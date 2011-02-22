@@ -1,0 +1,12 @@
+recursive-include PyTango *.py
+recursive-include PyTango3 *.py
+graft src
+graft doc
+graft build/sphinx/html
+
+global-exclude *.pyc
+exclude setup.cfg
+exclude .project
+exclude .pydevproject
+exclude images/*
+exclude src/precompiled_header.hpp.gch

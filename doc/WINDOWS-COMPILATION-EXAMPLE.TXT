@@ -1,0 +1,38 @@
+
+REM Set environment variables needed to compile
+
+set TANGO_ROOT=C:\Program Files\tango\win32_vc8\win32_dll
+set BOOST_ROOT=C:\Program Files\boost\boost_1_38
+set OMNI_ROOT=%TANGO_ROOT%
+set NUMPY_ROOT=C:\sicilia\Python25\Lib\site-packages\numpy\core\
+
+dir "%OMNI_ROOT%"\lib
+dir "%BOOST_ROOT%\lib"
+
+
+
+REM For some reason distutils is trying to locate Vs9 tools...
+REM And obviously it fails. We will fool him with this:
+
+set VS90COMNTOOLS=%VS80COMNTOOLS%
+
+REM compile :)
+setup.py -v build
+
+
+
+
+
+
+
+REM ------------------------------------
+
+REM to compile:
+setup.py -v build
+
+REM to create a MSI windows installer:
+setup.py bdist_msi
+
+REM to create a EXE windows installer:
+setup.py bdist_wininst
+
