@@ -40,6 +40,8 @@ import types
 import operator
 
 from _PyTango import StdStringVector, DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat
+from _PyTango import EventData, AttrConfEventData, DataReadyEventData
+from _PyTango import ApiUtil
 
 _scalar_int_types = (CmdArgType.DevShort, CmdArgType.DevUShort,
     CmdArgType.DevInt, CmdArgType.DevLong, CmdArgType.DevULong,
@@ -646,3 +648,139 @@ def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
     if num_retries == 0:
         print >>out, "Failed to export notification service event factory " \
                      "to TANGO database"
+
+
+class evt_cb(object):
+    """
+    Useful event callback for test purposes
+    
+    Usage::
+    
+        dev = PyTango.DeviceProxy(dev_name)
+        cb = PyTango.utils.evt_cb()
+        id = dev.subscribe_event("state", PyTango.EventType.CHANGE_EVENT, cb, [])
+    
+    Allowed format keys are:
+        
+        - date (event timestamp)
+        - reception_date (event reception timestamp)
+        - type (event type)
+        - dev_name (device name)
+        - name (attribute name)
+        - value (event value)
+        
+    New in PyTango 7.2.0
+    """
+
+    def __init__(self, format="{date} {dev_name} {name} {type} {value}",
+                 fd=sys.stdout, max_buf=100):
+        
+        self._msg = format
+        self._fd = fd
+        self._evts = []
+        self._max_buf = max_buf
+    
+    def push_event(self, evt):
+        try:
+            self._push_event(evt)
+        except Exception, e:
+            print >>self._fd, "Unexpected error in callback: %s" % str(e)
+    
+    def _push_event(self, evt):
+        self._append(evt)
+        d = { "date" : evt.get_date().todatetime(),
+              "reception_date" : evt.reception_date.todatetime(),
+              "type" : evt.event.upper(),
+              "dev_name" : evt.device.dev_name().upper(),
+              "name" : evt.attr_name.split("/")[-1].upper(),
+              "value" : self._get_value(evt) }
+        print >>self._fd, self._msg.format(**d)
+
+    def _append(self, evt):
+        evts = self._evts
+        if len(evts) == self._max_buf:
+            evts.pop(0)
+        evts.append(evt)
+        
+    def _get_value(self, evt):
+        if evt.err:
+            e = evt.errors[0]
+            return "[%s] %s" % (e.reason, e.desc)
+        
+        if isinstance(evt, EventData):
+            return "[%s] %s" %(evt.attr_value.quality, str(evt.attr_value.value))
+        elif isinstance(evt, AttrConfEventData):
+            cfg = evt.attr_conf
+            return "label='%s'; unit='%s'" % (cfg.label, cfg.unit)
+        elif isinstance(evt, DataReadyEventData):
+            return ""
+
+def get_home():
+    """
+    Find user's home directory if possible. Otherwise raise error.
+    
+    :return: user's home directory
+    :rtype: str
+    
+    New in PyTango 7.2.0
+    """
+    path=''
+    try:
+        path=os.path.expanduser("~")
+    except:
+        pass
+    if not os.path.isdir(path):
+        for evar in ('HOME', 'USERPROFILE', 'TMP'):
+            try:
+                path = os.environ[evar]
+                if os.path.isdir(path):
+                    break
+            except: pass
+    if path:
+        return path
+    else:
+        raise RuntimeError('please define environment variable $HOME')
+
+def _get_env_var(env_var_name):
+    """
+    Returns the value for the given environment name
+
+    Search order:
+
+        * a real environ var
+        * HOME/.tangorc
+        * /etc/tangorc
+        
+    :param env_var_name: the environment variable name
+    :type env_var_name: str
+    :return: the value for the given environment name
+    :rtype: str
+    
+    New in PyTango 7.2.0
+    """
+    
+    if env_var_name in os.environ:
+        return os.environ[env_var_name]
+    
+    fname = os.path.join(get_home(), '.tangorc')
+    if not os.path.exists(fname):
+        if os.name == 'posix':
+            fname = "/etc/tangorc"
+    if not os.path.exists(fname):
+        return None
+
+    for line in file(fname):
+        strippedline = line.split('#',1)[0].strip()
+        
+        if not strippedline:
+            #empty line
+            continue
+        
+        tup = strippedline.split('=',1)
+        if len(tup) !=2:
+            # illegal line!
+            continue
+        
+        key, val = map(str.strip, tup)
+        if key == env_var_name:
+            return val

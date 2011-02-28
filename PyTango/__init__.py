@@ -67,3 +67,4 @@ from device_class import *
 from globals import *
 from utils import *
 from tango_numpy import *
+from exception import *

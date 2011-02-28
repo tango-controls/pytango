@@ -25,14 +25,13 @@ import sys
 import errno
 import platform
 
-from ez_setup import use_setuptools
-use_setuptools()
+#from ez_setup import use_setuptools
+#use_setuptools()
+#from setuptools import setup
+#from setuptools import Extension, Distribution
+from distutils.core import setup, Extension
+from distutils.dist import Distribution
 
-from setuptools import setup
-from setuptools import Extension, Distribution
-
-#from distutils.core import setup, Extension
-#from distutils.dist import Distribution
 import distutils.sysconfig
 
 
@@ -270,8 +269,8 @@ _pytango = Extension(name               = '_PyTango',
                      depends            = []
                      )
 
-from setuptools import Command
-#from distutils.cmd import Command
+#from setuptools import Command
+from distutils.cmd import Command
 from distutils.command.build import build as dftbuild
 from distutils.command.build_ext import build_ext as dftbuild_ext
 from distutils.unixccompiler import UnixCCompiler

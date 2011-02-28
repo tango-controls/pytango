@@ -60,5 +60,34 @@ def __define_init():
         ret = ipython_00_10.init_ipython
     return ret
 
+def get_ipython_dir():
+    """Find the ipython local directory. Usually is <home>/.ipython"""
+    if hasattr(IPython.iplib, 'get_ipython_dir'):
+        # Starting from ipython 0.9 they hadded this method
+        return IPython.iplib.get_ipython_dir()
+    
+    # Try to find the profile in the current directory and then in the 
+    # default IPython dir
+    userdir = os.path.realpath(os.path.curdir)
+    home_dir = IPython.genutils.get_home_dir()
+    
+    if os.name == 'posix':
+        ipdir = '.ipython'
+    else:
+        ipdir = '_ipython'
+    ipdir = os.path.join(home_dir, ipdir)
+    ipythondir = os.path.abspath( os.environ.get('IPYTHONDIR', ipdir) )
+    return ipythondir
+
+def get_ipython_profiles():
+    """Helper functions to find ipython profiles"""
+    ret = []
+    ipydir = get_ipython_dir()
+    if os.path.isdir(ipydir):
+        for i in os.listdir(ipdir):
+            if i.startswith("ipy_profile_") and i.endswith(".py") and \
+                os.path.isfile(i):
+                ret.append(i[len("ipy_profile_"):s.rfind(".")])
+    return ret
+
 init_ipython = __define_init()
-#init_ipython(IPython.ipapi.get())

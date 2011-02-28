@@ -30,6 +30,7 @@ __docformat__ = "restructuredtext"
 
 import attribute_proxy
 import base_types
+import exception
 import callback
 import api_util
 import connection
@@ -57,6 +58,7 @@ def __init():
     global __DOC
     doc = __DOC
     base_types.init(doc=doc)
+    exception.init(doc=doc)
     callback.init(doc=doc)
     api_util.init(doc=doc)
     connection.init(doc=doc)

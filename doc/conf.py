@@ -233,6 +233,14 @@ latex_documents = [
 # If false, no module index is generated.
 #latex_use_modindex = True
 
+# -- Options for reference to other documentation ------------------------------
+
+intersphinx_mapping = {
+    'http://docs.python.org/dev': None,
+    'http://docs.scipy.org/doc/scipy/reference' : None,
+    'http://docs.scipy.org/doc/numpy' : None,
+}
+
 def copy_spaces(origin):
     r = ''
     for x in xrange(len(origin)):

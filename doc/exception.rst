@@ -90,15 +90,6 @@ Exception API
 .. autoclass:: PyTango.Except
    :show-inheritance:
    :members:
-    
-    .. staticmethod:: print_exception(exception)
-        
-        Prints the Tango exception on the standard output
-
-        :param exception: tango exception
-        :type exception: :class:`DevFailed`
-        :rtype: None
-
 
 .. autoclass:: PyTango.DevError
    :show-inheritance:

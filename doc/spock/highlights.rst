@@ -90,7 +90,7 @@ where the attribute resides is running.
     sys/tg_test/1/double_scalar        sys/tg_test/1/string_image_ro
     ...
 
-    Spock <homer:10000> [1]: short_scalar = Attribute("sys/tg_test/1/shost_scalar")
+    Spock <homer:10000> [1]: short_scalar = Attribute("sys/tg_test/1/short_scalar")
     
     Spock <homer:10000> [29]: print test.read()
     DeviceAttribute[
@@ -283,7 +283,7 @@ command.
     switchdb homer 10005
     switchdb homer
     
-    Spock <homer:10000> [2]: switchdb bart      # by default port is 10000
+    Spock <homer:10000> [2]: switchdb bart       # by default port is 10000
     
     Spock <bart:10000> [3]: switchdb lisa 10005  # you can use spaces between host and port
     
@@ -385,7 +385,7 @@ spock features will also be loaded.
 Adding spock to an existing customized profile
 ##############################################
 
-If you have been working with IPython_ before and have already have defined a
+If you have been working with IPython_ before and have already defined a
 customized personal profile, you can extend your profile with spock features 
 without breaking your existing options. The trick is to initialize spock extension
 with a parameter that tells spock to maintain the existing options (like colors,

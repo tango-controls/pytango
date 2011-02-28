@@ -30,10 +30,11 @@ __docformat__ = "restructuredtext"
 
 from _PyTango import ApiUtil
 
-from utils import document_method, document_static_method
+from utils import document_method, document_static_method, _get_env_var
 
 def __init_api_util():
-    pass
+    if not hasattr(ApiUtil, "get_env_var"):
+        ApiUtil.get_env_var = staticmethod(_get_env_var)
 
 def __doc_api_util():
     

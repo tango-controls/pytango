@@ -592,22 +592,6 @@ def __doc_base_types():
         New in PyTango 7.0.0
     """ )
 
-
-    Except.__doc__ = """
-    A containner for the static methods:
-        - throw_exception
-        - re_throw_exception
-        - print_exception
-        - compare_exception"""
-
-    DevError.__doc__ = """
-    Structure describing any error resulting from a command execution,
-    or an attribute query, with following members:
-        - reason : (str)
-        - severity : (ErrSeverity) error severty (WARN, ERR, PANIC)
-        - desc : (str) error description
-        - origin : (str) Tango server method in which the error happened"""
-
     TimeVal.__doc__ = """
     Time value structure with the following members
         - tv_sec : seconds

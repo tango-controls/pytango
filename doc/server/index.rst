@@ -831,8 +831,8 @@ called IRMiror and PLC::
         U.server_init()
         U.server_run()
 
-:Line 6: The Tango class PLC is registered in the device server
-:Line 7: The Tango class IRMirror is registered in the device server
+:Line 8: The Tango class PLC is registered in the device server
+:Line 9: The Tango class IRMirror is registered in the device server
 
 It is also possible to add C++ Tango class in a Python device server as soon as:
     1. The Tango class is in a shared library
@@ -861,8 +861,8 @@ device server than before but with one C++ Tango class called SerialLine::
         U.server_init()
         U.server_run()
 
-:Line 6: The C++ class is registered in the device server
-:Line 8 and 9: The two Python classes are registered in the device server
+:Line 9: The C++ class is registered in the device server
+:Line 10 and 11: The two Python classes are registered in the device server
 
 Server API
 ----------

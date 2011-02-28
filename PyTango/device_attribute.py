@@ -110,7 +110,6 @@ def __init_DeviceAttribute():
     DeviceAttribute.__init_orig = DeviceAttribute.__init__
     DeviceAttribute.__init__ = __DeviceAttribute__init
     DeviceAttribute.ExtractAs = ExtractAs
-    pass
 
 def init(doc=True):
     __init_DeviceAttribute()
