@@ -97,7 +97,7 @@ class EventProperties(object):
         self.per_event = PeriodicEventProp()
         self.arch_event = ArchiveEventProp()
 
-def __init_attr_config(attr_cfg):
+def _init_attr_config(attr_cfg):
     """Helper function to initialize attribute config objects"""
     attr_cfg.name = ''
     attr_cfg.writable = -1
@@ -121,7 +121,7 @@ class AttributeConfig(object):
     AttributeConfig."""
     
     def __init__(self):
-        __init_attr_config(self)
+        _init_attr_config(self)
         self.min_alarm = ''
         self.max_alarm = ''
         
@@ -130,7 +130,7 @@ class AttributeConfig_2(object):
     AttributeConfig_2."""
 
     def __init__(self):
-        __init_attr_config(self)
+        _init_attr_config(self)
         self.level = -1
         self.min_alarm = ''
         self.max_alarm = ''
@@ -140,7 +140,7 @@ class AttributeConfig_3(object):
     AttributeConfig_3."""
 
     def __init__(self):
-        __init_attr_config(self)
+        _init_attr_config(self)
         self.level = -1
         self.att_alarm = AttributeAlarm()
         self.event_prop = EventProperties()
@@ -999,6 +999,39 @@ def __doc_DeviceImpl():
         
         New in PyTango 7.1.2
     """ )
+
+    document_method("get_min_poll_period", """
+    get_min_poll_period(self) -> int
+
+            Returns the min poll period
+
+        Parameters : None
+        Return     : (int) the min poll period
+        
+        New in PyTango 7.2.0
+    """ )
+
+    document_method("get_cmd_min_poll_period", """
+    get_cmd_min_poll_period(self) -> seq<str>
+
+            Returns the min command poll period
+
+        Parameters : None
+        Return     : (seq<str>) the min command poll period
+        
+        New in PyTango 7.2.0
+    """ )
+
+    document_method("get_attr_min_poll_period", """
+    get_attr_min_poll_period(self) -> seq<str>
+
+            Returns the min attribute poll period
+
+        Parameters : None
+        Return     : (seq<str>) the min attribute poll period
+        
+        New in PyTango 7.2.0
+    """ )
     
 def __doc_extra_DeviceImpl(cls):
     def document_method(method_name, desc, append=True):
@@ -1854,6 +1887,29 @@ def __doc_Attr():
         Return     : (bool) true if a archive event criteria will be checked.
     """ )
 
+    document_method("set_data_ready_event", """
+    set_data_ready_event(self, implemented) -> None
+
+            Set a flag to indicate that the server fires data ready events.
+
+        Parameters :
+            - implemented : (bool) True when the server fires data ready events
+        Return     : None
+        
+        New in PyTango 7.2.0
+    """ )
+
+    document_method("is_data_ready_event", """
+    is_data_ready_event(self) -> bool
+
+            Check if the data ready event is fired for this attribute.
+
+        Parameters : None
+        Return     : (bool) true if firing data ready event is implemented.
+        
+        New in PyTango 7.2.0
+    """ )
+
     document_method("get_name", """
     get_name(self) -> str
 
@@ -1943,6 +1999,29 @@ def __doc_Attr():
 
         Parameters : None
         Return     : (bool) if it is assoc
+    """ )
+
+    document_method("get_cl_name", """
+    get_cl_name(self) -> str
+
+            Returns the class name
+
+        Parameters : None
+        Return     : (str) the class name
+        
+        New in PyTango 7.2.0
+    """ )
+
+    document_method("set_cl_name", """
+    set_cl_name(self, cl) -> None
+
+            Sets the class name
+
+        Parameters :
+            - cl : (str) new class name
+        Return     : None
+        
+        New in PyTango 7.2.0
     """ )
 
     document_method("get_class_properties", """

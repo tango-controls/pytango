@@ -27,11 +27,12 @@ import platform
 
 #from ez_setup import use_setuptools
 #use_setuptools()
+
 #from setuptools import setup
 #from setuptools import Extension, Distribution
+
 from distutils.core import setup, Extension
 from distutils.dist import Distribution
-
 import distutils.sysconfig
 
 
@@ -133,12 +134,23 @@ def uniquify(seq):
     [ no_dups.append(i) for i in seq if not no_dups.count(i) ]
     return no_dups
 
-include_dirs = [
-    os.path.abspath('src'),
-    os.path.join(TANGO_ROOT, 'include'),
+#-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+# include directories
+#-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+
+include_dirs = [ os.path.abspath('src') ]
+
+_tango_root_inc = os.path.join(TANGO_ROOT, 'include')
+include_dirs.append(_tango_root_inc)
+
+include_dirs.extend([
     os.path.join(OMNI_ROOT, 'include'),
     os.path.join(NUMPY_ROOT, 'include'),
-]
+])
+
+#-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+# library directories
+#-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
 libraries = [
         'tango',
@@ -237,7 +249,7 @@ else:
     # and then uncommenting this line. Someday maybe this will be
     # automated...
     extra_compile_args += [
-#        '-includesrc/precompiled_header.hpp',
+        '-includesrc/precompiled_header.hpp',
     ]
 
     #if not please_debug:

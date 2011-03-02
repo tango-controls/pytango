@@ -64,7 +64,7 @@ void CppDeviceClass::create_attribute(vector<Tango::Attr *> &att_list,
                                     const std::string &read_method_name,
                                     const std::string &write_method_name,
                                     const std::string &is_allowed_name,
-                                    Tango::UserDefaultAttrProp &att_prop)
+                                    Tango::UserDefaultAttrProp *att_prop)
 {
     //
     // Create the attribute objet according to attribute format
@@ -112,7 +112,9 @@ void CppDeviceClass::create_attribute(vector<Tango::Attr *> &att_list,
     py_attr_ptr->set_write_name(write_method_name);
     py_attr_ptr->set_allowed_name(is_allowed_name);
 
-    attr_ptr->set_default_properties(att_prop);
+    if (att_prop)
+        attr_ptr->set_default_properties(*att_prop);
+        
     attr_ptr->set_disp_level(display_level);
     if (memorized)
     {

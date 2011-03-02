@@ -925,7 +925,7 @@ def __doc_Database():
     document_method("get_access_except_errors", """
     get_access_except_errors(self) -> DevErrorList
 
-            Returns a reference to the conctrol access exceptions.
+            Returns a reference to the control access exceptions.
 
         Parameters : None
         Return     : DevErrorList
@@ -933,6 +933,31 @@ def __doc_Database():
         New in PyTango 7.0.0
     """ )
 
+    document_method("is_multi_tango_host", """
+    is_multi_tango_host(self) -> bool
+
+            Returns if in multi tango host.
+
+        Parameters : None
+        Return     : True if multi tango host or False otherwise
+
+        New in PyTango 7.2.0
+    """ )
+
+    document_method("get_file_name", """
+    get_file_name(self) -> str
+
+            Returns the database file name or throws an exception
+            if not using a file database
+
+        Parameters : None
+        Return     : a string containing the database file name
+
+        Throws     : DevFailed
+        
+        New in PyTango 7.2.0
+    """ )
+    
     document_method("get_info", """
     get_info(self) -> str
 

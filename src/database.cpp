@@ -23,7 +23,7 @@
 
 #include <boost/python.hpp>
 #include <boost/python/return_value_policy.hpp>
-#include <tango.h>
+#include <tango/tango.h>
 #include <string>
 
 #include "defs.h"
@@ -126,6 +126,11 @@ struct PyDatabase
         Tango::Connection *conn = static_cast<Tango::Connection *>(&self);
         return boost::python::str(conn->dev_name());
     }
+
+    //static inline boost::python::str get_file_name(Tango::Database& self)
+    //{
+    //    return boost::python::str(self.get_file_name());
+    //}
 };
 
 void export_database()
@@ -249,7 +254,12 @@ void export_database()
         .def("get_access_except_errors",
             &Tango::Database::get_access_except_errors,
             return_internal_reference<1>())
-
+        .def("is_multi_tango_host", &Tango::Database::is_multi_tango_host)
+        
+        //.def("get_file_name", &PyDatabase::get_file_name)
+        .def("get_file_name", &Tango::Database::get_file_name,
+            return_value_policy<copy_const_reference>())
+        
         //
         // General methods
         //

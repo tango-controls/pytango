@@ -449,7 +449,9 @@ class DeviceClass(_DeviceClass):
         else:
             memorized = False
 
-        att_prop = self.__create_user_default_attr_prop(attr_name, extra_info)
+        att_prop = None
+        if extra_info:
+            att_prop = self.__create_user_default_attr_prop(attr_name, extra_info)
 
         self._create_attribute(attr_list, attr_name, attr_type, attr_format,
                                attr_write, dim_x, dim_y,

@@ -1,7 +1,7 @@
 #include <boost/python.hpp>
 #include <boost/python/return_value_policy.hpp>
 #include <string>
-#include <tango.h>
+#include <tango/tango.h>
 
 #include "defs.h"
 #include "pytgutils.h"

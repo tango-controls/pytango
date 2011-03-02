@@ -2,7 +2,7 @@
 #define _DEVICE_CLASS_H_
 
 #include <boost/python.hpp>
-#include <tango.h>
+#include <tango/tango.h>
 
 class CppDeviceClass: public Tango::DeviceClass
 {
@@ -68,7 +68,7 @@ public:
                           const std::string &read_method_name,
                           const std::string &write_method_name,
                           const std::string &is_allowed_name,
-                          Tango::UserDefaultAttrProp &att_prop);
+                          Tango::UserDefaultAttrProp *att_prop);
 
     /**
      * Creates a command.

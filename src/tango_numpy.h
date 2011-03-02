@@ -37,7 +37,7 @@
 #      include <numpy/arrayobject.h>
 // - }
 
-#include <tgutils.h>
+#include "tgutils.h"
 
 /// @name Conversion from a Tango scalar type name to the numpy equivalent name
 /// @{

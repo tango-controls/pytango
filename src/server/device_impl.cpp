@@ -1,7 +1,7 @@
 #include <boost/python.hpp>
 #include <boost/python/return_value_policy.hpp>
 #include <string>
-#include <tango.h>
+#include <tango/tango.h>
 
 #include "defs.h"
 #include "pytgutils.h"
@@ -1232,8 +1232,16 @@ void export_device_impl()
         .def("__warn_stream", &PyDeviceImpl::warn)
         .def("__error_stream", &PyDeviceImpl::error)
         .def("__fatal_stream", &PyDeviceImpl::fatal)
+        
+        .def("get_min_poll_period", &Tango::DeviceImpl::get_min_poll_period)
+        .def("get_cmd_min_poll_period", 
+            &Tango::DeviceImpl::get_cmd_min_poll_period,
+            return_internal_reference<>())
+        .def("get_attr_min_poll_period", 
+            &Tango::DeviceImpl::get_attr_min_poll_period,
+            return_internal_reference<>())
     ;
-
+    
     class_<Tango::Device_2Impl, Device_2ImplWrap,
            bases<Tango::DeviceImpl>,
            boost::noncopyable>

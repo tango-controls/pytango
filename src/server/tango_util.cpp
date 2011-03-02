@@ -22,7 +22,7 @@
 *******************************************************************************/
 
 #include <boost/python.hpp>
-#include <tango.h>
+#include <tango/tango.h>
 #include <iostream>
 
 #include "defs.h"
@@ -35,7 +35,7 @@ using namespace boost::python;
 
 /// @todo GET RID OF THIS!! I HATE "HERE_OLD_TANGO___"
 #ifndef WIN32
-# define HERE_OLD_TANGO___
+//# define HERE_OLD_TANGO___
 #endif
 
 #ifdef HERE_OLD_TANGO___
@@ -60,9 +60,9 @@ namespace PyUtil
         for(int i = 0; i < cl_len; ++i)
         {
             tuple class_info = extract<tuple>(cpp_class_list[i]);
-            char *class_name = extract<char *>(class_info[0]);
-            char *par_name   = extract<char *>(class_info[1]);
-            dserver->create_cpp_class(class_name, par_name);
+            const char *class_name = extract<const char *>(class_info[0]);
+            const char *par_name   = extract<const char *>(class_info[1]);
+            dserver->_create_cpp_class(class_name, par_name);
         }
 
     //
@@ -78,7 +78,7 @@ namespace PyUtil
         for(int i = 0; i < cc_len; ++i)
         {
             CppDeviceClass *cpp_dc = extract<CppDeviceClass *> (constructed_classes[i])();
-            dserver->add_class(cpp_dc);
+            dserver->_add_class(cpp_dc);
         }
     }
 
@@ -94,7 +94,8 @@ namespace PyUtil
     void server_init(Tango::Util & instance, bool with_window = false)
     {
         AutoPythonAllowThreads guard;
-        instance.set_class_factory_cb(_class_factory);
+        Tango::DServer::register_class_factory(_class_factory);
+        //instance.set_class_factory_cb(_class_factory);
         instance.server_init(with_window);
     }
 #endif

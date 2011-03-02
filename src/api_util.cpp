@@ -23,11 +23,24 @@
 
 #include <boost/python.hpp>
 #include <boost/python/return_value_policy.hpp>
-#include <tango.h>
+#include <tango/tango.h>
 
 #include "pyutils.h"
 
 using namespace boost::python;
+
+namespace PyApiUtil
+{
+    inline object get_env_var(const char *name)
+    {
+        std::string value;
+        if (Tango::ApiUtil::get_env_var(name, value) == 0)
+        {
+            return str(value);
+        }
+        return object();
+    }
+};
 
 void (Tango::ApiUtil::*get_asynch_replies1)() = &Tango::ApiUtil::get_asynch_replies;
 void (Tango::ApiUtil::*get_asynch_replies2)(long) = &Tango::ApiUtil::get_asynch_replies;
@@ -50,5 +63,12 @@ void export_api_util()
         
         .def("set_asynch_cb_sub_model", &Tango::ApiUtil::set_asynch_cb_sub_model)
         .def("get_asynch_cb_sub_model", &Tango::ApiUtil::get_asynch_cb_sub_model)
+        
+        .def("get_env_var", &PyApiUtil::get_env_var)
+        .staticmethod("get_env_var")
+        
+        .def("is_event_consumer_created", &Tango::ApiUtil::is_event_consumer_created)
+        .def("get_user_connect_timeout", &Tango::ApiUtil::get_user_connect_timeout)
+        
     ;
 }
