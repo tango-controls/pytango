@@ -142,6 +142,9 @@ include_dirs = [ os.path.abspath('src') ]
 
 _tango_root_inc = os.path.join(TANGO_ROOT, 'include')
 include_dirs.append(_tango_root_inc)
+_tango_root_inc = os.path.join(_tango_root_inc, 'tango')
+if os.path.isdir(_tango_root_inc):
+    include_dirs.append(_tango_root_inc)
 
 include_dirs.extend([
     os.path.join(OMNI_ROOT, 'include'),

@@ -27,6 +27,18 @@ namespace PyAttribute
 
     void set_value_date_quality(Tango::Attribute &, boost::python::object &,
                                 double, Tango::AttrQuality , long, long);
+                                
+    boost::python::object get_properties(Tango::Attribute &,
+                                         boost::python::object &);
+
+    boost::python::object get_properties_2(Tango::Attribute &,
+                                           boost::python::object &);
+
+    boost::python::object get_properties_3(Tango::Attribute &,
+                                           boost::python::object &);
+
+    boost::python::object set_properties(Tango::Attribute &,
+                                         boost::python::object &);
 };
 
 

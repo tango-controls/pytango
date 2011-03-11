@@ -28,7 +28,11 @@ __all__ = []
             
 __docformat__ = "restructuredtext"
 
-import operator, types
+import sys
+import operator
+import types
+import threading
+import traceback
 
 from _PyTango import StdStringVector
 from _PyTango import DbData, DbDatum
@@ -687,6 +691,7 @@ def __DeviceProxy__subscribe_event ( self, attr_name, event_type, cb_or_queuesiz
             All other parameters are similar to the descriptions given in the
             other subscribe_event() version.
     """
+    
     if callable(cb_or_queuesize):
         cb = __CallBackPushEvent()
         cb.push_event = cb_or_queuesize

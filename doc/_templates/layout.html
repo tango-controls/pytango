@@ -1,4 +1,20 @@
-{% extends "sphinxdoc/layout.html" %}
+{% extends "!layout.html" %}
+
+{% block extrahead %}
+    <script src="{{ pathto('_static/js/jquery.min.js',1) }}"></script> 
+    <script src="{{ pathto('_static/js/jquery.mousewheel.min.js',1) }}"></script> 
+    <script src="{{ pathto('_static/js/jquery.terminal.min.js',1) }}"></script> 
+    <link href="{{ pathto('_static/css/jquery.terminal.css',1) }}" rel="stylesheet"/> 
+    
+    <link href="{{ pathto('_static/css/start/jquery-ui-1.8.10.custom.css',1) }}" rel="stylesheet"/> 
+    <link href="{{ pathto('_static/css/pytango.css',1) }}" rel="stylesheet"/> 
+    <link href="{{ pathto('_static/css/pytango_terminal.css',1) }}" rel="stylesheet"/> 
+    <script src="{{ pathto('_static/js/jquery-ui-1.8.10.custom.min.js',1) }}"></script> 
+    
+    <script src="{{ pathto('_static/js/dterm.js',1) }}"></script> 
+    <script src="{{ pathto('_static/js/pytango.js',1) }}"></script> 
+
+{% endblock %}
 
 {% block rootrellink %}
     <li><a href="{{ pathto('index') }}">home</a>|&nbsp;</li>
@@ -8,3 +24,6 @@
 {% endblock %}
 
 
+{% block relbaritems %}
+    <li>::&nbsp;<a id="open_terminal" href="">open terminal</a>&nbsp;::<div id="dialog"/></li>
+{% endblock %}

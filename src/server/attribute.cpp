@@ -361,6 +361,111 @@ namespace PyAttribute
                                        double t, Tango::AttrQuality quality,
                                        long x, long y)
     { __set_value("set_value_date_quality", att, value, &x, &y, t, &quality); }
+    
+    inline boost::python::object get_properties(Tango::Attribute &att,
+                                                boost::python::object &attr_cfg)
+    {
+        Tango::AttributeConfig tg_attr_cfg;
+        att.get_properties(tg_attr_cfg);
+        attr_cfg.attr("writable") = tg_attr_cfg.writable;
+        attr_cfg.attr("data_format") = tg_attr_cfg.data_format;
+        attr_cfg.attr("max_dim_x") = tg_attr_cfg.max_dim_x;
+        attr_cfg.attr("max_dim_y") = tg_attr_cfg.max_dim_y;
+        attr_cfg.attr("data_type") = tg_attr_cfg.data_type;
+        attr_cfg.attr("name") = tg_attr_cfg.name;
+        attr_cfg.attr("label") = tg_attr_cfg.label;
+        attr_cfg.attr("description") = tg_attr_cfg.description;
+        attr_cfg.attr("unit") = tg_attr_cfg.unit;
+        attr_cfg.attr("standard_unit") = tg_attr_cfg.standard_unit;
+        attr_cfg.attr("display_unit") = tg_attr_cfg.display_unit;
+        attr_cfg.attr("format") = tg_attr_cfg.format;
+        attr_cfg.attr("writable_attr_name") = tg_attr_cfg.writable_attr_name;
+        attr_cfg.attr("min_alarm") = tg_attr_cfg.min_alarm;
+        attr_cfg.attr("max_alarm") = tg_attr_cfg.max_alarm;
+        attr_cfg.attr("min_value") = tg_attr_cfg.min_value;
+        attr_cfg.attr("max_value") = tg_attr_cfg.max_value;
+        
+        return attr_cfg;
+    }
+    
+    inline boost::python::object get_properties_2(Tango::Attribute &att,
+                                                  boost::python::object &attr_cfg)
+    {
+        Tango::AttributeConfig_2 tg_attr_cfg;
+        att.get_properties_2(tg_attr_cfg);
+        attr_cfg.attr("writable") = tg_attr_cfg.writable;
+        attr_cfg.attr("data_format") = tg_attr_cfg.data_format;
+        attr_cfg.attr("max_dim_x") = tg_attr_cfg.max_dim_x;
+        attr_cfg.attr("max_dim_y") = tg_attr_cfg.max_dim_y;
+        attr_cfg.attr("data_type") = tg_attr_cfg.data_type;
+        attr_cfg.attr("name") = tg_attr_cfg.name;
+        attr_cfg.attr("label") = tg_attr_cfg.label;
+        attr_cfg.attr("description") = tg_attr_cfg.description;
+        attr_cfg.attr("unit") = tg_attr_cfg.unit;
+        attr_cfg.attr("standard_unit") = tg_attr_cfg.standard_unit;
+        attr_cfg.attr("display_unit") = tg_attr_cfg.display_unit;
+        attr_cfg.attr("format") = tg_attr_cfg.format;
+        attr_cfg.attr("writable_attr_name") = tg_attr_cfg.writable_attr_name;
+        attr_cfg.attr("min_alarm") = tg_attr_cfg.min_alarm;
+        attr_cfg.attr("max_alarm") = tg_attr_cfg.max_alarm;
+        attr_cfg.attr("min_value") = tg_attr_cfg.min_value;
+        attr_cfg.attr("max_value") = tg_attr_cfg.max_value;
+        attr_cfg.attr("level") = tg_attr_cfg.level;
+        
+        return attr_cfg;
+    }
+
+    inline boost::python::object get_properties_3(Tango::Attribute &att,
+                                                  boost::python::object &attr_cfg)
+    {
+        Tango::AttributeConfig_3 tg_attr_cfg;
+        att.get_properties_3(tg_attr_cfg);
+        attr_cfg.attr("writable") = tg_attr_cfg.writable;
+        attr_cfg.attr("data_format") = tg_attr_cfg.data_format;
+        attr_cfg.attr("max_dim_x") = tg_attr_cfg.max_dim_x;
+        attr_cfg.attr("max_dim_y") = tg_attr_cfg.max_dim_y;
+        attr_cfg.attr("data_type") = tg_attr_cfg.data_type;
+        attr_cfg.attr("name") = tg_attr_cfg.name;
+        attr_cfg.attr("label") = tg_attr_cfg.label;
+        attr_cfg.attr("description") = tg_attr_cfg.description;
+        attr_cfg.attr("unit") = tg_attr_cfg.unit;
+        attr_cfg.attr("standard_unit") = tg_attr_cfg.standard_unit;
+        attr_cfg.attr("display_unit") = tg_attr_cfg.display_unit;
+        attr_cfg.attr("format") = tg_attr_cfg.format;
+        attr_cfg.attr("writable_attr_name") = tg_attr_cfg.writable_attr_name;
+        attr_cfg.attr("min_value") = tg_attr_cfg.min_value;
+        attr_cfg.attr("max_value") = tg_attr_cfg.max_value;
+        attr_cfg.attr("level") = tg_attr_cfg.level;
+
+        // Copy alarm properties
+        object att_alarm = attr_cfg.attr("att_alarm");
+        att_alarm.attr("min_alarm") = tg_attr_cfg.att_alarm.min_alarm;
+        att_alarm.attr("max_alarm") = tg_attr_cfg.att_alarm.max_alarm;
+        att_alarm.attr("min_warning") = tg_attr_cfg.att_alarm.min_warning;
+        att_alarm.attr("max_warning") = tg_attr_cfg.att_alarm.max_warning;
+        att_alarm.attr("delta_t") = tg_attr_cfg.att_alarm.delta_t;
+        att_alarm.attr("delta_val") = tg_attr_cfg.att_alarm.delta_val;
+        
+        object event_prop = attr_cfg.attr("event_prop");
+        
+        // Copy periodic event property
+        object per_event = event_prop.attr("per_event");
+        per_event.attr("period") = tg_attr_cfg.event_prop.per_event.period;
+        
+        // Copy change event properties
+        object ch_event = event_prop.attr("ch_event");
+        ch_event.attr("rel_change") = tg_attr_cfg.event_prop.ch_event.rel_change;
+        ch_event.attr("abs_change") = tg_attr_cfg.event_prop.ch_event.abs_change;
+        
+        // Copy archive event properties
+        object arch_event = event_prop.attr("arch_event");
+        arch_event.attr("rel_change") = tg_attr_cfg.event_prop.arch_event.rel_change;
+        arch_event.attr("abs_change") = tg_attr_cfg.event_prop.arch_event.abs_change;
+        arch_event.attr("period") = tg_attr_cfg.event_prop.arch_event.period;
+        arch_event.attr("period") = tg_attr_cfg.event_prop.arch_event.period;
+        
+        return attr_cfg;
+    }
 };
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_quality_overloads,
@@ -457,5 +562,11 @@ void export_attribute()
         .def("is_archive_event", &Tango::Attribute::is_archive_event)
         .def("is_check_archive_criteria", &Tango::Attribute::is_check_archive_criteria)
         .def("remove_configuration", &Tango::Attribute::remove_configuration)
+        
+        .def("_get_properties", &PyAttribute::get_properties)
+        .def("_get_properties_2", &PyAttribute::get_properties_2)
+        .def("_get_properties_3", &PyAttribute::get_properties_3)
+
+        
     ;
 }
