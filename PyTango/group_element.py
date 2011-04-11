@@ -153,8 +153,6 @@ def __doc_GroupElement():
         Throws     : TypeError, ArgumentError
     """ )
 
-
-
     document_method("remove", """
     remove(self, patterns, forward=True) -> None
         
@@ -328,7 +326,7 @@ def __doc_GroupElement():
                             only applied to the local set of devices.
                 
         Return     : (bool) This method returns true if all devices in
-        the group are alive, false otherwise.
+                     the group are alive, false otherwise.
         
         Throws     : 
     """ )

@@ -1,5 +1,5 @@
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 
 #include "defs.h"
 #include "pytgutils.h"

@@ -148,7 +148,7 @@ class AttributeConfig_3(object):
         self.sys_extensions = []
 
 def __Attribute__get_properties(self, attr_cfg = None):
-    """get_properties(self, attr_cfg = None) -> None
+    """get_properties(self, attr_cfg = None) -> AttributeConfig
 
                 Get attribute properties.
 
@@ -161,7 +161,7 @@ def __Attribute__get_properties(self, attr_cfg = None):
             Return     : (AttributeConfig) the config object filled with
                          attribute configuration information
 
-            New in PyTango 7.2.0
+            New in PyTango 7.1.4
     """
 
     if attr_cfg is None:
@@ -169,7 +169,7 @@ def __Attribute__get_properties(self, attr_cfg = None):
     return self._get_properties(attr_cfg)
 
 def __Attribute__get_properties_2(self, attr_cfg = None):
-    """get_properties_2(self, attr_cfg = None) -> None
+    """get_properties_2(self, attr_cfg = None) -> AttributeConfig_2
 
                 Get attribute properties.
 
@@ -182,7 +182,7 @@ def __Attribute__get_properties_2(self, attr_cfg = None):
             Return     : (AttributeConfig_2) the config object filled with
                          attribute configuration information
 
-            New in PyTango 7.2.0
+            New in PyTango 7.1.4
     """
 
     if attr_cfg is None:
@@ -190,7 +190,7 @@ def __Attribute__get_properties_2(self, attr_cfg = None):
     return self._get_properties_2(attr_cfg)
 
 def __Attribute__get_properties_3(self, attr_cfg = None):
-    """get_properties_3(self, attr_cfg = None) -> None
+    """get_properties_3(self, attr_cfg = None) -> AttributeConfig_3
 
                 Get attribute properties.
 
@@ -203,12 +203,33 @@ def __Attribute__get_properties_3(self, attr_cfg = None):
             Return     : (AttributeConfig_3) the config object filled with
                          attribute configuration information
 
-            New in PyTango 7.2.0
+            New in PyTango 7.1.4
     """
 
     if attr_cfg is None:
-        attr_cfg = AttributeConfig_2()
-    return self._get_properties_2(attr_cfg)
+        attr_cfg = AttributeConfig_3()
+    return self._get_properties_3(attr_cfg)
+
+def __Attribute__set_properties(self, attr_cfg, dev):
+    """set_properties(self, attr_cfg, dev) -> None
+
+                Set attribute properties.
+
+                This method sets the attribute properties value with the content
+                of the fileds in the AttributeConfig/ AttributeConfig_3 object
+
+            Parameters :
+                - conf : (AttributeConfig or AttributeConfig_3) the config 
+                         object.
+                - dev : (DeviceImpl) the device
+
+            New in PyTango 7.1.4
+    """
+    if isinstance(attr_cfg, AttributeConfig_3):
+        self._set_properties_3(attr_cfg, dev)
+    else:
+        self._set_properties(attr_cfg, dev)
+
 
 def __DeviceImpl__get_device_class(self):
     try:
@@ -586,6 +607,7 @@ def __init_Attribute():
     Attribute.get_properties = __Attribute__get_properties
     Attribute.get_properties_2 = __Attribute__get_properties_2
     Attribute.get_properties_3 = __Attribute__get_properties_3
+    Attribute.set_properties = __Attribute__set_properties
     
 def __init_Logger():
     Logger.log = __Logger__log
@@ -1067,39 +1089,6 @@ def __doc_DeviceImpl():
         New in PyTango 7.1.2
     """ )
 
-    document_method("get_min_poll_period", """
-    get_min_poll_period(self) -> int
-
-            Returns the min poll period
-
-        Parameters : None
-        Return     : (int) the min poll period
-        
-        New in PyTango 7.2.0
-    """ )
-
-    document_method("get_cmd_min_poll_period", """
-    get_cmd_min_poll_period(self) -> seq<str>
-
-            Returns the min command poll period
-
-        Parameters : None
-        Return     : (seq<str>) the min command poll period
-        
-        New in PyTango 7.2.0
-    """ )
-
-    document_method("get_attr_min_poll_period", """
-    get_attr_min_poll_period(self) -> seq<str>
-
-            Returns the min attribute poll period
-
-        Parameters : None
-        Return     : (seq<str>) the min attribute poll period
-        
-        New in PyTango 7.2.0
-    """ )
-    
 def __doc_extra_DeviceImpl(cls):
     def document_method(method_name, desc, append=True):
         return __document_method(cls, method_name, desc, append)
@@ -1954,29 +1943,6 @@ def __doc_Attr():
         Return     : (bool) true if a archive event criteria will be checked.
     """ )
 
-    document_method("set_data_ready_event", """
-    set_data_ready_event(self, implemented) -> None
-
-            Set a flag to indicate that the server fires data ready events.
-
-        Parameters :
-            - implemented : (bool) True when the server fires data ready events
-        Return     : None
-        
-        New in PyTango 7.2.0
-    """ )
-
-    document_method("is_data_ready_event", """
-    is_data_ready_event(self) -> bool
-
-            Check if the data ready event is fired for this attribute.
-
-        Parameters : None
-        Return     : (bool) true if firing data ready event is implemented.
-        
-        New in PyTango 7.2.0
-    """ )
-
     document_method("get_name", """
     get_name(self) -> str
 
@@ -2066,29 +2032,6 @@ def __doc_Attr():
 
         Parameters : None
         Return     : (bool) if it is assoc
-    """ )
-
-    document_method("get_cl_name", """
-    get_cl_name(self) -> str
-
-            Returns the class name
-
-        Parameters : None
-        Return     : (str) the class name
-        
-        New in PyTango 7.2.0
-    """ )
-
-    document_method("set_cl_name", """
-    set_cl_name(self, cl) -> None
-
-            Sets the class name
-
-        Parameters :
-            - cl : (str) new class name
-        Return     : None
-        
-        New in PyTango 7.2.0
     """ )
 
     document_method("get_class_properties", """

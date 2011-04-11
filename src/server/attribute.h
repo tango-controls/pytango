@@ -2,7 +2,7 @@
 #define _ATTRIBUTE_H_
 
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 
 namespace PyAttribute
 {
@@ -37,8 +37,11 @@ namespace PyAttribute
     boost::python::object get_properties_3(Tango::Attribute &,
                                            boost::python::object &);
 
-    boost::python::object set_properties(Tango::Attribute &,
-                                         boost::python::object &);
+    void set_properties(Tango::Attribute &, boost::python::object &,
+                        boost::python::object &);
+    
+    void set_properties_3(Tango::Attribute &, boost::python::object &,
+                          boost::python::object &);
 };
 
 

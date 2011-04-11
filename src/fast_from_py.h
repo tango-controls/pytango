@@ -209,22 +209,14 @@ struct array_element_from_py<Tango::DEVVAR_CHARARRAY>
         convert(o.ptr(), tg);
     }
 
+#ifdef DISABLE_PYTANGO_NUMPY
     static inline void convert(PyObject *o, TangoScalarType &tg)
     {
         long cpy_value = PyLong_AsLong(o);
         if(PyErr_Occurred()) {
-            if(PyArray_CheckScalar(o) &&
-            ( PyArray_DescrFromScalar(o)
-                == PyArray_DescrFromType(TANGO_const2scalarnumpy(tangoArrayTypeConst))))
-            {
-                PyArray_ScalarAsCtype(o, reinterpret_cast<void*>(&tg));
-                return;
-            } else
-                PyErr_SetString(PyExc_TypeError, "Expecting a numeric type,"
-                    " but it is not. If you use a numpy type instead of"
-                    " python core types, then it must exactly match (ex:"
-                    " numpy.int32 for PyTango.DevLong)");
-                boost::python::throw_error_already_set(); 
+            PyErr_SetString(PyExc_TypeError, "Expecting a numeric type,"
+                " but it is not");
+            boost::python::throw_error_already_set(); 
         }
         if (TangoScalarTypeLimits::is_integer) {
             if (cpy_value > TangoScalarTypeLimits::max()) {
@@ -238,6 +230,39 @@ struct array_element_from_py<Tango::DEVVAR_CHARARRAY>
         }
         tg = static_cast<TangoScalarType>(cpy_value);
     }
+#else
+    static inline void convert(PyObject *o, TangoScalarType &tg)
+    {
+        long cpy_value = PyLong_AsLong(o);
+        if(PyErr_Occurred()) {
+            if(PyArray_CheckScalar(o) &&
+            ( PyArray_DescrFromScalar(o)
+                == PyArray_DescrFromType(TANGO_const2scalarnumpy(tangoArrayTypeConst))))
+            {
+                PyArray_ScalarAsCtype(o, reinterpret_cast<void*>(&tg));
+                return;
+            } else {
+                PyErr_SetString(PyExc_TypeError, "Expecting a numeric type,"
+                    " but it is not. If you use a numpy type instead of"
+                    " python core types, then it must exactly match (ex:"
+                    " numpy.int32 for PyTango.DevLong)");
+                boost::python::throw_error_already_set();
+            }
+        }
+        if (TangoScalarTypeLimits::is_integer) {
+            if (cpy_value > TangoScalarTypeLimits::max()) {
+                PyErr_SetString(PyExc_OverflowError, "Value is too large.");
+                boost::python::throw_error_already_set();
+            }
+            if (cpy_value < TangoScalarTypeLimits::min()) {
+                PyErr_SetString(PyExc_OverflowError, "Value is too small.");
+                boost::python::throw_error_already_set();
+            }
+        }
+        tg = static_cast<TangoScalarType>(cpy_value);
+    }
+#endif // DISABLE_PYTANGO_NUMPY
+
 };
 
 

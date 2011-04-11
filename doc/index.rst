@@ -13,18 +13,14 @@ Welcome to PyTango 7.1 documentation!
 
 .. sidebar:: Latest news
 
+    2011-04-08:
+        PyTango 7.1.4 is out!
+
     2010-11-05:
         PyTango 7.1.3 is out!
 
     2010-08-19:
         :ref:`Tango logging <logging>` updated
-
-    2010-08-06:
-        PyTango 7.1.2 is out!
-
-    2010-08-02:
-          Checkout the new PyTango companion: 
-          :ref:`spock` (an IPython_ based tango CLI)
 
 PyTango is a python module that exposes to Python_ the complete Tango_ C++ API.
 This includes both client and server API.

@@ -4,15 +4,18 @@
 .. highlight:: python
    :linenothreshold: 3
    
+.. _server:
+   
 The Tango Device Server Python API
 ==================================
 
-This chapter does not explain what a Tango device or a device server is. 
-This is explained in details in "The Tango control system manual" available at 
+This chapter does not explain what a Tango device or a device server is.
+This is explained in details in "The Tango control system manual" available at
 http://www.tango-controls.org/TangoKernel.
-The device server we will detailed in the following example is a Tango device 
-server with one Tango class called PyDsExp. This class has two commands called 
-IOLong and IOStringArray and two attributes called Long_attr and Short_attr_rw.
+The device server described in the following example is a Tango device server
+with one Tango class called *PyDsExp*. This class has two commands called
+*IOLong* and *IOStringArray* and two attributes called *Long_attr* and
+*Short_attr_rw*.
 
 Importing python modules
 ------------------------
@@ -21,7 +24,7 @@ To write a Python script which is a Tango device server, you need to import
 two modules which are:
 
 1. The :mod:`PyTango` module which is the Python to C++ interface
-2. The Python classical sys module
+2. The Python classical :mod:`sys` module
 
 This could be done with code like (supposing the PYTHONPATH environment variable
 is correctly set)::
@@ -33,8 +36,11 @@ The main part of a Python device server
 ---------------------------------------
 
 The rule of this part of a Tango device server is to:
-    - Create the :class:`Util` object passing it the Python interpreter command line arguments
-    - Add to this object the list of Tango class(es) which have to be hosted by this interpreter
+
+    - Create the :class:`Util` object passing it the Python interpreter command
+      line arguments
+    - Add to this object the list of Tango class(es) which have to be hosted by
+      this interpreter
     - Initialize the device server
     - Run the device server loop
 
@@ -42,7 +48,6 @@ The following is a typical code for this main function::
 
     if __name__ == '__main__':
         util = PyTango.Util(sys.argv)
-        #Deprecated : util.add_TgClass(PyDsExpClass, PyDsExp, 'PyDsExp')
         util.add_class(PyDsExpClass, PyDsExp)
         
         U = PyTango.Util.instance()
@@ -51,7 +56,7 @@ The following is a typical code for this main function::
 
 **Line 2**
     Create the Util object passing it the interpreter command line arguments
-**Line 4**
+**Line 3**
     Add the Tango class *PyDsExp* to the device server. The :meth:`Util.add_class`
     method of the Util class has two arguments which are the Tango class 
     PyDsExpClass instance and the Tango PyDsExp instance.
@@ -67,9 +72,11 @@ The PyDsExpClass class in Python
 --------------------------------
 
 The rule of this class is to :
-- Host and manage data you have only once for the Tango class whatever devices of this class will be created
-- Define Tango class command(s)
-- Define Tango class attribute(s)
+
+    - Host and manage data you have only once for the Tango class whatever
+      devices of this class will be created
+    - Define Tango class command(s)
+    - Define Tango class attribute(s)
 
 In our example, the code of this Python class looks like::
 
@@ -94,15 +101,16 @@ In our example, the code of this Python class looks like::
         
 
 **Line 1** 
-    The PyDsExpClass class has to inherit from the PyTango.PyDeviceClass class
+    The PyDsExpClass class has to inherit from the :class:`DeviceClass` class
     
 **Line 3 to 7**
-    Definition of the cmd_list dictionnary defining commands. The IOLong command 
-    is defined at lines 3 and 4. The IOStringArray command is defined in line 5 and 6
-**Line 10 to 16**
-    Definition of the attr_list dictionnary defining attributes. The Long_attr 
-    attribute is defined at lines 8 to 11 and the Short_attr_rw attribute is 
-    defined at lines 13 to 15
+    Definition of the cmd_list :class:`dict` defining commands. The *IOLong* command 
+    is defined at lines 3 and 4. The *IOStringArray* command is defined in 
+    lines 5 and 6
+**Line 9 to 17**
+    Definition of the attr_list :class:`dict` defining attributes. The *Long_attr*
+    attribute is defined at lines 9 to 12 and the *Short_attr_rw* attribute is 
+    defined at lines 14 to 16
     
 If you have something specific to do in the class constructor like
 initializing some specific data member, you will have to code a class 
@@ -117,19 +125,22 @@ The device type is set at line 3.
 Defining commands
 -----------------
 
-As shown in the previous example, commands have to be defined in a dictionary called *cmd_list* as a data
-member of the xxxClass class of the Tango class. This dictionary has one element per command. The element
-key is the command name. The element value is a Python list which defines the command. The generic form
-of a command definition is:
+As shown in the previous example, commands have to be defined in a :class:`dict`
+called *cmd_list* as a data member of the xxxClass class of the Tango class.
+This :class:`dict` has one element per command. The element key is the command
+name. The element value is a python list which defines the command. The generic
+form of a command definition is:
     
     ``'cmd_name' : [ [in_type, <"In desc">], [out_type, <"Out desc">], <{opt parameters}>]``
 
-The first element of the value list is itself a list with the command input data type (one of the PyTango.ArgType
-pseudo enumeration value) and optionally a string describing this input argument. The second element of the
-value list is also a list with the command output data type (one of the PyTango.ArgType pseudo enumeration
-value) and optionally a string describing it.        These two elements are mandatory.   The third list element is
-optional and allows additional command definition. The authorized element for this dictionary are summarized
-in the following array:
+The first element of the value list is itself a list with the command input
+data type (one of the :class:`PyTango.ArgType` pseudo enumeration value) and
+optionally a string describing this input argument. The second element of the
+value list is also a list with the command output data type (one of the
+:class:`PyTango.ArgType` pseudo enumeration value) and optionaly a string
+describing it. These two elements are mandatory. The third list element is
+optional and allows additional command definition. The authorized element for
+this :class:`dict` are summarized in the following array:
 
     +-------------------+----------------------+------------------------------------------+
     |      key          |        Value         |             Definition                   |
@@ -144,11 +155,12 @@ in the following array:
 Defining attributes
 -------------------
 
-                                                                                         
-As shown in the previous example, attributes have to be defined in a dictionary called **attr_list** as a data
-member of the xxxClass class of the Tango class. This dictionary has one element per attribute. The element
-key is the attribute name. The element value is a Python list which defines the attribute. The generic form of
-an attribute definition is:
+As shown in the previous example, attributes have to be defined in a :class:`dict`
+called **attr_list** as a data
+member of the xxxClass class of the Tango class. This :class:`dict` has one element
+per attribute. The element key is the attribute name. The element value is a
+python :class:`list` which defines the attribute. The generic form of an 
+attribute definition is:
 
     ``'attr_name' : [ [mandatory parameters], <{opt parameters}>]``
 
@@ -156,50 +168,53 @@ For any kind of attributes, the mandatory parameters are:
 
     ``[attr data type, attr data format, attr data R/W type]``
     
-The attribute data type is one of the possible value for attributes of the PyTango.ArgType pseudo enunmeration.
-The attribute data format is one of the possible value of the PyTango.AttrDataFormat pseudo enumeration and
-the attribute R/W type is one of the possible value of the PyTango.AttrWriteType pseudo enumeration. For
-spectrum attribute, you have to add the maximum X size (a number). For image attribute, you have to add
-the maximun X and Y dimension (two numbers). The authorized elements for the dictionnary defining optional
-parameters are summarized in the following array
+The attribute data type is one of the possible value for attributes of the
+:class:`PyTango.ArgType` pseudo enunmeration. The attribute data format is one
+of the possible value of the :class:`PyTango.AttrDataFormat` pseudo enumeration
+and the attribute R/W type is one of the possible value of the
+:class:`PyTango.AttrWriteType` pseudo enumeration. For spectrum attribute,
+you have to add the maximum X size (a number). For image attribute, you have
+to add the maximun X and Y dimension (two numbers). The authorized elements for
+the :class:`dict` defining optional parameters are summarized in the following
+array:
 
-+-------------------+-----------------------------------+------------------------------------------+
-|       key         |              value                |            definition                    |
-+===================+===================================+==========================================+
-| "display level"   | PyTango.DispLevel enum value      |   The attribute display level            |
-+-------------------+-----------------------------------+------------------------------------------+
-|"polling period"   |          Any number               | The attribute polling period (mS)        |
-+-------------------+-----------------------------------+------------------------------------------+
-|  "memorized"      | True or True_without_hard_applied | Define if and how the att. is memorized  |
-+-------------------+-----------------------------------+------------------------------------------+
-|     "label"       |            A string               |       The attribute label                |
-+-------------------+-----------------------------------+------------------------------------------+
-|  "description"    |            A string               |   The attribute description              |
-+-------------------+-----------------------------------+------------------------------------------+
-|     "unit"        |            A string               |       The attribute unit                 |
-+-------------------+-----------------------------------+------------------------------------------+
-|"standard unit"    |           A number                |  The attribute standard unit             |
-+-------------------+-----------------------------------+------------------------------------------+
-| "display unit"    |            A string               |   The attribute display unit             |
-+-------------------+-----------------------------------+------------------------------------------+
-|    "format"       |            A string               | The attribute display format             |
-+-------------------+-----------------------------------+------------------------------------------+
-|  "max value"      |          A number                 |   The attribute max value                |
-+-------------------+-----------------------------------+------------------------------------------+
-|   "min value"     |           A number                |    The attribute min value               |
-+-------------------+-----------------------------------+------------------------------------------+
-|  "max alarm"      |           A number                |    The attribute max alarm               |
-+-------------------+-----------------------------------+------------------------------------------+
-|  "min alarm"      |           A number                |    The attribute min alarm               |
-+-------------------+-----------------------------------+------------------------------------------+
-| "min warning"     |           A number                |  The attribute min warning               |
-+-------------------+-----------------------------------+------------------------------------------+
-|"max warning"      |           A number                |  The attribute max warning               |
-+-------------------+-----------------------------------+------------------------------------------+
-|  "delta time"     |           A number                | The attribute RDS alarm delta time       |
-+-------------------+-----------------------------------+------------------------------------------+
-|   "delta val"     |           A number                | The attribute RDS alarm delta val        |
-+-------------------+-----------------------------------+------------------------------------------+
+    +-------------------+-----------------------------------+------------------------------------------+
+    |       key         |              value                |            definition                    |
+    +===================+===================================+==========================================+
+    | "display level"   | PyTango.DispLevel enum value      |   The attribute display level            |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |"polling period"   |          Any number               | The attribute polling period (mS)        |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |  "memorized"      | True or True_without_hard_applied | Define if and how the att. is memorized  |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |     "label"       |            A string               |       The attribute label                |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |  "description"    |            A string               |   The attribute description              |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |     "unit"        |            A string               |       The attribute unit                 |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |"standard unit"    |           A number                |  The attribute standard unit             |
+    +-------------------+-----------------------------------+------------------------------------------+
+    | "display unit"    |            A string               |   The attribute display unit             |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |    "format"       |            A string               | The attribute display format             |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |  "max value"      |          A number                 |   The attribute max value                |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |   "min value"     |           A number                |    The attribute min value               |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |  "max alarm"      |           A number                |    The attribute max alarm               |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |  "min alarm"      |           A number                |    The attribute min alarm               |
+    +-------------------+-----------------------------------+------------------------------------------+
+    | "min warning"     |           A number                |  The attribute min warning               |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |"max warning"      |           A number                |  The attribute max warning               |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |  "delta time"     |           A number                | The attribute RDS alarm delta time       |
+    +-------------------+-----------------------------------+------------------------------------------+
+    |   "delta val"     |           A number                | The attribute RDS alarm delta val        |
+    +-------------------+-----------------------------------+------------------------------------------+
 
 The PyDsExp class in Python
 ---------------------------
@@ -262,66 +277,79 @@ In our example, the code of this class looks like::
         def read_attr_hardware(self, data):
             self.info_stream('In read_attr_hardware')
 
-        #------------------------------------------------------------------
-
         def read_Long_attr(self, the_att):
             self.info_stream("read_Long_attr")
 
             the_att.set_value(self.attr_long)
 
-        #------------------------------------------------------------------
+        def is_Long_attr_allowed(self, req_type):
+            return self.get_state() in (PyTango.DevState.ON,)
 
         def read_Short_attr_rw(self, the_att):
             self.info_stream("read_Short_attr_rw")
 
             the_att.set_value(self.attr_short_rw)
 
-        #------------------------------------------------------------------
-
         def write_Short_attr_rw(self, the_att):
             self.info_stream("write_Short_attr_rw")
 
             self.attr_short_rw = the_att.get_write_value()
 
+        def is_Short_attr_rw_allowed(self, req_type):
+            return self.get_state() in (PyTango.DevState.ON,)
+
 **Line 1**
     The PyDsExp class has to inherit from the PyTango.Device_4Impl
 **Line 3 to 6**
-    PyDsExp class constructor. Note that at line 6, it calls the *init_device()* 
+    PyDsExp class constructor. Note that at line 6, it calls the *init_device()*
     method
 **Line 8 to 12**
-    The init_device() method. It sets the device state (line 9) and initialises 
+    The init_device() method. It sets the device state (line 9) and initialises
     some data members
 **Line 16 to 17**
-    The delete_device() method. This method is not mandatory. You define it 
+    The delete_device() method. This method is not mandatory. You define it
     only if you have to do something specific before the device is destroyed
 **Line 23 to 30**
-    The two methods for the IOLong command. The first method is called 
-    *is_IOLong_allowed()* and it is the command is_allowed method (line 23 to 24). 
-    The second method has the same name than the command name. It is the method 
+    The two methods for the *IOLong* command. The first method is called
+    *is_IOLong_allowed()* and it is the command is_allowed method (line 23 to 24).
+    The second method has the same name than the command name. It is the method
     which executes the command. The command input data type is a Tango long
-    and therefore, this method receives a Python integer.
+    and therefore, this method receives a python integer.
 **Line 34 to 47**
-    The two methods for the IOStringArray command. The first method is its 
-    is_allowed method (Line 34 to 35). The second one is the command 
-    execution method (Line 37 to 47). The command input data type is a String 
-    array. Therefore, the method receives the array in a Python list of Python
+    The two methods for the *IOStringArray* command. The first method is its
+    is_allowed method (Line 34 to 35). The second one is the command
+    execution method (Line 37 to 47). The command input data type is a string
+    array. Therefore, the method receives the array in a python list of python
     strings.
 **Line 53 to 54**
-    The *read_attr_hardware()* method. Its argument is a Python sequence of 
+    The *read_attr_hardware()* method. Its argument is a Python sequence of
     Python integer.
-**Line 58 to 61**
-    The method executed when the Long_attr attribute is read. Note that before
+**Line 56 to 59**
+    The method executed when the *Long_attr* attribute is read. Note that before
     PyTango 7 it sets the attribute value with the PyTango.set_attribute_value
     function. Now the same can be done using the set_value of the attribute
     object
-**Line 65 to 68**
-    The method executed when the Short_attr_rw attribute is read.
-**Line 72 to 75**
-    The method executed when the Short_attr_rw attribute is written. 
-    Note that before PyTango 7 it gets the attribute value with a call to the 
-    Attribute method *get_write_value* with a list as argument. Now the write 
+**Line 61 to 62**
+    The is_allowed method for the *Long_attr* attribute. This is an optional
+    method that is called when the attribute is read or written. Not defining it
+    has the same effect as always returning True. The parameter req_type is of
+    type :class:`AttReqtype` which tells if the method is called due to a read
+    or write request. Since this is a read-only attribute, the method will only
+    be called for read requests, obviously.
+**Line 64 to 67**
+    The method executed when the *Short_attr_rw* attribute is read.
+**Line 69 to 72**
+    The method executed when the Short_attr_rw attribute is written.
+    Note that before PyTango 7 it gets the attribute value with a call to the
+    Attribute method *get_write_value* with a list as argument. Now the write
     value can be obtained as the return value of the *get_write_value* call. And
     in case it is a scalar there is no more the need to extract it from the list.
+**Line 74 to 75**
+    The is_allowed method for the *Short_attr_rw* attribute. This is an optional
+    method that is called when the attribute is read or written. Not defining it
+    has the same effect as always returning True. The parameter req_type is of
+    type :class:`AttReqtype` which tells if the method is called due to a read
+    or write request.
 
 General methods
 ###############
@@ -338,9 +366,9 @@ device server are implemented in Python.
 +----------------------+-------------------------+-------------+-----------+
 | always_executed_hook |        None             |   None      |  No       |
 +----------------------+-------------------------+-------------+-----------+
-|    signal_handler    |   Python integer        |   None      |  No       |
+|    signal_handler    |   :py:obj:`int`         |   None      |  No       |
 +----------------------+-------------------------+-------------+-----------+
-| read_attr_hardware   | Python list of integer  |   None      |  No       |
+| read_attr_hardware   | sequence<:py:obj:`int`> |   None      |  No       |
 +----------------------+-------------------------+-------------+-----------+
 
 Implementing a command
@@ -350,10 +378,11 @@ Commands are defined as described above. Nevertheless, some methods implementing
 them have to be written. These methods names are fixed and depend on command 
 name. They have to be called:
 
-    ``is_<Cmd_name>_allowed`` and ``<Cmd_name>``
+    - ``is_<Cmd_name>_allowed(self)``
+    - ``<Cmd_name>(self, arg)``
 
-For instance, with a command called MyCmd, its is_allowed method has to be 
-called is_MyCmd_allowed and its execution method has to be called simply MyCmd. 
+For instance, with a command called *MyCmd*, its is_allowed method has to be 
+called `is_MyCmd_allowed` and its execution method has to be called simply *MyCmd*.
 The following array gives some more info on these methods.
 
 +-----------------------+-------------------------+--------------------+-----------+
@@ -366,78 +395,79 @@ The following array gives some more info on these methods.
 
 Tango has more data types than Python which is more dynamic. The input and
 output values of the commands are translated according to the array below.
-Not that if PyTango is compiled with numpy support the numpy type will be
-the used for the input arguments. Also, it is recomended to use numpy arrays
-of the appropiate type for output arguments as well, as it is much more efficient.
+Note that if PyTango is compiled with :py:mod:`numpy` support the numpy type
+will be the used for the input arguments. Also, it is recomended to use numpy
+arrays of the appropiate type for output arguments as well, as it is much more
+efficient.
 
-+-------------------------+-------------------------------------------+
-|   Tango data type       |              Python type                  |
-+=========================+===========================================+
-|          DEV_VOID       |                    No data                |
-+-------------------------+-------------------------------------------+
-|       DEV_BOOLEAN       | bool                                      |
-+-------------------------+-------------------------------------------+
-|         DEV_SHORT       | int                                       |
-+-------------------------+-------------------------------------------+
-|         DEV_LONG        | int                                       |
-+-------------------------+-------------------------------------------+
-|        DEV_LONG64       | long (on a 32 bits computer) or           |
-|                         | int (on a 64 bits computer)               |
-+-------------------------+-------------------------------------------+
-|         DEV_FLOAT       | float                                     |
-+-------------------------+-------------------------------------------+
-|       DEV_DOUBLE        | float                                     |
-+-------------------------+-------------------------------------------+
-|        DEV_USHORT       | int                                       |
-+-------------------------+-------------------------------------------+
-|        DEV_ULONG        | int                                       |
-+-------------------------+-------------------------------------------+
-|        DEV_ULONG64      | long (on a 32 bits computer) or           |
-|                         | int (on a 64 bits computer)               |
-+-------------------------+-------------------------------------------+
-|        DEV_STRING       | str                                       |
-+-------------------------+-------------------------------------------+
-|    DEVVAR_CHARARRAY     | numpy.ndarray(dtype=numpy.uint8) or       |
-|                         | sequence<int>                             |
-+-------------------------+-------------------------------------------+
-|    DEVVAR_SHORTARRAY    | numpy.ndarray(dtype=numpy.int16) or       |
-|                         | sequence<int>                             |
-+-------------------------+-------------------------------------------+
-|    DEVVAR_LONGARRAY     | numpy.ndarray(dtype=numpy.int32) or       |
-|                         | sequence<int>                             |
-+-------------------------+-------------------------------------------+
-|   DEVVAR_LONG64ARRAY    | numpy.ndarray(dtype=numpy.int64) or       |
-|                         | sequence<long> (on a 32 bits computer) or |
-|                         | sequence<int> (on a 64 bits computer)     |
-+-------------------------+-------------------------------------------+
-|    DEVVAR_FLOATARRAY    | numpy.ndarray(dtype=numpy.float32) or     |
-|                         | sequence<float>                           |
-+-------------------------+-------------------------------------------+
-|   DEVVAR_DOUBLEARRAY    | numpy.ndarray(dtype=numpy.float64) or     |
-|                         | sequence<float>                           |
-+-------------------------+-------------------------------------------+
-|   DEVVAR_USHORTARRAY    | numpy.ndarray(dtype=numpy.uint16) or      |
-|                         | sequence<int>                             |
-+-------------------------+-------------------------------------------+
-|   DEVVAR_ULONGARRAY     | numpy.ndarray(dtype=numpy.uint32) or      |
-|                         | sequence<int>                             |
-+-------------------------+-------------------------------------------+
-|  DEVVAR_ULONG64ARRAY    | numpy.ndarray(dtype=numpy.uint64) or      |
-|                         | sequence<long> (on a 32 bits computer) or |
-|                         | sequence<int> (on a 64 bits computer)     |
-+-------------------------+-------------------------------------------+
-|   DEVVAR_STRINGARRAY    | sequence<str>                             |
-+-------------------------+-------------------------------------------+
-|                         | A sequence with two elements:             |
-| DEVVAR_LONGSTRINGARRAY  |  1. numpy.ndarray(dtype=numpy.int32) or   |
-|                         |     sequence<int>                         |
-|                         |  2. sequence<str>                         |
-+-------------------------+-------------------------------------------+
-|                         | A sequence with two elements:             |
-|DEVVAR_DOUBLESTRINGARRAY |  1. numpy.ndarray(dtype=numpy.float64) or |
-|                         |     sequence<float>                       |
-|                         |  2. sequence<str>                         |
-+-------------------------+-------------------------------------------+
++-------------------------+-------------------------------------------------------------------+
+|   Tango data type       |              Python type                                          |
++=========================+===================================================================+
+|          DEV_VOID       |                    No data                                        |
++-------------------------+-------------------------------------------------------------------+
+|       DEV_BOOLEAN       | :py:obj:`bool`                                                    |
++-------------------------+-------------------------------------------------------------------+
+|         DEV_SHORT       | :py:obj:`int`                                                     |
++-------------------------+-------------------------------------------------------------------+
+|         DEV_LONG        | :py:obj:`int`                                                     |
++-------------------------+-------------------------------------------------------------------+
+|        DEV_LONG64       | :py:obj:`long` (on a 32 bits computer) or                         |
+|                         | :py:obj:`int` (on a 64 bits computer)                             |
++-------------------------+-------------------------------------------------------------------+
+|         DEV_FLOAT       | :py:obj:`float`                                                   |
++-------------------------+-------------------------------------------------------------------+
+|       DEV_DOUBLE        | :py:obj:`float`                                                   |
++-------------------------+-------------------------------------------------------------------+
+|        DEV_USHORT       | :py:obj:`int`                                                     |
++-------------------------+-------------------------------------------------------------------+
+|        DEV_ULONG        | :py:obj:`int`                                                     |
++-------------------------+-------------------------------------------------------------------+
+|        DEV_ULONG64      | :py:obj:`long` (on a 32 bits computer) or                         |
+|                         | :py:obj:`int` (on a 64 bits computer)                             |
++-------------------------+-------------------------------------------------------------------+
+|        DEV_STRING       | :py:obj:`str`                                                     |
++-------------------------+-------------------------------------------------------------------+
+|    DEVVAR_CHARARRAY     | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint8`) or       |
+|                         | sequence<:py:obj:`int`>                                           |
++-------------------------+-------------------------------------------------------------------+
+|    DEVVAR_SHORTARRAY    | :py:class:`numpy.ndarray` (dtype=:py:obj:`numpy.int16`) or        |
+|                         | sequence<:py:obj:`int`>                                           |
++-------------------------+-------------------------------------------------------------------+
+|    DEVVAR_LONGARRAY     | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int32`) or       |
+|                         | sequence<:py:obj:`int`>                                           |
++-------------------------+-------------------------------------------------------------------+
+|   DEVVAR_LONG64ARRAY    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int64`) or       |
+|                         | sequence<:py:obj:`long`> (on a 32 bits computer) or               |
+|                         | sequence<:py:obj:`int`> (on a 64 bits computer)                   |
++-------------------------+-------------------------------------------------------------------+
+|    DEVVAR_FLOATARRAY    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float32`) or     |
+|                         | sequence<:py:obj:`float`>                                         |
++-------------------------+-------------------------------------------------------------------+
+|   DEVVAR_DOUBLEARRAY    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float64`) or     |
+|                         | sequence<:py:obj:`float`>                                         |
++-------------------------+-------------------------------------------------------------------+
+|   DEVVAR_USHORTARRAY    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint16`) or      |
+|                         | sequence<:py:obj:`int`>                                           |
++-------------------------+-------------------------------------------------------------------+
+|   DEVVAR_ULONGARRAY     | numpy.ndarray(dtype= :py:obj:`numpy.uint32`) or                   |
+|                         | sequence<:py:obj:`int`>                                           |
++-------------------------+-------------------------------------------------------------------+
+|  DEVVAR_ULONG64ARRAY    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint64`) or      |
+|                         | sequence<:py:obj:`long`> (on a 32 bits computer) or               |
+|                         | sequence<:py:obj:`int`> (on a 64 bits computer)                   |
++-------------------------+-------------------------------------------------------------------+
+|   DEVVAR_STRINGARRAY    | sequence<:py:obj:`str`>                                           |
++-------------------------+-------------------------------------------------------------------+
+|                         | A sequence with two elements:                                     |
+| DEVVAR_LONGSTRINGARRAY  |  1. :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int32`) or   |
+|                         |     sequence<:py:obj:`int`>                                       |
+|                         |  2. sequence<:py:obj:`str`>                                       |
++-------------------------+-------------------------------------------------------------------+
+|                         | A sequence with two elements:                                     |
+|DEVVAR_DOUBLESTRINGARRAY |  1. :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float64`) or |
+|                         |     sequence<:py:obj:`float`>                                     |
+|                         |  2. sequence<:py:obj:`str`>                                       |
++-------------------------+-------------------------------------------------------------------+
 
 The following code is an example of how you write code executed when a client
 calls a command named IOLong::
@@ -474,76 +504,80 @@ Attributes are defined as described in chapter 5.3.2. Nevertheless, some methods
 implementing them have to be written. These methods names are fixed and depend 
 on attribute name. They have to be called:
 
-    ``is_<Attr_name>_allowed`` and ``read_<Attr_name>`` or/and ``write_<Attr_name>``
+    - ``is_<Attr_name>_allowed(self, req_type)``
+    - ``read_<Attr_name>(self, attr)``
+    - ``write_<Attr_name>(self, attr)``
 
-For instance, with an attribute called MyAttr, its is_allowed method has to be 
-called is_MyAttr_allowed, its read method has to be called read_MyAttr and 
-its write method has to be called write_MyAttr. The following array gives some 
-more info on these methods.
+For instance, with an attribute called *MyAttr*, its is_allowed method has to be 
+called *is_MyAttr_allowed*, its read method has to be called *read_MyAttr* and 
+its write method has to be called *write_MyAttr*.
+The *attr* parameter is an instance of :class:`Attr`.
+Unlike the commands, the is_allowed method for attributes receives a parameter
+of type :class:`AttReqtype`.
+The following table gives some more info on these methods:
 
-+-------------+-------------+-------------------------------------------+
-| data format | data type   |  python type                              |
-+=============+=============+===========================================+
-| SCALAR      | DEV_BOOLEAN | bool                                      |
-|             +-------------+-------------------------------------------+
-|             | DEV_UCHAR   | int                                       |
-|             +-------------+-------------------------------------------+
-|             | DEV_SHORT   | int                                       |
-|             +-------------+-------------------------------------------+
-|             | DEV_USHORT  | int                                       |
-|             +-------------+-------------------------------------------+
-|             | DEV_LONG    | int                                       |
-|             +-------------+-------------------------------------------+
-|             | DEV_ULONG   | int                                       |
-|             +-------------+-------------------------------------------+
-|             | DEV_LONG64  | int/long                                  |
-|             +-------------+-------------------------------------------+
-|             | DEV_ULONG64 | int/long                                  |
-|             +-------------+-------------------------------------------+
-|             | DEV_FLOAT   | float                                     |
-|             +-------------+-------------------------------------------+
-|             | DEV_DOUBLE  | float                                     |
-|             +-------------+-------------------------------------------+
-|             | DEV_STRING  | str                                       |
-+-------------+-------------+-------------------------------------------+
-| SPECTRUM    | DEV_BOOLEAN | numpy.ndarray(dtype=numpy.bool) or        |
-| or          |             | sequence<bool>                            |
-| IMAGE       +-------------+-------------------------------------------+
-|             | DEV_UCHAR   | numpy.ndarray(dtype=numpy.uint8) or       |
-|             |             | sequence<int>                             |
-|             +-------------+-------------------------------------------+
-|             | DEV_SHORT   | numpy.ndarray(dtype=numpy.int16) or       |
-|             |             | sequence<int>                             |
-|             +-------------+-------------------------------------------+
-|             | DEV_USHORT  | numpy.ndarray(dtype=numpy.uint16) or      |
-|             |             | sequence<int>                             |
-|             +-------------+-------------------------------------------+
-|             | DEV_LONG    | numpy.ndarray(dtype=numpy.int32) or       |
-|             |             | sequence<int>                             |
-|             +-------------+-------------------------------------------+
-|             | DEV_ULONG   | numpy.ndarray(dtype=numpy.uint32) or      |
-|             |             | sequence<int>                             |
-|             +-------------+-------------------------------------------+
-|             | DEV_LONG64  | numpy.ndarray(dtype=numpy.int64) or       |
-|             |             | sequence<int>                             |
-|             +-------------+-------------------------------------------+
-|             | DEV_ULONG64 | numpy.ndarray(dtype=numpy.uint64) or      |
-|             |             | sequence<int>                             |
-|             +-------------+-------------------------------------------+
-|             | DEV_FLOAT   | numpy.ndarray(dtype=numpy.float32) or     |
-|             |             | sequence<float>                           |
-|             +-------------+-------------------------------------------+
-|             | DEV_DOUBLE  | numpy.ndarray(dtype=numpy.float64) or     |
-|             |             | sequence<float>                           |
-|             +-------------+-------------------------------------------+
-|             | DEV_STRING  | sequence<str>                             |
-+-------------+-------------+-------------------------------------------+
+    +-------------+-------------+--------------------------------------------------------------+
+    | data format | data type   |  python type                                                 |
+    +=============+=============+==============================================================+
+    | SCALAR      | DEV_BOOLEAN | :py:obj:`bool`                                               |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_UCHAR   | :py:obj:`int`                                                |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_SHORT   | :py:obj:`int`                                                |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_USHORT  | :py:obj:`int`                                                |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_LONG    | :py:obj:`int`                                                |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_ULONG   | :py:obj:`int`                                                |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_LONG64  | :py:obj:`int`/ :py:obj:`long`                                |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_ULONG64 | :py:obj:`int`/ :py:obj:`long`                                |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_FLOAT   | :py:obj:`float`                                              |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_DOUBLE  | :py:obj:`float`                                              |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_STRING  | :py:obj:`str`                                                |
+    +-------------+-------------+--------------------------------------------------------------+
+    | SPECTRUM    | DEV_BOOLEAN | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.bool`)      |
+    | or          |             | or sequence<:py:obj:`bool`>                                  |
+    | IMAGE       +-------------+--------------------------------------------------------------+
+    |             | DEV_UCHAR   | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint8`)     |
+    |             |             | or sequence<:py:obj:`int`>                                   |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_SHORT   | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int16`)     |
+    |             |             | or sequence<:py:obj:`int`>                                   |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_USHORT  | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint16`)    |
+    |             |             | or sequence<:py:obj:`int`>                                   |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_LONG    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int32`)     |
+    |             |             | or sequence<:py:obj:`int`>                                   |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_ULONG   | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint32`)    |
+    |             |             | or sequence<:py:obj:`int`>                                   |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_LONG64  | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int64`)     |
+    |             |             | or sequence<:py:obj:`int`>                                   |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_ULONG64 | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint64`)    |
+    |             |             | or sequence<:py:obj:`int`>                                   |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_FLOAT   | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float32`)   |
+    |             |             | or sequence<:py:obj:`float`>                                 |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_DOUBLE  | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float64`)   |
+    |             |             | or sequence<:py:obj:`float`>                                 |
+    |             +-------------+--------------------------------------------------------------+
+    |             | DEV_STRING  | sequence<:py:obj:`str`>                                      |
+    +-------------+-------------+--------------------------------------------------------------+
 
 For SPECTRUM and IMAGES the actual sequence object used depends on the context 
-where the tango data is used, and the availability of ``numpy``.
+where the tango data is used, and the availability of :py:mod:`numpy`.
 
-1. for properties the sequence is always a ``list``
-    Example:
+1. for properties the sequence is always a :py:class:`list`. Example:
     
     >>> import PyTango
     >>> db = PyTango.Database()
@@ -552,11 +586,12 @@ where the tango data is used, and the availability of ``numpy``.
     <type 'list'>
 
 2. for attribute/command values
-    - ``numpy.ndarray`` if PyTango was compiled with numpy support (default) and ``numpy`` is installed.
-    - ``list`` otherwise
+    - :py:class:`numpy.ndarray` if PyTango was compiled with :py:mod:`numpy`
+      support (default) and :py:mod:`numpy` is installed.
+    - :py:class:`list` otherwise
     
-The following code is an example of how you write code executed when a client read an attribute which is
-called Long_attr::
+The following code is an example of how you write code executed when a client
+read an attribute which is called *Long_attr*::
     
     def read_Long_attr(self, the_att):
         self.info_stream("read attribute name Long_attr")
@@ -566,8 +601,8 @@ called Long_attr::
     Method declaration with "the_att" being an instance of the Attribute
     class representing the Long_attr attribute
 **Line 2**
-    write a log message to the tango INFO stream (click :ref:`here <logging>` for
-    more information about PyTango log system).
+    write a log message to the tango INFO stream (click :ref:`here <logging>`
+    for more information about PyTango log system).
 **Line 3**
     Set the attribute value using the method set_value() with the attribute 
     value as parameter.
@@ -768,7 +803,8 @@ tango command called Clone::
             klass = self.get_device_class()
             klass.delete_device(dev_name)
             
-Note that the cb parameter is optional. In the example it is given for demonstration purposes only.
+Note that the cb parameter is optional. In the example it is given for
+demonstration purposes only.
 
 Dynamic attributes
 ##################
@@ -791,9 +827,10 @@ attribute within this method:
 
 There is another point to be noted regarding dynamic attribute within Python 
 device server. The Tango Python device server core checks that for each 
-attribute it exists methods named <attribute_name>_read and/or <attribute_name>_write and/or 
-is_<attribute_name>_allowed. Using dynamic attribute, it is not possible to 
-define these methods because attributes name and number are known only at run-time. 
+attribute it exists methods named <attribute_name>_read and/or
+<attribute_name>_write and/or is_<attribute_name>_allowed. Using dynamic
+attribute, it is not possible to define these methods because attributes name
+and number are known only at run-time.
 To address this issue, the Device_3Impl::add_attribute() method has a diferent
 signature for Python device server which is:
 
@@ -822,8 +859,6 @@ called IRMiror and PLC::
 
     if __name__ == '__main__':
         util = PyTango.Util(sys.argv)
-        # Deprecated: util.add_TgClass(PLCClass, PLC, 'PLC')
-        # Deprecated: util.add_TgClass(IRMirrorClass, IRMirror, 'IRMirror')
         util.add_class(PLCClass, PLC, 'PLC')
         util.add_class(IRMirrorClass, IRMirror, 'IRMirror')
         
@@ -831,8 +866,8 @@ called IRMiror and PLC::
         U.server_init()
         U.server_run()
 
-:Line 8: The Tango class PLC is registered in the device server
-:Line 9: The Tango class IRMirror is registered in the device server
+:Line 6: The Tango class PLC is registered in the device server
+:Line 7: The Tango class IRMirror is registered in the device server
 
 It is also possible to add C++ Tango class in a Python device server as soon as:
     1. The Tango class is in a shared library
@@ -850,9 +885,6 @@ device server than before but with one C++ Tango class called SerialLine::
     
     if __name__ == '__main__':
         py = PyTango.Util(sys.argv)
-        # Deprecated: py.add_Cpp_TgClass('SerialLine', 'SerialLine')
-        # Deprecated: py.add_TgClass(PLCClass, PLC, 'PLC')
-        # Deprecated: py.add_TgClass(IRMirrorClass, IRMirror, 'IRMirror')
         util.add_class('SerialLine', 'SerialLine', language="c++")
         util.add_class(PLCClass, PLC, 'PLC')
         util.add_class(IRMirrorClass, IRMirror, 'IRMirror')
@@ -861,8 +893,8 @@ device server than before but with one C++ Tango class called SerialLine::
         U.server_init()
         U.server_run()
 
-:Line 9: The C++ class is registered in the device server
-:Line 10 and 11: The two Python classes are registered in the device server
+:Line 6: The C++ class is registered in the device server
+:Line 7 and 8: The two Python classes are registered in the device server
 
 Server API
 ----------

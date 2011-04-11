@@ -25,6 +25,13 @@ using namespace boost::python;
     try { boost::python::call_method<void>(m_self, #name, __VA_ARGS__); } \
     __AUX_CATCH_PY_EXCEPTION
 
+CppDeviceClass::CppDeviceClass(const string &name)
+    :Tango::DeviceClass(const_cast<string&>(name))
+{}
+
+CppDeviceClass::~CppDeviceClass()
+{}
+
 void CppDeviceClass::create_command(const std::string &cmd_name,
                                     Tango::CmdArgType param_type,
                                     Tango::CmdArgType result_type,
@@ -128,12 +135,24 @@ void CppDeviceClass::create_attribute(vector<Tango::Attr *> &att_list,
     att_list.push_back(attr_ptr);
 }
 
+CppDeviceClassWrap::CppDeviceClassWrap(PyObject *self, const std::string &name)
+    : CppDeviceClass(name), m_self(self)
+{
+    init_class();
+}
+
+/**
+ * Destructor
+ */
+CppDeviceClassWrap::~CppDeviceClassWrap()
+{}
+
 void CppDeviceClassWrap::init_class()
 {
     AutoPythonGIL python_guard;
     
     //@TODO remove this line when Tango C++ is cleaned up
-    set_py_class(true);
+    //set_py_class(true);
 
     signal_handler_defined = is_method_defined(m_self, "signal_handler");
 }
@@ -218,6 +237,23 @@ namespace PyDeviceClass
         }
         return py_dev_list;
     }
+    
+    /*
+    void add_device(CppDeviceClass &self, auto_ptr<Tango::DeviceImpl> dev)
+    {
+        self.add_device(dev.get());
+        dev.release();
+    }
+
+    void add_device(CppDeviceClass &self, auto_ptr<Tango::Device_4Impl> dev)
+    {
+        self.add_device(dev.get());
+        dev.release();
+    }
+
+    void (*add_device1)(CppDeviceClass &, auto_ptr<Tango::DeviceImpl>) = &add_device;
+    void (*add_device2)(CppDeviceClass &, auto_ptr<Tango::Device_4Impl>) = &add_device;
+    */
 }
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS (export_device_overload,
@@ -231,6 +267,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS (register_signal_overload,
                                         Tango::DeviceClass::register_signal, 1, 2)
 #endif
 
+
 void export_device_class()
 {
     void (Tango::DeviceClass::*add_wiz_dev_prop_)(string &,string &) =
@@ -242,13 +279,15 @@ void export_device_class()
     void (Tango::DeviceClass::*add_wiz_class_prop__)(string &,string &,string &) =
         &Tango::DeviceClass::add_wiz_class_prop;
 
-    class_<CppDeviceClass, CppDeviceClassWrap, boost::noncopyable>("_DeviceClass",
+    class_<CppDeviceClass, auto_ptr<CppDeviceClassWrap>, boost::noncopyable>("_DeviceClass",
         init<const std::string &>())
 
         .def("device_factory", &CppDeviceClassWrap::device_factory)
         .def("export_device", &CppDeviceClass::export_device,
             export_device_overload())
-        .def("cpp_add_device", &CppDeviceClass::add_device)
+        //.def("_add_device", PyDeviceClass::add_device1)
+        //.def("_add_device", PyDeviceClass::add_device2)
+        .def("_add_device", &CppDeviceClass::add_device)
         .def("register_signal",&Tango::DeviceClass::register_signal,
             register_signal_overload())
         .def("unregister_signal", &Tango::DeviceClass::unregister_signal)
@@ -283,9 +322,10 @@ void export_device_class()
         .def("_device_destroyer",
             (void (Tango::DeviceClass::*) (const char *))
             &Tango::DeviceClass::device_destroyer)
-
+        .def("is_py_class", &Tango::DeviceClass::is_py_class)
         .def("_create_attribute", &CppDeviceClass::create_attribute)
         .def("_create_command", &CppDeviceClass::create_command)
     ;
+    implicitly_convertible<auto_ptr<CppDeviceClassWrap>, auto_ptr<CppDeviceClass> >();
 }
 

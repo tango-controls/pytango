@@ -49,6 +49,7 @@ extensions = ['sphinx.ext.pngmath',
               'sphinx.ext.autodoc',
               'sphinx.ext.doctest',
               'sphinx.ext.graphviz',
+              'sphinx.ext.intersphinx',
               'ipython_console_highlighting',
               'spock_console_highlighting']
 

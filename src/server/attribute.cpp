@@ -1,7 +1,7 @@
 #include <boost/python.hpp>
 #include <boost/python/return_value_policy.hpp>
 #include <string>
-#include <tango/tango.h>
+#include <tango.h>
 
 #include "defs.h"
 #include "pytgutils.h"
@@ -329,6 +329,9 @@ namespace PyAttribute
     inline void set_value(Tango::Attribute &att, boost::python::object &value)
     { __set_value("set_value", att, value, 0, 0); }
 
+    inline void set_value(Tango::Attribute &att, Tango::EncodedAttribute *data)
+    { att.set_value(data); }
+
     inline void set_value(Tango::Attribute &att, boost::python::str &data_str, boost::python::str &data)
     { __set_value("set_value", att, data_str, data); }
 
@@ -367,25 +370,7 @@ namespace PyAttribute
     {
         Tango::AttributeConfig tg_attr_cfg;
         att.get_properties(tg_attr_cfg);
-        attr_cfg.attr("writable") = tg_attr_cfg.writable;
-        attr_cfg.attr("data_format") = tg_attr_cfg.data_format;
-        attr_cfg.attr("max_dim_x") = tg_attr_cfg.max_dim_x;
-        attr_cfg.attr("max_dim_y") = tg_attr_cfg.max_dim_y;
-        attr_cfg.attr("data_type") = tg_attr_cfg.data_type;
-        attr_cfg.attr("name") = tg_attr_cfg.name;
-        attr_cfg.attr("label") = tg_attr_cfg.label;
-        attr_cfg.attr("description") = tg_attr_cfg.description;
-        attr_cfg.attr("unit") = tg_attr_cfg.unit;
-        attr_cfg.attr("standard_unit") = tg_attr_cfg.standard_unit;
-        attr_cfg.attr("display_unit") = tg_attr_cfg.display_unit;
-        attr_cfg.attr("format") = tg_attr_cfg.format;
-        attr_cfg.attr("writable_attr_name") = tg_attr_cfg.writable_attr_name;
-        attr_cfg.attr("min_alarm") = tg_attr_cfg.min_alarm;
-        attr_cfg.attr("max_alarm") = tg_attr_cfg.max_alarm;
-        attr_cfg.attr("min_value") = tg_attr_cfg.min_value;
-        attr_cfg.attr("max_value") = tg_attr_cfg.max_value;
-        
-        return attr_cfg;
+        return to_py(tg_attr_cfg, attr_cfg);
     }
     
     inline boost::python::object get_properties_2(Tango::Attribute &att,
@@ -393,26 +378,7 @@ namespace PyAttribute
     {
         Tango::AttributeConfig_2 tg_attr_cfg;
         att.get_properties_2(tg_attr_cfg);
-        attr_cfg.attr("writable") = tg_attr_cfg.writable;
-        attr_cfg.attr("data_format") = tg_attr_cfg.data_format;
-        attr_cfg.attr("max_dim_x") = tg_attr_cfg.max_dim_x;
-        attr_cfg.attr("max_dim_y") = tg_attr_cfg.max_dim_y;
-        attr_cfg.attr("data_type") = tg_attr_cfg.data_type;
-        attr_cfg.attr("name") = tg_attr_cfg.name;
-        attr_cfg.attr("label") = tg_attr_cfg.label;
-        attr_cfg.attr("description") = tg_attr_cfg.description;
-        attr_cfg.attr("unit") = tg_attr_cfg.unit;
-        attr_cfg.attr("standard_unit") = tg_attr_cfg.standard_unit;
-        attr_cfg.attr("display_unit") = tg_attr_cfg.display_unit;
-        attr_cfg.attr("format") = tg_attr_cfg.format;
-        attr_cfg.attr("writable_attr_name") = tg_attr_cfg.writable_attr_name;
-        attr_cfg.attr("min_alarm") = tg_attr_cfg.min_alarm;
-        attr_cfg.attr("max_alarm") = tg_attr_cfg.max_alarm;
-        attr_cfg.attr("min_value") = tg_attr_cfg.min_value;
-        attr_cfg.attr("max_value") = tg_attr_cfg.max_value;
-        attr_cfg.attr("level") = tg_attr_cfg.level;
-        
-        return attr_cfg;
+        return to_py(tg_attr_cfg, attr_cfg);
     }
 
     inline boost::python::object get_properties_3(Tango::Attribute &att,
@@ -420,51 +386,25 @@ namespace PyAttribute
     {
         Tango::AttributeConfig_3 tg_attr_cfg;
         att.get_properties_3(tg_attr_cfg);
-        attr_cfg.attr("writable") = tg_attr_cfg.writable;
-        attr_cfg.attr("data_format") = tg_attr_cfg.data_format;
-        attr_cfg.attr("max_dim_x") = tg_attr_cfg.max_dim_x;
-        attr_cfg.attr("max_dim_y") = tg_attr_cfg.max_dim_y;
-        attr_cfg.attr("data_type") = tg_attr_cfg.data_type;
-        attr_cfg.attr("name") = tg_attr_cfg.name;
-        attr_cfg.attr("label") = tg_attr_cfg.label;
-        attr_cfg.attr("description") = tg_attr_cfg.description;
-        attr_cfg.attr("unit") = tg_attr_cfg.unit;
-        attr_cfg.attr("standard_unit") = tg_attr_cfg.standard_unit;
-        attr_cfg.attr("display_unit") = tg_attr_cfg.display_unit;
-        attr_cfg.attr("format") = tg_attr_cfg.format;
-        attr_cfg.attr("writable_attr_name") = tg_attr_cfg.writable_attr_name;
-        attr_cfg.attr("min_value") = tg_attr_cfg.min_value;
-        attr_cfg.attr("max_value") = tg_attr_cfg.max_value;
-        attr_cfg.attr("level") = tg_attr_cfg.level;
+        return to_py(tg_attr_cfg, attr_cfg);
+    }
+    
+    void set_properties(Tango::Attribute &att, boost::python::object &attr_cfg,
+                        boost::python::object &dev)
+    {
+        Tango::AttributeConfig tg_attr_cfg;
+        from_py_object(attr_cfg, tg_attr_cfg);
+        Tango::DeviceImpl *dev_ptr = extract<Tango::DeviceImpl*>(dev);
+        att.set_properties(tg_attr_cfg, dev_ptr);
+    }
 
-        // Copy alarm properties
-        object att_alarm = attr_cfg.attr("att_alarm");
-        att_alarm.attr("min_alarm") = tg_attr_cfg.att_alarm.min_alarm;
-        att_alarm.attr("max_alarm") = tg_attr_cfg.att_alarm.max_alarm;
-        att_alarm.attr("min_warning") = tg_attr_cfg.att_alarm.min_warning;
-        att_alarm.attr("max_warning") = tg_attr_cfg.att_alarm.max_warning;
-        att_alarm.attr("delta_t") = tg_attr_cfg.att_alarm.delta_t;
-        att_alarm.attr("delta_val") = tg_attr_cfg.att_alarm.delta_val;
-        
-        object event_prop = attr_cfg.attr("event_prop");
-        
-        // Copy periodic event property
-        object per_event = event_prop.attr("per_event");
-        per_event.attr("period") = tg_attr_cfg.event_prop.per_event.period;
-        
-        // Copy change event properties
-        object ch_event = event_prop.attr("ch_event");
-        ch_event.attr("rel_change") = tg_attr_cfg.event_prop.ch_event.rel_change;
-        ch_event.attr("abs_change") = tg_attr_cfg.event_prop.ch_event.abs_change;
-        
-        // Copy archive event properties
-        object arch_event = event_prop.attr("arch_event");
-        arch_event.attr("rel_change") = tg_attr_cfg.event_prop.arch_event.rel_change;
-        arch_event.attr("abs_change") = tg_attr_cfg.event_prop.arch_event.abs_change;
-        arch_event.attr("period") = tg_attr_cfg.event_prop.arch_event.period;
-        arch_event.attr("period") = tg_attr_cfg.event_prop.arch_event.period;
-        
-        return attr_cfg;
+    void set_properties_3(Tango::Attribute &att, boost::python::object &attr_cfg,
+                          boost::python::object &dev)
+    {
+        Tango::AttributeConfig_3 tg_attr_cfg;
+        from_py_object(attr_cfg, tg_attr_cfg);
+        Tango::DeviceImpl *dev_ptr = extract<Tango::DeviceImpl*>(dev);
+        att.set_properties(tg_attr_cfg, dev_ptr);
     }
 };
 
@@ -487,7 +427,7 @@ void export_attribute()
         .value("max_warn", Tango::Attribute::max_warn)
         .value("numFlags", Tango::Attribute::numFlags)
     ;
-
+    
     class_<Tango::Attribute>("Attribute", no_init)
         .def("is_write_associated", &Tango::Attribute::is_writ_associated)
         .def("is_min_alarm", &Tango::Attribute::is_min_alarm)
@@ -534,6 +474,9 @@ void export_attribute()
             (void (*) (Tango::Attribute &, boost::python::str &, boost::python::str &))
             &PyAttribute::set_value)
         .def("set_value",
+            (void (*) (Tango::Attribute &, Tango::EncodedAttribute *))
+            &PyAttribute::set_value)
+        .def("set_value",
             (void (*) (Tango::Attribute &, boost::python::object &, long))
             &PyAttribute::set_value)
         .def("set_value",
@@ -566,7 +509,8 @@ void export_attribute()
         .def("_get_properties", &PyAttribute::get_properties)
         .def("_get_properties_2", &PyAttribute::get_properties_2)
         .def("_get_properties_3", &PyAttribute::get_properties_3)
-
         
+        .def("_set_properties", &PyAttribute::set_properties)
+        .def("_set_properties_3", &PyAttribute::set_properties_3)
     ;
 }

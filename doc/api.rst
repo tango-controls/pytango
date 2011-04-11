@@ -13,4 +13,6 @@ PyTango API
     client/index
     database
     server/index
+    encoded
+    utilities
     exception

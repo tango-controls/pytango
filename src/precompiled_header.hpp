@@ -28,4 +28,4 @@
 // We don't want to waste those seconds for each cpp file, so we
 // use this precompiled header.
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <tango.h>

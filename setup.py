@@ -142,6 +142,14 @@ include_dirs = [ os.path.abspath('src') ]
 
 _tango_root_inc = os.path.join(TANGO_ROOT, 'include')
 include_dirs.append(_tango_root_inc)
+
+# $TANGO_ROOT/include/tango exists since tango 7.2.0
+# we changed the PyTango code include statements from:
+# #include <tango.h> to:
+# #include <tango/tango.h>
+# However tango itself complains that it doesn't know his own header files
+# if we don't add the $TANGO_ROOT/include/tango directory to the path. So we do it
+# here
 _tango_root_inc = os.path.join(_tango_root_inc, 'tango')
 if os.path.isdir(_tango_root_inc):
     include_dirs.append(_tango_root_inc)
@@ -252,7 +260,7 @@ else:
     # and then uncommenting this line. Someday maybe this will be
     # automated...
     extra_compile_args += [
-        '-includesrc/precompiled_header.hpp',
+#        '-includesrc/precompiled_header.hpp',
     ]
 
     #if not please_debug:

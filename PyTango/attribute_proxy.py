@@ -164,27 +164,32 @@ def __AttributeProxy__delete_property(self, value):
     """
     delete_property(self, value) -> None
     
-            Delete a the given of properties for this attribute.
-            This method accepts the following types as value parameter:
+        Delete a the given of properties for this attribute.
+        This method accepts the following types as value parameter:
+        
             1. string [in] - single property to be deleted
             2. PyTango.DbDatum [in] - single property data to be deleted
             3. PyTango.DbData [in] - several property data to be deleted
             4. sequence<string> [in]- several property data to be deleted
             5. sequence<DbDatum> [in] - several property data to be deleted
-            6. dict<str, obj> [in] - keys are property names to be deleted (values are ignored)
-            7. dict<str, DbDatum> [in] - several DbDatum.name are property names to be
-                                        deleted (keys are ignored)
-
+            6. dict<str, obj> [in] - keys are property names to be deleted
+               (values are ignored)
+            7. dict<str, DbDatum> [in] - several DbDatum.name are property names
+               to be deleted (keys are ignored)
+        
         Parameters :
             - value : can be one of the following:
+
                 1. string [in] - single property data to be deleted
                 2. PyTango.DbDatum [in] - single property data to be deleted
                 3. PyTango.DbData [in] - several property data to be deleted
                 4. sequence<string> [in]- several property data to be deleted
                 5. sequence<DbDatum> [in] - several property data to be deleted
-                6. dict<str, obj> [in] - keys are property names to be deleted (values are ignored)
-                7. dict<str, DbDatum> [in] - several DbDatum.name are property names
-                                            to be deleted (keys are ignored)
+                6. dict<str, obj> [in] - keys are property names to be deleted
+                   (values are ignored)
+                7. dict<str, DbDatum> [in] - several DbDatum.name are property
+                   names to be deleted (keys are ignored)
+        
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed
@@ -311,7 +316,7 @@ def __init_AttributeProxy(doc=True):
     _AttributeProxy.get_property        = __AttributeProxy__get_property
     _AttributeProxy.put_property        = __AttributeProxy__put_property
     _AttributeProxy.delete_property     = __AttributeProxy__delete_property
-
+    
     # General methods
     #AttributeProxy.name                manually defined
     AttributeProxy.status               = _method_device('status', doc=doc)
@@ -319,16 +324,16 @@ def __init_AttributeProxy(doc=True):
     AttributeProxy.ping                 = _method_device('ping', doc=doc)
     AttributeProxy.get_transparency_reconnection=_method_device('get_transparency_reconnection', doc=doc)
     AttributeProxy.set_transparency_reconnection=_method_device('set_transparency_reconnection', doc=doc)
-
+    
     # Property methods
     AttributeProxy.get_property         = _method_attribute('get_property', doc=doc)
     AttributeProxy.put_property         = _method_attribute('put_property', doc=doc)
     AttributeProxy.delete_property      = _method_attribute('delete_property', doc=doc)
-
+    
     # Attribute methods
     AttributeProxy.get_config           = _method_dev_and_name('get_attribute_config', doc=doc)
     AttributeProxy.set_config           = _method_device('set_attribute_config', doc=doc)
-
+    
     AttributeProxy.write                = _method_dev_and_name('write_attribute', doc=doc)
     AttributeProxy.read                 = _method_dev_and_name('read_attribute', doc=doc)
     AttributeProxy.write_read           = _method_dev_and_name('write_read_attribute', doc=doc)

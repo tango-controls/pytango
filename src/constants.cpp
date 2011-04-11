@@ -22,7 +22,7 @@
 *******************************************************************************/
 
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 
 using namespace boost::python;
 
@@ -109,7 +109,6 @@ void export_constants()
 
     consts_scope.attr("CLNT_TIMEOUT_STR") = CLNT_TIMEOUT_STR;
     consts_scope.attr("CLNT_TIMEOUT") = CLNT_TIMEOUT;
-    consts_scope.attr("NARROW_CLNT_TIMEOUT") = NARROW_CLNT_TIMEOUT;
 
     //
     // Connection and call timeout for database device

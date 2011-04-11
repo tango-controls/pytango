@@ -68,3 +68,4 @@ from globals import *
 from utils import *
 from tango_numpy import *
 from exception import *
+from encoded_attribute import *

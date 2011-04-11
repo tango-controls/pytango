@@ -22,7 +22,8 @@
 *******************************************************************************/
 
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <boost/python/handle.hpp>
+#include <tango.h>
 #include <iostream>
 #include <string>
 #include <memory>
@@ -87,19 +88,84 @@ struct python_tangocpp<Tango::DEV_STRING> {
 namespace PyDeviceAttribute {
 
     template<long tangoTypeConst>
+    static inline void _update_value_as_string(Tango::DeviceAttribute &self, object py_value)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+        typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
+
+        // Extract the actual data from Tango::DeviceAttribute (self)
+        TangoArrayType* value_ptr = 0;
+        try {
+            self >> value_ptr;
+        } catch (Tango::DevFailed &e ) {
+            if (strcmp(e.errors[0].reason.in(),"API_EmptyDeviceAttribute") != 0)
+                throw;
+        }
+        std::auto_ptr<TangoArrayType> guard_value_ptr(value_ptr);
+
+        if (value_ptr == 0) {
+            py_value.attr(value_attr_name) = boost::python::str();
+            py_value.attr(w_value_attr_name) = object();
+            return;
+        }
+
+        TangoScalarType* buffer = value_ptr->get_buffer();
+
+        const char *ch_ptr = reinterpret_cast<char *>(buffer);
+        size_t nb_bytes = value_ptr->length() * sizeof(TangoScalarType);
+
+        py_value.attr(value_attr_name) = str(ch_ptr, (size_t)nb_bytes);
+        py_value.attr(w_value_attr_name) = object();
+    }
+
+    template<>
+    inline void _update_value_as_string<Tango::DEV_ENCODED>(Tango::DeviceAttribute &self, object py_value)
+    {
+        Tango::DevVarEncodedArray* value;
+        self >> value;
+        std::auto_ptr<Tango::DevVarEncodedArray> guard(value);
+        
+        Tango::DevEncoded* buffer = value->get_buffer();
+        
+        using namespace boost::python;
+        str encoded_format(buffer[0].encoded_format);
+        str encoded_data((const char*)buffer[0].encoded_data.get_buffer(),
+                          buffer[0].encoded_data.length());
+        
+        py_value.attr(value_attr_name) = make_tuple(encoded_format, encoded_data);
+
+        if (self.get_written_dim_x() > 0) {
+            bool is_write_type = self.get_written_dim_x() && (value->length() < 2);
+            if (is_write_type) {
+                object w_encoded_format(encoded_format);
+                object w_encoded_data(encoded_data);
+                py_value.attr(w_value_attr_name) = make_tuple(w_encoded_format, w_encoded_data);
+            } else {
+                str w_encoded_format(buffer[1].encoded_format);
+                str w_encoded_data((const char*)buffer[1].encoded_data.get_buffer(),
+                                   buffer[1].encoded_data.length());
+                py_value.attr(w_value_attr_name) = make_tuple(w_encoded_format, w_encoded_data);
+            }
+        } else {
+            py_value.attr(w_value_attr_name) = object();
+        }
+    }
+    
+    template<long tangoTypeConst>
     static inline void _update_scalar_values(Tango::DeviceAttribute &self, object py_value)
     {
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-
+        
         if (self.get_written_dim_x() > 0) {
             std::vector<TangoScalarType> val;
-            self >> val;
+            self.extract_read(val);
             // In the following lines, the cast is absolutely necessary because
             // vector<TangoScalarType> may not be a vector<TangoScalarType> at
             // compile time. For example, for vector<DevBoolean>, the compiler
             // may create a std::_Bit_reference type.
             py_value.attr(value_attr_name) = object((TangoScalarType)val[0]);
-            py_value.attr(w_value_attr_name) = object((TangoScalarType)val[1]);
+            self.extract_set(val);
+            py_value.attr(w_value_attr_name) = object((TangoScalarType)val[0]);
         } else {
             TangoScalarType rvalue;
             self >> rvalue;
@@ -113,27 +179,43 @@ namespace PyDeviceAttribute {
     {
         Tango::DevVarEncodedArray* value;
         self >> value;
-        std::auto_ptr<Tango::DevVarEncodedArray> guard(value);
-
+        std::auto_ptr<Tango::DevVarEncodedArray> guard_value(value);
+        
         Tango::DevEncoded* buffer = value->get_buffer();
-
-        /// @todo I am making a copy of encoded_data as string. This
-        /// is far from ideal, but it's what we have now...
+        
         using namespace boost::python;
+        str r_encoded_format(buffer[0].encoded_format);
+
+        Tango::DevVarCharArray &encReadBuffer = buffer[0].encoded_data;
+        Py_ssize_t size = encReadBuffer.length();
+        CORBA::Octet *rawReadBuffer = encReadBuffer.get_buffer(1);
+        
+        PyObject *readArray = PyBuffer_FromReadWriteMemory(rawReadBuffer, size);
+        
+        object r_encoded_data = object(handle<>(readArray));
+        
+        py_value.attr(value_attr_name) = make_tuple(r_encoded_format, r_encoded_data);
+
         if (self.get_written_dim_x() > 0) {
-            str encoded_format(buffer[0].encoded_format);
-            str w_encoded_format(buffer[1].encoded_format);
-
-            str encoded_data((const char*)buffer[0].encoded_data.get_buffer(), buffer[0].encoded_data.length());
-            str w_encoded_data((const char*)buffer[1].encoded_data.get_buffer(), buffer[1].encoded_data.length());
-
-            py_value.attr(value_attr_name) = make_tuple(encoded_format, encoded_data);
-            py_value.attr(w_value_attr_name) = make_tuple(w_encoded_format, w_encoded_data);
+            bool is_write_type = self.get_written_dim_x() && (value->length() < 2);
+            if (is_write_type) {
+                object w_encoded_format(r_encoded_format);
+                object w_encoded_data(r_encoded_data);
+                py_value.attr(w_value_attr_name) = make_tuple(w_encoded_format, w_encoded_data);
+            } else {
+                str w_encoded_format(buffer[1].encoded_format);
+                
+                Tango::DevVarCharArray &encWriteBuffer = buffer[1].encoded_data;
+                int size = encWriteBuffer.length();
+                CORBA::Octet *rawWriteBuffer = encWriteBuffer.get_buffer(1);
+                
+                PyObject *writeArray = PyBuffer_FromReadWriteMemory(rawWriteBuffer, size);
+                
+                object w_encoded_data = object(handle<>(writeArray));
+                
+                py_value.attr(w_value_attr_name) = make_tuple(w_encoded_format, w_encoded_data);
+            }
         } else {
-            str encoded_format(buffer[0].encoded_format);
-            str encoded_data((const char*)buffer[0].encoded_data.get_buffer(), buffer[0].encoded_data.length());
-            
-            py_value.attr(value_attr_name) = make_tuple(encoded_format, encoded_data);
             py_value.attr(w_value_attr_name) = object();
         }
     }
@@ -141,16 +223,15 @@ namespace PyDeviceAttribute {
     template<>
     inline void _update_scalar_values<Tango::DEV_STRING>(Tango::DeviceAttribute &self, object py_value)
     {
-        if (self.get_written_dim_x() > 0) { /// @todo not the same as old pytango, 'writable' missing...
+        if (self.get_written_dim_x() > 0) {
             std::vector<std::string> val;
-            self >> val;
-
+            self.extract_read(val);
             py_value.attr(value_attr_name) = object(val[0]);
-            py_value.attr(w_value_attr_name) = object(val[1]);
+            self.extract_set(val);
+            py_value.attr(w_value_attr_name) = object(val[0]);
         } else {
             std::string rvalue;
             self >> rvalue;
-
             py_value.attr(value_attr_name) = object(rvalue);
             py_value.attr(w_value_attr_name) = object();
         }
@@ -180,15 +261,32 @@ namespace PyDeviceAttribute {
         }
 
         TangoScalarType* buffer = value_ptr->get_buffer();
-
+        int total_length = value_ptr->length();
+        
+        // Determine if the attribute is AttrWriteType.WRITE
+        int read_size =0, write_size = 0;
+        if (isImage) {
+            read_size = self.get_dim_x() * self.get_dim_y();
+            write_size = self.get_written_dim_x() * self.get_written_dim_y();
+        } else {
+            read_size = self.get_dim_x();
+            write_size = self.get_written_dim_x();
+        }
+        bool is_write_type = (read_size + write_size) > total_length;
+        
         // Convert to a list of lists
         long offset = 0;
         for(int it=1; it>=0; --it) { // 2 iterations: read part/write part
+            if ((!it) && is_write_type) {
+                py_value.attr(w_value_attr_name) = py_value.attr(value_attr_name);
+                continue;
+            }
             boost::python::list result;
+            
             if (isImage) {
                 const int dim_x = it? self.get_dim_x() : self.get_written_dim_x();
                 const int dim_y = it? self.get_dim_y() : self.get_written_dim_y();
-
+                
                 for (int y=0; y < dim_y; ++y) {
                     boost::python::list row;
                     for (int x=0; x < dim_x; ++x)
@@ -199,7 +297,7 @@ namespace PyDeviceAttribute {
             } else {
                 const int dim_x = it? self.get_dim_x() : self.get_written_dim_x();
                 for (int x=0; x < dim_x; ++x)
-                    result.append(python_tangocpp<tangoTypeConst>::to_python(buffer[x]));
+                    result.append(python_tangocpp<tangoTypeConst>::to_python(buffer[offset + x]));
                 offset += dim_x;
             }
             py_value.attr(it? value_attr_name : w_value_attr_name) = result;
@@ -272,11 +370,27 @@ namespace PyDeviceAttribute {
         }
 
         TangoScalarType* buffer = value_ptr->get_buffer();
-
-        // Convert to a list of lists
+        int total_length = value_ptr->length();
+        
+        // Determine if the attribute is AttrWriteType.WRITE
+        int read_size =0, write_size = 0;
+        if (isImage) {
+            read_size = self.get_dim_x() * self.get_dim_y();
+            write_size = self.get_written_dim_x() * self.get_written_dim_y();
+        } else {
+            read_size = self.get_dim_x();
+            write_size = self.get_written_dim_x();
+        }
+        bool is_write_type = (read_size + write_size) > total_length;
+        
+        // Convert to a tuple of tuples
         long offset = 0;
         for(int it=1; it>=0; --it) { // 2 iterations: read part/write part
-            //boost::python::list result;
+            if ((!it) && is_write_type) {
+                py_value.attr(w_value_attr_name) = py_value.attr(value_attr_name);
+                continue;
+            }
+            
             object result_guard;
             if (isImage) {
                 const int dim_x = it? self.get_dim_x() : self.get_written_dim_x();
@@ -288,7 +402,6 @@ namespace PyDeviceAttribute {
                 result_guard = object(handle<>(result));
 
                 for (int y=0; y < dim_y; ++y) {
-                    //boost::python::list row;
                     PyObject * row = PyTuple_New(dim_x);
                     if (!row)
                         boost::python::throw_error_already_set();
@@ -311,7 +424,7 @@ namespace PyDeviceAttribute {
                 result_guard = object(handle<>(result));
 
                 for (int x=0; x < dim_x; ++x) {
-                    object el = python_tangocpp<tangoTypeConst>::to_python(buffer[x]);
+                    object el = python_tangocpp<tangoTypeConst>::to_python(buffer[offset +x]);
                     PyTuple_SetItem(result, x, el.ptr());
                     incref(el.ptr());
                 }
@@ -319,37 +432,6 @@ namespace PyDeviceAttribute {
             }
             py_value.attr(it? value_attr_name : w_value_attr_name) = result_guard;
         }
-    }
-
-    template<long tangoTypeConst>
-    static inline void _update_value_as_string(Tango::DeviceAttribute &self, object py_value)
-    {
-        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-        typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
-
-        // Extract the actual data from Tango::DeviceAttribute (self)
-        TangoArrayType* value_ptr = 0;
-        try {
-            self >> value_ptr;
-        } catch (Tango::DevFailed &e ) {
-            if (strcmp(e.errors[0].reason.in(),"API_EmptyDeviceAttribute") != 0)
-                throw;
-        }
-        std::auto_ptr<TangoArrayType> guard_value_ptr(value_ptr);
-
-        if (value_ptr == 0) {
-            py_value.attr(value_attr_name) = boost::python::str();
-            py_value.attr(w_value_attr_name) = object();
-            return;
-        }
-
-        TangoScalarType* buffer = value_ptr->get_buffer();
-
-        const char *ch_ptr = reinterpret_cast<char *>(buffer);
-        size_t nb_bytes = value_ptr->length() * sizeof(TangoScalarType);
-
-        py_value.attr(value_attr_name) = str(ch_ptr, (size_t)nb_bytes);
-        py_value.attr(w_value_attr_name) = object();
     }
 
     void update_values(Tango::DeviceAttribute &self, object& py_value, PyTango::ExtractAs extract_as/*=ExtractAsNumpy*/)
@@ -432,55 +514,6 @@ namespace PyDeviceAttribute {
                 raise_(PyExc_ValueError, "Can't extract data because: self.get_data_format()=FMT_UNKNOWN");
                 assert(false);
         }
-    }
-
-    template<long tangoTypeConst>
-    static inline void _fill_scalar_attribute(Tango::DeviceAttribute & dev_attr, const object & py_value)
-    {
-        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-
-    TangoScalarType value;
-    from_py<tangoTypeConst>::convert(py_value.ptr(), value);
-        dev_attr << const_cast<TangoScalarType&>(value);
-    }
-
-    template<>
-    inline void _fill_scalar_attribute<Tango::DEV_STRING>(Tango::DeviceAttribute & dev_attr, const object & py_value)
-    {
-        std::string value = extract<std::string>(py_value);
-        dev_attr << value;
-    }
-
-    template<>
-    inline void _fill_scalar_attribute<Tango::DEV_ENCODED>(Tango::DeviceAttribute & dev_attr, const object & py_value)
-    {
-        static const long tangoTypeConst = Tango::DEV_ENCODED;
-        typedef TANGO_const2type(tangoTypeConst) TangoScalarType;
-        typedef TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
-
-        /// @todo test it!!
-
-        /// @todo Now I am accepting 2 strings: encoded_format, encoded_data. This
-        /// is far from a good solution, but its something...
-
-        if (boost::python::len(py_value) != 2) {
-            raise_(PyExc_TypeError, "Expecting a tuple of strings: encoded_format, encoded_data");
-        }
-
-        boost::python::object encoded_format_str = py_value[0];
-        boost::python::object encoded_data_str = py_value[1];
-
-        /// @todo not sure... second parameter of insert is a reference, does it
-        /// mean anything? Does he pretend to take ownership of the pointer or
-        /// is he making another copy? what should I do?
-        char* encoded_format = const_cast<char*>((extract<const char*>(encoded_format_str)()));
-        unsigned int encoded_data_len = boost::python::len(encoded_data_str);
-        unsigned char* encoded_data = reinterpret_cast<unsigned char*>(const_cast<char*>((extract<const char*>(encoded_data_str)())));
-        // void insert(char *&,unsigned char *&,unsigned int);
-        dev_attr.insert(encoded_format, encoded_data, encoded_data_len);
-
-        std::string value = extract<std::string>(py_value);
-        dev_attr << value;
     }
 
     template<long tangoTypeConst>
@@ -621,36 +654,21 @@ void export_device_attribute()
 
     DeviceAttribute
         .def(init<const Tango::DeviceAttribute &>())
-
         .def_readwrite("name", &Tango::DeviceAttribute::name)
-
         .def_readwrite("quality", &Tango::DeviceAttribute::quality)
-
         .def_readwrite("time", &Tango::DeviceAttribute::time)
-
         .add_property("dim_x", &Tango::DeviceAttribute::get_dim_x)
-
         .add_property("dim_y", &Tango::DeviceAttribute::get_dim_y)
-
         .add_property("w_dim_x", &Tango::DeviceAttribute::get_written_dim_x)
-
         .add_property("w_dim_y", &Tango::DeviceAttribute::get_written_dim_y)
-
         .add_property("r_dimension", &Tango::DeviceAttribute::get_r_dimension)
-
         .add_property("w_dimension", &Tango::DeviceAttribute::get_w_dimension)
-
         .add_property("nb_read", &Tango::DeviceAttribute::get_nb_read)
-
         .add_property("nb_written", &Tango::DeviceAttribute::get_nb_written)
-
         .add_property("data_format", &Tango::DeviceAttribute::get_data_format)
-            
         .def("get_date", &Tango::DeviceAttribute::get_date,
             return_internal_reference<>())
-
         .def("get_err_stack", &Tango::DeviceAttribute::get_err_stack,
             return_value_policy<copy_const_reference>())
-
     ;
 }

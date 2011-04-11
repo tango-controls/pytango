@@ -28,6 +28,7 @@ __all__ = [ "DeviceClass" ]
 
 __docformat__ = "restructuredtext"
 
+import sys
 import types
 import operator
 
@@ -293,9 +294,13 @@ class DeviceClass(_DeviceClass):
                 self.prop_util.get_class_properties(self, self.class_property_list)
                 for prop_name in self.class_property_list.keys():
                     setattr(self, prop_name, self.prop_util.get_property_values(prop_name, self.class_property_list))
-        except DevFailed, e:
-            print "----> ", e
-    
+        except DevFailed, df:
+            print("PyDS: %s: A Tango error occured in the constructor:" % name)
+            Except.print_exception(df)
+        except Exception, e:
+            print("PyDS: %s: An error occured in the constructor:" % name)
+            print(str(e))
+            
     def __str__(self):
         return '%s(%s)' % (self.__class__.__name__, self.get_name())
     
@@ -661,7 +666,6 @@ class DeviceClass(_DeviceClass):
             raise RuntimeError("Device class '%s' is not registered" % klass_name)
 
         if klass is None:
-            print get_constructed_classes()
             raise RuntimeError("Device class '%s' as not been constructed" % klass_name)
         
         deviceClassClass, deviceImplClass, deviceImplName = info
@@ -670,10 +674,19 @@ class DeviceClass(_DeviceClass):
         tmp_dev_list = []
         for dev_name in device_list:
             device = deviceImplClass(klass, dev_name)
-            self.cpp_add_device(device)
+            self._add_device(device)
             tmp_dev_list.append(device)
 
         self.dyn_attr(tmp_dev_list)
+#        try:
+#            self.dyn_attr(tmp_dev_list)
+#        except DevFailed, df:
+#            print("PyDS: %s: A Tango error occured trying to create dynamic attributes" % name)
+#            Except.print_exception(df)
+#        except Exception, e:
+#            print("PyDS: %s: An error occured trying to create dynamic attributes" % klass_name)
+#            print(str(e))
+#            sys.exit()
 
         for dev in tmp_dev_list:
             if Util._UseDb and not Util._FileDb:

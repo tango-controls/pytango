@@ -2,7 +2,7 @@
 #define _DEVICE_IMPL_H
 
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 
 #include <server/device_class.h>
 
@@ -289,8 +289,7 @@ public:
     /**
      * Destructor
      */
-    virtual ~Device_4ImplWrap()
-    {}
+    virtual ~Device_4ImplWrap();
 
     /**
      * A wrapper around the add_attribute in order to process some

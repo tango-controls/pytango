@@ -96,10 +96,13 @@ object to_py(const Tango::EventProperties &event_props)
     return py_event_props;
 }
 
-object to_py(const Tango::AttributeConfig &attr_conf)
+object to_py(const Tango::AttributeConfig &attr_conf, object py_attr_conf)
 {
-    PYTANGO_MOD
-    object py_attr_conf = pytango.attr("AttributeConfig")();
+    if(py_attr_conf.ptr() == Py_None)
+    {
+        PYTANGO_MOD
+        py_attr_conf = pytango.attr("AttributeConfig")();
+    }
     
     py_attr_conf.attr("name") = str(attr_conf.name.in());
     py_attr_conf.attr("writable") = attr_conf.writable;
@@ -124,10 +127,13 @@ object to_py(const Tango::AttributeConfig &attr_conf)
     return py_attr_conf;
 }
 
-object to_py(const Tango::AttributeConfig_2 &attr_conf)
+object to_py(const Tango::AttributeConfig_2 &attr_conf, object py_attr_conf)
 {
-    PYTANGO_MOD
-    object py_attr_conf = pytango.attr("AttributeConfig_2")();
+    if(py_attr_conf.ptr() == Py_None)
+    {
+        PYTANGO_MOD
+        py_attr_conf = pytango.attr("AttributeConfig_2")();
+    }
     
     py_attr_conf.attr("name") = str(attr_conf.name.in());
     py_attr_conf.attr("writable") = attr_conf.writable;
@@ -152,10 +158,13 @@ object to_py(const Tango::AttributeConfig_2 &attr_conf)
     return py_attr_conf;
 }
 
-object to_py(const Tango::AttributeConfig_3 &attr_conf)
+object to_py(const Tango::AttributeConfig_3 &attr_conf, object py_attr_conf)
 {
-    PYTANGO_MOD
-    object py_attr_conf = pytango.attr("AttributeConfig_3")();
+    if(py_attr_conf.ptr() == Py_None)
+    {
+        PYTANGO_MOD
+        py_attr_conf = pytango.attr("AttributeConfig_3")();
+    }
     
     py_attr_conf.attr("name") = str(attr_conf.name.in());
     py_attr_conf.attr("writable") = attr_conf.writable;
@@ -183,10 +192,11 @@ object to_py(const Tango::AttributeConfig_3 &attr_conf)
 boost::python::list to_py(const Tango::AttributeConfigList &attr_conf_list)
 {
     boost::python::list py_attr_conf_list;
+    boost::python::object none;
     for(unsigned long index = 0; index < attr_conf_list.length(); ++index)
     {
         const Tango::AttributeConfig &attr_conf = attr_conf_list[index];
-        py_attr_conf_list.append(to_py(attr_conf));
+        py_attr_conf_list.append(to_py(attr_conf, none));
     }
     return py_attr_conf_list;
 }
@@ -194,10 +204,11 @@ boost::python::list to_py(const Tango::AttributeConfigList &attr_conf_list)
 boost::python::list to_py(const Tango::AttributeConfigList_2 &attr_conf_list)
 {
     boost::python::list py_attr_conf_list;
+    boost::python::object none;
     for(unsigned long index = 0; index < attr_conf_list.length(); ++index)
     {
         const Tango::AttributeConfig_2 &attr_conf = attr_conf_list[index];
-        py_attr_conf_list.append(to_py(attr_conf));
+        py_attr_conf_list.append(to_py(attr_conf, none));
     }
     return py_attr_conf_list;
 }
@@ -205,10 +216,11 @@ boost::python::list to_py(const Tango::AttributeConfigList_2 &attr_conf_list)
 boost::python::list to_py(const Tango::AttributeConfigList_3 &attr_conf_list)
 {
     boost::python::list py_attr_conf_list;
+    boost::python::object none;
     for(unsigned long index = 0; index < attr_conf_list.length(); ++index)
     {
         const Tango::AttributeConfig_3 &attr_conf = attr_conf_list[index];
-        py_attr_conf_list.append(to_py(attr_conf));
+        py_attr_conf_list.append(to_py(attr_conf, none));
     }
     return py_attr_conf_list;
 }

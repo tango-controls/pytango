@@ -132,7 +132,7 @@ History classes
 ---------------
 
 .. autoclass:: PyTango.DeviceAttributeHistory
-    :show-inheritance:    
+    :show-inheritance:
     :members:
 
 See :class:`DeviceAttribute`.

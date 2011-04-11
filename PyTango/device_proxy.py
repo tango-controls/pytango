@@ -381,7 +381,7 @@ def __DeviceProxy__delete_property(self, value):
             5. sequence<DbDatum> [in] - several property data to be deleted
             6. dict<str, obj> [in] - keys are property names to be deleted (values are ignored)
             7. dict<str, DbDatum> [in] - several DbDatum.name are property names to be
-                                        deleted (keys are ignored)
+               deleted (keys are ignored)
 
         Parameters :
             - value : can be one of the following:
@@ -392,7 +392,7 @@ def __DeviceProxy__delete_property(self, value):
                 5. sequence<DbDatum> [in] - several property data to be deleted
                 6. dict<str, obj> [in] - keys are property names to be deleted (values are ignored)
                 7. dict<str, DbDatum> [in] - several DbDatum.name are property names
-                                            to be deleted (keys are ignored)
+                   to be deleted (keys are ignored)
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed
@@ -678,6 +678,7 @@ def __DeviceProxy__subscribe_event ( self, attr_name, event_type, cb_or_queuesiz
             event reception buffer.
             The event reception buffer is implemented as a round robin buffer. This
             way the client can set-up different ways to receive events:
+            
                 * Event reception buffer size = 1 : The client is interested only
                   in the value of the last event received. All other events that
                   have been received since the last reading are discarded.
@@ -959,7 +960,7 @@ def __doc_DeviceProxy():
 
         Parameters : None
         Return     : (int) time elapsed in milliseconds
-        Throw      : exception if device is not alive
+        Throws     : exception if device is not alive
     """ )
 
     document_method("black_box", """
@@ -998,6 +999,7 @@ def __doc_DeviceProxy():
                 print com_info.in_type_desc
                 print com_info.out_type_desc
                 print com_info.disp_level
+                
         See CommandInfo documentation string form more detail
     """ )
 
@@ -1107,8 +1109,15 @@ def __doc_DeviceProxy():
             - attr_name  : (str) The name of the attribute to read.
             - extract_as : (ExtractAs) Defaults to numpy.
         Return     : (DeviceAttribute)
-
+        
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device
+            
+    .. versionchanged:: 7.1.4
+        For DevEncoded attributes, before it was returning a DeviceAttribute.value
+        as a tuple **(format<str>, data<str>)** no matter what was the *extract_as*
+        value was. Since 7.1.4, it returns a **(format<str>, data<buffer>)**
+        unless *extract_as* is String, in which case it returns 
+        **(format<str>, data<str>)**.
     """ )
 
     document_method("read_attributes", """
@@ -1212,7 +1221,7 @@ def __doc_DeviceProxy():
 
         Parameters : None
         Return     : (sequence<str>) One string for each polled command/attribute.
-                     Each string is multi-line string with
+                     Each string is multi-line string with:
                         - attribute/command name
                         - attribute/command polling period in milliseconds
                         - attribute/command polling ring buffer
@@ -1392,9 +1401,11 @@ def __doc_DeviceProxy():
             for the time specified in timeout. If after timeout milliseconds,
             the reply is still not there, an exception is thrown. If timeout is
             set to 0, the call waits until the reply arrived.
+            
         Parameters :
             - id      : (int) the asynchronous call identifier.
-            - timeout : (int)
+            - timeout : (int) the timeout
+            
         Return     : None
 
         Throws     : AsynCall, AsynReplyNotArrived, CommunicationFailed, DevFailed from device.

@@ -32,7 +32,7 @@
 #   include <numpy/arrayobject.h>
 #endif
 
-#include <tango/tango.h>
+#include <tango.h>
 #include <iostream>
 #include <string>
 
@@ -55,6 +55,7 @@ void export_callback(); /// @todo not sure were to put it...
 void export_util();
 void export_attr();
 void export_attribute();
+void export_encoded_attribute();
 void export_wattribute();
 void export_multi_attribute();
 void export_user_default_attr_prop();
@@ -105,6 +106,7 @@ BOOST_PYTHON_MODULE(_PyTango)
     export_util();
     export_attr();
     export_attribute();
+    export_encoded_attribute();
     export_wattribute();
     export_multi_attribute();
     export_user_default_attr_prop();

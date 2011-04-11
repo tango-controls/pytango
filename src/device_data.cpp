@@ -23,7 +23,7 @@
 
 #include <boost/python.hpp>
 #include <boost/mpl/if.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 #include <iostream>
 #include <string>
 

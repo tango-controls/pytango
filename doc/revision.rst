@@ -53,7 +53,7 @@ History of modifications:
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 05/11/10 | `8.7 <http://www.tango-controls.org/static/PyTango/v713/doc/html/index.html>`_   | Update to PyTango 7.1.3                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| ??/01/11 | `8.8 <http://www.tango-controls.org/static/PyTango/v720/doc/html/index.html>`_   | Update to PyTango 7.2.0                             | T\. Coutinho          |
+| 05/04/11 | `8.8 <http://www.tango-controls.org/static/PyTango/v714/doc/html/index.html>`_   | Update to PyTango 7.1.4                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _version-history:
@@ -64,12 +64,30 @@ Version history
 +------------+-------------------------------------------------------------------------------------+
 | version    | Changes                                                                             |
 +============+=====================================================================================+
-| 7.2.0      | Features:                                                                           |
-|            |     - None so far                                                                   |
+| 7.1.4      | Features:                                                                           |
+|            |     - from sourceforge:                                                             |
+|            |         - 3274309: Generic Callback for events                                      |
 |            |                                                                                     |
 |            | Bug fixes:                                                                          |
 |            |     - from sourceforge:                                                             |
+|            |         - 3011775: Seg Faults due to removed dynamic attributes                     |
+|            |         - 3105169: PyTango 7.1.3 does not compile with Tango 7.2.X                  |
+|            |         - 3107243: spock profile does not work with python 2.5                      |
 |            |         - 3124427: PyTango.WAttribute.set_max_value() changes min value             |
+|            |         - 3170399: Missing documentation about is_<attr>_allowed method             |
+|            |         - 3189082: Missing get_properties() for Attribute class                     |
+|            |         - 3196068: delete_device() not called after server_admin.Kill()             |
+|            |         - 3257286: Binding crashes when reading a WRITE string attribute            |
+|            |         - 3267628: DP.read_attribute(, extract=List/tuple) write value is wrong     |
+|            |         - 3274262: Database.is_multi_tango_host missing                             |
+|            |         - 3274319: EncodedAttribute is missing in PyTango (<= 7.1.3)                |
+|            |         - 3277269: read_attribute(DevEncoded) is not numpy as expected              |
+|            |         - 3278946: DeviceAttribute copy constructor is not working                  |
+|            |                                                                                     |
+|            | Documentation:                                                                      |
+|            |     - Added :ref:`utilities` chapter                                                |
+|            |     - Added :ref:`encoded` chapter                                                  |
+|            |     - Improved :ref:`server` chapter                                                |
 +------------+-------------------------------------------------------------------------------------+
 | 7.1.3      | Features:                                                                           |
 |            |     - tango logging with print statement                                            |

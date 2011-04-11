@@ -941,21 +941,7 @@ def __doc_Database():
         Parameters : None
         Return     : True if multi tango host or False otherwise
 
-        New in PyTango 7.2.0
-    """ )
-
-    document_method("get_file_name", """
-    get_file_name(self) -> str
-
-            Returns the database file name or throws an exception
-            if not using a file database
-
-        Parameters : None
-        Return     : a string containing the database file name
-
-        Throws     : DevFailed
-        
-        New in PyTango 7.2.0
+        New in PyTango 7.1.4
     """ )
     
     document_method("get_info", """

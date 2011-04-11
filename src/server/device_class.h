@@ -2,17 +2,14 @@
 #define _DEVICE_CLASS_H_
 
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 
 class CppDeviceClass: public Tango::DeviceClass
 {
 public:
-    CppDeviceClass(const string &name)
-        :Tango::DeviceClass(const_cast<string&>(name))
-    {}
+    CppDeviceClass(const string &);
 
-    virtual ~CppDeviceClass()
-    {}
+    virtual ~CppDeviceClass();
 
     /**
      * Export a device.
@@ -101,17 +98,12 @@ public:
      * @param[in] self A reference to the python device class object
      * @param[in] name the class name
      */
-    CppDeviceClassWrap(PyObject *self, const std::string &name)
-        : CppDeviceClass(name), m_self(self)
-    {
-        init_class();
-    }
+    CppDeviceClassWrap(PyObject *self, const std::string &name);
 
     /**
      * Destructor
      */
-    virtual ~CppDeviceClassWrap()
-    {}
+    virtual ~CppDeviceClassWrap();
 
     /**
      * This method forward a C++ call to the device_factory method to the

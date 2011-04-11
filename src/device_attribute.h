@@ -24,12 +24,15 @@
 #pragma once
 
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 #include <iostream>
 #include <string>
 
 #include "pyutils.h"
 #include "defs.h"
+#include "pytgutils.h"
+#include "tango_numpy.h"
+#include "fast_from_py.h"
 
 namespace PyDeviceAttribute {
 
@@ -156,4 +159,55 @@ namespace PyDeviceAttribute {
         update_data_format(dev_proxy, dev_attr, 1);
         return convert_to_python(dev_attr, extract_as);
     }
+    
+
+    template<long tangoTypeConst>
+    static inline void _fill_scalar_attribute(Tango::DeviceAttribute & dev_attr, const boost::python::object & py_value)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+    TangoScalarType value;
+    from_py<tangoTypeConst>::convert(py_value.ptr(), value);
+        dev_attr << const_cast<TangoScalarType&>(value);
+    }
+
+    template<>
+    inline void _fill_scalar_attribute<Tango::DEV_STRING>(Tango::DeviceAttribute & dev_attr, const boost::python::object & py_value)
+    {
+        std::string value = boost::python::extract<std::string>(py_value);
+        dev_attr << value;
+    }
+
+    template<>
+    inline void _fill_scalar_attribute<Tango::DEV_ENCODED>(Tango::DeviceAttribute & dev_attr, const boost::python::object & py_value)
+    {
+        static const long tangoTypeConst = Tango::DEV_ENCODED;
+        typedef TANGO_const2type(tangoTypeConst) TangoScalarType;
+        typedef TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
+
+        /// @todo test it!!
+
+        /// @todo Now I am accepting 2 strings: encoded_format, encoded_data. This
+        /// is far from a good solution, but its something...
+
+        if (boost::python::len(py_value) != 2) {
+            raise_(PyExc_TypeError, "Expecting a tuple of strings: encoded_format, encoded_data");
+        }
+
+        boost::python::object encoded_format_str = py_value[0];
+        boost::python::object encoded_data_str = py_value[1];
+
+        /// @todo not sure... second parameter of insert is a reference, does it
+        /// mean anything? Does he pretend to take ownership of the pointer or
+        /// is he making another copy? what should I do?
+        char* encoded_format = const_cast<char*>((boost::python::extract<const char*>(encoded_format_str)()));
+        unsigned int encoded_data_len = boost::python::len(encoded_data_str);
+        unsigned char* encoded_data = reinterpret_cast<unsigned char*>(const_cast<char*>((boost::python::extract<const char*>(encoded_data_str)())));
+        // void insert(char *&,unsigned char *&,unsigned int);
+        dev_attr.insert(encoded_format, encoded_data, encoded_data_len);
+
+        std::string value = boost::python::extract<std::string>(py_value);
+        dev_attr << value;
+    }
+
 }

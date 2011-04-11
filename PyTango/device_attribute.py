@@ -38,8 +38,10 @@ def __DeviceAttribute__get_data(self):
     return self.get_data_raw().extract()
 
 def __DeviceAttribute__init(self, da=None):
-    DeviceAttribute.__init_orig(self)
-    if da is not None:
+    if da is None:
+        DeviceAttribute.__init_orig(self)
+    else:
+        DeviceAttribute.__init_orig(self, da)
         try: self.value = copy.deepcopy(da.value)
         except: pass
         try: self.w_value = copy.deepcopy(da.w_value)

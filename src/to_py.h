@@ -24,7 +24,7 @@
 #pragma once
 
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 
 #include "defs.h"
 
@@ -290,9 +290,12 @@ boost::python::object to_py(const Tango::PeriodicEventProp &);
 boost::python::object to_py(const Tango::ArchiveEventProp &);
 boost::python::object to_py(const Tango::EventProperties &);
 
-boost::python::object to_py(const Tango::AttributeConfig &);
-boost::python::object to_py(const Tango::AttributeConfig_2 &);
-boost::python::object to_py(const Tango::AttributeConfig_3 &);
+boost::python::object to_py(const Tango::AttributeConfig &, 
+                            boost::python::object py_attr_conf);
+boost::python::object to_py(const Tango::AttributeConfig_2 &,
+                            boost::python::object py_attr_conf);
+boost::python::object to_py(const Tango::AttributeConfig_3 &,
+                            boost::python::object py_attr_conf);
 
 boost::python::list to_py(const Tango::AttributeConfigList &);
 boost::python::list to_py(const Tango::AttributeConfigList_2 &);

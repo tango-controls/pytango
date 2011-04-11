@@ -23,7 +23,7 @@
 
 #include <boost/python.hpp>
 #include <boost/python/return_value_policy.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 #include <string>
 
 #include "defs.h"
@@ -255,10 +255,6 @@ void export_database()
             &Tango::Database::get_access_except_errors,
             return_internal_reference<1>())
         .def("is_multi_tango_host", &Tango::Database::is_multi_tango_host)
-        
-        //.def("get_file_name", &PyDatabase::get_file_name)
-        .def("get_file_name", &Tango::Database::get_file_name,
-            return_value_policy<copy_const_reference>())
         
         //
         // General methods

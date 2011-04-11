@@ -901,7 +901,7 @@ def init_console(ip):
     o = ip.options
 
     so = IPython.ipstruct.Struct(
-        spock_banner = """{Blue}hint: Try typing: mydev = Device("{LightBlue}<tab>{Normal}\n""")
+        spock_banner = """%(Blue)shint: Try typing: mydev = Device("%(LightBlue)s<tab>%(Normal)s\n""")
 
     so = ip.user_ns.get("spock_options", so)
     
@@ -909,15 +909,17 @@ def init_console(ip):
     o.prompt_in1 = "Spock <$DB_NAME> [\\#]: "
     o.prompt_out = "Result [\\#]: "
     banner = """
-{LightPurple}Spock {version}{Normal} -- An interactive {Purple}Tango{Normal} client.
+%(Purple)sSpock %(version)s%(Normal)s -- An interactive %(Purple)sTango%(Normal)s client.
 
-Running on top of Python {pyver}, IPython {ipyver} and PyTango {pytangover}
+Running on top of Python %(pyver)s, IPython %(ipyver)s and PyTango %(pytangover)s
 
 help      -> Spock's help system.
 object?   -> Details about 'object'. ?object also works, ?? prints more.
 
 """ + so.spock_banner
-    o.banner = banner.format(**d)
+    o.banner = banner % d
+    if hasattr(o.banner, "format"):
+        o.banner = o.banner.format(**d)
     
 def init_magic(ip):
     __expose_magic(ip, "refreshdb", magic_refreshdb)
