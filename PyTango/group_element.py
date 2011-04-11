@@ -190,13 +190,14 @@ def __doc_GroupElement():
         
         Parameters :
             - patterns   : (str | sequence<str>) A string with the pattern or a
-                            list of patterns.
+                           list of patterns.
             - forward    : (bool) If fwd is set to true (the default), the remove
-                            request is also forwarded to subgroups. Otherwise,
-                            it is only applied to the local set of elements.
-                            For instance, the following code remove any
-                            stepper motor in the hierarchy:
-                                root_group->remove("*/stepper_motor/*");
+                           request is also forwarded to subgroups. Otherwise,
+                           it is only applied to the local set of elements.
+                           For instance, the following code remove any
+                           stepper motor in the hierarchy:
+                           
+                               root_group->remove("*/stepper_motor/*");
                 
         Return     : None
         

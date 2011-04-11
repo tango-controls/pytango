@@ -28,14 +28,7 @@ using namespace boost::python;
 
 void export_device_info()
 {
-    class_<Tango::DeviceInfo>("DeviceInfo",
-        "A structure containing available information for a device with the\n"
-        "following members,\n"
-        " - dev_class : string\n"
-        " - server_id : string\n"
-        " - server_host : string\n"
-        " - server_version : integer\n"
-        " - doc_url : string")
+    class_<Tango::DeviceInfo>("DeviceInfo")
         .def_readonly("dev_class", &Tango::DeviceInfo::dev_class)
         .def_readonly("server_id", &Tango::DeviceInfo::server_id)
         .def_readonly("server_host", &Tango::DeviceInfo::server_host)

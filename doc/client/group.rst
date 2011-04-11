@@ -23,6 +23,7 @@ GroupReply classes
 
 Group member functions do not return the same as their DeviceProxy counterparts,
 but objects that contain them. This is:
+
     - *write attribute* family returns PyTango.GroupReplyList
     - *read attribute* family returns PyTango.GroupAttrReplyList
     - *command inout* family returns PyTango.GroupCmdReplyList

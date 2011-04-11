@@ -281,12 +281,11 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
         Parameters :
             attr : (Attr) the new attribute to be added to the list.
             r_meth : (callable) the read method to be called on a read request
-            w_meth : (callable) th write method to be called on a write request (if attr is writable)
-            is_allo_meth: (callable) the method that is called to check if it is possible to access
-                          the attribute or not
-
+            w_meth : (callable) the write method to be called on a write request (if attr is writable)
+            is_allo_meth: (callable) the method that is called to check if it is possible to access the attribute or not
+        
         Return     : None
-
+        
         Throws     : DevFailed"""
     att_name = attr.get_name()
 
@@ -1130,7 +1129,7 @@ def __doc_extra_DeviceImpl(cls):
             Write the hardware for attributes.
             Default method to implement an action necessary on a device to write
             the hardware involved in a a write attribute. This method must be
-             redefined in sub-classes in order to support writable attribute
+            redefined in sub-classes in order to support writable attribute
 
         Parameters :
             attr_list : (sequence<int>) list of indices in the device object attribute vector
@@ -1434,12 +1433,13 @@ def __doc_Attribute():
     
     document_method("set_value", """
     set_value(self, data, dim_x = 1, dim_y = 0) -> None <= DEPRECATED
-    set_value(self, data)
+    set_value(self, data) -> None
     set_value(self, str_data, data) -> None
 
             Set internal attribute value.
             This method stores the attribute read value inside the object.
             This method also stores the date when it is called and initializes the attribute quality factor.
+            
         Parameters :
             - data : the data to be set. Data must be compatible with the attribute type and format.
                      In the DEPRECATED form for SPECTRUM and IMAGE attributes, data

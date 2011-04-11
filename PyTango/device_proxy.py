@@ -375,25 +375,26 @@ def __DeviceProxy__delete_property(self, value):
     
             Delete a the given of properties for this device.
             This method accepts the following types as value parameter:
-            1. string [in] - single property to be deleted
-            2. PyTango.DbDatum [in] - single property data to be deleted
-            3. PyTango.DbData [in] - several property data to be deleted
-            4. sequence<string> [in]- several property data to be deleted
-            5. sequence<DbDatum> [in] - several property data to be deleted
-            6. dict<str, obj> [in] - keys are property names to be deleted (values are ignored)
-            7. dict<str, DbDatum> [in] - several DbDatum.name are property names to be
-               deleted (keys are ignored)
+            
+                1. string [in] - single property to be deleted
+                2. PyTango.DbDatum [in] - single property data to be deleted
+                3. PyTango.DbData [in] - several property data to be deleted
+                4. sequence<string> [in]- several property data to be deleted
+                5. sequence<DbDatum> [in] - several property data to be deleted
+                6. dict<str, obj> [in] - keys are property names to be deleted (values are ignored)
+                7. dict<str, DbDatum> [in] - several DbDatum.name are property names to be deleted (keys are ignored)
 
         Parameters :
             - value : can be one of the following:
+            
                 1. string [in] - single property data to be deleted
                 2. PyTango.DbDatum [in] - single property data to be deleted
                 3. PyTango.DbData [in] - several property data to be deleted
                 4. sequence<string> [in]- several property data to be deleted
                 5. sequence<DbDatum> [in] - several property data to be deleted
                 6. dict<str, obj> [in] - keys are property names to be deleted (values are ignored)
-                7. dict<str, DbDatum> [in] - several DbDatum.name are property names
-                   to be deleted (keys are ignored)
+                7. dict<str, DbDatum> [in] - several DbDatum.name are property names to be deleted (keys are ignored)
+        
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed
@@ -1223,6 +1224,7 @@ def __doc_DeviceProxy():
         Parameters : None
         Return     : (sequence<str>) One string for each polled command/attribute.
                      Each string is multi-line string with:
+                     
                         - attribute/command name
                         - attribute/command polling period in milliseconds
                         - attribute/command polling ring buffer

@@ -36,6 +36,7 @@ def __doc_Except():
     
     Except.__doc__ = """
     A containner for the static methods:
+    
         - throw_exception
         - re_throw_exception
         - print_exception
@@ -98,7 +99,8 @@ def __doc_DevError():
     DevError.__doc__ = """
     Structure describing any error resulting from a command execution,
     or an attribute query, with following members:
-        - reason : (str)
+    
+        - reason : (str) reason
         - severity : (ErrSeverity) error severty (WARN, ERR, PANIC)
         - desc : (str) error description
         - origin : (str) Tango server method in which the error happened"""

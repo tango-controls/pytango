@@ -218,12 +218,10 @@ class Util(_Util):
 
         This class is implemented using the singleton design pattern.
         Therefore a device server process can have only one instance of this
-        class and its constructor is not public.
-
-            Example:
-                util = PyTango.Util.instance()
-                print util.get_host_name()
-        """
+        class and its constructor is not public. Example::
+            
+            util = PyTango.Util.instance()
+            print util.get_host_name()"""
 
     def __init__(self, args):
         args = copy.copy(args)
@@ -232,11 +230,13 @@ class Util(_Util):
         _Util.init_python()
 
     def add_TgClass(self, klass_device_class, klass_device, device_class_name=None):
-        """Register a new python tango class.
+        """Register a new python tango class. Example::
            
-           Example:
                util.add_TgClass(MotorClass, Motor)
-               util.add_TgClass(MotorClass, Motor, 'Motor') # equivalent to previous line"""
+               util.add_TgClass(MotorClass, Motor, 'Motor') # equivalent to previous line
+           
+           .. deprecated:: 7.1.2
+               Use :meth:`PyTango.Util.add_class` instead."""
                
         if device_class_name is None:
             device_class_name = klass_device.__name__
@@ -247,12 +247,15 @@ class Util(_Util):
         """Register a new C++ tango class.
            
            If there is a shared library file called MotorClass.so which
-           contains a MotorClass class and a _create_MotorClass_class method.
-           Example:
+           contains a MotorClass class and a _create_MotorClass_class method. Example::
+           
                util.add_Cpp_TgClass('MotorClass', 'Motor')
                
-           .. note: the parameter 'device_class_name' must match the shared
-           library name."""
+           .. note:: the parameter 'device_class_name' must match the shared
+                     library name.
+                    
+           .. deprecated:: 7.1.2
+               Use :meth:`PyTango.Util.add_class` instead."""
         cpp_class_list.append((device_class_name, tango_device_class_name))
 
     def add_class(self, *args, **kwargs):
@@ -263,9 +266,8 @@ class Util(_Util):
            
                 If language is 'python' then args must be the same as 
                 :meth:`PyTango.Util.add_TgClass`. Otherwise, args should be the ones
-                in :meth:`PyTango.Util.add_Cpp_TgClass`.
-            
-                Example:
+                in :meth:`PyTango.Util.add_Cpp_TgClass`. Example::
+                
                     util.add_class(MotorClass, Motor)
                     util.add_class('CounterClass', 'Counter', language='c++')
            
