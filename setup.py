@@ -459,7 +459,7 @@ class install(dftinstall):
                 global _IPY_ROOT
                 self.ipython_dir = os.path.join(_IPY_ROOT, "Extensions")
         else:
-            if ipython-local:
+            if self.ipython_local:
                 self.warn("Both options 'ipython-dir' and 'ipython-local' were given. " \
                           "'ipython-dir' will be used.")
         self.ensure_dirname('ipython_dir')

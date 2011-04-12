@@ -73,6 +73,7 @@ Version history
 |            |         - 3284265: [pytango][7.1.4] a few files without licence and copyright       |
 |            |         - 3284318: copyleft vs copyright                                            |
 |            |         - 3284434: [pytango][doc] few ERROR during the doc generation               |
+|            |         - 3284435: [pytango][doc] few warning during the doc generation             |
 +------------+-------------------------------------------------------------------------------------+
 | 7.1.4      | Features:                                                                           |
 |            |     - from sourceforge:                                                             |
