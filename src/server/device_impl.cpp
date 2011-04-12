@@ -869,9 +869,7 @@ Device_4ImplWrap::Device_4ImplWrap(PyObject *self, CppDeviceClass *cl,
 }
 
 Device_4ImplWrap::~Device_4ImplWrap()
-{
-    cout << "-----------------------------------------------------hello" <<endl;
-}
+{}
 
 void Device_4ImplWrap::_init()
 {
