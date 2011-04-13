@@ -52,13 +52,14 @@ prefix=$(_PY_DIR)/site-packages
 endif
 endif
 
-
 SRC_DIR = src
+
+ifndef OBJS_DIR
 OBJS_DIR = objs
+endif
 
 CC = gcc
 CCFLAGS = -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -fPIC $(INCLUDE_DIRS)
-CCOPTS = -include$(SRC_DIR)/precompiled_header.hpp
 
 LN = g++ -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions
 LN_VER = -Wl,-h -Wl,--strip-all
@@ -76,7 +77,6 @@ $(TANGO_INC)/tango \
 $(PY_INC) \
 $(NUMPY_INC)
 
-PREP = $(SRC_DIR)/precompiled_header.hpp
 LIBNAME = _PyTango.so
 
 OBJS = \
@@ -160,10 +160,10 @@ device_impl.h
 
 all: build
 
-build: $(PREP).gch $(LIBNAME)
+build: init $(LIBNAME)
 
-$(PREP).gch: $(PREP)
-	$(CC) $(CCFLAGS) -c $< -o $(PREP).gch
+init:
+	mkdir -p $(OBJS_DIR)
 
 #
 # Rule for shared library
@@ -177,12 +177,10 @@ $(PREP).gch: $(PREP)
 # Rule for API files
 #
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $(OBJS_DIR)
-	$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(CCOPTS)
+	$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o
 
 $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
-	mkdir -p $(OBJS_DIR)
-	$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(CCOPTS)
+	$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o
 
 #
 #	The shared libs
@@ -193,9 +191,8 @@ $(LIBNAME): $(OBJS)
 
 clean:
 	rm -f *.o core
-	rm -f $(OBJS_DIR)/*.o
-	rm -f $(OBJS_DIR)/*.so
 	rm -f $(PREP).gch
+	rm -rf $(OBJS_DIR)
 
 install: build
 	rsync -r PyTango $(prefix)

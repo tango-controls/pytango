@@ -680,7 +680,7 @@ PyDeviceImplBase::~PyDeviceImplBase()
 
 void PyDeviceImplBase::py_delete_dev()
 {}
-
+ 
 Device_3ImplWrap::Device_3ImplWrap(PyObject *self, CppDeviceClass *cl,
                                    std::string &st)
     :Tango::Device_3Impl(cl,st),
@@ -705,15 +705,6 @@ void Device_3ImplWrap::_init()
     // Make sure the wrapper contains a valid pointer to the self
     // I found out this is needed by inspecting the boost wrapper_base.hpp code
     initialize_wrapper(the_self, this);
-
-    // Tell Tango that this is a Python device.
-    // Humm, we should try to avoid this in the future
-    this->set_py_device(true);
-
-    Tango::Device_3ImplExt *tmp_ptr = ext_3;
-    Py_Device_3ImplExt *new_ext = new Py_Device_3ImplExt(this);
-    ext_3 = new_ext;
-    delete tmp_ptr;
 }
 
 void Device_3ImplWrap::init_device()
@@ -869,22 +860,13 @@ Device_4ImplWrap::Device_4ImplWrap(PyObject *self, CppDeviceClass *cl,
 }
 
 Device_4ImplWrap::~Device_4ImplWrap()
-{}
+{ delete_device(); }
 
 void Device_4ImplWrap::_init()
 {
     // Make sure the wrapper contains a valid pointer to the self
     // I found out this is needed by inspecting the boost wrapper_base.hpp code
     initialize_wrapper(the_self, this);
-
-    // Tell Tango that this is a Python device.
-    // Humm, we should try to avoid this in the future
-    this->set_py_device(true);
-
-    Tango::Device_3ImplExt *tmp_ptr = ext_3;
-    Py_Device_3ImplExt *new_ext = new Py_Device_3ImplExt(this);
-    ext_3 = new_ext;
-    delete tmp_ptr;
 }
 
 void Device_4ImplWrap::init_device()
@@ -1010,22 +992,6 @@ void Device_4ImplWrap::signal_handler(long signo)
 void Device_4ImplWrap::default_signal_handler(long signo)
 {
     this->Tango::Device_4Impl::signal_handler(signo);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Ext
-///////////////////////////////////////////////////////////////////////////////
-
-Py_Device_3ImplExt::Py_Device_3ImplExt(PyDeviceImplBase *ptr)
-    :Tango::Device_3ImplExt(), my_dev(ptr)
-{}
-
-Py_Device_3ImplExt::~Py_Device_3ImplExt()
-{}
-
-void Py_Device_3ImplExt::delete_dev()
-{
-    my_dev->py_delete_dev();
 }
 
 #if ((defined sun) || (defined WIN32))

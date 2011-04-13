@@ -173,10 +173,6 @@ CppDeviceClassWrap::~CppDeviceClassWrap()
 void CppDeviceClassWrap::init_class()
 {
     AutoPythonGIL python_guard;
-    
-    //@TODO remove this line when Tango C++ is cleaned up
-    //set_py_class(true);
-
     signal_handler_defined = is_method_defined(m_self, "signal_handler");
 }
 
@@ -345,7 +341,6 @@ void export_device_class()
         .def("_device_destroyer",
             (void (Tango::DeviceClass::*) (const char *))
             &Tango::DeviceClass::device_destroyer)
-        .def("is_py_class", &Tango::DeviceClass::is_py_class)
         .def("_create_attribute", &CppDeviceClass::create_attribute)
         .def("_create_command", &CppDeviceClass::create_command)
     ;

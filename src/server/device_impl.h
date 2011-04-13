@@ -419,32 +419,4 @@ protected:
     void _init();
 };
 
-/**
- * Device_3Impl extension wrapper
- */
-class Py_Device_3ImplExt:public Tango::Device_3ImplExt
-{
-public:
-    /** pointer to pytango wrapper */
-    PyDeviceImplBase *my_dev;
-
-    /**
-     * Constructor
-     *
-     * @param[in] ptr Device_4Impl wrapper pointer
-     */
-    Py_Device_3ImplExt(PyDeviceImplBase *ptr);
-
-    /**
-     * Destructor
-     */
-    virtual ~Py_Device_3ImplExt();
-
-    /**
-     * overwrite of delete_dev method
-     */
-    virtual void delete_dev();
-
-};
-
 #endif // _DEVICE_IMPL_H
