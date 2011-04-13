@@ -708,7 +708,7 @@ void Device_3ImplWrap::_init()
 
     // Tell Tango that this is a Python device.
     // Humm, we should try to avoid this in the future
-    //this->set_py_device(true);
+    this->set_py_device(true);
 
     Tango::Device_3ImplExt *tmp_ptr = ext_3;
     Py_Device_3ImplExt *new_ext = new Py_Device_3ImplExt(this);

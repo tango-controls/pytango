@@ -105,8 +105,9 @@ please_debug = False
 packages = [
     'PyTango',
     'PyTango.ipython',
-    'PyTango3'
 ]
+
+py_modules = []
 
 provides = [
     'PyTango',
@@ -309,32 +310,29 @@ from distutils.command.install import install as dftinstall
 from distutils.unixccompiler import UnixCCompiler
 
 class build(dftbuild):
-
+    
     user_options = dftbuild.user_options + \
-        [('ipython-local', None, "install spock as current user profile instead of as an ipython extension"),
-        ('ipython-dir=', None, "Location of the ipython installation. (Defaults to '%s' if ipython-local is NOT set or to '%s' otherwise" % (_IPY_ROOT, _IPY_LOCAL) ) ]
-
-    boolean_options = [ 'ipython-local' ]
-
+        [('with-pytango3', None, "distribute PyTango3 module"),
+         ('without-spock', None, "spock IPython extension")]
+    
+    boolean_options = dftbuild.boolean_options + ['with-pytango3', 'without-spock']
+    
     def initialize_options (self):
         dftbuild.initialize_options(self)
-        self.ipython_dir = None
-        self.ipython_local = False
+        self.with_pytango3 = None
+        self.without_spock = None
     
     def finalize_options(self):
         dftbuild.finalize_options(self)
-        if self.ipython_dir is None:
-            if self.ipython_local:
-                global _IPY_LOCAL
-                self.ipython_dir = _IPY_LOCAL
-            else:
-                global _IPY_ROOT
-                self.ipython_dir = os.path.join(_IPY_ROOT, "Extensions")
-        else:
-            if ipython-local:
-                self.warn("Both options 'ipython-dir' and 'ipython-local' were given. " \
-                          "'ipython-dir' will be used.")
-        self.ensure_dirname('ipython_dir')
+        
+    def run(self):
+        if self.with_pytango3:
+            self.distribution.packages.append('PyTango3')
+        
+        if IPython and not self.without_spock:
+            self.distribution.py_modules.append('IPython.Extensions.ipy_profile_spock')
+
+        dftbuild.run(self)
 
     def has_doc(self):
         if sphinx is None: return False
@@ -373,45 +371,6 @@ if sphinx:
     
     cmdclass['build_doc'] = build_doc
 
-if IPython:
-    class install_spock(Command):
-        
-        description = "Install Spock, the PyTango's IPython extension"
-
-        user_options = [
-            ('ipython-local', None, "install spock as current user profile instead of as an ipython extension"),
-            ('ipython-dir=', None, "Location of the ipython installation. (Defaults to '%s' if ipython-local is NOT set or to '%s' otherwise" % (_IPY_ROOT, _IPY_LOCAL) ) ]
-
-        boolean_options = [ 'ipython-local' ]
-
-        def initialize_options (self):
-            self.ipython_dir = None
-            self.ipython_local = False
-        
-        def finalize_options(self):
-            self.set_undefined_options('install',
-                                       ('ipython_local', 'ipython_local'),
-                                       ('ipython_dir', 'ipython_dir'))
-        
-        def run(self):
-            added_path = False
-            try:
-                import PyTango.ipython
-                PyTango.ipython.install(self.ipython_dir, verbose=False)
-            except IOError, ioerr:
-                self.warn("Unable to install Spock IPython extension. Reason:")
-                self.warn(str(ioerr))
-                if ioerr.errno == errno.EACCES:
-                    self.warn("Probably you don't have enough previledges to install spock as an ipython extension.")
-                    self.warn("Try executing setup.py with sudo or otherwise give '--ipython-local' parameter to")
-                    self.warn("setup.py to install spock as a current user ipython profile.")
-                    self.warn("type: setup.py --help install_spock for more information")
-            except Exception, e:
-                self.warn("Unable to install Spock IPython extension. Reason:")
-                self.warn(str(e))
-            
-    cmdclass['install_spock'] = install_spock
-
 
 class install_html(Command):
 
@@ -434,36 +393,15 @@ cmdclass['install_html'] = install_html
 
 class install(dftinstall):
     
-    user_options = list(dftinstall.user_options)
-    user_options.extend([
-        ('ipython-local', None, "install spock as current user profile instead of as an ipython extension"),
-        ('ipython-dir=', None, "Location of the ipython installation. (Defaults to '%s' if ipython-local is NOT set or to '%s' otherwise" % (_IPY_ROOT, _IPY_LOCAL) ),
-        ('install-html=', None, "installation directory for HTML documentation") ])
-
-    boolean_options = list(dftinstall.boolean_options)
-    boolean_options.append('ipython-local')
+    user_options = dftinstall.user_options + \
+        [('install-html=', None, "installation directory for HTML documentation"),]
 
     def initialize_options(self):
         dftinstall.initialize_options(self)
-        self.ipython_dir = None
-        self.ipython_local = False
         self.install_html = None
-    
+
     def finalize_options(self):
         dftinstall.finalize_options(self)
-        if self.ipython_dir is None:
-            if self.ipython_local:
-                global _IPY_LOCAL
-                self.ipython_dir = _IPY_LOCAL
-            else:
-                global _IPY_ROOT
-                self.ipython_dir = os.path.join(_IPY_ROOT, "Extensions")
-        else:
-            if self.ipython_local:
-                self.warn("Both options 'ipython-dir' and 'ipython-local' were given. " \
-                          "'ipython-dir' will be used.")
-        self.ensure_dirname('ipython_dir')
-
         # We do a hack here. We cannot trust the 'install_base' value because it
         # is not always the final target. For example, in unix, the install_base
         # is '/usr' and all other install_* are directly relative to it. However,
@@ -475,16 +413,11 @@ class install(dftinstall):
         # different systems.
         if self.install_html is None:
             self.install_html = os.path.join(self.install_data, 'share', 'doc', 'PyTango', 'html')
-        self.dump_dirs("Installation directories")
         
-    def has_ipython(self):
-        return IPython is not None
-
     def has_html(self):
         return sphinx is not None
     
     sub_commands = list(dftinstall.sub_commands)
-    sub_commands.append(('install_spock', has_ipython))
     sub_commands.append(('install_html', has_html))
 
 
@@ -503,6 +436,7 @@ dist = setup(
     license          = Release.license,
     packages         = packages,
     package_dir      = { 'PyTango' : 'PyTango', 'PyTango3' : 'PyTango3' },
+    py_modules       = py_modules,
     classifiers      = classifiers,
     package_data     = package_data,
     data_files       = data_files,

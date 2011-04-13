@@ -13,14 +13,18 @@ Welcome to PyTango 7.1 documentation!
 
 .. sidebar:: Latest news
 
+    2011-04-13:
+        PyTango 7.1.5 is out!
+
+    2011-04-12:
+        PyTango 7.1.4 doesn't compile. Please don't use this release.
+        PyTango 7.1.5 will be released soon.
+
     2011-04-08:
         PyTango 7.1.4 is out!
 
     2010-11-05:
         PyTango 7.1.3 is out!
-
-    2010-08-19:
-        :ref:`Tango logging <logging>` updated
 
 PyTango is a python module that exposes to Python_ the complete Tango_ C++ API.
 This includes both client and server API.

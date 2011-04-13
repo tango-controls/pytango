@@ -55,7 +55,7 @@ History of modifications:
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 08/04/11 | `8.8 <http://www.tango-controls.org/static/PyTango/v714/doc/html/index.html>`_   | Update to PyTango 7.1.4                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| 12/04/11 | `8.9 <http://www.tango-controls.org/static/PyTango/v715/doc/html/index.html>`_   | Update to PyTango 7.1.5                             | T\. Coutinho          |
+| 13/04/11 | `8.9 <http://www.tango-controls.org/static/PyTango/v715/doc/html/index.html>`_   | Update to PyTango 7.1.5                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _version-history:
@@ -66,14 +66,14 @@ Version history
 +------------+-------------------------------------------------------------------------------------+
 | version    | Changes                                                                             |
 +============+=====================================================================================+
-| 7.1.5      |                                                                                     |
-|            | Bug fixes:                                                                          |
+| 7.1.5      | Bug fixes:                                                                          |
 |            |     - from sourceforge:                                                             |
 |            |         - 3284174: 7.1.4 does not build with gcc 4.5 and tango 7.2.6                |
 |            |         - 3284265: [pytango][7.1.4] a few files without licence and copyright       |
 |            |         - 3284318: copyleft vs copyright                                            |
 |            |         - 3284434: [pytango][doc] few ERROR during the doc generation               |
 |            |         - 3284435: [pytango][doc] few warning during the doc generation             |
+|            |         - 3284440: [pytango][spock] the profile can't be installed                  |
 +------------+-------------------------------------------------------------------------------------+
 | 7.1.4      | Features:                                                                           |
 |            |     - from sourceforge:                                                             |
