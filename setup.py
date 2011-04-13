@@ -270,7 +270,7 @@ else:
     # and then uncommenting this line. Someday maybe this will be
     # automated...
     extra_compile_args += [
-        '-includesrc/precompiled_header.hpp',
+#        '-includesrc/precompiled_header.hpp',
     ]
 
     #if not please_debug:
