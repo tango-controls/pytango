@@ -260,10 +260,12 @@ def __DeviceImpl__get_device_properties(self, ds_class = None):
         except:
             return
     try:
-        self.prop_util = ds_class.prop_util
+        pu = self.prop_util = ds_class.prop_util
         self.device_property_list = copy.deepcopy(ds_class.device_property_list)
         class_prop = ds_class.class_property_list
-        self.prop_util.get_device_properties(self, class_prop, self.device_property_list)
+        pu.get_device_properties(self, class_prop, self.device_property_list)
+        for prop_name in class_prop.keys():
+            setattr(self, prop_name, pu.get_property_values(prop_name, class_prop))
         for prop_name in self.device_property_list.keys():
             setattr(self, prop_name, self.prop_util.get_property_values(prop_name, self.device_property_list))
     except _PyTango.DevFailed, e:

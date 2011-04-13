@@ -286,15 +286,13 @@ class DeviceClass(_DeviceClass):
         _DeviceClass.__init__(self,name)
         self.dyn_att_added_methods = []
         try:
-            self.prop_util = PropUtil()
+            pu = self.prop_util = PropUtil()
             self.py_dev_list = []
-            has_cl_prop = hasattr(self,"class_property_list")
-            has_dev_prop = hasattr(self,"device_property_list")
-            if has_cl_prop and has_dev_prop:
-                self.prop_util.set_default_property_values(self,self.class_property_list, self.device_property_list)
-                self.prop_util.get_class_properties(self, self.class_property_list)
-                for prop_name in self.class_property_list.keys():
-                    setattr(self, prop_name, self.prop_util.get_property_values(prop_name, self.class_property_list))
+            pu.set_default_property_values(self, self.class_property_list,
+                                           self.device_property_list)
+            pu.get_class_properties(self, self.class_property_list)
+            for prop_name in self.class_property_list.keys():
+                setattr(self, prop_name, pu.get_property_values(prop_name, self.class_property_list))
         except DevFailed, df:
             print("PyDS: %s: A Tango error occured in the constructor:" % name)
             Except.print_exception(df)
