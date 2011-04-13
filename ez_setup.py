@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## This file is part of Taurus, a Tango User Interface Library
+## This file is part of PyTango, a python binding for Tango
 ## 
 ## http://www.tango-controls.org/static/PyTango/latest/doc/html/index.html
 ##
