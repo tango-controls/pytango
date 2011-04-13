@@ -1,6 +1,6 @@
 #!python
 
-##############################################################################
+################################################################################
 ##
 ## This file is part of PyTango, a python binding for Tango
 ## 
@@ -21,7 +21,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with PyTango.  If not, see <http://www.gnu.org/licenses/>.
 ##
-##############################################################################
+################################################################################
 
 """Bootstrap setuptools installation
 
