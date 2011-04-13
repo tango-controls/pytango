@@ -74,6 +74,7 @@ Version history
 |            |         - 3284434: [pytango][doc] few ERROR during the doc generation               |
 |            |         - 3284435: [pytango][doc] few warning during the doc generation             |
 |            |         - 3284440: [pytango][spock] the profile can't be installed                  |
+|            |         - 3285185: PyTango Device Server does not load Class Properties values      |
 |            |         - 3286055: PyTango 7.1.x DS using Tango C++ 7.2.x seg faults on exit        |
 +------------+-------------------------------------------------------------------------------------+
 | 7.1.4      | Features:                                                                           |
