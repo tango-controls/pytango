@@ -1,5 +1,7 @@
 recursive-include PyTango *.py
 recursive-include PyTango3 *.py
+recursive-include IPython *.py
+
 graft src
 graft doc
 graft build/sphinx/html

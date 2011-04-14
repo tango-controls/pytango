@@ -331,7 +331,7 @@ class build(dftbuild):
         
         if IPython and not self.without_spock:
             self.distribution.py_modules.append('IPython.Extensions.ipy_profile_spock')
-
+            
         dftbuild.run(self)
 
     def has_doc(self):
