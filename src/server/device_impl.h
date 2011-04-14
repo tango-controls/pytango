@@ -25,7 +25,7 @@
 #define _DEVICE_IMPL_H
 
 #include <boost/python.hpp>
-#include <tango.h>
+#include <tango/tango.h>
 
 #include <server/device_class.h>
 
@@ -167,6 +167,11 @@ public:
                      const char *status = StatusNotSet);
 
     /**
+     * Destructor
+     */
+    virtual ~Device_3ImplWrap();
+    
+    /**
      * A wrapper around the add_attribute in order to process some
      * internal information
      *
@@ -180,12 +185,6 @@ public:
      * string & to const string & conversion and default parameters
      */
     void _remove_attribute(const char *att_name);
-
-    /**
-     * Destructor
-     */
-    virtual ~Device_3ImplWrap()
-    {}
 
     /**
      * Necessary init_device implementation to call python

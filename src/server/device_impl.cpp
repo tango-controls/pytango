@@ -24,7 +24,7 @@
 #include <boost/python.hpp>
 #include <boost/python/return_value_policy.hpp>
 #include <string>
-#include <tango.h>
+#include <tango/tango.h>
 
 #include "defs.h"
 #include "pytgutils.h"
@@ -700,6 +700,9 @@ Device_3ImplWrap::Device_3ImplWrap(PyObject *self, CppDeviceClass *cl,
     _init();
 }
 
+Device_3ImplWrap::~Device_3ImplWrap()
+{ delete_device(); }
+
 void Device_3ImplWrap::_init()
 {
     // Make sure the wrapper contains a valid pointer to the self
@@ -1215,6 +1218,14 @@ void export_device_impl()
         .def("__warn_stream", &PyDeviceImpl::warn)
         .def("__error_stream", &PyDeviceImpl::error)
         .def("__fatal_stream", &PyDeviceImpl::fatal)
+
+        .def("get_min_poll_period", &Tango::DeviceImpl::get_min_poll_period)
+        .def("get_cmd_min_poll_period", 
+            &Tango::DeviceImpl::get_cmd_min_poll_period,
+            return_internal_reference<>())
+        .def("get_attr_min_poll_period", 
+            &Tango::DeviceImpl::get_attr_min_poll_period,
+            return_internal_reference<>())
     ;
     implicitly_convertible<auto_ptr<DeviceImplWrap>, auto_ptr<Tango::DeviceImpl> >();
     

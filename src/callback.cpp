@@ -22,7 +22,7 @@
 *******************************************************************************/
 
 #include <boost/python.hpp>
-#include <tango.h>
+#include <tango/tango.h>
 #include "pytgutils.h"
 #include "callback.h"
 #include "device_attribute.h"

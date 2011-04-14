@@ -24,7 +24,7 @@
 #include <boost/python.hpp>
 #include <boost/python/return_value_policy.hpp>
 #include <string>
-#include <tango.h>
+#include <tango/tango.h>
 
 #include "defs.h"
 #include "pytgutils.h"
@@ -527,6 +527,8 @@ void export_attribute()
         .def("is_check_change_criteria", &Tango::Attribute::is_check_change_criteria)
         .def("is_archive_event", &Tango::Attribute::is_archive_event)
         .def("is_check_archive_criteria", &Tango::Attribute::is_check_archive_criteria)
+        .def("set_data_ready_event", &Tango::Attribute::set_data_ready_event)
+        .def("is_data_ready_event", &Tango::Attribute::is_data_ready_event)
         .def("remove_configuration", &Tango::Attribute::remove_configuration)
         
         .def("_get_properties", &PyAttribute::get_properties)

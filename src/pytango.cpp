@@ -32,7 +32,7 @@
 #   include <numpy/arrayobject.h>
 #endif
 
-#include <tango.h>
+#include <tango/tango.h>
 #include <iostream>
 #include <string>
 

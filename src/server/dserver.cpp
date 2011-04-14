@@ -22,7 +22,7 @@
 *******************************************************************************/
 
 #include <boost/python.hpp>
-#include <tango.h>
+#include <tango/tango.h>
 
 #include "to_py.h"
 #include "from_py.h"

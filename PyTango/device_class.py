@@ -677,15 +677,6 @@ class DeviceClass(_DeviceClass):
             tmp_dev_list.append(device)
 
         self.dyn_attr(tmp_dev_list)
-#        try:
-#            self.dyn_attr(tmp_dev_list)
-#        except DevFailed, df:
-#            print("PyDS: %s: A Tango error occured trying to create dynamic attributes" % name)
-#            Except.print_exception(df)
-#        except Exception, e:
-#            print("PyDS: %s: An error occured trying to create dynamic attributes" % klass_name)
-#            print(str(e))
-#            sys.exit()
 
         for dev in tmp_dev_list:
             if Util._UseDb and not Util._FileDb:

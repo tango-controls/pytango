@@ -25,7 +25,7 @@
 #define _ATTRIBUTE_H_
 
 #include <boost/python.hpp>
-#include <tango.h>
+#include <tango/tango.h>
 
 namespace PyAttribute
 {

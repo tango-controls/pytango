@@ -22,7 +22,7 @@
 *******************************************************************************/
 
 #include <boost/python.hpp>
-#include <tango.h>
+#include <tango/tango.h>
 #include <iostream>
 
 #include "defs.h"
@@ -78,7 +78,7 @@ namespace PyUtil
         for(int i = 0; i < cc_len; ++i)
         {
             CppDeviceClass *cpp_dc = extract<CppDeviceClass *> (constructed_classes[i])();
-            dserver->add_class(cpp_dc);
+            dserver->_add_class(cpp_dc);
         }
     }
 

@@ -22,7 +22,7 @@
 *******************************************************************************/
 
 #include <boost/python.hpp>
-#include <tango.h>
+#include <tango/tango.h>
 
 #include "server/attr.h"
 
@@ -105,6 +105,8 @@ void export_attr()
         .def("set_archive_event", &Tango::Attr::set_archive_event)
         .def("is_archive_event", &Tango::Attr::is_archive_event)
         .def("is_check_archive_criteria", &Tango::Attr::is_check_archive_criteria)
+        .def("set_data_ready_event", &Tango::Attr::set_data_ready_event)
+        .def("is_data_ready_event", &Tango::Attr::is_data_ready_event)
         .def("get_name", &Tango::Attr::get_name,
             return_value_policy<copy_non_const_reference>())
         .def("get_format", &Tango::Attr::get_format)
@@ -117,6 +119,9 @@ void export_attr()
         .def("get_assoc", &Tango::Attr::get_assoc,
             return_value_policy<copy_non_const_reference>())
         .def("is_assoc", &Tango::Attr::is_assoc)
+        .def("get_cl_name", &Tango::Attr::get_cl_name,
+            return_value_policy<copy_const_reference>())
+        .def("set_cl_name", &Tango::Attr::set_cl_name)
         .def("get_class_properties", &Tango::Attr::get_class_properties,
             return_internal_reference<>())
         .def("get_user_default_properties", &Tango::Attr::get_user_default_properties,

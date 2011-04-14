@@ -23,7 +23,7 @@
 
 #include <boost/python/copy_const_reference.hpp>
 #include <boost/python/copy_non_const_reference.hpp>
-#include <tango.h>
+#include <tango/tango.h>
 
 #include "pytgutils.h"
 #include "callback.h"
@@ -92,6 +92,13 @@ namespace PyConnection
         AutoPythonAllowThreads guard;
         self.get_asynch_replies(call_timeout);
     }
+    
+    str get_fqdn()
+    {
+        string fqdn;
+        Tango::Connection::get_fqdn(fqdn);
+        return str(fqdn.c_str());
+    }
 }
 
 void export_connection()
@@ -103,94 +110,57 @@ void export_connection()
 
     Connection
         .def("dev_name", pure_virtual(&Tango::Connection::dev_name))
-
         .def("get_db_host", &Tango::Connection::get_db_host,
-            ( arg_("self") ),
             return_value_policy<copy_non_const_reference>())
-
         .def("get_db_port", &Tango::Connection::get_db_port,
-            ( arg_("self") ),
             return_value_policy<copy_non_const_reference>())
-
-        .def("get_db_port_num", &Tango::Connection::get_db_port_num,
-            ( arg_("self") ))
-
-        .def("get_from_env_var", &Tango::Connection::get_from_env_var,
-            ( arg_("self") ))
-
-        .def("connect", &Tango::Connection::connect,
-            ( arg_("self"), arg_("corba_name") ))
-
-        .def("reconnect", &Tango::Connection::reconnect,
-            ( arg_("self"), arg_("db_used") ))
-
-        .def("get_idl_version", &Tango::Connection::get_idl_version,
-            ( arg_("self") ))
-
-        .def("set_timeout_millis", &Tango::Connection::set_timeout_millis,
-            ( arg_("self"), arg_("timeout") ))
-
-        .def("get_timeout_millis", &Tango::Connection::get_timeout_millis,
-            ( arg_("self") ))
-
-        .def("get_source", &Tango::Connection::get_source,
-            ( arg_("self") ))
-
-        .def("set_source", &Tango::Connection::set_source,
-            ( arg_("self"), arg_("source") ))
-
+        .def("get_db_port_num", &Tango::Connection::get_db_port_num)
+        .def("get_from_env_var", &Tango::Connection::get_from_env_var)
+        .def("get_fqdn", &PyConnection::get_fqdn)
+        .staticmethod("get_fqdn")
+        .def("is_dbase_used", &Tango::Connection::is_dbase_used)
+        .def("get_dev_host", &Tango::Connection::get_dev_host,
+            return_value_policy<copy_non_const_reference>())
+        .def("get_dev_port", &Tango::Connection::get_dev_port,
+            return_value_policy<copy_non_const_reference>())
+        .def("connect", &Tango::Connection::connect)
+        .def("reconnect", &Tango::Connection::reconnect)
+        .def("get_idl_version", &Tango::Connection::get_idl_version)
+        .def("set_timeout_millis", &Tango::Connection::set_timeout_millis)
+        .def("get_timeout_millis", &Tango::Connection::get_timeout_millis)
+        .def("get_source", &Tango::Connection::get_source)
+        .def("set_source", &Tango::Connection::set_source)
         .def("get_transparency_reconnection",
-            &Tango::Connection::get_transparency_reconnection,
-            ( arg_("self") ))
-
+            &Tango::Connection::get_transparency_reconnection)
         .def("set_transparency_reconnection",
-            &Tango::Connection::set_transparency_reconnection,
-            ( arg_("self"), arg_("yesno") ))
-
+            &Tango::Connection::set_transparency_reconnection)
         .def("__command_inout", &PyConnection::command_inout)
         .def("__command_inout_asynch_id", &PyConnection::command_inout_asynch_id)
         .def("__command_inout_asynch_cb", &PyConnection::command_inout_asynch_cb)
-
         .def("command_inout_reply_raw",
             (Tango::DeviceData (*)(Tango::Connection&, long))
-            &PyConnection::command_inout_reply,
-            ( arg_("self"), arg_("id") ))
-
+            &PyConnection::command_inout_reply)
         .def("command_inout_reply_raw",
             (Tango::DeviceData (*)(Tango::Connection&, long, long))
-            &PyConnection::command_inout_reply,
-            ( arg_("self"), arg_("id"), arg_("timeout") ))
-
+            &PyConnection::command_inout_reply)
 
         //
         // Asynchronous methods
         //
 
         .def("get_asynch_replies",
-            (void (*) (Tango::Connection&))
-            &PyConnection::get_asynch_replies,
-            ( arg_("self") ))
-
+            (void (*) (Tango::Connection&)) &PyConnection::get_asynch_replies)
         .def("get_asynch_replies",
-            (void (*) (Tango::Connection&,long))
-            &PyConnection::get_asynch_replies,
-            ( arg_("self"), arg_("call_timeout") ))
-
-        .def("cancel_asynch_request",
-            &Tango::Connection::cancel_asynch_request,
-            ( arg_("self"), arg_("id") ))
-
+            (void (*) (Tango::Connection&,long)) &PyConnection::get_asynch_replies)
+        .def("cancel_asynch_request", &Tango::Connection::cancel_asynch_request)
         .def("cancel_all_polling_asynch_request",
-            &Tango::Connection::cancel_all_polling_asynch_request,
-            ( arg_("self") ))
+            &Tango::Connection::cancel_all_polling_asynch_request)
 
         //
         // Control access related methods
         //
-        .def("get_access_control", &Tango::Connection::get_access_control,
-            ( arg_("self") ))
-
-        .def("set_access_control", &Tango::Connection::set_access_control,
-            ( arg_("self"), arg_("acc") ))
+        
+        .def("get_access_control", &Tango::Connection::get_access_control)
+        .def("set_access_control", &Tango::Connection::set_access_control)
     ;
 }

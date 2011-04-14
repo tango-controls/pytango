@@ -33,6 +33,7 @@ from _PyTango import Connection, DeviceData, __CallBackAutoDie, CmdArgType
 from _PyTango import DeviceProxy, Database
 from _PyTango import ExtractAs
 from utils import document_method as __document_method
+from utils import document_static_method as __document_static_method
 import operator
 
 def __CallBackAutoDie__cmd_ended_aux(fn):
@@ -253,6 +254,9 @@ def __doc_Connection():
     def document_method(method_name, desc, append=True):
         return __document_method(Connection, method_name, desc, append)
 
+    def document_static_method(method_name, desc, append=True):
+        return __document_static_method(Connection, method_name, desc, append)
+    
     Connection.__doc__ = """
         The abstract Connection class for DeviceProxy. Not to be initialized directly.
     """
@@ -531,6 +535,7 @@ def __doc_Connection():
 
     document_method("set_access_control", """
     set_access_control(self, acc) -> None
+            
             Sets the current access control type
             
         Parameters :
@@ -540,7 +545,51 @@ def __doc_Connection():
 
         New in PyTango 7.0.0
     """)
+    
+    document_static_method("get_fqdn", """
+    get_fqdn(self) -> str
+    
+            Returns the fully qualified domain name
 
+        Parameters : None
+        Return     : (str) the fully qualified domain name
+        
+        New in PyTango 7.2.0
+    """)
+
+    document_method("is_dbase_used", """
+    is_dbase_used(self) -> bool
+            
+            Returns if the database is being used
+            
+        Parameters : None
+        Return     : (bool) True if the database is being used
+
+        New in PyTango 7.2.0
+    """)
+    
+    document_method("get_dev_host", """
+    get_dev_host(self) -> str
+            
+            Returns the current host
+            
+        Parameters : None
+        Return     : (str) the current host
+
+        New in PyTango 7.2.0
+    """)
+    
+    document_method("get_dev_port", """
+    get_dev_port(self) -> str
+            
+            Returns the current port
+            
+        Parameters : None
+        Return     : (str) the current port
+
+        New in PyTango 7.2.0
+    """)
+    
 def init(doc=True):
     __init_Connection()
     if doc:
