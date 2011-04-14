@@ -190,7 +190,12 @@ void export_base_types()
         .value("PyTango3", PyTango::ExtractAsPyTango3)
         .value("Nothing", PyTango::ExtractAsNothing)
     ;
-    
+
+    enum_<PyTango::ImageFormat>("_ImageFormat")
+        .value("RawImage", PyTango::RawImage)
+        .value("JpegImage", PyTango::JpegImage)
+    ;
+
     // Export some std types
 
     // vector_indexing_suite<*, true | false>:

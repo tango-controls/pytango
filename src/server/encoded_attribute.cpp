@@ -157,6 +157,116 @@ namespace PyEncodedAttribute
         self.encode_gray8(buffer, w, h);
     }
 
+    void encode_jpeg_gray8(Tango::EncodedAttribute &self, object py_value, int w, int h, double quality)
+    {
+        PyObject *py_value_ptr = py_value.ptr();
+        unsigned char *buffer = NULL;
+        if (PyString_Check(py_value_ptr))
+        {
+            buffer = reinterpret_cast<unsigned char*>(PyString_AsString(py_value_ptr));
+            self.encode_jpeg_gray8(buffer, w, h, quality);
+            return;
+        }
+        else if (PyArray_Check(py_value_ptr))
+        {
+            w = PyArray_DIM(py_value_ptr, 1);
+            h = PyArray_DIM(py_value_ptr, 0);
+            
+            buffer = static_cast<unsigned char*>(PyArray_DATA(py_value_ptr));
+            self.encode_jpeg_gray8(buffer, w, h, quality);
+            return;
+        }
+        // It must be a py sequence
+        // we are sure that w and h are given by python (see encoded_attribute.py)
+        unsigned char b[w*h];
+        buffer = b;
+        unsigned char *p = b;
+        int w_bytes = w;
+        for (long y=0; y<h; ++y)
+        {
+            PyObject *row = PySequence_GetItem(py_value_ptr, y);
+            if (!row) boost::python::throw_error_already_set();
+            if (!PySequence_Check(row))
+            {
+                Py_DECREF(row);
+                PyErr_SetString(PyExc_TypeError,
+                    "Expected sequence (str, numpy.ndarray, list, tuple or "
+                    "bytearray) inside a sequence");
+                boost::python::throw_error_already_set();
+            }
+            // The given object is a sequence of strings were each string is the entire row
+            if (PyString_Check(row))
+            {
+                if (PyString_Size(row) != w_bytes)
+                {
+                    Py_DECREF(row);
+                    PyErr_SetString(PyExc_TypeError,
+                        "All sequences inside a sequence must have same size");
+                    boost::python::throw_error_already_set();
+                }
+                memcpy(p, PyString_AsString(row), w_bytes);
+                p += w;
+            }
+            else
+            {
+                if (PySequence_Size(row) != w)
+                {
+                    Py_DECREF(row);
+                    PyErr_SetString(PyExc_TypeError,
+                        "All sequences inside a sequence must have same size");
+                    boost::python::throw_error_already_set();
+                }
+                
+                for (long x=0; x<w; ++x)
+                {
+                    PyObject *cell = PySequence_GetItem(row, x);
+                    if (!cell)
+                    {
+                        Py_DECREF(row);
+                        boost::python::throw_error_already_set();
+                    }
+                    if (PyString_Check(cell))
+                    {
+                        if (PyString_Size(cell) != 1)
+                        {
+                            Py_DECREF(row);
+                            Py_DECREF(cell);
+                            PyErr_SetString(PyExc_TypeError,
+                                "All string items must have length one");
+                            boost::python::throw_error_already_set();
+                        }
+                        char byte = PyString_AsString(cell)[0];
+                        *p = byte;
+                    }
+                    else if (PyInt_Check(cell) || PyLong_Check(cell))
+                    {
+                        long byte = PyLong_AsLong(cell);
+                        if (byte==-1 and PyErr_Occurred())
+                        {
+                            Py_DECREF(row);
+                            Py_DECREF(cell);
+                            boost::python::throw_error_already_set();
+                        }
+                        if (byte < 0 || byte > 255)
+                        {
+                            Py_DECREF(row);
+                            Py_DECREF(cell);
+                            PyErr_SetString(PyExc_TypeError,
+                                "int item not in range(256)");
+                            boost::python::throw_error_already_set();
+                        }
+                        *p = (unsigned char)byte;
+                        
+                    }
+                    Py_DECREF(cell);
+                    p++;
+                }
+            }
+            Py_DECREF(row);
+        }
+        self.encode_jpeg_gray8(buffer, w, h, quality);
+    }
+    
     void encode_gray16(Tango::EncodedAttribute &self, object py_value, int w, int h)
     {
         PyObject *py_value_ptr = py_value.ptr();
@@ -265,7 +375,7 @@ namespace PyEncodedAttribute
         }
         self.encode_gray16(buffer, w, h);
     }
-    
+
     void encode_rgb24(Tango::EncodedAttribute &self, object py_value, int w, int h)
     {
         PyObject *py_value_ptr = py_value.ptr();
@@ -375,7 +485,230 @@ namespace PyEncodedAttribute
         }
         self.encode_rgb24(buffer, w, h);
     }
-    
+
+    void encode_jpeg_rgb24(Tango::EncodedAttribute &self, object py_value, int w, int h, double quality)
+    {
+        PyObject *py_value_ptr = py_value.ptr();
+        unsigned char *buffer = NULL;
+        if (PyString_Check(py_value_ptr))
+        {
+            buffer = reinterpret_cast<unsigned char*>(PyString_AsString(py_value_ptr));
+            self.encode_jpeg_rgb24(buffer, w, h, quality);
+            return;
+        }
+        else if (PyArray_Check(py_value_ptr))
+        {
+            buffer = static_cast<unsigned char*>(PyArray_DATA(py_value_ptr));
+            self.encode_jpeg_rgb24(buffer, w, h, quality);
+            return;
+        }
+        // It must be a py sequence
+        // we are sure that w and h are given by python (see encoded_attribute.py)
+        unsigned char b[w*h];
+        buffer = b;
+        unsigned char *p = b;
+        int w_bytes = 3*w;
+        for (long y=0; y<h; ++y)
+        {
+            PyObject *row = PySequence_GetItem(py_value_ptr, y);
+            if (!row) boost::python::throw_error_already_set();
+            if (!PySequence_Check(row))
+            {
+                Py_DECREF(row);
+                PyErr_SetString(PyExc_TypeError,
+                    "Expected sequence (str, numpy.ndarray, list, tuple or "
+                    "bytearray) inside a sequence");
+                boost::python::throw_error_already_set();
+            }
+            // The given object is a sequence of strings were each string is the entire row
+            if (PyString_Check(row))
+            {
+                if (PyString_Size(row) != w_bytes)
+                {
+                    Py_DECREF(row);
+                    PyErr_SetString(PyExc_TypeError,
+                        "All sequences inside a sequence must have same size");
+                    boost::python::throw_error_already_set();
+                }
+                memcpy(p, PyString_AsString(row), w_bytes);
+                p += w;
+            }
+            else
+            {
+                if (PySequence_Size(row) != w)
+                {
+                    Py_DECREF(row);
+                    PyErr_SetString(PyExc_TypeError,
+                        "All sequences inside a sequence must have same size");
+                    boost::python::throw_error_already_set();
+                }
+                
+                for (long x=0; x<w; ++x)
+                {
+                    PyObject *cell = PySequence_GetItem(row, x);
+                    if (!cell)
+                    {
+                        Py_DECREF(row);
+                        boost::python::throw_error_already_set();
+                    }
+                    if (PyString_Check(cell))
+                    {
+                        if (PyString_Size(cell) != 3)
+                        {
+                            Py_DECREF(row);
+                            Py_DECREF(cell);
+                            PyErr_SetString(PyExc_TypeError,
+                                "All string items must have length one");
+                            boost::python::throw_error_already_set();
+                        }
+                        char *byte = PyString_AsString(cell);
+                        *p = *byte; p++; byte++;
+                        *p = *byte; p++; byte++;
+                        *p = *byte; p++;
+                    }
+                    else if (PyInt_Check(cell) || PyLong_Check(cell))
+                    {
+                        long byte = PyLong_AsLong(cell);
+                        if (byte==-1 and PyErr_Occurred())
+                        {
+                            Py_DECREF(row);
+                            Py_DECREF(cell);
+                            boost::python::throw_error_already_set();
+                        }
+                        if (BYTE_ORDER == LITTLE_ENDIAN)
+                        {
+                            *p = (byte) & 0xFF; p++;
+                            *p = (byte >>  8) & 0xFF; p++;
+                            *p = (byte >> 16) & 0xFF; p++;
+                        }
+                        else
+                        {
+                            *p = (byte >> 16) & 0xFF; p++;
+                            *p = (byte >>  8) & 0xFF; p++;
+                            *p = (byte) & 0xFF; p++;
+                        }
+                    }
+                    Py_DECREF(cell);
+                }
+            }
+            Py_DECREF(row);
+        }
+        self.encode_jpeg_rgb24(buffer, w, h, quality);
+    }
+
+    void encode_jpeg_rgb32(Tango::EncodedAttribute &self, object py_value, int w, int h, double quality)
+    {
+        PyObject *py_value_ptr = py_value.ptr();
+        unsigned char *buffer = NULL;
+        if (PyString_Check(py_value_ptr))
+        {
+            buffer = reinterpret_cast<unsigned char*>(PyString_AsString(py_value_ptr));
+            self.encode_jpeg_rgb32(buffer, w, h, quality);
+            return;
+        }
+        else if (PyArray_Check(py_value_ptr))
+        {
+            buffer = static_cast<unsigned char*>(PyArray_DATA(py_value_ptr));
+            self.encode_jpeg_rgb32(buffer, w, h, quality);
+            return;
+        }
+        // It must be a py sequence
+        // we are sure that w and h are given by python (see encoded_attribute.py)
+        unsigned char b[w*h];
+        buffer = b;
+        unsigned char *p = b;
+        int w_bytes = 4*w;
+        for (long y=0; y<h; ++y)
+        {
+            PyObject *row = PySequence_GetItem(py_value_ptr, y);
+            if (!row) boost::python::throw_error_already_set();
+            if (!PySequence_Check(row))
+            {
+                Py_DECREF(row);
+                PyErr_SetString(PyExc_TypeError,
+                    "Expected sequence (str, numpy.ndarray, list, tuple or "
+                    "bytearray) inside a sequence");
+                boost::python::throw_error_already_set();
+            }
+            // The given object is a sequence of strings were each string is the entire row
+            if (PyString_Check(row))
+            {
+                if (PyString_Size(row) != w_bytes)
+                {
+                    Py_DECREF(row);
+                    PyErr_SetString(PyExc_TypeError,
+                        "All sequences inside a sequence must have same size");
+                    boost::python::throw_error_already_set();
+                }
+                memcpy(p, PyString_AsString(row), w_bytes);
+                p += w;
+            }
+            else
+            {
+                if (PySequence_Size(row) != w)
+                {
+                    Py_DECREF(row);
+                    PyErr_SetString(PyExc_TypeError,
+                        "All sequences inside a sequence must have same size");
+                    boost::python::throw_error_already_set();
+                }
+                
+                for (long x=0; x<w; ++x)
+                {
+                    PyObject *cell = PySequence_GetItem(row, x);
+                    if (!cell)
+                    {
+                        Py_DECREF(row);
+                        boost::python::throw_error_already_set();
+                    }
+                    if (PyString_Check(cell))
+                    {
+                        if (PyString_Size(cell) != 3)
+                        {
+                            Py_DECREF(row);
+                            Py_DECREF(cell);
+                            PyErr_SetString(PyExc_TypeError,
+                                "All string items must have length one");
+                            boost::python::throw_error_already_set();
+                        }
+                        char *byte = PyString_AsString(cell);
+                        *p = *byte; p++; byte++;
+                        *p = *byte; p++; byte++;
+                        *p = *byte; p++; byte++;
+                        *p = *byte; p++;
+                    }
+                    else if (PyInt_Check(cell) || PyLong_Check(cell))
+                    {
+                        long byte = PyLong_AsLong(cell);
+                        if (byte==-1 and PyErr_Occurred())
+                        {
+                            Py_DECREF(row);
+                            Py_DECREF(cell);
+                            boost::python::throw_error_already_set();
+                        }
+                        if (BYTE_ORDER == LITTLE_ENDIAN)
+                        {
+                            *p = (byte) & 0xFF; p++;
+                            *p = (byte >>  8) & 0xFF; p++;
+                            *p = (byte >> 16) & 0xFF; p++;
+                            *p = (byte >> 24) & 0xFF; p++;
+                        }
+                        else
+                        {
+                            *p = (byte >> 24) & 0xFF; p++;
+                            *p = (byte >> 16) & 0xFF; p++;
+                            *p = (byte >>  8) & 0xFF; p++;
+                            *p = (byte) & 0xFF; p++;
+                        }
+                    }
+                    Py_DECREF(cell);
+                }
+            }
+            Py_DECREF(row);
+        }
+        self.encode_jpeg_rgb32(buffer, w, h, quality);
+    }
+
     PyObject *decode_gray8(Tango::EncodedAttribute &self, Tango::DeviceAttribute *attr, PyTango::ExtractAs extract_as)
     {
         unsigned char *buffer;
@@ -837,6 +1170,9 @@ void export_encoded_attribute()
         .def("_encode_gray8", &PyEncodedAttribute::encode_gray8)
         .def("_encode_gray16", &PyEncodedAttribute::encode_gray16)
         .def("_encode_rgb24", &PyEncodedAttribute::encode_rgb24)
+        .def("_encode_jpeg_gray8", &PyEncodedAttribute::encode_jpeg_gray8)
+        .def("_encode_jpeg_rgb24", &PyEncodedAttribute::encode_jpeg_rgb24)
+        .def("_encode_jpeg_rgb32", &PyEncodedAttribute::encode_jpeg_rgb32)
         .def("_decode_gray8", &PyEncodedAttribute::decode_gray8)
         .def("_decode_gray16", &PyEncodedAttribute::decode_gray16)
         .def("_decode_rgb32", &PyEncodedAttribute::decode_rgb32)

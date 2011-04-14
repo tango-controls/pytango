@@ -35,6 +35,7 @@ import operator
 from _PyTango import Except
 from _PyTango import EncodedAttribute
 from _PyTango import ExtractAs
+from _PyTango import _ImageFormat
 from utils import document_method as __document_method
 
 try:
@@ -45,6 +46,43 @@ except:
 _allowed_extract = ExtractAs.Numpy, ExtractAs.String, ExtractAs.Tuple, \
                    ExtractAs.List, ExtractAs.PyTango3
 
+def __EncodedAttribute_encode_jpeg_gray8(self, gray8, width=0, height=0, quality=100.0):
+    """Encode a 8 bit grayscale image as JPEG format
+    
+           :param gray8: an object containning image information
+           :type gray8: :py:obj:`str` or :class:`numpy.ndarray` or seq< seq<element> >
+           :param width: image width. **MUST** be given if gray8 is a string or
+                         if it is a :class:`numpy.ndarray` with ndims != 2.
+                         Otherwise it is calculated internally.
+           :type width: :py:obj:`int`
+           :param height: image height. **MUST** be given if gray8 is a string
+                          or if it is a :class:`numpy.ndarray` with ndims != 2.
+                          Otherwise it is calculated internally.
+           :type height: :py:obj:`int`
+           :param quality: Quality of JPEG (0=poor quality 100=max quality) (default is 100.0)
+           :type quality: :py:obj:`float`
+           
+       .. note::
+           When :class:`numpy.ndarray` is given:
+        
+               - gray8 **MUST** be CONTIGUOUS, ALIGNED
+               - if gray8.ndims != 2, width and height **MUST** be given and
+                 gray8.nbytes **MUST** match width*height
+               - if gray8.ndims == 2, gray8.itemsize **MUST** be 1 (typically,
+                 gray8.dtype is one of `numpy.dtype.byte`, `numpy.dtype.ubyte`,
+                 `numpy.dtype.int8` or `numpy.dtype.uint8`)
+    
+       Example::
+           
+           def read_myattr(self, attr):
+               enc = PyTango.EncodedAttribute()
+               data = numpy.arange(100, dtype=numpy.byte)
+               data = numpy.array((data,data,data))
+               enc.encode_jpeg_gray8(data)
+               attr.set_value(data)
+    """
+    self._generic_encode_gray8(gray8, width=width, height=height, quality=quality, format=_ImageFormat.JpegImage)
+
 def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
     """Encode a 8 bit grayscale image (no compression)
     
@@ -53,10 +91,12 @@ def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
            :param width: image width. **MUST** be given if gray8 is a string or
                          if it is a :class:`numpy.ndarray` with ndims != 2.
                          Otherwise it is calculated internally.
+           :type width: :py:obj:`int`
            :param height: image height. **MUST** be given if gray8 is a string
                           or if it is a :class:`numpy.ndarray` with ndims != 2.
                           Otherwise it is calculated internally.
-    
+           :type height: :py:obj:`int`
+           
        .. note::
            When :class:`numpy.ndarray` is given:
         
@@ -76,6 +116,10 @@ def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
                enc.encode_gray8(data)
                attr.set_value(data)
     """
+    self._generic_encode_gray8(gray8, width=width, height=height, format=_ImageFormat.RawImage)
+
+def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, quality=0, format=_ImageFormat.RawImage):
+    """Internal usage only"""
     if not operator.isSequenceType(gray8):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
@@ -114,7 +158,10 @@ def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
                              "bytearray) inside a sequence")
         width = len(row0)
 
-    self._encode_gray8(gray8, width, height)
+    if format == _ImageFormat.RawImage:
+        self._encode_gray8(gray8, width, height)
+    elif format == _ImageFormat.JpegImage:
+        self._encode_jpeg_gray8(gray8, width, height, quality)
 
 def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
     """Encode a 16 bit grayscale image (no compression)
@@ -124,9 +171,11 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
            :param width: image width. **MUST** be given if gray16 is a string or
                          if it is a :class:`numpy.ndarray` with ndims != 2.
                          Otherwise it is calculated internally.
+           :type width: :py:obj:`int`
            :param height: image height. **MUST** be given if gray16 is a string
                           or if it is a :class:`numpy.ndarray` with ndims != 2.
                           Otherwise it is calculated internally.
+           :type height: :py:obj:`int`
     
        .. note::
            When :class:`numpy.ndarray` is given:
@@ -135,7 +184,7 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
                - if gray16.ndims != 2, width and height **MUST** be given and
                  gray16.nbytes/2 **MUST** match width*height
                - if gray16.ndims == 2, gray16.itemsize **MUST** be 2 (typically,
-                 gray8.dtype is one of `numpy.dtype.int16`, `numpy.dtype.uint16`,
+                 gray16.dtype is one of `numpy.dtype.int16`, `numpy.dtype.uint16`,
                  `numpy.dtype.short` or `numpy.dtype.ushort`)
     
        Example::
@@ -189,18 +238,23 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
 
     self._encode_gray16(gray16, width, height)
 
-def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
-    """Encode a 8 bit grayscale image (no compression)
+
+def __EncodedAttribute_encode_jpeg_rgb24(self, rgb24, width=0, height=0, quality=100.0):
+    """Encode a 24 bit rgb color image as JPEG format.
     
            :param rgb24: an object containning image information
            :type rgb24: :py:obj:`str` or :class:`numpy.ndarray` or seq< seq<element> >
            :param width: image width. **MUST** be given if rgb24 is a string or
                          if it is a :class:`numpy.ndarray` with ndims != 3.
                          Otherwise it is calculated internally.
+           :type width: :py:obj:`int`
            :param height: image height. **MUST** be given if rgb24 is a string
                           or if it is a :class:`numpy.ndarray` with ndims != 3.
                           Otherwise it is calculated internally.
-    
+           :type height: :py:obj:`int`
+           :param quality: Quality of JPEG (0=poor quality 100=max quality) (default is 100.0)
+           :type quality: :py:obj:`float`
+           
        .. note::
            When :class:`numpy.ndarray` is given:
         
@@ -208,7 +262,43 @@ def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
                - if rgb24.ndims != 3, width and height **MUST** be given and
                  rgb24.nbytes/3 **MUST** match width*height
                - if rgb24.ndims == 3, rgb24.itemsize **MUST** be 1 (typically,
-                 gray8.dtype is one of `numpy.dtype.byte`, `numpy.dtype.ubyte`,
+                 rgb24.dtype is one of `numpy.dtype.byte`, `numpy.dtype.ubyte`,
+                 `numpy.dtype.int8` or `numpy.dtype.uint8`) and shape **MUST** be
+                 (height, width, 3)
+       
+       Example::
+           
+           def read_myattr(self, attr):
+               enc = PyTango.EncodedAttribute()
+               # create an 'image' where each pixel is R=0x01, G=0x01, B=0x01
+               arr = numpy.ones((10,10,3), dtype=numpy.uint8)
+               enc.encode_jpeg_rgb24(data)
+               attr.set_value(data)
+    """
+    self._generic_encode_rgb24(rgb24, width=width, height=height, quality=quality, format=_ImageFormat.JpegImage)
+
+def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
+    """Encode a 24 bit color image (no compression)
+    
+           :param rgb24: an object containning image information
+           :type rgb24: :py:obj:`str` or :class:`numpy.ndarray` or seq< seq<element> >
+           :param width: image width. **MUST** be given if rgb24 is a string or
+                         if it is a :class:`numpy.ndarray` with ndims != 3.
+                         Otherwise it is calculated internally.
+           :type width: :py:obj:`int`
+           :param height: image height. **MUST** be given if rgb24 is a string
+                          or if it is a :class:`numpy.ndarray` with ndims != 3.
+                          Otherwise it is calculated internally.
+           :type height: :py:obj:`int`
+           
+       .. note::
+           When :class:`numpy.ndarray` is given:
+        
+               - rgb24 **MUST** be CONTIGUOUS, ALIGNED
+               - if rgb24.ndims != 3, width and height **MUST** be given and
+                 rgb24.nbytes/3 **MUST** match width*height
+               - if rgb24.ndims == 3, rgb24.itemsize **MUST** be 1 (typically,
+                 rgb24.dtype is one of `numpy.dtype.byte`, `numpy.dtype.ubyte`,
                  `numpy.dtype.int8` or `numpy.dtype.uint8`) and shape **MUST** be
                  (height, width, 3)
        
@@ -221,6 +311,10 @@ def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
                enc.encode_rgb24(data)
                attr.set_value(data)
     """
+    self._generic_encode_rgb24(rgb24, width=width, height=height, format=_ImageFormat.RawImage)
+    
+def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, quality=0, format=_ImageFormat.RawImage):
+    """Internal usage only"""
     if not operator.isSequenceType(rgb24):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
@@ -260,7 +354,85 @@ def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
         width = len(row0)
         if type(row0) in types.StringTypes or type(row0) == bytearray:
             width /= 3
-    self._encode_rgb24(rgb24, width, height)
+    if format == _ImageFormat.RawImage:
+        self._encode_rgb24(rgb24, width, height)
+    elif format == _ImageFormat.JpegImage:
+        self._encode_jpeg_rgb24(rgb24, width, height, quality)
+
+def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality=100.0):
+    """Encode a 32 bit rgb color image as JPEG format.
+    
+           :param rgb32: an object containning image information
+           :type rgb32: :py:obj:`str` or :class:`numpy.ndarray` or seq< seq<element> >
+           :param width: image width. **MUST** be given if rgb32 is a string or
+                         if it is a :class:`numpy.ndarray` with ndims != 2.
+                         Otherwise it is calculated internally.
+           :type width: :py:obj:`int`
+           :param height: image height. **MUST** be given if rgb32 is a string
+                          or if it is a :class:`numpy.ndarray` with ndims != 2.
+                          Otherwise it is calculated internally.
+           :type height: :py:obj:`int`
+    
+       .. note::
+           When :class:`numpy.ndarray` is given:
+        
+               - rgb32 **MUST** be CONTIGUOUS, ALIGNED
+               - if rgb32.ndims != 2, width and height **MUST** be given and
+                 rgb32.nbytes/4 **MUST** match width*height
+               - if rgb32.ndims == 2, rgb32.itemsize **MUST** be 4 (typically,
+                 rgb32.dtype is one of `numpy.dtype.int32`, `numpy.dtype.uint32`)
+    
+       Example::
+           
+           def read_myattr(self, attr):
+               enc = PyTango.EncodedAttribute()
+               data = numpy.arange(100, dtype=numpy.int32)
+               data = numpy.array((data,data,data))
+               enc.encode_jpeg_rgb32(data)
+               attr.set_value(data)
+    """
+    if not operator.isSequenceType(rgb32):
+        raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
+                        "or bytearray) as first argument")
+    
+    is_str = type(rgb32) in types.StringTypes
+    if is_str:
+        if not width or not height:
+            raise ValueError("When giving a string as data, you must also "
+                             "supply width and height")
+    
+    if numpy and isinstance(rgb32, numpy.ndarray):
+        if rgb32.ndim != 2:
+            if not width or not height:
+                raise ValueError("When giving a non 2D numpy array, width and "
+                                 "height must be supplied")
+            if rgb32.nbytes/4 != width*height:
+                raise ValueError("numpy array size mismatch")
+        else:
+            if rgb32.itemsize != 4:
+                raise TypeError("Expected numpy array with itemsize == 4")
+        if rgb32.flags.c_contiguous != True:
+            raise TypeError("Currently, only contiguous, aligned numpy arrays "
+                            "are supported")
+        if rgb32.flags.aligned != True:
+            raise TypeError("Currently, only contiguous, aligned numpy arrays "
+                            "are supported")
+
+    if not is_str and (not width or not height):
+        height = len(rgb32)
+        if height < 1:
+            raise IndexError("Expected sequence with at least one row")
+        
+        row0 = rgb32[0]
+        if not operator.isSequenceType(row0):
+            raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
+                             "bytearray) inside a sequence")
+        width = len(row0)
+        if type(row0) in types.StringTypes or type(row0) == bytearray:
+            width /= 4
+
+    self._encode_jpeg_rgb32(rgb32, width, height, quality)
+
 
 def __EncodedAttribute_decode_gray8(self, da, extract_as=ExtractAs.Numpy):
     """Decode a 8 bits grayscale image (JPEG_GRAY8 or GRAY8) and returns a 8 bits gray scale image.
@@ -368,9 +540,14 @@ def __EncodedAttribute_decode_rgb32(self, da, extract_as=ExtractAs.Numpy):
     return self._decode_rgb32(da, extract_as)
 
 def __init_EncodedAttribute():
+    EncodedAttribute._generic_encode_gray8 = __EncodedAttribute_generic_encode_gray8
     EncodedAttribute.encode_gray8 = __EncodedAttribute_encode_gray8
+    EncodedAttribute.encode_jpeg_gray8 = __EncodedAttribute_encode_jpeg_gray8
     EncodedAttribute.encode_gray16 = __EncodedAttribute_encode_gray16
+    EncodedAttribute._generic_encode_rgb24 = __EncodedAttribute_generic_encode_rgb24
     EncodedAttribute.encode_rgb24 = __EncodedAttribute_encode_rgb24
+    EncodedAttribute.encode_jpeg_rgb24 = __EncodedAttribute_encode_jpeg_rgb24
+    EncodedAttribute.encode_jpeg_rgb32 = __EncodedAttribute_encode_jpeg_rgb32
     EncodedAttribute.decode_gray8 = __EncodedAttribute_decode_gray8
     EncodedAttribute.decode_gray16 = __EncodedAttribute_decode_gray16
     EncodedAttribute.decode_rgb32 = __EncodedAttribute_decode_rgb32

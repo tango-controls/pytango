@@ -40,4 +40,9 @@ namespace PyTango
         ExtractAsPyTango3,
         ExtractAsNothing
     };
+    
+    enum ImageFormat {
+        RawImage,
+        JpegImage
+    };
 }
