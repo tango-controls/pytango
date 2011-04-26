@@ -27,11 +27,7 @@
 
 import sys
 import os
-import token
-import tokenize
-import copy
 import re
-import operator
 import StringIO
 import textwrap
 import IPython.ipapi
@@ -559,8 +555,8 @@ def __get_db(host_port=None):
             db = PyTango.Database(*host_port.split(":"))
             
             ip.user_ns["DB_NAME"] = host_port
-        except Exception, e:
-            print 
+        except Exception:
+            print
             if db:
                 print "Could not access Database", host_port
                 old_host_port = "%s:%s" % (db.get_db_host(), db.get_db_port())
@@ -612,12 +608,12 @@ def __get_ipython_version():
     try:
         try:
             v = IPython.Release.version
-        except Exception, e1:
+        except Exception:
             try:
                 v = IPython.release.version
-            except Exception, e2:
+            except Exception:
                 pass
-    except Exception, e3:
+    except Exception:
         pass
     return v
 
@@ -645,7 +641,6 @@ def __build_color_scheme(ip, name):
     
     # make some schemes as instances so we can copy them for modification easily:
     ColorANSI = IPython.ColorANSI
-    ColorScheme = ColorANSI.ColorScheme
     InputColors = ColorANSI.InputTermColors
     TermColors = ColorANSI.TermColors
     PromptColors = IPython.Prompts.PromptColors
@@ -712,7 +707,6 @@ def __store(ip, var):
 
 def init_colors(ip):
     ColorANSI = IPython.ColorANSI
-    ColorScheme = ColorANSI.ColorScheme
     InputColors = ColorANSI.InputTermColors
     TermColors = ColorANSI.TermColors
     
@@ -750,7 +744,6 @@ def init_colors(ip):
 
 def init_pytango(ip):
     """Initializes the IPython environment with PyTango elements"""
-    TermColors = IPython.ColorANSI.TermColors
 
     # export symbols to IPython namepspace
     ip.ex("import PyTango")

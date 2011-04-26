@@ -29,7 +29,6 @@ __all__ = []
 
 __docformat__ = "restructuredtext"
 
-from utils import document_method as __document_method
 from _PyTango import GroupReplyList
 from _PyTango import GroupCmdReplyList
 from _PyTango import GroupAttrReplyList

@@ -29,7 +29,6 @@ __all__ = [ "DeviceClass" ]
 
 __docformat__ = "restructuredtext"
 
-import sys
 import types
 import operator
 
@@ -40,11 +39,11 @@ from _PyTango import UserDefaultAttrProp
 
 from pyutil import Util
 
-from utils import DbData_2_dict, seqStr_2_obj, obj_2_str, is_array
+from utils import seqStr_2_obj, obj_2_str, is_array
 from utils import document_method as __document_method
 
-from globals import get_classes, get_class, get_class_by_class
-from globals import get_constructed_classes, get_constructed_class, get_constructed_class_by_class
+from globals import get_class, get_class_by_class
+from globals import get_constructed_class_by_class
 
 class PropUtil:
     """An internal Property util class"""

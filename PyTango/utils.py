@@ -40,9 +40,9 @@ import socket
 import types
 import operator
 
-from _PyTango import StdStringVector, DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat
+from _PyTango import StdStringVector, StdDoubleVector
+from _PyTango import DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat
 from _PyTango import EventData, AttrConfEventData, DataReadyEventData
-from _PyTango import ApiUtil
 
 _scalar_int_types = (CmdArgType.DevShort, CmdArgType.DevUShort,
     CmdArgType.DevInt, CmdArgType.DevLong, CmdArgType.DevULong,
@@ -246,7 +246,7 @@ def StdDoubleVector_2_seq(vec, seq=None):
     if seq is None: seq = []
     if not isinstance(vec, StdDoubleVector):
         raise TypeError('vec must be a PyTango.StdDoubleVector')
-    for e in vec: sec.append(float(e))
+    for e in vec: seq.append(float(e))
     return seq
 
 def seq_2_DbDevInfos(seq, vec=None):
@@ -759,20 +759,20 @@ def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
     num_retries = 3
     while num_retries > 0:
         try:
-            ret = db.command_inout("DbExportEvent", args)
+            db.command_inout("DbExportEvent", args)
             print >>out, "Successfully exported notification service event " \
                          "factory for host", host_name, "to Tango database !"
             break
         except PyTango.CommunicationFailed, cf:
             if len(cf.errors) >= 2:
-                if e.errors[1].reason == "API_DeviceTimedOut":
+                if cf.errors[1].reason == "API_DeviceTimedOut":
                     if num_retries > 0:
                         num_retries -= 1
                 else:
                     num_retries = 0
             else:
                 num_retries = 0
-        except Exception, e:
+        except Exception:
             num_retries = 0
     
     if num_retries == 0:

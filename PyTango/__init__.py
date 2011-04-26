@@ -31,7 +31,6 @@ http://www.tango-controls.org/static/PyTango/latest/doc/html/index.html
 __docformat__ = "restructuredtext"
 
 try:
-    import time
     from _PyTango import *
 except ImportError, ie:
     if not ie.args[0].count("_PyTango"):
@@ -48,14 +47,14 @@ except ImportError, ie:
 
 ArgType = _PyTango.CmdArgType
 
-from release import *
+from release import Release
 
 __author__ = "\n".join([ "%s <%s>" % x for x in Release.authors.values()])
 __version_info__ = Release.version_info
 __version__ = Release.version
 __version_long__ = Release.version_long
 __version_number__ = Release.version_number
-__version_description__  = Release.version_description
+__version_description__ = Release.version_description
 __doc__ = Release.long_description
 
 import pytango_init

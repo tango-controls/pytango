@@ -36,7 +36,7 @@ from _PyTango import StdStringVector
 from _PyTango import Database, DbDatum, DbData
 from _PyTango import DbDevInfo, DbDevInfos
 from _PyTango import DbDevImportInfo, DbDevExportInfo
-from _PyTango import DbDevImportInfos, DbDevExportInfos
+from _PyTango import DbDevExportInfos
 from _PyTango import DbHistory, DbServerInfo
 
 from utils import seq_2_StdStringVector

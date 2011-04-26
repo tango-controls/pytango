@@ -30,7 +30,6 @@ __all__ = []
 __docformat__ = "restructuredtext"
 
 import operator
-import types
 
 from _PyTango import StdStringVector
 from _PyTango import GroupElement

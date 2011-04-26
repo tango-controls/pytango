@@ -29,9 +29,6 @@ __all__ = [ "Group" ]
 
 __docformat__ = "restructuredtext"
 
-import operator
-import types
-
 from _PyTango import __Group as _RealGroup, GroupElement
 from utils import document_method as __document_method
 

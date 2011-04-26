@@ -26,20 +26,17 @@ This is an internal PyTango module.
 """
 
 __all__ = []
-            
+
 __docformat__ = "restructuredtext"
 
-import sys
 import operator
 import types
-import threading
-import traceback
 
 from _PyTango import StdStringVector
 from _PyTango import DbData, DbDatum
 from _PyTango import AttributeInfo, AttributeInfoEx
 from _PyTango import AttributeInfoList, AttributeInfoListEx
-from _PyTango import DeviceProxy, DeviceAttribute, DeviceData
+from _PyTango import DeviceProxy
 from _PyTango import __CallBackAutoDie, __CallBackPushEvent, EventType
 from _PyTango import DevFailed
 from _PyTango import ExtractAs

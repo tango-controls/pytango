@@ -32,11 +32,8 @@ __all__ = [ "ChangeEventProp", "PeriodicEventProp", "ArchiveEventProp",
 __docformat__ = "restructuredtext"
 
 import copy
-import operator
-import types
 
 import _PyTango
-from _PyTango import StdStringVector, StdDoubleVector
 from _PyTango import DeviceImpl, Device_3Impl, Device_4Impl
 from _PyTango import Attribute, WAttribute, MultiAttribute
 from _PyTango import Attr
@@ -44,7 +41,6 @@ from _PyTango import Logger
 from _PyTango import AttrWriteType, AttrDataFormat, DispLevel
 from _PyTango import UserDefaultAttrProp
 
-from utils import seq_2_StdStringVector, seq_2_StdDoubleVector
 from utils import document_method as __document_method
 from utils import copy_doc
 

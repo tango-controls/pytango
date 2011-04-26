@@ -112,8 +112,8 @@ class LogIt(object):
 
     def __compact_dict(self, k, v, maxlen=None):
         if maxlen is None:
-            return "%s=%s" % (k, __compact(v))
-        return "%s=%s" % (k, __compact(v, maxlen=maxlen))
+            return "%s=%s" % (k, self.__compact(v))
+        return "%s=%s" % (k, self.__compact(v, maxlen=maxlen))
 
     def is_enabled(self, d):
         return d.get_logger().is_debug_enabled()

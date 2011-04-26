@@ -32,16 +32,15 @@ __docformat__ = "restructuredtext"
 import types
 import operator
 
-from _PyTango import Except
 from _PyTango import EncodedAttribute
 from _PyTango import ExtractAs
 from _PyTango import _ImageFormat
-from utils import document_method as __document_method
 
 try:
     import numpy
+    np = numpy
 except:
-    numpy = None
+    np = None
 
 _allowed_extract = ExtractAs.Numpy, ExtractAs.String, ExtractAs.Tuple, \
                    ExtractAs.List, ExtractAs.PyTango3
@@ -130,7 +129,7 @@ def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, qual
             raise ValueError("When giving a string as data, you must also "
                              "supply width and height")
     
-    if numpy and isinstance(gray8, numpy.ndarray):
+    if np and isinstance(gray8, np.ndarray):
         if gray8.ndim != 2:
             if not width or not height:
                 raise ValueError("When giving a non 2D numpy array, width and "
@@ -206,7 +205,7 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
             raise ValueError("When giving a string as data, you must also "
                              "supply width and height")
     
-    if numpy and isinstance(gray16, numpy.ndarray):
+    if np and isinstance(gray16, np.ndarray):
         if gray16.ndim != 2:
             if not width or not height:
                 raise ValueError("When giving a non 2D numpy array, width and "
@@ -325,7 +324,7 @@ def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, qual
             raise ValueError("When giving a string as data, you must also "
                              "supply width and height")
     
-    if numpy and isinstance(rgb24, numpy.ndarray):
+    if np and isinstance(rgb24, np.ndarray):
         if rgb24.ndim != 3:
             if not width or not height:
                 raise ValueError("When giving a non 2D numpy array, width and "
@@ -401,7 +400,7 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
             raise ValueError("When giving a string as data, you must also "
                              "supply width and height")
     
-    if numpy and isinstance(rgb32, numpy.ndarray):
+    if np and isinstance(rgb32, np.ndarray):
         if rgb32.ndim != 2:
             if not width or not height:
                 raise ValueError("When giving a non 2D numpy array, width and "

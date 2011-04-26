@@ -30,9 +30,6 @@ __all__ = []
 __docformat__ = "restructuredtext"
 
 from _PyTango import CmdDoneEvent, AttrReadEvent, AttrWrittenEvent
-# __CallBackAutoDie, __CallBackPushEvent
-from utils import document_method as __document_method
-
 
 def __init_Callback():
     pass

@@ -38,12 +38,11 @@ import types
 
 from _PyTango import StdStringVector
 from _PyTango import DbData, DbDatum
-from PyTango.utils import seq_2_StdStringVector, StdStringVector_2_seq
+from PyTango.utils import seq_2_StdStringVector
 from PyTango.utils import seq_2_DbData, DbData_2_dict
-from utils import document_method as __document_method
 
-from _PyTango import    __AttributeProxy as _AttributeProxy,         \
-                        DeviceProxy
+from _PyTango import __AttributeProxy as _AttributeProxy
+from _PyTango import DeviceProxy
 
 def __AttributeProxy__get_property(self, propname, value=None):
     """

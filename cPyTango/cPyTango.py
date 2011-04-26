@@ -23,14 +23,13 @@
 
 import ctypes
 import ctypes.util
-import atexit
 import enumeration
 import time
 
 _tango_lib_name = ctypes.util.find_library("c_tango")
 
 if _tango_lib_name is None:
-    raise RuntimeException("Failed to find c_tango shared library")
+    raise RuntimeError("Failed to find c_tango shared library")
 
 _ref      = ctypes.byref
 String    = ctypes.c_char_p
@@ -246,8 +245,8 @@ class VarStringArray(VarArray):
         l = self.length
         if l == 1:
             return self.sequence[0]
-        return str(list(seq[:10]))
-VarStringArrayPtr = ctypes.POINTER(VarStringArray)        
+        return str(list(self.sequence[:10]))
+VarStringArrayPtr = ctypes.POINTER(VarStringArray)
 
 class VarStateArray(VarArray):
     _fields_ = \
@@ -258,7 +257,7 @@ class VarStateArray(VarArray):
         l = self.length
         if l == 1:
             return TangoDevStateEnum.whatis(self.sequence[0])
-        return map(cPyTango.TangoDevStateEnum.whatis, seq[:10])
+        return map(TangoDevStateEnum.whatis, self.sequence[:10])
         
 
 class TangoAttributeData(ctypes.Union):

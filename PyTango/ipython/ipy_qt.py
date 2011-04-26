@@ -21,10 +21,7 @@
 ##
 ################################################################################
 
-import operator
 import logging
-import time
-import datetime
 import PyTango
 import PyQt4.Qt as Qt
 

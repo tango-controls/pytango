@@ -32,7 +32,6 @@ __docformat__ = "restructuredtext"
 import copy
 
 from utils import document_method as __document_method
-from utils import document_enum as __document_enum
 from _PyTango import DeviceAttribute, ExtractAs
 
 def __DeviceAttribute__get_data(self):

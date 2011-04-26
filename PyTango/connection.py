@@ -36,7 +36,7 @@ from utils import document_method as __document_method
 from utils import document_static_method as __document_static_method
 import operator
 
-def __CallBackAutoDie__cmd_ended_aux(fn):
+def __CallBackAutoDie__cmd_ended_aux(self, fn):
     def __new_fn(cmd_done_event):
         try:
             cmd_done_event.argout = cmd_done_event.argout_raw.extract(
@@ -167,12 +167,12 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
     elif len(args) == 1:
         if callable(args[0]): # command_inout_asynch(lambda)
             cb = __CallBackAutoDie()
-            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(args[0])
+            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[0])
             argin = __get_command_inout_param(self, cmd_name)
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
         elif hasattr(args[0], 'cmd_ended'): # command_inout_asynch(Cbclass)
             cb = __CallBackAutoDie()
-            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(args[0].cmd_ended)
+            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[0].cmd_ended)
             argin = __get_command_inout_param(self, cmd_name)
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
         else: # command_inout_asynch(value)
@@ -182,12 +182,12 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
     elif len(args) == 2:
         if callable(args[1]): #command_inout_asynch( value, lambda)
             cb = __CallBackAutoDie()
-            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(args[1])
+            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[1])
             argin = __get_command_inout_param(self, cmd_name, args[0])
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
         elif hasattr(args[1], 'cmd_ended'): #command_inout_asynch(value, cbClass)
             cb = __CallBackAutoDie()
-            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(args[1].cmd_ended)
+            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[1].cmd_ended)
             argin = __get_command_inout_param(self, cmd_name, args[0])
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
         else: # command_inout_asynch(value, forget)

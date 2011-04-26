@@ -23,15 +23,10 @@
 
 import os
 import sys
-import errno
 import platform
-import copy
-import shutil
 import imp
-import StringIO
 
 from distutils.core import setup, Extension
-from distutils.dist import Distribution
 import distutils.sysconfig
 
 try:

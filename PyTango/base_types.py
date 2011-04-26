@@ -32,7 +32,7 @@ __docformat__ = "restructuredtext"
 import operator
 
 from _PyTango import *
-from utils import document_method, document_static_method
+from utils import document_method
 from utils import document_enum as __document_enum
 
 def __StdVector__add(self, seq):

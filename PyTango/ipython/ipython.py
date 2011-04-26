@@ -21,24 +21,27 @@
 ##
 ################################################################################
 
+import os
+
 try:
     import IPython
+    ipython = IPython
 except:
-    IPython = None
+    ipython = None
 
 def get_ipython_version():
     """Returns the current IPython version"""
-    if IPython is None:return None
+    if ipython is None:return None
     v = None
     try:
         try:
-            v = IPython.Release.version
-        except Exception, e1:
+            v = ipython.Release.version
+        except Exception:
             try:
-                v = IPython.release.version
-            except Exception, e2:
+                v = ipython.release.version
+            except Exception:
                 pass
-    except Exception, e3:
+    except Exception:
         pass
     return v
 
@@ -63,14 +66,13 @@ def __define_init():
 
 def get_ipython_dir():
     """Find the ipython local directory. Usually is <home>/.ipython"""
-    if hasattr(IPython.iplib, 'get_ipython_dir'):
+    if hasattr(ipython.iplib, 'get_ipython_dir'):
         # Starting from ipython 0.9 they hadded this method
-        return IPython.iplib.get_ipython_dir()
+        return ipython.iplib.get_ipython_dir()
     
     # Try to find the profile in the current directory and then in the 
     # default IPython dir
-    userdir = os.path.realpath(os.path.curdir)
-    home_dir = IPython.genutils.get_home_dir()
+    home_dir = ipython.genutils.get_home_dir()
     
     if os.name == 'posix':
         ipdir = '.ipython'
@@ -85,10 +87,10 @@ def get_ipython_profiles():
     ret = []
     ipydir = get_ipython_dir()
     if os.path.isdir(ipydir):
-        for i in os.listdir(ipdir):
+        for i in os.listdir(ipydir):
             if i.startswith("ipy_profile_") and i.endswith(".py") and \
                 os.path.isfile(i):
-                ret.append(i[len("ipy_profile_"):s.rfind(".")])
+                ret.append(i[len("ipy_profile_"):i.rfind(".")])
     return ret
 
 init_ipython = __define_init()

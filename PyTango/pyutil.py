@@ -31,7 +31,6 @@ __docformat__ = "restructuredtext"
 
 import os
 import copy
-import operator
 
 from _PyTango import _Util, Except, DevFailed, DbDevInfo
 from utils import document_method as __document_method
