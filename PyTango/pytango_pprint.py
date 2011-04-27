@@ -44,14 +44,11 @@ from _PyTango import (StdStringVector, StdLongVector, CommandInfoList,
     DbDatum, DbDevInfo, DbDevImportInfo, DbDevExportInfo, DbServerInfo,
     GroupElement, GroupReply, GroupAttrReply, GroupCmdReply,
     DevError, EventData, AttrConfEventData, DataReadyEventData,
-    AttributeConfig, AttributeConfig_2, AttributeConfig_3,
-    ChangeEventProp, PeriodicEventProp, ArchiveEventProp,
-    AttributeAlarm, EventProperties,
     TimeVal, DevFailed, CmdArgType)
 
-#from device_server import AttributeAlarm, EventProperties
-#from device_server import ChangeEventProp, PeriodicEventProp, ArchiveEventProp
-#from device_server import AttributeConfig, AttributeConfig_2, AttributeConfig_3
+from device_server import AttributeAlarm, EventProperties
+from device_server import ChangeEventProp, PeriodicEventProp, ArchiveEventProp
+from device_server import AttributeConfig, AttributeConfig_2, AttributeConfig_3
 
 def __inc_param(obj, name):
     ret  = not name.startswith('_')
