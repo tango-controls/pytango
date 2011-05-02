@@ -492,8 +492,11 @@ def __tango_exc_handler(ip, etype, value, tb):
     global _SPOCK_ERR
     ip.user_ns[_SPOCK_ERR] = etype, value, tb
     if etype == PyTango.DevFailed:
-        v = value[0]
-        print v.reason,":",v.desc
+        if len(value.args):
+            v = value[0]
+            print v.reason,":",v.desc
+        else:
+            print "Empty DevFailed"
         print "For more detailed information type: tango_error"
         
 def __safe_tango_exec(f, *args, **kwargs):
@@ -759,6 +762,7 @@ def init_pytango(ip):
     ip.set_hook('complete_command', attr_completer, re_key = ".*AttributeProxy[^\w\.]+")
     ip.set_hook('complete_command', attr_completer, re_key = ".*Attribute[^\w\.]+")
     
+    ip
     ip.set_custom_exc((PyTango.DevFailed,), __tango_exc_handler)
 
 def init_db(ip, parameter_s=''):
