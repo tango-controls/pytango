@@ -38,7 +38,7 @@ from _PyTango import AttributeInfo, AttributeInfoEx
 from _PyTango import AttributeInfoList, AttributeInfoListEx
 from _PyTango import DeviceProxy
 from _PyTango import __CallBackAutoDie, __CallBackPushEvent, EventType
-from _PyTango import DevFailed
+from _PyTango import DevFailed, Except
 from _PyTango import ExtractAs
 from PyTango.utils import seq_2_StdStringVector, StdStringVector_2_seq
 from PyTango.utils import seq_2_DbData, DbData_2_dict
@@ -707,6 +707,13 @@ def __DeviceProxy__subscribe_event ( self, attr_name, event_type, cb_or_queuesiz
     event_id = self.__subscribe_event(attr_name, event_type, cb, filters, stateless, extract_as)
 
     se = self.__get_event_map()
+    evt_data = se.get(event_id)
+    if evt_data is not None:
+        desc = "Internal PyTango error:\n" \
+               "%s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)\n" \
+               "Please report error to PyTango" % \
+               (self, attr_name, event_type, event_id, evt_data[2], evt_data[1])
+        Except.throw_exception("Py_InternalError", desc, "DeviceProxy.subscribe_event")
     se[event_id] = (cb, event_type, attr_name)
     return event_id
 
