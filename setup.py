@@ -36,6 +36,7 @@ import distutils.sysconfig
 
 try:
     import sphinx
+    raise Exception()
     from sphinx.setup_command import BuildDoc
 except:
     sphinx = None
@@ -120,12 +121,15 @@ class build(dftbuild):
                     d = abspath(self.build_lib, "PyTango")
                     orig_dir = os.path.abspath(os.curdir)
                     so = "_PyTango.so"
-                    dbg = so + ".debug"
+                    dbg = so + ".dbg"
                     try:
                         os.chdir(d)
-                        os.system("objcopy --only-keep-debug %s %s" % (so, dbg))
-                        os.system("objcopy --strip-debug --strip-unneeded %s" % (so,))
-                        os.system("objcopy --add-gnu-debuglink=%s %s" % (dbg, so))
+                        is_stripped = os.system('file %s | grep -q "not stripped" || exit 1' % so) != 0
+                        if not is_stripped:
+                            os.system("objcopy --only-keep-debug %s %s" % (so, dbg))
+                            os.system("objcopy --strip-debug --strip-unneeded %s" % (so,))
+                            os.system("objcopy --add-gnu-debuglink=%s %s" % (dbg, so))
+                            os.system("chmod -x %s" % (dbg,))
                     finally:
                         os.chdir(orig_dir)
 
@@ -147,18 +151,18 @@ class build_ext(dftbuild_ext):
             #self.compiler.compiler_so = " ".join(compiler_pars)
         dftbuild_ext.build_extensions(self)
 
-
-class build_doc(BuildDoc):
-    
-    def run(self):
-        # make sure the python path is pointing to the newly built
-        # code so that the documentation is built on this and not a
-        # previously installed version
+if sphinx:
+    class build_doc(BuildDoc):
         
-        build = self.get_finalized_command('build')
-        sys.path.insert(0, os.path.abspath(build.build_lib))
-        sphinx.setup_command.BuildDoc.run(self)
-        sys.path.pop(0)
+        def run(self):
+            # make sure the python path is pointing to the newly built
+            # code so that the documentation is built on this and not a
+            # previously installed version
+            
+            build = self.get_finalized_command('build')
+            sys.path.insert(0, os.path.abspath(build.build_lib))
+            sphinx.setup_command.BuildDoc.run(self)
+            sys.path.pop(0)
 
 
 class install_html(Command):

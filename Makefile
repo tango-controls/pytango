@@ -59,7 +59,7 @@ OBJS_DIR = objs
 endif
 
 CC = gcc
-CCFLAGS = -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O0 -Wall -fPIC $(INCLUDE_DIRS)
+CCFLAGS = -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -fPIC $(INCLUDE_DIRS)
 
 LN = g++ -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions
 LN_VER = -Wl,-h -Wl,--strip-all

@@ -36,12 +36,15 @@ from _PyTango import EncodedAttribute
 from _PyTango import ExtractAs
 from _PyTango import _ImageFormat
 
-try:
-    import numpy
-    np = numpy
-except:
+if _PyTango.constants.NUMPY_SUPPORT:
+    try:
+        import numpy
+        np = numpy
+    except:
+        np = None
+else:
     np = None
-
+    
 _allowed_extract = ExtractAs.Numpy, ExtractAs.String, ExtractAs.Tuple, \
                    ExtractAs.List, ExtractAs.PyTango3
 
@@ -221,7 +224,7 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
         if gray16.flags.aligned != True:
             raise TypeError("Currently, only contiguous, aligned numpy arrays "
                             "are supported")
-
+    
     if not is_str and (not width or not height):
         height = len(gray16)
         if height < 1:
@@ -234,9 +237,8 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
         width = len(row0)
         if type(row0) in types.StringTypes or type(row0) == bytearray:
             width /= 2
-
+    
     self._encode_gray16(gray16, width, height)
-
 
 def __EncodedAttribute_encode_jpeg_rgb24(self, rgb24, width=0, height=0, quality=100.0):
     """Encode a 24 bit rgb color image as JPEG format.
