@@ -180,6 +180,22 @@ int raise_asynch_exception(long thread_id, boost::python::object exp_klass)
     return PyThreadState_SetAsyncExc(thread_id, exp_klass.ptr());
 }
 
+bool isBufferLikeType(PyObject* obj)
+{
+#if PY_VERSION_HEX < 0x02060000
+    // Returns true for buffer
+    if (PyBuffer_Check(obj))
+        return true;
+    if (PyString_Check(obj))
+        return true;
+#else
+    // Returns true for str, buffer bytes, bytearray, memoryview
+    if (PyObject_CheckBuffer(obj))
+        return true;
+#endif
+    return false;
+}
+
 void export_base_types()
 {
     enum_<PyTango::ExtractAs>("ExtractAs")
@@ -347,4 +363,6 @@ void export_base_types()
     export_time_val();
     
     def("raise_asynch_exception", &raise_asynch_exception);
+    
+    def("isBufferLikeType", &isBufferLikeType);
 }

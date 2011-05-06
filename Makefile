@@ -77,7 +77,8 @@ $(TANGO_INC)/tango \
 $(PY_INC) \
 $(NUMPY_INC)
 
-LIBNAME = _PyTango.so
+LIB_NAME = _PyTango.so
+LIB_SYMB_NAME = $(LIB_NAME).dbg
 
 OBJS = \
 $(OBJS_DIR)/api_util.o \
@@ -160,7 +161,7 @@ device_impl.h
 
 all: build
 
-build: init $(LIBNAME)
+build: init $(LIB_NAME)
 
 init:
 	mkdir -p $(OBJS_DIR)
@@ -186,8 +187,12 @@ $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
 #	The shared libs
 #
 
-$(LIBNAME): $(OBJS)
-	$(LN) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIBNAME) $(LN_VER)
+$(LIB_NAME): $(OBJS)
+	$(LN) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME) $(LN_VER)
+	objcopy --only-keep-debug $(OBJS_DIR)/$(LIB_NAME) $(OBJS_DIR)/$(LIB_SYMB_NAME)
+	objcopy --strip-debug --strip-unneeded $(OBJS_DIR)/$(LIB_NAME)
+	objcopy --add-gnu-debuglink=$(OBJS_DIR)/$(LIB_SYMB_NAME) $(OBJS_DIR)/$(LIB_NAME)
+	chmod -x $(OBJS_DIR)/$(LIB_SYMB_NAME)
 
 clean:
 	rm -f *.o core
@@ -197,4 +202,5 @@ clean:
 install: build
 	mkdir -p $(prefix)
 	rsync -r PyTango $(prefix)
-	rsync $(OBJS_DIR)/$(LIBNAME) $(prefix)/PyTango
+	rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/PyTango
+	rsync $(OBJS_DIR)/$(LIB_SYMB_NAME) $(prefix)/PyTango

@@ -278,7 +278,7 @@ namespace PyDeviceClass
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS (export_device_overload,
                                         CppDeviceClass::export_device, 1, 2)
 
-#if ((defined sun) || (defined WIN32))
+#if !(defined __linux)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS (register_signal_overload,
                                         Tango::DeviceClass::register_signal, 1, 1)
 #else

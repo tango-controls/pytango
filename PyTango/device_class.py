@@ -787,13 +787,24 @@ def __doc_DeviceClass():
 
     document_method("register_signal", """
     register_signal(self, signo) -> None
+    register_signal(self, signo, own_handler=false) -> None
 
             Register a signal.
             Register this class as class to be informed when signal signo
-            is sent to to the device server process
+            is sent to to the device server process.
+            The second version of the method is available only under Linux.
 
         Parameters :
             - signo : (int) signal identifier
+            - own_handler : (bool) true if you want the device signal handler
+                            to be executed in its own handler instead of being
+                            executed by the signal thread. If this parameter 
+                            is set to true, care should be taken on how the
+                            handler is written. A default false value is provided
+        
+        Throws PyTango.DevFailed:
+            - if the signal number is out of range
+            - if the operating system failed to register a signal for the process.
 
         Return     : None
     """ )

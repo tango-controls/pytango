@@ -31,6 +31,11 @@
 typedef int Py_ssize_t;
 #endif
 
+// -----------------------------------------------------------------------------
+// The following section contains functions that changed signature from <=2.4
+// using char* to >=2.5 using const char*. Basically we defined them here using
+// const std::string
+
 inline PyObject *PyObject_GetAttrString_(PyObject *o, const std::string &attr_name)
 {
 #if PY_VERSION_HEX < 0x02050000
@@ -50,6 +55,49 @@ inline PyObject *PyImport_ImportModule_(const std::string &name)
 #endif
     return PyImport_ImportModule(attr);
 }
+
+// -----------------------------------------------------------------------------
+// The following section defines missing symbols in python <3.0 with macros
+
+#if PY_VERSION_HEX < 0x02070000
+    #if PY_VERSION_HEX < 0x02060000
+        #define PyObject_CheckBuffer(object) (0)
+
+        #define PyObject_GetBuffer(obj, view, flags) (PyErr_SetString(PyExc_NotImplementedError, \
+                        "new buffer interface is not available"), -1)
+        #define PyBuffer_FillInfo(view, obj, buf, len, readonly, flags) (PyErr_SetString(PyExc_NotImplementedError, \
+                    "new buffer interface is not available"), -1)
+        #define PyBuffer_Release(obj) (PyErr_SetString(PyExc_NotImplementedError, \
+                        "new buffer interface is not available"), -1)
+        // Bytes->String
+        #define PyBytes_FromStringAndSize PyString_FromStringAndSize
+        #define PyBytes_FromString PyString_FromString
+        #define PyBytes_AsString PyString_AsString
+        #define PyBytes_Size PyString_Size
+    #endif
+
+    #define PyMemoryView_FromBuffer(info) (PyErr_SetString(PyExc_NotImplementedError, \
+                    "new buffer interface is not available"), (PyObject *)NULL)
+    #define PyMemoryView_FromObject(object)     (PyErr_SetString(PyExc_NotImplementedError, \
+                                        "new buffer interface is not available"), (PyObject *)NULL)
+#endif
+
+#if PY_VERSION_HEX >= 0x03000000
+    // for buffers
+    #define Py_END_OF_BUFFER ((Py_ssize_t) 0)
+
+    #define PyObject_CheckReadBuffer(object) (0)
+
+    #define PyBuffer_FromMemory(ptr, s) (PyErr_SetString(PyExc_NotImplementedError, \
+                            "old buffer interface is not available"), (PyObject *)NULL)
+    #define PyBuffer_FromReadWriteMemory(ptr, s) (PyErr_SetString(PyExc_NotImplementedError, \
+                            "old buffer interface is not available"), (PyObject *)NULL)
+    #define PyBuffer_FromObject(object, offset, size)  (PyErr_SetString(PyExc_NotImplementedError, \
+                            "old buffer interface is not available"), (PyObject *)NULL)
+    #define PyBuffer_FromReadWriteObject(object, offset, size)  (PyErr_SetString(PyExc_NotImplementedError, \
+                            "old buffer interface is not available"), (PyObject *)NULL)
+
+#endif
 
 inline void raise_(PyObject *type, const char *message)
 {

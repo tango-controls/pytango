@@ -32,6 +32,7 @@ __docformat__ = "restructuredtext"
 import types
 import operator
 
+import _PyTango
 from _PyTango import EncodedAttribute
 from _PyTango import ExtractAs
 from _PyTango import _ImageFormat
@@ -169,7 +170,7 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
     """Encode a 16 bit grayscale image (no compression)
     
            :param gray16: an object containning image information
-           :type gray16: :py:obj:`str` or :class:`numpy.ndarray` or seq< seq<element> >
+           :type gray16: :py:obj:`str` or :py:obj:`buffer` or :class:`numpy.ndarray` or seq< seq<element> >
            :param width: image width. **MUST** be given if gray16 is a string or
                          if it is a :class:`numpy.ndarray` with ndims != 2.
                          Otherwise it is calculated internally.
@@ -207,6 +208,7 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
         if not width or not height:
             raise ValueError("When giving a string as data, you must also "
                              "supply width and height")
+    
     
     if np and isinstance(gray16, np.ndarray):
         if gray16.ndim != 2:
