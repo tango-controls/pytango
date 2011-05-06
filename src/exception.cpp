@@ -259,11 +259,19 @@ void handle_python_exception(boost::python::error_already_set &eas)
     }
 }
 
-namespace PyDevFailed2DevFailed
+struct convert_PyDevFailed_to_DevFailed
 {
+    convert_PyDevFailed_to_DevFailed()
+    {
+        boost::python::converter::registry::push_back(
+            &convertible,
+            &construct,
+            boost::python::type_id<Tango::DevFailed>());
+    }
+
     // Check if given Python object is convertible to a DevFailed.
     // If so, return obj, otherwise return 0
-    void* convertible(PyObject* obj)
+    static void* convertible(PyObject* obj)
     {
         if (PyObject_IsInstance(obj, PyTango_DevFailed.ptr()))
             return obj;
@@ -273,8 +281,8 @@ namespace PyDevFailed2DevFailed
 
     // Construct a vec3f object from the given Python object, and
     // store it in the stage1 (?) data.
-    void construct(PyObject* obj,
-                   boost::python::converter::rvalue_from_python_stage1_data* data)
+    static void construct(PyObject* obj,
+                          boost::python::converter::rvalue_from_python_stage1_data* data)
     {
         typedef boost::python::converter::rvalue_from_python_storage<Tango::DevFailed> DevFailed_storage;
 
@@ -284,15 +292,6 @@ namespace PyDevFailed2DevFailed
         PyDevFailed_2_DevFailed(obj, *df_ptr);
         data->convertible = storage;
     }
-
-    void convert_PyDevFailed_to_DevFailed()
-    {
-        boost::python::converter::registry::push_back(
-            &convertible,
-            &construct,
-            boost::python::type_id<Tango::DevFailed>());
-    }
-
 };
 
 
@@ -451,7 +450,7 @@ void export_exceptions()
         .staticmethod("print_error_stack")
     ;
 
-    PyDevFailed2DevFailed::convert_PyDevFailed_to_DevFailed();
+    convert_PyDevFailed_to_DevFailed pydevfailed_2_devfailed;
 
     /// NamedDevFailed & family:
     class_<Tango::NamedDevFailed> NamedDevFailed(
