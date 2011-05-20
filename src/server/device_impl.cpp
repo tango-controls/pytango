@@ -540,7 +540,19 @@ namespace PyDeviceImpl
         py_attr_ptr->set_read_name(read_name_met);
         py_attr_ptr->set_write_name(write_name_met);
         py_attr_ptr->set_allowed_name(is_allowed_method);
-
+        
+        if (new_attr.get_memorized())
+            attr_ptr->set_memorized();
+        attr_ptr->set_memorized_init(new_attr.get_memorized_init());
+        
+        attr_ptr->set_disp_level(new_attr.get_disp_level());
+        attr_ptr->set_polling_period(new_attr.get_polling_period());
+        attr_ptr->set_change_event(new_attr.is_change_event(),
+                                   new_attr.is_check_change_criteria());
+        attr_ptr->set_archive_event(new_attr.is_archive_event(),
+                                    new_attr.is_check_archive_criteria());
+        attr_ptr->set_data_ready_event(new_attr.is_data_ready_event());
+        
         //
         // Install attribute in Tango.
         //
