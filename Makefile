@@ -189,10 +189,10 @@ $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
 
 $(LIB_NAME): $(OBJS)
 	$(LN) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME) $(LN_VER)
-	objcopy --only-keep-debug $(OBJS_DIR)/$(LIB_NAME) $(OBJS_DIR)/$(LIB_SYMB_NAME)
-	objcopy --strip-debug --strip-unneeded $(OBJS_DIR)/$(LIB_NAME)
-	objcopy --add-gnu-debuglink=$(OBJS_DIR)/$(LIB_SYMB_NAME) $(OBJS_DIR)/$(LIB_NAME)
-	chmod -x $(OBJS_DIR)/$(LIB_SYMB_NAME)
+#	objcopy --only-keep-debug $(OBJS_DIR)/$(LIB_NAME) $(OBJS_DIR)/$(LIB_SYMB_NAME)
+#	objcopy --strip-debug --strip-unneeded $(OBJS_DIR)/$(LIB_NAME)
+#	objcopy --add-gnu-debuglink=$(OBJS_DIR)/$(LIB_SYMB_NAME) $(OBJS_DIR)/$(LIB_NAME)
+#	chmod -x $(OBJS_DIR)/$(LIB_SYMB_NAME)
 
 clean:
 	rm -f *.o core

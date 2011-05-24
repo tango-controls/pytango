@@ -30,7 +30,8 @@ from __future__ import with_statement
 __all__ = [ "is_scalar_type", "is_array_type", "is_numerical_type", 
             "is_int_type", "is_float_type", "obj_2_str", "seqStr_2_obj",
             "document_method", "document_static_method", "document_enum",
-            "CaselessList", "CaselessDict", "EventCallBack", "get_home" ]
+            "CaselessList", "CaselessDict", "EventCallBack", "get_home",
+            "from_version_str_to_hex_str", "from_version_str_to_int", ]
 
 __docformat__ = "restructuredtext"
 
@@ -927,3 +928,11 @@ def _get_env_var(env_var_name):
         key, val = map(str.strip, tup)
         if key == env_var_name:
             return val
+
+def from_version_str_to_hex_str(version_str):
+    v = map(int, version_str.split('.'));
+    return "0x%02d%02d%02d00" % (v[0],v[1],v[2])
+
+def from_version_str_to_int(version_str):
+    return int(from_version_str_to_hex_str(version_str, 16))
+

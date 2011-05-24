@@ -167,6 +167,7 @@ template<>
 void extract_scalar<Tango::DEV_VOID>(const CORBA::Any &any, boost::python::object &o)
 {}
 
+#ifndef DISABLE_PYTANGO_NUMPY
 /// This callback is run to delete Tango::DevVarXArray* objects.
 /// It is called by python. The array was associated with an attribute
 /// value object that is not being used anymore.
@@ -182,6 +183,7 @@ static void dev_var_x_array_deleter__(void * ptr_, void *type_)
         delete static_cast<TANGO_const2type(tangoTypeConst)*>(ptr_);
     );
 }
+#endif
 
 template<long tangoArrayTypeConst>
 void extract_array(const CORBA::Any &any, boost::python::object &py_result)
@@ -193,7 +195,7 @@ void extract_array(const CORBA::Any &any, boost::python::object &py_result)
     if ((any >>= tmp_ptr) == false)
         throw_bad_type(Tango::CmdArgTypeName[tangoArrayTypeConst]);
 
-#   ifndef DISABLE_PYTANGO_NUMPY
+#ifndef DISABLE_PYTANGO_NUMPY
       // For numpy we need a 'guard' object that handles the memory used
       // by the numpy object (releases it).
       // But I cannot manage memory inside our 'any' object, because it is
@@ -217,9 +219,9 @@ void extract_array(const CORBA::Any &any, boost::python::object &py_result)
       }
 
       py_result = to_py_numpy<tangoArrayTypeConst>(copy_ptr, object(handle<>(guard)));
-#   else
+#else
       py_result = to_py_list(tmp_ptr);
-#   endif
+#endif
 }
 
 CORBA::Any *PyCmd::execute(Tango::DeviceImpl *dev, const CORBA::Any &param_any)

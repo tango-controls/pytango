@@ -31,6 +31,7 @@ __docformat__ = "restructuredtext"
 
 import operator
 import types
+import threading
 
 from _PyTango import StdStringVector
 from _PyTango import DbData, DbDatum
@@ -618,6 +619,15 @@ def __DeviceProxy__set_attribute_config(self, value):
 
     return self._set_attribute_config(v)
 
+def __DeviceProxy__get_event_map_lock(self):
+    """
+    Internal helper method"""
+    if not hasattr(self, '_subscribed_events_lock'):
+        # do it like this instead of self._subscribed_events = dict() to avoid
+        # calling __setattr__ which requests list of tango attributes from device
+        self.__dict__['_subscribed_events_lock'] = threading.Lock()
+    return self._subscribed_events_lock
+
 def __DeviceProxy__get_event_map(self):
     """
     Internal helper method"""
@@ -706,15 +716,20 @@ def __DeviceProxy__subscribe_event ( self, attr_name, event_type, cb_or_queuesiz
 
     event_id = self.__subscribe_event(attr_name, event_type, cb, filters, stateless, extract_as)
 
-    se = self.__get_event_map()
-    evt_data = se.get(event_id)
-    if evt_data is not None:
-        desc = "Internal PyTango error:\n" \
-               "%s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)\n" \
-               "Please report error to PyTango" % \
-               (self, attr_name, event_type, event_id, evt_data[2], evt_data[1])
-        Except.throw_exception("Py_InternalError", desc, "DeviceProxy.subscribe_event")
-    se[event_id] = (cb, event_type, attr_name)
+    l = self.__get_event_map_lock()
+    l.acquire()
+    try:
+        se = self.__get_event_map()
+        evt_data = se.get(event_id)
+        if evt_data is not None:
+            desc = "Internal PyTango error:\n" \
+                   "%s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)\n" \
+                   "Please report error to PyTango" % \
+                   (self, attr_name, event_type, event_id, evt_data[2], evt_data[1])
+            Except.throw_exception("Py_InternalError", desc, "DeviceProxy.subscribe_event")
+        se[event_id] = (cb, event_type, attr_name)
+    finally:
+        l.release()
     return event_id
 
 def __DeviceProxy__unsubscribe_event(self, event_id):
@@ -733,20 +748,28 @@ def __DeviceProxy__unsubscribe_event(self, event_id):
 
         Throws     : EventSystemFailed
     """
-    se = self.__get_event_map()
-    if event_id not in se:
-        raise IndexError("This device proxy does not own this subscription " + str(event_id))
+    l = self.__get_event_map_lock()
+    l.acquire()
+    try:
+        se = self.__get_event_map()
+        if event_id not in se:
+            raise IndexError("This device proxy does not own this subscription " + str(event_id))
+        del se[event_id]
+    finally:
+        l.release()
     self.__unsubscribe_event(event_id)
-    del se[event_id]
 
 def __DeviceProxy__unsubscribe_event_all(self):
-    se = self.__get_event_map()
-    for event_id in se:
-        try:
-            self.__unsubscribe_event(event_id)
-        except Exception:
-            pass # @todo print or something, but not rethrow
-    se.clear()
+    l = self.__get_event_map_lock()
+    l.acquire()
+    try:
+        se = self.__get_event_map()
+        event_ids = se.keys()
+        se.clear()
+    finally:
+        l.release()
+    for event_id in event_ids:
+        self.__unsubscribe_event(event_id)
 
 def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractAs.Numpy):
     """
@@ -849,6 +872,7 @@ def __init_DeviceProxy():
     DeviceProxy.set_attribute_config = __DeviceProxy__set_attribute_config
 
     DeviceProxy.__get_event_map = __DeviceProxy__get_event_map
+    DeviceProxy.__get_event_map_lock = __DeviceProxy__get_event_map_lock
     DeviceProxy.subscribe_event = __DeviceProxy__subscribe_event
     DeviceProxy.unsubscribe_event = __DeviceProxy__unsubscribe_event
     DeviceProxy.__unsubscribe_event_all = __DeviceProxy__unsubscribe_event_all

@@ -72,6 +72,8 @@ inline static void throw_wrong_python_data_type_in_array(const std::string &att_
             o.str(), method);
 }
 
+extern long TANGO_VERSION_HEX;
+
 namespace PyAttribute
 {
     /**
@@ -116,16 +118,17 @@ namespace PyAttribute
     {
         Tango::DevString *v = new Tango::DevString;
 
-        if (att.get_writable() == Tango::READ)
-        { // No memory leak here. Do the standard thing
-            from_py<Tango::DEV_STRING>::convert(value, *v);
-        }
-        else
+        if (TANGO_VERSION_HEX < 0x07020000 && att.get_writable() != Tango::READ)
         { // MEMORY LEAK: use the python string directly instead of creating a
           // string
             v[0] = PyString_AsString(value.ptr());
+            att.set_value(v, 1, 0);
         }
-        att.set_value(v, 1, 0, true);
+        else
+        { // No memory leak here. Do the standard thing
+            from_py<Tango::DEV_STRING>::convert(value, *v);
+            att.set_value(v, 1, 0, true);
+        }
     }
     */
     

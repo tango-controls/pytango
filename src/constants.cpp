@@ -26,6 +26,8 @@
 
 using namespace boost::python;
 
+long TANGO_VERSION_HEX;
+
 void export_constants()
 {
     object consts_module(handle<>(borrowed(PyImport_AddModule("PyTango.constants"))));
@@ -40,6 +42,18 @@ void export_constants()
 #else
     consts_scope.attr("NUMPY_SUPPORT") = true;
 #endif
+
+    str py_TgLibVers = TgLibVers;
+    boost::python::list pylist_TgLibVers = py_TgLibVers.split(".");
+    long_ major = long_(pylist_TgLibVers[0]);
+    long_ minor = long_(pylist_TgLibVers[1]);
+    long_ patch = long_(pylist_TgLibVers[2]);
+    object h = "0x%02d%02d%02d00" % make_tuple(major, minor, patch);
+    PyObject *ptr = PyInt_FromString(PyString_AsString(h.ptr()), NULL, 0);
+    TANGO_VERSION_HEX = PyInt_AsLong(ptr);
+    Py_DECREF(ptr);
+    consts_scope.attr("TANGO_VERSION_HEX") = TANGO_VERSION_HEX;
+
     //
     // From tango_const.h
     //
