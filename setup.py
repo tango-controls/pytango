@@ -36,9 +36,9 @@ import distutils.sysconfig
 
 try:
     import sphinx
-    raise Exception()
     from sphinx.setup_command import BuildDoc
-except:
+except Exception,e:
+    print e
     sphinx = None
 
 try:
@@ -140,6 +140,10 @@ class build(dftbuild):
             return False
         if sphinx is None:
             return False
+        v = map(int, sphinx.__version__.split("."))
+        if v <= [0,6,5]:
+            print "Documentation will not be generated: sphinx version (%s) too low. Needs 0.6.6" % sphinx.__version__
+            return False 
         setup_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.isdir(os.path.join(setup_dir, 'doc'))
 
