@@ -88,16 +88,18 @@ class build(dftbuild):
     user_options = dftbuild.user_options + \
         [('with-pytango3', None, "distribute PyTango3 module"),
          ('without-spock', None, "spock IPython extension"),
-         ('strip-lib', None, "strips the shared library of debugging symbols (Unix like systems only)"), ]
+         ('strip-lib', None, "strips the shared library of debugging symbols (Unix like systems only)"),
+         ('no-doc', None, "do not build documentation") ]
     
-    boolean_options = dftbuild.boolean_options + ['with-pytango3', 'without-spock', 'strip-lib']
+    boolean_options = dftbuild.boolean_options + ['with-pytango3', 'without-spock', 'strip-lib', 'no-doc']
     
     def initialize_options (self):
         dftbuild.initialize_options(self)
         self.with_pytango3 = None
         self.without_spock = None
         self.strip_lib = None
-    
+        self.no_doc = None
+
     def finalize_options(self):
         dftbuild.finalize_options(self)
         
@@ -134,7 +136,10 @@ class build(dftbuild):
                         os.chdir(orig_dir)
 
     def has_doc(self):
-        if sphinx is None: return False
+        if self.no_doc:
+            return False
+        if sphinx is None:
+            return False
         setup_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.isdir(os.path.join(setup_dir, 'doc'))
 
@@ -390,7 +395,7 @@ def main():
         # and then uncommenting this line. Someday maybe this will be
         # automated...
         extra_compile_args += [
-    #        '-includesrc/precompiled_header.hpp',
+#            '-includesrc/precompiled_header.hpp',
         ]
 
         #if not please_debug:
