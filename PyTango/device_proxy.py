@@ -56,7 +56,12 @@ def __check_read_attribute(dev_attr):
     return dev_attr
 
 def __DeviceProxy__refresh_cmd_cache(self):
-    self.__cmd_cache = [cmd.cmd_name.lower() for cmd in self.command_list_query()]
+    cmd_list = self.command_list_query()
+    cmd_cache = {}
+    for cmd in cmd_list:
+        n = cmd.cmd_name.lower()
+        cmd_cache[n] = cmd, None
+    self.__dict__['__cmd_cache'] = cmd_cache
 
 def __DeviceProxy__refresh_attr_cache(self):
     attr_cache = [attr_name.lower() for attr_name in self.get_attribute_list()]
@@ -69,25 +74,37 @@ def __DeviceProxy__getattr(self, name):
     if name[:2] == "__" or name == 'trait_names':
         raise AttributeError, name
     
-    find_cmd = True
-    if not hasattr(self, '__cmd_cache') or name.lower() not in self.__cmd_cache:
+    name_l = name.lower()
+    cmd_info = None
+    if not hasattr(self, '__cmd_cache'):
         try:
             self.__refresh_cmd_cache()
         except:
-            find_cmd = False
-    
-    if find_cmd and name.lower() in self.__cmd_cache:
-        def f(*args,**kwds): return self.command_inout(name, *args, **kwds)
+            pass
+    try:
+        cmd_info = self.__cmd_cache[name_l]
+    except:
+        pass
+        
+    if cmd_info is not None:
+        d, f = cmd_info
+        if f is None:
+            doc =  "%s(%s) -> %s\n\n" % (d.cmd_name, d.in_type, d.out_type)
+            doc += " -  in (%s): %s\n" % (d.in_type, d.in_type_desc)
+            doc += " - out (%s): %s\n" % (d.out_type, d.out_type_desc)
+            def f(*args,**kwds): return self.command_inout(name, *args, **kwds)
+            f.__doc__ = doc
+            self.__cmd_cache[name_l] = d, f
         return f
     
     find_attr = True
-    if not hasattr(self, '__attr_cache') or name.lower() not in self.__attr_cache:
+    if not hasattr(self, '__attr_cache') or name_l not in self.__attr_cache:
         try:
             self.__refresh_attr_cache()
         except:
             find_attr = False
     
-    if not find_attr or name.lower() not in self.__attr_cache:
+    if not find_attr or name_l not in self.__attr_cache:
         raise AttributeError, name
     
     return self.read_attribute(name).value
