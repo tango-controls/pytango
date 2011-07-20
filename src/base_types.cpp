@@ -310,7 +310,8 @@ void export_base_types()
     to_python_converter<Tango::DevVarDoubleStringArray, CORBA_sequence_to_list<Tango::DevVarDoubleStringArray> >();
     to_python_converter<Tango::DevVarLong64Array, CORBA_sequence_to_list<Tango::DevVarLong64Array> >();
     to_python_converter<Tango::DevVarULong64Array, CORBA_sequence_to_list<Tango::DevVarULong64Array> >();
-
+    
+    to_python_converter<Tango::DevEncoded, DevEncoded_to_tuple>();
     //to_python_converter<unsigned char, UChar_to_str>();
     
     convert_PySequence_to_CORBA_Sequence<Tango::DevVarCharArray>();
