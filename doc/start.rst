@@ -26,12 +26,12 @@ Dependencies on other libraries
 
     digraph dependencies {
         size="6,3";
-        PyTango     [shape=box, label="PyTango 7.1.0"];
+        PyTango     [shape=box, label="PyTango 7.2"];
         Python      [shape=box, label="Python >=2.4"];
         boostpython [shape=box, label="boost python"];
         boostp1     [shape=box, label="boost >=1.33"];
         boostp2     [shape=box, label="boost >=1.41"];
-        Tango       [shape=box, label="Tango >=7.1"];
+        Tango       [shape=box, label="Tango >=7.2"];
         omniORB     [shape=box, label="omniORB >=4"];
         numpy       [shape=box, label="numpy >=1.1.0"];
         IPython     [shape=box, label="IPython >=0.10"];
@@ -50,8 +50,7 @@ The current PyTango version has four major dependencies:
 
 - python (>= 2.4) (http://www.python.org/)
 - omniORB (http://omniorb.sourceforge.net/)
-- Tango (>= 7.1.0) (http://www.tango-controls.org/)
-  (really recommended 7.1.1)
+- Tango (>= 7.2.0) (http://www.tango-controls.org/)
 - boost python (http://www.boost.org):
     if python >= 2.6.3 then: boost-python >= 1.41
     else: boost-python >= 1.33

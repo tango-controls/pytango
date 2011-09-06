@@ -606,6 +606,9 @@ def __init_Attribute():
     Attribute.get_properties_2 = __Attribute__get_properties_2
     Attribute.get_properties_3 = __Attribute__get_properties_3
     Attribute.set_properties = __Attribute__set_properties
+
+def __init_MultiAttribute():
+    MultiAttribute.get_attribute_list = __MultiAttribute__get_attribute_list
     
 def __init_Logger():
     Logger.log = __Logger__log
@@ -1743,6 +1746,19 @@ def __doc_WAttribute():
         Return     : (obj) the attribute write value.
     """ )
 
+def __MultiAttribute__get_attribute_list(self):
+    """
+        get_attribute_list(self) -> seq<Attribute>
+
+            Get the list of attribute objects.
+
+        Return     : (seq<Attribute>) list of attribute objects
+        
+        New in PyTango 7.2.1
+    """
+    return [ self.get_attr_by_ind(i) for i in range(self.get_attr_nb()) ]
+        
+    
 def __doc_MultiAttribute():
     def document_method(method_name, desc, append=True):
         return __document_method(MultiAttribute, method_name, desc, append)
@@ -2382,6 +2398,7 @@ def init(doc=True):
     __init_Attribute()
     __init_Attr()
     __init_Logger()
+    __init_MultiAttribute()
     if doc:
         __doc_DeviceImpl()
         __doc_extra_DeviceImpl(Device_3Impl)
