@@ -259,6 +259,9 @@ void export_base_types()
     class_<std::vector<Tango::Attr *> >("AttrList")
         .def(vector_indexing_suite<std::vector<Tango::Attr *>, true>());
 
+    class_<std::vector<Tango::Attribute *> >("AttributeList")
+        .def(vector_indexing_suite<std::vector<Tango::Attribute *>, true>());
+
     //class_<Tango::EventDataList>("EventDataList")
     //    .def(vector_indexing_suite<Tango::EventDataList>());
 

@@ -343,6 +343,8 @@ void export_device_class()
             &Tango::DeviceClass::device_destroyer)
         .def("_create_attribute", &CppDeviceClass::create_attribute)
         .def("_create_command", &CppDeviceClass::create_command)
+        .def("get_class_attr", &Tango::DeviceClass::get_class_attr,
+            return_value_policy<reference_existing_object>())
     ;
     implicitly_convertible<auto_ptr<CppDeviceClassWrap>, auto_ptr<CppDeviceClass> >();
 }

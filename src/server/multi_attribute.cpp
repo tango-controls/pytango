@@ -53,5 +53,7 @@ void export_multi_attribute()
         .def("read_alarm",
             (void (Tango::MultiAttribute::*) (const std::string &))
             &Tango::MultiAttribute::read_alarm) // New in 7.0.0
+        .def("get_attribute_list", &Tango::MultiAttribute::get_attribute_list,
+            return_value_policy<reference_existing_object>())
     ;
 }

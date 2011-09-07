@@ -80,6 +80,7 @@ Version history
 |            |     - from sourceforge:                                                                                                                                                      |
 |            |         - `3372371: write attribute of DevEncoded doesn't work <https://sourceforge.net/tracker/?func=detail&aid=3372371&group_id=57612&atid=484769>`_                       |
 |            |         - `3404771: PyTango.MultiAttribute.get_attribute_list missing <https://sourceforge.net/tracker/?func=detail&aid=3404771&group_id=57612&atid=484769>`_                |
+|            |         - `3405580: PyTango.MultiClassAttribute missing <https://sourceforge.net/tracker/?func=detail&aid=3405580&group_id=57612&atid=484769>`_                              |
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 7.2.0      | Features:                                                                                                                                                                    |
 |            |     - from sourceforge:                                                                                                                                                      |

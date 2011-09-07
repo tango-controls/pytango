@@ -135,6 +135,7 @@ $(OBJS_DIR)/dserver.o \
 $(OBJS_DIR)/encoded_attribute.o \
 $(OBJS_DIR)/log4tango.o \
 $(OBJS_DIR)/multi_attribute.o \
+$(OBJS_DIR)/multi_class_attribute.o \
 $(OBJS_DIR)/subdev.o \
 $(OBJS_DIR)/tango_util.o \
 $(OBJS_DIR)/user_default_attr_prop.o \
@@ -199,8 +200,11 @@ clean:
 	rm -f $(PREP).gch
 	rm -rf $(OBJS_DIR)
 
-install: build
+install-py:
 	mkdir -p $(prefix)
 	rsync -r PyTango $(prefix)
+
+install: build install-py
 	rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/PyTango
-	rsync $(OBJS_DIR)/$(LIB_SYMB_NAME) $(prefix)/PyTango
+#	rsync $(OBJS_DIR)/$(LIB_SYMB_NAME) $(prefix)/PyTango
+    
