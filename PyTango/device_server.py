@@ -43,6 +43,7 @@ from _PyTango import UserDefaultAttrProp
 
 from utils import document_method as __document_method
 from utils import copy_doc
+from attr_data import AttrData
 
 import log4tango
 
@@ -269,7 +270,7 @@ def __DeviceImpl__get_device_properties(self, ds_class = None):
         raise e
 
 def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_meth=None):
-    """add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_meth=None) -> None
+    """add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_meth=None) -> Attr
 
             Add a new attribute to the device attribute list. Please, note that if you add
             an attribute to a device at device creation time, this attribute will be added
@@ -277,33 +278,50 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
             same class created after this attribute addition will also have this attribute.
 
         Parameters :
-            attr : (Attr) the new attribute to be added to the list.
+            attr : (Attr or AttrData) the new attribute to be added to the list.
             r_meth : (callable) the read method to be called on a read request
-            w_meth : (callable) the write method to be called on a write request (if attr is writable)
-            is_allo_meth: (callable) the method that is called to check if it is possible to access the attribute or not
+            w_meth : (callable) the write method to be called on a write request
+                     (if attr is writable)
+            is_allo_meth: (callable) the method that is called to check if it
+                          is possible to access the attribute or not
         
-        Return     : None
+        Return     : (Attr) the newly created attribute.
         
         Throws     : DevFailed"""
+    
+    attr_data = None
+    if isinstance(attr, AttrData):
+        attr_data = attr
+        attr = attr.to_attr()
+    
     att_name = attr.get_name()
 
     add_name_in_list = False
     if r_meth is not None:
-        r_meth_name = 'read_%s' % att_name
+        if attr_data is None:
+            r_meth_name = 'read_%s' % att_name
+        else:
+            r_meth_name = attr_data.read_method_name
         if not hasattr(self.__class__, r_meth_name):
             setattr(self.__class__, r_meth_name, r_meth)
             add_name_in_list = True
 
     if w_meth is not None:
-        w_meth_name = 'write_%s' % att_name
+        if attr_data is None:
+            w_meth_name = 'write_%s' % att_name
+        else:
+            w_meth_name = attr_data.write_method_name
         if not hasattr(self.__class__, w_meth_name):
             setattr(self.__class__, w_meth_name, w_meth)
             add_name_in_list = True
 
     if is_allo_meth is not None:
-        allo_meth_name = 'is_%s_allowed' % att_name
+        if attr_data is None:
+            allo_meth_name = 'is_%s_allowed' % att_name
+        else:
+            allo_meth_name = attr_data.is_allowed_name
         if not hasattr(self.__class__, allo_meth_name):
-            setattr(self.__class__, allo_meth_name,is_allo_meth)
+            setattr(self.__class__, allo_meth_name, is_allo_meth)
             add_name_in_list = True
 
     try:
@@ -314,6 +332,8 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
     except:
         if add_name_in_list:
             self._remove_attr_meth(att_name)
+        raise
+    return attr
 
 def __DeviceImpl__remove_attribute(self, attr_name):
     """

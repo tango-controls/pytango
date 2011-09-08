@@ -58,6 +58,7 @@ __version_description__ = Release.version_description
 __doc__ = Release.long_description
 
 import pytango_init
+from attr_data import *
 from log4tango import *
 from device_server import *
 from attribute_proxy import *

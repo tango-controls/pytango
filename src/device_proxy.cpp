@@ -127,7 +127,6 @@ namespace PyDeviceProxy
 
     static inline void write_attribute(Tango::DeviceProxy& self, const Tango::AttributeInfo & attr_info, object py_value)
     {
-
         Tango::DeviceAttribute da;
         PyDeviceAttribute::reset(da, attr_info, py_value);
         AutoPythonAllowThreads guard;

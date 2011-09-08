@@ -31,12 +31,13 @@ __docformat__ = "restructuredtext"
 
 import types
 import operator
+import collections
 
 from _PyTango import Except, DevFailed
 from _PyTango import _DeviceClass, Database
 from _PyTango import CmdArgType, AttrDataFormat, AttrWriteType, DispLevel
 from _PyTango import UserDefaultAttrProp
-
+from _PyTango import Attr, SpectrumAttr, ImageAttr
 from pyutil import Util
 
 from utils import seqStr_2_obj, obj_2_str, is_array
@@ -44,6 +45,7 @@ from utils import document_method as __document_method
 
 from globals import get_class, get_class_by_class
 from globals import get_constructed_class_by_class
+from attr_data import AttrData
 
 class PropUtil:
     """An internal Property util class"""
@@ -271,6 +273,7 @@ class PropUtil:
         """internal helper method"""
         return obj_2_str(argin, argout_type)
 
+
 class DeviceClass(_DeviceClass):
     """Base class for all TANGO device-class class.
        A TANGO device-class class is a class where is stored all
@@ -317,152 +320,20 @@ class DeviceClass(_DeviceClass):
         """for internal usage only"""
 
         for attr_name, attr_info in self.attr_list.iteritems():
-            self.__create_attribute(attr_list, attr_name, attr_info)
+            attr_data = AttrData(attr_name, self.get_name(), attr_info)
+            self.__create_attribute(attr_list, attr_data)
 
-    def __create_attribute(self, attr_list, attr_name, attr_info):
+    def __create_attribute(self, attr_list, attr_data):
         """for internal usage only"""
-        name = self.get_name()
-
-        # check for well defined attribute info
-
-        # check parameter
-        if not operator.isSequenceType(attr_info):
-            msg = "Wrong data type for value for describing attribute %s in " \
-                  "class %s\nMust be a sequence with 1 or 2 elements" % (attr_name, name)
-            self.__throw_create_attribute_exception(msg)
-
-        if len(attr_info) < 1 or len(attr_info) > 2:
-            msg = "Wrong number of argument for describing attribute %s in " \
-                  "class %s\nMust be a sequence with 1 or 2 elements" % (attr_name, name)
-            self.__throw_create_attribute_exception(msg)
-
-        extra_info = {}
-        if len(attr_info) == 2:
-            # attr_info[1] must be a dictionary
-            # extra_info = attr_info[1], with all the keys lowercase
-            for k, v in attr_info[1].iteritems():
-                extra_info[k.lower()] = v
-
-        attr_info = attr_info[0]
-
-        attr_info_len = len(attr_info)
-        # check parameter
-        if not operator.isSequenceType(attr_info) or attr_info_len < 3 or attr_info_len > 5:
-            msg = "Wrong data type for describing mandatory information for attribute %s " \
-                  "in class %s\nMust be a sequence with 3, 4 or 5 elements" % (attr_name, name)
-            self.__throw_create_attribute_exception(msg)
-
-        # get data type
-        attr_type = CmdArgType.DevVoid
-        try:
-            attr_type = CmdArgType(attr_info[0])
-        except:
-            msg = "Wrong data type in attribute argument for attribute %s in " \
-                  "class %s\nAttribute data type (first element in first " \
-                  "sequence) must be a PyTango.CmdArgType"
-            self.__throw_create_attribute_exception(msg)
-
-        # get format
-        attr_format = AttrDataFormat.SCALAR
-        try:
-            attr_format = AttrDataFormat(attr_info[1])
-        except:
-            msg = "Wrong data format in attribute argument for attribute %s in " \
-                  "class %s\nAttribute data format (second element in first " \
-                  "sequence) must be a PyTango.AttrDataFormat"
-            self.__throw_create_attribute_exception(msg)
-
-        dim_x, dim_y = 1, 0
-        if attr_format == AttrDataFormat.SCALAR:
-            if attr_info_len != 3:
-                msg = "Wrong data type in attribute argument for attribute %s in " \
-                      "class %s\nSequence describing mandatory attribute parameters " \
-                      "for scalar attribute must have 3 elements"
-                self.__throw_create_attribute_exception(msg)
-        elif attr_format == AttrDataFormat.SPECTRUM:
-            if attr_info_len != 4:
-                msg = "Wrong data type in attribute argument for attribute %s in " \
-                      "class %s\nSequence describing mandatory attribute parameters " \
-                      "for spectrum attribute must have 4 elements"
-                self.__throw_create_attribute_exception(msg)
-            try:
-                dim_x = int(attr_info[3])
-            except:
-                msg = "Wrong data type in attribute argument for attribute %s in " \
-                      "class %s\n4th element in sequence describing mandatory dim_x " \
-                      "attribute parameter for spectrum attribute must be an integer"
-                self.__throw_create_attribute_exception(msg)
-        elif attr_format == AttrDataFormat.IMAGE:
-            if attr_info_len != 5:
-                msg = "Wrong data type in attribute argument for attribute %s in " \
-                      "class %s\nSequence describing mandatory attribute parameters " \
-                      "for image attribute must have 5 elements"
-                self.__throw_create_attribute_exception(msg)
-            try:
-                dim_x = int(attr_info[3])
-            except:
-                msg = "Wrong data type in attribute argument for attribute %s in " \
-                      "class %s\n4th element in sequence describing mandatory dim_x " \
-                      "attribute parameter for image attribute must be an integer"
-                self.__throw_create_attribute_exception(msg)
-            try:
-                dim_y = int(attr_info[4])
-            except:
-                msg = "Wrong data type in attribute argument for attribute %s in " \
-                      "class %s\n5th element in sequence describing mandatory dim_y " \
-                      "attribute parameter for image attribute must be an integer"
-                self.__throw_create_attribute_exception(msg)
-
-        #get write type
-        attr_write = AttrWriteType.READ
-        try:
-            attr_write = AttrWriteType(attr_info[2])
-        except:
-            msg = "Wrong data write type in attribute argument for attribute %s in " \
-                  "class %s\nAttribute write type (third element in first " \
-                  "sequence) must be a PyTango.AttrWriteType"
-            self.__throw_create_attribute_exception(msg)
-
-        # check that the method(s) to be executed exists
-        read_method_name = "read_%s" % attr_name
-        write_method_name = "write_%s" % attr_name
-        is_allowed_name = "is_%s_allowed" % attr_name
-
-        try:
-            display_level = DispLevel(extra_info.get("display level", DispLevel.OPERATOR))
-        except:
-            msg = "Wrong display level in attribute information for attribute %s in " \
-                  "class %s\nAttribute information for display level is not a " \
-                  "PyTango.DispLevel" % (attr_name, name)
-            self.__throw_create_attribute_exception(msg)
-
-        try:
-            polling_period = int(extra_info.get("polling period", -1))
-        except:
-            msg = "Wrong polling period in attribute information for attribute %s in " \
-                  "class %s\nAttribute information for polling period is not an " \
-                  "integer" % (attr_name, name)
-            self.__throw_create_attribute_exception(msg)
-
-        memorized, hw_memorized = extra_info.get("memorized", "false"), False
-        if memorized == "true":
-            memorized, hw_memorized = True, True
-        elif memorized == "true_without_hard_applied":
-            memorized = True
-        else:
-            memorized = False
-
-        att_prop = None
-        if extra_info:
-            att_prop = self.__create_user_default_attr_prop(attr_name, extra_info)
-
-        self._create_attribute(attr_list, attr_name, attr_type, attr_format,
-                               attr_write, dim_x, dim_y,
-                               display_level, polling_period,
-                               memorized, hw_memorized,
-                               read_method_name, write_method_name,
-                               is_allowed_name,
-                               att_prop)
+        self._create_attribute(attr_list, attr_data.attr_name,
+                               attr_data.attr_type, attr_data.attr_format,
+                               attr_data.attr_write, attr_data.dim_x,
+                               attr_data.dim_y, attr_data.display_level,
+                               attr_data.polling_period, attr_data.memorized,
+                               attr_data.hw_memorized,
+                               attr_data.read_method_name,
+                               attr_data.write_method_name,
+                               attr_data.is_allowed_name, attr_data.att_prop)
 
     def __create_user_default_attr_prop(self, attr_name, extra_info):
         """for internal usage only"""
