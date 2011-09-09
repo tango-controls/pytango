@@ -297,35 +297,57 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
     att_name = attr.get_name()
 
     add_name_in_list = False
-    if r_meth is not None:
-        if attr_data is None:
-            r_meth_name = 'read_%s' % att_name
-        else:
-            r_meth_name = attr_data.read_method_name
-        if not hasattr(self.__class__, r_meth_name):
-            setattr(self.__class__, r_meth_name, r_meth)
-            add_name_in_list = True
+    
+    r_name = 'read_%s' % att_name
+    if r_meth is None:
+        if attr_data is not None:
+            r_name = attr_data.read_method_name
+    else:
+        r_name = r_meth.__name__
+        
+    w_name = 'write_%s' % att_name
+    if w_meth is None:
+        if attr_data is not None:
+            w_name = attr_data.write_method_name
+    else:
+        w_name = w_meth.__name__
+    
+    ia_name = 'is_%s_allowed' % att_name
+    if is_allo_meth is None:
+        if attr_data is not None:
+            ia_name = attr_data.is_allowed_name
+    else:
+        ia_name = is_allo_meth.__name__
 
-    if w_meth is not None:
-        if attr_data is None:
-            w_meth_name = 'write_%s' % att_name
-        else:
-            w_meth_name = attr_data.write_method_name
-        if not hasattr(self.__class__, w_meth_name):
-            setattr(self.__class__, w_meth_name, w_meth)
-            add_name_in_list = True
+#    if r_meth is not None:
+#        if attr_data is None:
+#            r_meth_name = 'read_%s' % att_name
+#        else:
+#            r_meth_name = attr_data.read_method_name
+#        if not hasattr(self.__class__, r_meth_name):
+#            setattr(self.__class__, r_meth_name, r_meth)
+#            add_name_in_list = True
 
-    if is_allo_meth is not None:
-        if attr_data is None:
-            allo_meth_name = 'is_%s_allowed' % att_name
-        else:
-            allo_meth_name = attr_data.is_allowed_name
-        if not hasattr(self.__class__, allo_meth_name):
-            setattr(self.__class__, allo_meth_name, is_allo_meth)
-            add_name_in_list = True
+#    if w_meth is not None:
+#        if attr_data is None:
+#            w_meth_name = 'write_%s' % att_name
+#        else:
+#            w_meth_name = attr_data.write_method_name
+#        if not hasattr(self.__class__, w_meth_name):
+#            setattr(self.__class__, w_meth_name, w_meth)
+#            add_name_in_list = True
 
+#    if is_allo_meth is not None:
+#        if attr_data is None:
+#            allo_meth_name = 'is_%s_allowed' % att_name
+#        else:
+#            allo_meth_name = attr_data.is_allowed_name
+#        if not hasattr(self.__class__, allo_meth_name):
+#            setattr(self.__class__, allo_meth_name, is_allo_meth)
+#            add_name_in_list = True
+    
     try:
-        self._add_attribute(attr)
+        self._add_attribute(attr, r_name, w_name, ia_name)
         if add_name_in_list:
             cl = self.get_device_class()
             cl.dyn_att_added_methods.append(att_name)

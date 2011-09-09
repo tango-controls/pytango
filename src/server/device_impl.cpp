@@ -475,16 +475,44 @@ namespace PyDeviceImpl
         }
     }
 
-    void add_attribute(Tango::DeviceImpl &self, const Tango::Attr &c_new_attr)
+    void add_attribute(Tango::DeviceImpl &self, const Tango::Attr &c_new_attr,
+                       boost::python::object read_meth_name,
+                       boost::python::object write_meth_name,
+                       boost::python::object is_allowed_meth_name)
     {
         Tango::Attr &new_attr = const_cast<Tango::Attr &>(c_new_attr);
-
+        
         std::string
             attr_name = new_attr.get_name(),
-            is_allowed_method = "is_" + attr_name + "_allowed",
-            read_name_met = "read_" + attr_name,
-            write_name_met = "write_" + attr_name;
+            read_name_met, write_name_met, is_allowed_method;
+            
+        if (read_meth_name.ptr() == Py_None)
+        {
+            read_name_met = "read_" + attr_name;
+        }
+        else
+        {
+            read_name_met = boost::python::extract<const char *>(read_meth_name);
+        }
 
+        if (write_meth_name.ptr() == Py_None)
+        {
+            write_name_met = "write_" + attr_name;
+        }
+        else
+        {
+            write_name_met = boost::python::extract<const char *>(write_meth_name);
+        }
+
+        if (is_allowed_meth_name.ptr() == Py_None)
+        {
+            is_allowed_method = "is_" + attr_name + "_allowed";
+        }
+        else
+        {
+            is_allowed_method = boost::python::extract<const char *>(is_allowed_meth_name);
+        }
+        
         Tango::AttrWriteType attr_write = new_attr.get_writable();
 
         //
