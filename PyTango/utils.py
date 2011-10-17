@@ -825,17 +825,41 @@ class EventCallBack(object):
         try:
             self._push_event(evt)
         except Exception, e:
-            print >>self._fd, "Unexpected error in callback: %s" % str(e)
+            name = evt.attr_name
+            print >>self._fd, "Unexpected error in callback for %s: %s" % (str(evt), str(e))
     
     def _push_event(self, evt):
         """Internal usage only"""
         self._append(evt)
-        d = { "date" : evt.get_date().todatetime(),
-              "reception_date" : evt.reception_date.todatetime(),
-              "type" : evt.event.upper(),
-              "dev_name" : evt.device.dev_name().upper(),
-              "name" : evt.attr_name.split("/")[-1].upper(),
-              "value" : self._get_value(evt) }
+        import datetime
+        now = datetime.datetime.now()
+        try:
+            date = evt.get_date().todatetime()
+        except:
+            date = now
+        try:
+            reception_date = evt.reception_date.todatetime()
+        except:
+            reception_date = now
+        try:
+            evt_type = evt.event.upper()
+        except:
+            evt_type = "<UNKNOWN>"
+        try:
+            dev_name = evt.device.dev_name().upper()
+        except:
+            dev_name = "<UNKNOWN>"
+        try:
+            attr_name = evt.attr_name.split("/")[-1].upper()
+        except:
+            attr_name = "<UNKNOWN>"
+        try:
+            value = self._get_value(evt)
+        except Exception, e:
+            value = "Unexpected exception in getting event value: %s" % str(e)
+        d = { "date" : date, "reception_date" : reception_date,
+              "type" : evt_type, "dev_name" : dev_name, "name" : attr_name,
+              "value" : value }
         print >>self._fd, self._msg.format(**d)
 
     def _append(self, evt):
