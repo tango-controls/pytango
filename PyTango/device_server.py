@@ -318,33 +318,6 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
             ia_name = attr_data.is_allowed_name
     else:
         ia_name = is_allo_meth.__name__
-
-#    if r_meth is not None:
-#        if attr_data is None:
-#            r_meth_name = 'read_%s' % att_name
-#        else:
-#            r_meth_name = attr_data.read_method_name
-#        if not hasattr(self.__class__, r_meth_name):
-#            setattr(self.__class__, r_meth_name, r_meth)
-#            add_name_in_list = True
-
-#    if w_meth is not None:
-#        if attr_data is None:
-#            w_meth_name = 'write_%s' % att_name
-#        else:
-#            w_meth_name = attr_data.write_method_name
-#        if not hasattr(self.__class__, w_meth_name):
-#            setattr(self.__class__, w_meth_name, w_meth)
-#            add_name_in_list = True
-
-#    if is_allo_meth is not None:
-#        if attr_data is None:
-#            allo_meth_name = 'is_%s_allowed' % att_name
-#        else:
-#            allo_meth_name = attr_data.is_allowed_name
-#        if not hasattr(self.__class__, allo_meth_name):
-#            setattr(self.__class__, allo_meth_name, is_allo_meth)
-#            add_name_in_list = True
     
     try:
         self._add_attribute(attr, r_name, w_name, ia_name)
