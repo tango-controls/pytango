@@ -135,9 +135,6 @@ def __DeviceProxy__getAttributeNames(self):
         pass
     return []
 
-def __DeviceProxy__del(self):
-    self.__unsubscribe_event_all()
-
 def __DeviceProxy__getitem(self, key):
     return self.read_attribute(key)
 
@@ -849,7 +846,6 @@ def __DeviceProxy__str(self):
 def __init_DeviceProxy():
     DeviceProxy.__getattr__ = __DeviceProxy__getattr
     DeviceProxy.__setattr__ = __DeviceProxy__setattr
-    DeviceProxy.__del__ = __DeviceProxy__del
     DeviceProxy.__getitem__ = __DeviceProxy__getitem
     DeviceProxy.__setitem__ = __DeviceProxy__setitem
     DeviceProxy.__contains__ = __DeviceProxy__contains
