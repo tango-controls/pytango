@@ -25,6 +25,8 @@
 This is an internal PyTango module.
 """
 
+from __future__ import with_statement
+
 __all__ = []
 
 __docformat__ = "restructuredtext"
