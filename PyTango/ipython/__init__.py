@@ -22,3 +22,5 @@
 ################################################################################
 
 from ipython import init_ipython, install
+from ipython import load_ipython_extension, unload_ipython_extension, \
+    init_ipython, load_config

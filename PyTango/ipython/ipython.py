@@ -21,7 +21,8 @@
 ##
 ################################################################################
 
-__all__ = ["init_ipython", "install"]
+__all__ = ["init_ipython", "install", "load_ipython_extension",
+           "unload_ipython_extension", "load_config"]
 
 import os
 
@@ -72,19 +73,25 @@ def default_init_ipython(ip, store=True, pytango=True, colors=True,
 def default_install(ipydir=None, verbose=True):
     print "Unsupported IPython version (%s) for spock profile" \
         % get_ipython_version()
-    print "Supported IPython versions are: 0.10"
+    print "Supported IPython versions are: 0.10, 0.11 and 0.12"
     print "Tango extension to IPyhon will NOT be installed."
-    
-def __define():
-    ipv = get_ipython_version_list()
-    ret = default_init_ipython, default_install
-    if ipv >= [0, 10] and ipv < [0, 11]:
-        import ipython_00_10
-        ret = ipython_00_10.init_ipython, ipython_00_10.install
-    elif ipv >= [0, 11] and ipv <= [0, 12]:
-        import ipython_00_11
-        ret = ipython_00_11.init_ipython, ipython_00_11.install        
-    return ret
-    
-init_ipython, install = __define()
+ 
+init_ipython = default_init_ipython
+install = default_install
 
+ipv = get_ipython_version_list()
+if ipv >= [0, 10] and ipv < [0, 11]:
+    import ipython_00_10
+    init_ipython = ipython_00_10.init_ipython
+    install = ipython_00_10.install
+    load_config = None
+    load_ipython_extension = None
+    unload_ipython_extension = None
+elif ipv >= [0, 11] and ipv <= [0, 12]:
+    import ipython_00_11
+    init_ipython = None
+    install = ipython_00_11.install
+    load_config = ipython_00_11.load_config
+    load_ipython_extension = ipython_00_11.load_ipython_extension
+    unload_ipython_extension = ipython_00_11.unload_ipython_extension
+    

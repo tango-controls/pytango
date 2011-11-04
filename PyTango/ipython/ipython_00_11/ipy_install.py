@@ -23,11 +23,18 @@
 ##
 ################################################################################
 
+from __future__ import with_statement
+
 import sys
 import os
 import StringIO
 
 import IPython
+from IPython.core.profiledir import ProfileDirError, ProfileDir
+from IPython.core.application import BaseIPythonApplication
+from IPython.utils.path import get_ipython_dir
+from IPython.utils.io import ask_yes_no
+
 import PyTango
 
 __PROFILE = """\
@@ -36,62 +43,56 @@ __PROFILE = """\
 friendly interface to Tango.
 Created with PyTango {pytangover} for IPython {ipyver}\"\"\"
 
-PyTango.ipython.init_ipython()
+import PyTango.ipython
+
+config = get_config()
+PyTango.ipython.load_config(config)
+
+# Put any additional environment here
 """
 
-def install(ipydir=None,verbose=True):
-    install_dir = ipydir or IPython.core.path.get_ipython_dir()
-    f_name = os.path.join(install_dir, 'ipy_profile_spock.py')
+def install(ipydir=None, verbose=True, profile='spock'):
     if verbose:
         out = sys.stdout
     else:
         out = StringIO.StringIO()
-    if ipydir is None and os.path.isfile(f_name):
-        print "Warning: The file '%s' already exists." % f_name
-        r = ''
-        while r.lower() not in ('y', 'n'):
-            r = raw_input("Do you wish to override it [Y/n]?")
-            r = r or 'y'
-        if r.lower() == 'n':
-            return
-    profile = __PROFILE.format(pytangover=PyTango.Release.version,
-                               ipyver=IPython.release.version)
     
+    ipython_dir = ipydir or get_ipython_dir()
+    try:
+        p_dir = ProfileDir.find_profile_dir_by_name(ipython_dir, profile)
+    except ProfileDirError:
+        p_dir = ProfileDir.create_profile_dir_by_name(ipython_dir, profile)
+    
+    config_file_name = BaseIPythonApplication.config_file_name.default_value
+    abs_config_file_name = os.path.join(p_dir.location, config_file_name)
+    create_config = True
+    if os.path.isfile(abs_config_file_name):
+        create_config = ask_yes_no("Spock configuration file already exists. "\
+                                   "Do you wish to replace it?", default='y')
+    
+    if not create_config:
+        return
+
     out.write("Installing spock extension to ipython... ")
     out.flush()
-    try:
-        f = file(f_name, "w")
+
+    profile = __PROFILE.format(pytangover=PyTango.Release.version,
+                               ipyver=IPython.release.version)
+    with file(abs_config_file_name, "w") as f:
         f.write(profile)
         f.close()
-        out.write("[DONE]\n\n")
-    except Exception, e:
-        out.write("[FAILED]\n\n")
-        raise e
-    
-    d = IPython.core.path.get_ipython_dir()
-    ipy_user_config = os.path.join(d, 'ipy_user_conf.py')
+    out.write("[DONE]\n\n")
     out.write("""\
 To start spock simply type on the command line:
-%% ipython -p spock
-
-If you want spock extension to be automaticaly active when you start ipython,
-edit your %s and add the line:
-import ipy_profile_spock
-
-Next time, just start ipython on the command line:
-%% ipython
-
-and your spock extension should be loaded automaticaly. Note that if you are
-also loading other extensions that, for example, overwrite the prompt, the
-prompt that will appear is the one from the last extension to be imported.
+%% ipython --profile=spock
 
 For more information goto:
 http://www.tango-controls.org/static/PyTango/latest/doc/html/
 
 Have fun with spock!
 The PyTango team
-    """ % (ipy_user_config,))
-
+""")
+    
 def main():
     d = None
     if len(sys.argv) > 1:

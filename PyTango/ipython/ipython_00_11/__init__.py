@@ -21,5 +21,6 @@
 ##
 ################################################################################
 
-from ipython_00_11 import init_ipython
+from ipython_00_11 import load_ipython_extension, unload_ipython_extension, \
+    load_config
 from ipy_install import install
