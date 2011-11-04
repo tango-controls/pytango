@@ -21,6 +21,8 @@
 ##
 ################################################################################
 
+__all__ = ["init_ipython", "install"]
+
 import os
 
 try:
@@ -45,52 +47,44 @@ def get_ipython_version():
         pass
     return v
 
-def default_init_ipython(ip, store=True, pytango=True, colors=True, console=True, magic=True):
-    print "Unsupported IPython version (%s) for spock profile" % get_ipython_version()
+def get_ipython_version_list():
+    ipv_str = get_ipython_version()
+
+    if ipv_str is None:
+        ipv = [0, 0]
+    else:
+        ipv = []
+        for i in ipv_str.split(".")[:2]:
+            try:
+                i = int(i)
+            except:
+                i = 0
+            ipv.append(i)
+    return ipv
+
+def default_init_ipython(ip, store=True, pytango=True, colors=True,
+                         console=True, magic=True):
+    print "Unsupported IPython version (%s) for spock profile" \
+        % get_ipython_version()
     print "Supported IPython versions are: 0.10"
     print "Starting normal IPython console..."
 
-def __define_init():
-    _ipv_str = get_ipython_version()
-
-    if _ipv_str is None:
-        _ipv = 0,0
-    else:
-        _ipv = tuple(map(int,_ipv_str.split(".")[:3]))
-
-    ret = default_init_ipython
-    if _ipv >= (0,10) and _ipv <= (0,11):
+def default_install(ipydir=None, verbose=True):
+    print "Unsupported IPython version (%s) for spock profile" \
+        % get_ipython_version()
+    print "Supported IPython versions are: 0.10"
+    print "Tango extension to IPyhon will NOT be installed."
+    
+def __define():
+    ipv = get_ipython_version_list()
+    ret = default_init_ipython, default_install
+    if ipv >= [0, 10] and ipv < [0, 11]:
         import ipython_00_10
-        ret = ipython_00_10.init_ipython
+        ret = ipython_00_10.init_ipython, ipython_00_10.install
+    elif ipv >= [0, 11] and ipv <= [0, 12]:
+        import ipython_00_11
+        ret = ipython_00_11.init_ipython, ipython_00_11.install        
     return ret
-
-def get_ipython_dir():
-    """Find the ipython local directory. Usually is <home>/.ipython"""
-    if hasattr(ipython.iplib, 'get_ipython_dir'):
-        # Starting from ipython 0.9 they hadded this method
-        return ipython.iplib.get_ipython_dir()
     
-    # Try to find the profile in the current directory and then in the 
-    # default IPython dir
-    home_dir = ipython.genutils.get_home_dir()
-    
-    if os.name == 'posix':
-        ipdir = '.ipython'
-    else:
-        ipdir = '_ipython'
-    ipdir = os.path.join(home_dir, ipdir)
-    ipythondir = os.path.abspath( os.environ.get('IPYTHONDIR', ipdir) )
-    return ipythondir
+init_ipython, install = __define()
 
-def get_ipython_profiles():
-    """Helper functions to find ipython profiles"""
-    ret = []
-    ipydir = get_ipython_dir()
-    if os.path.isdir(ipydir):
-        for i in os.listdir(ipydir):
-            if i.startswith("ipy_profile_") and i.endswith(".py") and \
-                os.path.isfile(i):
-                ret.append(i[len("ipy_profile_"):i.rfind(".")])
-    return ret
-
-init_ipython = __define_init()

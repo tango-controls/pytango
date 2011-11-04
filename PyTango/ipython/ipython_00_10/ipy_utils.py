@@ -21,4 +21,22 @@
 ##
 ################################################################################
 
-from ipython import init_ipython, install
+import os
+
+import IPython
+ipython = IPython
+
+def get_ipython_dir():
+    """Find the ipython local directory. Usually is <home>/.ipython"""
+    return ipython.iplib.get_ipython_dir()
+
+def get_ipython_profiles():
+    """Helper functions to find ipython profiles"""
+    ret = []
+    ipydir = get_ipython_dir()
+    if os.path.isdir(ipydir):
+        for i in os.listdir(ipydir):
+            if i.startswith("ipy_profile_") and i.endswith(".py") and \
+                os.path.isfile(i):
+                ret.append(i[len("ipy_profile_"):i.rfind(".")])
+    return ret

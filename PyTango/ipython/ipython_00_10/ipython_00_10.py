@@ -762,7 +762,6 @@ def init_pytango(ip):
     ip.set_hook('complete_command', attr_completer, re_key = ".*AttributeProxy[^\w\.]+")
     ip.set_hook('complete_command', attr_completer, re_key = ".*Attribute[^\w\.]+")
     
-    ip
     ip.set_custom_exc((PyTango.DevFailed,), __tango_exc_handler)
 
 def init_db(ip, parameter_s=''):
