@@ -546,7 +546,8 @@ def __get_db(host_port=None):
         host_port = host_port.strip().replace(" ",":")
         if host_port.count(":") == 0:
             host_port += ":10000"
-        
+    host_port = str(host_port)
+    
     if db is None:
         create_db = True
     elif host_port is None:
@@ -560,10 +561,10 @@ def __get_db(host_port=None):
             db = PyTango.Database(*host_port.split(":"))
             
             ip.user_ns["DB_NAME"] = host_port
-        except Exception:
-            print
+        except Exception, e:
             if db:
-                print "Could not access Database", host_port
+                print "Could not access Database %s:" % host_port
+                print str(e)
                 old_host_port = "%s:%s" % (db.get_db_host(), db.get_db_port())
                 print "Maintaining connection to Database", old_host_port
                 ip.user_ns["DB_NAME"] = old_host_port
