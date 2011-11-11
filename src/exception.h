@@ -51,7 +51,8 @@ void throw_python_dev_failed();
 /**
  * Throws the current python exception as a DevFailed exception.
  */
-void throw_python_generic_exception();
+void throw_python_generic_exception(PyObject *type=NULL, PyObject *value=NULL,
+                                    PyObject *traceback=NULL);
 
 /**
  * Handles the current python exception:

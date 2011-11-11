@@ -151,11 +151,15 @@ void throw_python_dev_failed()
     throw df;
 }
 
-void throw_python_generic_exception()
+void throw_python_generic_exception(PyObject *type, PyObject *value,
+                                    PyObject *traceback)
 {
-    PyObject *type, *value, *traceback;
-    PyErr_Fetch(&type, &value, &traceback);
-
+    if ((type == NULL) || (value == NULL) || (traceback == NULL))
+    {
+        PyObject *type, *value, *traceback;
+        PyErr_Fetch(&type, &value, &traceback);
+    }
+    
 //
 // Send a default exception in case Python does not send us information
 //
@@ -444,10 +448,12 @@ void export_exceptions()
         .def("compare_exception",
             (bool (*) (const Tango::DevFailed &, const Tango::DevFailed &))
             compare_exception_)
+        .def("throw_python_exception", &throw_python_generic_exception)
         .staticmethod("throw_exception")
         .staticmethod("re_throw_exception")
         .staticmethod("print_exception")
         .staticmethod("print_error_stack")
+        .staticmethod("throw_python_exception")
     ;
 
     convert_PyDevFailed_to_DevFailed pydevfailed_2_devfailed;

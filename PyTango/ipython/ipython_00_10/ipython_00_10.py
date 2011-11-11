@@ -494,7 +494,7 @@ def __tango_exc_handler(ip, etype, value, tb):
     if etype == PyTango.DevFailed:
         if len(value.args):
             v = value[0]
-            print v.reason,":",v.desc
+            print "%s: %s" % (v.reason ,v.desc)
         else:
             print "Empty DevFailed"
         print "For more detailed information type: tango_error"

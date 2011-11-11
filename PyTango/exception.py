@@ -95,6 +95,27 @@ def __doc_Except():
             - ex     : (PyTango.DevFailed) The :class:`~PyTango.DevFailed` exception
     """ )
 
+    document_static_method("throw_python_exception", """
+    throw_python_exception(type, value, traceback) -> None
+
+            Generate and throw a TANGO DevFailed exception.
+            The exception is created with a single :class:`~PyTango.DevError` 
+            object. A default value *PyTango.ErrSeverity.ERR* is defined for 
+            the :class:`~PyTango.DevError` severity field.
+            
+            The parameters are the same as the ones generates by a call to
+            :func:`sys.exc_info`.
+            
+        Parameters :
+            - type : (class)  the exception type of the exception being handled 
+            - value : (object) exception parameter (its associated value or the
+                      second argument to raise, which is always a class instance
+                      if the exception type is a class object)
+            - traceback : (traceback) traceback object
+
+        Throws     : DevFailed
+    """ )
+    
 def __doc_DevError():
     DevError.__doc__ = """
     Structure describing any error resulting from a command execution,

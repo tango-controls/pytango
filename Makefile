@@ -62,6 +62,7 @@ CC = gcc
 CCFLAGS = -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -fPIC $(INCLUDE_DIRS)
 
 LN = g++ -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions
+LN_STATIC = g++ -pthread -static -Wl,-O1 -Wl,-Bsymbolic-functions
 LN_VER = -Wl,-h -Wl,--strip-all
 LN_LIBS = -ltango -llog4tango -lpthread -lrt -ldl -lomniORB4 -lomniDynamic4 -lomnithread -lCOS4 -lboost_python
 LN_DIRS = -L$(TANGO_ROOT)/lib
@@ -78,6 +79,7 @@ $(PY_INC) \
 $(NUMPY_INC)
 
 LIB_NAME = _PyTango.so
+LIB_NAME_STATIC = _PyTangoStatic.so
 LIB_SYMB_NAME = $(LIB_NAME).dbg
 
 OBJS = \
@@ -190,6 +192,7 @@ $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
 
 $(LIB_NAME): $(OBJS)
 	$(LN) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME) $(LN_VER)
+#	$(LN_STATIC) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME_STATIC) $(LN_VER)
 #	objcopy --only-keep-debug $(OBJS_DIR)/$(LIB_NAME) $(OBJS_DIR)/$(LIB_SYMB_NAME)
 #	objcopy --strip-debug --strip-unneeded $(OBJS_DIR)/$(LIB_NAME)
 #	objcopy --add-gnu-debuglink=$(OBJS_DIR)/$(LIB_SYMB_NAME) $(OBJS_DIR)/$(LIB_NAME)
