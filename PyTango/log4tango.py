@@ -40,7 +40,7 @@ Example::
 
 __all__ = [ "TangoStream", "LogIt", "DebugIt", "InfoIt", "WarnIt", 
             "ErrorIt", "FatalIt" ]
-            
+
 __docformat__ = "restructuredtext"
 
 import functools

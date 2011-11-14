@@ -214,7 +214,8 @@ class AttrData(object):
                 
         att_prop = None
         if extra_info:
-            self.att_prop = self.__create_user_default_attr_prop(attr_name, extra_info)
+            att_prop = self.__create_user_default_attr_prop(attr_name, extra_info)
+        self.att_prop = att_prop
     
     def to_attr(self):
         attr = self.attr_class(*self.attr_args)

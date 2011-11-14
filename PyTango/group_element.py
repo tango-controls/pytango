@@ -26,7 +26,7 @@ This is an internal PyTango module.
 """
 
 __all__ = []
-            
+
 __docformat__ = "restructuredtext"
 
 import operator

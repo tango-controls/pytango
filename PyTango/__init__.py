@@ -68,5 +68,24 @@ from device_class import *
 from globals import *
 from utils import *
 from tango_numpy import *
-from exception import *
-from encoded_attribute import *
+
+# The following lines will replace the '*' imports above in the future.
+#from attr_data import AttrData
+#from log4tango import TangoStream, LogIt, DebugIt, InfoIt, WarnIt, \
+#    ErrorIt, FatalIt
+#from device_server import ChangeEventProp, PeriodicEventProp, \
+#    ArchiveEventProp, AttributeAlarm, EventProperties, AttributeConfig, \
+#    AttributeConfig_2, AttributeConfig_3
+#from attribute_proxy import AttributeProxy
+#from group import Group
+#from pyutil import Util
+#from device_class import DeviceClass
+#from globals import get_class, get_classes, get_cpp_class, get_cpp_classes, \
+#    get_constructed_class, get_constructed_classes, class_factory, \
+#    delete_class_list, class_list, cpp_class_list, constructed_class
+#from utils import is_scalar_type, is_array_type, is_numerical_type, \
+#    is_int_type, is_float_type, obj_2_str, seqStr_2_obj, document_method, \
+#    document_static_method, document_enum, CaselessList, CaselessDict, \
+#    EventCallBack, get_home, from_version_str_to_hex_str, \
+#    from_version_str_to_int
+#from tango_numpy import NumpyType, numpy_type, numpy_spectrum, numpy_image

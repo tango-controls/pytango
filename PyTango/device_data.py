@@ -26,7 +26,7 @@ This is an internal PyTango module.
 """
 
 __all__ = []
-            
+
 __docformat__ = "restructuredtext"
 
 from utils import document_method as __document_method

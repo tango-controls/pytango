@@ -31,7 +31,17 @@ __docformat__ = "restructuredtext"
 
 import operator
 
-from _PyTango import *
+from _PyTango import (StdStringVector, StdLongVector, StdDoubleVector, \
+    CommandInfoList, AttributeInfoList, AttributeInfoListEx, DbData, \
+    DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList, \
+    DeviceDataHistoryList, StdGroupReplyVector, \
+    StdGroupCmdReplyVector, StdGroupAttrReplyVector, \
+    ArchiveEventInfo, EventData, AttrConfEventData, AttributeAlarmInfo, \
+    AttributeDimension, AttributeEventInfo, DeviceAttributeConfig, \
+    AttributeInfo, AttributeInfoEx, ChangeEventInfo, PeriodicEventInfo, \
+    DevCommandInfo, CommandInfo, DataReadyEventData, DeviceInfo, \
+    LockerInfo, PollDevice, TimeVal)
+
 from utils import document_method
 from utils import document_enum as __document_enum
 

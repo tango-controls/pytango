@@ -31,13 +31,12 @@ __docformat__ = "restructuredtext"
 
 import types
 import operator
-import collections
 
 from _PyTango import Except, DevFailed
 from _PyTango import _DeviceClass, Database
-from _PyTango import CmdArgType, AttrDataFormat, AttrWriteType, DispLevel
+from _PyTango import CmdArgType, DispLevel
 from _PyTango import UserDefaultAttrProp
-from _PyTango import Attr, SpectrumAttr, ImageAttr
+
 from pyutil import Util
 
 from utils import seqStr_2_obj, obj_2_str, is_array

@@ -146,10 +146,8 @@ def _define_numpy():
                 else:
                     return numpy.ndarray(shape=(dim_y,dim_x,), dtype=np_type)
         
-        return NumpyType, NumpyType.spectrum, NumpyType.image, NumpyType.tango_to_numpy
-        numpy_spectrum = NumpyType.spectrum
-        numpy_image = NumpyType.image
-        numpy_type = NumpyType.tango_to_numpy
+        return NumpyType, NumpyType.spectrum, \
+            NumpyType.image, NumpyType.tango_to_numpy
     except Exception:
         return None, _numpy_invalid, _numpy_invalid, _numpy_invalid
 

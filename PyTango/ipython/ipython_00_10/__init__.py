@@ -21,5 +21,7 @@
 ##
 ################################################################################
 
+__all__ = ['init_ipython', 'install']
+
 from ipython_00_10 import init_ipython
 from ipy_install import install

@@ -713,42 +713,6 @@ def __store(ip, var):
 # Initialization methods
 #-------------------------------------------------------------------------------
 
-def init_colors(ip):
-    InputColors = ColorANSI.InputTermColors
-    TermColors = ColorANSI.TermColors
-    
-    name = "Tango"
-    scheme = __build_color_scheme(ip, name)
-    for k, v in scheme.items():
-        v[0].add_scheme(v[1])
-
-    name = "PurpleTango"
-    scheme = __build_color_scheme(ip, name)
-    for k, v in scheme.items():
-        v[0].add_scheme(v[1])
-
-    name = "BlueTango"
-    scheme = __build_color_scheme(ip, name)
-    prompt = scheme["prompt"][1]
-    prompt.colors.in_prompt  = InputColors.Blue
-    prompt.colors.in_number  = InputColors.LightBlue
-    prompt.colors.in_prompt2 = InputColors.Blue
-    prompt.colors.out_prompt = TermColors.Cyan
-    prompt.colors.out_number = TermColors.LightCyan
-    for k, v in scheme.items():
-        v[0].add_scheme(v[1])
-
-    name = "GreenTango"
-    scheme = __build_color_scheme(ip, name)
-    prompt = scheme["prompt"][1]
-    prompt.colors.in_prompt  = InputColors.Green
-    prompt.colors.in_number  = InputColors.LightGreen
-    prompt.colors.in_prompt2 = InputColors.Green
-    prompt.colors.out_prompt = TermColors.Red
-    prompt.colors.out_number = TermColors.LightRed
-    for k, v in scheme.items():
-        v[0].add_scheme(v[1])
-
 def init_pytango(ip):
     """Initializes the IPython environment with PyTango elements"""
 
@@ -875,47 +839,6 @@ def init_db(ip, parameter_s=''):
     
     return db
 
-def init_store(ip):
-    # recover the environment
-    ip.magic("store -r")
-    spock_store = ip.user_ns.get(_SPOCK_STORE)
-    
-    if spock_store is None:
-        print "Initializing spock store (should only happen once)"
-        spock_store = {}
-        ip.user_ns.update( { _SPOCK_STORE : spock_store} )
-        __store(ip, _SPOCK_STORE)
-        
-def init_console(ip):
-    from IPython.utils.coloransi import TermColors
-    
-    d = { "version" : PyTango.Release.version,
-          "pyver" : __get_python_version(),
-          "ipyver" : __get_ipython_version(),
-          "pytangover" : __get_pytango_version() }
-    d.update(TermColors.__dict__)
-
-    so = Struct(
-        spock_banner="""%(Blue)shint: Try typing: mydev = Device("%(LightBlue)s<tab>%(Normal)s\n""")
-
-    so = ip.user_ns.get("spock_options", so)
-    
-    ip.colors = "Linux"
-    ip.prompt_in1 = "Spock <$DB_NAME> [\\#]: "
-    ip.prompt_out = "Result [\\#]: "
-    banner = """
-%(Purple)sSpock %(version)s%(Normal)s -- An interactive %(Purple)sTango%(Normal)s client.
-
-Running on top of Python %(pyver)s, IPython %(ipyver)s and PyTango %(pytangover)s
-
-help      -> Spock's help system.
-object?   -> Details about 'object'. ?object also works, ?? prints more.
-
-""" + so.spock_banner
-    ip.banner = banner % d
-    if hasattr(ip.banner, "format"):
-        ip.banner = ip.banner.format(**d)
-    
 def init_magic(ip):
     __expose_magic(ip, "refreshdb", magic_refreshdb)
     __expose_magic(ip, "reloaddb", magic_refreshdb)
@@ -965,15 +888,13 @@ def init_ipython(ip=None, store=True, pytango=True, colors=True, console=True,
     global _spock_init
     if _spock_init is True: return
     
-    #ip.IP._orig_complete = ip.IP.complete
-    #ip.IP.complete = complete
+    if pytango:
+        init_pytango(ip)
     
-    if colors:  init_colors(ip)
-    if store:   init_store(ip)
-    if pytango: init_pytango(ip)
     init_db(ip)
-    #if console: init_console(ip)
-    if magic:   init_magic(ip)
+
+    if magic:
+        init_magic(ip)
     
     _spock_init = True
 
@@ -995,7 +916,7 @@ def load_config(config):
     # Application
     # ------------------------------------
     app = config.Application
-    config.log_level = 30
+    app.log_level = 30
 
     # ------------------------------------
     # InteractiveShell
@@ -1024,12 +945,12 @@ def load_config(config):
     # ------------------------------------
     # IPKernelApp: options for the  Qt Console
     # ------------------------------------
-    kernel_app = config.IPKernelApp
+    #kernel_app = config.IPKernelApp
     ipython_widget = config.IPythonWidget
     ipython_widget.in_prompt  = 'Spock [<span class="in-prompt-number">%i</span>]: '
     ipython_widget.out_prompt = '  Out [<span class="out-prompt-number">%i</span>]: '
     
-    zmq_i_shell = config.ZMQInteractiveShell
+    #zmq_i_shell = config.ZMQInteractiveShell
     
     # ------------------------------------
     # TerminalInteractiveShell

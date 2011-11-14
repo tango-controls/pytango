@@ -726,7 +726,7 @@ def _notifd2db_file_db(ior_string, files, out=sys.stdout):
     print >>out, "going to export notification service event factory to " \
                  "device server property file(s) ..."
     for f in files:
-        with file(f, "w") as out_file:
+        with file(f, "w"):
             pass
     return
 
@@ -825,8 +825,8 @@ class EventCallBack(object):
         try:
             self._push_event(evt)
         except Exception, e:
-            name = evt.attr_name
-            print >>self._fd, "Unexpected error in callback for %s: %s" % (str(evt), str(e))
+            print >>self._fd, "Unexpected error in callback for %s: %s" \
+                % (str(evt), str(e))
     
     def _push_event(self, evt):
         """Internal usage only"""

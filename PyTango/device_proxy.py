@@ -732,7 +732,7 @@ def __DeviceProxy__subscribe_event ( self, attr_name, event_type, cb_or_queuesiz
 
     event_id = self.__subscribe_event(attr_name, event_type, cb, filters, stateless, extract_as)
 
-    with self.__get_event_map_lock() as lock:
+    with self.__get_event_map_lock():
         se = self.__get_event_map()
         evt_data = se.get(event_id)
         if evt_data is not None:
@@ -760,7 +760,7 @@ def __DeviceProxy__unsubscribe_event(self, event_id):
 
         Throws     : EventSystemFailed
     """
-    with self.__get_event_map_lock() as lock:
+    with self.__get_event_map_lock():
         se = self.__get_event_map()
         if event_id not in se:
             raise IndexError("This device proxy does not own this subscription " + str(event_id))
@@ -768,7 +768,7 @@ def __DeviceProxy__unsubscribe_event(self, event_id):
     self.__unsubscribe_event(event_id)
 
 def __DeviceProxy__unsubscribe_event_all(self):
-    with self.__get_event_map_lock() as lock:
+    with self.__get_event_map_lock():
         se = self.__get_event_map()
         event_ids = se.keys()
         se.clear()
