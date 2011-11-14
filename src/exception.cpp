@@ -156,7 +156,6 @@ void throw_python_generic_exception(PyObject *type, PyObject *value,
 {
     if ((type == NULL) || (value == NULL) || (traceback == NULL))
     {
-        PyObject *type, *value, *traceback;
         PyErr_Fetch(&type, &value, &traceback);
     }
     
