@@ -1001,9 +1001,9 @@ def load_config(config):
     # InteractiveShell
     # ------------------------------------
     i_shell = config.InteractiveShell
-    i_shell.colors = "Linux"
-    i_shell.prompt_in1 = "Spock <$DB_NAME> [\\#]: "
-    i_shell.prompt_out = "Result [\\#]: "
+    i_shell.colors = 'Linux'
+    i_shell.prompt_in1 = 'Spock <$DB_NAME> [\\#]: '
+    i_shell.prompt_out = 'Result [\\#]: '
     
     # ------------------------------------
     # InteractiveShellApp
@@ -1025,6 +1025,11 @@ def load_config(config):
     # IPKernelApp: options for the  Qt Console
     # ------------------------------------
     kernel_app = config.IPKernelApp
+    ipython_widget = config.IPythonWidget
+    ipython_widget.in_prompt  = 'Spock [<span class="in-prompt-number">%i</span>]: '
+    ipython_widget.out_prompt = '  Out [<span class="out-prompt-number">%i</span>]: '
+    
+    zmq_i_shell = config.ZMQInteractiveShell
     
     # ------------------------------------
     # TerminalInteractiveShell
