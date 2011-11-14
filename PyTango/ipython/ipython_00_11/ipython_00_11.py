@@ -563,14 +563,15 @@ def __get_db(host_port=None):
             ip.user_ns["DB_NAME"] = host_port
         except Exception, e:
             if db:
-                print "Could not access Database %s:" % host_port
+                print "\nCould not access Database %s:" % host_port
                 print str(e)
                 old_host_port = "%s:%s" % (db.get_db_host(), db.get_db_port())
                 print "Maintaining connection to Database", old_host_port
                 ip.user_ns["DB_NAME"] = old_host_port
             else:
-                print "Could not access any Database."
-                print "Make sure .tangorc, /etc/tangorc or TANGO_HOST environment is defined."
+                print "\nCould not access any Database. Make sure:"
+                print "\t- .tangorc, /etc/tangorc or TANGO_HOST environment is defined."
+                print "\t- the Database DS is running"
                 ip.user_ns["DB_NAME"] = "OFFLINE"
                 
         # register the 'db' in the user namespace
