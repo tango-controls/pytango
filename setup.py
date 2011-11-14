@@ -36,6 +36,8 @@ import distutils.sysconfig
 
 try:
     import sphinx
+    import sphinx.util.console
+    sphinx.util.console.color_terminal = lambda : False
     from sphinx.setup_command import BuildDoc
 except Exception,e:
     print e

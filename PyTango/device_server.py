@@ -278,12 +278,12 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
             same class created after this attribute addition will also have this attribute.
 
         Parameters :
-            attr : (Attr or AttrData) the new attribute to be added to the list.
-            r_meth : (callable) the read method to be called on a read request
-            w_meth : (callable) the write method to be called on a write request
-                     (if attr is writable)
-            is_allo_meth: (callable) the method that is called to check if it
-                          is possible to access the attribute or not
+            - attr : (Attr or AttrData) the new attribute to be added to the list.
+            - r_meth : (callable) the read method to be called on a read request
+            - w_meth : (callable) the write method to be called on a write request
+                       (if attr is writable)
+            - is_allo_meth: (callable) the method that is called to check if it
+                            is possible to access the attribute or not
         
         Return     : (Attr) the newly created attribute.
         

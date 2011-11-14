@@ -25,7 +25,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ['init']
 
 __docformat__ = "restructuredtext"
 
@@ -52,7 +52,7 @@ import time_val
 __INITIALIZED = False
 __DOC = True
 
-def __init():
+def init():
     global __INITIALIZED
     if __INITIALIZED:
         return
@@ -82,5 +82,3 @@ def __init():
     attribute_proxy.init(doc=doc)
 
     __INITIALIZED = True
-    
-__init()

@@ -1446,6 +1446,45 @@ def __doc_DeviceProxy():
 
         New in PyTango 7.0.0
     """ )
+    
+    document_method("write_attribute_reply", """
+    write_attribute_reply(self, id) -> None
+
+            Check if the answer of an asynchronous write_attribute is arrived
+            (polling model). If the reply is arrived and if it is a valid reply,
+            the call returned. If the reply is an exception, it is re-thrown by
+            this call. An exception is also thrown in case of the reply is not
+            yet arrived.
+
+        Parameters :
+            - id : (int) the asynchronous call identifier.
+        Return     : None
+
+        Throws     : AsynCall, AsynReplyNotArrived, CommunicationFailed, DevFailed from device.
+
+        New in PyTango 7.0.0
+
+    write_attribute_reply(self, id, timeout) -> None
+
+            Check if the answer of an asynchronous write_attribute is arrived
+            (polling model). id is the asynchronous call identifier. If the
+            reply is arrived and if it is a valid reply, the call returned. If
+            the reply is an exception, it is re-thrown by this call. If the
+            reply is not yet arrived, the call will wait (blocking the process)
+            for the time specified in timeout. If after timeout milliseconds,
+            the reply is still not there, an exception is thrown. If timeout is
+            set to 0, the call waits until the reply arrived.
+            
+        Parameters :
+            - id      : (int) the asynchronous call identifier.
+            - timeout : (int) the timeout
+            
+        Return     : None
+
+        Throws     : AsynCall, AsynReplyNotArrived, CommunicationFailed, DevFailed from device.
+
+        New in PyTango 7.0.0
+    """ )
 
 #-------------------------------------
 #   Logging administration methods
