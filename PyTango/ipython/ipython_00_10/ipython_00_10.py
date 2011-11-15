@@ -43,6 +43,7 @@ import PyTango.utils
 _DB_SYMB = "db"
 _DFT_TANGO_HOST = None
 _SPOCK_STORE = "__spock_store"
+_TANGO_ERR = "__tango_error"
 _SPOCK_ERR = "__spock_error"
 _spock_init = False
 
@@ -304,14 +305,25 @@ def magic_lsserv(self, parameter_s=''):
 def magic_tango_error(self, parameter_s=''):
     """Displays detailed information about the last tango error"""
     
-    global _SPOCK_ERR
-    err_info = self.user_ns.get(_SPOCK_ERR)
+    global _TANGO_ERR
+    err_info = self.user_ns.get(_TANGO_ERR)
     if err_info is None:
         print "No tango error reported so far."
         return
     print "Last tango error:"
     print err_info[1]
+
+def magic_spock_error(self, parameter_s=''):
+    """Displays detailed information about the last spock error"""
     
+    global _SPOCK_ERR
+    err_info = self.user_ns.get(_SPOCK_ERR)
+    if err_info is None:
+        print "No error reported so far."
+        return
+    ip = IPython.ipapi.get()
+    ip.IP.InteractiveTB(*err_info, tb_offset=None)
+
 _EVT_LOG = None
 def __get_event_log():
     global _EVT_LOG
@@ -488,17 +500,22 @@ def get_alias_list():
 # Private helper methods
 #-------------------------------------------------------------------------------
 
-def __tango_exc_handler(ip, etype, value, tb):
-    global _SPOCK_ERR
-    ip.user_ns[_SPOCK_ERR] = etype, value, tb
+def __exc_handler(ip, etype, value, tb):
     if etype == PyTango.DevFailed:
+        global _TANGO_ERR
+        ip.user_ns[_TANGO_ERR] = etype, value, tb
         if len(value.args):
             v = value[0]
             print "%s: %s" % (v.reason ,v.desc)
         else:
             print "Empty DevFailed"
-        print "For more detailed information type: tango_error"
-        
+        print "(For more detailed information type: tango_error)"
+    else:
+        global _SPOCK_ERR
+        ip.user_ns[_SPOCK_ERR] = etype, value, tb
+        print etype.__name__ + ": " + str(value)
+        print "(For more detailed information type: spock_error)"
+
 def __safe_tango_exec(f, *args, **kwargs):
     try:
         return f(*args, **kwargs)
@@ -762,7 +779,7 @@ def init_pytango(ip):
     ip.set_hook('complete_command', attr_completer, re_key = ".*AttributeProxy[^\w\.]+")
     ip.set_hook('complete_command', attr_completer, re_key = ".*Attribute[^\w\.]+")
     
-    ip.set_custom_exc((PyTango.DevFailed,), __tango_exc_handler)
+    ip.set_custom_exc((Exception,), __exc_handler)
 
 def init_db(ip, parameter_s=''):
     global _DB_SYMB
@@ -926,6 +943,7 @@ def init_magic(ip):
     __expose_magic(ip, "lsdevclass", magic_lsdevclass)
     __expose_magic(ip, "lsserv", magic_lsserv)
     __expose_magic(ip, "tango_error", magic_tango_error)
+    __expose_magic(ip, "spock_error", magic_spock_error)
     __expose_magic(ip, "mon", magic_mon, __monitor_completer)
     #__expose_magic(ip, "umon", magic_umon, __monitor_completer)
     
