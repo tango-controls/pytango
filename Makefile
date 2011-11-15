@@ -54,6 +54,9 @@ endif
 
 SRC_DIR = src
 
+PRE_C_H = $(SRC_DIR)/precompiled_header.hpp
+PRE_C_H_O = $(PRE_C_H).gch
+
 ifndef OBJS_DIR
 OBJS_DIR = objs
 endif
@@ -70,6 +73,7 @@ LN_DIRS = -L$(TANGO_ROOT)/lib
 PY_INC = $(shell python-config --includes)
 NUMPY_INC = -I$(NUMPY_ROOT)/include
 TANGO_INC = -I$(TANGO_ROOT)/include
+PRE_C = -include$(PRE_C_H)
 
 INCLUDE_DIRS = \
 -Isrc \
@@ -164,27 +168,30 @@ device_impl.h
 
 all: build
 
-build: init $(LIB_NAME)
+build: init $(PRE_C_H_O) $(LIB_NAME)
 
 init:
 	mkdir -p $(OBJS_DIR)
+
+$(PRE_C_H_O): $(PRE_C_H)
+	$(CC) $(CCFLAGS) -c $< -o $(PRE_C_H_O)
 
 #
 # Rule for shared library
 #
 
 .SUFFIXES: .o .cpp
-.cpp.o:
+.cpp.o: $(PRE_C_H_O)
 	$(CC) $(CCFLAGS) -c $< -o $*.o
 
 #
 # Rule for API files
 #
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o
+	$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(PRE_C)
 
 $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
-	$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o
+	$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(PRE_C)
 
 #
 #	The shared libs
@@ -200,7 +207,7 @@ $(LIB_NAME): $(OBJS)
 
 clean:
 	rm -f *.o core
-	rm -f $(PREP).gch
+	rm -f $(SRC_DIR)/*.gch
 	rm -rf $(OBJS_DIR)
 
 install-py:
