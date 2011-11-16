@@ -519,13 +519,6 @@ def __exc_handler(ip, etype, value, tb, tb_offset=None):
         print etype.__name__ + ": " + str(value)
         print "(For more detailed information type: spock_error)"
 
-def __safe_tango_exec(f, *args, **kwargs):
-    try:
-        return f(*args, **kwargs)
-    except PyTango.DevFailed, df:
-        print df[0].reason,":",df[0].desc
-        print "For more information type: get_last_tango_error"
-
 def __get_default_tango_host():
     global _DFT_TANGO_HOST
     if _DFT_TANGO_HOST is None:
@@ -866,6 +859,7 @@ def init_magic(ip):
     __expose_magic(ip, "lsdevclass", magic_lsdevclass)
     __expose_magic(ip, "lsserv", magic_lsserv)
     __expose_magic(ip, "tango_error", magic_tango_error)
+    __expose_magic(ip, "tango_error", magic_spock_error)
     __expose_magic(ip, "mon", magic_mon, __monitor_completer)
     #__expose_magic(ip, "umon", magic_umon, __monitor_completer)
     
