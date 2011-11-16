@@ -501,7 +501,8 @@ def get_alias_list():
 #-------------------------------------------------------------------------------
 
 def __exc_handler(ip, etype, value, tb):
-    if etype == PyTango.DevFailed:
+    global _TG_EXCEPTIONS
+    if etype in _TG_EXCEPTIONS:
         global _TANGO_ERR
         ip.user_ns[_TANGO_ERR] = etype, value, tb
         if len(value.args):
