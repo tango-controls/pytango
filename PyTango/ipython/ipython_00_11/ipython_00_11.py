@@ -330,8 +330,8 @@ def magic_spock_error(self, parameter_s=''):
     if err_info is None:
         print "No error reported so far."
         return
-    ip = IPython.ipapi.get()
-    ip.IP.InteractiveTB(*err_info, tb_offset=None)
+    ip = ipapi.get()
+    ip.InteractiveTB(*err_info, tb_offset=None)
 
 _EVT_LOG = None
 def __get_event_log():
@@ -859,7 +859,7 @@ def init_magic(ip):
     __expose_magic(ip, "lsdevclass", magic_lsdevclass)
     __expose_magic(ip, "lsserv", magic_lsserv)
     __expose_magic(ip, "tango_error", magic_tango_error)
-    __expose_magic(ip, "tango_error", magic_spock_error)
+    __expose_magic(ip, "spock_error", magic_spock_error)
     __expose_magic(ip, "mon", magic_mon, __monitor_completer)
     #__expose_magic(ip, "umon", magic_umon, __monitor_completer)
     
