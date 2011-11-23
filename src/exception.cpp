@@ -122,7 +122,7 @@ void throw_python_dev_failed()
 
     if (value == NULL)
     {
-        Py_DECREF(type);
+        Py_XDECREF(type);
         Py_XDECREF(traceback);
 
         Tango::Except::throw_exception(
@@ -138,116 +138,126 @@ void throw_python_dev_failed()
     }
     catch(...)
     {
-        Py_DECREF(type);
-        Py_DECREF(value);
-        Py_XDECREF(traceback);
-        throw;
-    }
-
-    Py_DECREF(type);
-    Py_DECREF(value);
-    Py_XDECREF(traceback);
-
-    throw df;
-}
-
-void throw_python_generic_exception(PyObject *type, PyObject *value,
-                                    PyObject *traceback)
-{
-    if ((type == NULL) || (value == NULL) || (traceback == NULL))
-    {
-        PyErr_Fetch(&type, &value, &traceback);
-    }
-    
-//
-// Send a default exception in case Python does not send us information
-//
-    if (value == NULL)
-    {
         Py_XDECREF(type);
         Py_XDECREF(value);
         Py_XDECREF(traceback);
-
-        Tango::Except::throw_exception((const char *)"PyDs_BadPythonException",
-                (const char *)"A badly formed exception has been received",
-                (const char *)"Py_throw_dev_failed");
-    }
-
-    Tango::DevErrorList dev_err;
-    dev_err.length(1);
-
-    //
-    // Populate a one level DevFailed exception
-    //
-
-    PyObject *tracebackModule = PyImport_ImportModule("traceback");
-    if (tracebackModule != NULL)
-    {
-        PyObject *tbList, *emptyString, *strRetval;
-
-        //
-        // Format the traceback part of the Python exception
-        // and store it in the origin part of the Tango exception
-        //
-
-        tbList = PyObject_CallMethod(
-                tracebackModule,
-                (char *)"format_tb",
-                (char *)"O",
-                traceback == NULL ? Py_None : traceback);
-
-        emptyString = PyString_FromString("");
-        strRetval = PyObject_CallMethod(emptyString, (char *)"join", (char *)"O", tbList);
-
-        dev_err[0].origin = CORBA::string_dup(PyString_AsString(strRetval));
-
-        Py_DECREF(tbList);
-        Py_DECREF(emptyString);
-        Py_DECREF(strRetval);
-
-        //
-        // Format the exec and value part of the Python exception
-        // and store it in the desc part of the Tango exception
-        //
-
-        tbList = PyObject_CallMethod(
-                tracebackModule,
-                (char *)"format_exception_only",
-                (char *)"OO",
-                type,
-                value == NULL ? Py_None : value);
-
-        emptyString = PyString_FromString("");
-        strRetval = PyObject_CallMethod(emptyString, (char *)"join", (char *)"O", tbList);
-
-        dev_err[0].desc = CORBA::string_dup(PyString_AsString(strRetval));
-
-        Py_DECREF(tbList);
-        Py_DECREF(emptyString);
-        Py_DECREF(strRetval);
-        Py_DECREF(tracebackModule);
-
-        dev_err[0].reason = CORBA::string_dup("PyDs_PythonError");
-        dev_err[0].severity = Tango::ERR;
-    }
-    else
-    {
-        //
-        // Send a default exception because we can't format the
-        // different parts of the Python's one !
-        //
-
-        dev_err[0].origin = CORBA::string_dup("Py_throw_dev_failed");
-        dev_err[0].desc = CORBA::string_dup("Can't import Python traceback module. Can't extract info from Python exception");
-        dev_err[0].reason = CORBA::string_dup("PyDs_PythonError");
-        dev_err[0].severity = Tango::ERR;
+        throw;
     }
 
     Py_XDECREF(type);
     Py_XDECREF(value);
     Py_XDECREF(traceback);
 
-    throw Tango::DevFailed(dev_err);
+    throw df;
+}
+
+Tango::DevFailed to_dev_failed(PyObject *type, PyObject *value,
+                               PyObject *traceback)
+{
+    bool from_fetch = false;
+    if ((type == NULL) || (value == NULL) || (traceback == NULL) ||
+        (type == Py_None) || (value == Py_None) || (traceback == Py_None))
+    {
+        PyErr_Fetch(&type, &value, &traceback);
+        from_fetch = true;
+    }
+
+    Tango::DevErrorList dev_err;
+    dev_err.length(1);
+    
+
+    if (value == NULL)
+    {
+        //
+        // Send a default exception in case Python does not send us information
+        //
+        dev_err[0].origin = CORBA::string_dup("Py_to_dev_failed");
+        dev_err[0].desc = CORBA::string_dup("A badly formed exception has been received");
+        dev_err[0].reason = CORBA::string_dup("PyDs_BadPythonException");
+        dev_err[0].severity = Tango::ERR;
+    }
+    else
+    {
+        //
+        // Populate a one level DevFailed exception
+        //
+
+        PyObject *tracebackModule = PyImport_ImportModule("traceback");
+        if (tracebackModule != NULL)
+        {
+            PyObject *tbList, *emptyString, *strRetval;
+
+            //
+            // Format the traceback part of the Python exception
+            // and store it in the origin part of the Tango exception
+            //
+
+            tbList = PyObject_CallMethod(
+                    tracebackModule,
+                    (char *)"format_tb",
+                    (char *)"O",
+                    traceback == NULL ? Py_None : traceback);
+
+            emptyString = PyString_FromString("");
+            strRetval = PyObject_CallMethod(emptyString, (char *)"join", (char *)"O", tbList);
+
+            dev_err[0].origin = CORBA::string_dup(PyString_AsString(strRetval));
+
+            Py_DECREF(tbList);
+            Py_DECREF(emptyString);
+            Py_DECREF(strRetval);
+
+            //
+            // Format the exec and value part of the Python exception
+            // and store it in the desc part of the Tango exception
+            //
+
+            tbList = PyObject_CallMethod(
+                    tracebackModule,
+                    (char *)"format_exception_only",
+                    (char *)"OO",
+                    type,
+                    value == NULL ? Py_None : value);
+
+            emptyString = PyString_FromString("");
+            strRetval = PyObject_CallMethod(emptyString, (char *)"join", (char *)"O", tbList);
+
+            dev_err[0].desc = CORBA::string_dup(PyString_AsString(strRetval));
+
+            Py_DECREF(tbList);
+            Py_DECREF(emptyString);
+            Py_DECREF(strRetval);
+            Py_DECREF(tracebackModule);
+
+            dev_err[0].reason = CORBA::string_dup("PyDs_PythonError");
+            dev_err[0].severity = Tango::ERR;
+        }
+        else
+        {
+            //
+            // Send a default exception because we can't format the
+            // different parts of the Python's one !
+            //
+
+            dev_err[0].origin = CORBA::string_dup("Py_to_dev_failed");
+            dev_err[0].desc = CORBA::string_dup("Can't import Python traceback module. Can't extract info from Python exception");
+            dev_err[0].reason = CORBA::string_dup("PyDs_PythonError");
+            dev_err[0].severity = Tango::ERR;
+        }
+    }
+    if(from_fetch)
+    {
+        Py_XDECREF(type);
+        Py_XDECREF(value);
+        Py_XDECREF(traceback);
+    }
+    return Tango::DevFailed(dev_err);
+}
+
+void throw_python_generic_exception(PyObject *type, PyObject *value,
+                                    PyObject *traceback)
+{
+    throw to_dev_failed(type, value, traceback);
 }
 
 void handle_python_exception(boost::python::error_already_set &eas)
@@ -367,6 +377,10 @@ namespace PyNamedDevFailed
     }
 }
 
+//BOOST_PYTHON_FUNCTION_OVERLOADS(to_dev_failed_overloads, to_dev_failed, 0, 3)
+BOOST_PYTHON_FUNCTION_OVERLOADS(throw_python_generic_exception_overloads,
+                                throw_python_generic_exception, 0, 3)
+
 void export_exceptions()
 {
     bool (*compare_exception_) (Tango::DevFailed &, Tango::DevFailed &) = &Tango::Except::compare_exception;
@@ -447,11 +461,14 @@ void export_exceptions()
         .def("compare_exception",
             (bool (*) (const Tango::DevFailed &, const Tango::DevFailed &))
             compare_exception_)
-        .def("throw_python_exception", &throw_python_generic_exception)
+        //.def("to_dev_failed", &to_dev_failed, to_dev_failed_overloads())
+        .def("throw_python_exception", &throw_python_generic_exception,
+            throw_python_generic_exception_overloads())
         .staticmethod("throw_exception")
         .staticmethod("re_throw_exception")
         .staticmethod("print_exception")
         .staticmethod("print_error_stack")
+        //.staticmethod("to_dev_failed")
         .staticmethod("throw_python_exception")
     ;
 

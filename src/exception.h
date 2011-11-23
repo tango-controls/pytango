@@ -49,6 +49,12 @@ void PyDevFailed_2_DevFailed(PyObject *obj, Tango::DevFailed &df);
 void throw_python_dev_failed();
 
 /**
+ * Transforms a python exception into a Tango::DevFailed
+ */
+Tango::DevFailed to_dev_failed(PyObject *type=NULL, PyObject *value=NULL,
+                               PyObject *traceback=NULL);
+
+/**
  * Throws the current python exception as a DevFailed exception.
  */
 void throw_python_generic_exception(PyObject *type=NULL, PyObject *value=NULL,

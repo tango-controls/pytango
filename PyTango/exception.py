@@ -32,6 +32,34 @@ __docformat__ = "restructuredtext"
 from utils import document_static_method as __document_static_method
 from _PyTango import Except, DevError
 
+def __to_dev_failed(exc_type=None, exc_value=None, traceback=None):
+    """to_dev_failed(exc_type, exc_value, traceback) -> PyTango.DevFailed
+
+            Generate a TANGO DevFailed exception.
+            The exception is created with a single :class:`~PyTango.DevError`
+            object. A default value *PyTango.ErrSeverity.ERR* is defined for
+            the :class:`~PyTango.DevError` severity field.
+            
+            The parameters are the same as the ones generates by a call to
+            :func:`sys.exc_info`.
+            
+        Parameters :
+            - type : (class)  the exception type of the exception being handled
+            - value : (object) exception parameter (its associated value or the
+                      second argument to raise, which is always a class instance
+                      if the exception type is a class object)
+            - traceback : (traceback) traceback object
+        
+        Return     : (PyTango.DevFailed) a tango exception object
+        
+        New in PyTango 7.2.1"""
+    try:
+        Except.throw_python_exception(exc_type, exc_value, traceback)
+    except Exception, e:
+        return e
+
+def __init_Except():
+    Except.to_dev_failed = staticmethod(__to_dev_failed)
 
 def __doc_Except():
     def document_static_method(method_name, desc, append=True):
@@ -97,26 +125,28 @@ def __doc_Except():
         Parameters :
             - ex     : (PyTango.DevFailed) The :class:`~PyTango.DevFailed` exception
     """ )
-
+    
     document_static_method("throw_python_exception", """
     throw_python_exception(type, value, traceback) -> None
 
             Generate and throw a TANGO DevFailed exception.
-            The exception is created with a single :class:`~PyTango.DevError` 
-            object. A default value *PyTango.ErrSeverity.ERR* is defined for 
+            The exception is created with a single :class:`~PyTango.DevError`
+            object. A default value *PyTango.ErrSeverity.ERR* is defined for
             the :class:`~PyTango.DevError` severity field.
             
             The parameters are the same as the ones generates by a call to
             :func:`sys.exc_info`.
             
         Parameters :
-            - type : (class)  the exception type of the exception being handled 
+            - type : (class)  the exception type of the exception being handled
             - value : (object) exception parameter (its associated value or the
                       second argument to raise, which is always a class instance
                       if the exception type is a class object)
             - traceback : (traceback) traceback object
 
         Throws     : DevFailed
+        
+        New in PyTango 7.2.1
     """ )
     
 def __doc_DevError():
@@ -131,6 +161,7 @@ def __doc_DevError():
 
   
 def init(doc=True):
+    __init_Except()
     if doc:
         __doc_Except()
         __doc_DevError()
