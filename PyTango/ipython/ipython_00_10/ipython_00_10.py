@@ -47,6 +47,13 @@ _TANGO_ERR = "__tango_error"
 _SPOCK_ERR = "__spock_error"
 _spock_init = False
 
+_TG_EXCEPTIONS = PyTango.DevFailed, PyTango.CommunicationFailed, \
+    PyTango.NamedDevFailed, PyTango.NamedDevFailedList, \
+    PyTango.WrongNameSyntax, PyTango.NonDbDevice, PyTango.WrongData, \
+    PyTango.NonSupportedFeature, PyTango.AsynCall, \
+    PyTango.AsynReplyNotArrived, PyTango.EventSystemFailed, \
+    PyTango.DeviceUnlocked, PyTango.NotAllowed
+
 class DeviceClassCompleter(object):
     """Completer class that returns the list of devices of some class when
     called. """
