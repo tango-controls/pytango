@@ -1252,6 +1252,8 @@ void export_device_impl()
         .def("push_data_ready_event", &Tango::DeviceImpl::push_data_ready_event,
             push_data_ready_event_overload())
 
+        .def("push_att_conf_event", &Tango::DeviceImpl::push_att_conf_event)
+
         .def("get_logger", &Tango::DeviceImpl::get_logger, return_internal_reference<>())
         .def("__debug_stream", &PyDeviceImpl::debug)
         .def("__info_stream", &PyDeviceImpl::info)

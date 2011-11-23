@@ -1135,6 +1135,18 @@ def __doc_DeviceImpl():
         New in PyTango 7.2.0
     """ )
 
+    document_method("push_att_conf_event", """
+    push_att_conf_event(self, attr) -> None
+
+            Push an attribute configuration event.
+
+        Parameters : (Attribute) the attribute for which the configuration event
+                     will be sent.
+        Return     : None
+        
+        New in PyTango 7.2.1
+    """ )
+    
 def __doc_extra_DeviceImpl(cls):
     def document_method(method_name, desc, append=True):
         return __document_method(cls, method_name, desc, append)
@@ -1199,7 +1211,7 @@ def __doc_extra_DeviceImpl(cls):
 
         Throws     : DevFailed This method does not throw exception but a redefined method can.
     """ )
-
+    
     copy_doc(cls, "dev_state")
     copy_doc(cls, "dev_status")
 
@@ -1653,6 +1665,7 @@ def __doc_Attribute():
         
         New in PyTango 7.1.0
     """ )
+
 
 def __doc_WAttribute():
     def document_method(method_name, desc, append=True):
