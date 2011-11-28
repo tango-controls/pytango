@@ -33,21 +33,87 @@
 
 using namespace boost::python;
 
-/// @todo GET RID OF THIS!! I HATE "HERE_OLD_TANGO___"
-#ifndef WIN32
-# define HERE_OLD_TANGO___
-#endif
+#ifndef _TG_WINDOWS_
+#include <unistd.h>
+#include <signal.h>
+#include <dlfcn.h>
+#endif /* _TG_WINDOWS_ */
 
-#ifdef HERE_OLD_TANGO___
-    void Tango::DServer::class_factory()
+typedef Tango::DeviceClass *(*Cpp_creator_ptr)(const char *);
+
+Tango::DeviceClass* create_cpp_class(const std::string& class_name,
+                                     const std::string& par_name)
+{
+    std::string lib_name = class_name;
+    std::string sym_name = "_create_" + class_name + "_class";
+    
+#ifdef _TG_WINDOWS_
+    HMODULE mod;
+
+    if ((mod = LoadLibrary(lib_name.c_str())) == NULL)
     {
-        Tango::DServer* dserver = this;
+           char *str = 0;
+        
+        DWORD l_err = GetLastError();
+            ::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,NULL,
+                  l_err,MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(char *)&str,0,NULL);
+
+        cerr << "Error: " << str << endl;
+
+        TangoSys_OMemStream o;
+        o << "Trying to load shared library " << lib_name
+          << " failed. It returns error: " << str << ends;
+        ::LocalFree((HLOCAL)str);
+
+        Tango::Except::throw_exception("API_ClassNotFound", o.str(),
+                                       "DServer::create_cpp_class");
+    }
+    FARPROC proc;
+    
+    if ((proc = GetProcAddress(mod,sym_name.c_str())) == NULL)
+    {
+        TangoSys_OMemStream o;
+        o << "Class " << cl_name << " does not have the C creator function "
+             "(_create_<Class name>_class)" << ends;
+
+        Tango::Except::throw_exception("API_ClassNotFound", o.str(),
+                                       "DServer::create_cpp_class");
+    }
+    Cpp_creator_ptr mt = (Cpp_creator_ptr)proc;
 #else
+    lib_name += ".so";
+    
+    void *lib_ptr = dlopen(lib_name.c_str(), RTLD_NOW);
+    if (lib_ptr == NULL)
+    {
+        TangoSys_OMemStream o;
+        o << "Trying to load shared library " << lib_name
+          << " failed. It returns error: " << dlerror() << ends;
+
+        Tango::Except::throw_exception("API_ClassNotFound",o.str(),
+                                       "DServer::create_cpp_class");
+    }
+
+    void *sym = dlsym(lib_ptr,sym_name.c_str());
+    if (sym == NULL)
+    {
+        TangoSys_OMemStream o;
+        o << "Class " << class_name << " does not have the C creator function "
+             "(_create_<Class name>_class)" << ends;
+
+        Tango::Except::throw_exception("API_ClassNotFound", o.str(),
+                                       "DServer::create_cpp_class");
+    }
+    Cpp_creator_ptr mt = (Cpp_creator_ptr)sym;
+#endif /* _TG_WINDOWS_ */
+    Tango::DeviceClass *dc = (*mt)(par_name.c_str());
+    return dc;
+}
+
 namespace PyUtil
 {
     void _class_factory(Tango::DServer* dserver)
     {
-#endif
         AutoPythonGIL guard;
         PYTANGO_MOD
 
@@ -62,7 +128,8 @@ namespace PyUtil
             tuple class_info = extract<tuple>(cpp_class_list[i]);
             char *class_name = extract<char *>(class_info[0]);
             char *par_name   = extract<char *>(class_info[1]);
-            dserver->create_cpp_class(class_name, par_name);
+            Tango::DeviceClass* cpp_dc = create_cpp_class(class_name, par_name);
+            dserver->_add_class(cpp_dc);
         }
 
     //
@@ -82,22 +149,12 @@ namespace PyUtil
         }
     }
 
-#ifdef HERE_OLD_TANGO___
-namespace PyUtil
-{
     void server_init(Tango::Util & instance, bool with_window = false)
     {
         AutoPythonAllowThreads guard;
+        Tango::DServer::register_class_factory(_class_factory);
         instance.server_init(with_window);
     }
-#else
-    void server_init(Tango::Util & instance, bool with_window = false)
-    {
-        AutoPythonAllowThreads guard;
-        instance.set_class_factory_cb(_class_factory);
-        instance.server_init(with_window);
-    }
-#endif
 
     void server_run(Tango::Util & instance)
     {
