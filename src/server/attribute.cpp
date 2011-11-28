@@ -432,6 +432,28 @@ namespace PyAttribute
         Tango::DeviceImpl *dev_ptr = extract<Tango::DeviceImpl*>(dev);
         att.set_properties(tg_attr_cfg, dev_ptr);
     }
+
+    inline void fire_change_event(Tango::Attribute &self)
+    {
+        self.fire_change_event();
+    }
+
+    inline void fire_change_event(Tango::Attribute &self, object &data)
+    {
+        boost::python::extract<Tango::DevFailed> except_convert(data);
+        if (except_convert.check()) {
+            self.fire_change_event(
+                           const_cast<Tango::DevFailed*>( &except_convert() ));
+            return;
+        }
+        TangoSys_OMemStream o;
+        o << "Wrong Python argument type for attribute " << self.get_name()
+            << ". Expected a DevFailed." << ends;
+        Tango::Except::throw_exception(
+                "PyDs_WrongPythonDataTypeForAttribute",
+                o.str(),
+                "fire_change_event()");
+    }
 };
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_quality_overloads,
@@ -540,5 +562,12 @@ void export_attribute()
         
         .def("_set_properties", &PyAttribute::set_properties)
         .def("_set_properties_3", &PyAttribute::set_properties_3)
-    ;
+        
+        .def("fire_change_event",
+            (void (*) (Tango::Attribute &))
+            &PyAttribute::fire_change_event)
+        .def("fire_change_event",
+            (void (*) (Tango::Attribute &, boost::python::object &))
+            &PyAttribute::fire_change_event)
+        ;
 }
