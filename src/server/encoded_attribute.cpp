@@ -28,9 +28,13 @@
 
 using namespace boost::python;
 
+const int i = 1;
+#define IS_BIGENDIAN() ( (*(char*)&i) == 0 )
+
 namespace PyEncodedAttribute
 {
-    /// This callback is run to delete char* objects.
+
+	/// This callback is run to delete char* objects.
     /// It is called by python. The array was associated with an attribute
     /// value object that is not being used anymore.
     /// @param ptr_ The array object.
@@ -44,7 +48,7 @@ namespace PyEncodedAttribute
         else if (2 == t)
             delete [] (static_cast<unsigned short*>(ptr_));
         else if (4 == t)
-            delete [] (static_cast<uint32_t*>(ptr_));
+			delete [] (static_cast<Tango::DevULong*>(ptr_));
     }
     
     void encode_gray8(Tango::EncodedAttribute &self, object py_value, int w, int h)
@@ -70,9 +74,11 @@ namespace PyEncodedAttribute
 #endif
         // It must be a py sequence
         // we are sure that w and h are given by python (see encoded_attribute.py)
-        unsigned char b[w*h];
-        buffer = b;
-        unsigned char *p = b;
+		const int length = w*h;
+	    unsigned char *raw_b = new unsigned char[length];
+		auto_ptr<unsigned char> b(raw_b);
+        buffer = raw_b;
+        unsigned char *p = raw_b;
         int w_bytes = w;
         for (long y=0; y<h; ++y)
         {
@@ -133,7 +139,7 @@ namespace PyEncodedAttribute
                     else if (PyInt_Check(cell) || PyLong_Check(cell))
                     {
                         long byte = PyLong_AsLong(cell);
-                        if (byte==-1 and PyErr_Occurred())
+                        if (byte==-1 && PyErr_Occurred())
                         {
                             Py_DECREF(row);
                             Py_DECREF(cell);
@@ -182,9 +188,11 @@ namespace PyEncodedAttribute
 #endif
         // It must be a py sequence
         // we are sure that w and h are given by python (see encoded_attribute.py)
-        unsigned char b[w*h];
-        buffer = b;
-        unsigned char *p = b;
+		const int length = w*h;
+        unsigned char *raw_b = new unsigned char[length];
+        auto_ptr<unsigned char> b(raw_b);
+		buffer = raw_b;
+        unsigned char *p = raw_b;
         int w_bytes = w;
         for (long y=0; y<h; ++y)
         {
@@ -245,7 +253,7 @@ namespace PyEncodedAttribute
                     else if (PyInt_Check(cell) || PyLong_Check(cell))
                     {
                         long byte = PyLong_AsLong(cell);
-                        if (byte==-1 and PyErr_Occurred())
+                        if (byte==-1 && PyErr_Occurred())
                         {
                             Py_DECREF(row);
                             Py_DECREF(cell);
@@ -294,9 +302,11 @@ namespace PyEncodedAttribute
 #endif
         // It must be a py sequence
         // we are sure that w and h are given by python (see encoded_attribute.py)
-        unsigned short b[w*h];
-        buffer = b;
-        unsigned short *p = b;
+		const int length = w*h;
+        unsigned short *raw_b = new unsigned short[length];
+        auto_ptr<unsigned short> b(raw_b);
+		buffer = raw_b;
+        unsigned short *p = raw_b;
         int w_bytes = 2*w;
         for (long y=0; y<h; ++y)
         {
@@ -356,7 +366,7 @@ namespace PyEncodedAttribute
                     }
                     else if (PyInt_Check(cell) || PyLong_Check(cell))
                     {
-                        unsigned short word = PyLong_AsUnsignedLong(cell);
+                        unsigned short word = (unsigned short)PyLong_AsUnsignedLong(cell);
                         if (PyErr_Occurred())
                         {
                             Py_DECREF(row);
@@ -402,9 +412,11 @@ namespace PyEncodedAttribute
 #endif
         // It must be a py sequence
         // we are sure that w and h are given by python (see encoded_attribute.py)
-        unsigned char b[w*h];
-        buffer = b;
-        unsigned char *p = b;
+		const int length = w*h;
+        unsigned char *raw_b = new unsigned char[length];
+        auto_ptr<unsigned char> b(raw_b);
+		buffer = raw_b;
+        unsigned char *p = raw_b;
         int w_bytes = 3*w;
         for (long y=0; y<h; ++y)
         {
@@ -467,23 +479,23 @@ namespace PyEncodedAttribute
                     else if (PyInt_Check(cell) || PyLong_Check(cell))
                     {
                         long byte = PyLong_AsLong(cell);
-                        if (byte==-1 and PyErr_Occurred())
+                        if (byte==-1 && PyErr_Occurred())
                         {
                             Py_DECREF(row);
                             Py_DECREF(cell);
                             boost::python::throw_error_already_set();
                         }
-                        if (BYTE_ORDER == LITTLE_ENDIAN)
+                        if (IS_BIGENDIAN())
                         {
-                            *p = (byte) & 0xFF; p++;
-                            *p = (byte >>  8) & 0xFF; p++;
-                            *p = (byte >> 16) & 0xFF; p++;
+                            *p = (unsigned char)(byte >> 16) & 0xFF; p++;
+                            *p = (unsigned char)(byte >>  8) & 0xFF; p++;
+                            *p = (unsigned char)(byte) & 0xFF; p++;
                         }
                         else
                         {
-                            *p = (byte >> 16) & 0xFF; p++;
-                            *p = (byte >>  8) & 0xFF; p++;
-                            *p = (byte) & 0xFF; p++;
+                            *p = (unsigned char)(byte) & 0xFF; p++;
+                            *p = (unsigned char)(byte >>  8) & 0xFF; p++;
+                            *p = (unsigned char)(byte >> 16) & 0xFF; p++;
                         }
                     }
                     Py_DECREF(cell);
@@ -514,9 +526,11 @@ namespace PyEncodedAttribute
 #endif
         // It must be a py sequence
         // we are sure that w and h are given by python (see encoded_attribute.py)
-        unsigned char b[w*h];
-        buffer = b;
-        unsigned char *p = b;
+		const int length = w*h;
+        unsigned char *raw_b = new unsigned char[length];
+        auto_ptr<unsigned char> b(raw_b);
+		buffer = raw_b;
+        unsigned char *p = raw_b;
         int w_bytes = 3*w;
         for (long y=0; y<h; ++y)
         {
@@ -579,23 +593,23 @@ namespace PyEncodedAttribute
                     else if (PyInt_Check(cell) || PyLong_Check(cell))
                     {
                         long byte = PyLong_AsLong(cell);
-                        if (byte==-1 and PyErr_Occurred())
+                        if (byte==-1 && PyErr_Occurred())
                         {
                             Py_DECREF(row);
                             Py_DECREF(cell);
                             boost::python::throw_error_already_set();
                         }
-                        if (BYTE_ORDER == LITTLE_ENDIAN)
+                        if (IS_BIGENDIAN())
                         {
-                            *p = (byte) & 0xFF; p++;
-                            *p = (byte >>  8) & 0xFF; p++;
-                            *p = (byte >> 16) & 0xFF; p++;
+                            *p = (unsigned char)(byte >> 16) & 0xFF; p++;
+                            *p = (unsigned char)(byte >>  8) & 0xFF; p++;
+                            *p = (unsigned char)(byte) & 0xFF; p++;
                         }
                         else
                         {
-                            *p = (byte >> 16) & 0xFF; p++;
-                            *p = (byte >>  8) & 0xFF; p++;
-                            *p = (byte) & 0xFF; p++;
+                            *p = (unsigned char)(byte) & 0xFF; p++;
+                            *p = (unsigned char)(byte >>  8) & 0xFF; p++;
+                            *p = (unsigned char)(byte >> 16) & 0xFF; p++;
                         }
                     }
                     Py_DECREF(cell);
@@ -626,9 +640,11 @@ namespace PyEncodedAttribute
 #endif
         // It must be a py sequence
         // we are sure that w and h are given by python (see encoded_attribute.py)
-        unsigned char b[w*h];
-        buffer = b;
-        unsigned char *p = b;
+		const int length = w*h;
+        unsigned char *raw_b = new unsigned char[length];
+        auto_ptr<unsigned char> b(raw_b);
+		buffer = raw_b;
+        unsigned char *p = raw_b;
         int w_bytes = 4*w;
         for (long y=0; y<h; ++y)
         {
@@ -692,25 +708,25 @@ namespace PyEncodedAttribute
                     else if (PyInt_Check(cell) || PyLong_Check(cell))
                     {
                         long byte = PyLong_AsLong(cell);
-                        if (byte==-1 and PyErr_Occurred())
+                        if (byte==-1 && PyErr_Occurred())
                         {
                             Py_DECREF(row);
                             Py_DECREF(cell);
                             boost::python::throw_error_already_set();
                         }
-                        if (BYTE_ORDER == LITTLE_ENDIAN)
+                        if (IS_BIGENDIAN())
                         {
-                            *p = (byte) & 0xFF; p++;
-                            *p = (byte >>  8) & 0xFF; p++;
-                            *p = (byte >> 16) & 0xFF; p++;
-                            *p = (byte >> 24) & 0xFF; p++;
+                            *p = (unsigned char)(byte >> 24) & 0xFF; p++;
+                            *p = (unsigned char)(byte >> 16) & 0xFF; p++;
+                            *p = (unsigned char)(byte >>  8) & 0xFF; p++;
+                            *p = (unsigned char)(byte) & 0xFF; p++;
                         }
                         else
                         {
-                            *p = (byte >> 24) & 0xFF; p++;
-                            *p = (byte >> 16) & 0xFF; p++;
-                            *p = (byte >>  8) & 0xFF; p++;
-                            *p = (byte) & 0xFF; p++;
+                            *p = (unsigned char)(byte) & 0xFF; p++;
+                            *p = (unsigned char)(byte >>  8) & 0xFF; p++;
+                            *p = (unsigned char)(byte >> 16) & 0xFF; p++;
+                            *p = (unsigned char)(byte >> 24) & 0xFF; p++;
                         }
                     }
                     Py_DECREF(cell);
@@ -1085,22 +1101,22 @@ namespace PyEncodedAttribute
                     {
                         long idx = 4*(y*width+x);
                         // data comes in in big endian format
-                        uint32_t data;
-                        if (BYTE_ORDER == LITTLE_ENDIAN)
+						Tango::DevULong data;
+                        if (IS_BIGENDIAN())
+                        {
+                            char *p = reinterpret_cast<char *>(&data);
+                            *p = ch_ptr[idx++]; ++p;
+                            *p = ch_ptr[idx++]; ++p;
+                            *p = ch_ptr[idx++]; ++p;
+                            *p = ch_ptr[idx];
+                        }
+                        else
                         {
                             idx +=3;
                             char *p = reinterpret_cast<char *>(&data);
                             *p = ch_ptr[idx--]; ++p;
                             *p = ch_ptr[idx--]; ++p;
                             *p = ch_ptr[idx--]; ++p;
-                            *p = ch_ptr[idx];
-                        }
-                        else
-                        {
-                            char *p = reinterpret_cast<char *>(&data);
-                            *p = ch_ptr[idx++]; ++p;
-                            *p = ch_ptr[idx++]; ++p;
-                            *p = ch_ptr[idx++]; ++p;
                             *p = ch_ptr[idx];
                         }
                         PyTuple_SetItem(row, x, PyLong_FromUnsignedLong(data));
@@ -1134,22 +1150,22 @@ namespace PyEncodedAttribute
                     {
                         long idx = 4*(y*width+x);
                         // data comes in in big endian format
-                        uint32_t data;
-                        if (BYTE_ORDER == LITTLE_ENDIAN)
+						Tango::DevULong data;
+                        if (IS_BIGENDIAN())
+                        {
+                            char *p = reinterpret_cast<char *>(&data);
+                            *p = ch_ptr[idx++]; ++p;
+                            *p = ch_ptr[idx++]; ++p;
+                            *p = ch_ptr[idx++]; ++p;
+                            *p = ch_ptr[idx];
+                        }
+                        else
                         {
                             idx +=3;
                             char *p = reinterpret_cast<char *>(&data);
                             *p = ch_ptr[idx--]; ++p;
                             *p = ch_ptr[idx--]; ++p;
                             *p = ch_ptr[idx--]; ++p;
-                            *p = ch_ptr[idx];
-                        }
-                        else
-                        {
-                            char *p = reinterpret_cast<char *>(&data);
-                            *p = ch_ptr[idx++]; ++p;
-                            *p = ch_ptr[idx++]; ++p;
-                            *p = ch_ptr[idx++]; ++p;
                             *p = ch_ptr[idx];
                         }
                         PyList_SetItem(row, x, PyLong_FromUnsignedLong(data));

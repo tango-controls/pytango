@@ -149,11 +149,11 @@ struct from_py<tangoTypeConst> \
                     boost::python::throw_error_already_set();  \
             } \
             if (TangoScalarTypeLimits::is_integer) { \
-                if (cpy_value > TangoScalarTypeLimits::max()) { \
+                if (cpy_value > (cpy_type)TangoScalarTypeLimits::max()) { \
                     PyErr_SetString(PyExc_OverflowError, "Value is too large."); \
                     boost::python::throw_error_already_set(); \
                 } \
-                if (cpy_value < TangoScalarTypeLimits::min()) { \
+                if (cpy_value < (cpy_type)TangoScalarTypeLimits::min()) { \
                     PyErr_SetString(PyExc_OverflowError, "Value is too small."); \
                     boost::python::throw_error_already_set(); \
                 } \

@@ -352,7 +352,9 @@ def main():
         library_dirs += [ os.path.join(OMNI_ROOT, 'lib', 'x86_win32') ]
         
         extra_compile_args += [
-            '/EHsc'
+            '/EHsc',
+            '/wd4005', # supress redefinition of HAVE_STRFTIME between python and omniORB
+            '/wd4996', # same as /D_SCL_SECURE_NO_WARNINGS
         ]
 
         extra_link_args += []
@@ -418,10 +420,12 @@ def main():
     include_dirs = uniquify(include_dirs)
     library_dirs = uniquify(library_dirs)
 
-    _cppfiles_exclude = []
-    _cppfiles  = [ os.path.join('src',fname) for fname in os.listdir('src') if fname.endswith('.cpp') and not fname in _cppfiles_exclude]
-    _cppfiles += [ os.path.join('src','server',fname) for fname in os.listdir(os.path.join('src','server')) if fname.endswith('.cpp') and not fname in _cppfiles_exclude]
-
+    _clientfiles = [ os.path.join('src',fname) for fname in os.listdir('src') if fname.endswith('.cpp') ]
+    _clientfiles.sort()
+    _serverfiles = [ os.path.join('src','server',fname) for fname in os.listdir(os.path.join('src','server')) if fname.endswith('.cpp') ]
+    _serverfiles.sort()
+    _cppfiles = _clientfiles + _serverfiles
+    
     _pytango = Extension(
         name               = '_PyTango',
         sources            = _cppfiles,

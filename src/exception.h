@@ -70,7 +70,7 @@ void throw_python_generic_exception(PyObject *type=NULL, PyObject *value=NULL,
 void handle_python_exception(boost::python::error_already_set &eas);
 
 #define SAFE_CATCH_REPORT(meth_name) \
-    catch(boost::python::error_already_set &eas) \
+    catch(boost::python::error_already_set &) \
     { \
         std::cerr << "PyTango generated an unexpected python exception in " \
                   << meth_name << "." << std::endl \
@@ -94,7 +94,7 @@ void handle_python_exception(boost::python::error_already_set &eas);
     }
 
 #define SAFE_CATCH_INFORM(meth_name) \
-    catch(boost::python::error_already_set &eas) \
+    catch(boost::python::error_already_set &) \
     { \
         std::cerr << meth_name << " generated the following python exception:" << std::endl; \
         PyErr_Print(); \

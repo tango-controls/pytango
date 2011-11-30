@@ -84,7 +84,7 @@ namespace PyDeviceAttribute {
                         }
                     }
                 }
-                catch(Tango::DevFailed &df)
+                catch(Tango::DevFailed &)
                 {
                     // if we fail to get info about the missing attributes from
                     // the server (because it as shutdown, for example) we assume

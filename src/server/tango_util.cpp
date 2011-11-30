@@ -73,7 +73,7 @@ Tango::DeviceClass* create_cpp_class(const std::string& class_name,
     if ((proc = GetProcAddress(mod,sym_name.c_str())) == NULL)
     {
         TangoSys_OMemStream o;
-        o << "Class " << cl_name << " does not have the C creator function "
+        o << "Class " << class_name << " does not have the C creator function "
              "(_create_<Class name>_class)" << ends;
 
         Tango::Except::throw_exception("API_ClassNotFound", o.str(),

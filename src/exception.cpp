@@ -28,6 +28,7 @@
 #include <string>
 
 #include "pytgutils.h"
+#include "exception.h"
 
 using namespace boost::python;
 
