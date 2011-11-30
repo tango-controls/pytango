@@ -34,9 +34,6 @@
 #include "server/attribute.h"
 #include "to_py.h"
 
-#pragma warning( push )
-#pragma warning( disable : 4250 ) // C4250 - 'class1' : inherits 'class2::member' 
-
 extern const char *param_must_be_seq;
 
 using namespace boost::python;
@@ -1333,5 +1330,3 @@ void export_device_impl()
     ;
     implicitly_convertible<auto_ptr<Device_4ImplWrap>, auto_ptr<Tango::Device_4Impl> >();
 }
-
-#pragma warning( pop ) // C4250
