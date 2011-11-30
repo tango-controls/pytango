@@ -28,7 +28,7 @@
 #if BOOST_VERSION < 103400
 #include <boost/python/detail/api_placeholder.hpp>
 #endif
-#include <tango/tango.h>
+#include <tango.h>
 
 #include "defs.h"
 #include "tgutils.h"

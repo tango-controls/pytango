@@ -24,7 +24,7 @@
 #pragma once
 
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 
 /**
  * Translates a seq<DevError> into a C++ DevErrorList

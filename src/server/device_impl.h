@@ -25,7 +25,7 @@
 #define _DEVICE_IMPL_H
 
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 
 #include <server/device_class.h>
 

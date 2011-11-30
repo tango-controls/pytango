@@ -22,7 +22,7 @@
 *******************************************************************************/
 
 #include <boost/python.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 
 #include "server/attr.h"
 

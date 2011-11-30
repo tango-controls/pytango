@@ -23,7 +23,7 @@
 
 #include <boost/python.hpp>
 #include <boost/python/return_value_policy.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 
 #include "pyutils.h"
 

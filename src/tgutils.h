@@ -24,7 +24,7 @@
 #pragma once
 
 #include <cassert>
-#include <tango/tango.h>
+#include <tango.h>
 
 namespace Tango
 {

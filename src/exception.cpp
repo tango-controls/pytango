@@ -23,7 +23,7 @@
 
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <tango/tango.h>
+#include <tango.h>
 #include <iostream>
 #include <string>
 
