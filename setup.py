@@ -242,6 +242,7 @@ def main():
         'PyTango',
         'PyTango.ipython',
         'PyTango.ipython.ipython_00_10',
+        'PyTango.ipython.ipython_00_11',
     ]
 
     py_modules = []
@@ -355,6 +356,7 @@ def main():
             '/EHsc',
             '/wd4005', # supress redefinition of HAVE_STRFTIME between python and omniORB
             '/wd4996', # same as /D_SCL_SECURE_NO_WARNINGS
+            '/wd4250', # supress base class inheritance warning
         ]
 
         extra_link_args += []
