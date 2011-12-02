@@ -21,11 +21,7 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-#include <boost/python/return_value_policy.hpp>
-#include <string>
-#include <tango.h>
-
+#include "precompiled_header.hpp"
 #include "defs.h"
 #include "pytgutils.h"
 #include "fast_from_py.h"

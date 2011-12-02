@@ -21,7 +21,7 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
+#include "precompiled_header.hpp"
 #include <tango.h>
 
 using namespace boost::python;
@@ -48,7 +48,7 @@ void export_constants()
     long_ major = long_(pylist_TgLibVers[0]);
     long_ minor = long_(pylist_TgLibVers[1]);
     long_ patch = long_(pylist_TgLibVers[2]);
-    object h = "0x%02d%02d%02d00" % make_tuple(major, minor, patch);
+    object h = "0x%02d%02d%02d00" % boost::python::make_tuple(major, minor, patch);
     PyObject *ptr = PyInt_FromString(PyString_AsString(h.ptr()), NULL, 0);
     TANGO_VERSION_HEX = PyInt_AsLong(ptr);
     Py_DECREF(ptr);

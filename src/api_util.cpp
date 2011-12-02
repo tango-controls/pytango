@@ -21,10 +21,8 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-#include <boost/python/return_value_policy.hpp>
+#include "precompiled_header.hpp"
 #include <tango.h>
-
 #include "pyutils.h"
 
 using namespace boost::python;

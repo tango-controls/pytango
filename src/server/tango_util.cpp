@@ -21,14 +21,10 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-#include <tango.h>
-#include <iostream>
-
+#include "precompiled_header.hpp"
 #include "defs.h"
 #include "pytgutils.h"
 #include "exception.h"
-
 #include "server/device_class.h"
 
 using namespace boost::python;

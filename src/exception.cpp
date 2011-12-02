@@ -21,12 +21,7 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <tango.h>
-#include <iostream>
-#include <string>
-
+#include "precompiled_header.hpp"
 #include "pytgutils.h"
 #include "exception.h"
 

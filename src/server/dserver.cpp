@@ -21,9 +21,8 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
+#include "precompiled_header.hpp"
 #include <tango.h>
-
 #include "to_py.h"
 #include "from_py.h"
 

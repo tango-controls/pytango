@@ -21,8 +21,8 @@
    
 *******************************************************************************/
 
+#include "precompiled_header.hpp"
 #include "pytgutils.h"
-#include <sstream>
 
 using namespace boost::python;
 

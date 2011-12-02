@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PyTango", "PyTango.vcproj", "{764A5ECE-11AE-4363-9A1C-573972A1BADD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release_Py26|Win32 = Release_Py26|Win32
+		Release_Py27_numpy16|Win32 = Release_Py27_numpy16|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.Debug|Win32.Build.0 = Debug|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.Release_Py26|Win32.ActiveCfg = Release_Py26|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.Release_Py26|Win32.Build.0 = Release_Py26|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.Release_Py27_numpy16|Win32.ActiveCfg = Release_Py27_numpy16|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.Release_Py27_numpy16|Win32.Build.0 = Release_Py27_numpy16|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.Release|Win32.ActiveCfg = Release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

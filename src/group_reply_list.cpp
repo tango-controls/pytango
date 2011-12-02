@@ -21,11 +21,7 @@
    
 *******************************************************************************/
 
-#include <boost/python/copy_const_reference.hpp>
-#include <boost/python/copy_non_const_reference.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <tango.h>
-
+#include "precompiled_header.hpp"
 #include "pytgutils.h"
 #include "device_attribute.h"
 

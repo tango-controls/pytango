@@ -21,9 +21,7 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-#include <tango.h>
-
+#include "precompiled_header.hpp"
 #include "server/attr.h"
 
 using namespace boost::python;

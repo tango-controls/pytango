@@ -21,8 +21,8 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-#include <boost/version.hpp>
+#include "precompiled_header.hpp"
+
 #if BOOST_VERSION < 103400
 #define DISABLE_BOOST_DOCSTRING_OPTIONS
 #endif
@@ -33,8 +33,6 @@
 #endif
 
 #include <tango.h>
-#include <iostream>
-#include <string>
 
 using namespace boost::python;
 

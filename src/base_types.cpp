@@ -21,13 +21,9 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <tango.h>
-
+#include "precompiled_header.hpp"
 #include "defs.h"
 #include "pytgutils.h"
-
 #include "fast_from_py.h"
 #include "base_types_numpy.hpp"
 

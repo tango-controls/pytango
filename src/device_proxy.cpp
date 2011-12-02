@@ -21,15 +21,9 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-#include <boost/python/return_value_policy.hpp>
-#include <tango.h>
-#include <string>
-#include <memory>
-
+#include "precompiled_header.hpp"
 #include "device_attribute.h"
 #include "callback.h"
-
 #include "defs.h"
 #include "pytgutils.h"
 

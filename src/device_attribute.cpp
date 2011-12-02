@@ -21,15 +21,8 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-#include <boost/python/handle.hpp>
-#include <tango.h>
-#include <iostream>
-#include <string>
-#include <memory>
-
+#include "precompiled_header.hpp"
 #include "device_attribute.h"
-
 #include "pytgutils.h"
 #include "tango_numpy.h"
 #include "fast_from_py.h"
@@ -132,19 +125,19 @@ namespace PyDeviceAttribute {
         str encoded_data((const char*)buffer[0].encoded_data.get_buffer(),
                           buffer[0].encoded_data.length());
         
-        py_value.attr(value_attr_name) = make_tuple(encoded_format, encoded_data);
+		py_value.attr(value_attr_name) = boost::python::make_tuple(encoded_format, encoded_data);
 
         if (self.get_written_dim_x() > 0) {
             bool is_write_type = self.get_written_dim_x() && (value->length() < 2);
             if (is_write_type) {
                 object w_encoded_format(encoded_format);
                 object w_encoded_data(encoded_data);
-                py_value.attr(w_value_attr_name) = make_tuple(w_encoded_format, w_encoded_data);
+                py_value.attr(w_value_attr_name) = boost::python::make_tuple(w_encoded_format, w_encoded_data);
             } else {
                 str w_encoded_format(buffer[1].encoded_format);
                 str w_encoded_data((const char*)buffer[1].encoded_data.get_buffer(),
                                    buffer[1].encoded_data.length());
-                py_value.attr(w_value_attr_name) = make_tuple(w_encoded_format, w_encoded_data);
+                py_value.attr(w_value_attr_name) = boost::python::make_tuple(w_encoded_format, w_encoded_data);
             }
         } else {
             py_value.attr(w_value_attr_name) = object();
@@ -194,14 +187,14 @@ namespace PyDeviceAttribute {
         
         object r_encoded_data = object(handle<>(readArray));
         
-        py_value.attr(value_attr_name) = make_tuple(r_encoded_format, r_encoded_data);
+        py_value.attr(value_attr_name) = boost::python::make_tuple(r_encoded_format, r_encoded_data);
 
         if (self.get_written_dim_x() > 0) {
             bool is_write_type = self.get_written_dim_x() && (value->length() < 2);
             if (is_write_type) {
                 object w_encoded_format(r_encoded_format);
                 object w_encoded_data(r_encoded_data);
-                py_value.attr(w_value_attr_name) = make_tuple(w_encoded_format, w_encoded_data);
+                py_value.attr(w_value_attr_name) = boost::python::make_tuple(w_encoded_format, w_encoded_data);
             } else {
                 str w_encoded_format(buffer[1].encoded_format);
                 
@@ -213,7 +206,7 @@ namespace PyDeviceAttribute {
                 
                 object w_encoded_data = object(handle<>(writeArray));
                 
-                py_value.attr(w_value_attr_name) = make_tuple(w_encoded_format, w_encoded_data);
+                py_value.attr(w_value_attr_name) = boost::python::make_tuple(w_encoded_format, w_encoded_data);
             }
         } else {
             py_value.attr(w_value_attr_name) = object();

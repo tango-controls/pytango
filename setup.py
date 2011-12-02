@@ -421,10 +421,12 @@ def main():
 
     include_dirs = uniquify(include_dirs)
     library_dirs = uniquify(library_dirs)
-
-    _clientfiles = [ os.path.join('src',fname) for fname in os.listdir('src') if fname.endswith('.cpp') ]
+    src_dir = abspath('src')
+    client_dir = src_dir
+    server_dir = os.path.join(src_dir, 'server')
+    _clientfiles = [ os.path.join(client_dir,fname) for fname in os.listdir(client_dir) if fname.endswith('.cpp') ]
     _clientfiles.sort()
-    _serverfiles = [ os.path.join('src','server',fname) for fname in os.listdir(os.path.join('src','server')) if fname.endswith('.cpp') ]
+    _serverfiles = [ os.path.join(server_dir,fname) for fname in os.listdir(server_dir) if fname.endswith('.cpp') ]
     _serverfiles.sort()
     _cppfiles = _clientfiles + _serverfiles
     

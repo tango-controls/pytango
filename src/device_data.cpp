@@ -21,12 +21,7 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-#include <boost/mpl/if.hpp>
-#include <tango.h>
-#include <iostream>
-#include <string>
-
+#include "precompiled_header.hpp"
 #include "pytgutils.h"
 #include "fast_from_py.h"
 

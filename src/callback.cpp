@@ -21,8 +21,7 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-#include <tango.h>
+#include "precompiled_header.hpp"
 #include "pytgutils.h"
 #include "callback.h"
 #include "device_attribute.h"

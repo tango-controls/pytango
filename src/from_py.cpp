@@ -21,6 +21,7 @@
    
 *******************************************************************************/
 
+#include "precompiled_header.hpp"
 #include "from_py.h"
 
 using namespace boost::python;

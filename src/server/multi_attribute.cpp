@@ -21,8 +21,8 @@
    
 *******************************************************************************/
 
-#include "pytgutils.h"
-#include <sstream>
+#include "precompiled_header.hpp"
+#include <tango.h>
 
 using namespace boost::python;
 

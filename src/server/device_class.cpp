@@ -21,13 +21,12 @@
    
 *******************************************************************************/
 
+#include "precompiled_header.hpp"
 #include "pytgutils.h"
 #include "exception.h"
 #include "server/device_class.h"
 #include "server/attr.h"
 #include "server/command.h"
-
-#include <sstream>
 
 using namespace boost::python;
 

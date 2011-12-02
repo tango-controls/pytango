@@ -21,8 +21,7 @@
    
 *******************************************************************************/
 
-#include <boost/python.hpp>
-
+#include "precompiled_header.hpp"
 #include "defs.h"
 #include "pyutils.h"
 
