@@ -29,7 +29,15 @@ import os.path as osp
 
 executable = sys.executable
 
-setup_name = osp.join(osp.dirname(osp.abspath(__file__)), "setup.py")
-cmd_line = "%s %s bdist_msi" % (executable, setup_name)
-print "Starting '%s'..." % cmd_line
-os.system(cmd_line)
+curr_dir = os.getcwd()
+
+winsetup_dir = osp.dirname(osp.abspath(__file__))
+os.chdir(winsetup_dir)
+setup_name = "setup.py"
+
+try:
+    cmd_line = "%s %s bdist_msi --skip-build" % (executable, setup_name)
+    print "Starting '%s'..." % cmd_line
+    os.system(cmd_line)
+finally:
+    os.chdir(curr_dir)
