@@ -59,6 +59,6 @@ class Release:
     author_lines = "\n".join([ "%s <%s>" % x for x in authors.values()])
     url = 'http://www.tango-controls.org/static/PyTango/latest/doc/html/'
     download_url = 'http://pypi.python.org/packages/source/P/PyTango'
-    platform = ['Linux', 'Windows XP/2000/NT', 'Windows 95/98/ME']
+    platform = ['Linux', 'Windows XP/Vista/7']
     keywords = ['Tango', 'CORBA', 'binding']
     
