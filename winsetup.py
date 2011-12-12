@@ -23,6 +23,12 @@
 ##
 ################################################################################
 
+################################################################################
+# WARNING: This script should only be executed as a Post-Build Event from inside
+#          Microsoft Visual Studio and not from the command line
+################################################################################
+
+
 import sys
 import os
 import os.path as osp
@@ -34,10 +40,21 @@ curr_dir = os.getcwd()
 winsetup_dir = osp.dirname(osp.abspath(__file__))
 os.chdir(winsetup_dir)
 setup_name = "setup.py"
+bitmap = osp.join(winsetup_dir, 'doc', 'logo-medium.bmp')
+ver = ".".join(map(str, sys.version_info[:2]))
 
 try:
-    cmd_line = "%s %s bdist_msi --skip-build" % (executable, setup_name)
-    print "Starting '%s'..." % cmd_line
+    cmd_line = '%s %s bdist_msi --skip-build --target-version=%s' \
+               % (executable, setup_name, ver)
     os.system(cmd_line)
+    cmd_line = '%s %s bdist_wininst --skip-build --target-version=%s ' \
+               '--title="PyTango 7" ' \
+               '--bitmap="%s"' % (executable, setup_name, ver, bitmap)
+    os.system(cmd_line)
+except:
+    print "Failed:"
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
 finally:
     os.chdir(curr_dir)
