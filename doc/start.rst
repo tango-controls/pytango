@@ -67,27 +67,66 @@ plus two optional dependencies (activated by default) on:
 Installing precompiled binaries
 -------------------------------
 
-The latest binaries for PyTango can be found at: http://www.tango-controls.org/download under
-the tango bindings section.
-
 Linux
 ~~~~~
 
-The PyTango team does **not** provide a precompiled binary for Linux since this 
-would mean having to provide 12 different binaries: one for each major python 
+The PyTango team does **not** provide a precompiled binary for Linux since this
+would mean having to provide 12 different binaries: one for each major python
 version (2.4, 2.5, 2.6, 2.7, 3.0 and 3.1) times 2 for both 32bits and 64bits.
+
+Tango contributers have written packages for *at least* ubuntu and debian linux
+distributions. Check the **Ubuntu GNU/Linux binary distribution** chapter under
+`Tango downloads <http://www.tango-controls.org/download>`_ for more details.
+
+.. _pytango-windows-bin:
 
 Windows
 ~~~~~~~
 
-PyTango team provides a binary PyTango distributable for Windows XP/Vista 32bits 
-**for usage with python 2.6**.
+PyTango team provides a binary PyTango distributable for Windows XP/Vista/7
+32bits **for usage with python 2.6**.
 
-The binary **comes with its's own boost-python, omniORB and Tango DLLs**
+.. _PyTango-7.2.2.win32-py2.6.msi: http://www.tango-controls.org/static/PyTango/v722/download/PyTango-7.2.2.win32-py2.6.msi
+.. _PyTango-7.2.2.win32-py2.6.exe: http://www.tango-controls.org/static/PyTango/v722/download/PyTango-7.2.2.win32-py2.6.exe
+
++----------------------------------+--------------------------------------------------+--------------------------------------+
+| version                          | Dependencies                                     | Compilation env.                     |
++==================================+==================================================+======================================+
+| `PyTango-7.2.2.win32-py2.6.msi`_ | - Tango C++ >= 7.2.6 and < 8.0                   | - Tango 7.2.6 windows distribution   |
+| `PyTango-7.2.2.win32-py2.6.exe`_ | - Python 2.6.x (where x >= 0)                    | - Python 2.6.6                       |
+|                                  | - numpy 1.x (where x >= 1. Recommended x >= 5)   | - Numpy 1.5                          |
+|                                  |                                                  | - boost-python 1.41 mutithreaded dll |
++----------------------------------+--------------------------------------------------+--------------------------------------+
+
+Until version 7.2.2 (due to internal incompatibilities between tango C++ API
+and PyTango), PyTango had to be shipped with an internal copy of tango and
+omniORB DLLs. Since version 7.2.2 ( and tango C++ version 7.2.6) this is no
+longer necessary. In other words, until 7.2.2 you could install and use PyTango
+without having tango c++ installed. Starting from 7.2.2 you **must** have tango
+C++ installed **and** the environment variable :envvar:`PATH` **must** include
+the directory where the tango C++ DLLs are installed (usually
+:file:`C:\\Program Files{ (x86)}\\tango\\win32_vc8\\win32_dll`).
+
+Regarding boost-python, since VS hard links with the boost-python DLL file of
+the machine where PyTango binary was originally compiled, PyTango ships with
+it's own internal copy of the boost-python DLL.
+Maybe in the future PyTango will link with the static version of boost-python
+but for now we get to many errors at compile time so we are skipping this for
+now. Anyway, it's just an internal developers detail. For you just means 250kb more
+of memory usage in windows.
+
+The binary was compiled with numpy dependency therefore you need to have *numpy*
+installed in order to use PyTango.
+
+If PyTango reports *DLL load failed* probably you are missing Visual Studio 2005
+redistributable package. You can download and install it from
+`Microsoft Visual C++ 2005 Redistributable Package (x86) <http://www.microsoft.com/download/en/details.aspx?id=3387>`_
 
 +------------+-----------------------------------------------------------------+
 | version    | Includes the following DLLs                                     |
 +============+=================================================================+
+| 7.2.2      | - boost python 1.41 (VC++8, multi-threaded)                     |
++------------+-----------------------------------------------------------------+
 | 7.1.0      | - tango 7.1.1 (VC++ 8)                                          |
 |            | - omniORB 4.1.4                                                 |
 |            | - boost python 1.41 (VC++8, multi-threaded)                     |
@@ -100,8 +139,6 @@ The binary **comes with its's own boost-python, omniORB and Tango DLLs**
 |            |   python >= 2.6.3                                               |
 +------------+-----------------------------------------------------------------+
 
-The binary was compiled with numpy dependency therefore you need to have *numpy*
-installed in order to use PyTango.
 
 Compiling & installing
 ----------------------
@@ -128,15 +165,16 @@ compilation command.
 
 Most linux distributions today provide a boost python package.
 
-Furthermore, in order to be able to build PyTango, you also need the include headers of
-boost python. They are normaly provided by a package called boost_python-dev.
+Furthermore, in order to be able to build PyTango, you also need the include
+headers of boost python. They are normaly provided by a package called
+boost_python-dev.
 
-If, for some reason, you need to compile and install boost python, here is a 
+If, for some reason, you need to compile and install boost python, here is a
 quick recipie:
 
     #. Download latest boost tar.gz file and extract it
-    #. Download latest bjam (most linux distributions have a bjam package. If not, 
-       sourceforge provides a binary for many platforms)
+    #. Download latest bjam (most linux distributions have a bjam package. If
+       not, sourceforge provides a binary for many platforms)
     #. build and/or install:
     
        #. Simple build: in the root directory where you extracted boost type:

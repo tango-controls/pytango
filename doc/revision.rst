@@ -61,7 +61,7 @@ History of modifications:
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 15/04/11 | `8.11 <http://www.tango-controls.org/static/PyTango/v720/doc/html/index.html>`_  | Update to PyTango 7.2.0                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| --/--/11 | `8.12 <http://www.tango-controls.org/static/PyTango/v721/doc/html/index.html>`_  | Update to PyTango 7.2.1                             | T\. Coutinho          |
+| 12/12/11 | `8.12 <http://www.tango-controls.org/static/PyTango/v722/doc/html/index.html>`_  | Update to PyTango 7.2.2                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _version-history:
@@ -72,17 +72,21 @@ Version history
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | version    | Changes                                                                                                                                                                      |
 +============+==============================================================================================================================================================================+
-| 7.2.1      | Features:                                                                                                                                                                    |
+| 7.2.2      | Features:                                                                                                                                                                    |
 |            |     - from sourceforge:                                                                                                                                                      |
 |            |         - `3305251: DS dynamic attributes discards some Attr properties <https://sourceforge.net/tracker/?func=detail&aid=3305251&group_id=57612&atid=484769>`_              |
 |            |         - `3365792: DeviceProxy.<cmd_name> could be documented <https://sourceforge.net/tracker/?func=detail&aid=3365792&group_id=57612&atid=484772>`_                       |
+|            |         - `3386079: add support for ipython 0.11 <https://sourceforge.net/tracker/?func=detail&aid=3386079&group_id=57612&atid=484772>`_                                     |
 |            |         - `3437654: throw python exception as tango exception <https://sourceforge.net/tracker/?func=detail&aid=3437654&group_id=57612&atid=484772>`_                        |
+|            |         - `3447477: spock profile installation <https://sourceforge.net/tracker/?func=detail&aid=3447477&group_id=57612&atid=484772>`_                                       |
 |            | Bug fixes:                                                                                                                                                                   |
 |            |     - from sourceforge:                                                                                                                                                      |
 |            |         - `3372371: write attribute of DevEncoded doesn't work <https://sourceforge.net/tracker/?func=detail&aid=3372371&group_id=57612&atid=484769>`_                       |
-|            |         -  3374026: [pytango] pyflakes warning <https://sourceforge.net/tracker/?func=detail&aid=3374026&group_id=57612&atid=484769>`_                                       |
+|            |         - `3374026: [pytango] pyflakes warning <https://sourceforge.net/tracker/?func=detail&aid=3374026&group_id=57612&atid=484769>`_                                       |
 |            |         - `3404771: PyTango.MultiAttribute.get_attribute_list missing <https://sourceforge.net/tracker/?func=detail&aid=3404771&group_id=57612&atid=484769>`_                |
 |            |         - `3405580: PyTango.MultiClassAttribute missing <https://sourceforge.net/tracker/?func=detail&aid=3405580&group_id=57612&atid=484769>`_                              |
++------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 7.2.1      | *SKIPPED*                                                                                                                                                                    |
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 7.2.0      | Features:                                                                                                                                                                    |
 |            |     - from sourceforge:                                                                                                                                                      |
@@ -182,8 +186,8 @@ Version history
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 7.1.0      | Features:                                                                                                                                                                    |
 |            |     - from sourceforge:                                                                                                                                                      |
-|            |       - `2908176: read_*, write_* and is_*_allowed() methods can now be defined <https://sourceforge.net/tracker/?func=detail&aid=2908176&group_id=57612&atid=484772>`_      |
-|            |       - `2941036: TimeVal conversion to time and datetime <https://sourceforge.net/tracker/?func=detail&aid=2941036&group_id=57612&atid=484772>`_                            |
+|            |         - `2908176: read_*, write_* and is_*_allowed() methods can now be defined <https://sourceforge.net/tracker/?func=detail&aid=2908176&group_id=57612&atid=484772>`_    |
+|            |         - `2941036: TimeVal conversion to time and datetime <https://sourceforge.net/tracker/?func=detail&aid=2941036&group_id=57612&atid=484772>`_                          |
 |            |     - added str representation on Attr, Attribute, DeviceImpl and DeviceClass                                                                                                |
 |            |                                                                                                                                                                              |
 |            | Bug fixes:                                                                                                                                                                   |
