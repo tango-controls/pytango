@@ -96,6 +96,7 @@ PyTango team provides a binary PyTango distributable for Windows XP/Vista/7
 | `PyTango-7.2.2.win32-py2.6.exe`_ | - Python 2.6.x (where x >= 0)                    | - Python 2.6.6                       |
 |                                  | - numpy 1.x (where x >= 1. Recommended x >= 5)   | - Numpy 1.5                          |
 |                                  |                                                  | - boost-python 1.41 mutithreaded dll |
+|                                  |                                                  | - Visual Studio 8.0 (2005)           |
 +----------------------------------+--------------------------------------------------+--------------------------------------+
 
 Until version 7.2.2 (due to internal incompatibilities between tango C++ API
