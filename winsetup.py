@@ -44,9 +44,13 @@ bitmap = osp.join(winsetup_dir, 'doc', 'logo-medium.bmp')
 ver = ".".join(map(str, sys.version_info[:2]))
 
 try:
+    cmd_line = '%s %s build_py --force --no-compile' % (executable, setup_name)
+    os.system(cmd_line)
+
     cmd_line = '%s %s bdist_msi --skip-build --target-version=%s' \
                % (executable, setup_name, ver)
     os.system(cmd_line)
+
     cmd_line = '%s %s bdist_wininst --skip-build --target-version=%s ' \
                '--title="PyTango 7" ' \
                '--bitmap="%s"' % (executable, setup_name, ver, bitmap)
