@@ -45,9 +45,15 @@ except Exception,e:
 
 try:
     import IPython
-    import IPython.genutils
     _IPY_ROOT = os.path.dirname(os.path.abspath(IPython.__file__))
-    _IPY_LOCAL = str(IPython.genutils.get_ipython_dir())
+    _IPY_VER = map(int, IPython.__version__.split(".")[:2])
+    if _IPY_VER > [0,10]:
+        import IPython.utils.path
+        get_ipython_dir = IPython.utils.path.get_ipython_dir
+    else:
+        import IPython.genutils
+        get_ipython_dir = IPython.genutils.get_ipython_dir
+    _IPY_LOCAL = str(get_ipython_dir())
 except:
     IPython = None
 
@@ -114,7 +120,10 @@ class build(dftbuild):
             self.distribution.packages.append('PyTango3')
         
         if IPython and not self.without_spock:
-            self.distribution.py_modules.append('IPython.Extensions.ipy_profile_spock')
+            if _IPY_VER > [0,10]:
+                self.distribution.py_modules.append('IPython.config.profile.spock')
+            else:
+                self.distribution.py_modules.append('IPython.Extensions.ipy_profile_spock')
             
         dftbuild.run(self)
         
@@ -307,9 +316,9 @@ def main():
     #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
     libraries = [
-            'tango',
-            'log4tango',
-        ]
+        'tango',
+        'log4tango',
+    ]
 
     extra_compile_args = []
 
