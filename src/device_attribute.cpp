@@ -120,12 +120,11 @@ namespace PyDeviceAttribute {
         
         Tango::DevEncoded* buffer = value->get_buffer();
         
-        using namespace boost::python;
-        str encoded_format(buffer[0].encoded_format);
-        str encoded_data((const char*)buffer[0].encoded_data.get_buffer(),
-                          buffer[0].encoded_data.length());
+        boost::python::str encoded_format(buffer[0].encoded_format);
+        boost::python::str encoded_data((const char*)buffer[0].encoded_data.get_buffer(),
+                                        buffer[0].encoded_data.length());
         
-		py_value.attr(value_attr_name) = boost::python::make_tuple(encoded_format, encoded_data);
+        py_value.attr(value_attr_name) = boost::python::make_tuple(encoded_format, encoded_data);
 
         if (self.get_written_dim_x() > 0) {
             bool is_write_type = self.get_written_dim_x() && (value->length() < 2);
@@ -176,15 +175,14 @@ namespace PyDeviceAttribute {
         
         Tango::DevEncoded* buffer = value->get_buffer();
         
-        using namespace boost::python;
-        str r_encoded_format(buffer[0].encoded_format);
-
+        boost::python::str r_encoded_format(buffer[0].encoded_format);
+        
         Tango::DevVarCharArray &encReadBuffer = buffer[0].encoded_data;
         Py_ssize_t size = encReadBuffer.length();
-        CORBA::Octet *rawReadBuffer = encReadBuffer.get_buffer(1);
         
-        PyObject *readArray = PyBuffer_FromReadWriteMemory(rawReadBuffer, size);
-        
+        char *rawReadBuffer = (char *)encReadBuffer.get_buffer();
+        PyObject *readArray = PyString_FromStringAndSize(rawReadBuffer, size);
+
         object r_encoded_data = object(handle<>(readArray));
         
         py_value.attr(value_attr_name) = boost::python::make_tuple(r_encoded_format, r_encoded_data);

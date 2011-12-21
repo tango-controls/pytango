@@ -27,9 +27,6 @@
 
 #pragma once
 
-// Because of line: object iter_guard(handle<>(iter));
-#pragma warning(disable:4930)
-
 namespace PyDeviceAttribute {
 
     /// This callback is run to delete Tango::DevVarXArray* objects.
