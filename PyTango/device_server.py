@@ -372,14 +372,14 @@ def __DeviceImpl___remove_attr_meth(self,attr_name):
         if hasattr(self.__class__, r_meth_name):
             delattr(self.__class__, r_meth_name)
 
-    w_meth_name = 'write_%s' % attr_name
-    if hasattr(self.__class__, w_meth_name):
-        delattr(self.__class__, w_meth_name)
+        w_meth_name = 'write_%s' % attr_name
+        if hasattr(self.__class__, w_meth_name):
+            delattr(self.__class__, w_meth_name)
 
-    allo_meth_name = 'is_%s_allowed' % attr_name
-    if hasattr(self.__class__, allo_meth_name):
-        delattr(self.__class__, allo_meth_name)
-    cl.dyn_att_added_methods.remove(attr_name)
+        allo_meth_name = 'is_%s_allowed' % attr_name
+        if hasattr(self.__class__, allo_meth_name):
+            delattr(self.__class__, allo_meth_name)
+        cl.dyn_att_added_methods.remove(attr_name)
 
 def __join_msg(msg):
     return ' '.join(map(str, msg))
