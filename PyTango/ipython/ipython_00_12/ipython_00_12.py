@@ -27,14 +27,36 @@
 
 __all__ = ["load_config"]
 
+import sys
+import PyTango
+
+from IPython.utils.ipstruct import Struct
+from IPython.utils.coloransi import TermColors
+
+def __get_python_version():
+    return '.'.join(map(str,sys.version_info[:3]))
+
+def __get_ipython_version():
+    """Returns the current IPython version"""
+    import IPython
+    v = "<Unknown>"
+    try:
+        v = IPython.release.version
+    except Exception:
+        pass
+    return v
+
+def __get_pytango_version():
+    vi = PyTango.Release.version_info
+    return ".".join(map(str,vi[:3]))+vi[3]
+
+
 def load_config(config):
-    
-    import IPython.utils.coloransi
     d = { "version" : PyTango.Release.version,
           "pyver" : __get_python_version(),
           "ipyver" : __get_ipython_version(),
           "pytangover" : __get_pytango_version() }
-    d.update(IPython.utils.coloransi.TermColors.__dict__)
+    d.update(TermColors.__dict__)
 
     so = Struct(
         spock_banner="""%(Blue)shint: Try typing: mydev = Device("%(LightBlue)s<tab>%(Normal)s""")
@@ -84,7 +106,7 @@ def load_config(config):
     # ------------------------------------
     #kernel_app = config.IPKernelApp
     ipython_widget = config.IPythonWidget
-    ipython_widget.in_prompt  = 'Spock [<span class="in-prompt-number">%i</span>]: '
+    ipython_widget.in_prompt  = 'Spock {DB_NAME} [<span class="in-prompt-number">%i</span>]: '
     ipython_widget.out_prompt = '  Out [<span class="out-prompt-number">%i</span>]: '
     
     #zmq_i_shell = config.ZMQInteractiveShell
@@ -108,3 +130,4 @@ object?   -> Details about 'object'. ?object also works, ?? prints more.
     spock_banner = spock_banner.format(**d)
     term_i_shell.banner1 = banner
     term_i_shell.banner2 = spock_banner
+
