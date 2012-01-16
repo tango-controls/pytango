@@ -65,13 +65,13 @@ def default_init_ipython(ip, store=True, pytango=True, colors=True,
                          console=True, magic=True):
     print "Unsupported IPython version (%s) for spock profile" \
         % get_ipython_version()
-    print "Supported IPython versions are: 0.10"
+    print "Supported IPython versions are: >= 0.10"
     print "Starting normal IPython console..."
 
 def default_install(ipydir=None, verbose=True):
     print "Unsupported IPython version (%s) for spock profile" \
         % get_ipython_version()
-    print "Supported IPython versions are: 0.10, 0.11 and 0.12"
+    print "Supported IPython versions are: 0.10 to 0.13"
     print "Tango extension to IPyhon will NOT be installed."
 
 init_ipython = default_init_ipython
@@ -85,7 +85,7 @@ if ipv >= [0, 10] and ipv < [0, 11]:
     load_config = None
     load_ipython_extension = None
     unload_ipython_extension = None
-elif ipv >= [0, 11] and ipv <= [0, 12]:
+elif ipv >= [0, 11] and ipv <= [0, 13]:
     import ipython_00_11
     init_ipython = None
     install = ipython_00_11.install
