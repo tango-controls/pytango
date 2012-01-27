@@ -42,10 +42,10 @@ import PyTango.utils
 
 _DB_SYMB = "db"
 _DFT_TANGO_HOST = None
-_SPOCK_STORE = "__spock_store"
+_TANGO_STORE = "__tango_store"
 _TANGO_ERR = "__tango_error"
-_SPOCK_ERR = "__spock_error"
-_spock_init = False
+_PYTHON_ERR = "__python_error"
+_tango_init = False
 
 _TG_EXCEPTIONS = PyTango.DevFailed, PyTango.CommunicationFailed, \
     PyTango.NamedDevFailed, PyTango.NamedDevFailedList, \
@@ -320,11 +320,11 @@ def magic_tango_error(self, parameter_s=''):
     print "Last tango error:"
     print err_info[1]
 
-def magic_spock_error(self, parameter_s=''):
-    """Displays detailed information about the last spock error"""
+def magic_python_error(self, parameter_s=''):
+    """Displays detailed information about the last python error"""
     
-    global _SPOCK_ERR
-    err_info = self.user_ns.get(_SPOCK_ERR)
+    global _PYTHON_ERR
+    err_info = self.user_ns.get(_PYTHON_ERR)
     if err_info is None:
         print "No error reported so far."
         return
@@ -340,7 +340,7 @@ def __get_event_log():
             import ipy_qt
             model = ipy_qt.EventLoggerTableModel(capacity=10000)
             _EVT_LOG = ipy_qt.EventLogger(model=model)
-            _EVT_LOG.setWindowTitle("Spock - Event Logger Table")
+            _EVT_LOG.setWindowTitle("ITango - Event Logger Table")
         else:
             import ipy_cli
             _EVT_LOG = ipy_cli.EventLogger(capacity=10000)
@@ -450,7 +450,7 @@ def get_device_map():
         - tango server name (full tango server name <name>/<instance>)
         - tango class name
         - DeviceProxy to the device or None if it hasn't been initialized yet
-          (this last element is for internal spock usage only. If you need a 
+          (this last element is for internal tango usage only. If you need a 
            DeviceProxy to this device, create your own)"""
     db = __get_db()
     if db is None:
@@ -519,10 +519,10 @@ def __exc_handler(ip, etype, value, tb):
             print "Empty DevFailed"
         print "(For more detailed information type: tango_error)"
     else:
-        global _SPOCK_ERR
-        ip.user_ns[_SPOCK_ERR] = etype, value, tb
+        global _PYTHON_ERR
+        ip.user_ns[_PYTHON_ERR] = etype, value, tb
         print etype.__name__ + ": " + str(value)
-        print "(For more detailed information type: spock_error)"
+        print "(For more detailed information type: python_error)"
 
 def __get_default_tango_host():
     global _DFT_TANGO_HOST
@@ -609,7 +609,7 @@ def __completer_wrapper(f):
             return f(ip, evt)
         except Exception, e:
             print
-            print "An unexpected exception ocorred during Spock command completer."
+            print "An unexpected exception ocorred during ITango command completer."
             print "Please send a bug report to the PyTango team with the following informantion:"
             print IPython.ipapi.get().options.banner
             print 80*"-"
@@ -619,28 +619,6 @@ def __completer_wrapper(f):
             print 80*"-"
             raise e
     return wrapper
-
-def __get_python_version():
-    return '.'.join(map(str,sys.version_info[:3]))
-
-def __get_ipython_version():
-    """Returns the current IPython version"""
-    v = None
-    try:
-        try:
-            v = IPython.Release.version
-        except Exception:
-            try:
-                v = IPython.release.version
-            except Exception:
-                pass
-    except Exception:
-        pass
-    return v
-
-def __get_pytango_version():
-    vi = PyTango.Release.version_info
-    return ".".join(map(str,vi[:3]))+vi[3]
 
 def __get_ipapi():
     return IPython.ipapi.get()
@@ -700,15 +678,15 @@ def __build_color_scheme(ip, name):
 
 def __set_store(ip, key=None, value=None):
     if key is not None:
-        spock_store = ip.user_ns.get(_SPOCK_STORE)
-        spock_store[key] = value
-    __store(ip, _SPOCK_STORE)
+        tango_store = ip.user_ns.get(_TANGO_STORE)
+        tango_store[key] = value
+    __store(ip, _TANGO_STORE)
 
 def __get_store(ip, key, nvalue=None):
-    spock_store = ip.user_ns.get(_SPOCK_STORE)
-    v = spock_store.get(key)
+    tango_store = ip.user_ns.get(_TANGO_STORE)
+    v = tango_store.get(key)
     if v is None and nvalue is not None:
-        spock_store[key] = nvalue
+        tango_store[key] = nvalue
         v = nvalue
     return v
 
@@ -846,8 +824,6 @@ def init_db(ip, parameter_s=''):
             c = DeviceClassCompleter(klass, devices)
             ip.set_hook('complete_command', c, re_key = ".*" + klass + "[^\w\.]+")
             exposed_klasses[klass] = PyTango.DeviceProxy
-        else:
-            print "Failed to add completer for DeviceClass",klass
     
     # expose classes no user namespace
     ip.to_user_ns(exposed_klasses)
@@ -895,43 +871,44 @@ def init_db(ip, parameter_s=''):
 def init_store(ip):
     # recover the environment
     ip.magic("store -r")
-    spock_store = ip.user_ns.get(_SPOCK_STORE)
+    tango_store = ip.user_ns.get(_TANGO_STORE)
     
-    if spock_store is None:
-        print "Initializing spock store (should only happen once)"
-        spock_store = {}
-        ip.to_user_ns( { _SPOCK_STORE : spock_store} )
-        __store(ip, _SPOCK_STORE)
+    if tango_store is None:
+        print "Initializing tango store (should only happen once)"
+        tango_store = {}
+        ip.to_user_ns( { _TANGO_STORE : tango_store} )
+        __store(ip, _TANGO_STORE)
         
 def init_console(ip):
+    import PyTango.ipython
     
     TermColors = IPython.ColorANSI.TermColors
     
-    d = { "version" : PyTango.Release.version,
-          "pyver" : __get_python_version(),
-          "ipyver" : __get_ipython_version(),
-          "pytangover" : __get_pytango_version() }
+    d = { "version" : PyTango.ipython.get_pytango_version(),
+          "pyver" : PyTango.ipython.get_python_version(),
+          "ipyver" : PyTango.ipython.get_ipython_version(),
+          "pytangover" : PyTango.ipython.get_pytango_version() }
     d.update(TermColors.__dict__)
 
     o = ip.options
 
     so = IPython.ipstruct.Struct(
-        spock_banner = """%(Blue)shint: Try typing: mydev = Device("%(LightBlue)s<tab>%(Normal)s\n""")
+        tango_banner = """%(Blue)shint: Try typing: mydev = Device("%(LightBlue)s<tab>%(Normal)s\n""")
 
-    so = ip.user_ns.get("spock_options", so)
+    so = ip.user_ns.get("tango_options", so)
     
     o.colors = "Tango"
-    o.prompt_in1 = "Spock <$DB_NAME> [\\#]: "
+    o.prompt_in1 = "ITango <$DB_NAME> [\\#]: "
     o.prompt_out = "Result [\\#]: "
     banner = """
-%(Purple)sSpock %(version)s%(Normal)s -- An interactive %(Purple)sTango%(Normal)s client.
+%(Purple)sITango %(version)s%(Normal)s -- An interactive %(Purple)sTango%(Normal)s client.
 
 Running on top of Python %(pyver)s, IPython %(ipyver)s and PyTango %(pytangover)s
 
-help      -> Spock's help system.
+help      -> ITango's help system.
 object?   -> Details about 'object'. ?object also works, ?? prints more.
 
-""" + so.spock_banner
+""" + so.tango_banner
     o.banner = banner % d
     if hasattr(o.banner, "format"):
         o.banner = o.banner.format(**d)
@@ -944,7 +921,7 @@ def init_magic(ip):
     __expose_magic(ip, "lsdevclass", magic_lsdevclass)
     __expose_magic(ip, "lsserv", magic_lsserv)
     __expose_magic(ip, "tango_error", magic_tango_error)
-    __expose_magic(ip, "spock_error", magic_spock_error)
+    __expose_magic(ip, "python_error", magic_python_error)
     __expose_magic(ip, "mon", magic_mon, __monitor_completer)
     #__expose_magic(ip, "umon", magic_umon, __monitor_completer)
     
@@ -980,10 +957,10 @@ def complete(text):
 def init_ipython(ip, store=True, pytango=True, colors=True, console=True, magic=True):
     
     if ip is None:
-        raise Exception("Spock's init_ipython must be called from inside IPython")
+        raise Exception("ITango's init_ipython must be called from inside IPython")
     
-    global _spock_init
-    if _spock_init is True: return
+    global _tango_init
+    if _tango_init is True: return
     
     #ip.IP._orig_complete = ip.IP.complete
     #ip.IP.complete = complete
@@ -995,4 +972,4 @@ def init_ipython(ip, store=True, pytango=True, colors=True, console=True, magic=
     if console: init_console(ip)
     if magic:   init_magic(ip)
     
-    _spock_init = True
+    _tango_init = True

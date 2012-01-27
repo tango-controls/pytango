@@ -51,7 +51,7 @@ PyTango.ipython.load_config(config)
 # Put any additional environment here
 """
 
-def install(ipydir=None, verbose=True, profile='spock'):
+def install(ipydir=None, verbose=True, profile='tango'):
     if verbose:
         out = sys.stdout
     else:
@@ -67,13 +67,13 @@ def install(ipydir=None, verbose=True, profile='spock'):
     abs_config_file_name = os.path.join(p_dir.location, config_file_name)
     create_config = True
     if os.path.isfile(abs_config_file_name):
-        create_config = ask_yes_no("Spock configuration file already exists. "\
+        create_config = ask_yes_no("Tango configuration file already exists. "\
                                    "Do you wish to replace it?", default='y')
     
     if not create_config:
         return
 
-    out.write("Installing spock extension to ipython... ")
+    out.write("Installing tango extension to ipython... ")
     out.flush()
 
     profile = __PROFILE.format(pytangover=PyTango.Release.version,
@@ -83,13 +83,13 @@ def install(ipydir=None, verbose=True, profile='spock'):
         f.close()
     out.write("[DONE]\n\n")
     out.write("""\
-To start spock simply type on the command line:
-%% ipython --profile=spock
+To start ipython with tango interface simply type on the command line:
+%% ipython --profile=tango
 
 For more information goto:
 http://www.tango-controls.org/static/PyTango/latest/doc/html/
 
-Have fun with spock!
+Have fun with ITango!
 The PyTango team
 """)
     

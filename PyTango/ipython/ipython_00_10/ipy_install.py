@@ -46,7 +46,7 @@ PyTango.ipython.init_ipython(ip)
 
 def install(ipydir=None,verbose=True):
     install_dir = ipydir or IPython.genutils.get_ipython_dir()
-    f_name = os.path.join(install_dir, 'ipy_profile_spock.py')
+    f_name = os.path.join(install_dir, 'ipy_profile_tango.py')
     if verbose:
         out = sys.stdout
     else:
@@ -61,7 +61,7 @@ def install(ipydir=None,verbose=True):
             return
     profile = __PROFILE.format(pytangover=PyTango.Release.version, ipyver=IPython.Release.version)
     
-    out.write("Installing spock extension to ipython... ")
+    out.write("Installing tango extension to ipython... ")
     out.flush()
     try:
         f = file(f_name, "w")
@@ -74,23 +74,23 @@ def install(ipydir=None,verbose=True):
     
     ipy_user_config = os.path.join(IPython.genutils.get_ipython_dir(), 'ipy_user_conf.py')
     out.write("""\
-To start spock simply type on the command line:
-%% ipython -p spock
+To start ipython with tango interface simply type on the command line:
+%% ipython -p tango
 
-If you want spock extension to be automaticaly active when you start ipython,
+If you want tango extension to be automaticaly active when you start ipython,
 edit your %s and add the line:
-import ipy_profile_spock
+import ipy_profile_tango
 
 Next time, just start ipython on the command line:
 %% ipython
 
-and your spock extension should be loaded automaticaly. Note that if you are also
+and your tango extension should be loaded automaticaly. Note that if you are also
 loading other extensions that, for example, overwrite the prompt, the prompt
 that will appear is the one from the last extension to be imported.
 
 For more information goto: http://www.tango-controls.org/static/PyTango/latest/doc/html/index.html
 
-Have fun with spock!
+Have fun with ITango!
 The PyTango team
     """ % (ipy_user_config,))
 

@@ -24,55 +24,22 @@
 __all__ = ["init_ipython", "install", "load_ipython_extension",
            "unload_ipython_extension", "load_config"]
 
-try:
-    import IPython
-    ipython = IPython
-except:
-    ipython = None
-
-def get_ipython_version():
-    """Returns the current IPython version"""
-    if ipython is None:return None
-    v = None
-    try:
-        try:
-            v = ipython.Release.version
-        except Exception:
-            try:
-                v = ipython.release.version
-            except Exception:
-                pass
-    except Exception:
-        pass
-    return v
-
-def get_ipython_version_list():
-    ipv_str = get_ipython_version()
-
-    if ipv_str is None:
-        ipv = [0, 0]
-    else:
-        ipv = []
-        for i in ipv_str.split(".")[:2]:
-            try:
-                i = int(i)
-            except:
-                i = 0
-            ipv.append(i)
-    return ipv
+from .common import get_python_version, get_python_version_number, \
+    get_ipython_version, get_ipython_version_list, \
+    get_ipython_version_number, get_pytango_version, get_pytango_version_number
 
 def default_init_ipython(ip, store=True, pytango=True, colors=True,
                          console=True, magic=True):
-    print "Unsupported IPython version (%s) for spock profile" \
+    print "Unsupported IPython version (%s) for tango profile" \
         % get_ipython_version()
     print "Supported IPython versions are: >= 0.10"
     print "Starting normal IPython console..."
 
 def default_install(ipydir=None, verbose=True):
-    print "Unsupported IPython version (%s) for spock profile" \
+    print "Unsupported IPython version (%s) for tango profile" \
         % get_ipython_version()
     print "Supported IPython versions are: 0.10 to 0.13"
-    print "Tango extension to IPyhon will NOT be installed."
+    print "Tango extension to IPython will NOT be installed."
 
 init_ipython = default_init_ipython
 install = default_install
@@ -92,7 +59,7 @@ elif ipv >= [0, 11] and ipv < [0, 12]:
     load_config = ipython_00_11.load_config
     load_ipython_extension = ipython_00_11.load_ipython_extension
     unload_ipython_extension = ipython_00_11.unload_ipython_extension
-elif ipv >= [0, 12] and ipv <= [0, 13]:
+elif ipv >= [0, 12] and ipv < [1, 0]:
     import ipython_00_12
     init_ipython = None
     install = ipython_00_12.install

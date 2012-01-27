@@ -27,41 +27,22 @@
 
 __all__ = ["load_config"]
 
-import sys
-import PyTango
-
 from IPython.utils.ipstruct import Struct
-from IPython.utils.coloransi import TermColors
-
-def __get_python_version():
-    return '.'.join(map(str,sys.version_info[:3]))
-
-def __get_ipython_version():
-    """Returns the current IPython version"""
-    import IPython
-    v = "<Unknown>"
-    try:
-        v = IPython.release.version
-    except Exception:
-        pass
-    return v
-
-def __get_pytango_version():
-    vi = PyTango.Release.version_info
-    return ".".join(map(str,vi[:3]))+vi[3]
-
+from  IPython.utils.coloransi import TermColors
 
 def load_config(config):
-    d = { "version" : PyTango.Release.version,
-          "pyver" : __get_python_version(),
-          "ipyver" : __get_ipython_version(),
-          "pytangover" : __get_pytango_version() }
+    import PyTango.ipython
+    
+    d = { "version" : PyTango.ipython.get_pytango_version(),
+          "pyver" : PyTango.ipython.get_python_version(),
+          "ipyver" : PyTango.ipython.get_ipython_version(),
+          "pytangover" : PyTango.ipython.get_pytango_version(), }
     d.update(TermColors.__dict__)
 
     so = Struct(
-        spock_banner="""%(Blue)shint: Try typing: mydev = Device("%(LightBlue)s<tab>%(Normal)s""")
+        tango_banner="""%(Blue)shint: Try typing: mydev = Device("%(LightBlue)s<tab>%(Normal)s""")
 
-    so = config.get("spock_options", so)
+    so = config.get("tango_options", so)
 
     # ------------------------------------
     # Application
@@ -74,14 +55,12 @@ def load_config(config):
     # ------------------------------------
     i_shell = config.InteractiveShell
     i_shell.colors = 'Linux'
-    #i_shell.prompt_in1 = 'Spock <$DB_NAME> [\\#]: '
-    #i_shell.prompt_out = 'Result [\\#]: '
     
     # ------------------------------------
     # PromptManager
     # ------------------------------------
     prompt = config.PromptManager
-    prompt.in_template = 'Spock {DB_NAME} [\\#]: '
+    prompt.in_template = 'ITango {DB_NAME} [\\#]: '
     #prompt.in2_template = 
     prompt.out_template = 'Result [\\#]: '
     
@@ -92,6 +71,7 @@ def load_config(config):
     extensions = getattr(i_shell_app, 'extensions', [])
     extensions.append('PyTango.ipython')
     i_shell_app.extensions = extensions
+    i_shell_app.ignore_old_config=True
     
     # ------------------------------------
     # TerminalIPythonApp: options for the IPython terminal (and not Qt Console)
@@ -106,8 +86,8 @@ def load_config(config):
     # ------------------------------------
     #kernel_app = config.IPKernelApp
     ipython_widget = config.IPythonWidget
-    ipython_widget.in_prompt  = 'Spock [<span class="in-prompt-number">%i</span>]: '
-    ipython_widget.out_prompt = '  Out [<span class="out-prompt-number">%i</span>]: '
+    ipython_widget.in_prompt  = 'ITango [<span class="in-prompt-number">%i</span>]: '
+    ipython_widget.out_prompt = '   Out [<span class="out-prompt-number">%i</span>]: '
     
     #zmq_i_shell = config.ZMQInteractiveShell
     
@@ -116,18 +96,17 @@ def load_config(config):
     # ------------------------------------
     term_i_shell = config.TerminalInteractiveShell
     banner = """\
-%(Purple)sSpock %(version)s%(Normal)s -- An interactive %(Purple)sTango%(Normal)s client.
+%(Purple)sITango %(version)s%(Normal)s -- An interactive %(Purple)sTango%(Normal)s client.
 
 Running on top of Python %(pyver)s, IPython %(ipyver)s and PyTango %(pytangover)s
 
-help      -> Spock's help system.
+help      -> ITango's help system.
 object?   -> Details about 'object'. ?object also works, ?? prints more.
 """
     
     banner = banner % d
     banner = banner.format(**d)
-    spock_banner = so.spock_banner % d
-    spock_banner = spock_banner.format(**d)
+    tango_banner = so.tango_banner % d
+    tango_banner = tango_banner.format(**d)
     term_i_shell.banner1 = banner
-    term_i_shell.banner2 = spock_banner
-
+    term_i_shell.banner2 = tango_banner
