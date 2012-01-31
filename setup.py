@@ -252,6 +252,7 @@ def main():
         'PyTango.ipython',
         'PyTango.ipython.ipython_00_10',
         'PyTango.ipython.ipython_00_11',
+        'PyTango.ipython.ipython_00_12',
     ]
 
     py_modules = []
