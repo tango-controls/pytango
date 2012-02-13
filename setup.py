@@ -267,7 +267,8 @@ def main():
     ]
 
     package_data = {
-        'PyTango' : []
+        'PyTango' : [],
+        'PyTango.ipython.ipython_00_12.examples.notebooks' : ['notebooks/*', 'static/**/*', 'templates/*'],
     }
 
     data_files = []
