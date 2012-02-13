@@ -1,0 +1,207 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <title>ITango Notebook</title>
+
+    {% if mathjax_url %}
+    <script type="text/javascript" src="{{mathjax_url}}?config=TeX-AMS_HTML" charset="utf-8"></script>
+    {% end %}
+    <script type="text/javascript">
+    // MathJax disabled, set as null to distingish from *missing* MathJax,
+    // where it will be undefined, and should prompt a dialog later.
+    window.mathjax_url = "{{mathjax_url}}";
+    </script>
+
+    <link rel="stylesheet" href="/static/jquery/css/themes/base/jquery-ui.min.css" type="text/css" />
+    <link rel="stylesheet" href="/static/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="/static/codemirror/theme/ipython.css">
+
+    <link rel="stylesheet" href="/static/prettify/prettify.css"/>
+
+    <link rel="stylesheet" href="/static/css/boilerplate.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/layout.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/base.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/notebook.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/renderedhtml.css" type="text/css" />
+
+    {% comment  In the notebook, the read-only flag is used to determine %}
+    {% comment  whether to hide the side panels and switch off input %}
+    <meta name="read_only" content="{{read_only and not logged_in}}"/>
+
+</head>
+
+<body
+    data-project={{project}} data-notebook-id={{notebook_id}}
+    data-base-project-url={{base_project_url}} data-base-kernel-url={{base_kernel_url}}
+>
+
+<div id="header">
+    <span id="ipython_notebook"><h1><a href='..' alt='dashboard'><img src='/static/pytangologo.png' alt='ITango Notebook'/></a></h1></span>
+    <span id="save_widget">
+        <span id="notebook_name"></span>
+        <span id="save_status"></span>
+    </span>
+
+    <span id="login_widget">
+      {% comment  This is a temporary workaround to hide the logout button %}
+      {% comment  when appropriate until notebook.html is templated %}
+      {% if logged_in %}
+        <button id="logout">Logout</button>
+      {% elif not logged_in and login_available %}
+        <button id="login">Login</button>
+      {% end %}
+    </span>
+
+    <span id="kernel_status">Idle</span>
+</div>
+
+<div id="menubar">
+    <ul id="menus">
+        <li><a href="#">File</a>
+            <ul>
+                <li id="new_notebook"><a href="#">New</a></li>
+                <li id="open_notebook"><a href="#">Open...</a></li>
+                <hr/>
+                <li id="copy_notebook"><a href="#">Make a Copy...</a></li>
+                <li id="rename_notebook"><a href="#">Rename...</a></li>
+                <li id="save_notebook"><a href="#">Save</a></li>
+                <hr/>
+                <li><a href="#">Download as</a>
+                    <ul>
+                        <li id="download_ipynb"><a href="#">IPython (.ipynb)</a></li>
+                        <li id="download_py"><a href="#">Python (.py)</a></li>
+                    </ul>
+                </li>
+                <hr/>
+                <li id="print_notebook"><a href="/{{notebook_id}}/print" target="_blank">Print View</a></li>
+            </ul>
+        </li>
+        <li><a href="#">Edit</a>
+            <ul>
+                <li id="cut_cell"><a href="#">Cut</a></li>
+                <li id="copy_cell"><a href="#">Copy</a></li>
+                <li id="paste_cell" class="ui-state-disabled"><a href="#">Paste</a></li>
+                <li id="paste_cell_above" class="ui-state-disabled"><a href="#">Paste Above</a></li>
+                <li id="paste_cell_below" class="ui-state-disabled"><a href="#">Paste Below</a></li>
+                <li id="delete_cell"><a href="#">Delete</a></li>
+                <hr/>
+                <li id="split_cell"><a href="#">Split</a></li>
+                <li id="merge_cell_above"><a href="#">Merge Above</a></li>
+                <li id="merge_cell_below"><a href="#">Merge Below</a></li>
+                <hr/>
+                <li id="move_cell_up"><a href="#">Move Up</a></li>
+                <li id="move_cell_down"><a href="#">Move Down</a></li>
+                <hr/>
+                <li id="select_previous"><a href="#">Select Previous</a></li>
+                <li id="select_next"><a href="#">Select Next</a></li>
+            </ul>
+        </li>
+        <li><a href="#">Insert</a>
+            <ul>
+                <li id="insert_cell_above"><a href="#">Insert Cell Above</a></li>
+                <li id="insert_cell_below"><a href="#">Insert Cell Below</a></li>
+            </ul>
+        </li>
+        <li><a href="#">Cell</a>
+            <ul>
+                <li id="full_edit_cell"><a href="#">Edit in Ace</a></li>
+                <hr/>
+                <li id="run_cell"><a href="#">Run</a></li>
+                <li id="run_cell_in_place"><a href="#">Run in Place</a></li>
+                <li id="run_all_cells"><a href="#">Run All</a></li>
+                <hr/>
+                <li id="to_code"><a href="#">Code Cell</a></li>
+                <li id="to_markdown"><a href="#">Markdown Cell</a></li>
+                <hr/>
+                <li id="toggle_output"><a href="#">Toggle Output</a></li>
+                <li id="clear_all_output"><a href="#">Clear All Output</a></li>
+            </ul>
+        </li>
+        <li><a href="#">Kernel</a>
+            <ul>
+                <li id="int_kernel"><a href="#">Interrupt</a></li>
+                <li id="restart_kernel"><a href="#">Restart</a></li>
+            </ul>
+        </li>
+        <li><a href="#">Help</a>
+            <ul>
+                <li><a href="http://ipython.org/documentation.html" target="_blank">IPython Help</a></li>
+                <li><a href="http://ipython.org/ipython-doc/stable/interactive/htmlnotebook.html" target="_blank">Notebook Help</a></li>
+                <li id="keyboard_shortcuts"><a href="#">Keyboard Shortcuts</a></li>
+                <hr/>
+                <li><a href="https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts" target="_blank">Ace Keyboard Shortcuts</a></li>
+                <hr/>
+                <li><a href="http://docs.python.org" target="_blank">Python</a></li>
+                <li><a href="http://docs.scipy.org/doc/numpy/reference/" target="_blank">NumPy</a></li>
+                <li><a href="http://docs.scipy.org/doc/scipy/reference/" target="_blank">SciPy</a></li>
+                <li><a href="http://docs.sympy.org/dev/index.html" target="_blank">SymPy</a></li>
+                <li><a href="http://matplotlib.sourceforge.net/" target="_blank">Matplotlib</a></li>
+            </ul>
+        </li>
+    </ul>
+
+</div>
+
+<div id="main_app">
+
+    <div id="notebook_panel">
+        <div id="notebook"></div>
+        <div id="pager_splitter"></div>
+        <div id="pager"></div>
+    </div>
+
+</div>
+
+<div id="fulledit_widget" >
+    <div id="fulledit_header">
+        <button id="close_fulledit">Close</button>
+    </div>
+    <div id="fulledit_editor">some text</div>
+</div>
+
+<script src="/static/jquery/js/jquery-1.7.1.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/jquery/js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/codemirror/lib/codemirror.js" charset="utf-8"></script>
+<script src="/static/codemirror/mode/python/python.js" charset="utf-8"></script>
+<script src="/static/codemirror/mode/htmlmixed/htmlmixed.js" charset="utf-8"></script>
+<script src="/static/codemirror/mode/xml/xml.js" charset="utf-8"></script>
+<script src="/static/codemirror/mode/javascript/javascript.js" charset="utf-8"></script>
+<script src="/static/codemirror/mode/css/css.js" charset="utf-8"></script>
+<script src="/static/codemirror/mode/rst/rst.js" charset="utf-8"></script>
+<script src="/static/codemirror/mode/markdown/markdown.js" charset="utf-8"></script>
+
+<script src="/static/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ace/mode-python.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ace/mode-markdown.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ace/mode-html.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ace/theme-textmate.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/pagedown/Markdown.Converter.js" charset="utf-8"></script>
+
+<script src="/static/prettify/prettify.js" charset="utf-8"></script>
+<script src="/static/dateformat/date.format.js" charset="utf-8"></script>
+
+<script src="/static/js/namespace.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/cell.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/codecell.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/textcell.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/kernel.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/kernelstatus.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/layout.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/savewidget.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/quickhelp.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/loginwidget.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/pager.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/menubar.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/notebook.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/notebookmain.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/fulleditwidget.js" type="text/javascript" charset="utf-8"></script>
+
+</body>
+
+</html>
