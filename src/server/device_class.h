@@ -151,6 +151,12 @@ public:
     virtual void command_factory();
 
     /**
+     * This method forward a C++ call to the device_name_factory method to the
+     * Python method
+     */
+    virtual void device_name_factory(std::vector<std::string> &dev_list);
+
+    /**
      * This method is called to ask Python to delete a class by decrementing
      * the Python ref count
      */
@@ -171,6 +177,7 @@ public:
      * @param[in] signo signal identifier
      */
     void default_signal_handler(long signo);
+
 
 protected:
 

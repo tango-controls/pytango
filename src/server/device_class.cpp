@@ -193,6 +193,19 @@ void CppDeviceClassWrap::command_factory()
     CALL_DEVCLASS_METHOD(_DeviceClass__command_factory)
 }
 
+void CppDeviceClassWrap::device_name_factory(std::vector<std::string> &dev_list)
+{
+    //
+    // make sure we pass the same vector object to the python method
+    //
+    object py_dev_list(
+                handle<>(
+                    to_python_indirect<
+                        std::vector<std::string>,
+                        detail::make_reference_holder>()(dev_list)));
+    CALL_DEVCLASS_METHOD_VARGS(device_name_factory, py_dev_list);
+}
+
 void CppDeviceClassWrap::device_factory(const Tango::DevVarStringArray *dev_list)
 {
     CALL_DEVCLASS_METHOD_VARGS(device_factory, dev_list)
@@ -234,7 +247,6 @@ void CppDeviceClassWrap::delete_class()
     {
         handle_python_exception(eas);
     }
-
 }
 
 namespace PyDeviceClass
@@ -272,6 +284,7 @@ namespace PyDeviceClass
     void (*add_device1)(CppDeviceClass &, auto_ptr<Tango::DeviceImpl>) = &add_device;
     void (*add_device2)(CppDeviceClass &, auto_ptr<Tango::Device_4Impl>) = &add_device;
     */
+    
 }
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS (export_device_overload,
@@ -301,6 +314,7 @@ void export_device_class()
         init<const std::string &>())
 
         .def("device_factory", &CppDeviceClassWrap::device_factory)
+        .def("device_name_factory", &CppDeviceClassWrap::device_name_factory)
         .def("export_device", &CppDeviceClass::export_device,
             export_device_overload())
         //.def("_add_device", PyDeviceClass::add_device1)

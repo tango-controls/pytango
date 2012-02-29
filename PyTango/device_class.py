@@ -635,7 +635,22 @@ class DeviceClass(_DeviceClass):
                 return
         err_mess = "Device " + name + " not in Tango class device list!"
         Except.throw_exception("PyAPI_CantDestroyDevice",err_mess,"DeviceClass.device_destroyer")
+    
+    def device_name_factory(self, dev_name_list):
+        """
+            device_name_factory(self, dev_name_list) ->  None
+                
+                Create device(s) name list (for no database device server).
+                This method can be re-defined in DeviceClass sub-class for
+                device server started without database. Its rule is to
+                initialise class device name. The default method does nothing.
+            
+            Parameters :
+                - dev_name_list : (seq<str>) sequence of devices to be filled
 
+            Return     : None"""
+        pass
+    
 def __init_DeviceClass():
     pass
 
