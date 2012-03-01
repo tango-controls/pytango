@@ -268,7 +268,6 @@ def main():
 
     package_data = {
         'PyTango' : [],
-        'PyTango.ipython.ipython_00_12' : ['examples/notebooks/notebooks/*', 'examples/notebooks/static/*', 'examples/notebooks/templates/*' ] # ['notebooks/*', 'static/**/*', 'templates/*'],
     }
 
     data_files = []
