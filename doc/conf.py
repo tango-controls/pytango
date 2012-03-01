@@ -52,7 +52,7 @@ extensions = ['sphinx.ext.pngmath',
               'sphinx.ext.graphviz',
               'sphinx.ext.intersphinx',
               'ipython_console_highlighting',
-              'spock_console_highlighting']
+              'tango_console_highlighting']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -68,7 +68,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PyTango'
-copyright = u'2010, ALBA - CELLS'
+copyright = u'2012, ALBA - CELLS'
 copyright = u"""Except where otherwise noted, content on this site is
 licensed under a Creative Commons Attribution 3.0 License"""
 
@@ -117,7 +117,7 @@ exclude_trees = ['_build']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-pygments_style = 'spock_console_highlighting.SpockStyle'
+pygments_style = 'tango_console_highlighting.TangoStyle'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []

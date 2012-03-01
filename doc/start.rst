@@ -58,7 +58,7 @@ The current PyTango version has four major dependencies:
   
 plus two optional dependencies (activated by default) on:
 
-- IPyhon (>=0.10) (http://ipython.scipy.org/) (necessary for :ref:`spock`)
+- IPyhon (>=0.10) (http://ipython.scipy.org/) (necessary for :ref:`itango`)
 - numpy (>= 1.1.0) (http://numpy.scipy.org/)
 
 .. note::
@@ -248,14 +248,14 @@ Finally::
     sudo python setup.py install
     
 This will install PyTango in the system python installation directory and, since
-version 7.1.2, it will also install :ref:`spock` as an IPython_ extension.
+version 7.1.2, it will also install :ref:`itango` as an IPython_ extension.
     
 Or if you whish to install in a different directory::
     
     python setup.py build
     python setup.py install --prefix=/home/homer/local --ipython-local
 
-(This will try to install :ref:`spock` as an IPython profile to the local
+(This will try to install :ref`itango` as an IPython profile to the local
 user, since probably there is no permission to write into the IPython_ extension
 directory)
 
@@ -271,26 +271,26 @@ test
 ####
 
 If you have IPython_ installed, the best way to test your PyTango installation
-is by starting the new PyTango CLI called :ref:`spock` by typing on the command
-line
+is by starting the new PyTango CLI called :ref`itango` by typing on the command
+line:
 
-IPython <= 0.10::
+    #. IPython <= 0.10::
 
-    $ ipython -p spock
+        $ ipython -p tango
 
-IPython > 0.10::
+    #.IPython > 0.10::
 
-    $ ipython --profile spock
+        $ ipython --profile=tango
 
 
-then, in spock type:
+then, in ITango type:
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: PyTango.Release.version
-                 Result [1]: '7.1.2'
+    ITango <homer:10000> [1]: PyTango.Release.version
+                  Result [1]: '7.1.2'
 
-(if you are wondering, :ref:`spock` automaticaly does ``import PyTango`` for you!)
+(if you are wondering, :ref`itango` automaticaly does ``import PyTango`` for you!)
 
 If you don't have IPython_ installed, to test the installation start a python console
 and type:

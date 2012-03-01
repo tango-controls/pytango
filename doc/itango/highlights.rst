@@ -1,7 +1,7 @@
 
 .. currentmodule:: PyTango
 
-.. _spock-highlights:
+.. _itango-highlights:
 
 Highlights
 ==========
@@ -9,74 +9,74 @@ Highlights
 Tab completion
 --------------
 
-Spock exports many tango specific objects to the console namespace.
+ITango exports many tango specific objects to the console namespace.
 These include:
 
     - the PyTango module itself
       
-      .. sourcecode:: spock
+      .. sourcecode:: itango
 
-            Spock <homer:10000> [1]: PyTango
+            ITango <homer:10000> [1]: PyTango
                          Result [1]: <module 'PyTango' from ...>
                          
     - The :class:`DeviceProxy` (=Device), :class:`AttributeProxy` (=Attribute),
       :class:`Database` and :class:`Group` classes
       
-      .. sourcecode:: spock
+      .. sourcecode:: itango
 
-            Spock <homer:10000> [1]: De<tab>
+            ITango <homer:10000> [1]: De<tab>
             DeprecationWarning            Device       DeviceProxy
 
-            Spock <homer:10000> [2]: Device
+            ITango <homer:10000> [2]: Device
                          Result [2]: <class 'PyTango._PyTango.DeviceProxy'>
             
-            Spock <homer:10000> [3]: Device("sys/tg_test/1")
+            ITango <homer:10000> [3]: Device("sys/tg_test/1")
                          Result [3]: DeviceProxy(sys/tg_test/1)
                          
-            Spock <homer:10000> [4]: Datab<tab>
+            ITango <homer:10000> [4]: Datab<tab>
             
-            Spock <homer:10000> [4]: Database
+            ITango <homer:10000> [4]: Database
             
-            Spock <homer:10000> [4]: Att<tab>
+            ITango <homer:10000> [4]: Att<tab>
             Attribute       AttributeError  AttributeProxy
             
-    - The tango :class:`PyTango.Database` object to which the spock session is 
+    - The tango :class:`PyTango.Database` object to which the itango session is 
       currently connected
       
-      .. sourcecode:: spock
+      .. sourcecode:: itango
 
-            Spock <homer:10000> [1]: db
+            ITango <homer:10000> [1]: db
                          Result [1]: Database(homer, 10000)
     
 Device name completion
 ----------------------
 
-Spock knows the complete list of device names (including alias) for the current
+ITango knows the complete list of device names (including alias) for the current
 tango database. This means that when you try to create a new Device, by pressing
 <tab> you can see a context sensitive list of devices.
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: test = Device("<tab>
+    ITango <homer:10000> [1]: test = Device("<tab>
     Display all 3654 possibilities? (y or n) n
     
-    Spock <homer:10000> [1]: test = Device("sys<tab>
+    ITango <homer:10000> [1]: test = Device("sys<tab>
     sys/access_control/1  sys/database/2        sys/tautest/1         sys/tg_test/1
     
-    Spock <homer:10000> [2]: test = Device("sys/tg_test/1")
+    ITango <homer:10000> [2]: test = Device("sys/tg_test/1")
 
 Attribute name completion
 -------------------------
 
-Spock can inspect the list of attributes in case the device server for the device
+ITango can inspect the list of attributes in case the device server for the device
 where the attribute resides is running.
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: short_scalar = Attribute("sys<tab>
+    ITango <homer:10000> [1]: short_scalar = Attribute("sys<tab>
     sys/access_control/1/  sys/database/2/        sys/tautest/1/         sys/tg_test/1/
     
-    Spock <homer:10000> [1]: short_scalar = Attribute("sys/tg_test/1/<tab>
+    ITango <homer:10000> [1]: short_scalar = Attribute("sys/tg_test/1/<tab>
     sys/tg_test/1/State                sys/tg_test/1/no_value
     sys/tg_test/1/Status               sys/tg_test/1/short_image
     sys/tg_test/1/ampli                sys/tg_test/1/short_image_ro
@@ -90,9 +90,9 @@ where the attribute resides is running.
     sys/tg_test/1/double_scalar        sys/tg_test/1/string_image_ro
     ...
 
-    Spock <homer:10000> [1]: short_scalar = Attribute("sys/tg_test/1/short_scalar")
+    ITango <homer:10000> [1]: short_scalar = Attribute("sys/tg_test/1/short_scalar")
     
-    Spock <homer:10000> [29]: print test.read()
+    ITango <homer:10000> [29]: print test.read()
     DeviceAttribute[
     data_format = PyTango._PyTango.AttrDataFormat.SCALAR
       dim_x = 1
@@ -115,15 +115,15 @@ where the attribute resides is running.
 Automatic tango object member completion
 ----------------------------------------
 
-When you create a new tango object, (ex.: a device), spock is able to find out
+When you create a new tango object, (ex.: a device), itango is able to find out
 dynamically which are the members of this device (including tango commands 
 and attributes if the device is currently running)
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: test = Device("sys/tg_test/1")
+    ITango <homer:10000> [1]: test = Device("sys/tg_test/1")
     
-    Spock <homer:10000> [2]: test.<tab>
+    ITango <homer:10000> [2]: test.<tab>
     Display all 240 possibilities? (y or n)
     ...
     test.DevVoid                            test.get_access_control
@@ -133,14 +133,14 @@ and attributes if the device is currently running)
     test.SwitchStates                       test.get_attribute_list
     ...
     
-    Spock <homer:10000> [2]: test.short_<tab>
+    ITango <homer:10000> [2]: test.short_<tab>
     test.short_image        test.short_scalar       test.short_scalar_rww   test.short_spectrum
     test.short_image_ro     test.short_scalar_ro    test.short_scalar_w     test.short_spectrum_ro
 
-    Spock <homer:10000> [2]: test.short_scalar        # old style: test.read_attribute("short_scalar").value
+    ITango <homer:10000> [2]: test.short_scalar        # old style: test.read_attribute("short_scalar").value
                  Result [2]: 252
 
-    Spock <homer:10000> [3]: test.Dev<tab>
+    ITango <homer:10000> [3]: test.Dev<tab>
     test.DevBoolean               test.DevUShort                test.DevVarShortArray
     test.DevDouble                test.DevVarCharArray          test.DevVarStringArray
     test.DevFloat                 test.DevVarDoubleArray        test.DevVarULongArray
@@ -149,28 +149,28 @@ and attributes if the device is currently running)
     test.DevString                test.DevVarLongArray          
     test.DevULong                 test.DevVarLongStringArray
     
-    Spock <homer:10000> [3]: test.DevDouble(56.433)  # old style: test.command_inout("DevDouble").
+    ITango <homer:10000> [3]: test.DevDouble(56.433)  # old style: test.command_inout("DevDouble").
                  Result [3]: 56.433
 
 Tango classes as :class:`DeviceProxy`
 ---------------------------------------------
 
-Spock exports all known tango classes as python alias to :class:`DeviceProxy`. 
+ITango exports all known tango classes as python alias to :class:`DeviceProxy`. 
 This way, if you want to create a device of class which you already know 
 (say, Libera, for example) you can do:
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: lib01 = Libera("BO01/DI/BPM-01")
+    ITango <homer:10000> [1]: lib01 = Libera("BO01/DI/BPM-01")
 
 One great advantage is that the tango device name completion is sensitive to the
 type of device you want to create. This means that if you are in the middle of
 writting a device name and you press the <tab> key, only devices of the tango
 class 'Libera' will show up as possible completions.
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: bpm1 = Libera("<tab>
+    ITango <homer:10000> [1]: bpm1 = Libera("<tab>
     BO01/DI/BPM-01  BO01/DI/BPM-09  BO02/DI/BPM-06  BO03/DI/BPM-03  BO03/DI/BPM-11  BO04/DI/BPM-08
     BO01/DI/BPM-02  BO01/DI/BPM-10  BO02/DI/BPM-07  BO03/DI/BPM-04  BO04/DI/BPM-01  BO04/DI/BPM-09
     BO01/DI/BPM-03  BO01/DI/BPM-11  BO02/DI/BPM-08  BO03/DI/BPM-05  BO04/DI/BPM-02  BO04/DI/BPM-10
@@ -180,23 +180,23 @@ class 'Libera' will show up as possible completions.
     BO01/DI/BPM-07  BO02/DI/BPM-04  BO03/DI/BPM-01  BO03/DI/BPM-09  BO04/DI/BPM-06  
     BO01/DI/BPM-08  BO02/DI/BPM-05  BO03/DI/BPM-02  BO03/DI/BPM-10  BO04/DI/BPM-07
 
-    Spock <homer:10000> [1]: bpm1 = Libera("BO01<tab>
+    ITango <homer:10000> [1]: bpm1 = Libera("BO01<tab>
     BO01/DI/BPM-01  BO01/DI/BPM-03  BO01/DI/BPM-05  BO01/DI/BPM-07  BO01/DI/BPM-09  BO01/DI/BPM-11
     BO01/DI/BPM-02  BO01/DI/BPM-04  BO01/DI/BPM-06  BO01/DI/BPM-08  BO01/DI/BPM-10
     
-    Spock <homer:10000> [1]: bpm1 = Libera("BO01/DI/BPM-
+    ITango <homer:10000> [1]: bpm1 = Libera("BO01/DI/BPM-
     
     
 List tango devices, classes, servers
-------------------------------------
+--------------------------------------
 
-Spock provides a set of magic functions (ipython lingo) that allow you to check
+ITango provides a set of magic functions (ipython lingo) that allow you to check
 for the list tango devices, classes and servers which are registered in the 
 current database.
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: lsdev
+    ITango <homer:10000> [1]: lsdev
                                       Device                     Alias                    Server                Class
     ---------------------------------------- ------------------------- ------------------------- --------------------
                   expchan/BL99_Dummy0DCtrl/1                  BL99_0D1                 Pool/BL99      ZeroDExpChannel
@@ -219,7 +219,7 @@ current database.
                  expchan/BL99_UxTimerCtrl1/1                BL99_Timer                 Pool/BL99         CTExpChannel
     ...
     
-    Spock <homer:10000> [1]: lsdevclass
+    ITango <homer:10000> [1]: lsdevclass
     SimuCoTiCtrl                   TangoAccessControl             ZeroDExpChannel
     Door                           Motor                          DataBase
     MotorGroup                     IORegister                     SimuMotorCtrl
@@ -227,7 +227,7 @@ current database.
     SimuMotor                      SimuCounterEx                  MeasurementGroup
     Pool                           CTExpChannel
 
-    Spock <homer:10000> [1]: lsserv
+    ITango <homer:10000> [1]: lsserv
     MacroServer/BL99               MacroServer/BL98               Pool/V2
     Pool/BL99                      Pool/BL98                      TangoTest/test
     Pool/tcoutinho                 Simulator/BL98
@@ -235,23 +235,23 @@ current database.
     MacroServer/tcoutinho          Simulator/BL99
 
 Customized tango error message and introspection
-------------------------------------------------
+----------------------------------------------------
 
-Spock intercepts tango exceptions that occur when you do tango operations 
+ITango intercepts tango exceptions that occur when you do tango operations 
 (ex.: write an attribute with a value outside the allowed limits) and tries to
 display it in a summarized, user friendly way.
 If you need more detailed information about the last tango error, you can use
 the magic command 'tango_error'.
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: test = Device("sys/tg_test/1")
+    ITango <homer:10000> [1]: test = Device("sys/tg_test/1")
 
-    Spock <homer:10000> [2]: test.no_value
+    ITango <homer:10000> [2]: test.no_value
     API_AttrValueNotSet : Read value for attribute no_value has not been updated
     For more detailed information type: tango_error
 
-    Spock <homer:10000> [3]: tango_error
+    ITango <homer:10000> [3]: tango_error
     Last tango error:
     DevFailed[
     DevError[
@@ -266,14 +266,14 @@ the magic command 'tango_error'.
     severity = PyTango._PyTango.ErrSeverity.ERR]]
 
 Switching database
-------------------
+---------------------
 
 You can switch database simply by executing the 'switchdb <host> [<port>]' magic
 command.
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: switchdb
+    ITango <homer:10000> [1]: switchdb
 
     Must give new database name in format <host>[:<port>].
     <port> is optional. If not given it defaults to 10000.
@@ -283,75 +283,75 @@ command.
     switchdb homer 10005
     switchdb homer
     
-    Spock <homer:10000> [2]: switchdb bart       # by default port is 10000
+    ITango <homer:10000> [2]: switchdb bart       # by default port is 10000
     
-    Spock <bart:10000> [3]: switchdb lisa 10005  # you can use spaces between host and port
+    ITango <bart:10000> [3]: switchdb lisa 10005  # you can use spaces between host and port
     
-    Spock <lisa:10005> [4]: switchdb marge:10005 # or the traditional ':'
+    ITango <lisa:10005> [4]: switchdb marge:10005 # or the traditional ':'
 
 Refreshing the database
------------------------
+--------------------------
 
-When spock starts up or when the database is switched, a query is made to the
+When itango starts up or when the database is switched, a query is made to the
 tango Database device server which provides all necessary data. This
-data is stored locally in a spock cache which is used to provide all the nice 
+data is stored locally in a itango cache which is used to provide all the nice 
 features.
 If the Database server is changed in some way (ex: a new device server is registered),
 the local database cache is not consistent anymore with the tango database.
-Therefore, spock provides a magic command 'refreshdb' that allows you to reread
+Therefore, itango provides a magic command 'refreshdb' that allows you to reread
 all tango information from the database.
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: refreshdb
+    ITango <homer:10000> [1]: refreshdb
     
 Storing your favorite tango objects for later usage
----------------------------------------------------
+-------------------------------------------------------
 
 Since version 7.1.2, :class:`DeviceProxy`, :class:`AttributeProxy` and 
 :class:`Database` became pickable.
 This means that they can be used by the IPython_ 'store' magic command (type
-'store?' on the spock console to get information on how to use this command).
+'store?' on the itango console to get information on how to use this command).
 You can, for example, assign your favorite devices in local python variables and
-then store these for the next time you startup IPython_ with spock profile.
+then store these for the next time you startup IPython_ with itango profile.
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: theta = Motor("BL99_M1")  # notice how we used tango alias
+    ITango <homer:10000> [1]: theta = Motor("BL99_M1")  # notice how we used tango alias
     
-    Spock <homer:10000> [2]: store theta
+    ITango <homer:10000> [2]: store theta
     Stored 'theta' (DeviceProxy)
     
-    Spock <homer:10000> [3]: Ctrl+D
+    ITango <homer:10000> [3]: Ctrl+D
     
     (IPython session is closed and started again...)
     
-    Spock <homer:10000> [1]: print theta
+    ITango <homer:10000> [1]: print theta
     DeviceProxy(motor/bl99/1)
     
 Tango color modes
------------------
+--------------------
 
 IPython_ (0.10) provides three color modes: 'Linux', 'NoColor' and 'LightBG'.
-Spock provides in addition 'Tango' (default), 'PurpleTango' (='Tango'),
+ITango provides in addition 'Tango' (default), 'PurpleTango' (='Tango'),
 'BlueTango' and 'GreenTango'.
 
 You can switch between color modes online using the magic command 'colors'.
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: colors BlueTango
+    ITango <homer:10000> [1]: colors BlueTango
     
-    Spock <homer:10000> [2]: colors NoColor
+    ITango <homer:10000> [2]: colors NoColor
 
-Adding spock to your own ipython profile
-----------------------------------------
+Adding itango to your own ipython profile
+--------------------------------------------
 
-Adding spock to the ipython default profile
-###########################################
+Adding itango to the ipython default profile
+##################################################
 
-Let's assume that you find spock so useful that each time you start ipython, you want
-spock features to be loaded by default.
+Let's assume that you find itango so useful that each time you start ipython, you want
+itango features to be loaded by default.
 The way to do this is by editing your default ipython configuration file: 
 $HOME/.ipython/ipy_user_conf.py and add the lines 1 and 7.
 
@@ -374,7 +374,7 @@ And now, every time you start ipython::
 
     ipython
 
-spock features will also be loaded.
+itango features will also be loaded.
 
 .. sourcecode:: ipython
 
@@ -382,13 +382,13 @@ spock features will also be loaded.
     Out[1]: Database(homer, 10000)
 
 
-Adding spock to an existing customized profile
-##############################################
+Adding itango to an existing customized profile
+####################################################
 
 If you have been working with IPython_ before and have already defined a
-customized personal profile, you can extend your profile with spock features 
-without breaking your existing options. The trick is to initialize spock extension
-with a parameter that tells spock to maintain the existing options (like colors,
+customized personal profile, you can extend your profile with itango features 
+without breaking your existing options. The trick is to initialize itango extension
+with a parameter that tells itango to maintain the existing options (like colors,
 command line and initial banner).
 
 So, for example, let's say you have created a profile called nuclear, and therefore
@@ -410,7 +410,7 @@ contents:
         
     main()
 
-In order to have spock features available to this profile you simply need to
+In order to have itango features available to this profile you simply need to
 add two lines of code (lines 3 and 7):
 
 .. sourcecode:: python
@@ -430,13 +430,13 @@ add two lines of code (lines 3 and 7):
         
     main()
 
-This will load the spock features into your profile while preserving your
+This will load the itango features into your profile while preserving your
 profile's console options (like colors, command line and initial banner).
 
-Creating a profile that extends spock profile
-#############################################
+Creating a profile that extends itango profile
+####################################################
 
-It is also possible to create a profile that includes all spock features and at
+It is also possible to create a profile that includes all itango features and at
 the same time adds new ones. Let's suppose that you want to create a customized
 profile called 'orbit' that automaticaly exports devices of class 
 'Libera' for the booster accelerator (assuming you are working on a synchrotron
@@ -503,26 +503,26 @@ Then start your CLI with::
 
 and you will have something like this
 
-.. image:: spock02.png
+.. image:: itango02.png
 
 Advanced event monitoring
 -------------------------
 
-With spock it is possible to monitor change events triggered by any tango
+With itango it is possible to monitor change events triggered by any tango
 attribute which has events enabled.
 
 To start monitoring the change events of an attribute:
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: mon -a BL99_M1/Position
+    ITango <homer:10000> [1]: mon -a BL99_M1/Position
     'BL99_M1/Position' is now being monitored. Type 'mon' to see all events
     
 To list all events that have been intercepted:
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [2]: mon
+    ITango <homer:10000> [2]: mon
       ID           Device    Attribute            Value       Quality             Time
     ---- ---------------- ------------ ---------------- ------------- ----------------
        0     motor/bl99/1        state               ON    ATTR_VALID  17:11:08.026472
@@ -544,7 +544,7 @@ To list all events that have been intercepted:
       16     motor/bl99/1     position            100.0    ATTR_ALARM  17:12:13.738136
       17     motor/bl99/1        state            ALARM    ATTR_VALID  17:12:13.743481
 
-    Spock <homer:10000> [3]: mon -l mot.* state
+    ITango <homer:10000> [3]: mon -l mot.* state
       ID           Device    Attribute            Value       Quality             Time
     ---- ---------------- ------------ ---------------- ------------- ----------------
        0     motor/bl99/1        state               ON    ATTR_VALID  17:11:08.026472
@@ -553,9 +553,9 @@ To list all events that have been intercepted:
 
 To stop monitoring the attribute:
 
-.. sourcecode:: spock
+.. sourcecode:: itango
 
-    Spock <homer:10000> [1]: mon -d BL99_M1/Position
+    ITango <homer:10000> [1]: mon -d BL99_M1/Position
     Stopped monitoring 'BL99_M1/Position'
 
 .. note::
@@ -567,11 +567,11 @@ To stop monitoring the attribute:
     be available you need two things:
 
         #. Have PyQt4 (>= 4.1) installed
-        #. Start spock with '-q4thread' support: 'ipython -q4thread -p spock'
+        #. Start itango with '-q4thread' support: 'ipython -q4thread -p itango'
 
     When you type '%mon' the following table should appear:
 
-        .. image:: spock04.png
+        .. image:: itango04.png
 
 .. _IPython: http://ipython.scipy.org/
 .. _Tango: http://www.tango-controls.org/

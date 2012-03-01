@@ -1,10 +1,10 @@
 
-.. _spock-features:
+.. _itango-features:
 
 Features
 ========
 
-Spock works like a normal python console, but it gives you in addition a nice
+ITango works like a normal python console, but it gives you in addition a nice
 set of features from IPython_ like:
 
     - proper (bash-like) command completion
@@ -34,7 +34,7 @@ Plus an additional set o Tango_ specific features:
     - store favorite tango devices
     - tango color modes
 
-Check the :ref:`spock-highlights` to see how to put these feature to good use :-)
+Check the :ref:`itango-highlights` to see how to put these feature to good use :-)
 
 .. _IPython: http://ipython.scipy.org/
 .. _Tango: http://www.tango-controls.org/

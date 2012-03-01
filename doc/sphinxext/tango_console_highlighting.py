@@ -21,7 +21,7 @@
 ##
 ################################################################################
 
-"""reST directive for syntax-highlighting spock interactive sessions.
+"""reST directive for syntax-highlighting itango interactive sessions.
 """
 
 #-----------------------------------------------------------------------------
@@ -46,38 +46,38 @@ line_re = re.compile('.*?\n')
 
 DftStyle = pygments.styles.get_style_by_name("default")
 
-class SpockStyle(DftStyle):
+class TangoStyle(DftStyle):
     
     styles = copy.copy(DftStyle.styles)
     styles[Generic.Prompt] = 'bold #800080'
 
-class SpockConsoleLexer(Lexer):
+class TangoConsoleLexer(Lexer):
     """
-    For spock console output or doctests, such as:
+    For itango console output or doctests, such as:
 
-    .. sourcecode:: spock
+    .. sourcecode:: itango
 
-      Spock <homer:10000> [1]: a = 'foo'
+      ITango <homer:10000> [1]: a = 'foo'
 
-      Spock <homer:10000> [2]: a
+      ITango <homer:10000> [2]: a
                    Result [2]: 'foo'
 
-      Spock <homer:10000> [3]: print a
+      ITango <homer:10000> [3]: print a
       foo
 
-      Spock <homer:10000> [4]: 1 / 0
+      ITango <homer:10000> [4]: 1 / 0
 
     Notes:
 
       - Tracebacks are not currently supported.
 
-      - It assumes the default spock prompts, not customized ones.
+      - It assumes the default itango prompts, not customized ones.
     """
     
-    name = 'Spock console session'
-    aliases = ['spock']
-    mimetypes = ['text/x-spock-console']
-    input_prompt = re.compile("(Spock \<\w+:\d+\> \[(?P<N>[0-9]+)\]: )|(   \.\.\.+:)")
+    name = 'ITango console session'
+    aliases = ['itango']
+    mimetypes = ['text/x-itango-console']
+    input_prompt = re.compile("(ITango \<\w+:\d+\> \[(?P<N>[0-9]+)\]: )|(   \.\.\.+:)")
     output_prompt = re.compile("(\s*Result \[(?P<N>[0-9]+)\]: )|(   \.\.\.+:)")
     continue_prompt = re.compile("   \.\.\.+:")
     tb_start = re.compile("\-+")
@@ -136,4 +136,4 @@ def setup(app):
 
 #-----------------------------------------------------------------------------
 # Register the extension as a valid pygments lexer
-highlighting.lexers['spock'] = SpockConsoleLexer()
+highlighting.lexers['itango'] = TangoConsoleLexer()

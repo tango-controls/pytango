@@ -5,7 +5,7 @@ A quick tour (original)
 
 This quick tour will guide you through the first steps on using PyTango.
 This is the original quick tour guide that uses a simple Python console.
-There is a new version of this document which uses :ref:`spock` console in its
+There is a new version of this document which uses :ref:`itango` console in its
 examples. You can find this new version :ref:`here <quick-tour>`.
 
 Check PyTango version

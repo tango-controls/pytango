@@ -4,52 +4,58 @@ A quick tour
 ------------
 
 This quick tour will guide you through the first steps on using PyTango.
-This is the new quick tour guide based on the :ref:`spock` console.
+This is the new quick tour guide based on the :ref:`itango` console.
 You can still find the old version of this tour based on a simple python
 console :ref:`here <quick-tour-old>`.
 
 Check PyTango version
 ~~~~~~~~~~~~~~~~~~~~~
 
-Start an ipython spock console with::
+Start an ipython tango console with:
 
-    ipython -p spock
+    #. on IPython <= 0.10:
+    
+        ipython -p tango
+        
+    #. on IPython > 0.10:
+    
+        ipython --profile=tango
 
 and type:
 
-    .. sourcecode:: spock
+    .. sourcecode:: itango
 
-        Spock <homer:10000> [1]: PyTango.__version__
+        ITango <homer:10000> [1]: PyTango.__version__
                      Result [1]: '7.1.2'
 
-        Spock <homer:10000> [2]: PyTango.__version_long__
+        ITango <homer:10000> [2]: PyTango.__version_long__
                      Result [2]: '7.1.2dev0'
 
-        Spock <homer:10000> [3]: PyTango.__version_number__
+        ITango <homer:10000> [3]: PyTango.__version_number__
                      Result [3]: 712
 
-        Spock <homer:10000> [4]: PyTango.__version_description__
+        ITango <homer:10000> [4]: PyTango.__version_description__
                      Result [4]: 'This version implements the C++ Tango 7.1 API.'
 
 or alternatively:
 
-    .. sourcecode:: spock
+    .. sourcecode:: itango
 
-        Spock <homer:10000> [1]: PyTango.Release.version
+        ITango <homer:10000> [1]: PyTango.Release.version
                      Result [1]: '7.1.2'
 
-        Spock <homer:10000> [2]: PyTango.Release.version_long
+        ITango <homer:10000> [2]: PyTango.Release.version_long
                      Result [2]: '7.1.2dev0'
 
-        Spock <homer:10000> [3]: PyTango.Release.version_number
+        ITango <homer:10000> [3]: PyTango.Release.version_number
                      Result [3]: 712
 
-        Spock <homer:10000> [4]: PyTango.Release.version_description
+        ITango <homer:10000> [4]: PyTango.Release.version_description
                      Result [4]: 'This version implements the C++ Tango 7.1 API.'
 
 .. tip::
 
-    When typing, try pressing <tab>. Since Spock has autocomplete embedded you
+    When typing, try pressing <tab>. Since ITango has autocomplete embedded you
     should get a list of possible completions. Example::
     
         PyTango.Release.<tab>
@@ -61,11 +67,11 @@ Check Tango C++ version
 
 From a client (This is only possible since PyTango 7.0.0)
 
-    .. sourcecode:: spock
+    .. sourcecode:: itango
 
-        Spock <homer:10000> [1]: import PyTango.constants
+        ITango <homer:10000> [1]: import PyTango.constants
 
-        Spock <homer:10000> [2]: PyTango.constants.TgLibVers
+        ITango <homer:10000> [2]: PyTango.constants.TgLibVers
                      Result [2]: '7.1.1'
 
 From a server you can alternatively do::
@@ -80,10 +86,10 @@ Test the connection to the Device and get it's current state
 One of the most basic examples is to get a reference to a device and
 determine if it is running or not.
 
-    .. sourcecode:: spock
+    .. sourcecode:: itango
         
-        Spock <homer:10000> [1]: # What is a DeviceProxy, really?
-        Spock <homer:10000> [1]: DeviceProxy?
+        ITango <homer:10000> [1]: # What is a DeviceProxy, really?
+        ITango <homer:10000> [1]: DeviceProxy?
         DeviceProxy is the high level Tango object which provides the client with
         an easy-to-use interface to TANGO devices. DeviceProxy provides interfaces
         to all TANGO Device interfaces.The DeviceProxy manages timeouts, stateless
@@ -93,25 +99,26 @@ determine if it is running or not.
         Example :
            dev = PyTango.DeviceProxy("sys/tg_test/1")
            
-        Spock <homer:10000> [2]: tangotest = DeviceProxy("sys/tg_test/1")
+        ITango <homer:10000> [2]: tangotest = DeviceProxy("sys/tg_test/1")
 
-        Spock <homer:10000> [3]: # ping it
-        Spock <homer:10000> [4]: tangotest.ping()
+        ITango <homer:10000> [3]: # ping it
+        ITango <homer:10000> [4]: tangotest.ping()
                      Result [4]: 110
 
-        Spock <homer:10000> [3]: # Lets test the state
-        Spock <homer:10000> [5]: tangotest.state()
+        ITango <homer:10000> [3]: # Lets test the state
+        ITango <homer:10000> [5]: tangotest.state()
                      Result [5]: PyTango._PyTango.DevState.RUNNING
 
-        Spock <homer:10000> [3]: # And now the status
-        Spock <homer:10000> [5]: tangotest.status()
+        ITango <homer:10000> [3]: # And now the status
+        ITango <homer:10000> [5]: tangotest.status()
                      Result [5]: 'The device is in RUNNING state.'
 
 .. note::
-    Did you notice that you didn't write PyTango.DeviceProxy but instead just DeviceProxy?
-    This is because :ref:`spock` automatically exports the :class:`PyTango.DeviceProxy`,
-    :class:`PyTango.AttributeProxy`, :class:`PyTango.Database` and :class:`PyTango.Group`
-    classes to the namespace. If you are writting code outside :ref:`spock` you **MUST**
+    Did you notice that you didn't write PyTango.DeviceProxy but instead just
+    DeviceProxy? This is because :ref:`itango` automatically exports the
+    :class:`PyTango.DeviceProxy`, :class:`PyTango.AttributeProxy`,
+    :class:`PyTango.Database` and :class:`PyTango.Group` classes to the
+    namespace. If you are writting code outside :ref:`itango` you **MUST**
     use the `PyTango` module prefix.
 
 .. tip::
@@ -127,8 +134,8 @@ determine if it is running or not.
         tangotest = TangoTest("<tab>
 
     Now the list of devices should be reduced to the ones that belong to the 
-    'TangoTest' class. Note that TangoTest only works in Spock. If you are 
-    writting code outside :ref:`spock` you **MUST** use 
+    'TangoTest' class. Note that TangoTest only works in ITango. If you are 
+    writting code outside :ref:`itango` you **MUST** use 
     :class:`PyTango.DeviceProxy` instead.
     
 Execute commands with scalar arguments on a Device
@@ -137,22 +144,22 @@ Execute commands with scalar arguments on a Device
 As you can see in the following example, when scalar types are used, PyTango
 automatically manages the data types, and writing scripts is quite easy.
 
-    .. sourcecode:: spock
+    .. sourcecode:: itango
     
-        Spock <homer:10000> [1]: tangotest = TangoTest("sys/tg_test/1")
+        ITango <homer:10000> [1]: tangotest = TangoTest("sys/tg_test/1")
 
-        Spock <homer:10000> [2]: # classical way
-        Spock <homer:10000> [2]: r = tangotest.command_inout("DevString", "Hello, world!")
+        ITango <homer:10000> [2]: # classical way
+        ITango <homer:10000> [2]: r = tangotest.command_inout("DevString", "Hello, world!")
 
-        Spock <homer:10000> [3]: print "Result of execution of DevString command =", r
+        ITango <homer:10000> [3]: print "Result of execution of DevString command =", r
         Result of execution of DevString command = Hello, world!
 
-        Spock <homer:10000> [4]: # 'pythonic' way
-        Spock <homer:10000> [5]: tangotest.DevString("Hello, world!")
+        ITango <homer:10000> [4]: # 'pythonic' way
+        ITango <homer:10000> [5]: tangotest.DevString("Hello, world!")
                      Result [5]: 'Hello, world!'
         
-        Spock <homer:10000> [6]: # type is automatically managed by PyTango
-        Spock <homer:10000> [7]: tangotest.DevULong(12456)
+        ITango <homer:10000> [6]: # type is automatically managed by PyTango
+        ITango <homer:10000> [7]: tangotest.DevULong(12456)
                      Result [7]: 12456
 
 Execute commands with more complex types
@@ -161,13 +168,13 @@ Execute commands with more complex types
 In this case you have to use put your arguments data in the correct python
 structures.
 
-    .. sourcecode:: spock
+    .. sourcecode:: itango
     
-        Spock <homer:10000> [1]: tangotest = TangoTest("sys/tg_test/1")
+        ITango <homer:10000> [1]: tangotest = TangoTest("sys/tg_test/1")
 
-        Spock <homer:10000> [2]: argin = [1, 2, 3], ["Hello", "World"]
+        ITango <homer:10000> [2]: argin = [1, 2, 3], ["Hello", "World"]
 
-        Spock <homer:10000> [3]: tango_test.DevVarLongArray(argin)
+        ITango <homer:10000> [3]: tango_test.DevVarLongArray(argin)
                      Result [3]: [array([1, 2, 3]), ['Hello', 'World']]
         
 .. note::
@@ -181,10 +188,10 @@ Reading and writing attributes
 
 Basic read/write attribute operations.
 
-    .. sourcecode:: spock
+    .. sourcecode:: itango
     
-        Spock <homer:10000> [1]: # Read a scalar attribute
-        Spock <homer:10000> [2]: print tangotest.read_attribute("long_scalar")
+        ITango <homer:10000> [1]: # Read a scalar attribute
+        ITango <homer:10000> [2]: print tangotest.read_attribute("long_scalar")
         DeviceAttribute[
         data_format = PyTango._PyTango.AttrDataFormat.SCALAR
               dim_x = 1
@@ -204,8 +211,8 @@ Basic read/write attribute operations.
         w_dimension = AttributeDimension(dim_x = 1, dim_y = 0)
             w_value = 0]
             
-        Spock <homer:10000> [3]: # Read a spectrum attribute
-        Spock <pc151:10000> [4]: print tangotest.read_attribute("double_spectrum")
+        ITango <homer:10000> [3]: # Read a spectrum attribute
+        ITango <pc151:10000> [4]: print tangotest.read_attribute("double_spectrum")
         DeviceAttribute[
         data_format = PyTango._PyTango.AttrDataFormat.SPECTRUM
               dim_x = 20
@@ -227,33 +234,33 @@ Basic read/write attribute operations.
             w_value = array([  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.,
                 11.,  12.,  13.,  14.,  15.,  16.,  17.,  18.,  19.])]
 
-        Spock <homer:10000> [5]: # Write a scalar attribute
-        Spock <homer:10000> [6]: scalar_value = 18
-        Spock <homer:10000> [7]: tangotest.write_attribute("long_scalar", scalar_value)
+        ITango <homer:10000> [5]: # Write a scalar attribute
+        ITango <homer:10000> [6]: scalar_value = 18
+        ITango <homer:10000> [7]: tangotest.write_attribute("long_scalar", scalar_value)
 
-        Spock <homer:10000> [8]: # Write a spectrum attribute
-        Spock <homer:10000> [9]: spectrum_value = numpy.random.rand(100)*10
-        Spock <homer:10000> [10]: tangotest.write_attribute("double_spectrum", spectrum_value)
+        ITango <homer:10000> [8]: # Write a spectrum attribute
+        ITango <homer:10000> [9]: spectrum_value = numpy.random.rand(100)*10
+        ITango <homer:10000> [10]: tangotest.write_attribute("double_spectrum", spectrum_value)
         
         
-        Spock <homer:10000> [11]: # Write an image attribute
-        Spock <homer:10000> [12]: image_value = numpy.random.randint(0,10,size=(10,10))
-        Spock <homer:10000> [13]: tangotest.write_attribute("long_image", image_value)
+        ITango <homer:10000> [11]: # Write an image attribute
+        ITango <homer:10000> [12]: image_value = numpy.random.randint(0,10,size=(10,10))
+        ITango <homer:10000> [13]: tangotest.write_attribute("long_image", image_value)
 
 .. tip::
     
     If you are only interested in the attribute's read value you can do insted:
     
-    .. sourcecode:: spock
+    .. sourcecode:: itango
         
-            Spock <homer:10000> [1]: tangotest.long_scalar
+            ITango <homer:10000> [1]: tangotest.long_scalar
                          Result [1]: 239
     
     The same is valid for writting a new value to an attribute:
     
-    .. sourcecode:: spock
+    .. sourcecode:: itango
         
-            Spock <homer:10000> [1]: tangotest.long_scalar = 18
+            ITango <homer:10000> [1]: tangotest.long_scalar = 18
     
 .. note::
 
@@ -279,30 +286,30 @@ Registering devices
 
 Defining devices in the Tango DataBase:
 
-    .. sourcecode:: spock
+    .. sourcecode:: itango
     
-        Spock <homer:10000> [1]: # The 3 devices name we want to create
-        Spock <homer:10000> [2]: # Note: these 3 devices will be served by the same DServer
-        Spock <homer:10000> [3]: new_device_name1="px1/tdl/mouse1"
-        Spock <homer:10000> [4]: new_device_name2="px1/tdl/mouse2"
-        Spock <homer:10000> [5]: new_device_name3="px1/tdl/mouse3"
+        ITango <homer:10000> [1]: # The 3 devices name we want to create
+        ITango <homer:10000> [2]: # Note: these 3 devices will be served by the same DServer
+        ITango <homer:10000> [3]: new_device_name1="px1/tdl/mouse1"
+        ITango <homer:10000> [4]: new_device_name2="px1/tdl/mouse2"
+        ITango <homer:10000> [5]: new_device_name3="px1/tdl/mouse3"
 
-        Spock <homer:10000> [6]: # Define the Tango Class served by this DServer
-        Spock <homer:10000> [7]: new_device_info_mouse = PyTango.DbDevInfo()
-        Spock <homer:10000> [8]: new_device_info_mouse._class = "Mouse"
-        Spock <homer:10000> [9]: new_device_info_mouse.server = "ds_Mouse/server_mouse"
+        ITango <homer:10000> [6]: # Define the Tango Class served by this DServer
+        ITango <homer:10000> [7]: new_device_info_mouse = PyTango.DbDevInfo()
+        ITango <homer:10000> [8]: new_device_info_mouse._class = "Mouse"
+        ITango <homer:10000> [9]: new_device_info_mouse.server = "ds_Mouse/server_mouse"
 
-        Spock <homer:10000> [10]: # add the first device
-        Spock <homer:10000> [11]: new_device_info_mouse.name = new_device_name1
-        Spock <homer:10000> [12]: db.add_device(new_device_info_mouse)
+        ITango <homer:10000> [10]: # add the first device
+        ITango <homer:10000> [11]: new_device_info_mouse.name = new_device_name1
+        ITango <homer:10000> [12]: db.add_device(new_device_info_mouse)
 
-        Spock <homer:10000> [13]: # add the next device
-        Spock <homer:10000> [14]: new_device_info_mouse.name = new_device_name2
-        Spock <homer:10000> [15]: db.add_device(new_device_info_mouse)
+        ITango <homer:10000> [13]: # add the next device
+        ITango <homer:10000> [14]: new_device_info_mouse.name = new_device_name2
+        ITango <homer:10000> [15]: db.add_device(new_device_info_mouse)
 
-        Spock <homer:10000> [16]: # add the third device
-        Spock <homer:10000> [17]: new_device_info_mouse.name = new_device_name3
-        Spock <homer:10000> [18]: db.add_device(new_device_info_mouse)
+        ITango <homer:10000> [16]: # add the third device
+        ITango <homer:10000> [17]: new_device_info_mouse.name = new_device_name3
+        ITango <homer:10000> [18]: db.add_device(new_device_info_mouse)
 
 Setting up Device properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -312,13 +319,13 @@ The following python script example (containing some functions and instructions
 manipulating a Galil motor axis device server) gives an idea of how the Tango
 API should be accessed from Python.
 
-    .. sourcecode:: spock
+    .. sourcecode:: itango
     
-        Spock <homer:10000> [1]: # connecting to the motor axis device
-        Spock <homer:10000> [2]: axis1 = DeviceProxy ("microxas/motorisation/galilbox")
+        ITango <homer:10000> [1]: # connecting to the motor axis device
+        ITango <homer:10000> [2]: axis1 = DeviceProxy ("microxas/motorisation/galilbox")
 
-        Spock <homer:10000> [3]: # Getting Device Properties
-        Spock <homer:10000> [4]: property_names = ["AxisBoxAttachement",
+        ITango <homer:10000> [3]: # Getting Device Properties
+        ITango <homer:10000> [4]: property_names = ["AxisBoxAttachement",
                            ....:                   "AxisEncoderType",
                            ....:                   "AxisNumber",
                            ....:                   "CurrentAcceleration",
@@ -338,36 +345,36 @@ API should be accessed from Python.
                            ....:                   "UserEncoderRatio",
                            ....:                   "UserOffset"]
         
-        Spock <homer:10000> [5]: axis_properties = axis1.get_property(property_names)
-        Spock <homer:10000> [6]: for prop in axis_properties.keys():
+        ITango <homer:10000> [5]: axis_properties = axis1.get_property(property_names)
+        ITango <homer:10000> [6]: for prop in axis_properties.keys():
                            ....:     print "%s: %s" % (prop, axis_properties[prop][0])
 
-        Spock <homer:10000> [7]: # Changing Properties
-        Spock <homer:10000> [8]: axis_properties["AxisBoxAttachement"] = ["microxas/motorisation/galilbox"]
-        Spock <homer:10000> [9]: axis_properties["AxisEncoderType"] = ["1"]
-        Spock <homer:10000> [10]: axis_properties["AxisNumber"] = ["6"]
-        Spock <homer:10000> [11]: axis1.put_property(axis_properties)
+        ITango <homer:10000> [7]: # Changing Properties
+        ITango <homer:10000> [8]: axis_properties["AxisBoxAttachement"] = ["microxas/motorisation/galilbox"]
+        ITango <homer:10000> [9]: axis_properties["AxisEncoderType"] = ["1"]
+        ITango <homer:10000> [10]: axis_properties["AxisNumber"] = ["6"]
+        ITango <homer:10000> [11]: axis1.put_property(axis_properties)
 
-        Spock <homer:10000> [12]: # Reading attributes
-        Spock <homer:10000> [13]: att_list = axis.get_attribute_list()
-        Spock <homer:10000> [14]: for att in att_list:
+        ITango <homer:10000> [12]: # Reading attributes
+        ITango <homer:10000> [13]: att_list = axis.get_attribute_list()
+        ITango <homer:10000> [14]: for att in att_list:
                             ....:     att_val = axis.read_attribute(att)
                             ....:     print "%s: %s" % (att.name, att_val.value)
 
-        Spock <homer:10000> [15]: # Changing some attribute values
-        Spock <homer:10000> [16]: axis1.write_attribute("AxisBackslash", 0.5)
-        Spock <homer:10000> [17]: axis1.write_attribute("AxisDirection", 1.0)
-        Spock <homer:10000> [18]: axis1.write_attribute("AxisVelocity", 1000.0)
-        Spock <homer:10000> [19]: axis1.write_attribute("AxisOvershoot", 500.0)
+        ITango <homer:10000> [15]: # Changing some attribute values
+        ITango <homer:10000> [16]: axis1.write_attribute("AxisBackslash", 0.5)
+        ITango <homer:10000> [17]: axis1.write_attribute("AxisDirection", 1.0)
+        ITango <homer:10000> [18]: axis1.write_attribute("AxisVelocity", 1000.0)
+        ITango <homer:10000> [19]: axis1.write_attribute("AxisOvershoot", 500.0)
 
-        Spock <homer:10000> [20]: # Testing some device commands
-        Spock <homer:10000> [21]: pos1=axis1.read_attribute("AxisCurrentPosition")
-        Spock <homer:10000> [22]: axis1.command_inout("AxisBackward")
-        Spock <homer:10000> [23]: while pos1.value > 1000.0:
+        ITango <homer:10000> [20]: # Testing some device commands
+        ITango <homer:10000> [21]: pos1=axis1.read_attribute("AxisCurrentPosition")
+        ITango <homer:10000> [22]: axis1.command_inout("AxisBackward")
+        ITango <homer:10000> [23]: while pos1.value > 1000.0:
                             ....:     pos1 = axis1.read_attribute("AxisCurrentPosition")
                             ....:     print "position axis 1 = ", pos1.value
                             
-        Spock <homer:10000> [24]: axis1.command_inout("AxisStop")
+        ITango <homer:10000> [24]: axis1.command_inout("AxisStop")
 
 A quick tour of Tango device server binding through an example
 --------------------------------------------------------------
