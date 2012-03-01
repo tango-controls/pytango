@@ -76,6 +76,7 @@ Version history
 +============+==============================================================================================================================================================================+
 | 7.2.3      | Features:                                                                                                                                                                    |
 |            |     - from sourceforge:                                                                                                                                                      |
+|            |         - `3495607: DeviceClass.device_name_factory is missing <https://sourceforge.net/tracker/?func=detail&aid=3495607&group_id=57612&atid=484772>`_                       |
 |            | Bug fixes:                                                                                                                                                                   |
 |            |     - from sourceforge:                                                                                                                                                      |
 |            |         - `3463377: PyTango memory leak in read encoded attribute <https://sourceforge.net/tracker/?func=detail&aid=3463377&group_id=57612&atid=484769>`_                    |

@@ -21,31 +21,14 @@
 ##
 ################################################################################
 
-c = get_config()
-app = c.InteractiveShellApp
-
-import PyTango.ipython
-PyTango.ipython.load_config(c)
+config = get_config()
 
 # This can be used at any point in a config file to load a sub config
 # and merge it into the current one.
 load_subconfig('ipython_config.py', profile='default')
 
-lines = """
-"""
+import PyTango.ipython
+PyTango.ipython.load_config(config)
 
-# You have to make sure that attributes that are containers already
-# exist before using them.  Simple assigning a new list will override
-# all previous values.
 
-if hasattr(app, 'exec_lines'):
-    app.exec_lines.append(lines)
-else:
-    app.exec_lines = [lines]
-
-# Load the sympy_printing extension to enable nice printing of sympy expr's.
-#if hasattr(app, 'extensions'):
-#    app.extensions.append('sympyprinting')
-#else:
-#    app.extensions = ['sympyprinting']
 
