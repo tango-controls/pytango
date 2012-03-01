@@ -49,7 +49,7 @@ Tango_ homepage where you will find plenty of documentation, faq and tutorials.
     :align: middle
     :alt: PyTango logo
     
-.. |itangologo| image:: itango/spock03.png
+.. |itangologo| image:: itango/itango00.png
     :align: middle
     :alt: ITango console
 

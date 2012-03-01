@@ -562,6 +562,9 @@ def __get_db(host_port=None):
         host_port = host_port.strip().replace(" ",":")
         if host_port.count(":") == 0:
             host_port += ":10000"
+
+    if host_port is not None:
+        host_port = str(host_port)
         
     if db is None:
         create_db = True

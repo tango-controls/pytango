@@ -11,7 +11,7 @@ Contents
     :maxdepth: 2
 
     start
-    spock/index
+    itango/index
     API <api>
     faq
     History of changes <revision>

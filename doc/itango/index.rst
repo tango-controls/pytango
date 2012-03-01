@@ -11,19 +11,19 @@ IPython profile.
 
 ITango is available since PyTango 7.1.2
 
-You can start ITango by typing on the command line
+You can start ITango by typing on the command line:
 
-#. For ipython <= 0.10::
-    
-    $ ipython -p tango
+    #. For ipython <= 0.10::
+        
+        $ ipython -p tango
 
-#. For ipython > 0.10::
+    #. For ipython > 0.10::
 
-    $ ipython --profile=tango
+        $ ipython --profile=tango
 
 and you should get something like this:
 
-.. image:: spock00.png
+.. image:: itango00.png
 
 .. toctree::
     :maxdepth: 1

@@ -255,7 +255,7 @@ Or if you whish to install in a different directory::
     python setup.py build
     python setup.py install --prefix=/home/homer/local --ipython-local
 
-(This will try to install :ref`itango` as an IPython profile to the local
+(This will try to install :ref:`itango` as an IPython profile to the local
 user, since probably there is no permission to write into the IPython_ extension
 directory)
 
@@ -271,7 +271,7 @@ test
 ####
 
 If you have IPython_ installed, the best way to test your PyTango installation
-is by starting the new PyTango CLI called :ref`itango` by typing on the command
+is by starting the new PyTango CLI called :ref:`itango` by typing on the command
 line:
 
     #. IPython <= 0.10::
@@ -288,16 +288,16 @@ then, in ITango type:
 .. sourcecode:: itango
 
     ITango <homer:10000> [1]: PyTango.Release.version
-                  Result [1]: '7.1.2'
+                  Result [1]: '7.2.3'
 
-(if you are wondering, :ref`itango` automaticaly does ``import PyTango`` for you!)
+(if you are wondering, :ref:`itango` automaticaly does ``import PyTango`` for you!)
 
 If you don't have IPython_ installed, to test the installation start a python console
 and type:
 
     >>> import PyTango
     >>> print PyTango.Release.version
-    7.1.2
+    7.2.3
 
 .. toctree::
     :hidden:

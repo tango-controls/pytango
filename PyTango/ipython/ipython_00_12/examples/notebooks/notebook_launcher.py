@@ -159,6 +159,8 @@ def merge_dirs(base, overlay, target, preserve_originals=False):
     """
 
     def replace_prefix(prefix, path, new_prefix):
+        print path
+        print prefix
         assert path.startswith(prefix)
         if path.startswith("/"):
             path = path[1:]
