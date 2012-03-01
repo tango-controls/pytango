@@ -182,6 +182,8 @@ def merge_dirs(base, overlay, target, preserve_originals=False):
         # instead, just symlink them.
         # this keeps both walkers in sync.
         for subdir in set(base_dirs[:] + over_dirs[:]):
+            if subdir.startswith("."):
+                continue
             if subdir not in over_dirs:
                 base_dirs.remove(subdir)
                 from_base_dirs.append(os.path.join(base_path, subdir))

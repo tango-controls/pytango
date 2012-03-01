@@ -121,9 +121,9 @@ class build(dftbuild):
         
         if IPython and not self.without_spock:
             if _IPY_VER > [0,10]:
-                self.distribution.py_modules.append('IPython.config.profile.spock')
+                self.distribution.py_modules.append('IPython.config.profile.tango')
             else:
-                self.distribution.py_modules.append('IPython.Extensions.ipy_profile_spock')
+                self.distribution.py_modules.append('IPython.Extensions.ipy_profile_tango')
             
         dftbuild.run(self)
         

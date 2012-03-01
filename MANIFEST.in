@@ -2,6 +2,8 @@ recursive-include PyTango *.py
 recursive-include PyTango3 *.py
 recursive-include IPython *.py
 recursive-include win *.sln *.vcproj
+recursive-include PyTango/ipython/ipython_00_12/examples *
+
 include winsetup.py
 
 graft src
@@ -10,8 +12,10 @@ graft build/sphinx/html
 
 global-exclude *.pyc
 global-exclude *.pyo
+global-exclude .svn
 exclude setup.cfg
 exclude .project
+exclude .ropeproject
 exclude .pydevproject
 exclude images/*
 exclude src/precompiled_header.hpp.gch
