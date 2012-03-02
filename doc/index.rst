@@ -9,17 +9,17 @@
 Welcome to PyTango |version| documentation!
 ===========================================
 
-.. figure:: itango/itango07.png
-    :width: 500
-    :align: left
-    :alt: ITango console
-
 PyTango is a python module that exposes to Python_ the complete Tango_ C++ API
 (including both client and server).
 
 This means that you can write not only tango applications (scripts, CLIs, GUIs) 
 that access tango device servers but also tango device servers themselves, all 
 of this in pure Python_.
+
+.. figure:: itango/itango07.png
+    :width: 700
+    :align: center
+    :alt: ITango
 
 Check out the :ref:`getting started guide<getting-started>` to learn how to
 build and/or install PyTango and after that the :ref:`quick tour <quick-tour>` 
