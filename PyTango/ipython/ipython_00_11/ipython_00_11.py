@@ -331,7 +331,8 @@ def magic_python_error(self, parameter_s=''):
         print "No error reported so far."
         return
     ip = ipapi.get()
-    ip.InteractiveTB(*err_info, tb_offset=None)
+    etype, evalue, etb = err_info[:3]
+    ip.InteractiveTB(etype=etype, evalue=evalue, etb=etb, tb_offset=None)
 
 _EVT_LOG = None
 def __get_event_log():
