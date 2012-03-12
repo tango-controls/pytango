@@ -14,13 +14,14 @@ set of features from IPython_ like:
     - persistently store your favorite variables
     - color modes
  
-(for a complete list checkout the `IPython tutorial <http://ipython.scipy.org/doc/manual/html/interactive/tutorial.html>`_)
+(for a complete list checkout the `IPython web page <http://ipython.org/>`_)
 
 Plus an additional set o Tango_ specific features:
 
-    - automatic import of Tango objects to the console namespace (PyTango module,
-      :class:`PyTango.DeviceProxy` (=Device), :class:`PyTango.Database`, :class:`PyTango.Group`
-      and :class:`PyTango.AttributeProxy` (=Attribute))
+    - automatic import of Tango objects to the console namespace (:mod:`PyTango`
+      module, :class:`~PyTango.DeviceProxy` (=Device),
+      :class:`~PyTango.Database`, :class:`~PyTango.Group`
+      and :class:`~PyTango.AttributeProxy` (=Attribute))
     - device name completion
     - attribute name completion
     - automatic tango object member completion
@@ -34,7 +35,8 @@ Plus an additional set o Tango_ specific features:
     - store favorite tango devices
     - tango color modes
 
-Check the :ref:`itango-highlights` to see how to put these feature to good use :-)
+Check the :ref:`itango-highlights` to see how to put these feature to good use
+:-)
 
-.. _IPython: http://ipython.scipy.org/
+.. _IPython: http://ipython.org/
 .. _Tango: http://www.tango-controls.org/

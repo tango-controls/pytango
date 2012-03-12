@@ -24,6 +24,7 @@ You can start ITango by typing on the command line:
 and you should get something like this:
 
 .. image:: itango00.png
+    :align: center
 
 .. toctree::
     :maxdepth: 1
@@ -33,5 +34,5 @@ and you should get something like this:
 
 --------------------------------------------------------------------------------
 
-.. _IPython: http://ipython.scipy.org/
+.. _IPython: http://ipython.org/
 .. _Tango: http://www.tango-controls.org/

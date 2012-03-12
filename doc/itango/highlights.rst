@@ -308,6 +308,9 @@ all tango information from the database.
 Storing your favorite tango objects for later usage
 -------------------------------------------------------
 
+.. note::
+    This feature is not available if you have installed IPython 0.11!
+
 Since version 7.1.2, :class:`DeviceProxy`, :class:`AttributeProxy` and 
 :class:`Database` became pickable.
 This means that they can be used by the IPython_ 'store' magic command (type
@@ -325,24 +328,11 @@ then store these for the next time you startup IPython_ with itango profile.
     ITango <homer:10000> [3]: Ctrl+D
     
     (IPython session is closed and started again...)
+
+    ITango <homer:10000> [1]: store -r # in some versions of IPython you may need to do this ...
     
     ITango <homer:10000> [1]: print theta
     DeviceProxy(motor/bl99/1)
-    
-Tango color modes
---------------------
-
-IPython_ (0.10) provides three color modes: 'Linux', 'NoColor' and 'LightBG'.
-ITango provides in addition 'Tango' (default), 'PurpleTango' (='Tango'),
-'BlueTango' and 'GreenTango'.
-
-You can switch between color modes online using the magic command 'colors'.
-
-.. sourcecode:: itango
-
-    ITango <homer:10000> [1]: colors BlueTango
-    
-    ITango <homer:10000> [2]: colors NoColor
 
 Adding itango to your own ipython profile
 --------------------------------------------
@@ -353,23 +343,55 @@ Adding itango to the ipython default profile
 Let's assume that you find itango so useful that each time you start ipython, you want
 itango features to be loaded by default.
 The way to do this is by editing your default ipython configuration file: 
-$HOME/.ipython/ipy_user_conf.py and add the lines 1 and 7.
 
-.. note::
-    The code shown below is a small part of your $HOME/.ipython/ipy_user_conf.py.
-    It is shown here only the relevant part for this example.
+1. On IPython <= 0.10
 
-.. sourcecode:: python
+    $HOME/.ipython/ipy_user_conf.py and add the lines 1 and 7.
 
-    import PyTango.ipython
+    .. note::
+        The code shown below is a small part of your $HOME/.ipython/ipy_user_conf.py.
+        It is shown here only the relevant part for this example.
 
-    def main():
+    .. sourcecode:: python
 
-        # uncomment if you want to get ipython -p sh behaviour
-        # without having to use command line switches  
-        # import ipy_profile_sh
-        PyTango.ipython.init_ipython(ip, console=False)
+        import PyTango.ipython
 
+        def main():
+
+            # uncomment if you want to get ipython -p sh behaviour
+            # without having to use command line switches  
+            # import ipy_profile_sh
+            PyTango.ipython.init_ipython(ip, console=False)
+
+2. On IPython > 0.10
+
+    First you have to check which is the configuration directory being used by
+    IPython. For this, in an IPython console type:
+    
+    .. sourcecode:: itango
+
+        ITango <homer:10000> [1]: import IPython.utils.path
+        
+        ITango <homer:10000> [2]: IPython.utils.path.get_ipython_dir()
+        <IPYTHON_DIR>
+
+    now edit <IPYTHON_DIR>/profile_default/ipython_config.py and add the
+    following line at the end to add itango configuration::
+    
+        load_subconfig('ipython_config.py', profile='tango')
+    
+    Alternatively, you could also load itango as an IPython extension::
+        
+        config = get_config()
+        i_shell_app = config.InteractiveShellApp
+        extensions = getattr(i_shell_app, 'extensions', [])
+        extensions.append('PyTango.ipython')
+        i_shell_app.extensions = extensions
+        i_shell_app.ignore_old_config=True
+    
+    for more information on how to configure IPython >= 0.11 please check the
+    `IPython configuration <http://ipython.org/ipython-doc/dev/config/ipython.html#configuring-the-ipython-command-line-application>`_
+    
 And now, every time you start ipython::
 
     ipython
@@ -384,6 +406,10 @@ itango features will also be loaded.
 
 Adding itango to an existing customized profile
 ####################################################
+
+.. note::
+    This chapter has a pending update. The contents only apply to
+    IPython <= 0.10.
 
 If you have been working with IPython_ before and have already defined a
 customized personal profile, you can extend your profile with itango features 
@@ -436,6 +462,10 @@ profile's console options (like colors, command line and initial banner).
 Creating a profile that extends itango profile
 ####################################################
 
+.. note::
+    This chapter has a pending update. The contents only apply to
+    IPython <= 0.10.
+    
 It is also possible to create a profile that includes all itango features and at
 the same time adds new ones. Let's suppose that you want to create a customized
 profile called 'orbit' that automaticaly exports devices of class 
@@ -508,6 +538,10 @@ and you will have something like this
 Advanced event monitoring
 -------------------------
 
+.. note::
+    This chapter has a pending update. The contents only apply to
+    IPython <= 0.10.
+
 With itango it is possible to monitor change events triggered by any tango
 attribute which has events enabled.
 
@@ -573,5 +607,5 @@ To stop monitoring the attribute:
 
         .. image:: itango04.png
 
-.. _IPython: http://ipython.scipy.org/
+.. _IPython: http://ipython.org/
 .. _Tango: http://www.tango-controls.org/

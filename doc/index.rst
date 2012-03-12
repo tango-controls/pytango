@@ -16,7 +16,7 @@ This means that you can write not only tango applications (scripts, CLIs, GUIs)
 that access tango device servers but also tango device servers themselves, all 
 of this in pure Python_.
 
-.. figure:: itango/itango07.png
+.. figure:: itango/itango05.png
     :width: 700
     :align: center
     :alt: ITango
