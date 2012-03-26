@@ -83,6 +83,7 @@ Version history
 |            |         - `3458336: Problem with pytango 7.2.2 <https://sourceforge.net/tracker/?func=detail&aid=3458336&group_id=57612&atid=484769>`_                                       |
 |            |         - `3463377: PyTango memory leak in read encoded attribute <https://sourceforge.net/tracker/?func=detail&aid=3463377&group_id=57612&atid=484769>`_                    |
 |            |         - `3487930: [pytango] wrong python dependency <https://sourceforge.net/tracker/?func=detail&aid=3487930&group_id=57612&atid=484769>`_                                |
+|            |         - `3511509: Attribute.set_value_date_quality for encoded does not work <https://sourceforge.net/tracker/?func=detail&aid=3511509&group_id=57612&atid=484769>`_       |
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 7.2.2      | Features:                                                                                                                                                                    |
 |            |     - from sourceforge:                                                                                                                                                      |
