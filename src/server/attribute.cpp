@@ -237,18 +237,19 @@ namespace PyAttribute
         extract<Tango::DevString> val_str(data_str.ptr());
         if (!val_str.check())
         {
-            throw_wrong_python_data_type(att.get_name(), "set_value()");
+            throw_wrong_python_data_type(att.get_name(), "set_value1()");
         }
-        extract<Tango::DevUChar*> val(data.ptr());
+        extract<Tango::DevString> val(data.ptr());
         if (!val.check())
         {
-            throw_wrong_python_data_type(att.get_name(), "set_value()");
+            throw_wrong_python_data_type(att.get_name(), "set_value2()");
         }
 
         PYTG_NEW_TIME_FROM_DOUBLE(t, tv);
         Tango::DevString val_str_real = val_str;
-        Tango::DevUChar *val_real = val;
-        att.set_value_date_quality(&val_str_real, val_real, (long)len(data), tv, quality);
+        Tango::DevString val_real = val;
+        att.set_value_date_quality(&val_str_real, (Tango::DevUChar*)val_real,
+                                   (long)len(data), tv, quality);
     }
 
     template<long tangoTypeConst>
