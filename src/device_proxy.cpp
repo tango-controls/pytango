@@ -164,12 +164,24 @@ namespace PyDeviceProxy
         return PyDeviceAttribute::convert_to_python(r_dev_attr.release(), self, extract_as);
     }
 
-
-    static inline vector<Tango::DeviceDataHistory>*
+    static inline object
             command_history(Tango::DeviceProxy& self, const std::string & cmd_name, int depth)
     {
-        AutoPythonAllowThreads guard;
-        return self.command_history(const_cast<std::string&>(cmd_name), depth);
+        vector<Tango::DeviceDataHistory>* device_data_hist = NULL;
+        boost::python::list ret;
+        {
+            AutoPythonAllowThreads guard;
+            device_data_hist =
+                self.command_history(const_cast<std::string&>(cmd_name), depth);
+        }
+        vector<Tango::DeviceDataHistory>::iterator it = device_data_hist->begin();
+        for(;it != device_data_hist->end(); ++it)
+        {
+            Tango::DeviceDataHistory& hist = *it;
+            ret.append(hist);
+        }
+        delete device_data_hist;
+        return ret;
     }
 
     static inline object
@@ -564,8 +576,7 @@ void export_device_proxy()
         //
 
         .def("command_history", &PyDeviceProxy::command_history,
-            (arg_("self"), arg_("cmd_name"), arg_("depth")),
-            return_value_policy<manage_new_object>() )
+            (arg_("self"), arg_("cmd_name"), arg_("depth")))
 
         .def("attribute_history", &PyDeviceProxy::attribute_history,
             (   arg_("self"),
