@@ -520,17 +520,11 @@ def __exc_handler(ip, etype, value, tb, tb_offset=None):
 def __get_default_tango_host():
     global _DFT_TANGO_HOST
     if _DFT_TANGO_HOST is None:
-        _DFT_TANGO_HOST = os.environ.get("TANGO_HOST")
-        if _DFT_TANGO_HOST is None:
-            # ok, it must have been defined in the tangorc way. Since the
-            # method Tango::Connection::get_env_var is protected we do a hack to
-            # get the tango_host: Create a temporary Database object. It is not
-            #very nice but is done only once in the lifetime of the application 
-            try:
-                db = PyTango.Database()
-                _DFT_TANGO_HOST = "%s:%s" % (db.get_db_host(), db.get_db_port())
-            except:
-                pass
+        try:
+            db = PyTango.Database()
+            _DFT_TANGO_HOST = "%s:%s" % (db.get_db_host(), db.get_db_port())
+        except:
+            pass
     return _DFT_TANGO_HOST
 
 def __get_db(host_port=None):

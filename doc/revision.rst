@@ -84,6 +84,7 @@ Version history
 |            |         - `3463377: PyTango memory leak in read encoded attribute <https://sourceforge.net/tracker/?func=detail&aid=3463377&group_id=57612&atid=484769>`_                    |
 |            |         - `3487930: [pytango] wrong python dependency <https://sourceforge.net/tracker/?func=detail&aid=3487930&group_id=57612&atid=484769>`_                                |
 |            |         - `3511509: Attribute.set_value_date_quality for encoded does not work <https://sourceforge.net/tracker/?func=detail&aid=3511509&group_id=57612&atid=484769>`_       |
+|            |         - `3514457: [pytango]  TANGO_HOST multi-host support <https://sourceforge.net/tracker/?func=detail&aid=3514457&group_id=57612&atid=484769>`_                         |
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 7.2.2      | Features:                                                                                                                                                                    |
 |            |     - from sourceforge:                                                                                                                                                      |
