@@ -95,7 +95,7 @@ public:
         if (!_is_method(dev, read_name))
         {
             TangoSys_OMemStream o;
-            o << read_name << " method not found";
+            o << read_name << " method not found for " << att.get_name();
             Tango::Except::throw_exception("PyTango_ReadAttributeMethodNotFound",
                 o.str(), "PyTango::Attr::read");
         }
@@ -114,7 +114,7 @@ public:
         if (!_is_method(dev, write_name))
         {
             TangoSys_OMemStream o;
-            o << write_name << " method not found";
+            o << write_name << " method not found for " << att.get_name();
             Tango::Except::throw_exception("PyTango_WriteAttributeMethodNotFound",
                 o.str(), "PyTango::Attr::write");
         }
