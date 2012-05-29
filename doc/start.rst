@@ -87,24 +87,24 @@ PyTango team provides a limited set of binary PyTango distributables for
 Windows XP/Vista/7. The complete list of binaries can be downloaded from
 `PyTango PyPI website <http://pypi.python.org/pypi/PyTango/>`_.
 
-.. _PyTango-7.2.2.win32-py2.6.msi: http://pypi.python.org/packages/2.6/P/PyTango/PyTango-7.2.2.win32-py2.6.msi
-.. _PyTango-7.2.2.win32-py2.6.exe: http://pypi.python.org/packages/2.6/P/PyTango/PyTango-7.2.2.win32-py2.6.exe
-.. _PyTango-7.2.2.win32-py2.7.msi: http://pypi.python.org/packages/2.7/P/PyTango/PyTango-7.2.2.win32-py2.7.msi
-.. _PyTango-7.2.2.win32-py2.7.exe: http://pypi.python.org/packages/2.7/P/PyTango/PyTango-7.2.2.win32-py2.7.exe
+.. _PyTango-7.2.3.win32-py2.6.msi: http://pypi.python.org/packages/2.6/P/PyTango/PyTango-7.2.3.win32-py2.6.msi
+.. _PyTango-7.2.3.win32-py2.6.exe: http://pypi.python.org/packages/2.6/P/PyTango/PyTango-7.2.3.win32-py2.6.exe
+.. _PyTango-7.2.3.win32-py2.7.msi: http://pypi.python.org/packages/2.7/P/PyTango/PyTango-7.2.3.win32-py2.7.msi
+.. _PyTango-7.2.3.win32-py2.7.exe: http://pypi.python.org/packages/2.7/P/PyTango/PyTango-7.2.3.win32-py2.7.exe
 
 +----------------------------------+--------------------------------------------------+----------------------------------------------+
 | version                          | Dependencies                                     | Compilation env.                             |
 +==================================+==================================================+==============================================+
-| `PyTango-7.2.2.win32-py2.6.msi`_ | - Tango C++ >= 7.2.6 and < 8.0                   | - Tango 7.2.6 windows distribution           |
-| `PyTango-7.2.2.win32-py2.6.exe`_ | - Python 2.6.x (where x >= 0)                    | - Python 2.6.6                               |
+| `PyTango-7.2.3.win32-py2.6.msi`_ | - Tango C++ >= 7.2.6 and < 8.0                   | - Tango 7.2.6 windows distribution           |
+| `PyTango-7.2.3.win32-py2.6.exe`_ | - Python 2.6.x (where x >= 0)                    | - Python 2.6.6                               |
 |                                  | - numpy 1.x (where x >= 1. Recommended x >= 5)   | - Numpy 1.5                                  |
 |                                  |                                                  | - boost-python 1.41 mutithreaded dll         |
 |                                  |                                                  | - Visual Studio 8.0 (2005)                   |
 |                                  |                                                  | - Windows XP Pro 2002 SP3                    |
 |                                  |                                                  | - PC: Intel Xeon E5440 @ 2.83GHz 1GB RAM     |
 +----------------------------------+--------------------------------------------------+----------------------------------------------+
-| `PyTango-7.2.2.win32-py2.7.msi`_ | - Tango C++ >= 7.2.6 and < 8.0                   | - Tango 7.2.6 windows distribution           |
-| `PyTango-7.2.2.win32-py2.7.exe`_ | - Python 2.7.x (where x >= 0)                    | - Python 2.7.2                               |
+| `PyTango-7.2.3.win32-py2.7.msi`_ | - Tango C++ >= 7.2.6 and < 8.0                   | - Tango 7.2.6 windows distribution           |
+| `PyTango-7.2.3.win32-py2.7.exe`_ | - Python 2.7.x (where x >= 0)                    | - Python 2.7.2                               |
 |                                  | - numpy 1.x (where x >= 1. Recommended x >= 5)   | - Numpy 1.5                                  |
 |                                  |                                                  | - boost-python 1.47 mutithreaded dll         |
 |                                  |                                                  | - Visual Studio 8.0 (2005)                   |
@@ -121,13 +121,7 @@ C++ installed **and** the environment variable :envvar:`PATH` **must** include
 the directory where the tango C++ DLLs are installed (usually
 :file:`C:\\Program Files{ (x86)}\\tango\\win32_vc8\\win32_dll`).
 
-Regarding boost-python, since VS hard links with the boost-python DLL file of
-the machine where PyTango binary was originally compiled, PyTango ships with
-it's own internal copy of the boost-python DLL.
-Maybe in the future PyTango will link with the static version of boost-python
-but for now we get to many errors at compile time so we are skipping this for
-now. Anyway, it's just an internal developers detail. For you just means 250kb more
-of memory usage in windows.
+Since PyTango 7.2.3, boost-python is statically linked to avoid DLL conflicts.
 
 The binary was compiled with numpy dependency therefore you need to have *numpy*
 installed in order to use PyTango.
