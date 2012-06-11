@@ -27,7 +27,6 @@
 
 __all__ = ["load_config", "load_ipython_extension", "unload_ipython_extension"]
 
-import sys
 import os
 import re
 import StringIO
@@ -54,6 +53,7 @@ _TANGO_STORE = "__tango_store"
 _TANGO_ERR = "__tango_error"
 _PYTHON_ERR = "__python_error"
 _tango_init = False
+
 
 class DeviceClassCompleter(object):
     """Completer class that returns the list of devices of some class when
@@ -831,6 +831,107 @@ def complete(text):
     outcomps = sorted(comps)
     return outcomps
 
+__DEV_HTML_TEMPLATE = """\
+<table border="0" cellpadding="2">
+<tr><td rowspan="7" valign="middle" align="center"><img src="{icon}" height="128"/></td>
+    <td>Name:</td><td><b>{name}</b></td></tr>
+<tr><td>Alias:</td><td>{alias}</td></tr>
+<tr><td>Database:</td><td>{database}</td></tr>
+<tr><td>Device class:</td><td>{dev_class}</td></tr>
+<tr><td>Server:</td><td>{server_id}</td></tr>
+<tr><td>Server host:</td><td>{server_host}</td></tr>
+<tr><td>Documentation:</td><td><a target="_blank" href="{doc_url}">{doc_url}</a></td></tr>
+</table>"""
+
+__DB_HTML_TEMPLATE = """\
+<table border="0" cellpadding="2">
+<tr><td rowspan="2" valign="middle" align="center"><img src="{icon}" height="128"/></td>
+    <td><b>{name}</b></td></tr>
+<tr><td>{info}</td></tr>
+</table>"""
+
+__DIRNAME = os.path.dirname(os.path.abspath(__file__))
+__RES_DIR = os.path.join(__DIRNAME, os.path.pardir, 'resource')
+
+class __TangoInfo(object):
+    """Helper class for when DeviceProxy.info() is not available"""
+    
+    def __init__(self, dev):
+        try:
+            db = dev.get_device_db()
+            klass = db.get_class_for_device(dev.dev_name())
+            self.dev_class = self.dev_type = klass
+        except:
+            self.dev_class = self.dev_type = 'Device'
+        self.doc_url = 'http://www.esrf.fr/computing/cs/tango/tango_doc/ds_doc/'
+        self.server_host = 'Unknown'
+        self.server_id = 'Unknown'
+        self.server_version = 1
+
+def display_deviceproxy_html(dev_proxy):
+    """displayhook function for PyTango.DeviceProxy, rendered as HTML"""
+    try:
+        info = dev_proxy.info()
+    except:
+        info = __TangoInfo(dev_proxy)
+    name = dev_proxy.dev_name()
+    fmt = dict(dev_class=info.dev_class, server_id=info.server_id,
+               server_host=info.server_host, name=name)
+    
+    try:
+        fmt["alias"] = dev_proxy.alias()
+    except:
+        fmt["alias"] = "-----"
+
+    try:
+        db = dev_proxy.get_device_db()
+        fmt["database"] = db.get_db_host() + ":" + db.get_db_port()
+    except:
+        try:
+            fmt["database"] = dev_proxy.get_device_db().get_file_name()
+        except:
+            fmt["database"]  = "Unknown"
+
+    doc_url = info.doc_url.split("\n")[0]
+    try:
+        fmt["doc_url"] = doc_url[doc_url.index("http"):]
+    except ValueError:
+        fmt["doc_url"] = doc_url
+
+    icon = info.dev_class.lower() + os.path.extsep + "png"
+    icon = os.path.join(__RES_DIR, icon)
+    if not os.path.isfile(icon):
+        icon = os.path.join(__RES_DIR, "device.png")
+    fmt['icon'] =  icon
+
+    return __DEV_HTML_TEMPLATE.format(**fmt)
+
+def display_database_html(db):
+    """displayhook function for PyTango.Database, rendered as HTML"""
+    fmt = dict()
+
+    try:
+        fmt["name"] = db.get_db_host() + ":" + db.get_db_port()
+    except:
+        try:
+            fmt["name"] = db.get_file_name()
+        except:
+            fmt["name"]  = "Unknown"
+
+    try:
+        fmt["info"] = db.get_info().replace("\n", "<BR/>")
+    except:
+        fmt["info"] = "Unknown"
+    
+    fmt['icon'] = os.path.join(__RES_DIR, "database.png")
+
+    return __DB_HTML_TEMPLATE.format(**fmt)
+
+def init_display(ip):
+    html_formatter = ip.display_formatter.formatters["text/html"]
+    html_formatter.for_type(PyTango.DeviceProxy, display_deviceproxy_html)
+    html_formatter.for_type(PyTango.Database, display_database_html)
+
 def init_ipython(ip=None, store=True, pytango=True, colors=True, console=True,
                  magic=True):
     
@@ -839,6 +940,8 @@ def init_ipython(ip=None, store=True, pytango=True, colors=True, console=True,
     
     global _tango_init
     if _tango_init is True: return
+
+    init_display(ip)
     
     if pytango:
         init_pytango(ip)

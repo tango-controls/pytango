@@ -773,7 +773,7 @@ def init_db(ip, parameter_s=''):
         
     if db is None: return
     
-    os.environ["TANGO_HOST"] = "%s:%s" % (db.get_db_host(), db.get_db_port())
+#    os.environ["TANGO_HOST"] = "%s:%s" % (db.get_db_host(), db.get_db_port())
     
     # Initialize device and server information
     query = "SELECT name, alias, server, class FROM device order by name"
