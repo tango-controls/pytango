@@ -831,6 +831,7 @@ def complete(text):
     outcomps = sorted(comps)
     return outcomps
 
+
 __DEV_HTML_TEMPLATE = """\
 <table border="0" cellpadding="2">
 <tr><td rowspan="7" valign="middle" align="center"><img src="{icon}" height="128"/></td>
@@ -883,12 +884,12 @@ def display_deviceproxy_html(dev_proxy):
     except:
         fmt["alias"] = "-----"
 
+    db = dev_proxy.get_device_db()
     try:
-        db = dev_proxy.get_device_db()
         fmt["database"] = db.get_db_host() + ":" + db.get_db_port()
     except:
         try:
-            fmt["database"] = dev_proxy.get_device_db().get_file_name()
+            fmt["database"] = db.get_file_name()
         except:
             fmt["database"]  = "Unknown"
 
@@ -898,8 +899,22 @@ def display_deviceproxy_html(dev_proxy):
     except ValueError:
         fmt["doc_url"] = doc_url
 
-    icon = info.dev_class.lower() + os.path.extsep + "png"
-    icon = os.path.join(__RES_DIR, icon)
+    icon_prop = "__icon"
+    klass = info.dev_class
+        
+    try:
+        icon_filename = dev_proxy.get_property(icon_prop)[icon_prop]
+        if icon_filename:
+            icon_filename = icon_filename[0]
+        else:
+            icon_filename = db.get_class_property(klass, icon_prop)[icon_prop]
+            if icon_filename:
+                icon_filename = icon_filename[0]
+            else:            
+                icon_filename = klass.lower() + os.path.extsep + "png"
+    except:
+        icon_filename = klass.lower() + os.path.extsep + "png"
+    icon = os.path.join(__RES_DIR, icon_filename)
     if not os.path.isfile(icon):
         icon = os.path.join(__RES_DIR, "device.png")
     fmt['icon'] =  icon
