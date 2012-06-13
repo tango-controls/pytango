@@ -268,6 +268,7 @@ def main():
 
     package_data = {
         'PyTango' : [],
+        'PyTango.ipython' : ['resource/*'],
     }
 
     data_files = []
