@@ -39,8 +39,7 @@ try:
     import sphinx.util.console
     sphinx.util.console.color_terminal = lambda : False
     from sphinx.setup_command import BuildDoc
-except Exception,e:
-    print e
+except ImportError:
     sphinx = None
 
 try:
@@ -150,10 +149,11 @@ class build(dftbuild):
         if self.no_doc:
             return False
         if sphinx is None:
+            self.warn("Documentation will not be generated: sphinx is not available")
             return False
         v = map(int, sphinx.__version__.split("."))
         if v <= [0,6,5]:
-            print "Documentation will not be generated: sphinx version (%s) too low. Needs 0.6.6" % sphinx.__version__
+            self.warn("Documentation will not be generated: sphinx version (%s) too low. Needs 0.6.6" % sphinx.__version__)
             return False 
         setup_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.isdir(os.path.join(setup_dir, 'doc'))
