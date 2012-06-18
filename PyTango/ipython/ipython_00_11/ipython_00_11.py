@@ -838,7 +838,7 @@ __DEV_HTML_TEMPLATE = """\
     <td>Name:</td><td><b>{name}</b></td></tr>
 <tr><td>Alias:</td><td>{alias}</td></tr>
 <tr><td>Database:</td><td>{database}</td></tr>
-<tr><td>Device class:</td><td>{dev_class}</td></tr>
+<tr><td>Type:</td><td>{dev_class}</td></tr>
 <tr><td>Server:</td><td>{server_id}</td></tr>
 <tr><td>Server host:</td><td>{server_host}</td></tr>
 <tr><td>Documentation:</td><td><a target="_blank" href="{doc_url}">{doc_url}</a></td></tr>
@@ -864,10 +864,34 @@ class __TangoInfo(object):
             self.dev_class = self.dev_type = klass
         except:
             self.dev_class = self.dev_type = 'Device'
-        self.doc_url = 'http://www.esrf.fr/computing/cs/tango/tango_doc/ds_doc/'
+        self.doc_url = 'http://www.esrf.eu/computing/cs/tango/tango_doc/ds_doc/index.html'
         self.server_host = 'Unknown'
         self.server_id = 'Unknown'
         self.server_version = 1
+
+def __get_device_icon(dev_proxy, klass="Device"):
+    icon_prop = "__icon"
+    db = dev_proxy.get_device_db()
+    try:
+        icon_filename = dev_proxy.get_property(icon_prop)[icon_prop]
+        if icon_filename:
+            icon_filename = icon_filename[0]
+        else:
+            icon_filename = db.get_class_property(klass, icon_prop)[icon_prop]
+            if icon_filename:
+                icon_filename = icon_filename[0]
+            else:            
+                icon_filename = klass.lower() + os.path.extsep + "png"
+    except:
+        icon_filename = klass.lower() + os.path.extsep + "png"
+    
+    if os.path.isabs(icon_filename):
+        icon = icon_filename
+    else:
+        icon = os.path.join(__RES_DIR, icon_filename)
+    if not os.path.isfile(icon):
+        icon = os.path.join(__RES_DIR, "device.png")
+    return icon
 
 def display_deviceproxy_html(dev_proxy):
     """displayhook function for PyTango.DeviceProxy, rendered as HTML"""
@@ -899,25 +923,7 @@ def display_deviceproxy_html(dev_proxy):
     except ValueError:
         fmt["doc_url"] = doc_url
 
-    icon_prop = "__icon"
-    klass = info.dev_class
-        
-    try:
-        icon_filename = dev_proxy.get_property(icon_prop)[icon_prop]
-        if icon_filename:
-            icon_filename = icon_filename[0]
-        else:
-            icon_filename = db.get_class_property(klass, icon_prop)[icon_prop]
-            if icon_filename:
-                icon_filename = icon_filename[0]
-            else:            
-                icon_filename = klass.lower() + os.path.extsep + "png"
-    except:
-        icon_filename = klass.lower() + os.path.extsep + "png"
-    icon = os.path.join(__RES_DIR, icon_filename)
-    if not os.path.isfile(icon):
-        icon = os.path.join(__RES_DIR, "device.png")
-    fmt['icon'] =  icon
+    fmt['icon'] = __get_device_icon(dev_proxy, info.dev_class)
 
     return __DEV_HTML_TEMPLATE.format(**fmt)
 

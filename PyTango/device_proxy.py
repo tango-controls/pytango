@@ -25,8 +25,6 @@
 This is an internal PyTango module.
 """
 
-from __future__ import with_statement
-
 __all__ = []
 
 __docformat__ = "restructuredtext"
@@ -46,6 +44,17 @@ from _PyTango import ExtractAs
 from PyTango.utils import seq_2_StdStringVector, StdStringVector_2_seq
 from PyTango.utils import seq_2_DbData, DbData_2_dict
 from utils import document_method as __document_method
+
+
+class __TangoInfo(object):
+    """Helper class for when DeviceProxy.info() is not available"""
+    
+    def __init__(self):
+        self.dev_class = self.dev_type = 'Device'
+        self.doc_url = 'http://www.esrf.fr/computing/cs/tango/tango_doc/ds_doc/'
+        self.server_host = 'Unknown'
+        self.server_id = 'Unknown'
+        self.server_version = 1
 
 #-------------------------------------------------------------------------------
 # Pythonic API: transform tango commands into methods and tango attributes into
@@ -731,8 +740,10 @@ def __DeviceProxy__subscribe_event ( self, attr_name, event_type, cb_or_queuesiz
                     " callable object or an object with a 'push_event' method.")
 
     event_id = self.__subscribe_event(attr_name, event_type, cb, filters, stateless, extract_as)
-
-    with self.__get_event_map_lock():
+    
+    l = self.__get_event_map_lock()
+    l.acquire()
+    try:
         se = self.__get_event_map()
         evt_data = se.get(event_id)
         if evt_data is not None:
@@ -742,6 +753,8 @@ def __DeviceProxy__subscribe_event ( self, attr_name, event_type, cb_or_queuesiz
                    (self, attr_name, event_type, event_id, evt_data[2], evt_data[1])
             Except.throw_exception("Py_InternalError", desc, "DeviceProxy.subscribe_event")
         se[event_id] = (cb, event_type, attr_name)
+    finally:
+        l.release()
     return event_id
 
 def __DeviceProxy__unsubscribe_event(self, event_id):
@@ -760,18 +773,26 @@ def __DeviceProxy__unsubscribe_event(self, event_id):
 
         Throws     : EventSystemFailed
     """
-    with self.__get_event_map_lock():
+    l = self.__get_event_map_lock()
+    l.acquire()
+    try:
         se = self.__get_event_map()
         if event_id not in se:
             raise IndexError("This device proxy does not own this subscription " + str(event_id))
         del se[event_id]
+    finally:
+        l.release()
     self.__unsubscribe_event(event_id)
 
 def __DeviceProxy__unsubscribe_event_all(self):
-    with self.__get_event_map_lock():
+    l = self.__get_event_map_lock()
+    l.acquire()
+    try:
         se = self.__get_event_map()
         event_ids = se.keys()
         se.clear()
+    finally:
+        l.release()
     for event_id in event_ids:
         self.__unsubscribe_event(event_id)
 
@@ -837,14 +858,19 @@ def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractA
     else:
         raise TypeError("Parameter 'callback' should be None, a callable object or an object with a 'push_event' method.")
 
-def __DeviceProxy__str(self):
-    if not hasattr(self, '_dev_class'):
+def __DeviceProxy___get_info_(self):
+    """Protected method that gets device info once and stores it in cache"""
+    if not hasattr(self, '_dev_info'):
         try:
-            self.__dict__["_dev_class"] = self.info().dev_class
+            self.__dict__["_dev_info"] = self.info()
         except:
-            return "DeviceProxy(%s)" % self.dev_name()
-    return "%s(%s)" % (self._dev_class, self.dev_name())
+            return __TangoInfo()
+    return self._dev_info
     
+def __DeviceProxy__str(self):
+    info = self._get_info_()
+    return "%s(%s)" % (info.dev_class, self.dev_name())
+
 def __init_DeviceProxy():
     DeviceProxy.__getattr__ = __DeviceProxy__getattr
     DeviceProxy.__setattr__ = __DeviceProxy__setattr
@@ -882,7 +908,10 @@ def __init_DeviceProxy():
     DeviceProxy.get_events = __DeviceProxy__get_events
     DeviceProxy.__str__ = __DeviceProxy__str
     DeviceProxy.__repr__ = __DeviceProxy__str
+    
+    DeviceProxy._get_info_ = __DeviceProxy___get_info_
 
+    
 def __doc_DeviceProxy():
     def document_method(method_name, desc, append=True):
         return __document_method(DeviceProxy, method_name, desc, append)

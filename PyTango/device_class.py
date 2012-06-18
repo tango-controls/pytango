@@ -33,7 +33,7 @@ import types
 import operator
 
 from _PyTango import Except, DevFailed
-from _PyTango import _DeviceClass, Database
+from _PyTango import _DeviceClass
 from _PyTango import CmdArgType, DispLevel
 from _PyTango import UserDefaultAttrProp
 
@@ -67,7 +67,7 @@ class PropUtil:
     def __init__(self):
         self.db = None
         if Util._UseDb:
-            self.db = Database()
+            self.db = Util.instance().get_database()
 
     def set_default_property_values(self, dev_class, class_prop, dev_prop):
         """
@@ -293,7 +293,11 @@ class DeviceClass(_DeviceClass):
                                            self.device_property_list)
             pu.get_class_properties(self, self.class_property_list)
             for prop_name in self.class_property_list.keys():
-                setattr(self, prop_name, pu.get_property_values(prop_name, self.class_property_list))
+                if not hasattr(self, prop_name):
+                    setattr(self, prop_name, pu.get_property_values(prop_name,
+                            self.class_property_list))
+            if hasattr(self, 'write_class_property'):
+                self.write_class_property()
         except DevFailed, df:
             print("PyDS: %s: A Tango error occured in the constructor:" % name)
             Except.print_exception(df)

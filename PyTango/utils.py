@@ -25,8 +25,6 @@
 This is an internal PyTango module.
 """
 
-from __future__ import with_statement
-
 __all__ = [ "is_scalar_type", "is_array_type", "is_numerical_type", 
             "is_int_type", "is_float_type", "obj_2_str", "seqStr_2_obj",
             "document_method", "document_static_method", "document_enum",
@@ -712,9 +710,13 @@ __NOTIFD_FACTORY_PREFIX = "notifd/factory/"
 
 def notifd2db(notifd_ior_file=__DEFAULT_FACT_IOR_FILE, files=None, host=None, out=sys.stdout):
     ior_string = ""
-    with file(notifd_ior_file) as ior_file:
+    ior_file = None
+    try:
+        ior_file = file(notifd_ior_file)
         ior_string = ior_file.read()
-    
+    finally:
+        if ior_file is not None:
+            ior_file.close()
     if files is None:
         return _notifd2db_real_db(ior_string, host=host, out=out)
     else:
@@ -723,12 +725,12 @@ def notifd2db(notifd_ior_file=__DEFAULT_FACT_IOR_FILE, files=None, host=None, ou
 def _notifd2db_file_db(ior_string, files, out=sys.stdout):
     raise RuntimeError("Not implemented yet")
 
-    print >>out, "going to export notification service event factory to " \
-                 "device server property file(s) ..."
-    for f in files:
-        with file(f, "w"):
-            pass
-    return
+    #print >>out, "going to export notification service event factory to " \
+    #             "device server property file(s) ..."
+    #for f in files:
+    #    with file(f, "w"):
+    #        pass
+    #return
 
 def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
     import PyTango
