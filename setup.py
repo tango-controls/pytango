@@ -28,6 +28,7 @@ import imp
 
 from distutils.core import setup, Extension
 from distutils.cmd import Command
+from distutils.errors import DistutilsOptionError
 from distutils.command.build import build as dftbuild
 from distutils.command.build_ext import build_ext as dftbuild_ext
 from distutils.command.install import install as dftinstall
@@ -80,9 +81,38 @@ def uniquify(seq):
     [ no_dups.append(i) for i in seq if not no_dups.count(i) ]
     return no_dups
 
+def get_numpy_root():
+    return os.environ.get('NUMPY_ROOT', '/usr')
+    
+def get_numpy_headers():
+    if numpy is None:
+        return None
+
+    # first check location given by environment variable (if defined)
+    has_numpy_root = 'NUMPY_ROOT' in os.environ
+    if has_numpy_root:
+        numpy_path = os.environ.get('NUMPY_ROOT')
+        numpy_h = os.path.join(numpy_path, "include", "numpy")
+        if os.path.exists(numpy_h):
+            return numpy_h
+    
+    # ... then check inside numpy code
+    numpy_paths = numpy.__path__
+    for numpy_path in numpy_paths:
+        numpy_path = os.path.abspath(numpy_path)
+        numpy_h = os.path.join(numpy_path, "core", "include", "numpy")
+        if os.path.exists(numpy_h):
+            return numpy_h
+
+    # fallback to default linux header location
+    numpy_h = os.path.join("/usr", "include", "numpy")
+    if os.path.exists(numpy_h):
+        return numpy_h
+
 def has_c_numpy():
-    NUMPY_ROOT = os.environ.get('NUMPY_ROOT', '/usr')
-    return os.path.isdir(os.path.join(NUMPY_ROOT, 'include','numpy'))
+    if numpy is None:
+        return False
+    return get_numpy_headers() is not None
 
 def has_numpy(with_src=True):
     ret = numpy is not None
@@ -100,7 +130,7 @@ class build(dftbuild):
     
     boolean_options = dftbuild.boolean_options + ['with-pytango3', 'without-ipython', 'strip-lib', 'no-doc']
     
-    def initialize_options (self):
+    def initialize_options(self):
         dftbuild.initialize_options(self)
         self.with_pytango3 = None
         self.without_ipython = None
@@ -111,10 +141,6 @@ class build(dftbuild):
         dftbuild.finalize_options(self)
         
     def run(self):
-        if numpy is None:
-            self.warn('NOT using numpy: it is not available')
-        elif not has_c_numpy():
-            self.warn("NOT using numpy: numpy available but C source is not")
         if self.with_pytango3:
             self.distribution.packages.append('PyTango3')
         
@@ -163,7 +189,29 @@ class build(dftbuild):
 
 class build_ext(dftbuild_ext): 
     
+    user_options = dftbuild_ext.user_options + \
+         [('without-numpy', None, "don't use numpy optimization"),]
+    
+    boolean_options = dftbuild_ext.boolean_options + ['without-numpy']
+    
+    def initialize_options(self):
+        dftbuild_ext.initialize_options(self)
+        self.without_numpy = None
+
     def build_extensions(self):
+        if self.without_numpy:
+            for extension in self.extensions:
+                extension.define_macros.append(('DISABLE_PYTANGO_NUMPY', None))
+        else:
+            if numpy is None:
+                raise DistutilsOptionError('Cannot use numpy: it is not '
+                    'available. You can still compile without numpy usage '
+                    'with --without-numpy')
+            elif not has_c_numpy():
+                raise DistutilsOptionError('Cannot use numpy: numpy '
+                    'available but C source is not. You can still build_ext '
+                    'without numpy usage with --without-numpy')
+
         if isinstance(self.compiler, UnixCCompiler):
             compiler_pars = self.compiler.compiler_so
             while '-Wstrict-prototypes' in compiler_pars:
@@ -241,6 +289,8 @@ def main():
     BOOST_ROOT = os.environ.get('BOOST_ROOT', BOOST_ROOT)
     NUMPY_ROOT = os.environ.get('NUMPY_ROOT', NUMPY_ROOT)
     
+    numpy_h = get_numpy_headers()
+    
     Release = get_release_info()
 
     author = Release.authors['Coutinho']
@@ -302,17 +352,19 @@ def main():
     # #include <tango.h> to:
     # #include <tango/tango.h>
     # However tango itself complains that it doesn't know his own header files
-    # if we don't add the $TANGO_ROOT/include/tango directory to the path. So we do it
-    # here
+    # if we don't add the $TANGO_ROOT/include/tango directory to the path.
+    # So we do it here
     _tango_root_inc = os.path.join(_tango_root_inc, 'tango')
     if os.path.isdir(_tango_root_inc):
         include_dirs.append(_tango_root_inc)
 
-    include_dirs.extend([
-        os.path.join(OMNI_ROOT, 'include'),
-        os.path.join(NUMPY_ROOT, 'include'),
-    ])
-
+    include_dirs.append(os.path.join(OMNI_ROOT, 'include'))
+    
+    if numpy_h:
+        pardir = os.path.pardir
+        numpy_h = os.path.join(numpy_h, pardir)
+        include_dirs.append(numpy_h)
+        
     #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
     # library directories
     #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
@@ -328,8 +380,8 @@ def main():
 
     macros = []
 
-    if not has_numpy():
-        macros.append( ('DISABLE_PYTANGO_NUMPY', None) )
+    #if not has_numpy():
+    #    macros.append( ('DISABLE_PYTANGO_NUMPY', None) )
 
     library_dirs = [
         os.path.join(TANGO_ROOT, 'lib'),
