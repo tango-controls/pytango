@@ -43,8 +43,8 @@ __all__ = [ "TangoStream", "LogIt", "DebugIt", "InfoIt", "WarnIt",
 
 __docformat__ = "restructuredtext"
 
-import functools
-
+from utils import wraps
+    
 class TangoStream:
     
     def __init__(self, fn):
@@ -122,7 +122,7 @@ class LogIt(object):
         return d.debug_stream
 
     def __call__(self, f):
-        @functools.wraps(f)
+        @wraps(f)
         def log_stream(*args, **kwargs):
             d = args[0]
             if not self.is_enabled(d):

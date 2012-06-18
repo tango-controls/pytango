@@ -29,7 +29,8 @@ __all__ = [ "is_scalar_type", "is_array_type", "is_numerical_type",
             "is_int_type", "is_float_type", "obj_2_str", "seqStr_2_obj",
             "document_method", "document_static_method", "document_enum",
             "CaselessList", "CaselessDict", "EventCallBack", "get_home",
-            "from_version_str_to_hex_str", "from_version_str_to_int", ]
+            "from_version_str_to_hex_str", "from_version_str_to_int", 
+            "wraps", "update_wrapper"]
 
 __docformat__ = "restructuredtext"
 
@@ -38,6 +39,59 @@ import os
 import socket
 import types
 import operator
+
+try:
+    from functools import wraps, update_wrapper
+except ImportError:
+    # -------------------
+    # Python 2.4 fallback
+    # -------------------
+    def curry(_curried_func, *args, **kwargs):
+        def _curried(*moreargs, **morekwargs):
+            return _curried_func(*(args+moreargs), **dict(kwargs, **morekwargs))
+        return _curried
+    
+    WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__doc__')
+    WRAPPER_UPDATES = ('__dict__',)
+    def update_wrapper(wrapper,
+                       wrapped,
+                       assigned = WRAPPER_ASSIGNMENTS,
+                       updated = WRAPPER_UPDATES):
+        """Update a wrapper function to look like the wrapped function
+
+           wrapper is the function to be updated
+           wrapped is the original function
+           assigned is a tuple naming the attributes assigned directly
+           from the wrapped function to the wrapper function (defaults to
+           functools.WRAPPER_ASSIGNMENTS)
+           updated is a tuple naming the attributes off the wrapper that
+           are updated with the corresponding attribute from the wrapped
+           function (defaults to functools.WRAPPER_UPDATES)
+        """
+        for attr in assigned:
+            try:
+                setattr(wrapper, attr, getattr(wrapped, attr))
+            except TypeError: # Python 2.3 doesn't allow assigning to __name__.
+                pass
+        for attr in updated:
+            getattr(wrapper, attr).update(getattr(wrapped, attr))
+        # Return the wrapper so this can be used as a decorator via curry()
+        return wrapper
+
+    def wraps(wrapped,
+          assigned = WRAPPER_ASSIGNMENTS,
+          updated = WRAPPER_UPDATES):
+        """Decorator factory to apply update_wrapper() to a wrapper function
+
+           Returns a decorator that invokes update_wrapper() with the decorated
+           function as the wrapper argument and the arguments to wraps() as the
+           remaining arguments. Default arguments are as for update_wrapper().
+           This is a convenience function to simplify applying curry() to
+           update_wrapper().
+        """
+        return curry(update_wrapper, wrapped=wrapped,
+                     assigned=assigned, updated=updated)
+
 
 from _PyTango import StdStringVector, StdDoubleVector
 from _PyTango import DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat
