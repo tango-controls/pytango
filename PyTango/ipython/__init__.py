@@ -30,37 +30,37 @@ from common import get_python_version, get_python_version_number, \
 
 def default_init_ipython(ip, store=True, pytango=True, colors=True,
                          console=True, magic=True):
-    print "Unsupported IPython version (%s) for tango profile" \
-        % get_ipython_version()
-    print "Supported IPython versions are: >= 0.10"
-    print "Starting normal IPython console..."
+    print("Unsupported IPython version (%s) for tango profile" \
+        % get_ipython_version())
+    print("Supported IPython versions are: >= 0.10")
+    print("Starting normal IPython console...")
 
 def default_install(ipydir=None, verbose=True):
-    print "Unsupported IPython version (%s) for tango profile" \
-        % get_ipython_version()
-    print "Supported IPython versions are: 0.10 to 0.13"
-    print "Tango extension to IPython will NOT be installed."
+    print("Unsupported IPython version (%s) for tango profile" \
+        % get_ipython_version())
+    print("Supported IPython versions are: >= 0.10")
+    print("Tango extension to IPython will NOT be installed.")
 
 init_ipython = default_init_ipython
 install = default_install
 
 ipv = get_ipython_version_list()
 if ipv >= [0, 10] and ipv < [0, 11]:
-    import ipython_00_10
+    from . import ipython_00_10
     init_ipython = ipython_00_10.init_ipython
     install = ipython_00_10.install
     load_config = None
     load_ipython_extension = None
     unload_ipython_extension = None
 elif ipv >= [0, 11] and ipv < [0, 12]:
-    import ipython_00_11
+    from . import ipython_00_11
     init_ipython = None
     install = ipython_00_11.install
     load_config = ipython_00_11.load_config
     load_ipython_extension = ipython_00_11.load_ipython_extension
     unload_ipython_extension = ipython_00_11.unload_ipython_extension
 elif ipv >= [0, 12] and ipv < [1, 0]:
-    import ipython_00_12
+    from . import ipython_00_12
     init_ipython = None
     install = ipython_00_12.install
     load_config = ipython_00_12.load_config

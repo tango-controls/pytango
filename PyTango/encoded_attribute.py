@@ -25,19 +25,18 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["encoded_attribute_init"]
 
 __docformat__ = "restructuredtext"
 
-import types
-import operator
+import collections
 
-import _PyTango
-from _PyTango import EncodedAttribute
-from _PyTango import ExtractAs
-from _PyTango import _ImageFormat
+from ._PyTango import EncodedAttribute, ExtractAs, _ImageFormat
+from ._PyTango import constants
 
-if _PyTango.constants.NUMPY_SUPPORT:
+from .utils import is_pure_str
+
+if constants.NUMPY_SUPPORT:
     try:
         import numpy
         np = numpy
@@ -47,7 +46,7 @@ else:
     np = None
     
 _allowed_extract = ExtractAs.Numpy, ExtractAs.String, ExtractAs.Tuple, \
-                   ExtractAs.List, ExtractAs.PyTango3
+                   ExtractAs.List
 
 def __EncodedAttribute_encode_jpeg_gray8(self, gray8, width=0, height=0, quality=100.0):
     """Encode a 8 bit grayscale image as JPEG format
@@ -123,11 +122,11 @@ def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
 
 def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, quality=0, format=_ImageFormat.RawImage):
     """Internal usage only"""
-    if not operator.isSequenceType(gray8):
+    if not isinstance(gray8, collections.Sequence):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
     
-    is_str = type(gray8) in types.StringTypes
+    is_str = is_pure_str(gray8)
     if is_str:
         if not width or not height:
             raise ValueError("When giving a string as data, you must also "
@@ -156,7 +155,7 @@ def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, qual
             raise IndexError("Expected sequence with at least one row")
         
         row0 = gray8[0]
-        if not operator.isSequenceType(row0):
+        if not isinstance(row0, collections.Sequence):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
                              "bytearray) inside a sequence")
         width = len(row0)
@@ -199,11 +198,11 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
                enc.encode_gray16(data)
                attr.set_value(data)
     """
-    if not operator.isSequenceType(gray16):
+    if not isinstance(gray16, collections.Sequence):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
     
-    is_str = type(gray16) in types.StringTypes
+    is_str = is_pure_str(gray16)
     if is_str:
         if not width or not height:
             raise ValueError("When giving a string as data, you must also "
@@ -233,11 +232,11 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
             raise IndexError("Expected sequence with at least one row")
         
         row0 = gray16[0]
-        if not operator.isSequenceType(row0):
+        if not isinstance(row0, collections.Sequence):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
                              "bytearray) inside a sequence")
         width = len(row0)
-        if type(row0) in types.StringTypes or type(row0) == bytearray:
+        if is_pure_str(row0) or type(row0) == bytearray:
             width /= 2
     
     self._encode_gray16(gray16, width, height)
@@ -318,11 +317,11 @@ def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
     
 def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, quality=0, format=_ImageFormat.RawImage):
     """Internal usage only"""
-    if not operator.isSequenceType(rgb24):
+    if not isinstance(rgb24, collections.Sequence):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
     
-    is_str = type(rgb24) in types.StringTypes
+    is_str = is_pure_str(rgb24)
     if is_str:
         if not width or not height:
             raise ValueError("When giving a string as data, you must also "
@@ -351,11 +350,11 @@ def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, qual
             raise IndexError("Expected sequence with at least one row")
         
         row0 = rgb24[0]
-        if not operator.isSequenceType(row0):
+        if not isinstance(row0, collections.Sequence):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
                              "bytearray) inside a sequence")
         width = len(row0)
-        if type(row0) in types.StringTypes or type(row0) == bytearray:
+        if is_pure_str(row0) or type(row0) == bytearray:
             width /= 3
     if format == _ImageFormat.RawImage:
         self._encode_rgb24(rgb24, width, height)
@@ -394,11 +393,11 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
                enc.encode_jpeg_rgb32(data)
                attr.set_value(data)
     """
-    if not operator.isSequenceType(rgb32):
+    if not isinstance(rgb32, collections.Sequence):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
     
-    is_str = type(rgb32) in types.StringTypes
+    is_str = is_pure_str(rgb32)
     if is_str:
         if not width or not height:
             raise ValueError("When giving a string as data, you must also "
@@ -427,11 +426,11 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
             raise IndexError("Expected sequence with at least one row")
         
         row0 = rgb32[0]
-        if not operator.isSequenceType(row0):
+        if not isinstance(row0, collections.Sequence):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
                              "bytearray) inside a sequence")
         width = len(row0)
-        if type(row0) in types.StringTypes or type(row0) == bytearray:
+        if is_pure_str(row0) or type(row0) == bytearray:
             width /= 4
 
     self._encode_jpeg_rgb32(rgb32, width, height, quality)
@@ -469,7 +468,7 @@ def __EncodedAttribute_decode_gray8(self, da, extract_as=ExtractAs.Numpy):
         raise TypeError("DeviceAttribute argument must have been obtained from "
                         "a call which doesn't extract the contents")
     if extract_as not in _allowed_extract:
-        raise TypeError("extract_as must be one of Numpy, String, Tuple, List, PyTango3")
+        raise TypeError("extract_as must be one of Numpy, String, Tuple, List")
     return self._decode_gray8(da, extract_as)
 
 def __EncodedAttribute_decode_gray16(self, da, extract_as=ExtractAs.Numpy):
@@ -504,7 +503,7 @@ def __EncodedAttribute_decode_gray16(self, da, extract_as=ExtractAs.Numpy):
         raise TypeError("DeviceAttribute argument must have been obtained from "
                         "a call which doesn't extract the contents")
     if extract_as not in _allowed_extract:
-        raise TypeError("extract_as must be one of Numpy, String, Tuple, List, PyTango3")
+        raise TypeError("extract_as must be one of Numpy, String, Tuple, List")
     return self._decode_gray16(da, extract_as)
 
 def __EncodedAttribute_decode_rgb32(self, da, extract_as=ExtractAs.Numpy):
@@ -539,7 +538,7 @@ def __EncodedAttribute_decode_rgb32(self, da, extract_as=ExtractAs.Numpy):
         raise TypeError("DeviceAttribute argument must have been obtained from "
                         "a call which doesn't extract the contents")
     if extract_as not in _allowed_extract:
-        raise TypeError("extract_as must be one of Numpy, String, Tuple, List, PyTango3")
+        raise TypeError("extract_as must be one of Numpy, String, Tuple, List")
     return self._decode_rgb32(da, extract_as)
 
 def __init_EncodedAttribute():
@@ -558,7 +557,7 @@ def __init_EncodedAttribute():
 def __doc_EncodedAttribute():
     pass
 
-def init(doc=True):
+def encoded_attribute_init(doc=True):
     __init_EncodedAttribute()
     if doc:
         __doc_EncodedAttribute()

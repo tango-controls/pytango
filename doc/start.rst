@@ -281,8 +281,8 @@ then, in ITango type:
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: PyTango.Release.version
-                  Result [1]: '7.2.3'
+    ITango [1]: PyTango.Release.version
+    Result [1]: '7.2.3'
 
 (if you are wondering, :ref:`itango` automaticaly does ``import PyTango`` for you!)
 

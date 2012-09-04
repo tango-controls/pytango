@@ -29,83 +29,6 @@
 
 using namespace boost::python;
 
-#ifndef _TG_WINDOWS_
-#include <unistd.h>
-#include <signal.h>
-#include <dlfcn.h>
-#endif /* _TG_WINDOWS_ */
-
-typedef Tango::DeviceClass *(*Cpp_creator_ptr)(const char *);
-
-Tango::DeviceClass* create_cpp_class(const std::string& class_name,
-                                     const std::string& par_name)
-{
-    std::string lib_name = class_name;
-    std::string sym_name = "_create_" + class_name + "_class";
-    
-#ifdef _TG_WINDOWS_
-    HMODULE mod;
-
-    if ((mod = LoadLibrary(lib_name.c_str())) == NULL)
-    {
-           char *str = 0;
-        
-        DWORD l_err = GetLastError();
-            ::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,NULL,
-                  l_err,MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(char *)&str,0,NULL);
-
-        cerr << "Error: " << str << endl;
-
-        TangoSys_OMemStream o;
-        o << "Trying to load shared library " << lib_name
-          << " failed. It returns error: " << str << ends;
-        ::LocalFree((HLOCAL)str);
-
-        Tango::Except::throw_exception("API_ClassNotFound", o.str(),
-                                       "DServer::create_cpp_class");
-    }
-    FARPROC proc;
-    
-    if ((proc = GetProcAddress(mod,sym_name.c_str())) == NULL)
-    {
-        TangoSys_OMemStream o;
-        o << "Class " << class_name << " does not have the C creator function "
-             "(_create_<Class name>_class)" << ends;
-
-        Tango::Except::throw_exception("API_ClassNotFound", o.str(),
-                                       "DServer::create_cpp_class");
-    }
-    Cpp_creator_ptr mt = (Cpp_creator_ptr)proc;
-#else
-    lib_name += ".so";
-    
-    void *lib_ptr = dlopen(lib_name.c_str(), RTLD_NOW);
-    if (lib_ptr == NULL)
-    {
-        TangoSys_OMemStream o;
-        o << "Trying to load shared library " << lib_name
-          << " failed. It returns error: " << dlerror() << ends;
-
-        Tango::Except::throw_exception("API_ClassNotFound",o.str(),
-                                       "DServer::create_cpp_class");
-    }
-
-    void *sym = dlsym(lib_ptr,sym_name.c_str());
-    if (sym == NULL)
-    {
-        TangoSys_OMemStream o;
-        o << "Class " << class_name << " does not have the C creator function "
-             "(_create_<Class name>_class)" << ends;
-
-        Tango::Except::throw_exception("API_ClassNotFound", o.str(),
-                                       "DServer::create_cpp_class");
-    }
-    Cpp_creator_ptr mt = (Cpp_creator_ptr)sym;
-#endif /* _TG_WINDOWS_ */
-    Tango::DeviceClass *dc = (*mt)(par_name.c_str());
-    return dc;
-}
-
 namespace PyUtil
 {
     void _class_factory(Tango::DServer* dserver)
@@ -124,8 +47,7 @@ namespace PyUtil
             tuple class_info = extract<tuple>(cpp_class_list[i]);
             char *class_name = extract<char *>(class_info[0]);
             char *par_name   = extract<char *>(class_info[1]);
-            Tango::DeviceClass* cpp_dc = create_cpp_class(class_name, par_name);
-            dserver->_add_class(cpp_dc);
+            dserver->_create_cpp_class(class_name, par_name);
         }
 
     //
@@ -171,10 +93,11 @@ namespace PyUtil
         Tango::Util* res = 0;
 
         try {
-
             for(int i = 0; i < argc; ++i)
             {
-                argv[i] = PyString_AsString(PySequence_GetItem(obj_ptr, i));
+                PyObject* item_ptr = PySequence_GetItem(obj_ptr, i);
+                str item = str(handle<>(item_ptr));
+                argv[i] = extract<char *>(item);
             }
             res = Tango::Util::init(argc, argv);
         } catch (...) {
@@ -296,6 +219,9 @@ void export_util()
         .def("trigger_attr_polling", &Tango::Util::trigger_attr_polling)
         .def("set_polling_threads_pool_size", &Tango::Util::set_polling_threads_pool_size)
         .def("get_polling_threads_pool_size", &Tango::Util::get_polling_threads_pool_size)
+        .def("is_svr_starting", &Tango::Util::is_svr_starting)
+        .def("is_svr_shutting_down", &Tango::Util::is_svr_shutting_down)        
+        .def("is_device_restarting", &Tango::Util::is_device_restarting)        
         .def("get_sub_dev_diag", &Tango::Util::get_sub_dev_diag,
             return_internal_reference<>())
         .def("connect_db", &Tango::Util::connect_db)

@@ -176,30 +176,15 @@ int raise_asynch_exception(long thread_id, boost::python::object exp_klass)
     return PyThreadState_SetAsyncExc(thread_id, exp_klass.ptr());
 }
 
-bool isBufferLikeType(PyObject* obj)
-{
-#if PY_VERSION_HEX < 0x02060000
-    // Returns true for buffer
-    if (PyBuffer_Check(obj))
-        return true;
-    if (PyString_Check(obj))
-        return true;
-#else
-    // Returns true for str, buffer bytes, bytearray, memoryview
-    if (PyObject_CheckBuffer(obj))
-        return true;
-#endif
-    return false;
-}
-
 void export_base_types()
 {
     enum_<PyTango::ExtractAs>("ExtractAs")
         .value("Numpy", PyTango::ExtractAsNumpy)
+        .value("ByteArray", PyTango::ExtractAsByteArray)
+        .value("Bytes", PyTango::ExtractAsBytes)
         .value("Tuple", PyTango::ExtractAsTuple)
         .value("List", PyTango::ExtractAsList)
         .value("String", PyTango::ExtractAsString)
-        .value("PyTango3", PyTango::ExtractAsPyTango3)
         .value("Nothing", PyTango::ExtractAsNothing)
     ;
 
@@ -276,6 +261,9 @@ void export_base_types()
     class_<std::vector<Tango::DbHistory> >("DbHistoryList")
         .def(vector_indexing_suite<std::vector<Tango::DbHistory>, true>());
 
+    class_<std::vector<Tango::DeviceData> >("DeviceDataList")
+        .def(vector_indexing_suite<std::vector<Tango::DeviceData>, true>());
+
     class_<Tango::DeviceDataHistoryList>("DeviceDataHistoryList")
         .def(vector_indexing_suite<Tango::DeviceDataHistoryList, true>());
 
@@ -291,8 +279,8 @@ void export_base_types()
     class_< StdGroupAttrReplyVector_ >("StdGroupAttrReplyVector")
         .def(vector_indexing_suite<StdGroupAttrReplyVector_, true>());
 
-    //to_python_converter<CORBA::String_member, CORBA_String_member_to_str>();
-    to_python_converter<_CORBA_String_member, CORBA_String_member_to_str2>();
+    to_python_converter<CORBA::String_member, CORBA_String_member_to_str>();
+    //to_python_converter<_CORBA_String_member, CORBA_String_member_to_str2>();
     to_python_converter<_CORBA_String_element, CORBA_String_element_to_str>();
 
     to_python_converter<Tango::DevErrorList, CORBA_sequence_to_tuple<Tango::DevErrorList> >();
@@ -363,6 +351,4 @@ void export_base_types()
     export_time_val();
     
     def("raise_asynch_exception", &raise_asynch_exception);
-    
-    def("isBufferLikeType", &isBufferLikeType);
 }

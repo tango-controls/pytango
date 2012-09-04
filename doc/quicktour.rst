@@ -25,33 +25,33 @@ and type:
 
     .. sourcecode:: itango
 
-        ITango <homer:10000> [1]: PyTango.__version__
-                     Result [1]: '7.1.2'
+        ITango [1]: PyTango.__version__
+        Result [1]: '7.1.2'
 
-        ITango <homer:10000> [2]: PyTango.__version_long__
-                     Result [2]: '7.1.2dev0'
+        ITango [2]: PyTango.__version_long__
+        Result [2]: '7.1.2dev0'
 
-        ITango <homer:10000> [3]: PyTango.__version_number__
-                     Result [3]: 712
+        ITango [3]: PyTango.__version_number__
+        Result [3]: 712
 
-        ITango <homer:10000> [4]: PyTango.__version_description__
-                     Result [4]: 'This version implements the C++ Tango 7.1 API.'
+        ITango [4]: PyTango.__version_description__
+        Result [4]: 'This version implements the C++ Tango 7.1 API.'
 
 or alternatively:
 
     .. sourcecode:: itango
 
-        ITango <homer:10000> [1]: PyTango.Release.version
-                     Result [1]: '7.1.2'
+        ITango [1]: PyTango.Release.version
+        Result [1]: '7.1.2'
 
-        ITango <homer:10000> [2]: PyTango.Release.version_long
-                     Result [2]: '7.1.2dev0'
+        ITango [2]: PyTango.Release.version_long
+        Result [2]: '7.1.2dev0'
 
-        ITango <homer:10000> [3]: PyTango.Release.version_number
-                     Result [3]: 712
+        ITango [3]: PyTango.Release.version_number
+        Result [3]: 712
 
-        ITango <homer:10000> [4]: PyTango.Release.version_description
-                     Result [4]: 'This version implements the C++ Tango 7.1 API.'
+        ITango [4]: PyTango.Release.version_description
+        Result [4]: 'This version implements the C++ Tango 7.1 API.'
 
 .. tip::
 
@@ -69,10 +69,10 @@ From a client (This is only possible since PyTango 7.0.0)
 
     .. sourcecode:: itango
 
-        ITango <homer:10000> [1]: import PyTango.constants
+        ITango [1]: import PyTango.constants
 
-        ITango <homer:10000> [2]: PyTango.constants.TgLibVers
-                     Result [2]: '7.1.1'
+        ITango [2]: PyTango.constants.TgLibVers
+        Result [2]: '7.1.1'
 
 From a server you can alternatively do::
     
@@ -88,8 +88,8 @@ determine if it is running or not.
 
     .. sourcecode:: itango
         
-        ITango <homer:10000> [1]: # What is a DeviceProxy, really?
-        ITango <homer:10000> [1]: DeviceProxy?
+        ITango [1]: # What is a DeviceProxy, really?
+        ITango [1]: DeviceProxy?
         DeviceProxy is the high level Tango object which provides the client with
         an easy-to-use interface to TANGO devices. DeviceProxy provides interfaces
         to all TANGO Device interfaces.The DeviceProxy manages timeouts, stateless
@@ -99,19 +99,19 @@ determine if it is running or not.
         Example :
            dev = PyTango.DeviceProxy("sys/tg_test/1")
            
-        ITango <homer:10000> [2]: tangotest = DeviceProxy("sys/tg_test/1")
+        ITango [2]: tangotest = DeviceProxy("sys/tg_test/1")
 
-        ITango <homer:10000> [3]: # ping it
-        ITango <homer:10000> [4]: tangotest.ping()
-                     Result [4]: 110
+        ITango [3]: # ping it
+        ITango [4]: tangotest.ping()
+        Result [4]: 110
 
-        ITango <homer:10000> [3]: # Lets test the state
-        ITango <homer:10000> [5]: tangotest.state()
-                     Result [5]: PyTango._PyTango.DevState.RUNNING
+        ITango [5]: # Lets test the state
+        ITango [6]: tangotest.state()
+        Result [6]: PyTango._PyTango.DevState.RUNNING
 
-        ITango <homer:10000> [3]: # And now the status
-        ITango <homer:10000> [5]: tangotest.status()
-                     Result [5]: 'The device is in RUNNING state.'
+        ITango [7]: # And now the status
+        ITango [8]: tangotest.status()
+        Result [8]: 'The device is in RUNNING state.'
 
 .. note::
     Did you notice that you didn't write PyTango.DeviceProxy but instead just
@@ -146,21 +146,21 @@ automatically manages the data types, and writing scripts is quite easy.
 
     .. sourcecode:: itango
     
-        ITango <homer:10000> [1]: tangotest = TangoTest("sys/tg_test/1")
+        ITango [1]: tangotest = TangoTest("sys/tg_test/1")
 
-        ITango <homer:10000> [2]: # classical way
-        ITango <homer:10000> [2]: r = tangotest.command_inout("DevString", "Hello, world!")
+        ITango [2]: # classical way
+        ITango [2]: r = tangotest.command_inout("DevString", "Hello, world!")
 
-        ITango <homer:10000> [3]: print "Result of execution of DevString command =", r
+        ITango [3]: print "Result of execution of DevString command =", r
         Result of execution of DevString command = Hello, world!
 
-        ITango <homer:10000> [4]: # 'pythonic' way
-        ITango <homer:10000> [5]: tangotest.DevString("Hello, world!")
-                     Result [5]: 'Hello, world!'
+        ITango [4]: # 'pythonic' way
+        ITango [5]: tangotest.DevString("Hello, world!")
+        Result [5]: 'Hello, world!'
         
-        ITango <homer:10000> [6]: # type is automatically managed by PyTango
-        ITango <homer:10000> [7]: tangotest.DevULong(12456)
-                     Result [7]: 12456
+        ITango [6]: # type is automatically managed by PyTango
+        ITango [7]: tangotest.DevULong(12456)
+        Result [7]: 12456
 
 Execute commands with more complex types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -170,12 +170,12 @@ structures.
 
     .. sourcecode:: itango
     
-        ITango <homer:10000> [1]: tangotest = TangoTest("sys/tg_test/1")
+        ITango [1]: tangotest = TangoTest("sys/tg_test/1")
 
-        ITango <homer:10000> [2]: argin = [1, 2, 3], ["Hello", "World"]
+        ITango [2]: argin = [1, 2, 3], ["Hello", "World"]
 
-        ITango <homer:10000> [3]: tango_test.DevVarLongArray(argin)
-                     Result [3]: [array([1, 2, 3]), ['Hello', 'World']]
+        ITango [3]: tango_test.DevVarLongArray(argin)
+        Result [3]: [array([1, 2, 3]), ['Hello', 'World']]
         
 .. note::
     notice that the command returns a list of two elements. The first element is
@@ -190,8 +190,8 @@ Basic read/write attribute operations.
 
     .. sourcecode:: itango
     
-        ITango <homer:10000> [1]: # Read a scalar attribute
-        ITango <homer:10000> [2]: print tangotest.read_attribute("long_scalar")
+        ITango [1]: # Read a scalar attribute
+        ITango [2]: print tangotest.read_attribute("long_scalar")
         DeviceAttribute[
         data_format = PyTango._PyTango.AttrDataFormat.SCALAR
               dim_x = 1
@@ -211,8 +211,8 @@ Basic read/write attribute operations.
         w_dimension = AttributeDimension(dim_x = 1, dim_y = 0)
             w_value = 0]
             
-        ITango <homer:10000> [3]: # Read a spectrum attribute
-        ITango <pc151:10000> [4]: print tangotest.read_attribute("double_spectrum")
+        ITango [3]: # Read a spectrum attribute
+        ITango [4]: print tangotest.read_attribute("double_spectrum")
         DeviceAttribute[
         data_format = PyTango._PyTango.AttrDataFormat.SPECTRUM
               dim_x = 20
@@ -234,18 +234,18 @@ Basic read/write attribute operations.
             w_value = array([  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.,
                 11.,  12.,  13.,  14.,  15.,  16.,  17.,  18.,  19.])]
 
-        ITango <homer:10000> [5]: # Write a scalar attribute
-        ITango <homer:10000> [6]: scalar_value = 18
-        ITango <homer:10000> [7]: tangotest.write_attribute("long_scalar", scalar_value)
+        ITango [5]: # Write a scalar attribute
+        ITango [6]: scalar_value = 18
+        ITango [7]: tangotest.write_attribute("long_scalar", scalar_value)
 
-        ITango <homer:10000> [8]: # Write a spectrum attribute
-        ITango <homer:10000> [9]: spectrum_value = numpy.random.rand(100)*10
-        ITango <homer:10000> [10]: tangotest.write_attribute("double_spectrum", spectrum_value)
+        ITango [8]: # Write a spectrum attribute
+        ITango [9]: spectrum_value = numpy.random.rand(100)*10
+        ITango [10]: tangotest.write_attribute("double_spectrum", spectrum_value)
         
         
-        ITango <homer:10000> [11]: # Write an image attribute
-        ITango <homer:10000> [12]: image_value = numpy.random.randint(0,10,size=(10,10))
-        ITango <homer:10000> [13]: tangotest.write_attribute("long_image", image_value)
+        ITango [11]: # Write an image attribute
+        ITango [12]: image_value = numpy.random.randint(0,10,size=(10,10))
+        ITango [13]: tangotest.write_attribute("long_image", image_value)
 
 .. tip::
     
@@ -253,14 +253,14 @@ Basic read/write attribute operations.
     
     .. sourcecode:: itango
         
-            ITango <homer:10000> [1]: tangotest.long_scalar
-                         Result [1]: 239
+            ITango [1]: tangotest.long_scalar
+            Result [1]: 239
     
     The same is valid for writting a new value to an attribute:
     
     .. sourcecode:: itango
         
-            ITango <homer:10000> [1]: tangotest.long_scalar = 18
+            ITango [1]: tangotest.long_scalar = 18
     
 .. note::
 
@@ -288,28 +288,28 @@ Defining devices in the Tango DataBase:
 
     .. sourcecode:: itango
     
-        ITango <homer:10000> [1]: # The 3 devices name we want to create
-        ITango <homer:10000> [2]: # Note: these 3 devices will be served by the same DServer
-        ITango <homer:10000> [3]: new_device_name1="px1/tdl/mouse1"
-        ITango <homer:10000> [4]: new_device_name2="px1/tdl/mouse2"
-        ITango <homer:10000> [5]: new_device_name3="px1/tdl/mouse3"
+        ITango [1]: # The 3 devices name we want to create
+        ITango [2]: # Note: these 3 devices will be served by the same DServer
+        ITango [3]: new_device_name1="px1/tdl/mouse1"
+        ITango [4]: new_device_name2="px1/tdl/mouse2"
+        ITango [5]: new_device_name3="px1/tdl/mouse3"
 
-        ITango <homer:10000> [6]: # Define the Tango Class served by this DServer
-        ITango <homer:10000> [7]: new_device_info_mouse = PyTango.DbDevInfo()
-        ITango <homer:10000> [8]: new_device_info_mouse._class = "Mouse"
-        ITango <homer:10000> [9]: new_device_info_mouse.server = "ds_Mouse/server_mouse"
+        ITango [6]: # Define the Tango Class served by this DServer
+        ITango [7]: new_device_info_mouse = PyTango.DbDevInfo()
+        ITango [8]: new_device_info_mouse._class = "Mouse"
+        ITango [9]: new_device_info_mouse.server = "ds_Mouse/server_mouse"
 
-        ITango <homer:10000> [10]: # add the first device
-        ITango <homer:10000> [11]: new_device_info_mouse.name = new_device_name1
-        ITango <homer:10000> [12]: db.add_device(new_device_info_mouse)
+        ITango [10]: # add the first device
+        ITango [11]: new_device_info_mouse.name = new_device_name1
+        ITango [12]: db.add_device(new_device_info_mouse)
 
-        ITango <homer:10000> [13]: # add the next device
-        ITango <homer:10000> [14]: new_device_info_mouse.name = new_device_name2
-        ITango <homer:10000> [15]: db.add_device(new_device_info_mouse)
+        ITango [13]: # add the next device
+        ITango [14]: new_device_info_mouse.name = new_device_name2
+        ITango [15]: db.add_device(new_device_info_mouse)
 
-        ITango <homer:10000> [16]: # add the third device
-        ITango <homer:10000> [17]: new_device_info_mouse.name = new_device_name3
-        ITango <homer:10000> [18]: db.add_device(new_device_info_mouse)
+        ITango [16]: # add the third device
+        ITango [17]: new_device_info_mouse.name = new_device_name3
+        ITango [18]: db.add_device(new_device_info_mouse)
 
 Setting up Device properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -321,11 +321,11 @@ API should be accessed from Python.
 
     .. sourcecode:: itango
     
-        ITango <homer:10000> [1]: # connecting to the motor axis device
-        ITango <homer:10000> [2]: axis1 = DeviceProxy ("microxas/motorisation/galilbox")
+        ITango [1]: # connecting to the motor axis device
+        ITango [2]: axis1 = DeviceProxy ("microxas/motorisation/galilbox")
 
-        ITango <homer:10000> [3]: # Getting Device Properties
-        ITango <homer:10000> [4]: property_names = ["AxisBoxAttachement",
+        ITango [3]: # Getting Device Properties
+        ITango [4]: property_names = ["AxisBoxAttachement",
                            ....:                   "AxisEncoderType",
                            ....:                   "AxisNumber",
                            ....:                   "CurrentAcceleration",
@@ -345,36 +345,36 @@ API should be accessed from Python.
                            ....:                   "UserEncoderRatio",
                            ....:                   "UserOffset"]
         
-        ITango <homer:10000> [5]: axis_properties = axis1.get_property(property_names)
-        ITango <homer:10000> [6]: for prop in axis_properties.keys():
+        ITango [5]: axis_properties = axis1.get_property(property_names)
+        ITango [6]: for prop in axis_properties.keys():
                            ....:     print "%s: %s" % (prop, axis_properties[prop][0])
 
-        ITango <homer:10000> [7]: # Changing Properties
-        ITango <homer:10000> [8]: axis_properties["AxisBoxAttachement"] = ["microxas/motorisation/galilbox"]
-        ITango <homer:10000> [9]: axis_properties["AxisEncoderType"] = ["1"]
-        ITango <homer:10000> [10]: axis_properties["AxisNumber"] = ["6"]
-        ITango <homer:10000> [11]: axis1.put_property(axis_properties)
+        ITango [7]: # Changing Properties
+        ITango [8]: axis_properties["AxisBoxAttachement"] = ["microxas/motorisation/galilbox"]
+        ITango [9]: axis_properties["AxisEncoderType"] = ["1"]
+        ITango [10]: axis_properties["AxisNumber"] = ["6"]
+        ITango [11]: axis1.put_property(axis_properties)
 
-        ITango <homer:10000> [12]: # Reading attributes
-        ITango <homer:10000> [13]: att_list = axis.get_attribute_list()
-        ITango <homer:10000> [14]: for att in att_list:
+        ITango [12]: # Reading attributes
+        ITango [13]: att_list = axis.get_attribute_list()
+        ITango [14]: for att in att_list:
                             ....:     att_val = axis.read_attribute(att)
                             ....:     print "%s: %s" % (att.name, att_val.value)
 
-        ITango <homer:10000> [15]: # Changing some attribute values
-        ITango <homer:10000> [16]: axis1.write_attribute("AxisBackslash", 0.5)
-        ITango <homer:10000> [17]: axis1.write_attribute("AxisDirection", 1.0)
-        ITango <homer:10000> [18]: axis1.write_attribute("AxisVelocity", 1000.0)
-        ITango <homer:10000> [19]: axis1.write_attribute("AxisOvershoot", 500.0)
+        ITango [15]: # Changing some attribute values
+        ITango [16]: axis1.write_attribute("AxisBackslash", 0.5)
+        ITango [17]: axis1.write_attribute("AxisDirection", 1.0)
+        ITango [18]: axis1.write_attribute("AxisVelocity", 1000.0)
+        ITango [19]: axis1.write_attribute("AxisOvershoot", 500.0)
 
-        ITango <homer:10000> [20]: # Testing some device commands
-        ITango <homer:10000> [21]: pos1=axis1.read_attribute("AxisCurrentPosition")
-        ITango <homer:10000> [22]: axis1.command_inout("AxisBackward")
-        ITango <homer:10000> [23]: while pos1.value > 1000.0:
+        ITango [20]: # Testing some device commands
+        ITango [21]: pos1=axis1.read_attribute("AxisCurrentPosition")
+        ITango [22]: axis1.command_inout("AxisBackward")
+        ITango [23]: while pos1.value > 1000.0:
                             ....:     pos1 = axis1.read_attribute("AxisCurrentPosition")
                             ....:     print "position axis 1 = ", pos1.value
                             
-        ITango <homer:10000> [24]: axis1.command_inout("AxisStop")
+        ITango [24]: axis1.command_inout("AxisStop")
 
 A quick tour of Tango device server binding through an example
 --------------------------------------------------------------

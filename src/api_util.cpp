@@ -67,5 +67,7 @@ void export_api_util()
         
         .def("is_event_consumer_created", &Tango::ApiUtil::is_event_consumer_created)
         .def("get_user_connect_timeout", &Tango::ApiUtil::get_user_connect_timeout)
+        
+        .def("get_ip_from_if", &Tango::ApiUtil::get_ip_from_if)
     ;
 }

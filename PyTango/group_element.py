@@ -25,24 +25,24 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["group_element_init"]
 
 __docformat__ = "restructuredtext"
 
 import operator
 
-from _PyTango import StdStringVector
-from _PyTango import GroupElement
+from ._PyTango import StdStringVector, GroupElement
 
-from utils import document_method as __document_method
-from utils import seq_2_StdStringVector
+from .utils import document_method as __document_method
+from .utils import seq_2_StdStringVector
+import collections
 
 def __apply_to(fn, key):
     if isinstance(key, slice):
         if key.step:
-            return [ fn(x) for x in xrange(key.start, key.stop, key.step) ]
+            return [ fn(x) for x in range(key.start, key.stop, key.step) ]
         else:
-            return [ fn(x) for x in xrange(key.start, key.stop) ]
+            return [ fn(x) for x in range(key.start, key.stop) ]
     else:
         return fn(key)
 
@@ -73,7 +73,7 @@ def __GroupElement__add(self, patterns_or_group, timeout_ms=-1):
         return self.__add(patterns_or_group, timeout_ms)
     elif isinstance(patterns_or_group, str):
         return self.__add(patterns_or_group, timeout_ms)
-    elif operator.isSequenceType(patterns_or_group):
+    elif isinstance(patterns_or_group, collections.Sequence):
         patterns = seq_2_StdStringVector(patterns_or_group)
         return self.__add(patterns, timeout_ms)
     else:
@@ -82,7 +82,7 @@ def __GroupElement__add(self, patterns_or_group, timeout_ms=-1):
 def __GroupElement__remove(self, patterns, forward=True):
     if isinstance(patterns, str):
         return self.__remove(patterns, forward)
-    elif operator.isSequenceType(patterns):
+    elif isinstance(patterns, collections.Sequence):
         std_patterns = seq_2_StdStringVector(patterns)
         return self.__remove(std_patterns, forward)
     else:
@@ -579,7 +579,7 @@ def __doc_GroupElement():
     # get_parent(self)
     
 
-def init(doc=True):
+def group_element_init(doc=True):
     __init_GroupElement()
     if doc:
         __doc_GroupElement()

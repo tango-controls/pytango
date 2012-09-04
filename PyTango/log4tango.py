@@ -127,7 +127,7 @@ class LogIt(object):
             d = args[0]
             if not self.is_enabled(d):
                 return f(*args, **kwargs)
-            in_msg = "-> %s(" % f.func_name
+            in_msg = "-> %s(" % f.__name__
             if self._show_args:
                 in_msg += ", ".join(map(self.__compact, args[1:]))
             if self._show_kwargs:
@@ -139,7 +139,7 @@ class LogIt(object):
             out_msg = ""
             if self._show_ret:
                 out_msg += self.__compact(ret) + " "
-            out_msg += "<- %s()" % f.func_name
+            out_msg += "<- %s()" % f.__name__
             self.get_log_func(d)(out_msg)
             return ret
         return log_stream

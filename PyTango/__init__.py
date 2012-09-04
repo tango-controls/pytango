@@ -28,6 +28,8 @@ Documentation for this package can be found online:
 http://www.tango-controls.org/static/PyTango/latest/doc/html/index.html
 """
 
+from __future__ import print_function
+
 __all__ = [ 'AccessControlType', 'ApiUtil', 'ArchiveEventInfo',
 'ArchiveEventProp', 'ArgType', 'AsynCall', 'AsynReplyNotArrived', 'AttReqType',
 'Attr', 'AttrConfEventData', 'AttrData', 'AttrDataFormat', 'AttrList',
@@ -51,8 +53,9 @@ __all__ = [ 'AccessControlType', 'ApiUtil', 'ArchiveEventInfo',
 'DevVarLongStringArray', 'DevVarShortArray', 'DevVarStringArray',
 'DevVarULong64Array', 'DevVarULongArray', 'DevVarUShortArray',
 'DevVoid', 'DeviceAttribute', 'DeviceAttributeConfig',
-'DeviceAttributeHistory', 'DeviceClass', 'DeviceData', 'DeviceDataHistory',
-'DeviceDataHistoryList', 'DeviceImpl', 'DeviceInfo', 'DeviceProxy',
+'DeviceAttributeHistory', 'DeviceClass', 'DeviceData', 'DeviceDataList',
+'DeviceDataHistory', 'DeviceDataHistoryList',
+'DeviceImpl', 'DeviceInfo', 'DeviceProxy',
 'DeviceUnlocked', 'Device_2Impl', 'Device_3Impl', 'Device_4Impl',
 'DispLevel', 'EncodedAttribute', 'ErrSeverity', 'ErrorIt',
 'EventData', 'EventProperties', 'EventSystemFailed', 'EventType',
@@ -76,7 +79,7 @@ __all__ = [ 'AccessControlType', 'ApiUtil', 'ArchiveEventInfo',
 'class_factory', 'class_list', 'constants', 'constructed_class',
 'cpp_class_list', 'delete_class_list', 'get_class', 'get_classes',
 'get_constructed_class', 'get_constructed_classes', 'get_cpp_class',
-'get_cpp_classes', 'isBufferLikeType', 'is_array_type', 'is_float_type',
+'get_cpp_classes', 'is_array_type', 'is_float_type',
 'is_int_type', 'is_numerical_type', 'is_scalar_type', 'numpy_image',
 'numpy_spectrum', 'numpy_type', 'obj_2_str', 'raise_asynch_exception',
 'seqStr_2_obj']
@@ -84,22 +87,21 @@ __all__ = [ 'AccessControlType', 'ApiUtil', 'ArchiveEventInfo',
 __docformat__ = "restructuredtext"
 
 try:
-    from _PyTango import DeviceProxy
-except ImportError, ie:
+    from ._PyTango import DeviceProxy
+except ImportError as ie:
     if not ie.args[0].count("_PyTango"):
         raise ie
-    print 80*"-"
-    print ie
-    print 80*"-"
-    print "Probably your current directory is the PyTango's source installation directory."
-    print "You must leave this directory first before using PyTango, otherwise the"
-    print "source distribution will conflict with the installed PyTango"
-    print 80*"-"
+    print(80*"-")
+    print(ie)
+    print(80*"-")
+    print("Probably your current directory is the PyTango's source installation directory.")
+    print("You must leave this directory first before using PyTango, otherwise the")
+    print("source distribution will conflict with the installed PyTango")
+    print(80*"-")
     import sys
     sys.exit(1)
 
-from _PyTango import \
-    (AccessControlType, ApiUtil, ArchiveEventInfo,
+from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     AsynCall, AsynReplyNotArrived, AttReqType, Attr, AttrConfEventData,
     AttrDataFormat, AttrList, AttrProperty, AttrQuality, AttrReadEvent,
     AttrSerialModel, AttrWriteType, AttrWrittenEvent, Attribute,
@@ -118,7 +120,7 @@ from _PyTango import \
     DevVarLongArray, DevVarLongStringArray, DevVarShortArray, DevVarStringArray,
     DevVarULong64Array, DevVarULongArray, DevVarUShortArray, DevVoid,
     DeviceAttribute, DeviceAttributeConfig, DeviceAttributeHistory,
-    DeviceData, DeviceDataHistory, DeviceDataHistoryList,
+    DeviceData, DeviceDataList, DeviceDataHistory, DeviceDataHistoryList,
     DeviceImpl, DeviceInfo, DeviceUnlocked, Device_2Impl,
     Device_3Impl, Device_4Impl, DispLevel, EncodedAttribute, ErrSeverity,
     EventData, EventSystemFailed, EventType,
@@ -134,12 +136,12 @@ from _PyTango import \
     StdGroupCmdReplyVector, StdGroupReplyVector, StdLongVector,
     StdNamedDevFailedVector, StdStringVector, SubDevDiag, TimeVal,
     UserDefaultAttrProp, WAttribute, WRITE, WrongData, WrongNameSyntax,
-    alarm_flags, asyn_req_type, cb_sub_model, constants, isBufferLikeType,
+    alarm_flags, asyn_req_type, cb_sub_model, constants,
     raise_asynch_exception)
 
 ArgType = CmdArgType
 
-from release import Release
+from .release import Release
 
 __author__ = Release.author_lines
 __version_info__ = Release.version_info
@@ -149,23 +151,23 @@ __version_number__ = Release.version_number
 __version_description__ = Release.version_description
 __doc__ = Release.long_description
 
-from attr_data import AttrData
-from log4tango import TangoStream, LogIt, DebugIt, InfoIt, WarnIt, \
+from .attr_data import AttrData
+from .log4tango import TangoStream, LogIt, DebugIt, InfoIt, WarnIt, \
     ErrorIt, FatalIt
-from device_server import ChangeEventProp, PeriodicEventProp, \
+from .device_server import ChangeEventProp, PeriodicEventProp, \
     ArchiveEventProp, AttributeAlarm, EventProperties, AttributeConfig, \
     AttributeConfig_2, AttributeConfig_3
-from attribute_proxy import AttributeProxy
-from group import Group
-from pyutil import Util
-from device_class import DeviceClass
-from globals import get_class, get_classes, get_cpp_class, get_cpp_classes, \
+from .attribute_proxy import AttributeProxy
+from .group import Group
+from .pyutil import Util
+from .device_class import DeviceClass
+from .globals import get_class, get_classes, get_cpp_class, get_cpp_classes, \
     get_constructed_class, get_constructed_classes, class_factory, \
     delete_class_list, class_list, cpp_class_list, constructed_class
-from utils import is_scalar_type, is_array_type, is_numerical_type, \
+from .utils import is_scalar_type, is_array_type, is_numerical_type, \
     is_int_type, is_float_type, obj_2_str, seqStr_2_obj
-from tango_numpy import NumpyType, numpy_type, numpy_spectrum, numpy_image
+from .tango_numpy import NumpyType, numpy_type, numpy_spectrum, numpy_image
 
-from pytango_init import init as __init
+from .pytango_init import init as __init
 __init()
 

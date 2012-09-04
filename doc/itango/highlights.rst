@@ -16,28 +16,28 @@ These include:
       
       .. sourcecode:: itango
 
-            ITango <homer:10000> [1]: PyTango
-                         Result [1]: <module 'PyTango' from ...>
+            ITango [1]: PyTango
+            Result [1]: <module 'PyTango' from ...>
                          
     - The :class:`DeviceProxy` (=Device), :class:`AttributeProxy` (=Attribute),
       :class:`Database` and :class:`Group` classes
       
       .. sourcecode:: itango
 
-            ITango <homer:10000> [1]: De<tab>
+            ITango [1]: De<tab>
             DeprecationWarning            Device       DeviceProxy
 
-            ITango <homer:10000> [2]: Device
-                         Result [2]: <class 'PyTango._PyTango.DeviceProxy'>
+            ITango [2]: Device
+            Result [2]: <class 'PyTango._PyTango.DeviceProxy'>
             
-            ITango <homer:10000> [3]: Device("sys/tg_test/1")
-                         Result [3]: DeviceProxy(sys/tg_test/1)
+            ITango [3]: Device("sys/tg_test/1")
+            Result [3]: DeviceProxy(sys/tg_test/1)
                          
-            ITango <homer:10000> [4]: Datab<tab>
+            ITango [4]: Datab<tab>
             
-            ITango <homer:10000> [4]: Database
+            ITango [4]: Database
             
-            ITango <homer:10000> [4]: Att<tab>
+            ITango [4]: Att<tab>
             Attribute       AttributeError  AttributeProxy
             
     - The tango :class:`PyTango.Database` object to which the itango session is 
@@ -45,8 +45,8 @@ These include:
       
       .. sourcecode:: itango
 
-            ITango <homer:10000> [1]: db
-                         Result [1]: Database(homer, 10000)
+            ITango [1]: db
+            Result [1]: Database(homer, 10000)
     
 Device name completion
 ----------------------
@@ -57,13 +57,13 @@ tango database. This means that when you try to create a new Device, by pressing
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: test = Device("<tab>
+    ITango [1]: test = Device("<tab>
     Display all 3654 possibilities? (y or n) n
     
-    ITango <homer:10000> [1]: test = Device("sys<tab>
+    ITango [1]: test = Device("sys<tab>
     sys/access_control/1  sys/database/2        sys/tautest/1         sys/tg_test/1
     
-    ITango <homer:10000> [2]: test = Device("sys/tg_test/1")
+    ITango [2]: test = Device("sys/tg_test/1")
 
 Attribute name completion
 -------------------------
@@ -73,10 +73,10 @@ where the attribute resides is running.
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: short_scalar = Attribute("sys<tab>
+    ITango [1]: short_scalar = Attribute("sys<tab>
     sys/access_control/1/  sys/database/2/        sys/tautest/1/         sys/tg_test/1/
     
-    ITango <homer:10000> [1]: short_scalar = Attribute("sys/tg_test/1/<tab>
+    ITango [1]: short_scalar = Attribute("sys/tg_test/1/<tab>
     sys/tg_test/1/State                sys/tg_test/1/no_value
     sys/tg_test/1/Status               sys/tg_test/1/short_image
     sys/tg_test/1/ampli                sys/tg_test/1/short_image_ro
@@ -90,9 +90,9 @@ where the attribute resides is running.
     sys/tg_test/1/double_scalar        sys/tg_test/1/string_image_ro
     ...
 
-    ITango <homer:10000> [1]: short_scalar = Attribute("sys/tg_test/1/short_scalar")
+    ITango [1]: short_scalar = Attribute("sys/tg_test/1/short_scalar")
     
-    ITango <homer:10000> [29]: print test.read()
+    ITango [29]: print test.read()
     DeviceAttribute[
     data_format = PyTango._PyTango.AttrDataFormat.SCALAR
       dim_x = 1
@@ -121,9 +121,9 @@ and attributes if the device is currently running)
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: test = Device("sys/tg_test/1")
+    ITango [1]: test = Device("sys/tg_test/1")
     
-    ITango <homer:10000> [2]: test.<tab>
+    ITango [2]: test.<tab>
     Display all 240 possibilities? (y or n)
     ...
     test.DevVoid                            test.get_access_control
@@ -133,14 +133,14 @@ and attributes if the device is currently running)
     test.SwitchStates                       test.get_attribute_list
     ...
     
-    ITango <homer:10000> [2]: test.short_<tab>
+    ITango [2]: test.short_<tab>
     test.short_image        test.short_scalar       test.short_scalar_rww   test.short_spectrum
     test.short_image_ro     test.short_scalar_ro    test.short_scalar_w     test.short_spectrum_ro
 
-    ITango <homer:10000> [2]: test.short_scalar        # old style: test.read_attribute("short_scalar").value
-                 Result [2]: 252
+    ITango [2]: test.short_scalar        # old style: test.read_attribute("short_scalar").value
+    Result [2]: 252
 
-    ITango <homer:10000> [3]: test.Dev<tab>
+    ITango [3]: test.Dev<tab>
     test.DevBoolean               test.DevUShort                test.DevVarShortArray
     test.DevDouble                test.DevVarCharArray          test.DevVarStringArray
     test.DevFloat                 test.DevVarDoubleArray        test.DevVarULongArray
@@ -149,8 +149,8 @@ and attributes if the device is currently running)
     test.DevString                test.DevVarLongArray          
     test.DevULong                 test.DevVarLongStringArray
     
-    ITango <homer:10000> [3]: test.DevDouble(56.433)  # old style: test.command_inout("DevDouble").
-                 Result [3]: 56.433
+    ITango [3]: test.DevDouble(56.433)  # old style: test.command_inout("DevDouble").
+    Result [3]: 56.433
 
 Tango classes as :class:`DeviceProxy`
 ---------------------------------------------
@@ -161,7 +161,7 @@ This way, if you want to create a device of class which you already know
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: lib01 = Libera("BO01/DI/BPM-01")
+    ITango [1]: lib01 = Libera("BO01/DI/BPM-01")
 
 One great advantage is that the tango device name completion is sensitive to the
 type of device you want to create. This means that if you are in the middle of
@@ -170,7 +170,7 @@ class 'Libera' will show up as possible completions.
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: bpm1 = Libera("<tab>
+    ITango [1]: bpm1 = Libera("<tab>
     BO01/DI/BPM-01  BO01/DI/BPM-09  BO02/DI/BPM-06  BO03/DI/BPM-03  BO03/DI/BPM-11  BO04/DI/BPM-08
     BO01/DI/BPM-02  BO01/DI/BPM-10  BO02/DI/BPM-07  BO03/DI/BPM-04  BO04/DI/BPM-01  BO04/DI/BPM-09
     BO01/DI/BPM-03  BO01/DI/BPM-11  BO02/DI/BPM-08  BO03/DI/BPM-05  BO04/DI/BPM-02  BO04/DI/BPM-10
@@ -180,11 +180,11 @@ class 'Libera' will show up as possible completions.
     BO01/DI/BPM-07  BO02/DI/BPM-04  BO03/DI/BPM-01  BO03/DI/BPM-09  BO04/DI/BPM-06  
     BO01/DI/BPM-08  BO02/DI/BPM-05  BO03/DI/BPM-02  BO03/DI/BPM-10  BO04/DI/BPM-07
 
-    ITango <homer:10000> [1]: bpm1 = Libera("BO01<tab>
+    ITango [1]: bpm1 = Libera("BO01<tab>
     BO01/DI/BPM-01  BO01/DI/BPM-03  BO01/DI/BPM-05  BO01/DI/BPM-07  BO01/DI/BPM-09  BO01/DI/BPM-11
     BO01/DI/BPM-02  BO01/DI/BPM-04  BO01/DI/BPM-06  BO01/DI/BPM-08  BO01/DI/BPM-10
     
-    ITango <homer:10000> [1]: bpm1 = Libera("BO01/DI/BPM-
+    ITango [1]: bpm1 = Libera("BO01/DI/BPM-
     
     
 List tango devices, classes, servers
@@ -196,7 +196,7 @@ current database.
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: lsdev
+    ITango [1]: lsdev
                                       Device                     Alias                    Server                Class
     ---------------------------------------- ------------------------- ------------------------- --------------------
                   expchan/BL99_Dummy0DCtrl/1                  BL99_0D1                 Pool/BL99      ZeroDExpChannel
@@ -219,7 +219,7 @@ current database.
                  expchan/BL99_UxTimerCtrl1/1                BL99_Timer                 Pool/BL99         CTExpChannel
     ...
     
-    ITango <homer:10000> [1]: lsdevclass
+    ITango [1]: lsdevclass
     SimuCoTiCtrl                   TangoAccessControl             ZeroDExpChannel
     Door                           Motor                          DataBase
     MotorGroup                     IORegister                     SimuMotorCtrl
@@ -227,7 +227,7 @@ current database.
     SimuMotor                      SimuCounterEx                  MeasurementGroup
     Pool                           CTExpChannel
 
-    ITango <homer:10000> [1]: lsserv
+    ITango [1]: lsserv
     MacroServer/BL99               MacroServer/BL98               Pool/V2
     Pool/BL99                      Pool/BL98                      TangoTest/test
     Pool/tcoutinho                 Simulator/BL98
@@ -245,13 +245,13 @@ the magic command 'tango_error'.
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: test = Device("sys/tg_test/1")
+    ITango [1]: test = Device("sys/tg_test/1")
 
-    ITango <homer:10000> [2]: test.no_value
+    ITango [2]: test.no_value
     API_AttrValueNotSet : Read value for attribute no_value has not been updated
     For more detailed information type: tango_error
 
-    ITango <homer:10000> [3]: tango_error
+    ITango [3]: tango_error
     Last tango error:
     DevFailed[
     DevError[
@@ -273,7 +273,7 @@ command.
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: switchdb
+    ITango [1]: switchdb
 
     Must give new database name in format <host>[:<port>].
     <port> is optional. If not given it defaults to 10000.
@@ -283,11 +283,23 @@ command.
     switchdb homer 10005
     switchdb homer
     
-    ITango <homer:10000> [2]: switchdb bart       # by default port is 10000
+    ITango [2]: db
+    Database(homer, 10000)
     
-    ITango <bart:10000> [3]: switchdb lisa 10005  # you can use spaces between host and port
+    ITango [3]: switchdb bart       # by default port is 10000
     
-    ITango <lisa:10005> [4]: switchdb marge:10005 # or the traditional ':'
+    ITango [4]: db
+    Database(bart, 10000)
+    
+    ITango [5]: switchdb lisa 10005  # you can use spaces between host and port
+    
+    ITango [6]: db
+    Database(lisa, 10005)
+
+    ITango [7]: switchdb marge:10005   # or the traditional ':'
+
+    ITango [8]: db
+    Database(marge, 10005)
 
 Refreshing the database
 --------------------------
@@ -303,7 +315,7 @@ all tango information from the database.
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: refreshdb
+    ITango [1]: refreshdb
     
 Storing your favorite tango objects for later usage
 -------------------------------------------------------
@@ -320,18 +332,18 @@ then store these for the next time you startup IPython_ with itango profile.
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: theta = Motor("BL99_M1")  # notice how we used tango alias
+    ITango [1]: theta = Motor("BL99_M1")  # notice how we used tango alias
     
-    ITango <homer:10000> [2]: store theta
+    ITango [2]: store theta
     Stored 'theta' (DeviceProxy)
     
-    ITango <homer:10000> [3]: Ctrl+D
+    ITango [3]: Ctrl+D
     
     (IPython session is closed and started again...)
 
-    ITango <homer:10000> [1]: store -r # in some versions of IPython you may need to do this ...
+    ITango [1]: store -r # in some versions of IPython you may need to do this ...
     
-    ITango <homer:10000> [1]: print theta
+    ITango [1]: print theta
     DeviceProxy(motor/bl99/1)
 
 Adding itango to your own ipython profile
@@ -370,9 +382,9 @@ The way to do this is by editing your default ipython configuration file:
     
     .. sourcecode:: itango
 
-        ITango <homer:10000> [1]: import IPython.utils.path
+        ITango [1]: import IPython.utils.path
         
-        ITango <homer:10000> [2]: IPython.utils.path.get_ipython_dir()
+        ITango [2]: IPython.utils.path.get_ipython_dir()
         <IPYTHON_DIR>
 
     now edit <IPYTHON_DIR>/profile_default/ipython_config.py and add the
@@ -549,14 +561,14 @@ To start monitoring the change events of an attribute:
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: mon -a BL99_M1/Position
+    ITango [1]: mon -a BL99_M1/Position
     'BL99_M1/Position' is now being monitored. Type 'mon' to see all events
     
 To list all events that have been intercepted:
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [2]: mon
+    ITango [2]: mon
       ID           Device    Attribute            Value       Quality             Time
     ---- ---------------- ------------ ---------------- ------------- ----------------
        0     motor/bl99/1        state               ON    ATTR_VALID  17:11:08.026472
@@ -578,7 +590,7 @@ To list all events that have been intercepted:
       16     motor/bl99/1     position            100.0    ATTR_ALARM  17:12:13.738136
       17     motor/bl99/1        state            ALARM    ATTR_VALID  17:12:13.743481
 
-    ITango <homer:10000> [3]: mon -l mot.* state
+    ITango [3]: mon -l mot.* state
       ID           Device    Attribute            Value       Quality             Time
     ---- ---------------- ------------ ---------------- ------------- ----------------
        0     motor/bl99/1        state               ON    ATTR_VALID  17:11:08.026472
@@ -589,7 +601,7 @@ To stop monitoring the attribute:
 
 .. sourcecode:: itango
 
-    ITango <homer:10000> [1]: mon -d BL99_M1/Position
+    ITango [1]: mon -d BL99_M1/Position
     Stopped monitoring 'BL99_M1/Position'
 
 .. note::

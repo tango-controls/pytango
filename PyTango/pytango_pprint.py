@@ -25,13 +25,13 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["pytango_pprint_init"]
 
 __docformat__ = "restructuredtext"
 
 import operator
 
-from _PyTango import (StdStringVector, StdLongVector, CommandInfoList,
+from ._PyTango import (StdStringVector, StdLongVector, CommandInfoList,
     AttributeInfoList, AttributeInfoListEx,
     DeviceDataHistoryList,
     GroupReplyList, GroupAttrReplyList, GroupCmdReplyList,
@@ -46,14 +46,15 @@ from _PyTango import (StdStringVector, StdLongVector, CommandInfoList,
     DevError, EventData, AttrConfEventData, DataReadyEventData,
     TimeVal, DevFailed, CmdArgType)
 
-from device_server import AttributeAlarm, EventProperties
-from device_server import ChangeEventProp, PeriodicEventProp, ArchiveEventProp
-from device_server import AttributeConfig, AttributeConfig_2, AttributeConfig_3
+from .device_server import AttributeAlarm, EventProperties
+from .device_server import ChangeEventProp, PeriodicEventProp, ArchiveEventProp
+from .device_server import AttributeConfig, AttributeConfig_2, AttributeConfig_3
+import collections
 
 def __inc_param(obj, name):
     ret  = not name.startswith('_')
     ret &= not name in ('except_flags',)
-    ret &= not callable(getattr(obj,name))
+    ret &= not isinstance(getattr(obj,name), collections.Callable)
     return ret
 
 def __single_param(obj, param_name, f=repr, fmt='%s = %s'):
@@ -107,7 +108,7 @@ def __registerSeqStr():
         seq.__repr__ = _SeqRepr
 
 def __str__DevFailed(self):
-    if operator.isSequenceType(self.args):
+    if isinstance(self.args, collections.Sequence):
         return 'DevFailed[\n%s]' % '\n'.join(map(str,self.args))
     return 'DevFailed[%s]' % (self.args)
     
@@ -152,6 +153,6 @@ def __registerStructStr():
 
     DevError.__str__ = __str__DevError
 
-def init(doc=True):
+def pytango_pprint_init(doc=True):
     __registerSeqStr()
     __registerStructStr()

@@ -25,16 +25,18 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["connection_init"]
 
 __docformat__ = "restructuredtext"
 
-from _PyTango import Connection, DeviceData, __CallBackAutoDie, CmdArgType
-from _PyTango import DeviceProxy, Database
-from _PyTango import ExtractAs
-from utils import document_method as __document_method
-from utils import document_static_method as __document_static_method
 import operator
+
+from ._PyTango import Connection, DeviceData, __CallBackAutoDie, CmdArgType, \
+    DeviceProxy, Database, ExtractAs
+from .utils import document_method as __document_method
+from .utils import document_static_method as __document_static_method
+import collections
+
 
 def __CallBackAutoDie__cmd_ended_aux(self, fn):
     def __new_fn(cmd_done_event):
@@ -67,7 +69,7 @@ def __get_command_inout_param(self, cmd_name, cmd_param=None):
         if isinstance(cmd_param, str):
             param.insert(CmdArgType.DevString, cmd_param)
             return param
-        elif operator.isSequenceType(cmd_param) and all([isinstance(x,str) for x in cmd_param]):
+        elif isinstance(cmd_param, collections.Sequence) and all([isinstance(x,str) for x in cmd_param]):
             param.insert(CmdArgType.DevVarStringArray, cmd_param)
             return param
         else:
@@ -165,7 +167,7 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
         forget = False
         return self.__command_inout_asynch_id(cmd_name, argin, forget)
     elif len(args) == 1:
-        if callable(args[0]): # command_inout_asynch(lambda)
+        if isinstance(args[0], collections.Callable): # command_inout_asynch(lambda)
             cb = __CallBackAutoDie()
             cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[0])
             argin = __get_command_inout_param(self, cmd_name)
@@ -180,7 +182,7 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
             forget = False
             return self.__command_inout_asynch_id(cmd_name, argin, forget)
     elif len(args) == 2:
-        if callable(args[1]): #command_inout_asynch( value, lambda)
+        if isinstance(args[1], collections.Callable): #command_inout_asynch( value, lambda)
             cb = __CallBackAutoDie()
             cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[1])
             argin = __get_command_inout_param(self, cmd_name, args[0])
@@ -545,7 +547,18 @@ def __doc_Connection():
 
         New in PyTango 7.0.0
     """)
+
+    document_method("get_access_right", """
+    get_access_right(self) -> AccessControlType
     
+            Returns the current access control type
+            
+        Parameters : None
+        Return     : (AccessControlType) The current access control type
+
+        New in PyTango 8.0.0
+    """)
+
     document_static_method("get_fqdn", """
     get_fqdn(self) -> str
     
@@ -590,7 +603,7 @@ def __doc_Connection():
         New in PyTango 7.2.0
     """)
     
-def init(doc=True):
+def connection_init(doc=True):
     __init_Connection()
     if doc:
         __doc_Connection()

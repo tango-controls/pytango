@@ -41,7 +41,7 @@ namespace PyWAttribute {
 
         // Copy buffer in a python raw buffer
         const char *original_ch_buffer = reinterpret_cast<const char *>(buffer);
-        PyObject* str_guard = PyString_FromStringAndSize(original_ch_buffer, length*sizeof(TangoScalarType));
+        PyObject* str_guard = PyBytes_FromStringAndSize(original_ch_buffer, length*sizeof(TangoScalarType));
 
         if (!str_guard) {
             throw_error_already_set();
@@ -52,7 +52,7 @@ namespace PyWAttribute {
         npy_intp dims[2];
         int nd = 1;
 
-        char* ch_buffer = PyString_AsString(str_guard);
+        char* ch_buffer = PyBytes_AsString(str_guard);
 
         if (att.get_data_format() == Tango::IMAGE) {
             nd = 2;

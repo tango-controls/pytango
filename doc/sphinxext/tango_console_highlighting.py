@@ -49,7 +49,7 @@ DftStyle = pygments.styles.get_style_by_name("default")
 class TangoStyle(DftStyle):
     
     styles = copy.copy(DftStyle.styles)
-    styles[Generic.Prompt] = 'bold #800080'
+    styles[Generic.Prompt] = 'bold #00AA00'
 
 class TangoConsoleLexer(Lexer):
     """
@@ -57,15 +57,15 @@ class TangoConsoleLexer(Lexer):
 
     .. sourcecode:: itango
 
-      ITango <homer:10000> [1]: a = 'foo'
+      ITango [1]: a = 'foo'
 
-      ITango <homer:10000> [2]: a
+      ITango [2]: a
                    Result [2]: 'foo'
 
-      ITango <homer:10000> [3]: print a
+      ITango [3]: print a
       foo
 
-      ITango <homer:10000> [4]: 1 / 0
+      ITango [4]: 1 / 0
 
     Notes:
 
@@ -77,7 +77,7 @@ class TangoConsoleLexer(Lexer):
     name = 'ITango console session'
     aliases = ['itango']
     mimetypes = ['text/x-itango-console']
-    input_prompt = re.compile("(ITango \<\w+:\d+\> \[(?P<N>[0-9]+)\]: )|(   \.\.\.+:)")
+    input_prompt = re.compile("(ITango \[(?P<N>[0-9]+)\]: )|(   \.\.\.+:)")
     output_prompt = re.compile("(\s*Result \[(?P<N>[0-9]+)\]: )|(   \.\.\.+:)")
     continue_prompt = re.compile("   \.\.\.+:")
     tb_start = re.compile("\-+")

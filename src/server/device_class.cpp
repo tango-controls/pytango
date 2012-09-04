@@ -267,7 +267,23 @@ namespace PyDeviceClass
         }
         return py_dev_list;
     }
-    
+
+    object get_command_list(CppDeviceClass &self)
+    {
+        boost::python::list py_cmd_list;
+        vector<Tango::Command *> cmd_list = self.get_command_list();
+        for(vector<Tango::Command *>::iterator it = cmd_list.begin(); it != cmd_list.end(); ++it)
+        {
+            object py_value = object(
+                        handle<>(
+                            to_python_indirect<
+                                Tango::Command*,
+                                detail::make_reference_holder>()(*it)));
+            py_cmd_list.append(py_value);
+        }
+        return py_cmd_list;
+    }
+        
     /*
     void add_device(CppDeviceClass &self, auto_ptr<Tango::DeviceImpl> dev)
     {
@@ -336,6 +352,9 @@ void export_device_class()
         .def("get_cvs_location",&Tango::DeviceClass::get_cvs_location,
             return_value_policy<copy_non_const_reference>())
         .def("get_device_list",&PyDeviceClass::get_device_list)
+        .def("get_command_list",&PyDeviceClass::get_device_list)
+        .def("get_cmd_by_name",&Tango::DeviceClass::get_cmd_by_name,
+            return_internal_reference<>())
         .def("set_type",
             (void (Tango::DeviceClass::*) (const char *))
             &Tango::DeviceClass::set_type)

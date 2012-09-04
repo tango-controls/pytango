@@ -25,19 +25,19 @@
 This is an internal PyTango module.
 """
 
-__all__ = [ "Util" ]
+__all__ = [ "Util", "pyutil_init" ]
 
 __docformat__ = "restructuredtext"
 
 import os
 import copy
 
-from _PyTango import _Util, Except, DevFailed, DbDevInfo
-from utils import document_method as __document_method
+from ._PyTango import _Util, Except, DevFailed, DbDevInfo
+from .utils import document_method as __document_method
 #from utils import document_static_method as __document_static_method
-from globals import class_list
-from globals import cpp_class_list
-from globals import get_constructed_classes
+from .globals import class_list, cpp_class_list, get_constructed_classes
+import collections
+
 
 def __simplify_device_name(dev_name):
     if dev_name.startswith("tango://"):
@@ -91,7 +91,7 @@ def __Util__create_device(self, klass_name, device_name, alias=None, cb=None):
                    device name (str). Default value is None meaning no callback
         
         Return     : None"""
-    if cb is not None and not callable(cb):
+    if cb is not None and not isinstance(cb, collections.Callable):
         Except.throw_exception("PyAPI_InvalidParameter",
             "The optional cb parameter must be a python callable",
             "Util.create_device")
@@ -103,7 +103,7 @@ def __Util__create_device(self, klass_name, device_name, alias=None, cb=None):
     device_exists = True
     try:
         db.import_device(device_name)
-    except DevFailed, df:
+    except DevFailed as df:
         device_exists = not df[0].reason == "DB_DeviceNotDefined"
 
     # 1 - Make sure device name doesn't exist already in the database
@@ -177,7 +177,7 @@ def __Util__delete_device(self, klass_name, device_name):
     device_exists = True
     try:
         db.import_device(device_name)
-    except DevFailed, df:
+    except DevFailed as df:
         device_exists = not df[0].reason == "DB_DeviceNotDefined"
 
     # 1 - Make sure device name exists in the database
@@ -220,7 +220,7 @@ class Util(_Util):
         class and its constructor is not public. Example::
             
             util = PyTango.Util.instance()
-            print util.get_host_name()"""
+            print(util.get_host_name())"""
 
     def __init__(self, args):
         args = copy.copy(args)
@@ -294,7 +294,7 @@ def __doc_Util():
 #
 #            Static method that gets the singleton object reference.
 #            If the class has not been initialised with it's init method,
-#            this method print a message and abort the device server process
+#            this method prints a message and aborts the device server process
 #
 #        Parameters :
 #            - exit : (bool)
@@ -558,7 +558,42 @@ def __doc_Util():
         Parameters : None
         Return     : (int) the maximun number of threads in the polling threads pool
     """ )
-    
+
+    document_method("is_svr_starting", """
+    is_svr_starting(self) -> bool
+
+            Check if the device server process is in its starting phase
+
+        Parameters : None
+        Return     : (bool) True if the server is in its starting phase
+
+        New in PyTango 8.0.0
+    """ )
+
+    document_method("is_svr_shutting_down", """
+    is_svr_shutting_down(self) -> bool
+
+            Check if the device server process is in its shutting down sequence
+
+        Parameters : None
+        Return     : (bool) True if the server is in its shutting down phase.
+
+        New in PyTango 8.0.0
+    """ )
+
+    document_method("is_device_restarting", """
+    is_device_restarting(self, (str)dev_name) -> bool
+
+            Check if the device is actually restarted by the device server
+            process admin device with its DevRestart command
+
+        Parameters :
+            dev_name : (str) device name
+        Return     : (bool) True if the device is restarting.
+
+        New in PyTango 8.0.0
+    """ )
+            
     document_method("get_sub_dev_diag", """
     get_sub_dev_diag(self) -> SubDevDiag
 
@@ -666,7 +701,7 @@ def __doc_Util():
 #        Return     : None
 #    """ )
 
-def init(doc=True):
+def pyutil_init(doc=True):
     __init_Util()
     if doc:
         __doc_Util()

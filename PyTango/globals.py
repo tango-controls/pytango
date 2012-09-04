@@ -101,8 +101,8 @@ def class_factory():
     local_cpp_class_list = get_cpp_classes()
 
     if ((len(local_class_list) + len(local_cpp_class_list)) == 0):
-        print 'Oups, no Tango class defined within this device server !!!'
-        print 'Sorry, but I exit'
+        print('Oups, no Tango class defined within this device server !!!')
+        print('Sorry, but I exit')
         import sys
         sys.exit()
 

@@ -25,13 +25,13 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["api_util_init"]
 
 __docformat__ = "restructuredtext"
 
-from _PyTango import ApiUtil
+from ._PyTango import ApiUtil
 
-from utils import document_method, document_static_method, _get_env_var
+from .utils import document_method, document_static_method, _get_env_var
 
 def __init_api_util():
     if not hasattr(ApiUtil, "get_env_var"):
@@ -143,7 +143,7 @@ def __doc_api_util():
         New in PyTango 7.1.3
     """ )
 
-def init(doc=True):
+def api_util_init(doc=True):
     __init_api_util()
     if doc:
         __doc_api_util()

@@ -319,7 +319,7 @@ class EventLoggerTable(Qt.QTableView):
         """Overwrite of slot rows inserted to do proper resize and scroll to 
         bottom if desired
         """
-        for i in xrange(start,end+1):
+        for i in range(start,end+1):
             self.resizeRowToContents(i)
         if start == 0:
             self.resizeColumnsToContents()

@@ -27,5 +27,5 @@ __all__ = ['load_ipython_extension', 'unload_ipython_extension', 'load_config',
 from PyTango.ipython.ipython_00_11 import *
 
 #rewrite 0.11's load config
-from ipython_00_12 import load_config
+from .ipython_00_12 import load_config
 

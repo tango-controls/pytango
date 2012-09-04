@@ -35,14 +35,24 @@ namespace PyDeviceAttribute {
     /// @param ptr_ The array object.
     /// @param type_ The type of the array objects. We need it to convert ptr_
     ///              to the proper type before deleting it. ex: Tango::DEV_SHORT.
-    static void _dev_var_x_array_deleter(void * ptr_, void *type_)
+#ifdef PYCAPSULE_OLD
+    template<long type>
+    static void _dev_var_x_array_deleter(void * ptr_)
     {
-        long type = reinterpret_cast<long>(type_);
-
         TANGO_DO_ON_ATTRIBUTE_DATA_TYPE(type,
             delete static_cast<TANGO_const2arraytype(tangoTypeConst)*>(ptr_);
         );
     }
+#else
+    template<long type>
+    static void _dev_var_x_array_deleter(PyObject* obj)
+    {
+        void * ptr_ = PyCapsule_GetPointer(obj, NULL);
+        TANGO_DO_ON_ATTRIBUTE_DATA_TYPE(type,
+            delete static_cast<TANGO_const2arraytype(tangoTypeConst)*>(ptr_);
+        );
+    }
+#endif
 
     template<long tangoTypeConst>
     static inline void _update_array_values(Tango::DeviceAttribute &self, bool isImage, object py_value)
@@ -123,18 +133,18 @@ namespace PyDeviceAttribute {
         // the last copy of numpy.ndarray() disappears.
         // PyCObject is intended for that kind of things. It's seen as a
         // black box object from python. We assign him a function to be called
-        // when it is deleted -> the function deletes de data.
-        PyObject* guard = PyCObject_FromVoidPtrAndDesc(
+        // when it is deleted -> the function deletes the data.
+        PyObject* guard = PyCapsule_New(
                 static_cast<void*>(value_ptr),
-                reinterpret_cast<void*>(tangoTypeConst),
-                _dev_var_x_array_deleter);
+                NULL,
+                _dev_var_x_array_deleter<tangoTypeConst>);
         if (!guard ) {
             Py_XDECREF(array);
             Py_XDECREF(warray);
             delete value_ptr;
             throw_error_already_set();
         }
-
+        
         PyArray_BASE(array) = guard;
         py_value.attr(value_attr_name) = boost::python::object(boost::python::handle<>(array));
 

@@ -25,27 +25,26 @@
 This is an internal PyTango module.
 """
 
+from __future__ import print_function
+
 __all__ = [ "ChangeEventProp", "PeriodicEventProp", "ArchiveEventProp",
             "AttributeAlarm", "EventProperties",
-            "AttributeConfig", "AttributeConfig_2", "AttributeConfig_3"]
+            "AttributeConfig", "AttributeConfig_2", "AttributeConfig_3",
+            "device_server_init"]
 
 __docformat__ = "restructuredtext"
 
 import copy
 
-import _PyTango
-from _PyTango import DeviceImpl, Device_3Impl, Device_4Impl
-from _PyTango import Attribute, WAttribute, MultiAttribute, MultiClassAttribute
-from _PyTango import Attr
-from _PyTango import Logger
-from _PyTango import AttrWriteType, AttrDataFormat, DispLevel
-from _PyTango import UserDefaultAttrProp
+from ._PyTango import DevFailed, DeviceImpl, Device_3Impl, Device_4Impl, \
+    Attribute, WAttribute, MultiAttribute, MultiClassAttribute, \
+    Attr, Logger, AttrWriteType, AttrDataFormat, DispLevel, UserDefaultAttrProp
 
-from utils import document_method as __document_method
-from utils import copy_doc
-from attr_data import AttrData
+from .utils import document_method as __document_method
+from .utils import copy_doc
+from .attr_data import AttrData
 
-import log4tango
+from .log4tango import TangoStream
 
 class AttributeAlarm(object):
     """This class represents the python interface for the Tango IDL object
@@ -261,13 +260,14 @@ def __DeviceImpl__get_device_properties(self, ds_class = None):
         self.device_property_list = copy.deepcopy(ds_class.device_property_list)
         class_prop = ds_class.class_property_list
         pu.get_device_properties(self, class_prop, self.device_property_list)
-        for prop_name in class_prop.keys():
+        for prop_name in class_prop:
             setattr(self, prop_name, pu.get_property_values(prop_name, class_prop))
-        for prop_name in self.device_property_list.keys():
+        for prop_name in self.device_property_list:
             setattr(self, prop_name, self.prop_util.get_property_values(prop_name, self.device_property_list))
-    except _PyTango.DevFailed, e:
-        print "----> ", e
-        raise e
+    except DevFailed as df:
+        print(80*"-")
+        print(df)
+        raise df
 
 def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_meth=None):
     """add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_meth=None) -> Attr
@@ -392,7 +392,7 @@ def __DeviceImpl__debug_stream(self, *msg):
 
             Since PyTango 7.1.3, the same can be achieved with::
             
-                print >>self.log_debug, msg
+                print(msg, file=self.log_debug)
             
         Parameters :
             - msg : (str) the message to be sent to the debug stream
@@ -408,7 +408,7 @@ def __DeviceImpl__info_stream(self, *msg):
 
             Since PyTango 7.1.3, the same can be achieved with::
             
-                print >>self.log_info, msg
+                print(msg, file=self.log_info)
 
         Parameters :
             - msg : (str) the message to be sent to the info stream
@@ -424,7 +424,7 @@ def __DeviceImpl__warn_stream(self, *msg):
 
             Since PyTango 7.1.3, the same can be achieved with::
             
-                print >>self.log_warn, msg
+                print(msg, file=self.log_warn)
 
         Parameters :
             - msg : (str) the message to be sent to the warn stream
@@ -440,7 +440,7 @@ def __DeviceImpl__error_stream(self, *msg):
 
             Since PyTango 7.1.3, the same can be achieved with::
             
-                print >>self.log_error, msg
+                print(msg, file=self.log_error)
 
         Parameters :
             - msg : (str) the message to be sent to the error stream
@@ -456,7 +456,7 @@ def __DeviceImpl__fatal_stream(self, *msg):
 
             Since PyTango 7.1.3, the same can be achieved with::
             
-                print >>self.log_fatal, msg
+                print(msg, file=self.log_fatal)
 
         Parameters :
             - msg : (str) the message to be sent to the fatal stream
@@ -467,31 +467,31 @@ def __DeviceImpl__fatal_stream(self, *msg):
 @property
 def __DeviceImpl__debug(self):
     if not hasattr(self, "_debug_s"):
-        self._debug_s = log4tango.TangoStream(self.debug_stream)
+        self._debug_s = TangoStream(self.debug_stream)
     return self._debug_s
 
 @property
 def __DeviceImpl__info(self):
     if not hasattr(self, "_info_s"):
-        self._info_s = log4tango.TangoStream(self.info_stream)
+        self._info_s = TangoStream(self.info_stream)
     return self._info_s
 
 @property
 def __DeviceImpl__warn(self):
     if not hasattr(self, "_warn_s"):
-        self._warn_s = log4tango.TangoStream(self.warn_stream)
+        self._warn_s = TangoStream(self.warn_stream)
     return self._warn_s
 
 @property
 def __DeviceImpl__error(self):
     if not hasattr(self, "_error_s"):
-        self._error_s = log4tango.TangoStream(self.error_stream)
+        self._error_s = TangoStream(self.error_stream)
     return self._error_s
 
 @property
 def __DeviceImpl__fatal(self):
     if not hasattr(self, "_fatal_s"):
-        self._fatal_s = log4tango.TangoStream(self.fatal_stream)
+        self._fatal_s = TangoStream(self.fatal_stream)
     return self._fatal_s
 
 def __DeviceImpl__str(self):
@@ -2468,7 +2468,7 @@ def __doc_UserDefaultAttrProp():
         Return     : None
     """ )
     
-def init(doc=True):
+def device_server_init(doc=True):
     __init_DeviceImpl()
     __init_Attribute()
     __init_Attr()

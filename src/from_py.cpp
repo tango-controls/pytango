@@ -36,9 +36,9 @@ void convert2array(const boost::python::object &py_value, Tango::DevVarCharArray
 
     size_t size = boost::python::len(py_value);
     result.length(size);
-    if (PyString_Check(py_value_ptr))
+    if (PyBytes_Check(py_value_ptr))
     {
-        char *ch = PyString_AS_STRING(py_value_ptr);
+        char *ch = PyBytes_AS_STRING(py_value_ptr);
         for (size_t i=0; i < size; ++i) {
             result[i] = ch[i];
         }
@@ -60,9 +60,15 @@ void convert2array(const object &py_value, StdStringVector & result)
         raise_(PyExc_TypeError, param_must_be_seq);
     }
     
-    if (PyString_Check(py_value_ptr))
+    if (PyBytes_Check(py_value_ptr))
     {
-        result.push_back(PyString_AsString(py_value_ptr));
+        result.push_back(PyBytes_AS_STRING(py_value_ptr));
+    }
+    else if(PyUnicode_Check(py_value_ptr))
+    {
+        PyObject* py_bytes_value_ptr = PyUnicode_AsLatin1String(py_value_ptr);
+        result.push_back(PyBytes_AS_STRING(py_bytes_value_ptr));
+        Py_DECREF(py_bytes_value_ptr);
     }
     else
     {
@@ -84,10 +90,16 @@ void convert2array(const object &py_value, Tango::DevVarStringArray & result)
         raise_(PyExc_TypeError, param_must_be_seq);
     }
     
-    if (PyString_Check(py_value_ptr))
+    if (PyBytes_Check(py_value_ptr))
     {
         result.length(1);
-        result[0] = CORBA::string_dup(PyString_AsString(py_value_ptr));
+        result[0] = CORBA::string_dup(PyBytes_AS_STRING(py_value_ptr));
+    }
+    else if(PyUnicode_Check(py_value_ptr))
+    {
+        PyObject* py_bytes_value_ptr = PyUnicode_AsLatin1String(py_value_ptr);
+        result[0] = CORBA::string_dup(PyBytes_AS_STRING(py_bytes_value_ptr));
+        Py_DECREF(py_bytes_value_ptr);
     }
     else
     {

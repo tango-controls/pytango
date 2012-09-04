@@ -46,7 +46,7 @@ def translate_version_str2int(version_str):
             v += int(parts[i])*int(math.pow(10,(2-i)*2))
             l -= 1
             i += 1
-        except ValueError,ve:
+        except ValueError:
             return v
         if not l: return v
     return v
@@ -54,21 +54,21 @@ def translate_version_str2int(version_str):
     try:
         v += 10000*int(parts[0])
         l -= 1
-    except ValueError,ve:
+    except ValueError:
         return v
     if not l: return v
     
     try:
         v += 100*int(parts[1])
         l -= 1
-    except ValueError,ve:
+    except ValueError:
         return v
     if not l: return v
 
     try:
         v += int(parts[0])
         l -= 1
-    except ValueError,ve:
+    except ValueError:
         return v
     if not l: return v
 
@@ -109,12 +109,12 @@ def get_ipython_version():
     try:
         try:
             v = IPython.Release.version
-        except Exception, e1:
+        except:
             try:
                 v = IPython.release.version
-            except Exception, e2:
+            except:
                 pass
-    except Exception, e3:
+    except:
         pass
     return v
 

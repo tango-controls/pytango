@@ -140,8 +140,16 @@ struct from_sequence
         for(Py_ssize_t i = 0; i < len; ++i)
         {
             PyObject *o_ptr = PySequence_GetItem(seq_ptr, i);
-            a.push_back(Tango::DbDatum(PyString_AsString(o_ptr)));
-            boost::python::decref(o_ptr);
+            if (PyBytes_Check(o_ptr))
+            {
+                a.push_back(Tango::DbDatum(PyBytes_AS_STRING(o_ptr)));
+            }
+            else if(PyUnicode_Check(o_ptr))
+            {
+                PyObject* o_bytes_ptr = PyUnicode_AsLatin1String(o_ptr);
+                a.push_back(Tango::DbDatum(PyBytes_AS_STRING(o_bytes_ptr)));
+                Py_DECREF(o_bytes_ptr);
+            }
         }
     }
 
@@ -169,7 +177,6 @@ struct from_sequence
             boost::python::tuple pair = (boost::python::tuple)it.attr("next")();
             boost::python::object key = pair[0];
             boost::python::object value = pair[1];
-            PyObject *value_ptr = value.ptr();
 
             boost::python::extract<Tango::DbDatum> ext(value);
             if(ext.check())
@@ -177,16 +184,28 @@ struct from_sequence
                 db_data.push_back(ext());
                 continue;
             }
-
-            Tango::DbDatum db_datum(PyString_AsString(key.ptr()));
-            if((PySequence_Check(value_ptr)) && (!PyString_Check(value_ptr)))
+            
+            char const* key_str = boost::python::extract<char const*>(key);
+            Tango::DbDatum db_datum(key_str);
+            
+            boost::python::extract<char const*> value_str(value);
+            
+            if(value_str.check())
             {
-                from_sequence<StdStringVector>::convert(value, db_datum.value_string);
+                db_datum.value_string.push_back(value_str());
             }
             else
             {
-                boost::python::object value_str = value.attr("__str__")();
-                db_datum.value_string.push_back(PyString_AsString(value_str.ptr()));
+                if(PySequence_Check(value.ptr()))
+                {
+                    from_sequence<StdStringVector>::convert(value, db_datum.value_string);
+                }
+                else
+                {
+                    boost::python::object str_value = value.attr("__str__")();
+                    boost::python::extract<char const*> str_value_str(str_value);
+                    db_datum.value_string.push_back(str_value_str());
+                }
             }
             db_data.push_back(db_datum);
         }
@@ -218,7 +237,9 @@ class CSequenceFromPython
         } else {
             if (PySequence_Check(py_obj.ptr()) == 0)
                 raise_(PyExc_TypeError, param_must_be_seq);
-            if (PyString_Check(py_obj.ptr()) != 0)
+            if (PyUnicode_Check(py_obj.ptr()) != 0)
+                raise_(PyExc_TypeError, param_must_be_seq);
+            if (PyUnicode_Check(py_obj.ptr()) != 0)
                 raise_(PyExc_TypeError, param_must_be_seq);
 
             m_own = true;

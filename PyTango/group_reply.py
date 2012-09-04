@@ -25,15 +25,12 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["group_reply_init"]
 
 __docformat__ = "restructuredtext"
 
-from utils import document_method as __document_method
-from _PyTango import GroupReply
-from _PyTango import GroupCmdReply
-from _PyTango import GroupAttrReply
-from _PyTango import ExtractAs
+from .utils import document_method as __document_method
+from ._PyTango import GroupReply, GroupCmdReply, GroupAttrReply, ExtractAs
 
 def __GroupCmdReply__get_data(self):
     return self.get_data_raw().extract()
@@ -109,7 +106,7 @@ def __doc_GroupReply():
         Return     : (DeviceAttribute) Whatever is stored there, or None.
     """ )
 
-def init(doc=True):
+def group_reply_init(doc=True):
     __init_GroupReply()
     if doc:
         __doc_GroupReply()

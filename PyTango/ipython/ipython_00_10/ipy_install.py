@@ -25,7 +25,7 @@
 
 import sys
 import os
-import StringIO
+import io
 
 import IPython.genutils
 import PyTango
@@ -50,12 +50,12 @@ def install(ipydir=None,verbose=True):
     if verbose:
         out = sys.stdout
     else:
-        out = StringIO.StringIO()
+        out = io.StringIO()
     if ipydir is None and os.path.isfile(f_name):
-        print "Warning: The file '%s' already exists." % f_name
+        print("Warning: The file '%s' already exists." % f_name)
         r = ''
         while r.lower() not in ('y', 'n'):
-            r = raw_input("Do you wish to override it [Y/n]?")
+            r = input("Do you wish to override it [Y/n]?")
             r = r or 'y'
         if r.lower() == 'n':
             return
@@ -64,13 +64,13 @@ def install(ipydir=None,verbose=True):
     out.write("Installing tango extension to ipython... ")
     out.flush()
     try:
-        f = file(f_name, "w")
+        f = open(f_name, "w")
         f.write(profile)
         f.close()
         out.write("[DONE]\n\n")
-    except Exception, e:
+    except:
         out.write("[FAILED]\n\n")
-        raise e
+        raise
     
     ipy_user_config = os.path.join(IPython.genutils.get_ipython_dir(), 'ipy_user_conf.py')
     out.write("""\

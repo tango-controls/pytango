@@ -25,7 +25,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["time_val_init"]
 
 __docformat__ = "restructuredtext"
 
@@ -33,7 +33,8 @@ import time
 import datetime
 import operator
 
-from _PyTango import TimeVal
+from ._PyTango import TimeVal
+import numbers
 
 def __TimeVal__init(self, a=None, b=None, c=None):
     TimeVal.__init_original(self)
@@ -44,7 +45,7 @@ def __TimeVal__init(self, a=None, b=None, c=None):
         assert(b is None and c is None)
         a = time.mktime(a.timetuple()) + a.microsecond*1E-6
 
-    elif operator.isNumberType(a):
+    elif isinstance(a, numbers.Number):
         if b is None:
             self.tv_sec = int(a)
             usec = (a - self.tv_sec) * 1E6
@@ -192,6 +193,6 @@ def __init_TimeVal():
     TimeVal.isoformat = __TimeVal__isoformat
     TimeVal.__str__ = __TimeVal__str__
     
-def init(doc=True):
+def time_val_init(doc=True):
     __init_TimeVal()
 

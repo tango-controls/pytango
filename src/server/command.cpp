@@ -172,14 +172,24 @@ void extract_scalar<Tango::DEV_VOID>(const CORBA::Any &any, boost::python::objec
 /// @param type_ The type of the array objects. We need it to convert ptr_
 ///              to the proper type before deleting it.
 ///              ex: Tango::DEVVAR_SHORTARRAY.
-static void dev_var_x_array_deleter__(void * ptr_, void *type_)
-{
-    long type = reinterpret_cast<long>(type_);
-
-    TANGO_DO_ON_ATTRIBUTE_DATA_TYPE(type,
-        delete static_cast<TANGO_const2type(tangoTypeConst)*>(ptr_);
-    );
-}
+#    ifdef PYCAPSULE_OLD
+         template<long type>
+         static void dev_var_x_array_deleter__(void * ptr_)
+         {
+             TANGO_DO_ON_ATTRIBUTE_DATA_TYPE(type,
+                 delete static_cast<TANGO_const2type(tangoTypeConst)*>(ptr_);
+             );
+         }
+#    else
+         template<long type>
+         static void dev_var_x_array_deleter__(PyObject* obj)
+         {
+             void * ptr_ = PyCapsule_GetPointer(obj, NULL);
+             TANGO_DO_ON_ATTRIBUTE_DATA_TYPE(type,
+                 delete static_cast<TANGO_const2type(tangoTypeConst)*>(ptr_);
+             );
+         }
+#endif
 #endif
 
 template<long tangoArrayTypeConst>
@@ -206,10 +216,10 @@ void extract_array(const CORBA::Any &any, boost::python::object &py_result)
       // PyCObject is intended for that kind of things. It's seen as a
       // black box object from python. We assign him a function to be called
       // when it is deleted -> the function deletes de data.
-      PyObject* guard = PyCObject_FromVoidPtrAndDesc(
+      PyObject* guard = PyCapsule_New(
               static_cast<void*>(copy_ptr),
-              reinterpret_cast<void*>(tangoArrayTypeConst),
-              dev_var_x_array_deleter__);
+              NULL,
+              dev_var_x_array_deleter__<tangoArrayTypeConst>);
       if (!guard ) {
           delete copy_ptr;
           throw_error_already_set();

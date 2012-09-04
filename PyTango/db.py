@@ -25,26 +25,18 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["db_init"]
 
 __docformat__ = "restructuredtext"
 
-import types
-import operator
+from ._PyTango import StdStringVector, Database, DbDatum, DbData, \
+    DbDevInfo, DbDevInfos, DbDevImportInfo, DbDevExportInfo, DbDevExportInfos, \
+    DbHistory, DbServerInfo
 
-from _PyTango import StdStringVector
-from _PyTango import Database, DbDatum, DbData
-from _PyTango import DbDevInfo, DbDevInfos
-from _PyTango import DbDevImportInfo, DbDevExportInfo
-from _PyTango import DbDevExportInfos
-from _PyTango import DbHistory, DbServerInfo
-
-from utils import seq_2_StdStringVector
-from utils import seq_2_DbDevInfos
-from utils import seq_2_DbDevExportInfos
-from utils import seq_2_DbData
-from utils import DbData_2_dict
-from utils import document_method as __document_method
+from .utils import is_pure_str, is_non_str_seq, seq_2_StdStringVector, \
+    seq_2_DbDevInfos, seq_2_DbDevExportInfos, seq_2_DbData, DbData_2_dict
+from .utils import document_method as __document_method
+import collections
 
 #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 # DbDatum extension
@@ -99,7 +91,7 @@ def __Database__add_server(self, servname, dev_info):
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """
 
-    if not operator.isSequenceType(dev_info) and \
+    if not isinstance(dev_info, collections.Sequence) and \
        not isinstance(dev_info, DbDevInfo):
         raise TypeError('value must be a DbDevInfos, a seq<DbDevInfo> or ' \
                         'a DbDevInfo')
@@ -126,7 +118,7 @@ def __Database__export_server(self, dev_info):
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """
 
-    if not operator.isSequenceType(dev_info) and \
+    if not isinstance(dev_info, collections.Sequence) and \
        not isinstance(dev_info, DbDevExportInfo):
         raise TypeError('value must be a DbDevExportInfos, a seq<DbDevExportInfo> or ' \
                         'a DbDevExportInfo')
@@ -147,19 +139,19 @@ def __Database__generic_get_property(self, obj_name, value, f):
     elif isinstance(value, DbDatum):
         new_value = DbData()
         new_value.append(value)
-    elif type(value) in types.StringTypes:
+    elif is_pure_str(value):
         new_value = DbData()
         new_value.append(DbDatum(value))
-    elif operator.isSequenceType(value):
+    elif isinstance(value, collections.Sequence):
         new_value = DbData()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif operator.isMappingType(value):
+    elif isinstance(value, collections.Mapping):
         new_value = DbData()
-        for k, v in value.iteritems():
+        for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
             else:
@@ -181,16 +173,16 @@ def __Database__generic_put_property(self, obj_name, value, f):
         new_value = DbData()
         new_value.append(value)
         value = new_value
-    elif operator.isSequenceType(value) and not type(value) in types.StringTypes:
+    elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif operator.isMappingType(value):
+    elif isinstance(value, collections.Mapping):
         new_value = DbData()
-        for k, v in value.iteritems():
+        for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
                 continue
             db_datum = DbDatum(k)
-            if operator.isSequenceType(v) and not type(v) in types.StringTypes:
+            if is_non_str_seq(v):
                 seq_2_StdStringVector(v, db_datum.value_string)
             else:
                 db_datum.value_string.append(str(v))
@@ -208,19 +200,19 @@ def __Database__generic_delete_property(self, obj_name, value, f):
     elif isinstance(value, DbDatum):
         new_value = DbData()
         new_value.append(value)
-    elif type(value) in types.StringTypes:
+    elif is_pure_str(value):
         new_value = DbData()
         new_value.append(DbDatum(value))
-    elif operator.isSequenceType(value):
+    elif isinstance(value, collections.Sequence):
         new_value = DbData()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif operator.isMappingType(value):
+    elif isinstance(value, collections.Mapping):
         new_value = DbData()
-        for k, v in value.iteritems():
+        for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
             else:
@@ -407,7 +399,7 @@ def __Database__get_device_property_list(self, dev_name, wildcard, array=None):
         return self._get_device_property_list(dev_name, wildcard)
     elif isinstance(array, StdStringVector):
         return self._get_device_property_list(dev_name, wildcard, array)
-    elif operator.isSequenceType(array) and not type(array) in types.StringTypes:
+    elif is_non_str_seq(array):
         res = self._get_device_property_list(dev_name, wildcard)
         for e in res: array.append(e)
         return array
@@ -448,19 +440,19 @@ def __Database__get_device_attribute_property(self, dev_name, value):
     elif isinstance(value, DbDatum):
         new_value = DbData()
         new_value.append(value)
-    elif type(value) in types.StringTypes:
+    elif is_pure_str(value):
         new_value = DbData()
         new_value.append(DbDatum(value))
-    elif operator.isSequenceType(value):
+    elif isinstance(value, collections.Sequence):
         new_value = DbData()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif operator.isMappingType(value):
+    elif isinstance(value, collections.Mapping):
         new_value = DbData()
-        for k, v in value.iteritems():
+        for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
             else:
@@ -481,7 +473,7 @@ def __Database__get_device_attribute_property(self, dev_name, value):
         ret[db_datum.name] = curr_dict
         nb_props = int(db_datum[0])
         i += 1
-        for k in xrange(nb_props):
+        for k in range(nb_props):
             db_datum = new_value[i]
             curr_dict[db_datum.name] = db_datum.value_string
             i += 1
@@ -512,20 +504,20 @@ def __Database__put_device_attribute_property(self, dev_name, value):
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
     if isinstance(value, DbData):
         pass
-    elif operator.isSequenceType(value) and not type(value) in types.StringTypes:
+    elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif operator.isMappingType(value):
+    elif isinstance(value, collections.Mapping):
         new_value = DbData()
-        for k1, v1 in value.iteritems():
+        for k1, v1 in value.items():
             attr = DbDatum(k1)
             attr.append(str(len(v1)))
             new_value.append(attr)
-            for k2, v2 in v1.iteritems():
+            for k2, v2 in v1.items():
                 if isinstance(v2, DbDatum):
                     new_value.append(v2)
                     continue
                 db_datum = DbDatum(k2)
-                if operator.isSequenceType(v2) and not type(v2) in types.StringTypes:
+                if is_non_str_seq(v2):
                     seq_2_StdStringVector(v2, db_datum.value_string)
                 else:
                     db_datum.value_string.append(str(v2))
@@ -556,11 +548,11 @@ def __Database__delete_device_attribute_property(self, dev_name, value):
 
     if isinstance(value, DbData):
         new_value = value
-    elif operator.isSequenceType(value) and not type(value) in types.StringTypes:
+    elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif operator.isMappingType(value):
+    elif isinstance(value, collections.Mapping):
         new_value = DbData()
-        for k1, v1 in value.iteritems():
+        for k1, v1 in value.items():
             attr = DbDatum(k1)
             attr.append(str(len(v1)))
             new_value.append(attr)
@@ -681,19 +673,19 @@ def __Database__get_class_attribute_property(self, class_name, value):
     elif isinstance(value, DbDatum):
         new_value = DbData()
         new_value.append(value)
-    elif type(value) in types.StringTypes:
+    elif is_pure_str(value):
         new_value = DbData()
         new_value.append(DbDatum(value))
-    elif operator.isSequenceType(value):
+    elif isinstance(value, collections.Sequence):
         new_value = DbData()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif operator.isMappingType(value):
+    elif isinstance(value, collections.Mapping):
         new_value = DbData()
-        for k, v in value.iteritems():
+        for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
             else:
@@ -714,7 +706,7 @@ def __Database__get_class_attribute_property(self, class_name, value):
         ret[db_datum.name] = curr_dict
         nb_props = int(db_datum[0])
         i += 1
-        for k in xrange(nb_props):
+        for k in range(nb_props):
             db_datum = new_value[i]
             curr_dict[db_datum.name] = db_datum.value_string
             i += 1
@@ -746,20 +738,20 @@ def __Database__put_class_attribute_property(self, class_name, value):
 
     if isinstance(value, DbData):
         pass
-    elif operator.isSequenceType(value) and not type(value) in types.StringTypes:
+    elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif operator.isMappingType(value):
+    elif isinstance(value, collections.Mapping):
         new_value = DbData()
-        for k1, v1 in value.iteritems():
+        for k1, v1 in value.items():
             attr = DbDatum(k1)
             attr.append(str(len(v1)))
             new_value.append(attr)
-            for k2, v2 in v1.iteritems():
+            for k2, v2 in v1.items():
                 if isinstance(v2, DbDatum):
                     new_value.append(v2)
                     continue
                 db_datum = DbDatum(k2)
-                if operator.isSequenceType(v2) and not type(v2) in types.StringTypes:
+                if is_non_str_seq(v2):
                     seq_2_StdStringVector(v2, db_datum.value_string)
                 else:
                     db_datum.value_string.append(str(v2))
@@ -793,11 +785,11 @@ def __Database__delete_class_attribute_property(self, class_name, value):
 
     if isinstance(value, DbData):
         new_value = value
-    elif operator.isSequenceType(value) and not type(value) in types.StringTypes:
+    elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif operator.isMappingType(value):
+    elif isinstance(value, collections.Mapping):
         new_value = DbData()
-        for k1, v1 in value.iteritems():
+        for k1, v1 in value.items():
             attr = DbDatum(k1)
             attr.append(str(len(v1)))
             new_value.append(attr)
@@ -1075,10 +1067,10 @@ def __doc_Database():
 
             Example :
                 dev_imp_info = db.import_device('my/own/device')
-                print dev_imp_info.name
-                print dev_imp_info.exported
-                print dev_imp_info.ior
-                print dev_imp_info.version
+                print(dev_imp_info.name)
+                print(dev_imp_info.exported)
+                print(dev_imp_info.ior)
+                print(dev_imp_info.version)
 
         Parameters :
             - dev_name : (str) device name
@@ -2089,7 +2081,7 @@ def __doc_DbServerInfo():
         - mode : (str) mode
         - level : (str) level"""
 
-def init(doc=True):
+def db_init(doc=True):
     __init_DbDatum()
     if doc:
         __doc_DbDatum()

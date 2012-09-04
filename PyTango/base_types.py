@@ -25,13 +25,12 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["base_types_init"]
 
 __docformat__ = "restructuredtext"
 
-import operator
 
-from _PyTango import (StdStringVector, StdLongVector, StdDoubleVector, \
+from ._PyTango import (StdStringVector, StdLongVector, StdDoubleVector, \
     CommandInfoList, AttributeInfoList, AttributeInfoListEx, DbData, \
     DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList, \
     DeviceDataHistoryList, StdGroupReplyVector, \
@@ -42,8 +41,8 @@ from _PyTango import (StdStringVector, StdLongVector, StdDoubleVector, \
     DevCommandInfo, CommandInfo, DataReadyEventData, DeviceInfo, \
     LockerInfo, PollDevice, TimeVal)
 
-from utils import document_method
-from utils import document_enum as __document_enum
+from .utils import document_method, is_integer
+from .utils import document_enum as __document_enum
 
 def __StdVector__add(self, seq):
     ret = seq.__class__(self)
@@ -52,18 +51,18 @@ def __StdVector__add(self, seq):
 
 def __StdVector__mul(self, n):
     ret = self.__class__()
-    for _ in xrange(n):
+    for _ in range(n):
         ret.extend(self)
     return ret
 
 def __StdVector__imul(self, n):
     ret = self.__class__()
-    for _ in xrange(n):
+    for _ in range(n):
         ret.extend(self)
     return ret
 
 def __StdVector__getitem(self, key):
-    if operator.isNumberType(key) or key.step is None:
+    if is_integer(key) or key.step is None:
         return self.__original_getitem(key)
     
     res = self.__class__()
@@ -75,7 +74,7 @@ def __StdVector__getitem(self, key):
     if stop > nb:
         stop = nb
     
-    for i in xrange(start, stop, key.step or 1):
+    for i in range(start, stop, key.step or 1):
         res.append(self[i])
     
     return res
@@ -124,11 +123,6 @@ def __doc_base_types():
           of lists
         - String   : The data will be stored 'as is', the binary data
           as it comes from TangoC++ in 'value'.
-        - PyTango3 : Backward compatibility mode. If the attribute is
-          an scalar, value and w_scalar_value will contain a value.
-          If it's an SPECTRUM or IMAGE it will be exported as a flat
-          list in value, were both the read and the write part are
-          in value.
         - Nothing  : The value will not be extracted from DeviceAttribute
     """ )
     
@@ -664,7 +658,7 @@ def __doc_base_types():
         - tv_usec : microseconds
         - tv_nsec : nanoseconds"""
 
-def init(doc=True):
+def base_types_init(doc=True):
     __init_base_types()
     if doc:
         __doc_base_types()

@@ -29,24 +29,26 @@ __all__ = [ "NumpyType", "numpy_type", "numpy_spectrum", "numpy_image" ]
 
 __docformat__ = "restructuredtext"
 
-import _PyTango
+from ._PyTango import Except
+from ._PyTango import constants
+
+from .attribute_proxy import AttributeProxy
+import collections
 
 def _numpy_invalid(*args, **kwds):
-    _PyTango.Except.throw_exception(
+    Except.throw_exception(
         "PyTango_InvalidConversion",
         "There's no registered conversor to numpy.",
         "NumpyType.tango_to_numpy"
     )
 
 def _define_numpy():
-    if not _PyTango.constants.NUMPY_SUPPORT:
+    if not constants.NUMPY_SUPPORT:
         return None, _numpy_invalid, _numpy_invalid, _numpy_invalid
     
     try:
         import numpy
         import operator
-
-        from attribute_proxy import AttributeProxy
 
         ArgType = _PyTango.CmdArgType
         AttributeInfo = _PyTango.AttributeInfo
@@ -115,7 +117,7 @@ def _define_numpy():
                         - sequence:
                 """
                 np_type = NumpyType.tango_to_numpy(tg_type)
-                if operator.isSequenceType(dim_x):
+                if isinstance(dim_x, collections.Sequence):
                     return numpy.array(dim_x, dtype=np_type)
                 else:
                     return numpy.ndarray(shape=(dim_x,), dtype=np_type)

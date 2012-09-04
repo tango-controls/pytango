@@ -34,10 +34,11 @@ namespace PyTango
 {
     enum ExtractAs {
         ExtractAsNumpy,
+        ExtractAsByteArray,
+        ExtractAsBytes,
         ExtractAsTuple,
         ExtractAsList,
         ExtractAsString,
-        ExtractAsPyTango3,
         ExtractAsNothing
     };
     

@@ -33,7 +33,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import sys
+import os
 import re
 import PyTango
 
@@ -49,10 +50,14 @@ sys.path.append(os.path.abspath('sphinxext'))
 extensions = ['sphinx.ext.pngmath',
               'sphinx.ext.autodoc',
               'sphinx.ext.doctest',
-              'sphinx.ext.graphviz',
               'sphinx.ext.intersphinx',
               'ipython_console_highlighting',
               'tango_console_highlighting']
+
+# disable until graphviz works in pyhon 3
+if sys.hexversion < 0x03000000:
+    extensions.append('sphinx.ext.graphviz')
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -139,10 +144,10 @@ html_theme = 'default'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = None
+#html_title = "PyTango documentation"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = None
+#html_short_title = "PyTango"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.

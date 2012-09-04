@@ -43,6 +43,9 @@ using namespace boost::python;
             struct timeval tv; PYTG_TIME_FROM_DOUBLE(dbl, tv)
 #endif
 
+#ifndef TgLibVersNb
+#   define TgLibVersNb 80005
+#endif
 
 inline static void throw_wrong_python_data_type(const std::string &att_name,
                                          const char *method)
@@ -430,6 +433,21 @@ namespace PyAttribute
         att.set_properties(tg_attr_cfg, dev_ptr);
     }
 
+    void set_upd_properties(Tango::Attribute &att, boost::python::object &attr_cfg)
+    {
+        Tango::AttributeConfig_3 tg_attr_cfg;
+        from_py_object(attr_cfg, tg_attr_cfg);
+        att.set_upd_properties(tg_attr_cfg);
+    }
+
+    void set_upd_properties(Tango::Attribute &att, boost::python::object &attr_cfg, boost::python::object &dev_name)
+    {
+        Tango::AttributeConfig_3 tg_attr_cfg;
+        from_py_object(attr_cfg, tg_attr_cfg);
+        string tg_dev_name = boost::python::extract<string>(dev_name);
+        att.set_upd_properties(tg_attr_cfg,tg_dev_name);
+    }
+
     inline void fire_change_event(Tango::Attribute &self)
     {
         self.fire_change_event();
@@ -451,6 +469,335 @@ namespace PyAttribute
                 o.str(),
                 "fire_change_event()");
     }
+
+#if TgLibVersNb >= 80100 // set_min_alarm
+
+    template<long tangoTypeConst>
+    inline void _set_min_alarm(Tango::Attribute &self, boost::python::object value)
+    {
+		typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+		TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
+		self.set_min_alarm(c_value);
+    }
+
+#else // set_min_alarm
+
+    template<typename TangoScalarType>
+    inline void __set_min_alarm(Tango::Attribute &self, boost::python::object value)
+    {
+		TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
+		self.set_min_alarm(c_value);
+    }
+
+    template<>
+    inline void __set_min_alarm<Tango::DevEncoded>(Tango::Attribute &self, boost::python::object value)
+    {
+    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+    	Tango::Except::throw_exception((const char *)"API_MethodArgument",
+    				  (const char *)err_msg.c_str(),
+    				  (const char *)"Attribute::set_min_alarm()");
+    }
+
+    template<long tangoTypeConst>
+    inline void _set_min_alarm(Tango::Attribute &self, boost::python::object value)
+    {
+		typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+		__set_min_alarm<TangoScalarType>(self,value);
+    }
+
+#endif // set_min_alarm
+
+    inline void set_min_alarm(Tango::Attribute &self, boost::python::object value)
+    {
+        bopy::extract<string> value_convert(value);
+        
+    	if (value_convert.check())
+    	{
+			self.set_min_alarm(value_convert());
+    	}
+    	else
+    	{
+			long tangoTypeConst = self.get_data_type();
+			// TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
+			// for one of the forbidden attribute data types; code dependent on Tango C++ implementation
+			if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
+				tangoTypeConst = Tango::DEV_DOUBLE;
+			else if(tangoTypeConst == Tango::DEV_ENCODED)
+				tangoTypeConst = Tango::DEV_UCHAR;
+
+			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(tangoTypeConst, _set_min_alarm, self, value);
+    	}
+    }
+
+#if TgLibVersNb >= 80100 // set_max_alarm
+
+    template<long tangoTypeConst>
+    inline void _set_max_alarm(Tango::Attribute &self, boost::python::object value)
+    {
+		typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+		TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
+		self.set_max_alarm(c_value);
+    }
+
+#else // set_max_alarm
+
+    template<typename TangoScalarType>
+    inline void __set_max_alarm(Tango::Attribute &self, boost::python::object value)
+    {
+		TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
+		self.set_max_alarm(c_value);
+    }
+
+    template<>
+    inline void __set_max_alarm<Tango::DevEncoded>(Tango::Attribute &self, boost::python::object value)
+    {
+    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+    	Tango::Except::throw_exception((const char *)"API_MethodArgument",
+    				  (const char *)err_msg.c_str(),
+    				  (const char *)"Attribute::set_max_alarm()");
+    }
+
+    template<long tangoTypeConst>
+    inline void _set_max_alarm(Tango::Attribute &self, boost::python::object value)
+    {
+		typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+		__set_max_alarm<TangoScalarType>(self,value);
+    }
+
+#endif // set_max_alarm
+
+    inline void set_max_alarm(Tango::Attribute &self, boost::python::object value)
+    {
+        bopy::extract<string> value_convert(value);
+        
+    	if (value_convert.check())
+    	{
+			self.set_max_alarm(value_convert());
+    	}
+    	else
+    	{
+			long tangoTypeConst = self.get_data_type();
+			// TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
+			// for one of the forbidden attribute data types; code dependent on Tango C++ implementation
+			if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
+				tangoTypeConst = Tango::DEV_DOUBLE;
+			else if(tangoTypeConst == Tango::DEV_ENCODED)
+				tangoTypeConst = Tango::DEV_UCHAR;
+
+			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(tangoTypeConst, _set_max_alarm, self, value);
+    	}
+    }
+
+#if TgLibVersNb >= 80100 // set_min_warning
+
+    template<long tangoTypeConst>
+    inline void _set_min_warning(Tango::Attribute &self, boost::python::object value)
+    {
+		typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+		TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
+		self.set_min_warning(c_value);
+    }
+
+#else // set_min_warning
+
+    template<typename TangoScalarType>
+    inline void __set_min_warning(Tango::Attribute &self, boost::python::object value)
+    {
+		TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
+		self.set_min_warning(c_value);
+    }
+
+    template<>
+    inline void __set_min_warning<Tango::DevEncoded>(Tango::Attribute &self, boost::python::object value)
+    {
+    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+    	Tango::Except::throw_exception((const char *)"API_MethodArgument",
+    				  (const char *)err_msg.c_str(),
+    				  (const char *)"Attribute::set_min_warning()");
+    }
+
+    template<long tangoTypeConst>
+    inline void _set_min_warning(Tango::Attribute &self, boost::python::object value)
+    {
+		typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+		__set_min_warning<TangoScalarType>(self,value);
+    }
+
+#endif // set_min_warning
+
+    inline void set_min_warning(Tango::Attribute &self, boost::python::object value)
+    {
+        bopy::extract<string> value_convert(value);
+        
+    	if (value_convert.check())
+    	{
+			self.set_min_warning(value_convert());
+    	}
+    	else
+    	{
+			long tangoTypeConst = self.get_data_type();
+			// TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
+			// for one of the forbidden attribute data types; code dependent on Tango C++ implementation
+			if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
+				tangoTypeConst = Tango::DEV_DOUBLE;
+			else if(tangoTypeConst == Tango::DEV_ENCODED)
+				tangoTypeConst = Tango::DEV_UCHAR;
+
+			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(tangoTypeConst, _set_min_warning, self, value);
+    	}
+    }
+
+#if TgLibVersNb >= 80100 // set_max_warning
+
+    template<long tangoTypeConst>
+    inline void _set_max_warning(Tango::Attribute &self, boost::python::object value)
+    {
+		typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+		TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
+		self.set_max_warning(c_value);
+    }
+
+#else // set_max_warning
+
+    template<typename TangoScalarType>
+    inline void __set_max_warning(Tango::Attribute &self, boost::python::object value)
+    {
+		TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
+		self.set_max_warning(c_value);
+    }
+
+    template<>
+    inline void __set_max_warning<Tango::DevEncoded>(Tango::Attribute &self, boost::python::object value)
+    {
+    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+    	Tango::Except::throw_exception((const char *)"API_MethodArgument",
+    				  (const char *)err_msg.c_str(),
+    				  (const char *)"Attribute::set_max_warning()");
+    }
+
+    template<long tangoTypeConst>
+    inline void _set_max_warning(Tango::Attribute &self, boost::python::object value)
+    {
+		typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+		__set_max_warning<TangoScalarType>(self,value);
+    }
+
+#endif // set_max_warning
+
+    inline void set_max_warning(Tango::Attribute &self, boost::python::object value)
+    {
+        bopy::extract<string> value_convert(value);
+        
+    	if (value_convert.check())
+    	{
+			self.set_max_warning(value_convert());
+    	}
+    	else
+    	{
+			long tangoTypeConst = self.get_data_type();
+			// TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
+			// for one of the forbidden attribute data types; code dependent on Tango C++ implementation
+			if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
+				tangoTypeConst = Tango::DEV_DOUBLE;
+			else if(tangoTypeConst == Tango::DEV_ENCODED)
+				tangoTypeConst = Tango::DEV_UCHAR;
+
+			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(tangoTypeConst, _set_max_warning, self, value);
+    	}
+    }
+
+    template<long tangoTypeConst>
+    PyObject* __get_min_alarm(Tango::Attribute &att)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+        TangoScalarType tg_val;
+        att.get_min_alarm(tg_val);
+        boost::python::object py_value(tg_val);
+
+        return boost::python::incref(py_value.ptr());
+    }
+
+    PyObject *get_min_alarm(Tango::Attribute &att)
+    {
+        long tangoTypeConst = att.get_data_type();
+
+		if(tangoTypeConst == Tango::DEV_ENCODED)
+			tangoTypeConst = Tango::DEV_UCHAR;
+
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(tangoTypeConst, return __get_min_alarm, att);
+        return 0;
+    }
+
+    template<long tangoTypeConst>
+    PyObject* __get_max_alarm(Tango::Attribute &att)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+        TangoScalarType tg_val;
+        att.get_max_alarm(tg_val);
+        boost::python::object py_value(tg_val);
+
+        return boost::python::incref(py_value.ptr());
+    }
+
+    PyObject *get_max_alarm(Tango::Attribute &att)
+    {
+        long tangoTypeConst = att.get_data_type();
+
+		if(tangoTypeConst == Tango::DEV_ENCODED)
+			tangoTypeConst = Tango::DEV_UCHAR;
+
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(tangoTypeConst, return __get_max_alarm, att);
+        return 0;
+    }
+
+    template<long tangoTypeConst>
+    PyObject* __get_min_warning(Tango::Attribute &att)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+        TangoScalarType tg_val;
+        att.get_min_warning(tg_val);
+        boost::python::object py_value(tg_val);
+
+        return boost::python::incref(py_value.ptr());
+    }
+
+    PyObject *get_min_warning(Tango::Attribute &att)
+    {
+        long tangoTypeConst = att.get_data_type();
+
+		if(tangoTypeConst == Tango::DEV_ENCODED)
+			tangoTypeConst = Tango::DEV_UCHAR;
+
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(tangoTypeConst, return __get_min_warning, att);
+        return 0;
+    }
+
+    template<long tangoTypeConst>
+    PyObject* __get_max_warning(Tango::Attribute &att)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+        TangoScalarType tg_val;
+        att.get_max_warning(tg_val);
+        boost::python::object py_value(tg_val);
+
+        return boost::python::incref(py_value.ptr());
+    }
+
+    PyObject *get_max_warning(Tango::Attribute &att)
+    {
+        long tangoTypeConst = att.get_data_type();
+
+		if(tangoTypeConst == Tango::DEV_ENCODED)
+			tangoTypeConst = Tango::DEV_UCHAR;
+
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(tangoTypeConst, return __get_max_warning, att);
+        return 0;
+    }
+
 };
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_quality_overloads,
@@ -511,7 +858,25 @@ void export_attribute()
         .def("get_polling_period", &Tango::Attribute::get_polling_period)
         .def("set_attr_serial_model", &Tango::Attribute::set_attr_serial_model)
         .def("get_attr_serial_model", &Tango::Attribute::get_attr_serial_model)
-        
+
+        .def("set_min_alarm", &PyAttribute::set_min_alarm)
+        .def("set_max_alarm", &PyAttribute::set_max_alarm)
+        .def("set_min_warning", &PyAttribute::set_min_warning)
+        .def("set_max_warning", &PyAttribute::set_max_warning)
+
+        .def("get_min_alarm",
+			(PyObject* (*) (Tango::Attribute &))
+			&PyAttribute::get_min_alarm)
+        .def("get_max_alarm",
+			(PyObject* (*) (Tango::Attribute &))
+			&PyAttribute::get_max_alarm)
+        .def("get_min_warning",
+			(PyObject* (*) (Tango::Attribute &))
+			&PyAttribute::get_min_warning)
+        .def("get_max_warning",
+			(PyObject* (*) (Tango::Attribute &))
+			&PyAttribute::get_max_warning)
+
         .def("set_value",
             (void (*) (Tango::Attribute &, boost::python::object &))
             &PyAttribute::set_value)
@@ -560,6 +925,14 @@ void export_attribute()
         .def("_set_properties", &PyAttribute::set_properties)
         .def("_set_properties_3", &PyAttribute::set_properties_3)
         
+        .def("set_upd_properties",
+			(void (*) (Tango::Attribute &, boost::python::object &))
+			&PyAttribute::set_upd_properties)
+
+        .def("set_upd_properties",
+			(void (*) (Tango::Attribute &, boost::python::object &, boost::python::object &))
+			&PyAttribute::set_upd_properties)
+
         .def("fire_change_event",
             (void (*) (Tango::Attribute &))
             &PyAttribute::fire_change_event)

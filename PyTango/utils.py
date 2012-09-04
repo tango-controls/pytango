@@ -25,77 +25,27 @@
 This is an internal PyTango module.
 """
 
-__all__ = [ "is_scalar_type", "is_array_type", "is_numerical_type", 
+from __future__ import with_statement
+from __future__ import print_function
+
+__all__ = [ "is_pure_str", "is_non_str_seq", "is_integer", "is_number",
+            "is_scalar_type", "is_array_type", "is_numerical_type",
             "is_int_type", "is_float_type", "obj_2_str", "seqStr_2_obj",
             "document_method", "document_static_method", "document_enum",
             "CaselessList", "CaselessDict", "EventCallBack", "get_home",
-            "from_version_str_to_hex_str", "from_version_str_to_int", 
-            "wraps", "update_wrapper"]
+            "from_version_str_to_hex_str", "from_version_str_to_int", ]
 
 __docformat__ = "restructuredtext"
 
 import sys
 import os
-import socket
-import types
-import operator
+import collections
+import numbers
 
-try:
-    from functools import wraps, update_wrapper
-except ImportError:
-    # -------------------
-    # Python 2.4 fallback
-    # -------------------
-    def curry(_curried_func, *args, **kwargs):
-        def _curried(*moreargs, **morekwargs):
-            return _curried_func(*(args+moreargs), **dict(kwargs, **morekwargs))
-        return _curried
-    
-    WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__doc__')
-    WRAPPER_UPDATES = ('__dict__',)
-    def update_wrapper(wrapper,
-                       wrapped,
-                       assigned = WRAPPER_ASSIGNMENTS,
-                       updated = WRAPPER_UPDATES):
-        """Update a wrapper function to look like the wrapped function
-
-           wrapper is the function to be updated
-           wrapped is the original function
-           assigned is a tuple naming the attributes assigned directly
-           from the wrapped function to the wrapper function (defaults to
-           functools.WRAPPER_ASSIGNMENTS)
-           updated is a tuple naming the attributes off the wrapper that
-           are updated with the corresponding attribute from the wrapped
-           function (defaults to functools.WRAPPER_UPDATES)
-        """
-        for attr in assigned:
-            try:
-                setattr(wrapper, attr, getattr(wrapped, attr))
-            except TypeError: # Python 2.3 doesn't allow assigning to __name__.
-                pass
-        for attr in updated:
-            getattr(wrapper, attr).update(getattr(wrapped, attr))
-        # Return the wrapper so this can be used as a decorator via curry()
-        return wrapper
-
-    def wraps(wrapped,
-          assigned = WRAPPER_ASSIGNMENTS,
-          updated = WRAPPER_UPDATES):
-        """Decorator factory to apply update_wrapper() to a wrapper function
-
-           Returns a decorator that invokes update_wrapper() with the decorated
-           function as the wrapper argument and the arguments to wraps() as the
-           remaining arguments. Default arguments are as for update_wrapper().
-           This is a convenience function to simplify applying curry() to
-           update_wrapper().
-        """
-        return curry(update_wrapper, wrapped=wrapped,
-                     assigned=assigned, updated=updated)
-
-
-from _PyTango import StdStringVector, StdDoubleVector
-from _PyTango import DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat
-from _PyTango import EventData, AttrConfEventData, DataReadyEventData
+from ._PyTango import StdStringVector, StdDoubleVector, \
+    DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
+    EventData, AttrConfEventData, DataReadyEventData
+from ._PyTango import constants
 
 _scalar_int_types = (CmdArgType.DevShort, CmdArgType.DevUShort,
     CmdArgType.DevInt, CmdArgType.DevLong, CmdArgType.DevULong,
@@ -139,6 +89,47 @@ _scalar_to_array_type = {
     CmdArgType.DevString : CmdArgType.DevVarStringArray,
     CmdArgType.ConstDevString : CmdArgType.DevVarStringArray,
 }
+
+__str_klasses = str,
+__int_klasses = int,
+__number_klasses = numbers.Number,
+
+__use_unicode = False
+try:
+    unicode
+    __use_unicode = True
+    __str_klasses = tuple(list(__str_klasses) + [unicode])
+except:
+    pass
+
+__use_long = False
+try:
+    long
+    __use_long = True
+    __int_klasses = tuple(list(__int_klasses) + [long])
+except:
+    pass
+
+if constants.NUMPY_SUPPORT:
+    import numpy
+    __int_klasses = tuple(list(__int_klasses) + [numpy.integer])
+    __number_klasses = tuple(list(__number_klasses) + [numpy.number])
+
+__str_klasses = tuple(__str_klasses)
+__int_klasses = tuple(__int_klasses)
+__number_klasses = tuple(__number_klasses)
+
+def is_pure_str(obj):
+    return isinstance(obj , __str_klasses)
+
+def is_non_str_seq(obj):
+    return isinstance(obj, collections.Sequence) and not is_pure_str(obj)
+
+def is_integer(obj):
+    return isinstance(obj, __int_klasses)
+
+def is_number(obj):
+    return isinstance(obj, __number_klasses)
 
 def is_scalar(tg_type):
     """Tells if the given tango type is a scalar
@@ -385,8 +376,8 @@ def seqStr_2_obj(seq, tg_type, tg_format=None):
 
 def _seqStr_2_obj_from_type(seq, tg_type):
     
-    if type(seq) in types.StringTypes:
-        seq = (seq,)
+    if is_pure_str(seq):
+        seq = seq,
     
     #    Scalar cases
     global _scalar_int_types
@@ -475,7 +466,7 @@ def obj_2_str(obj, tg_type):
     ret = ""
     if tg_type in _scalar_types:
         # scalar cases
-        if operator.isSequenceType(obj):
+        if isinstance(obj, collections.Sequence):
             if not len(obj):
                 return ret
             obj = obj[0]
@@ -485,25 +476,39 @@ def obj_2_str(obj, tg_type):
         ret = '\n'.join([ str(i) for i in obj ])
     return ret
 
+def __get_meth_func(klass, method_name):
+    meth = getattr(klass, method_name)
+    func = meth
+    if hasattr(meth, '__func__'):
+        func = meth.__func__
+    elif hasattr(meth, 'im_func'):
+        func = meth.im_func
+    return meth, func
+
 def copy_doc(klass, fnname):
-    """Copies documentation string of a method from the super class into the rewritten method of the given class"""
-    getattr(klass, fnname).im_func.__doc__ = getattr(klass.__base__, fnname).im_func.__doc__
+    """Copies documentation string of a method from the super class into the
+    rewritten method of the given class"""
+    base_meth, base_func = __get_meth_func(klass.__base__, fnname)
+    meth, func = __get_meth_func(klass, fnname)
+    func.__doc__ = base_func.__doc__
 
 def document_method(klass, method_name, d, add=True):
+    meth, func = __get_meth_func(klass, method_name)
     if add:
-        cpp_doc = getattr(klass, method_name).__doc__
+        cpp_doc = meth.__doc__
         if cpp_doc:
-            getattr(klass, method_name).im_func.__doc__ = "%s\n%s" % (d, cpp_doc)
+            func.__doc__ = "%s\n%s" % (d, cpp_doc)
             return
-    getattr(klass, method_name).im_func.__doc__ = d
+    func.__doc__ = d
 
 def document_static_method(klass, method_name, d, add=True):
+    meth, func = __get_meth_func(klass, method_name)
     if add:
-        cpp_doc = getattr(klass, method_name).__doc__
+        cpp_doc = meth.__doc__
         if cpp_doc:
-            getattr(klass, method_name).__doc__ = "%s\n%s" % (d, cpp_doc)
+            meth.__doc__ = "%s\n%s" % (d, cpp_doc)
             return
-    getattr(klass, method_name).__doc__ = d
+    meth.__doc__ = d
 
 def document_enum(klass, enum_name, desc, append=True):
     # derived = type(base)('derived', (base,), {'__doc__': 'desc'})
@@ -764,13 +769,9 @@ __NOTIFD_FACTORY_PREFIX = "notifd/factory/"
 
 def notifd2db(notifd_ior_file=__DEFAULT_FACT_IOR_FILE, files=None, host=None, out=sys.stdout):
     ior_string = ""
-    ior_file = None
-    try:
-        ior_file = file(notifd_ior_file)
+    with file(notifd_ior_file) as ior_file:
         ior_string = ior_file.read()
-    finally:
-        if ior_file is not None:
-            ior_file.close()
+    
     if files is None:
         return _notifd2db_real_db(ior_string, host=host, out=out)
     else:
@@ -779,17 +780,17 @@ def notifd2db(notifd_ior_file=__DEFAULT_FACT_IOR_FILE, files=None, host=None, ou
 def _notifd2db_file_db(ior_string, files, out=sys.stdout):
     raise RuntimeError("Not implemented yet")
 
-    #print >>out, "going to export notification service event factory to " \
-    #             "device server property file(s) ..."
-    #for f in files:
-    #    with file(f, "w"):
-    #        pass
-    #return
+    print("going to export notification service event factory to " \
+          "device server property file(s) ...", file=out)
+    for f in files:
+        with file(f, "w"):
+            pass
+    return
 
 def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
     import PyTango
-    print >>out, "going to export notification service event factory to " \
-                 "Tango database ..."
+    print("going to export notification service event factory to " \
+          "Tango database ...", file=out)
                  
     num_retries = 3
     while num_retries > 0:
@@ -797,15 +798,16 @@ def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
             db = PyTango.Database()
             db.set_timeout_millis(10000)
             num_retries = 0
-        except PyTango.DevFailed, df:
+        except PyTango.DevFailed as df:
             num_retries -= 1
             if num_retries == 0:
-                print >>out, "Can't create Tango database object"
-                print >>out, str(df)
+                print("Can't create Tango database object", file=out)
+                print(str(df), file=out)
                 return
-            print >>out, "Can't create Tango database object, retrying...."
+            print("Can't create Tango database object, retrying....", file=out)
     
     if host is None:
+        import socket
         host_name = socket.getfqdn()
     
     global __NOTIFD_FACTORY_PREFIX
@@ -817,10 +819,10 @@ def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
     while num_retries > 0:
         try:
             db.command_inout("DbExportEvent", args)
-            print >>out, "Successfully exported notification service event " \
-                         "factory for host", host_name, "to Tango database !"
+            print("Successfully exported notification service event " \
+                  "factory for host", host_name, "to Tango database !", file=out)
             break
-        except PyTango.CommunicationFailed, cf:
+        except PyTango.CommunicationFailed as cf:
             if len(cf.errors) >= 2:
                 if cf.errors[1].reason == "API_DeviceTimedOut":
                     if num_retries > 0:
@@ -833,8 +835,8 @@ def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
             num_retries = 0
     
     if num_retries == 0:
-        print >>out, "Failed to export notification service event factory " \
-                     "to TANGO database"
+        print("Failed to export notification service event factory " \
+              "to TANGO database", file=out)
 
 
 class EventCallBack(object):
@@ -880,9 +882,9 @@ class EventCallBack(object):
         """Internal usage only"""
         try:
             self._push_event(evt)
-        except Exception, e:
-            print >>self._fd, "Unexpected error in callback for %s: %s" \
-                % (str(evt), str(e))
+        except Exception as e:
+            print("Unexpected error in callback for %s: %s" \
+                  % (str(evt), str(e)), file=self._fd)
     
     def _push_event(self, evt):
         """Internal usage only"""
@@ -911,12 +913,12 @@ class EventCallBack(object):
             attr_name = "<UNKNOWN>"
         try:
             value = self._get_value(evt)
-        except Exception, e:
+        except Exception as e:
             value = "Unexpected exception in getting event value: %s" % str(e)
         d = { "date" : date, "reception_date" : reception_date,
               "type" : evt_type, "dev_name" : dev_name, "name" : attr_name,
               "value" : value }
-        print >>self._fd, self._msg.format(**d)
+        print(self._msg.format(**d), file=self._fd)
 
     def _append(self, evt):
         """Internal usage only"""

@@ -25,8 +25,6 @@
 #include "defs.h"
 #include "pytgutils.h"
 
-using namespace boost::python;
-
 extern const char *param_must_be_seq;
 extern const char *unreachable_code;
 extern const char *non_string_seq;
@@ -36,18 +34,18 @@ const char *param_numb_or_str_numb = "Second parameter must be an int or a "
 
 struct PyDatabase
 {
-    struct PickleSuite : pickle_suite
+    struct PickleSuite : bopy::pickle_suite
     {
-        static tuple getinitargs(Tango::Database& self)
+        static bopy::tuple getinitargs(Tango::Database& self)
         {
             std::string& host = self.get_db_host();
             std::string& port = self.get_db_port();
             if (host.size() > 0 && port.size() > 0)
             {
-                return make_tuple(host, port);
+                return bopy::make_tuple(host, port);
             }
             else
-                return make_tuple();
+                return bopy::make_tuple();
         }
     };
     
@@ -218,16 +216,14 @@ void export_database()
     void (Tango::Database::*delete_attribute_alias_)(std::string &) =
         &Tango::Database::delete_attribute_alias;
     
-    
-    class_<Tango::Database, bases<Tango::Connection> > Database(
-        "Database",
-        init<>())
+    bopy::class_<Tango::Database, bopy::bases<Tango::Connection> > Database("Database", bopy::init<>())
     ;
 
     Database
-        .def("__init__", make_constructor(PyDatabase::makeDatabase_host_port1))
-        .def("__init__", make_constructor(PyDatabase::makeDatabase_host_port2))
-        .def("__init__", make_constructor(PyDatabase::makeDatabase_file))
+        .def(bopy::init<const Tango::Database &>())
+        .def("__init__", bopy::make_constructor(PyDatabase::makeDatabase_host_port1))
+        .def("__init__", bopy::make_constructor(PyDatabase::makeDatabase_host_port2))
+        .def("__init__", bopy::make_constructor(PyDatabase::makeDatabase_file))
 
         //
         // Pickle
@@ -249,10 +245,10 @@ void export_database()
             &Tango::Database::set_access_checked)
         .def("get_access_except_errors",
             &Tango::Database::get_access_except_errors,
-            return_internal_reference<1>())
+            bopy::return_internal_reference<1>())
         .def("is_multi_tango_host", &Tango::Database::is_multi_tango_host)
         .def("get_file_name", &Tango::Database::get_file_name,
-            return_value_policy<copy_const_reference>())
+            bopy::return_value_policy<bopy::copy_const_reference>())
             
         //
         // General methods
@@ -362,7 +358,8 @@ void export_database()
         .def("get_device_class_list",
             (Tango::DbDatum (Tango::Database::*) (const std::string &))
             get_device_class_list_)
-
+        .def("get_server_release", &Tango::Database::get_server_release)
+        
         //
         // property methods
         //

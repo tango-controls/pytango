@@ -21,15 +21,17 @@
 ##
 ################################################################################
 
-import re
-import StringIO
+from __future__ import print_function
 
-import IPython.genutils
+import re
+import io
+import operator
 
 class EventLogger(object):
     
-    def __init__(self, capacity=100000):
+    def __init__(self, capacity=100000, pager=None):
         self._capacity = capacity
+        self._pager = pager
         self._records = []
         
     def push_event(self, evt):
@@ -62,11 +64,13 @@ class EventLogger(object):
         if aexpr is not None:
             aexpr = re.compile(aexpr, re.IGNORECASE)
             
-        s = StringIO.StringIO()
-        cols = 4, 30, 18, 20, 12, 16
-        l = "%{0}s %{1}s %{2}s %{3}s %{4}s %{5}s".format(*cols)
-        print >>s, l % ('ID', 'Device', 'Attribute', 'Value', 'Quality', 'Time')
-        print >>s, l % (cols[0]*"-", cols[1]*"-", cols[2]*"-", cols[3]*"-", cols[4]*"-", cols[5]*"-")
+        s = io.BytesIO()
+        lengths = 4, 30, 18, 20, 12, 16
+        title = 'ID', 'Device', 'Attribute', 'Value', 'Quality', 'Time'
+        templ = "{0:{l[0]}} {1:{l[1]}} {2:{l[2]}} {3:{l[3]}} {4:{l[4]}} {5:{l[5]}}"
+        print(templ.format(*title, l=lengths), file=s)
+        print(*map(operator.mul, lengths, len(lengths)*"-"), file=s)
+        
         for i,r in enumerate(self._records):
             if dexpr is not None and not dexpr.match(r.dev_name): continue
             if aexpr is not None and not aexpr.match(r.s_attr_name): continue
@@ -78,6 +82,10 @@ class EventLogger(object):
                 v = str(r.attr_value.value)
                 q = str(r.attr_value.quality)
                 ts = r.attr_value.time.strftime("%H:%M:%S.%f")
-            print >>s, l % (i, r.dev_name, r.s_attr_name, v, q, ts)
+            msg = templ.format(i, r.dev_name, r.s_attr_name, v, q, ts, l=lengths)
+            print(msg, file=s)
         s.seek(0)
-        IPython.genutils.page(s.read())
+        if self._pager is None:
+            print(s.read())
+        else:
+            self._pager(s.read())

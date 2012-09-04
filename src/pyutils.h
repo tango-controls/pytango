@@ -27,6 +27,10 @@
 
 #define arg_(a) boost::python::arg(a)
 
+#if PY_MAJOR_VERSION >= 3
+#define PYTANGO_PY3K
+#endif
+
 #if PY_VERSION_HEX < 0x02050000
 typedef int Py_ssize_t;
 #endif
@@ -56,48 +60,188 @@ inline PyObject *PyImport_ImportModule_(const std::string &name)
     return PyImport_ImportModule(attr);
 }
 
-// -----------------------------------------------------------------------------
-// The following section defines missing symbols in python <3.0 with macros
+// Bytes interface
+#if PY_VERSION_HEX < 0x02060000
+    #define PyBytesObject PyStringObject
+    #define PyBytes_Type PyString_Type
 
-#if PY_VERSION_HEX < 0x02070000
-    #if PY_VERSION_HEX < 0x02060000
-        #define PyObject_CheckBuffer(object) (0)
+    #define PyBytes_Check PyString_Check
+    #define PyBytes_CheckExact PyString_CheckExact 
+    #define PyBytes_CHECK_INTERNED PyString_CHECK_INTERNED
+    #define PyBytes_AS_STRING PyString_AS_STRING
+    #define PyBytes_GET_SIZE PyString_GET_SIZE
+    #define Py_TPFLAGS_BYTES_SUBCLASS Py_TPFLAGS_STRING_SUBCLASS
 
-        #define PyObject_GetBuffer(obj, view, flags) (PyErr_SetString(PyExc_NotImplementedError, \
-                        "new buffer interface is not available"), -1)
-        #define PyBuffer_FillInfo(view, obj, buf, len, readonly, flags) (PyErr_SetString(PyExc_NotImplementedError, \
-                    "new buffer interface is not available"), -1)
-        #define PyBuffer_Release(obj) (PyErr_SetString(PyExc_NotImplementedError, \
-                        "new buffer interface is not available"), -1)
-        // Bytes->String
-        #define PyBytes_FromStringAndSize PyString_FromStringAndSize
-        #define PyBytes_FromString PyString_FromString
-        #define PyBytes_AsString PyString_AsString
-        #define PyBytes_Size PyString_Size
-    #endif
-
-    #define PyMemoryView_FromBuffer(info) (PyErr_SetString(PyExc_NotImplementedError, \
-                    "new buffer interface is not available"), (PyObject *)NULL)
-    #define PyMemoryView_FromObject(object)     (PyErr_SetString(PyExc_NotImplementedError, \
-                                        "new buffer interface is not available"), (PyObject *)NULL)
+    #define PyBytes_FromStringAndSize PyString_FromStringAndSize
+    #define PyBytes_FromString PyString_FromString
+    #define PyBytes_FromFormatV PyString_FromFormatV
+    #define PyBytes_FromFormat PyString_FromFormat
+    #define PyBytes_Size PyString_Size
+    #define PyBytes_AsString PyString_AsString
+    #define PyBytes_Repr PyString_Repr
+    #define PyBytes_Concat PyString_Concat
+    #define PyBytes_ConcatAndDel PyString_ConcatAndDel
+    #define _PyBytes_Resize _PyString_Resize
+    #define _PyBytes_Eq _PyString_Eq
+    #define PyBytes_Format PyString_Format
+    #define _PyBytes_FormatLong _PyString_FormatLong
+    #define PyBytes_DecodeEscape PyString_DecodeEscape
+    #define _PyBytes_Join _PyString_Join
+    #define PyBytes_Decode PyString_Decode
+    #define PyBytes_Encode PyString_Encode
+    #define PyBytes_AsEncodedObject PyString_AsEncodedObject
+    #define PyBytes_AsEncodedString PyString_AsEncodedString
+    #define PyBytes_AsDecodedObject PyString_AsDecodedObject
+    #define PyBytes_AsDecodedString PyString_AsDecodedString
+    #define PyBytes_AsStringAndSize PyString_AsStringAndSize
+    #define _PyBytes_InsertThousandsGrouping _PyString_InsertThousandsGrouping
+#else
+    #include <bytesobject.h>
 #endif
 
-#if PY_VERSION_HEX >= 0x03000000
-    // for buffers
-    #define Py_END_OF_BUFFER ((Py_ssize_t) 0)
+/* PyCapsule definitions for old python */
 
-    #define PyObject_CheckReadBuffer(object) (0)
+#if (    (PY_VERSION_HEX <  0x02070000) \
+     || ((PY_VERSION_HEX >= 0x03000000) \
+      && (PY_VERSION_HEX <  0x03010000)) )
 
-    #define PyBuffer_FromMemory(ptr, s) (PyErr_SetString(PyExc_NotImplementedError, \
-                            "old buffer interface is not available"), (PyObject *)NULL)
-    #define PyBuffer_FromReadWriteMemory(ptr, s) (PyErr_SetString(PyExc_NotImplementedError, \
-                            "old buffer interface is not available"), (PyObject *)NULL)
-    #define PyBuffer_FromObject(object, offset, size)  (PyErr_SetString(PyExc_NotImplementedError, \
-                            "old buffer interface is not available"), (PyObject *)NULL)
-    #define PyBuffer_FromReadWriteObject(object, offset, size)  (PyErr_SetString(PyExc_NotImplementedError, \
-                            "old buffer interface is not available"), (PyObject *)NULL)
+#define PYCAPSULE_OLD
 
-#endif
+#define __PyCapsule_GetField(capsule, field, default_value) \
+    ( PyCapsule_CheckExact(capsule) \
+        ? (((PyCObject *)capsule)->field) \
+        : (default_value) \
+    ) \
+
+#define __PyCapsule_SetField(capsule, field, value) \
+    ( PyCapsule_CheckExact(capsule) \
+        ? (((PyCObject *)capsule)->field = value), 1 \
+        : 0 \
+    ) \
+
+
+#define PyCapsule_Type PyCObject_Type
+
+#define PyCapsule_CheckExact(capsule) (PyCObject_Check(capsule))
+#define PyCapsule_IsValid(capsule, name) (PyCObject_Check(capsule))
+
+
+#define PyCapsule_New(pointer, name, destructor) \
+    (PyCObject_FromVoidPtr(pointer, destructor))
+
+
+#define PyCapsule_GetPointer(capsule, name) \
+    (PyCObject_AsVoidPtr(capsule))
+
+/* Don't call PyCObject_SetPointer here, it fails if there's a destructor */
+#define PyCapsule_SetPointer(capsule, pointer) \
+    __PyCapsule_SetField(capsule, cobject, pointer)
+
+
+#define PyCapsule_GetDestructor(capsule) \
+    __PyCapsule_GetField(capsule, destructor)
+
+#define PyCapsule_SetDestructor(capsule, dtor) \
+    __PyCapsule_SetField(capsule, destructor, dtor)
+
+
+/*
+ * Sorry, there's simply no place
+ * to store a Capsule "name" in a CObject.
+ */
+#define PyCapsule_GetName(capsule) NULL
+
+static int
+PyCapsule_SetName(PyObject *capsule, const char *unused)
+{
+    unused = unused;
+    PyErr_SetString(PyExc_NotImplementedError,
+        "can't use PyCapsule_SetName with CObjects");
+    return 1;
+}
+
+
+
+#define PyCapsule_GetContext(capsule) \
+    __PyCapsule_GetField(capsule, descr)
+
+#define PyCapsule_SetContext(capsule, context) \
+    __PyCapsule_SetField(capsule, descr, context)
+
+
+static void *
+PyCapsule_Import(const char *name, int no_block)
+{
+    PyObject *object = NULL;
+    void *return_value = NULL;
+    char *trace;
+    size_t name_length = (strlen(name) + 1) * sizeof(char);
+    char *name_dup = (char *)PyMem_MALLOC(name_length);
+
+    if (!name_dup) {
+        return NULL;
+    }
+
+    memcpy(name_dup, name, name_length);
+
+    trace = name_dup;
+    while (trace) {
+        char *dot = strchr(trace, '.');
+        if (dot) {
+            *dot++ = '\0';
+        }
+
+        if (object == NULL) {
+            if (no_block) {
+                object = PyImport_ImportModuleNoBlock(trace);
+            } else {
+                object = PyImport_ImportModule(trace);
+                if (!object) {
+                    PyErr_Format(PyExc_ImportError,
+                        "PyCapsule_Import could not "
+                        "import module \"%s\"", trace);
+                }
+            }
+        } else {
+            PyObject *object2 = PyObject_GetAttrString(object, trace);
+            Py_DECREF(object);
+            object = object2;
+        }
+        if (!object) {
+            goto EXIT;
+        }
+
+        trace = dot;
+    }
+
+    if (PyCObject_Check(object)) {
+        PyCObject *cobject = (PyCObject *)object;
+        return_value = cobject->cobject;
+    } else {
+        PyErr_Format(PyExc_AttributeError,
+            "PyCapsule_Import \"%s\" is not valid",
+            name);
+    }
+
+EXIT:
+    Py_XDECREF(object);
+    if (name_dup) {
+        PyMem_FREE(name_dup);
+    }
+    return return_value;
+}
+
+#endif /* #if PY_VERSION_HEX < 0x02070000 */
+
+PyObject* from_char_to_str(const char* in, Py_ssize_t size=-1, 
+                           const char* encoding=NULL, /* defaults to latin-1 */
+                           const char* errors="strict");
+
+PyObject* from_char_to_str(const std::string& in,
+                           const char* encoding=NULL, /* defaults to latin-1 */
+                           const char* errors="strict");
+
+void from_str_to_char(PyObject* in, std::string& out);
 
 inline void raise_(PyObject *type, const char *message)
 {
@@ -113,10 +257,24 @@ class AutoPythonAllowThreads
     
 public:
     
-    inline void giveup() { if (m_save) { PyEval_RestoreThread(m_save); m_save = 0; } }
+    inline void giveup()
+    {
+        if (m_save)
+        {
+            PyEval_RestoreThread(m_save);
+            m_save = 0;
+        }
+    }
     
-    inline AutoPythonAllowThreads() { m_save = PyEval_SaveThread(); } ;
-    inline ~AutoPythonAllowThreads() {giveup();} ;
+    inline AutoPythonAllowThreads()
+    {
+        m_save = PyEval_SaveThread();
+    }
+    
+    inline ~AutoPythonAllowThreads()
+    {
+        giveup();
+    }
 };
 
 /**

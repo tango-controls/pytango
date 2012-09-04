@@ -25,26 +25,26 @@
 This is an internal PyTango module.
 """
 
-__all__ = [ "DeviceClass" ]
+from __future__ import print_function
+
+__all__ = [ "DeviceClass", "device_class_init" ]
 
 __docformat__ = "restructuredtext"
 
-import types
-import operator
+import collections
 
-from _PyTango import Except, DevFailed
-from _PyTango import _DeviceClass
-from _PyTango import CmdArgType, DispLevel
-from _PyTango import UserDefaultAttrProp
+from ._PyTango import Except, DevFailed, _DeviceClass, CmdArgType, \
+    DispLevel, UserDefaultAttrProp
+from .pyutil import Util
 
-from pyutil import Util
+from .utils import is_pure_str, is_non_str_seq, seqStr_2_obj, obj_2_str, \
+    is_array
+from .utils import document_method as __document_method
 
-from utils import seqStr_2_obj, obj_2_str, is_array
-from utils import document_method as __document_method
+from .globals import get_class, get_class_by_class, \
+    get_constructed_class_by_class
+from .attr_data import AttrData
 
-from globals import get_class, get_class_by_class
-from globals import get_constructed_class_by_class
-from attr_data import AttrData
 
 class PropUtil:
     """An internal Property util class"""
@@ -82,14 +82,14 @@ class PropUtil:
 
             Return     : None
         """
-        for name in class_prop.keys():
+        for name in class_prop:
             type = self.get_property_type(name, class_prop)
             val  = self.get_property_values(name, class_prop)
             val  = self.values2string(val, type)
             desc = self.get_property_description(name, class_prop)
             dev_class.add_wiz_class_prop(name, desc, val)
 
-        for name in dev_prop.keys():
+        for name in dev_prop:
             type = self.get_property_type(name, dev_prop)
             val  = self.get_property_values(name, dev_prop)
             val  = self.values2string(val, type)
@@ -113,16 +113,16 @@ class PropUtil:
             return
 
         # call database to get properties
-        props = self.db.get_class_property(dev_class.get_name(), class_prop.keys())
+        props = self.db.get_class_property(dev_class.get_name(), list(class_prop.keys()))
 
         # if value defined in database, store it
-        for name in class_prop.keys():
+        for name in class_prop:
             if props[name]:
                 type   = self.get_property_type(name, class_prop)
                 values = self.stringArray2values(props[name], type)
                 self.set_property_values(name, class_prop, values)
             else:
-                print name, " property NOT found in database"
+                print(name + " property NOT found in database")
 
     def get_device_properties(self, dev, class_prop, dev_prop):
         """
@@ -141,9 +141,9 @@ class PropUtil:
             return
 
         #    Call database to get properties
-        props = self.db.get_device_property(dev.get_name(),dev_prop.keys())
+        props = self.db.get_device_property(dev.get_name(), list(dev_prop.keys()))
         #    if value defined in database, store it
-        for name in dev_prop.keys():
+        for name in dev_prop:
             prop_value = props[name]
             if len(prop_value):
                 data_type = self.get_property_type(name, dev_prop)
@@ -181,7 +181,7 @@ class PropUtil:
                     - v : (object) the object to be analysed
 
                 Return     : (bool) True if the object is a sequence or False otherwise"""
-        return operator.isSequenceType(v)
+        return isinstance(v, collections.Sequence)
 
     def is_empty_seq(self, v):
         """
@@ -244,10 +244,10 @@ class PropUtil:
         except:
             val = []
 
-        if is_array(tg_type) or (operator.isSequenceType(val) and not len(val)):
+        if is_array(tg_type) or (isinstance(val, collections.Sequence) and not len(val)):
             return val
         else:
-            if operator.isSequenceType(val) and not type(val) in types.StringTypes:
+            if is_non_str_seq(val):
                 return val[0]
             else:
                 return val
@@ -292,16 +292,14 @@ class DeviceClass(_DeviceClass):
             pu.set_default_property_values(self, self.class_property_list,
                                            self.device_property_list)
             pu.get_class_properties(self, self.class_property_list)
-            for prop_name in self.class_property_list.keys():
+            for prop_name in self.class_property_list:
                 if not hasattr(self, prop_name):
                     setattr(self, prop_name, pu.get_property_values(prop_name,
                             self.class_property_list))
-            if hasattr(self, 'write_class_property'):
-                self.write_class_property()
-        except DevFailed, df:
+        except DevFailed as df:
             print("PyDS: %s: A Tango error occured in the constructor:" % name)
             Except.print_exception(df)
-        except Exception, e:
+        except Exception as e:
             print("PyDS: %s: An error occured in the constructor:" % name)
             print(str(e))
             
@@ -322,7 +320,7 @@ class DeviceClass(_DeviceClass):
     def __attribute_factory(self, attr_list):
         """for internal usage only"""
 
-        for attr_name, attr_info in self.attr_list.iteritems():
+        for attr_name, attr_info in self.attr_list.items():
             attr_data = AttrData(attr_name, self.get_name(), attr_info)
             self.__create_attribute(attr_list, attr_data)
 
@@ -341,7 +339,7 @@ class DeviceClass(_DeviceClass):
     def __create_user_default_attr_prop(self, attr_name, extra_info):
         """for internal usage only"""
         p = UserDefaultAttrProp()
-        for k, v in extra_info.iteritems():
+        for k, v in extra_info.items():
             k_lower = k.lower()
             method_name = "set_%s" % k_lower.replace(' ','_')
             if hasattr(p, method_name):
@@ -368,7 +366,7 @@ class DeviceClass(_DeviceClass):
                   "The init_device() method does not exist!" % name
             Except.throw_exception("PyDs_WrongCommandDefinition", msg, "command_factory()")
 
-        for cmd_name, cmd_info in self.cmd_list.iteritems():
+        for cmd_name, cmd_info in self.cmd_list.items():
             self.__create_command(deviceimpl_class, cmd_name, cmd_info)
 
     def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
@@ -378,7 +376,7 @@ class DeviceClass(_DeviceClass):
         # check for well defined command info
 
         # check parameter
-        if not operator.isSequenceType(cmd_info):
+        if not isinstance(cmd_info, collections.Sequence):
             msg = "Wrong data type for value for describing command %s in " \
                   "class %s\nMust be a sequence with 2 or 3 elements" % (cmd_name, name)
             self.__throw_create_command_exception(msg)
@@ -390,7 +388,7 @@ class DeviceClass(_DeviceClass):
 
         param_info, result_info = cmd_info[0], cmd_info[1]
 
-        if not operator.isSequenceType(param_info):
+        if not isinstance(param_info, collections.Sequence):
             msg = "Wrong data type in command argument for command %s in " \
                   "class %s\nCommand parameter (first element) must be a sequence" % (cmd_name, name)
             self.__throw_create_command_exception(msg)
@@ -413,14 +411,14 @@ class DeviceClass(_DeviceClass):
         param_desc = ""
         if len(param_info) > 1:
             param_desc = param_info[1]
-            if not type(param_desc) in types.StringTypes:
+            if not is_pure_str(param_desc):
                 msg = "Wrong data type in command parameter for command %s in " \
                       "class %s\nCommand parameter description (second element " \
                       "in first sequence), when given, must be a string"
                 self.__throw_create_command_exception(msg)
 
         # Check result
-        if not operator.isSequenceType(result_info):
+        if not isinstance(result_info, collections.Sequence):
             msg = "Wrong data type in command result for command %s in " \
                   "class %s\nCommand result (second element) must be a sequence" % (cmd_name, name)
             self.__throw_create_command_exception(msg)
@@ -443,7 +441,7 @@ class DeviceClass(_DeviceClass):
         result_desc = ""
         if len(result_info) > 1:
             result_desc = result_info[1]
-            if not type(result_desc) in types.StringTypes:
+            if not is_pure_str(result_desc):
                 msg = "Wrong data type in command result for command %s in " \
                       "class %s\nCommand parameter description (second element " \
                       "in second sequence), when given, must be a string" % (cmd_name, name)
@@ -454,7 +452,7 @@ class DeviceClass(_DeviceClass):
 
         if len(cmd_info) == 3:
             extra_info = cmd_info[2]
-            if not operator.isMappingType(extra_info):
+            if not isinstance(extra_info, collections.Mapping):
                 msg = "Wrong data type in command information for command %s in " \
                       "class %s\nCommand information (third element in sequence), " \
                       "when given, must be a dictionary" % (cmd_name, name)
@@ -466,7 +464,7 @@ class DeviceClass(_DeviceClass):
                       "three elements" % (cmd_name, name)
                 self.__throw_create_command_exception(msg)
 
-            for info_name, info_value in extra_info.iteritems():
+            for info_name, info_value in extra_info.items():
                 info_name_lower = info_name.lower()
                 if info_name_lower == "display level":
                     try:
@@ -477,7 +475,7 @@ class DeviceClass(_DeviceClass):
                               "PyTango.DispLevel" % (cmd_name, name)
                         self.__throw_create_command_exception(msg)
                 elif info_name_lower == "default command":
-                    if not type(info_value) in types.StringTypes:
+                    if not is_pure_str(info_value):
                         msg = "Wrong data type in command information for command %s in " \
                               "class %s\nCommand information for default command is not a " \
                               "string" % (cmd_name, name)
@@ -501,7 +499,7 @@ class DeviceClass(_DeviceClass):
         # check that the method to be executed exists
         try:
             cmd = getattr(deviceimpl_class, cmd_name)
-            if not callable(cmd):
+            if not isinstance(cmd, collections.Callable):
                 msg = "Wrong definition of command %s in " \
                       "class %s\nThe object exists in class but is not " \
                       "a method!" % (cmd_name, name)
@@ -514,7 +512,7 @@ class DeviceClass(_DeviceClass):
         is_allowed_name = "is_%s_allowed" % cmd_name
         try:
             is_allowed = getattr(deviceimpl_class, is_allowed_name)
-            if not callable(is_allowed):
+            if not isinstance(is_allowed, collections.Callable):
                 msg = "Wrong definition of command %s in " \
                       "class %s\nThe object '%s' exists in class but is " \
                       "not a method!" % (cmd_name, name, is_allowed_name)
@@ -787,6 +785,29 @@ def __doc_DeviceClass():
         Parameters : None
         Return     : (sequence<PyTango.DeviceImpl>) list of PyTango.DeviceImpl objects for this class
     """ )
+
+    document_method("get_command_list", """
+    get_command_list(self) -> sequence<PyTango.Command>
+
+            Gets the list of PyTango.Command objects for this class
+
+        Parameters : None
+        Return     : (sequence<PyTango.Command>) list of PyTango.Command objects for this class
+        
+        New in PyTango 8.0.0
+    """ )
+
+    document_method("get_cmd_by_name", """
+    get_cmd_by_name(self, (str)cmd_name) -> PyTango.Command
+
+            Get a reference to a command object.
+
+        Parameters :
+            - cmd_name : (str) command name
+        Return     : (PyTango.Command) PyTango.Command object
+        
+        New in PyTango 8.0.0
+    """ )
     
     document_method("add_wiz_dev_prop", """
     add_wiz_dev_prop(self, str, str) -> None
@@ -808,7 +829,7 @@ def __doc_DeviceClass():
         Return     : None
     """ )
 
-def init(doc=True):
+def device_class_init(doc=True):
     __init_DeviceClass()
     if doc:
         __doc_DeviceClass()

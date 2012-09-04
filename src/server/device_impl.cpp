@@ -86,11 +86,14 @@ using namespace boost::python;
     __AUX_CATCH_PY_EXCEPTION \
     __AUX_CATCH_EXCEPTION(name)
 
+// we don't use extract<> from boost bellow to get attribute name because it is
+// considerably slow
 #define SAFE_PUSH(dev, attr, attr_name) \
-    char *__att_name_ptr = PyString_AsString(attr_name.ptr()); \
+    std::string __att_name; \
+    from_str_to_char(attr_name.ptr(), __att_name); \
     AutoPythonAllowThreads python_guard_ptr; \
     Tango::AutoTangoMonitor tango_guard(&dev); \
-    Tango::Attribute & attr = dev.get_device_attr()->get_attr_by_name(__att_name_ptr); \
+    Tango::Attribute & attr = dev.get_device_attr()->get_attr_by_name(__att_name.c_str()); \
     python_guard_ptr.giveup();
 
 #define SAFE_PUSH_CHANGE_EVENT(dev, attr_name, data) \
@@ -583,10 +586,11 @@ namespace PyDeviceImpl
         self.add_attribute(attr_ptr);
     }
 
-    void remove_attribute(Tango::DeviceImpl &self, const char *att_name)
+    void remove_attribute(Tango::DeviceImpl &self, const char *att_name,
+                          bool clean_db = true)
     {
         string str(att_name);
-        self.remove_attribute(str, false);
+        self.remove_attribute(str, false, clean_db);
     }
 
     inline void debug(Tango::DeviceImpl &self, const string &msg)
@@ -634,6 +638,54 @@ namespace PyDeviceImpl
         from_py_object(py_attr_conf_list, attr_conf_list);
         self.set_attribute_config(attr_conf_list);
     }
+    
+    bool is_attribute_polled(Tango::DeviceImpl &self, const std::string &att_name)
+    {
+        DeviceImplWrap *self_w = (DeviceImplWrap*)(&self);
+        return self_w->_is_attribute_polled(att_name);
+    }
+
+    bool is_command_polled(Tango::DeviceImpl &self, const std::string &cmd_name)
+    {
+        DeviceImplWrap *self_w = (DeviceImplWrap*)(&self);
+        return self_w->_is_command_polled(cmd_name);
+    }
+
+    int get_attribute_poll_period(Tango::DeviceImpl &self, const std::string &att_name)
+    {
+        DeviceImplWrap *self_w = (DeviceImplWrap*)(&self);
+        return self_w->_get_attribute_poll_period(att_name);
+    }
+
+    int get_command_poll_period(Tango::DeviceImpl &self, const std::string &cmd_name)
+    {
+        DeviceImplWrap *self_w = (DeviceImplWrap*)(&self);
+        return self_w->_get_command_poll_period(cmd_name);
+    }
+
+    void poll_attribute(Tango::DeviceImpl &self, const std::string &att_name, int period)
+    {
+        DeviceImplWrap *self_w = (DeviceImplWrap*)(&self);
+        self_w->_poll_attribute(att_name, period);
+    }
+
+    void poll_command(Tango::DeviceImpl &self, const std::string &cmd_name, int period)
+    {
+        DeviceImplWrap *self_w = (DeviceImplWrap*)(&self);
+        self_w->_poll_command(cmd_name, period);
+    }
+
+    void stop_poll_attribute(Tango::DeviceImpl &self, const std::string &att_name)
+    {
+        DeviceImplWrap *self_w = (DeviceImplWrap*)(&self);
+        self_w->_stop_poll_attribute(att_name);
+    }
+
+    void stop_poll_command(Tango::DeviceImpl &self, const std::string &cmd_name)
+    {
+        DeviceImplWrap *self_w = (DeviceImplWrap*)(&self);
+        self_w->_stop_poll_command(cmd_name);
+    }
 }
 
 DeviceImplWrap::DeviceImplWrap(PyObject *self, CppDeviceClass *cl,
@@ -657,6 +709,48 @@ void DeviceImplWrap::init_device()
 {
     this->get_override("init_device")();
 }
+
+bool DeviceImplWrap::_is_attribute_polled(const std::string &att_name)
+{
+    return this->is_attribute_polled(att_name);
+}
+
+bool DeviceImplWrap::_is_command_polled(const std::string &cmd_name)
+{
+    return this->is_command_polled(cmd_name);
+}
+
+int DeviceImplWrap::_get_attribute_poll_period(const std::string &att_name)
+{
+    return this->get_attribute_poll_period(att_name);
+}
+
+int DeviceImplWrap::_get_command_poll_period(const std::string &cmd_name)
+{
+    return this->get_command_poll_period(cmd_name);
+}
+
+void DeviceImplWrap::_poll_attribute(const std::string &att_name, int period)
+{
+    this->poll_attribute(att_name, period);
+}
+
+void DeviceImplWrap::_poll_command(const std::string &cmd_name, int period)
+{
+    this->poll_command(cmd_name, period);
+}
+
+void DeviceImplWrap::_stop_poll_attribute(const std::string &att_name)
+{
+    this->stop_poll_attribute(att_name);
+}
+
+void DeviceImplWrap::_stop_poll_command(const std::string &cmd_name)
+{
+    this->stop_poll_command(cmd_name);
+}
+
+
 
 Device_2ImplWrap::Device_2ImplWrap(PyObject *self, CppDeviceClass *cl,
                                    std::string &st)
@@ -1051,7 +1145,9 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_archive_event_overload,
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(push_data_ready_event_overload,
                                        Tango::DeviceImpl::push_data_ready_event, 1, 2)
 
-
+BOOST_PYTHON_FUNCTION_OVERLOADS(remove_attribute_overload,
+                                PyDeviceImpl::remove_attribute, 2, 3)
+                                       
 void export_device_impl()
 {
  
@@ -1100,12 +1196,19 @@ void export_device_impl()
             &Tango::DeviceImpl::set_archive_event,
             set_archive_event_overload())
         .def("_add_attribute", &PyDeviceImpl::add_attribute)
-        .def("_remove_attribute", &PyDeviceImpl::remove_attribute)
+        .def("_remove_attribute", &PyDeviceImpl::remove_attribute,
+            remove_attribute_overload())
         //@TODO .def("get_device_class")
-        //@TODO .def("get_device_attr")
         //@TODO .def("get_db_device")
-        
-        
+        .def("is_attribute_polled", &PyDeviceImpl::is_attribute_polled)
+        .def("is_command_polled", &PyDeviceImpl::is_command_polled)
+        .def("get_attribute_poll_period", &PyDeviceImpl::get_attribute_poll_period)
+        .def("get_command_poll_period", &PyDeviceImpl::get_command_poll_period)
+        .def("poll_attribute", &PyDeviceImpl::poll_attribute)
+        .def("poll_command", &PyDeviceImpl::poll_command)
+        .def("stop_poll_attribute", &PyDeviceImpl::stop_poll_attribute)
+        .def("stop_poll_command", &PyDeviceImpl::stop_poll_command)
+                        
         .def("get_exported_flag", &Tango::DeviceImpl::get_exported_flag)
         .def("get_poll_ring_depth", &Tango::DeviceImpl::get_poll_ring_depth)
         .def("get_poll_old_factor", &Tango::DeviceImpl::get_poll_old_factor)

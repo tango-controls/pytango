@@ -27,6 +27,7 @@
 #include <tango.h>
 
 #include "defs.h"
+#include "pyutils.h"
 
 struct DevEncoded_to_tuple
 {
@@ -104,6 +105,7 @@ struct CORBA_sequence_to_tuple<Tango::DevVarStringArray>
         PyObject *t = PyTuple_New(size);
         for(unsigned long i=0; i < size; ++i)
         {
+            
             boost::python::str x(a[i].in());
             PyTuple_SetItem(t, i, boost::python::incref(x.ptr()));
         }
@@ -272,30 +274,50 @@ struct CORBA_String_member_to_str
 {
     static inline PyObject* convert(CORBA::String_member const& cstr)
     {
-        return boost::python::incref(boost::python::str(cstr.in()).ptr());
+        return from_char_to_str(cstr.in());
     }
 
-    static const PyTypeObject* get_pytype() { return &PyString_Type; }
+    //static const PyTypeObject* get_pytype() { return &PyBytes_Type; }
 };
 
 struct CORBA_String_member_to_str2
 {
     static inline PyObject* convert(_CORBA_String_member const& cstr)
     {
-        return boost::python::incref(boost::python::str(cstr.in()).ptr());
+        return from_char_to_str(cstr.in());
     }
 
-    static const PyTypeObject* get_pytype() { return &PyString_Type; }
+    //static const PyTypeObject* get_pytype() { return &PyBytes_Type; }
 };
 
 struct CORBA_String_element_to_str
 {
     static inline PyObject* convert(_CORBA_String_element const& cstr)
     {
-        return boost::python::incref(boost::python::str(cstr.in()).ptr());
+        return from_char_to_str(cstr.in());
     }
 
-    static const PyTypeObject* get_pytype() { return &PyString_Type; }
+    //static const PyTypeObject* get_pytype() { return &PyBytes_Type; }
+};
+
+struct String_to_str
+{
+    static inline PyObject* convert(std::string const& cstr)
+    {
+        return from_char_to_str(cstr);
+    }
+
+    //static const PyTypeObject* get_pytype() { return &PyBytes_Type; }
+};
+
+struct char_ptr_to_str
+{
+    static inline PyObject* convert(const char *cstr)
+    {
+        return from_char_to_str(cstr);
+    }
+
+    //static const PyTypeObject* get_pytype() { return &PyBytes_Type; }
 };
 
 boost::python::object to_py(const Tango::AttributeAlarm &);

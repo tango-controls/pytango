@@ -400,74 +400,153 @@ will be the used for the input arguments. Also, it is recomended to use numpy
 arrays of the appropiate type for output arguments as well, as it is much more
 efficient.
 
-+-------------------------+-------------------------------------------------------------------+
-|   Tango data type       |              Python type                                          |
-+=========================+===================================================================+
-|          DEV_VOID       |                    No data                                        |
-+-------------------------+-------------------------------------------------------------------+
-|       DEV_BOOLEAN       | :py:obj:`bool`                                                    |
-+-------------------------+-------------------------------------------------------------------+
-|         DEV_SHORT       | :py:obj:`int`                                                     |
-+-------------------------+-------------------------------------------------------------------+
-|         DEV_LONG        | :py:obj:`int`                                                     |
-+-------------------------+-------------------------------------------------------------------+
-|        DEV_LONG64       | :py:obj:`long` (on a 32 bits computer) or                         |
-|                         | :py:obj:`int` (on a 64 bits computer)                             |
-+-------------------------+-------------------------------------------------------------------+
-|         DEV_FLOAT       | :py:obj:`float`                                                   |
-+-------------------------+-------------------------------------------------------------------+
-|       DEV_DOUBLE        | :py:obj:`float`                                                   |
-+-------------------------+-------------------------------------------------------------------+
-|        DEV_USHORT       | :py:obj:`int`                                                     |
-+-------------------------+-------------------------------------------------------------------+
-|        DEV_ULONG        | :py:obj:`int`                                                     |
-+-------------------------+-------------------------------------------------------------------+
-|        DEV_ULONG64      | :py:obj:`long` (on a 32 bits computer) or                         |
-|                         | :py:obj:`int` (on a 64 bits computer)                             |
-+-------------------------+-------------------------------------------------------------------+
-|        DEV_STRING       | :py:obj:`str`                                                     |
-+-------------------------+-------------------------------------------------------------------+
-|    DEVVAR_CHARARRAY     | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint8`) or       |
-|                         | sequence<:py:obj:`int`>                                           |
-+-------------------------+-------------------------------------------------------------------+
-|    DEVVAR_SHORTARRAY    | :py:class:`numpy.ndarray` (dtype=:py:obj:`numpy.int16`) or        |
-|                         | sequence<:py:obj:`int`>                                           |
-+-------------------------+-------------------------------------------------------------------+
-|    DEVVAR_LONGARRAY     | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int32`) or       |
-|                         | sequence<:py:obj:`int`>                                           |
-+-------------------------+-------------------------------------------------------------------+
-|   DEVVAR_LONG64ARRAY    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int64`) or       |
-|                         | sequence<:py:obj:`long`> (on a 32 bits computer) or               |
-|                         | sequence<:py:obj:`int`> (on a 64 bits computer)                   |
-+-------------------------+-------------------------------------------------------------------+
-|    DEVVAR_FLOATARRAY    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float32`) or     |
-|                         | sequence<:py:obj:`float`>                                         |
-+-------------------------+-------------------------------------------------------------------+
-|   DEVVAR_DOUBLEARRAY    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float64`) or     |
-|                         | sequence<:py:obj:`float`>                                         |
-+-------------------------+-------------------------------------------------------------------+
-|   DEVVAR_USHORTARRAY    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint16`) or      |
-|                         | sequence<:py:obj:`int`>                                           |
-+-------------------------+-------------------------------------------------------------------+
-|   DEVVAR_ULONGARRAY     | numpy.ndarray(dtype= :py:obj:`numpy.uint32`) or                   |
-|                         | sequence<:py:obj:`int`>                                           |
-+-------------------------+-------------------------------------------------------------------+
-|  DEVVAR_ULONG64ARRAY    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint64`) or      |
-|                         | sequence<:py:obj:`long`> (on a 32 bits computer) or               |
-|                         | sequence<:py:obj:`int`> (on a 64 bits computer)                   |
-+-------------------------+-------------------------------------------------------------------+
-|   DEVVAR_STRINGARRAY    | sequence<:py:obj:`str`>                                           |
-+-------------------------+-------------------------------------------------------------------+
-|                         | A sequence with two elements:                                     |
-| DEVVAR_LONGSTRINGARRAY  |  1. :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int32`) or   |
-|                         |     sequence<:py:obj:`int`>                                       |
-|                         |  2. sequence<:py:obj:`str`>                                       |
-+-------------------------+-------------------------------------------------------------------+
-|                         | A sequence with two elements:                                     |
-|DEVVAR_DOUBLESTRINGARRAY |  1. :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float64`) or |
-|                         |     sequence<:py:obj:`float`>                                     |
-|                         |  2. sequence<:py:obj:`str`>                                       |
-+-------------------------+-------------------------------------------------------------------+
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|   Tango data type       |              Python 2.x type                                              |              Python 3.x type (*New in PyTango 8.0*)                       |
++=========================+===========================================================================+===========================================================================+
+|          DEV_VOID       |                    No data                                                |                    No data                                                |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|       DEV_BOOLEAN       | :py:obj:`bool`                                                            | :py:obj:`bool`                                                            |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|         DEV_SHORT       | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|         DEV_LONG        | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|        DEV_LONG64       | - :py:obj:`long` (on a 32 bits computer)                                  | :py:obj:`int`                                                             |
+|                         | - :py:obj:`int` (on a 64 bits computer)                                   |                                                                           |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|         DEV_FLOAT       | :py:obj:`float`                                                           | :py:obj:`float`                                                           |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|       DEV_DOUBLE        | :py:obj:`float`                                                           | :py:obj:`float`                                                           |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|        DEV_USHORT       | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|        DEV_ULONG        | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|        DEV_ULONG64      | * :py:obj:`long` (on a 32 bits computer)                                  | :py:obj:`int`                                                             |
+|                         | * :py:obj:`int` (on a 64 bits computer)                                   |                                                                           |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|        DEV_STRING       | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | sequence of two elements:                                                 | sequence of two elements:                                                 |
+| DEV_ENCODED             |                                                                           |                                                                           |
+| (*New in PyTango 8.0*)  | 0. :py:obj:`str`                                                          | 0. :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)               |
+|                         | 1. :py:obj:`bytes` (for any value of *extract_as*)                        | 1. :py:obj:`bytes` (for any value of *extract_as*, except String.         |
+|                         |                                                                           |    In this case it is :py:obj:`str` (decoded with default python          |
+|                         |                                                                           |    encoding *utf-8*))                                                     |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | ========= ============================================================    | ========= =============================================================== |
+|                         | ExtractAs                        Data Type                                | ExtractAs                        Data Type                                |
+|                         | ========= ============================================================    | ========= =============================================================== |
+|    DEVVAR_CHARARRAY     | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint8`)        | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint8`)        |
+|                         | Bytes     :py:obj:`bytes` (which is in fact equal to :py:obj:`str`)       | Bytes     :py:obj:`bytes`                                                 |
+|                         | ByteArray :py:obj:`bytearray`                                             | ByteArray :py:obj:`bytearray`                                             |
+|                         | String    :py:obj:`str`                                                   | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | List      :py:class:`list` <:py:obj:`int`>                                | List      :py:class:`list` <:py:obj:`int`>                                |
+|                         | Tuple     :py:class:`tuple` <:py:obj:`int`>                               | Tuple     :py:class:`tuple` <:py:obj:`int`>                               |
+|                         | ========= ============================================================    | ========= =============================================================== |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | ========= =============================================================== | ========= =============================================================== |
+|                         | ExtractAs                        Data Type                                | ExtractAs                        Data Type                                |
+|                         | ========= =============================================================== | ========= =============================================================== |
+|    DEVVAR_SHORTARRAY    | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint16`)       | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint16`)       |
+|                         | Bytes     :py:obj:`bytes` (which is in fact equal to :py:obj:`str`)       | Bytes     :py:obj:`bytes`                                                 |
+|                         | ByteArray :py:obj:`bytearray`                                             | ByteArray :py:obj:`bytearray`                                             |
+|                         | String    :py:obj:`str`                                                   | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | List      :py:class:`list` <:py:obj:`int`>                                | List      :py:class:`list` <:py:obj:`int`>                                |
+|                         | Tuple     :py:class:`tuple` <:py:obj:`int`>                               | Tuple     :py:class:`tuple` <:py:obj:`int`>                               |
+|                         | ========= =============================================================== | ========= =============================================================== |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | ========= =============================================================== | ========= =============================================================== |
+|                         | ExtractAs                        Data Type                                | ExtractAs                        Data Type                                |
+|                         | ========= =============================================================== | ========= =============================================================== |
+|    DEVVAR_LONGARRAY     | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint32`)       | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint32`)       |
+|                         | Bytes     :py:obj:`bytes` (which is in fact equal to :py:obj:`str`)       | Bytes     :py:obj:`bytes`                                                 |
+|                         | ByteArray :py:obj:`bytearray`                                             | ByteArray :py:obj:`bytearray`                                             |
+|                         | String    :py:obj:`str`                                                   | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | List      :py:class:`list` <:py:obj:`int`>                                | List      :py:class:`list` <:py:obj:`int`>                                |
+|                         | Tuple     :py:class:`tuple` <:py:obj:`int`>                               | Tuple     :py:class:`tuple` <:py:obj:`int`>                               |
+|                         | ========= =============================================================== | ========= =============================================================== |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | ========= =============================================================== | ========= =============================================================== |
+|                         | ExtractAs                        Data Type                                | ExtractAs                        Data Type                                |
+|                         | ========= =============================================================== | ========= =============================================================== |
+|    DEVVAR_LONG64ARRAY   | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint64`)       | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint64`)       |
+|                         | Bytes     :py:obj:`bytes` (which is in fact equal to :py:obj:`str`)       | Bytes     :py:obj:`bytes`                                                 |
+|                         | ByteArray :py:obj:`bytearray`                                             | ByteArray :py:obj:`bytearray`                                             |
+|                         | String    :py:obj:`str`                                                   | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | List      :py:class:`list` <int (64 bits) / long (32 bits)>               | List      :py:class:`list` <:py:obj:`int`>                                |
+|                         | Tuple     :py:class:`tuple` <int (64 bits) / long (32 bits)>              | Tuple     :py:class:`tuple` <:py:obj:`int`>                               |
+|                         | ========= =============================================================== | ========= =============================================================== |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | ========= =============================================================== | ========= =============================================================== |
+|                         | ExtractAs                        Data Type                                | ExtractAs                        Data Type                                |
+|                         | ========= =============================================================== | ========= =============================================================== |
+|    DEVVAR_FLOATARRAY    | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float32`)      | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float32`)      |
+|                         | Bytes     :py:obj:`bytes` (which is in fact equal to :py:obj:`str`)       | Bytes     :py:obj:`bytes`                                                 |
+|                         | ByteArray :py:obj:`bytearray`                                             | ByteArray :py:obj:`bytearray`                                             |
+|                         | String    :py:obj:`str`                                                   | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | List      :py:class:`list` <:py:obj:`int`>                                | List      :py:class:`list` <:py:obj:`int`>                                |
+|                         | Tuple     :py:class:`tuple` <:py:obj:`int`>                               | Tuple     :py:class:`tuple` <:py:obj:`int`>                               |
+|                         | ========= =============================================================== | ========= =============================================================== |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | ========= =============================================================== | ========= =============================================================== |
+|                         | ExtractAs                        Data Type                                | ExtractAs                        Data Type                                |
+|                         | ========= =============================================================== | ========= =============================================================== |
+|    DEVVAR_DOUBLEARRAY   | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float64`)      | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float64`)      |
+|                         | Bytes     :py:obj:`bytes` (which is in fact equal to :py:obj:`str`)       | Bytes     :py:obj:`bytes`                                                 |
+|                         | ByteArray :py:obj:`bytearray`                                             | ByteArray :py:obj:`bytearray`                                             |
+|                         | String    :py:obj:`str`                                                   | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | List      :py:class:`list` <:py:obj:`int`>                                | List      :py:class:`list` <:py:obj:`int`>                                |
+|                         | Tuple     :py:class:`tuple` <:py:obj:`int`>                               | Tuple     :py:class:`tuple` <:py:obj:`int`>                               |
+|                         | ========= =============================================================== | ========= =============================================================== |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | ========= =============================================================== | ========= =============================================================== |
+|                         | ExtractAs                        Data Type                                | ExtractAs                        Data Type                                |
+|                         | ========= =============================================================== | ========= =============================================================== |
+|    DEVVAR_USHORTARRAY   | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint16`)       | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint16`)       |
+|                         | Bytes     :py:obj:`bytes` (which is in fact equal to :py:obj:`str`)       | Bytes     :py:obj:`bytes`                                                 |
+|                         | ByteArray :py:obj:`bytearray`                                             | ByteArray :py:obj:`bytearray`                                             |
+|                         | String    :py:obj:`str`                                                   | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | List      :py:class:`list` <:py:obj:`int`>                                | List      :py:class:`list` <:py:obj:`int`>                                |
+|                         | Tuple     :py:class:`tuple` <:py:obj:`int`>                               | Tuple     :py:class:`tuple` <:py:obj:`int`>                               |
+|                         | ========= =============================================================== | ========= =============================================================== |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | ========= =============================================================== | ========= =============================================================== |
+|                         | ExtractAs                        Data Type                                | ExtractAs                        Data Type                                |
+|                         | ========= =============================================================== | ========= =============================================================== |
+|    DEVVAR_ULONGARRAY    | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint32`)       | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint32`)       |
+|                         | Bytes     :py:obj:`bytes` (which is in fact equal to :py:obj:`str`)       | Bytes     :py:obj:`bytes`                                                 |
+|                         | ByteArray :py:obj:`bytearray`                                             | ByteArray :py:obj:`bytearray`                                             |
+|                         | String    :py:obj:`str`                                                   | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | List      :py:class:`list` <:py:obj:`int`>                                | List      :py:class:`list` <:py:obj:`int`>                                |
+|                         | Tuple     :py:class:`tuple` <:py:obj:`int`>                               | Tuple     :py:class:`tuple` <:py:obj:`int`>                               |
+|                         | ========= =============================================================== | ========= =============================================================== |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | ========= =============================================================== | ========= =============================================================== |
+|                         | ExtractAs                        Data Type                                | ExtractAs                        Data Type                                |
+|                         | ========= =============================================================== | ========= =============================================================== |
+|    DEVVAR_ULONG64ARRAY  | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint64`)       | [Numpy]   :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint64`)       |
+|                         | Bytes     :py:obj:`bytes` (which is in fact equal to :py:obj:`str`)       | Bytes     :py:obj:`bytes`                                                 |
+|                         | ByteArray :py:obj:`bytearray`                                             | ByteArray :py:obj:`bytearray`                                             |
+|                         | String    :py:obj:`str`                                                   | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | List      :py:class:`list` <int (64 bits) / long (32 bits)>               | List      :py:class:`list` <:py:obj:`int`>                                |
+|                         | Tuple     :py:class:`tuple` <int (64 bits) / long (32 bits)>              | Tuple     :py:class:`tuple` <:py:obj:`int`>                               |
+|                         | ========= =============================================================== | ========= =============================================================== |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|   DEVVAR_STRINGARRAY    | sequence<:py:obj:`str`>                                                   | sequence<:py:obj:`str`> (decoded with *latin-1*, aka *ISO-8859-1*)        |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | sequence of two elements:                                                 | sequence of two elements:                                                 |
+|  DEV_LONGSTRINGARRAY    |                                                                           |                                                                           |
+|                         | 0. :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int32`) or            | 0. :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int32`) or            |
+|                         |    sequence<:py:obj:`int`>                                                |    sequence<:py:obj:`int`>                                                |
+|                         | 1. sequence<:py:obj:`str`>                                                | 1.  sequence<:py:obj:`str`> (decoded with *latin-1*, aka *ISO-8859-1*)    |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | sequence of two elements:                                                 | sequence of two elements:                                                 |
+|  DEV_DOUBLESTRINGARRAY  |                                                                           |                                                                           |
+|                         | 0. :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float64`) or          | 0. :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float64`) or          |
+|                         |    sequence<:py:obj:`int`>                                                |    sequence<:py:obj:`int`>                                                |
+|                         | 1. sequence<:py:obj:`str`>                                                | 1. sequence<:py:obj:`str`> (decoded with *latin-1*, aka *ISO-8859-1*)     |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 
 The following code is an example of how you write code executed when a client
 calls a command named IOLong::

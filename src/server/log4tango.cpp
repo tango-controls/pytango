@@ -45,7 +45,9 @@ namespace PyLogging
         par.length(len);
         for(int i = 0; i < len; ++i)
         {
-            par[i] = CORBA::string_dup(PyString_AsString(PySequence_GetItem(obj_ptr, i)));
+            PyObject* item_ptr = PySequence_GetItem(obj_ptr, i);
+            str item = str(handle<>(item_ptr));
+            par[i] = CORBA::string_dup(extract<const char*>(item));
         }
         Tango::Logging::add_logging_target(&par);
     }
@@ -63,7 +65,9 @@ namespace PyLogging
         par.length(len);
         for(int i = 0; i < len; ++i)
         {
-            par[i] = CORBA::string_dup(PyString_AsString(PySequence_GetItem(obj_ptr, i)));
+            PyObject* item_ptr = PySequence_GetItem(obj_ptr, i);
+            str item = str(handle<>(item_ptr));
+            par[i] = CORBA::string_dup(extract<const char*>(item));
         }
         Tango::Logging::remove_logging_target(&par);
     }

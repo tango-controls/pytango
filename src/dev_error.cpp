@@ -22,26 +22,25 @@
 *******************************************************************************/
 
 #include "precompiled_header.hpp"
+#include "pyutils.h"
 #include <tango.h>
-
-using namespace boost::python;
 
 struct PyDevError
 {
     static inline PyObject* get_reason(Tango::DevError &de)
-    { return PyString_FromString(de.reason); }
+    { return from_char_to_str(de.reason); }
 
     static inline PyObject* get_desc(Tango::DevError &de)
-    { return PyString_FromString(de.desc); }
+    { return from_char_to_str(de.desc); }
 
     static inline PyObject* get_origin(Tango::DevError &de)
-    { return PyString_FromString(de.origin); }
+    { return from_char_to_str(de.origin); }
 
 };
 
 void export_dev_error()
 {
-    class_<Tango::DevError>("DevError")
+    bopy::class_<Tango::DevError>("DevError")
         .add_property("reason", &PyDevError::get_reason)
         .def_readonly("severity", &Tango::DevError::severity)
         .add_property("desc", &PyDevError::get_desc)

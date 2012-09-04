@@ -25,10 +25,12 @@
 
 """An IPython profile designed to provide a user friendly interface to Tango"""
 
+from __future__ import print_function
+
 import sys
 import os
 import re
-import StringIO
+import io
 import textwrap
 import IPython.ipapi
 import IPython.ColorANSI
@@ -244,18 +246,18 @@ def magic_lsdev(self, parameter_s=''):
     
     db = __get_db()
     if db is None:
-        print "You are not connected to any Tango Database. Device list is empty"
+        print("You are not connected to any Tango Database. Device list is empty")
         return
     data = db._db_cache.devices
 
-    s = StringIO.StringIO()
+    s = io.BytesIO()
     cols = 40, 25, 25, 20
     l = "%{0}s %{1}s %{2}s %{3}s".format(*cols)
-    print >>s, l % ("Device", "Alias", "Server", "Class")
-    print >>s, l % (cols[0]*"-", cols[1]*"-", cols[2]*"-", cols[3]*"-")
+    print(l % ("Device", "Alias", "Server", "Class"), file=s)
+    print(l % (cols[0]*"-", cols[1]*"-", cols[2]*"-", cols[3]*"-"), file=s)
     for d, v in data.items():
         if reg_exp and not reg_exp.match(d): continue
-        print >>s, l % (d, v[0], v[1], v[2])
+        print(l % (d, v[0], v[1], v[2]), file=s)
     s.seek(0)
     IPython.genutils.page(s.read())
 
@@ -275,11 +277,11 @@ def magic_lsdevclass(self, parameter_s=''):
     
     db = __get_db()
     if db is None:
-        print "You are not connected to any Tango Database. Device class list is empty"
+        print("You are not connected to any Tango Database. Device class list is empty")
         return
     data = db._db_cache.klasses
 
-    s = StringIO.StringIO()
+    s = io.BytesIO()
     data = [ "%-030s" % klass for klass in data.keys() if not reg_exp or reg_exp.match(klass) ]
     s = textwrap.fill(" ".join(data), 80)
     IPython.genutils.page(s)
@@ -300,11 +302,11 @@ def magic_lsserv(self, parameter_s=''):
     
     db = __get_db()
     if db is None:
-        print "You are not connected to any Tango Database. Device class list is empty"
+        print("You are not connected to any Tango Database. Device class list is empty")
         return
     data = db._db_cache.servers
 
-    s = StringIO.StringIO()
+    s = io.BytesIO()
     data = [ "%-030s" % server for server in data.keys() if not reg_exp or reg_exp.match(server) ]
     s = textwrap.fill(" ".join(data), 80)
     IPython.genutils.page(s)
@@ -315,10 +317,10 @@ def magic_tango_error(self, parameter_s=''):
     global _TANGO_ERR
     err_info = self.user_ns.get(_TANGO_ERR)
     if err_info is None:
-        print "No tango error reported so far."
+        print("No tango error reported so far.")
         return
-    print "Last tango error:"
-    print err_info[1]
+    print("Last tango error:")
+    print(err_info[1])
 
 def magic_python_error(self, parameter_s=''):
     """Displays detailed information about the last python error"""
@@ -326,7 +328,7 @@ def magic_python_error(self, parameter_s=''):
     global _PYTHON_ERR
     err_info = self.user_ns.get(_PYTHON_ERR)
     if err_info is None:
-        print "No error reported so far."
+        print("No error reported so far.")
         return
     ip = IPython.ipapi.get()
     etype, evalue, etb = err_info[:3]
@@ -336,15 +338,8 @@ _EVT_LOG = None
 def __get_event_log():
     global _EVT_LOG
     if _EVT_LOG is None:
-        qthreads = IPython.ipapi.get().options.q4thread
-        if qthreads:
-            import ipy_qt
-            model = ipy_qt.EventLoggerTableModel(capacity=10000)
-            _EVT_LOG = ipy_qt.EventLogger(model=model)
-            _EVT_LOG.setWindowTitle("ITango - Event Logger Table")
-        else:
-            import ipy_cli
-            _EVT_LOG = ipy_cli.EventLogger(capacity=10000)
+        import PyTango.ipython.eventlogger
+        _EVT_LOG = PyTango.ipython.eventlogger.EventLogger(capacity=10000, pager=IPython.genutils.page)
     return _EVT_LOG
 
 def magic_mon(self, parameter_s=''):
@@ -359,12 +354,12 @@ def magic_mon(self, parameter_s=''):
     
     db = __get_db()
     if db is None:
-        print "You are not connected to any Tango Database."
+        print("You are not connected to any Tango Database.")
         return
     opts, args = self.parse_options(parameter_s,'adril', mode='list')
     if len(args) > 3:
         raise IPython.ipapi.UsageError("%mon: too many arguments")
-    if opts.has_key('d'):
+    if 'd' in opts:
         try:
             todel = args[0]
         except IndexError:
@@ -378,12 +373,12 @@ def magic_mon(self, parameter_s=''):
                 del subscriptions[attr.lower()]
                 d = __get_device_proxy(dev)
                 d.unsubscribe_event(id)
-                print "Stopped monitoring '%s'" % todel
+                print("Stopped monitoring '%s'" % todel)
             except KeyError:
                 raise IPython.ipapi.UsageError(
                     "%%mon -d: Not monitoring '%s'" % todel)
                     
-    elif opts.has_key('a'):
+    elif 'a' in opts:
         try:
             toadd = args[0]
         except IndexError:
@@ -400,14 +395,14 @@ def magic_mon(self, parameter_s=''):
         model = w.model()
         id = d.subscribe_event(attr, PyTango.EventType.CHANGE_EVENT, model, [])
         subscriptions[attr.lower()] = id
-        print "'%s' is now being monitored. Type 'mon' to see all events" % toadd
-    elif opts.has_key('r'):
+        print("'%s' is now being monitored. Type 'mon' to see all events" % toadd)
+    elif 'r' in opts:
         for d, v in db._db_cache.devices.items():
             d, subs = v[3], v[4]
             for id in subs.values():
                 d.unsubscribe_event(id)
             v[4] = {}
-    elif opts.has_key('i'):
+    elif 'i' in opts:
         try:
             evtid = int(args[0])
         except IndexError:
@@ -420,13 +415,13 @@ def magic_mon(self, parameter_s=''):
             w = __get_event_log()
             e = w.getEvents()[evtid]
             if e.err:
-                print str(PyTango.DevFailed(*e.errors))
+                print(str(PyTango.DevFailed(*e.errors)))
             else:
-                print str(e)
+                print(str(e))
         except IndexError:
             raise IPython.ipapi.UsageError(
                 "%mon -i: must provide a valid event ID")
-    elif opts.has_key('l'):
+    elif 'l' in opts:
         try:
             dexpr = args[0]
             aexpr = args[1]
@@ -455,7 +450,7 @@ def get_device_map():
            DeviceProxy to this device, create your own)"""
     db = __get_db()
     if db is None:
-        print "You are not connected to any Tango Database."
+        print("You are not connected to any Tango Database.")
         return
     return db._db_cache.devices
 
@@ -464,7 +459,7 @@ def get_server_map():
     and value is a sequence of device names that belong to the server"""
     db = __get_db()
     if db is None:
-        print "You are not connected to any Tango Database."
+        print("You are not connected to any Tango Database.")
         return
     return db._db_cache.servers
 
@@ -473,7 +468,7 @@ def get_class_map():
     sequence of device names that belong to the tango class"""
     db = __get_db()
     if db is None:
-        print "You are not connected to any Tango Database."
+        print("You are not connected to any Tango Database.")
         return
     return db._db_cache.klasses
 
@@ -482,7 +477,7 @@ def get_alias_map():
     is a the tango device name"""
     db = __get_db()
     if db is None:
-        print "You are not connected to any Tango Database."
+        print("You are not connected to any Tango Database.")
         return
     return db._db_cache.aliases
 
@@ -491,7 +486,7 @@ def get_device_list():
     database"""
     db = __get_db()
     if db is None:
-        print "You are not connected to any Tango Database."
+        print("You are not connected to any Tango Database.")
         return
     return db._db_cache.device_list
 
@@ -500,7 +495,7 @@ def get_alias_list():
     database"""
     db = __get_db()
     if db is None:
-        print "You are not connected to any Tango Database."
+        print("You are not connected to any Tango Database.")
         return
     return db._db_cache.alias_list    
     
@@ -515,15 +510,15 @@ def __exc_handler(ip, etype, value, tb):
         ip.user_ns[_TANGO_ERR] = etype, value, tb
         if len(value.args):
             v = value[0]
-            print "%s: %s" % (v.reason ,v.desc)
+            print("%s: %s" % (v.reason ,v.desc))
         else:
-            print "Empty DevFailed"
-        print "(For more detailed information type: tango_error)"
+            print("Empty DevFailed")
+        print("(For more detailed information type: tango_error)")
     else:
         global _PYTHON_ERR
         ip.user_ns[_PYTHON_ERR] = etype, value, tb
-        print etype.__name__ + ": " + str(value)
-        print "(For more detailed information type: python_error)"
+        print(etype.__name__ + ": " + str(value))
+        print("(For more detailed information type: python_error)")
 
 def __get_default_tango_host():
     global _DFT_TANGO_HOST
@@ -575,15 +570,15 @@ def __get_db(host_port=None):
             
             ip.user_ns["DB_NAME"] = host_port
         except Exception:
-            print
+            print()
             if db:
-                print "Could not access Database", host_port
+                print("Could not access Database", host_port)
                 old_host_port = "%s:%s" % (db.get_db_host(), db.get_db_port())
-                print "Maintaining connection to Database", old_host_port
+                print("Maintaining connection to Database", old_host_port)
                 ip.user_ns["DB_NAME"] = old_host_port
             else:
-                print "Could not access any Database."
-                print "Make sure .tangorc, /etc/tangorc or TANGO_HOST environment is defined."
+                print("Could not access any Database.")
+                print("Make sure .tangorc, /etc/tangorc or TANGO_HOST environment is defined.")
                 ip.user_ns["DB_NAME"] = "OFFLINE"
                 
         # register the 'db' in the user namespace
@@ -605,16 +600,16 @@ def __completer_wrapper(f):
     def wrapper(ip, evt):
         try:
             return f(ip, evt)
-        except Exception, e:
-            print
-            print "An unexpected exception ocorred during ITango command completer."
-            print "Please send a bug report to the PyTango team with the following informantion:"
-            print IPython.ipapi.get().options.banner
-            print 80*"-"
-            print "Completer:",__get_obj_name(f)
-            print 80*"-"
-            print str(e)
-            print 80*"-"
+        except Exception as e:
+            print()
+            print("An unexpected exception ocorred during ITango command completer.")
+            print("Please send a bug report to the PyTango team with the following informantion:")
+            print(IPython.ipapi.get().options.banner)
+            print(80*"-")
+            print("Completer:",__get_obj_name(f))
+            print(80*"-")
+            print(str(e))
+            print(80*"-")
             raise e
     return wrapper
 
@@ -693,7 +688,7 @@ def __store(ip, var):
     # we hide the standard output 
     stdout = sys.stdout
     try:
-        sys.stdout = StringIO.StringIO()
+        sys.stdout = io.BytesIO()
         ip.magic("store %s" % var)
     finally:
         sys.stdout = stdout
@@ -773,7 +768,7 @@ def init_db(ip, parameter_s=''):
         
     if db is None: return
     
-#    os.environ["TANGO_HOST"] = "%s:%s" % (db.get_db_host(), db.get_db_port())
+    #os.environ["TANGO_HOST"] = "%s:%s" % (db.get_db_host(), db.get_db_port())
     
     # Initialize device and server information
     query = "SELECT name, alias, server, class FROM device order by name"
@@ -818,7 +813,7 @@ def init_db(ip, parameter_s=''):
     excluded_klasses = "DServer",
     for klass, devices in klass_dict.items():
         if klass in excluded_klasses: continue
-        if not ip.user_ns.has_key(klass) or klass in old_junk:
+        if klass not in ip.user_ns or klass in old_junk:
             c = DeviceClassCompleter(klass, devices)
             ip.set_hook('complete_command', c, re_key = ".*" + klass + "[^\w\.]+")
             exposed_klasses[klass] = PyTango.DeviceProxy
@@ -872,7 +867,7 @@ def init_store(ip):
     tango_store = ip.user_ns.get(_TANGO_STORE)
     
     if tango_store is None:
-        print "Initializing tango store (should only happen once)"
+        print("Initializing tango store (should only happen once)")
         tango_store = {}
         ip.to_user_ns( { _TANGO_STORE : tango_store} )
         __store(ip, _TANGO_STORE)

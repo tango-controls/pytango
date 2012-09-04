@@ -25,13 +25,12 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["group_reply_list_init"]
 
 __docformat__ = "restructuredtext"
 
-from _PyTango import GroupReplyList
-from _PyTango import GroupCmdReplyList
-from _PyTango import GroupAttrReplyList
+from ._PyTango import GroupReplyList, GroupCmdReplyList, GroupAttrReplyList
+
 
 def __GroupReplyList__getitem(self, item):
     # Accessing an item in GroupReplyList and friends makes a C++ copy
@@ -47,7 +46,7 @@ def __GroupReplyList__getitem(self, item):
     
     # Slices support
     if isinstance(item, slice):
-        return [self.__getitem__(x) for x in xrange(*item.indices(len(self)))]
+        return [self.__getitem__(x) for x in range(*item.indices(len(self)))]
     
     # We want to get the same cache value for x[-1] as for x[len(x)-1]
     if item < 0:
@@ -72,7 +71,7 @@ def __GroupReplyList__getitem(self, item):
 def __GroupReplyList__iter(self):
     # Same problem as getitem. In this case it is easier for me to just
     # reimplement __iter__ in terms of __getitem__
-    for x in xrange(len(self)):
+    for x in range(len(self)):
         yield self[x]
 
 def __init_GroupReplyList():
@@ -92,7 +91,7 @@ def __init_GroupReplyList():
 def __doc_GroupReplyList():
     pass
 
-def init(doc=True):
+def group_reply_list_init(doc=True):
     __init_GroupReplyList()
     if doc:
         __doc_GroupReplyList()

@@ -34,30 +34,43 @@ const int i = 1;
 namespace PyEncodedAttribute
 {
 
-	/// This callback is run to delete char* objects.
+    /// This callback is run to delete char* objects.
     /// It is called by python. The array was associated with an attribute
     /// value object that is not being used anymore.
     /// @param ptr_ The array object.
     /// @param type_ The type of data. We don't need it for now
-
-    static void __ptr_deleter(void * ptr_, void *type_)
-    {
-        long t = reinterpret_cast<long>(type_);
-        if (1 == t)
-            delete [] (static_cast<unsigned char*>(ptr_));
-        else if (2 == t)
-            delete [] (static_cast<unsigned short*>(ptr_));
-        else if (4 == t)
-			delete [] (static_cast<Tango::DevULong*>(ptr_));
-    }
+#    ifdef PYCAPSULE_OLD
+         template<long type>
+         static void __ptr_deleter(void * ptr_)
+         {
+             if (1 == type)
+                 delete [] (static_cast<unsigned char*>(ptr_));
+             else if (2 == type)
+                 delete [] (static_cast<unsigned short*>(ptr_));
+             else if (4 == type)
+                 delete [] (static_cast<Tango::DevULong*>(ptr_));
+         }
+#    else
+         template<long type>
+         static void __ptr_deleter(PyObject* obj)
+         {
+             void * ptr_ = PyCapsule_GetPointer(obj, NULL);
+             if (1 == type)
+                 delete [] (static_cast<unsigned char*>(ptr_));
+             else if (2 == type)
+                 delete [] (static_cast<unsigned short*>(ptr_));
+             else if (4 == type)
+                 delete [] (static_cast<Tango::DevULong*>(ptr_));
+         }
+#    endif
     
     void encode_gray8(Tango::EncodedAttribute &self, object py_value, int w, int h)
     {
         PyObject *py_value_ptr = py_value.ptr();
         unsigned char *buffer = NULL;
-        if (PyString_Check(py_value_ptr))
+        if (PyBytes_Check(py_value_ptr))
         {
-            buffer = reinterpret_cast<unsigned char*>(PyString_AsString(py_value_ptr));
+            buffer = reinterpret_cast<unsigned char*>(PyBytes_AsString(py_value_ptr));
             self.encode_gray8(buffer, w, h);
             return;
         }
@@ -74,9 +87,9 @@ namespace PyEncodedAttribute
 #endif
         // It must be a py sequence
         // we are sure that w and h are given by python (see encoded_attribute.py)
-		const int length = w*h;
-	    unsigned char *raw_b = new unsigned char[length];
-		auto_ptr<unsigned char> b(raw_b);
+        const int length = w*h;
+        unsigned char *raw_b = new unsigned char[length];
+        unique_pointer<unsigned char> b(raw_b);
         buffer = raw_b;
         unsigned char *p = raw_b;
         int w_bytes = w;
@@ -93,16 +106,16 @@ namespace PyEncodedAttribute
                 boost::python::throw_error_already_set();
             }
             // The given object is a sequence of strings were each string is the entire row
-            if (PyString_Check(row))
+            if (PyBytes_Check(row))
             {
-                if (PyString_Size(row) != w_bytes)
+                if (PyBytes_Size(row) != w_bytes)
                 {
                     Py_DECREF(row);
                     PyErr_SetString(PyExc_TypeError,
                         "All sequences inside a sequence must have same size");
                     boost::python::throw_error_already_set();
                 }
-                memcpy(p, PyString_AsString(row), w_bytes);
+                memcpy(p, PyBytes_AsString(row), w_bytes);
                 p += w;
             }
             else
@@ -123,9 +136,9 @@ namespace PyEncodedAttribute
                         Py_DECREF(row);
                         boost::python::throw_error_already_set();
                     }
-                    if (PyString_Check(cell))
+                    if (PyBytes_Check(cell))
                     {
-                        if (PyString_Size(cell) != 1)
+                        if (PyBytes_Size(cell) != 1)
                         {
                             Py_DECREF(row);
                             Py_DECREF(cell);
@@ -133,10 +146,10 @@ namespace PyEncodedAttribute
                                 "All string items must have length one");
                             boost::python::throw_error_already_set();
                         }
-                        char byte = PyString_AsString(cell)[0];
+                        char byte = PyBytes_AsString(cell)[0];
                         *p = byte;
                     }
-                    else if (PyInt_Check(cell) || PyLong_Check(cell))
+                    else if (PyLong_Check(cell))
                     {
                         long byte = PyLong_AsLong(cell);
                         if (byte==-1 && PyErr_Occurred())
@@ -169,9 +182,9 @@ namespace PyEncodedAttribute
     {
         PyObject *py_value_ptr = py_value.ptr();
         unsigned char *buffer = NULL;
-        if (PyString_Check(py_value_ptr))
+        if (PyBytes_Check(py_value_ptr))
         {
-            buffer = reinterpret_cast<unsigned char*>(PyString_AsString(py_value_ptr));
+            buffer = reinterpret_cast<unsigned char*>(PyBytes_AsString(py_value_ptr));
             self.encode_jpeg_gray8(buffer, w, h, quality);
             return;
         }
@@ -188,10 +201,10 @@ namespace PyEncodedAttribute
 #endif
         // It must be a py sequence
         // we are sure that w and h are given by python (see encoded_attribute.py)
-		const int length = w*h;
+        const int length = w*h;
         unsigned char *raw_b = new unsigned char[length];
-        auto_ptr<unsigned char> b(raw_b);
-		buffer = raw_b;
+        unique_pointer<unsigned char> b(raw_b);
+        buffer = raw_b;
         unsigned char *p = raw_b;
         int w_bytes = w;
         for (long y=0; y<h; ++y)
@@ -207,16 +220,16 @@ namespace PyEncodedAttribute
                 boost::python::throw_error_already_set();
             }
             // The given object is a sequence of strings were each string is the entire row
-            if (PyString_Check(row))
+            if (PyBytes_Check(row))
             {
-                if (PyString_Size(row) != w_bytes)
+                if (PyBytes_Size(row) != w_bytes)
                 {
                     Py_DECREF(row);
                     PyErr_SetString(PyExc_TypeError,
                         "All sequences inside a sequence must have same size");
                     boost::python::throw_error_already_set();
                 }
-                memcpy(p, PyString_AsString(row), w_bytes);
+                memcpy(p, PyBytes_AsString(row), w_bytes);
                 p += w;
             }
             else
@@ -237,9 +250,9 @@ namespace PyEncodedAttribute
                         Py_DECREF(row);
                         boost::python::throw_error_already_set();
                     }
-                    if (PyString_Check(cell))
+                    if (PyBytes_Check(cell))
                     {
-                        if (PyString_Size(cell) != 1)
+                        if (PyBytes_Size(cell) != 1)
                         {
                             Py_DECREF(row);
                             Py_DECREF(cell);
@@ -247,10 +260,10 @@ namespace PyEncodedAttribute
                                 "All string items must have length one");
                             boost::python::throw_error_already_set();
                         }
-                        char byte = PyString_AsString(cell)[0];
+                        char byte = PyBytes_AsString(cell)[0];
                         *p = byte;
                     }
-                    else if (PyInt_Check(cell) || PyLong_Check(cell))
+                    else if (PyLong_Check(cell))
                     {
                         long byte = PyLong_AsLong(cell);
                         if (byte==-1 && PyErr_Occurred())
@@ -283,9 +296,9 @@ namespace PyEncodedAttribute
     {
         PyObject *py_value_ptr = py_value.ptr();
         unsigned short *buffer = NULL;
-        if (PyString_Check(py_value_ptr))
+        if (PyBytes_Check(py_value_ptr))
         {
-            buffer = reinterpret_cast<unsigned short*>(PyString_AsString(py_value_ptr));
+            buffer = reinterpret_cast<unsigned short*>(PyBytes_AsString(py_value_ptr));
             self.encode_gray16(buffer, w, h);
             return;
         }
@@ -302,10 +315,10 @@ namespace PyEncodedAttribute
 #endif
         // It must be a py sequence
         // we are sure that w and h are given by python (see encoded_attribute.py)
-		const int length = w*h;
+        const int length = w*h;
         unsigned short *raw_b = new unsigned short[length];
-        auto_ptr<unsigned short> b(raw_b);
-		buffer = raw_b;
+        unique_pointer<unsigned short> b(raw_b);
+        buffer = raw_b;
         unsigned short *p = raw_b;
         int w_bytes = 2*w;
         for (long y=0; y<h; ++y)
@@ -321,16 +334,16 @@ namespace PyEncodedAttribute
                 boost::python::throw_error_already_set();
             }
             // The given object is a sequence of strings were each string is the entire row
-            if (PyString_Check(row))
+            if (PyBytes_Check(row))
             {
-                if (PyString_Size(row) != w_bytes)
+                if (PyBytes_Size(row) != w_bytes)
                 {
                     Py_DECREF(row);
                     PyErr_SetString(PyExc_TypeError,
                         "All sequences inside a sequence must have same size");
                     boost::python::throw_error_already_set();
                 }
-                memcpy(p, PyString_AsString(row), w_bytes);
+                memcpy(p, PyBytes_AsString(row), w_bytes);
                 p += w;
             }
             else
@@ -351,9 +364,9 @@ namespace PyEncodedAttribute
                         Py_DECREF(row);
                         boost::python::throw_error_already_set();
                     }
-                    if (PyString_Check(cell))
+                    if (PyBytes_Check(cell))
                     {
-                        if (PyString_Size(cell) != 2)
+                        if (PyBytes_Size(cell) != 2)
                         {
                             Py_DECREF(row);
                             Py_DECREF(cell);
@@ -361,10 +374,10 @@ namespace PyEncodedAttribute
                                 "All string items must have length two");
                             boost::python::throw_error_already_set();
                         }
-                        unsigned short *word = reinterpret_cast<unsigned short *>(PyString_AsString(cell));
+                        unsigned short *word = reinterpret_cast<unsigned short *>(PyBytes_AsString(cell));
                         *p = *word;
                     }
-                    else if (PyInt_Check(cell) || PyLong_Check(cell))
+                    else if (PyLong_Check(cell))
                     {
                         unsigned short word = (unsigned short)PyLong_AsUnsignedLong(cell);
                         if (PyErr_Occurred())
@@ -396,9 +409,9 @@ namespace PyEncodedAttribute
     {
         PyObject *py_value_ptr = py_value.ptr();
         unsigned char *buffer = NULL;
-        if (PyString_Check(py_value_ptr))
+        if (PyBytes_Check(py_value_ptr))
         {
-            buffer = reinterpret_cast<unsigned char*>(PyString_AsString(py_value_ptr));
+            buffer = reinterpret_cast<unsigned char*>(PyBytes_AsString(py_value_ptr));
             self.encode_rgb24(buffer, w, h);
             return;
         }
@@ -412,10 +425,10 @@ namespace PyEncodedAttribute
 #endif
         // It must be a py sequence
         // we are sure that w and h are given by python (see encoded_attribute.py)
-		const int length = w*h;
+        const int length = w*h;
         unsigned char *raw_b = new unsigned char[length];
-        auto_ptr<unsigned char> b(raw_b);
-		buffer = raw_b;
+        unique_pointer<unsigned char> b(raw_b);
+        buffer = raw_b;
         unsigned char *p = raw_b;
         int w_bytes = 3*w;
         for (long y=0; y<h; ++y)
@@ -431,16 +444,16 @@ namespace PyEncodedAttribute
                 boost::python::throw_error_already_set();
             }
             // The given object is a sequence of strings were each string is the entire row
-            if (PyString_Check(row))
+            if (PyBytes_Check(row))
             {
-                if (PyString_Size(row) != w_bytes)
+                if (PyBytes_Size(row) != w_bytes)
                 {
                     Py_DECREF(row);
                     PyErr_SetString(PyExc_TypeError,
                         "All sequences inside a sequence must have same size");
                     boost::python::throw_error_already_set();
                 }
-                memcpy(p, PyString_AsString(row), w_bytes);
+                memcpy(p, PyBytes_AsString(row), w_bytes);
                 p += w;
             }
             else
@@ -461,9 +474,9 @@ namespace PyEncodedAttribute
                         Py_DECREF(row);
                         boost::python::throw_error_already_set();
                     }
-                    if (PyString_Check(cell))
+                    if (PyBytes_Check(cell))
                     {
-                        if (PyString_Size(cell) != 3)
+                        if (PyBytes_Size(cell) != 3)
                         {
                             Py_DECREF(row);
                             Py_DECREF(cell);
@@ -471,12 +484,12 @@ namespace PyEncodedAttribute
                                 "All string items must have length one");
                             boost::python::throw_error_already_set();
                         }
-                        char *byte = PyString_AsString(cell);
+                        char *byte = PyBytes_AsString(cell);
                         *p = *byte; p++; byte++;
                         *p = *byte; p++; byte++;
                         *p = *byte; p++;
                     }
-                    else if (PyInt_Check(cell) || PyLong_Check(cell))
+                    else if (PyLong_Check(cell))
                     {
                         long byte = PyLong_AsLong(cell);
                         if (byte==-1 && PyErr_Occurred())
@@ -510,9 +523,9 @@ namespace PyEncodedAttribute
     {
         PyObject *py_value_ptr = py_value.ptr();
         unsigned char *buffer = NULL;
-        if (PyString_Check(py_value_ptr))
+        if (PyBytes_Check(py_value_ptr))
         {
-            buffer = reinterpret_cast<unsigned char*>(PyString_AsString(py_value_ptr));
+            buffer = reinterpret_cast<unsigned char*>(PyBytes_AsString(py_value_ptr));
             self.encode_jpeg_rgb24(buffer, w, h, quality);
             return;
         }
@@ -528,7 +541,7 @@ namespace PyEncodedAttribute
         // we are sure that w and h are given by python (see encoded_attribute.py)
 		const int length = w*h;
         unsigned char *raw_b = new unsigned char[length];
-        auto_ptr<unsigned char> b(raw_b);
+        unique_pointer<unsigned char> b(raw_b);
 		buffer = raw_b;
         unsigned char *p = raw_b;
         int w_bytes = 3*w;
@@ -545,16 +558,16 @@ namespace PyEncodedAttribute
                 boost::python::throw_error_already_set();
             }
             // The given object is a sequence of strings were each string is the entire row
-            if (PyString_Check(row))
+            if (PyBytes_Check(row))
             {
-                if (PyString_Size(row) != w_bytes)
+                if (PyBytes_Size(row) != w_bytes)
                 {
                     Py_DECREF(row);
                     PyErr_SetString(PyExc_TypeError,
                         "All sequences inside a sequence must have same size");
                     boost::python::throw_error_already_set();
                 }
-                memcpy(p, PyString_AsString(row), w_bytes);
+                memcpy(p, PyBytes_AsString(row), w_bytes);
                 p += w;
             }
             else
@@ -575,9 +588,9 @@ namespace PyEncodedAttribute
                         Py_DECREF(row);
                         boost::python::throw_error_already_set();
                     }
-                    if (PyString_Check(cell))
+                    if (PyBytes_Check(cell))
                     {
-                        if (PyString_Size(cell) != 3)
+                        if (PyBytes_Size(cell) != 3)
                         {
                             Py_DECREF(row);
                             Py_DECREF(cell);
@@ -585,12 +598,12 @@ namespace PyEncodedAttribute
                                 "All string items must have length one");
                             boost::python::throw_error_already_set();
                         }
-                        char *byte = PyString_AsString(cell);
+                        char *byte = PyBytes_AsString(cell);
                         *p = *byte; p++; byte++;
                         *p = *byte; p++; byte++;
                         *p = *byte; p++;
                     }
-                    else if (PyInt_Check(cell) || PyLong_Check(cell))
+                    else if (PyLong_Check(cell))
                     {
                         long byte = PyLong_AsLong(cell);
                         if (byte==-1 && PyErr_Occurred())
@@ -624,9 +637,9 @@ namespace PyEncodedAttribute
     {
         PyObject *py_value_ptr = py_value.ptr();
         unsigned char *buffer = NULL;
-        if (PyString_Check(py_value_ptr))
+        if (PyBytes_Check(py_value_ptr))
         {
-            buffer = reinterpret_cast<unsigned char*>(PyString_AsString(py_value_ptr));
+            buffer = reinterpret_cast<unsigned char*>(PyBytes_AsString(py_value_ptr));
             self.encode_jpeg_rgb32(buffer, w, h, quality);
             return;
         }
@@ -642,7 +655,7 @@ namespace PyEncodedAttribute
         // we are sure that w and h are given by python (see encoded_attribute.py)
 		const int length = w*h;
         unsigned char *raw_b = new unsigned char[length];
-        auto_ptr<unsigned char> b(raw_b);
+        unique_pointer<unsigned char> b(raw_b);
 		buffer = raw_b;
         unsigned char *p = raw_b;
         int w_bytes = 4*w;
@@ -659,16 +672,16 @@ namespace PyEncodedAttribute
                 boost::python::throw_error_already_set();
             }
             // The given object is a sequence of strings were each string is the entire row
-            if (PyString_Check(row))
+            if (PyBytes_Check(row))
             {
-                if (PyString_Size(row) != w_bytes)
+                if (PyBytes_Size(row) != w_bytes)
                 {
                     Py_DECREF(row);
                     PyErr_SetString(PyExc_TypeError,
                         "All sequences inside a sequence must have same size");
                     boost::python::throw_error_already_set();
                 }
-                memcpy(p, PyString_AsString(row), w_bytes);
+                memcpy(p, PyBytes_AsString(row), w_bytes);
                 p += w;
             }
             else
@@ -689,9 +702,9 @@ namespace PyEncodedAttribute
                         Py_DECREF(row);
                         boost::python::throw_error_already_set();
                     }
-                    if (PyString_Check(cell))
+                    if (PyBytes_Check(cell))
                     {
-                        if (PyString_Size(cell) != 3)
+                        if (PyBytes_Size(cell) != 3)
                         {
                             Py_DECREF(row);
                             Py_DECREF(cell);
@@ -699,13 +712,13 @@ namespace PyEncodedAttribute
                                 "All string items must have length one");
                             boost::python::throw_error_already_set();
                         }
-                        char *byte = PyString_AsString(cell);
+                        char *byte = PyBytes_AsString(cell);
                         *p = *byte; p++; byte++;
                         *p = *byte; p++; byte++;
                         *p = *byte; p++; byte++;
                         *p = *byte; p++;
                     }
-                    else if (PyInt_Check(cell) || PyLong_Check(cell))
+                    else if (PyLong_Check(cell))
                     {
                         long byte = PyLong_AsLong(cell);
                         if (byte==-1 && PyErr_Occurred())
@@ -764,10 +777,10 @@ namespace PyEncodedAttribute
                 // PyCObject is intended for that kind of things. It's seen as a
                 // black box object from python. We assign him a function to be called
                 // when it is deleted -> the function deletes de data.
-                PyObject* guard = PyCObject_FromVoidPtrAndDesc(
-                    static_cast<void*>(ch_ptr),
-                    reinterpret_cast<void*>(1),
-                    __ptr_deleter);
+                PyObject* guard = PyCapsule_New(
+                        static_cast<void*>(ch_ptr),
+                        NULL,
+                        __ptr_deleter<1>);
                     
                 if (!guard)
                 {
@@ -789,7 +802,7 @@ namespace PyEncodedAttribute
                     throw_error_already_set();
                 }
                 size_t nb_bytes = width*height*sizeof(char);
-                PyObject *buffer_str = PyString_FromStringAndSize(ch_ptr, nb_bytes);
+                PyObject *buffer_str = PyBytes_FromStringAndSize(ch_ptr, nb_bytes);
                 if (!buffer_str)
                 {
                     Py_XDECREF(ret);
@@ -823,7 +836,7 @@ namespace PyEncodedAttribute
                     }
                     for (long x=0; x < width; ++x)
                     {
-                        PyTuple_SetItem(row, x, PyString_FromStringAndSize(ch_ptr + y*width+x, 1));
+                        PyTuple_SetItem(row, x, PyBytes_FromStringAndSize(ch_ptr + y*width+x, 1));
                     }
                     PyTuple_SetItem(ret, y, row);
                 }
@@ -831,7 +844,6 @@ namespace PyEncodedAttribute
                 delete [] buffer;
                 break;
             }
-            case PyTango::ExtractAsPyTango3:
             case PyTango::ExtractAsList:
             {
                 ret = PyList_New(height);
@@ -852,7 +864,7 @@ namespace PyEncodedAttribute
                     }
                     for (long x=0; x < width; ++x)
                     {
-                        PyList_SetItem(row, x, PyString_FromStringAndSize(ch_ptr + y*width+x, 1));
+                        PyList_SetItem(row, x, PyBytes_FromStringAndSize(ch_ptr + y*width+x, 1));
                     }
                     PyList_SetItem(ret, y, row);
                 }
@@ -899,10 +911,10 @@ namespace PyEncodedAttribute
                 // PyCObject is intended for that kind of things. It's seen as a
                 // black box object from python. We assign him a function to be called
                 // when it is deleted -> the function deletes de data.
-                PyObject* guard = PyCObject_FromVoidPtrAndDesc(
+                PyObject* guard = PyCapsule_New(
                     static_cast<void*>(ch_ptr),
-                    reinterpret_cast<void*>(2),
-                    __ptr_deleter);
+                    NULL,
+                    __ptr_deleter<2>);
                     
                 if (!guard)
                 {
@@ -925,7 +937,7 @@ namespace PyEncodedAttribute
                 }
                 size_t nb_bytes = width*height*sizeof(unsigned short);
                 
-                PyObject *buffer_str = PyString_FromStringAndSize(
+                PyObject *buffer_str = PyBytes_FromStringAndSize(
                     reinterpret_cast<char *>(ch_ptr), nb_bytes);
                 delete [] buffer;
                 
@@ -969,7 +981,6 @@ namespace PyEncodedAttribute
                 delete [] buffer;
                 break;
             }
-            case PyTango::ExtractAsPyTango3:
             case PyTango::ExtractAsList:
             {
                 ret = PyList_New(height);
@@ -1036,11 +1047,11 @@ namespace PyEncodedAttribute
                 // the last copy of numpy.ndarray() disappears.
                 // PyCObject is intended for that kind of things. It's seen as a
                 // black box object from python. We assign him a function to be called
-                PyObject* guard = PyCObject_FromVoidPtrAndDesc(
                 // when it is deleted -> the function deletes de data.
+                PyObject* guard = PyCapsule_New(
                     static_cast<void*>(ch_ptr),
-                    reinterpret_cast<void*>(2),
-                    __ptr_deleter);
+                    NULL,
+                    __ptr_deleter<4>);
                     
                 if (!guard)
                 {
@@ -1063,7 +1074,7 @@ namespace PyEncodedAttribute
                 }
                 size_t nb_bytes = width*height*4;
                 
-                PyObject *buffer_str = PyString_FromStringAndSize(
+                PyObject *buffer_str = PyBytes_FromStringAndSize(
                     reinterpret_cast<char *>(ch_ptr), nb_bytes);
                 delete [] buffer;
                 
@@ -1127,7 +1138,6 @@ namespace PyEncodedAttribute
                 delete [] buffer;
                 break;
             }
-            case PyTango::ExtractAsPyTango3:
             case PyTango::ExtractAsList:
             {
                 ret = PyList_New(height);

@@ -25,14 +25,14 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["device_attribute_init"]
 
 __docformat__ = "restructuredtext"
 
 import copy
 
-from utils import document_method as __document_method
-from _PyTango import DeviceAttribute, ExtractAs
+from .utils import document_method as __document_method
+from ._PyTango import DeviceAttribute, ExtractAs
 
 def __DeviceAttribute__get_data(self):
     return self.get_data_raw().extract()
@@ -108,12 +108,38 @@ def __doc_DeviceAttribute():
         Return     : (sequence<DevError>)
     """ )
 
+    document_method("set_w_dim_x", """
+    set_w_dim_x(self, val) -> None
+
+            Sets the write value dim x.
+
+        Parameters : 
+            - val : (int) new write dim x
+            
+        Return     : None
+        
+        New in PyTango 8.0.0
+    """ )
+
+    document_method("set_w_dim_y", """
+    set_w_dim_y(self, val) -> None
+
+            Sets the write value dim y.
+
+        Parameters : 
+            - val : (int) new write dim y
+            
+        Return     : None
+        
+        New in PyTango 8.0.0
+    """ )
+    
 def __init_DeviceAttribute():
     DeviceAttribute.__init_orig = DeviceAttribute.__init__
     DeviceAttribute.__init__ = __DeviceAttribute__init
     DeviceAttribute.ExtractAs = ExtractAs
 
-def init(doc=True):
+def device_attribute_init(doc=True):
     __init_DeviceAttribute()
     if doc:
         __doc_DeviceAttribute()

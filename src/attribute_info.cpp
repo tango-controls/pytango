@@ -30,7 +30,7 @@ void export_attribute_info()
 {
     class_<Tango::AttributeInfo, bases<Tango::DeviceAttributeConfig> >
         ("AttributeInfo")
-        .def(init<const Tango::AttributeInfoEx&>())
+        .def(init<const Tango::AttributeInfo&>())
         .def_readwrite("disp_level", &Tango::AttributeInfo::disp_level)
     ;
 }

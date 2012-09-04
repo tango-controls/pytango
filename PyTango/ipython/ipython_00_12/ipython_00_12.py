@@ -28,7 +28,7 @@
 __all__ = ["load_config"]
 
 from IPython.utils.ipstruct import Struct
-from  IPython.utils.coloransi import TermColors
+from IPython.utils.coloransi import TermColors
 
 def load_config(config):
     import PyTango.ipython
@@ -60,7 +60,7 @@ def load_config(config):
     # PromptManager
     # ------------------------------------
     prompt = config.PromptManager
-    prompt.in_template = 'ITango {DB_NAME} [\\#]: '
+    prompt.in_template = 'ITango [\\#]: '
     #prompt.in2_template = 
     prompt.out_template = 'Result [\\#]: '
     
@@ -110,3 +110,9 @@ object?   -> Details about 'object'. ?object also works, ?? prints more.
     tango_banner = tango_banner.format(**d)
     term_i_shell.banner1 = banner
     term_i_shell.banner2 = tango_banner
+    
+    # ------------------------------------
+    # FrontendWidget
+    # ------------------------------------
+    frontend_widget = config.FrontendWidget
+    frontend_widget.banner = banner

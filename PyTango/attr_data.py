@@ -31,8 +31,9 @@ __docformat__ = "restructuredtext"
 
 import operator
 
-from _PyTango import Except, CmdArgType, AttrDataFormat, AttrWriteType, \
+from ._PyTango import Except, CmdArgType, AttrDataFormat, AttrWriteType, \
     DispLevel, UserDefaultAttrProp, Attr, SpectrumAttr, ImageAttr
+import collections
 
 
 class AttrData(object):
@@ -66,7 +67,7 @@ class AttrData(object):
     def __create_user_default_attr_prop(self, attr_name, extra_info):
         """for internal usage only"""
         p = UserDefaultAttrProp()
-        for k, v in extra_info.iteritems():
+        for k, v in extra_info.items():
             k_lower = k.lower()
             method_name = "set_%s" % k_lower.replace(' ','_')
             if hasattr(p, method_name):
@@ -89,7 +90,7 @@ class AttrData(object):
         # check for well defined attribute info
         
         # check parameter
-        if not operator.isSequenceType(attr_info):
+        if not isinstance(attr_info, collections.Sequence):
             throw_ex("Wrong data type for value for describing attribute %s in "
                      "class %s\nMust be a sequence with 1 or 2 elements" 
                      % (attr_name, name))
@@ -103,14 +104,14 @@ class AttrData(object):
         if len(attr_info) == 2:
             # attr_info[1] must be a dictionary
             # extra_info = attr_info[1], with all the keys lowercase
-            for k, v in attr_info[1].iteritems():
+            for k, v in attr_info[1].items():
                 extra_info[k.lower()] = v
         
         attr_info = attr_info[0]
         
         attr_info_len = len(attr_info)
         # check parameter
-        if not operator.isSequenceType(attr_info) or \
+        if not isinstance(attr_info, collections.Sequence) or \
            attr_info_len < 3 or attr_info_len > 5:
             throw_ex("Wrong data type for describing mandatory information for "
                      "attribute %s in class %s\nMust be a sequence with 3, 4 "

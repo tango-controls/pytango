@@ -159,5 +159,6 @@ void export_connection()
         
         .def("get_access_control", &Tango::Connection::get_access_control)
         .def("set_access_control", &Tango::Connection::set_access_control)
+        .def("get_access_right", &Tango::Connection::get_access_right)
     ;
 }

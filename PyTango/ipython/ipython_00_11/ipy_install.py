@@ -23,9 +23,11 @@
 ##
 ################################################################################
 
+from __future__ import with_statement
+
 import sys
 import os
-import StringIO
+import io
 
 import IPython
 from IPython.core.profiledir import ProfileDirError, ProfileDir
@@ -53,7 +55,7 @@ def install(ipydir=None, verbose=True, profile='tango'):
     if verbose:
         out = sys.stdout
     else:
-        out = StringIO.StringIO()
+        out = io.StringIO()
     
     ipython_dir = ipydir or get_ipython_dir()
     try:
@@ -76,14 +78,9 @@ def install(ipydir=None, verbose=True, profile='tango'):
 
     profile = __PROFILE.format(pytangover=PyTango.Release.version,
                                ipyver=IPython.release.version)
-    f = None
-    try:
-        f = file(abs_config_file_name, "w")
+    with open(abs_config_file_name, "w") as f:
         f.write(profile)
-    finally:
-        if f is not None:
-            f.close()
-
+        f.close()
     out.write("[DONE]\n\n")
     out.write("""\
 To start ipython with tango interface simply type on the command line:

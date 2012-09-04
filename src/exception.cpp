@@ -181,48 +181,39 @@ Tango::DevFailed to_dev_failed(PyObject *type, PyObject *value,
         PyObject *tracebackModule = PyImport_ImportModule("traceback");
         if (tracebackModule != NULL)
         {
-            PyObject *tbList, *emptyString, *strRetval;
-
             //
             // Format the traceback part of the Python exception
             // and store it in the origin part of the Tango exception
             //
 
-            tbList = PyObject_CallMethod(
+            PyObject *tbList_ptr = PyObject_CallMethod(
                     tracebackModule,
                     (char *)"format_tb",
                     (char *)"O",
                     traceback == NULL ? Py_None : traceback);
-
-            emptyString = PyString_FromString("");
-            strRetval = PyObject_CallMethod(emptyString, (char *)"join", (char *)"O", tbList);
-
-            dev_err[0].origin = CORBA::string_dup(PyString_AsString(strRetval));
-
-            Py_DECREF(tbList);
-            Py_DECREF(emptyString);
-            Py_DECREF(strRetval);
+            
+            boost::python::object tbList = object(handle<>(tbList_ptr));
+            boost::python::str origin = str("").join(tbList);
+            char const* origin_ptr = boost::python::extract<char const*>(origin);
+            dev_err[0].origin = CORBA::string_dup(origin_ptr);
 
             //
             // Format the exec and value part of the Python exception
             // and store it in the desc part of the Tango exception
             //
 
-            tbList = PyObject_CallMethod(
+            tbList_ptr = PyObject_CallMethod(
                     tracebackModule,
                     (char *)"format_exception_only",
                     (char *)"OO",
                     type,
                     value == NULL ? Py_None : value);
+            
+            tbList = object(handle<>(tbList_ptr));
+            boost::python::str desc = str("").join(tbList);
+            char const* desc_ptr = boost::python::extract<char const*>(desc);
+            dev_err[0].desc = CORBA::string_dup(desc_ptr);
 
-            emptyString = PyString_FromString("");
-            strRetval = PyObject_CallMethod(emptyString, (char *)"join", (char *)"O", tbList);
-
-            dev_err[0].desc = CORBA::string_dup(PyString_AsString(strRetval));
-
-            Py_DECREF(tbList);
-            Py_DECREF(emptyString);
-            Py_DECREF(strRetval);
             Py_DECREF(tracebackModule);
 
             dev_err[0].reason = CORBA::string_dup("PyDs_PythonError");

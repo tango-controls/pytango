@@ -25,12 +25,12 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["exception_init"]
 
 __docformat__ = "restructuredtext"
 
-from utils import document_static_method as __document_static_method
-from _PyTango import Except, DevError
+from .utils import document_static_method as __document_static_method
+from ._PyTango import Except, DevError
 
 def __to_dev_failed(exc_type=None, exc_value=None, traceback=None):
     """to_dev_failed(exc_type, exc_value, traceback) -> PyTango.DevFailed
@@ -55,7 +55,7 @@ def __to_dev_failed(exc_type=None, exc_value=None, traceback=None):
         New in PyTango 7.2.1"""
     try:
         Except.throw_python_exception(exc_type, exc_value, traceback)
-    except Exception, e:
+    except Exception as e:
         return e
 
 def __init_Except():
@@ -160,7 +160,7 @@ def __doc_DevError():
         - origin : (str) Tango server method in which the error happened"""
 
   
-def init(doc=True):
+def exception_init(doc=True):
     __init_Except()
     if doc:
         __doc_Except()

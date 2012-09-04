@@ -25,11 +25,11 @@
 This is an internal PyTango module.
 """
 
-__all__ = []
+__all__ = ["callback_init"]
 
 __docformat__ = "restructuredtext"
 
-from _PyTango import CmdDoneEvent, AttrReadEvent, AttrWrittenEvent
+from ._PyTango import CmdDoneEvent, AttrReadEvent, AttrWrittenEvent
 
 def __init_Callback():
     pass
@@ -74,7 +74,7 @@ def __doc_Callback():
             - ext        :
     """
 
-def init(doc=True):
+def callback_init(doc=True):
     __init_Callback()
     if doc:
         __doc_Callback()

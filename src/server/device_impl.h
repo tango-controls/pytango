@@ -73,6 +73,15 @@ public:
      * Invokes the actual init_device
      */
     void init_device();
+    
+    bool _is_attribute_polled(const std::string &att_name);
+    bool _is_command_polled(const std::string &cmd_name);
+    int _get_attribute_poll_period(const std::string &att_name);
+    int _get_command_poll_period(const std::string &cmd_name);
+    void _poll_attribute(const std::string &att_name, int period);
+    void _poll_command(const std::string &cmd_name, int period);
+    void _stop_poll_attribute(const std::string &att_name);
+    void _stop_poll_command(const std::string &cmd_name);
 };
 
 /**
@@ -171,21 +180,6 @@ public:
      */
     virtual ~Device_3ImplWrap();
     
-    /**
-     * A wrapper around the add_attribute in order to process some
-     * internal information
-     *
-     * @param att the attribute reference containning information about
-     *            the new attribute to be added
-     */
-    void _add_attribute(const Tango::Attr &att);
-
-    /**
-     * Wrapper around the remove_attribute in order to simplify
-     * string & to const string & conversion and default parameters
-     */
-    void _remove_attribute(const char *att_name);
-
     /**
      * Necessary init_device implementation to call python
      */
@@ -312,21 +306,6 @@ public:
      * Destructor
      */
     virtual ~Device_4ImplWrap();
-
-    /**
-     * A wrapper around the add_attribute in order to process some
-     * internal information
-     *
-     * @param att the attribute reference containning information about
-     *            the new attribute to be added
-     */
-    void _add_attribute(const Tango::Attr &att);
-
-    /**
-     * Wrapper around the remove_attribute in order to simplify
-     * string & to const string & conversion and default parameters
-     */
-    void _remove_attribute(const char *att_name);
 
     /**
      * Necessary init_device implementation to call python

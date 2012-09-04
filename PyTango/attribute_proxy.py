@@ -29,20 +29,16 @@ To access these members use directly :mod:`PyTango` module and NOT
 PyTango.attribute_proxy.
 """
 
-__all__ = [ "AttributeProxy" ]
+__all__ = [ "AttributeProxy", "attribute_proxy_init"]
             
 __docformat__ = "restructuredtext"
 
-import operator
-import types
+from ._PyTango import StdStringVector, DbData, DbDatum, DeviceProxy
+from ._PyTango import __AttributeProxy as _AttributeProxy
+from .utils import seq_2_StdStringVector, seq_2_DbData, DbData_2_dict, \
+    is_pure_str, is_non_str_seq
+import collections
 
-from _PyTango import StdStringVector
-from _PyTango import DbData, DbDatum
-from PyTango.utils import seq_2_StdStringVector
-from PyTango.utils import seq_2_DbData, DbData_2_dict
-
-from _PyTango import __AttributeProxy as _AttributeProxy
-from _PyTango import DeviceProxy
 
 def __AttributeProxy__get_property(self, propname, value=None):
     """
@@ -77,7 +73,7 @@ def __AttributeProxy__get_property(self, propname, value=None):
                      DevFailed from database device
     """
 
-    if type(propname) in types.StringTypes or isinstance(propname, StdStringVector):
+    if is_pure_str(propname) or isinstance(propname, StdStringVector):
         new_value = value
         if new_value is None:
             new_value = DbData()
@@ -88,12 +84,12 @@ def __AttributeProxy__get_property(self, propname, value=None):
         new_value.append(propname)
         self._get_property(new_value)
         return DbData_2_dict(new_value)
-    elif operator.isSequenceType(propname):
+    elif isinstance(propname, collections.Sequence):
         if isinstance(propname, DbData):
             self._get_property(propname)
             return DbData_2_dict(propname)
 
-        if type(propname[0]) in types.StringTypes:
+        if is_pure_str(propname[0]):
             new_propname = StdStringVector()
             for i in propname: new_propname.append(i)
             new_value = value
@@ -140,16 +136,16 @@ def __AttributeProxy__put_property(self, value):
         new_value = DbData()
         new_value.append(value)
         value = new_value
-    elif operator.isSequenceType(value) and not type(value) in types.StringTypes:
+    elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif operator.isMappingType(value):
+    elif isinstance(value, collections.Mapping):
         new_value = DbData()
-        for k, v in value.iteritems():
+        for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
                 continue
             db_datum = DbDatum(k)
-            if operator.isSequenceType(v) and not type(v) in types.StringTypes:
+            if is_non_str_seq(v):
                 seq_2_StdStringVector(v, db_datum.value_string)
             else:
                 db_datum.value_string.append(str(v))
@@ -196,21 +192,21 @@ def __AttributeProxy__delete_property(self, value):
                     DevFailed from device (DB_SQLError)
     """
     if isinstance(value, DbData) or isinstance(value, StdStringVector) or \
-       type(value) in types.StringTypes:
+       is_pure_str(value):
         new_value = value
     elif isinstance(value, DbDatum):
         new_value = DbData()
         new_value.append(value)
-    elif operator.isSequenceType(value):
+    elif isinstance(value, collections.Sequence):
         new_value = DbData()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif operator.isMappingType(value):
+    elif isinstance(value, collections.Mapping):
         new_value = DbData()
-        for k, v in value.iteritems():
+        for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
             else:
@@ -362,5 +358,5 @@ def __init_AttributeProxy(doc=True):
     AttributeProxy.get_last_event_date  = _method_device('get_last_event_date', doc=doc)
     AttributeProxy.is_event_queue_empty = _method_device('is_event_queue_empty', doc=doc)
 
-def init(doc=True):
+def attribute_proxy_init(doc=True):
     __init_AttributeProxy(doc=doc)
