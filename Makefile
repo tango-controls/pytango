@@ -33,58 +33,77 @@
 # if target == install also needs: prefix=<install_dir>
 # ex: make install prefix=/home/homer/.local/lib/python2.6/site-packages
 #
+# Optional:
+# - OBJS_DIR: directory where files will be build (default: objs)
+# - PY3K: if defined use python 3 boost python
+# - PY_VER: use a specific python version (default is empty) (ex: 3.2)
 
 ifndef TANGO_ROOT
 TANGO_ROOT=/usr
 endif
 
+ifdef PY_VER
+PY_EXC=python$(PY_VER)
+PY_MAJOR=$(shell $(PY_EXC) -c "import sys; sys.stdout.write(str(sys.version_info[0]))")
+PY_MINOR=$(shell $(PY_EXC) -c "import sys; sys.stdout.write(str(sys.version_info[1]))")
+else
+PY_EXC=python
+PY_MAJOR=$(shell $(PY_EXC) -c "import sys; sys.stdout.write(str(sys.version_info[0]))")
+PY_MINOR=$(shell $(PY_EXC) -c "import sys; sys.stdout.write(str(sys.version_info[1]))")
+PY_VER=$(PY_MAJOR).$(PY_MINOR)
+endif
+
+PY_VER_S=$(PY_MAJOR)$(PY_MINOR)
+
 ifndef NUMPY_ROOT
-NUMPY_ROOT=$(shell python -c "import os; import numpy; print os.path.dirname(numpy.__file__)")/core
+NUMPY_ROOT=$(shell $(PY_EXC) -c "import sys, os, numpy; sys.stdout.write(os.path.dirname(numpy.__file__))")/core
 endif
 
 ifndef prefix
 ifdef user
-_PY_DIR=$(shell python -c "import os; print os.path.split(os.path.join(os.path.dirname(os.__file__)))[1]")
+_PY_DIR=$(shell $(PY_EXC) -c "import sys, os; sys.stdout.write(os.path.split(os.path.join(os.path.dirname(os.__file__)))[1])")
 prefix=$(HOME)/.local/lib/$(_PY_DIR)/site-packages
 else
-_PY_DIR=$(shell python -c "import os; print os.path.join(os.path.dirname(os.__file__))")
+_PY_DIR=$(shell $(PY_EXC) -c "import sys, os; sys.stdout.write(os.path.join(os.path.dirname(os.__file__)))")
 prefix=$(_PY_DIR)/site-packages
 endif
 endif
 
 SRC_DIR = src
 
-PRE_C_H = $(SRC_DIR)/precompiled_header.hpp
-PRE_C_H_O = $(PRE_C_H).gch
-
 ifndef OBJS_DIR
-OBJS_DIR = objs
+OBJS_DIR = objs_py$(PY_VER_S)
 endif
 
 CC = gcc
-CCFLAGS = -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -fPIC $(INCLUDE_DIRS)
 
+PY_INC = $(shell python$(PY_VER)-config --includes)
+NUMPY_INC = -I$(NUMPY_ROOT)/include
+TANGO_INC = -I$(TANGO_ROOT)/include
+PRE_C_H = precompiled_header.hpp
+PRE_C_H_O = $(OBJS_DIR)/$(PRE_C_H).gch
+PRE_C = -include$(OBJS_DIR)/$(PRE_C_H)
 LN = g++ -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions
 LN_STATIC = g++ -pthread -static -Wl,-O1 -Wl,-Bsymbolic-functions
 LN_VER = -Wl,-h -Wl,--strip-all
-LN_LIBS = -ltango -llog4tango -lpthread -lrt -ldl -lomniORB4 -lomniDynamic4 -lomnithread -lCOS4 -lboost_python
+BOOST_LIB = boost_python-py$(PY_VER_S)
+LN_LIBS = -ltango -llog4tango -lpthread -lrt -ldl -lomniORB4 -lomniDynamic4 -lomnithread -lCOS4 -l$(BOOST_LIB) -lzmq
 LN_DIRS = -L$(TANGO_ROOT)/lib
 
-PY_INC = $(shell python-config --includes)
-NUMPY_INC = -I$(NUMPY_ROOT)/include
-TANGO_INC = -I$(TANGO_ROOT)/include
-PRE_C = -include$(PRE_C_H)
-
 INCLUDE_DIRS = \
--Isrc \
-$(TANGO_INC) \
-$(TANGO_INC)/tango \
-$(PY_INC) \
-$(NUMPY_INC)
+    -Isrc \
+    $(TANGO_INC) \
+    $(TANGO_INC)/tango \
+    $(PY_INC) \
+    $(NUMPY_INC)
+
+CCFLAGS = -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -fPIC -std=c++0x $(INCLUDE_DIRS)
 
 LIB_NAME = _PyTango.so
 LIB_NAME_STATIC = _PyTangoStatic.so
 LIB_SYMB_NAME = $(LIB_NAME).dbg
+
+
 
 OBJS = \
 $(OBJS_DIR)/api_util.o \
@@ -119,7 +138,6 @@ $(OBJS_DIR)/event_data.o \
 $(OBJS_DIR)/exception.o \
 $(OBJS_DIR)/from_py.o \
 $(OBJS_DIR)/group.o \
-$(OBJS_DIR)/group_element.o \
 $(OBJS_DIR)/group_reply.o \
 $(OBJS_DIR)/group_reply_list.o \
 $(OBJS_DIR)/locker_info.o \
@@ -173,7 +191,7 @@ build: init $(PRE_C_H_O) $(LIB_NAME)
 init:
 	mkdir -p $(OBJS_DIR)
 
-$(PRE_C_H_O): $(PRE_C_H)
+$(PRE_C_H_O): $(SRC_DIR)/$(PRE_C_H)
 	$(CC) $(CCFLAGS) -c $< -o $(PRE_C_H_O)
 
 #

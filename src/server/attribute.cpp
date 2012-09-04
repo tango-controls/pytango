@@ -95,7 +95,7 @@ namespace PyAttribute
            I prefer this one since it decouples TangoC++ from PyTango and creating
            a scalar is not so expensive after all
         */
-        std::auto_ptr<TangoScalarType> cpp_val(new TangoScalarType);
+        unique_pointer<TangoScalarType> cpp_val(new TangoScalarType);
         
         from_py<tangoTypeConst>::convert(value, *cpp_val);
         att.set_value(cpp_val.release(), 1, 0, true);
@@ -184,7 +184,7 @@ namespace PyAttribute
            I prefer this one since it decouples TangoC++ from PyTango and creating
            a scalar is not so expensive after all
         */
-        std::auto_ptr<TangoScalarType> cpp_val(new TangoScalarType);
+        unique_pointer<TangoScalarType> cpp_val(new TangoScalarType);
         
         from_py<tangoTypeConst>::convert(value, *cpp_val);
         att.set_value_date_quality(cpp_val.release(), tv, quality, 1, 0, true);
@@ -468,6 +468,14 @@ namespace PyAttribute
                 "PyDs_WrongPythonDataTypeForAttribute",
                 o.str(),
                 "fire_change_event()");
+    }
+    
+    // usually not necessary to rewrite but with direct declaration the compiler
+    // gives an error. It seems to be because the tango method definition is not
+    // in the header file.
+    inline bool is_polled(Tango::Attribute &self)
+    {
+        return self.is_polled();
     }
 
 #if TgLibVersNb >= 80100 // set_min_alarm
@@ -827,8 +835,7 @@ void export_attribute()
         .def("is_min_warning", &Tango::Attribute::is_min_warning)
         .def("is_max_warning", &Tango::Attribute::is_max_warning)
         .def("is_rds_alarm", &Tango::Attribute::is_rds_alarm)
-        //TODO .def("is_alarmed", &Tango::Attribute::is_alarmed)
-        .def("is_polled", &Tango::Attribute::is_polled)
+        .def("is_polled", &PyAttribute::is_polled)
         .def("check_alarm", &Tango::Attribute::check_alarm)
         .def("get_writable", &Tango::Attribute::get_writable)
         .def("get_name", &Tango::Attribute::get_name,

@@ -65,7 +65,12 @@ void export_constants()
     consts_scope.attr("DefaultDocUrl") = DefaultDocUrl;
     consts_scope.attr("EnvVariable") = EnvVariable;
     consts_scope.attr("DbObjName") = DbObjName;
-    consts_scope.attr("DescNotSet") = DescNotSet;
+    
+    // Changed in tango 8 from DescNotSet to NotSet. We keep the old constant
+    // to try to maintain backward compatibility
+    consts_scope.attr("DescNotSet") = NotSet;
+    consts_scope.attr("NotSet") = NotSet;
+    
     consts_scope.attr("ResNotDefined") = ResNotDefined;
     consts_scope.attr("MessBoxTitle") = MessBoxTitle;
     consts_scope.attr("StatusNotSet") = StatusNotSet;

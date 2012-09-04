@@ -698,13 +698,13 @@ inline TANGO_const2type(Tango::DEVVAR_LONGSTRINGARRAY)* fast_convert2array<Tango
         &py_lng = py_value[0],
         &py_str = py_value[1];
 
-    std::auto_ptr<Tango::DevVarLongArray> a_lng(
+    unique_pointer<Tango::DevVarLongArray> a_lng(
         fast_convert2array<Tango::DEVVAR_LONGARRAY>(py_lng));
 
-    std::auto_ptr<Tango::DevVarStringArray> a_str(
+    unique_pointer<Tango::DevVarStringArray> a_str(
         fast_convert2array<Tango::DEVVAR_STRINGARRAY>(py_str));
 
-    std::auto_ptr<TangoArrayType> result(new TangoArrayType());
+    unique_pointer<TangoArrayType> result(new TangoArrayType());
 
     result->lvalue = *a_lng;
     result->svalue = *a_str;
@@ -733,13 +733,13 @@ inline TANGO_const2type(Tango::DEVVAR_DOUBLESTRINGARRAY)* fast_convert2array<Tan
         &py_dbl = py_value[0],
         &py_str = py_value[1];
 
-    std::auto_ptr<Tango::DevVarDoubleArray> a_dbl(
+    unique_pointer<Tango::DevVarDoubleArray> a_dbl(
         fast_convert2array<Tango::DEVVAR_DOUBLEARRAY>(py_dbl));
 
-    std::auto_ptr<Tango::DevVarStringArray> a_str(
+    unique_pointer<Tango::DevVarStringArray> a_str(
         fast_convert2array<Tango::DEVVAR_STRINGARRAY>(py_str));
 
-    std::auto_ptr<TangoArrayType> result(new TangoArrayType());
+    unique_pointer<TangoArrayType> result(new TangoArrayType());
 
     result->dvalue = *a_dbl;
     result->svalue = *a_str;

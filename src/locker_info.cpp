@@ -24,21 +24,19 @@
 #include "precompiled_header.hpp"
 #include <tango.h>
 
-using namespace boost::python;
-
 struct PyLockerInfo
 {
-    static inline object get_locker_id(Tango::LockerInfo &li)
+    static inline boost::python::object get_locker_id(Tango::LockerInfo &li)
     {
         return (li.ll == Tango::CPP) ?
-            object(li.li.LockerPid) :
-            tuple(li.li.UUID);
+            boost::python::object(li.li.LockerPid) :
+            boost::python::tuple(li.li.UUID);
     }
 };
 
 void export_locker_info()
 {
-    class_<Tango::LockerInfo>("LockerInfo")
+    boost::python::class_<Tango::LockerInfo>("LockerInfo")
         .def_readonly("ll", &Tango::LockerInfo::ll)
         .add_property("li", &PyLockerInfo::get_locker_id)
         .def_readonly("locker_host", &Tango::LockerInfo::locker_host)

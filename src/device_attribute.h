@@ -38,7 +38,7 @@ namespace PyDeviceAttribute {
 
 /// @name Types
 /// @{
-    typedef std::auto_ptr<std::vector<Tango::DeviceAttribute> > AutoDevAttrVector;
+    typedef unique_pointer<std::vector<Tango::DeviceAttribute> > AutoDevAttrVector;
 /// @}
     
     template<long tangoTypeConst>
@@ -71,7 +71,7 @@ namespace PyDeviceAttribute {
             }
         }
         if (attr_names.size()) {
-            std::auto_ptr<Tango::AttributeInfoListEx> attr_infos;
+            unique_pointer<Tango::AttributeInfoListEx> attr_infos;
             {
                 AutoPythonAllowThreads guard;
                 p = first;
@@ -132,7 +132,7 @@ namespace PyDeviceAttribute {
     /// as we get a reference to auto_ptr -> the caller must use an auto_ptr,
     /// so the memory will finally be deleted.
     template<typename TDeviceAttribute>
-    boost::python::object convert_to_python(const std::auto_ptr<std::vector<TDeviceAttribute> >& dev_attr_vec, Tango::DeviceProxy & dev_proxy, PyTango::ExtractAs extract_as)
+    boost::python::object convert_to_python(const unique_pointer<std::vector<TDeviceAttribute> >& dev_attr_vec, Tango::DeviceProxy & dev_proxy, PyTango::ExtractAs extract_as)
     {
         update_data_format(dev_proxy, &(*dev_attr_vec)[0], dev_attr_vec->size());
 

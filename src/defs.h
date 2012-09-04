@@ -30,6 +30,15 @@ typedef std::vector<std::string> StdStringVector;
 typedef std::vector<long> StdLongVector;
 typedef std::vector<double> StdDoubleVector;
 
+/* HAS_UNIQUE_PTR definition comes from tango. It tells PyTango if Tango itself
+   is using the new C++0x unique_ptr or not. In PyTango we try to use the same
+   as TangoC++ whenever possible. */
+#ifdef HAS_UNIQUE_PTR
+#define unique_pointer std::unique_ptr
+#else
+#define unique_pointer std::auto_ptr
+#endif
+
 namespace PyTango
 {
     enum ExtractAs {

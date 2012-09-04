@@ -25,92 +25,12 @@
 #include "pytgutils.h"
 #include "device_attribute.h"
 
-namespace PyGroupElement
-{
-    using namespace boost::python;
-
-
-    Tango::GroupCmdReplyList command_inout_reply(Tango::GroupElement &self, long req_id, long timeout_ms)
-    {
-        AutoPythonAllowThreads guard;
-        return self.command_inout_reply(req_id, timeout_ms);
-    }
-
-    static void __update_data_format(Tango::GroupElement &self, Tango::GroupAttrReplyList& r)
-    {
-        // Usually we pass a device_proxy to "convert_to_python" in order to
-        // get the data_format of the DeviceAttribute for Tango versions
-        // older than 7.0. However, GroupAttrReply has no device_proxy to use!
-        // So, we are using update_data_format() in here.
-        // The conver_to_python method is called, without the usual
-        // device_proxy argument, in PyGroupAttrReply::get_data().
-        Tango::GroupAttrReplyList::iterator i, e = r.end();
-        for (i=r.begin(); i != e; ++i) {
-            Tango::DeviceProxy* dev_proxy = self.get_device(i->dev_name());
-            if (!dev_proxy)
-                continue;
-            PyDeviceAttribute::update_data_format( *dev_proxy, &(i->get_data()), 1 );
-        }
-    }
-    
-    Tango::GroupAttrReplyList read_attribute_reply (Tango::GroupElement &self,  long req_id, long timeout_ms = 0 )
-    {
-        Tango::GroupAttrReplyList r;
-        {
-            AutoPythonAllowThreads guard;
-            r = self.read_attribute_reply(req_id, timeout_ms);
-        }
-        __update_data_format(self, r);
-        return r;
-    }
-    
-    Tango::GroupAttrReplyList read_attributes_reply (Tango::GroupElement &self, long req_id, long timeout_ms = 0)
-    {
-        Tango::GroupAttrReplyList r;
-        {
-            AutoPythonAllowThreads guard;
-            r = self.read_attributes_reply(req_id, timeout_ms);
-        }
-        __update_data_format(self, r);
-        return r;
-    }
-
-    long read_attributes_asynch (Tango::GroupElement &self, object py_value, bool forward = true, long reserved = -1)
-    {
-        StdStringVector r;
-        convert2array(py_value, r);
-        return self.read_attributes_asynch(r, forward, reserved);
-    }
-
-    long write_attribute_asynch (Tango::GroupElement &self, const std::string &attr_name, object py_value, bool forward = true, long reserved = -1)
-    {
-        Tango::DeviceAttribute dev_attr;
-        Tango::DeviceProxy* dev_proxy = self.get_device(1);
-        if (dev_proxy)
-            PyDeviceAttribute::reset(dev_attr, attr_name, *dev_proxy, py_value);
-        // If !dev_proxy (no device added in self or his children) then we
-        // don't initialize dev_attr. As a result, the reply will be empty.
-        /// @todo or should we raise an exception instead?
-
-        AutoPythonAllowThreads guard;
-        return self.write_attribute_asynch(dev_attr, forward, reserved);
-    }
-
-    Tango::GroupReplyList write_attribute_reply (Tango::GroupElement &self, long req_id, long timeout_ms = 0)
-    {
-        AutoPythonAllowThreads guard;
-        return self.write_attribute_reply(req_id, timeout_ms);
-    }
-    
-    
-}
-
-
 void export_group_element()
 {
     using namespace boost::python;
 
-    class_<Tango::GroupElement, std::auto_ptr<Tango::GroupElement>, boost::noncopyable> GroupElement("GroupElement",
+    class_<Tango::GroupElement, unique_pointer<Tango::GroupElement>,
+           boost::noncopyable> GroupElement("GroupElement",
         "The abstract GroupElement class for Group. Not to be initialized\n"
         "directly.", no_init)
     ;
@@ -119,22 +39,22 @@ void export_group_element()
     //
     // Group management methods
     //
-        .def("__add",
-            (void (Tango::GroupElement::*) (const std::string &, int))
-            &Tango::GroupElement::add,
-            (arg_("self"), arg_("pattern"), arg_("timeout_ms")=-1) )
-        .def("__add",
-            (void (Tango::GroupElement::*) (const std::vector<std::string> &, int))
-            &Tango::GroupElement::add,
-            (arg_("self"), arg_("patterns"), arg_("timeout_ms")=-1))
-        .def("__remove",
-            (void (Tango::GroupElement::*) (const std::string &, bool))
-            &Tango::GroupElement::remove,
-            (arg_("self"), arg_("pattern"), arg_("forward")=true))
-        .def("__remove",
-            (void (Tango::GroupElement::*) (const std::vector<std::string> &, bool))
-            &Tango::GroupElement::remove,
-            (arg_("self"), arg_("patterns"), arg_("forward")=true))
+//        .def("__add",
+//            (void (Tango::GroupElement::*) (const std::string &, int))
+//            &Tango::GroupElement::add,
+//            (arg_("self"), arg_("pattern"), arg_("timeout_ms")=-1) )
+//        .def("__add",
+//            (void (Tango::GroupElement::*) (const std::vector<std::string> &, int))
+//            &Tango::GroupElement::add,
+//            (arg_("self"), arg_("patterns"), arg_("timeout_ms")=-1))
+//        .def("__remove",
+//            (void (Tango::GroupElement::*) (const std::string &, bool))
+//            &Tango::GroupElement::remove,
+//            (arg_("self"), arg_("pattern"), arg_("forward")=true))
+//        .def("__remove",
+//            (void (Tango::GroupElement::*) (const std::vector<std::string> &, bool))
+//            &Tango::GroupElement::remove,
+//            (arg_("self"), arg_("patterns"), arg_("forward")=true))
         .def("contains",
             &Tango::GroupElement::contains,
             (arg_("self"), arg_("pattern"), arg_("forward")=true) )
@@ -148,10 +68,10 @@ void export_group_element()
             &Tango::GroupElement::get_device,
             (arg_("self"), arg_("idx")),
             return_internal_reference<1>() )
-        .def("get_group",
-            &Tango::GroupElement::get_group,
-            (arg_("self"), arg_("group_name")),
-            return_internal_reference<1>() )
+//        .def("get_group",
+//            &Tango::GroupElement::get_group,
+//            (arg_("self"), arg_("group_name")),
+//            return_internal_reference<1>() )
 
     //
     // Tango methods (~ DeviceProxy interface)
@@ -162,62 +82,7 @@ void export_group_element()
         .def("set_timeout_millis",
             pure_virtual(&Tango::GroupElement::set_timeout_millis),
             (arg_("self"), arg_("timeout_ms")) )
-        .def("command_inout_asynch",
-            pure_virtual((long (Tango::GroupElement::*) (const std::string&, bool, bool, long))
-            &Tango::GroupElement::command_inout_asynch),
-            (   arg_("self"),
-                arg_("cmd_name"),
-                arg_("forget")=false,
-                arg_("forward")=true,
-                arg_("reserved")=-1) )
-        .def("command_inout_asynch",
-            pure_virtual((long (Tango::GroupElement::*) (const std::string&, const Tango::DeviceData&, bool, bool, long))
-            &Tango::GroupElement::command_inout_asynch),
-            (   arg_("self"),
-                arg_("cmd_name"),
-                arg_("param"),
-                arg_("forget")=false,
-                arg_("forward")=true,
-                arg_("reserved")=-1) )
-        .def("command_inout_reply",
-            PyGroupElement::command_inout_reply,
-            (   arg_("self"),
-                arg_("req_id"),
-                arg_("timeout_ms")=0 ) )
-        .def("read_attribute_asynch",
-            pure_virtual(&Tango::GroupElement::read_attribute_asynch),
-            (   arg_("self"),
-                arg_("attr_name"),
-                arg_("forward")=true,
-                arg_("reserved")=-1) )
-        .def("read_attribute_reply",
-            &PyGroupElement::read_attribute_reply,
-            (   arg_("self"),
-                arg_("req_id"),
-                arg_("timeout_ms")=0 ) )
-        .def("read_attributes_asynch",
-            PyGroupElement::read_attributes_asynch,
-            (   arg_("self"),
-                arg_("attr_names"),
-                arg_("forward")=true,
-                arg_("reserved")=-1) )
-        .def("read_attributes_reply",
-            PyGroupElement::read_attributes_reply,
-            (   arg_("self"),
-                arg_("req_id"),
-                arg_("timeout_ms")=0 ) )
-        .def("write_attribute_asynch",
-            &PyGroupElement::write_attribute_asynch,
-            (   arg_("self"),
-                arg_("attr_name"),
-                arg_("value"),
-                arg_("forward")=true,
-                arg_("reserved")=-1 ) )
-        .def("write_attribute_reply",
-            PyGroupElement::write_attribute_reply,
-            (   arg_("self"),
-                arg_("req_id"),
-                arg_("timeout_ms")=0 ) )
+
 
     //
     // Misc
@@ -244,9 +109,9 @@ void export_group_element()
         .def("name_matches",
             &Tango::GroupElement::name_matches,
             (arg_("self")) )
-        .def("get_size",
-            &Tango::GroupElement::get_size,
-            (arg_("self"), arg_("forward")=true) )
+//        .def("get_size",
+//            &Tango::GroupElement::get_size,
+//            (arg_("self"), arg_("forward")=true) )
 
     //
     // "Should not be used" methods

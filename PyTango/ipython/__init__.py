@@ -24,7 +24,7 @@
 __all__ = ["init_ipython", "install", "load_ipython_extension",
            "unload_ipython_extension", "load_config"]
 
-from common import get_python_version, get_python_version_number, \
+from .common import get_python_version, get_python_version_number, \
     get_ipython_version, get_ipython_version_list, \
     get_ipython_version_number, get_pytango_version, get_pytango_version_number
 

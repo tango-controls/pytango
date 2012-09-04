@@ -245,7 +245,7 @@ class CSequenceFromPython
             m_own = true;
             //m_seq = new SequenceT(PySequence_Length(Py_obj.ptr()));
             m_seq = new SequenceT();
-            std::auto_ptr<SequenceT> guard(m_seq);
+            unique_pointer<SequenceT> guard(m_seq);
             from_sequence<SequenceT>::convert(py_obj, *m_seq);
             guard.release();
         }

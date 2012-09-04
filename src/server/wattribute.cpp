@@ -565,7 +565,8 @@ namespace PyWAttribute
 void export_wattribute()
 {
 
-    class_<Tango::WAttribute, bases<Tango::Attribute> >("WAttribute", no_init)
+    class_<Tango::WAttribute, bases<Tango::Attribute>, boost::noncopyable>
+        ("WAttribute", no_init)
         .def("get_min_value",
             (PyObject* (*) (Tango::WAttribute &))
             &PyWAttribute::get_min_value)

@@ -44,7 +44,7 @@ namespace PyUtil
         int cl_len = len(cpp_class_list);
         for(int i = 0; i < cl_len; ++i)
         {
-            tuple class_info = extract<tuple>(cpp_class_list[i]);
+            bopy::tuple class_info = extract<bopy::tuple>(cpp_class_list[i]);
             char *class_name = extract<char *>(class_info[0]);
             char *par_name   = extract<char *>(class_info[1]);
             dserver->_create_cpp_class(class_name, par_name);

@@ -25,7 +25,7 @@
 #include "defs.h"
 #include "pytgutils.h"
 
-using namespace boost::python;
+namespace bopy = boost::python;
 
 extern const char *param_must_be_seq;
 extern const char *unreachable_code;
@@ -33,15 +33,15 @@ extern const char *non_string_seq;
 
 namespace PyAttributeProxy
 {
-    struct PickleSuite : pickle_suite
+    struct PickleSuite : bopy::pickle_suite
     {
-        static tuple getinitargs(Tango::AttributeProxy& self)
+        static bopy::tuple getinitargs(Tango::AttributeProxy& self)
         {
             Tango::DeviceProxy* dev = self.get_device_proxy();
             
             std::string ret = dev->get_db_host() + ":" + dev->get_db_port() + 
                              "/" + dev->dev_name() + "/" + self.name();
-            return make_tuple(ret);
+            return bopy::make_tuple(ret);
         }
     };
 }
@@ -58,14 +58,14 @@ void export_attribute_proxy()
     void (Tango::AttributeProxy::*delete_property_)(std::string &) =
         &Tango::AttributeProxy::delete_property;
 
-    class_<Tango::AttributeProxy> AttributeProxy(
+    bopy::class_<Tango::AttributeProxy> AttributeProxy(
         "__AttributeProxy",
-        init<const char *>())
+        bopy::init<const char *>())
     ;
 
     AttributeProxy
-        .def(init<const Tango::DeviceProxy *, const char *>())
-        .def(init<const Tango::AttributeProxy &>())
+        .def(bopy::init<const Tango::DeviceProxy *, const char *>())
+        .def(bopy::init<const Tango::AttributeProxy &>())
 
         //
         // Pickle
@@ -81,7 +81,7 @@ void export_attribute_proxy()
 
         .def("get_device_proxy", &Tango::AttributeProxy::get_device_proxy,
             ( arg_("self") ),
-            return_internal_reference<1>())
+            bopy::return_internal_reference<1>())
 
         //
         // property methods

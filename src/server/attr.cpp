@@ -73,17 +73,17 @@ void PyAttr::set_user_prop(vector<Tango::AttrProperty> &user_prop,
         else if (prop_name == "delta_t")
             def_prop.set_delta_t(prop_value);
         else if (prop_name == "abs_change")
-            def_prop.set_abs_change(prop_value);
+            def_prop.set_event_abs_change(prop_value);
         else if (prop_name == "rel_change")
-            def_prop.set_rel_change(prop_value);
+            def_prop.set_event_rel_change(prop_value);
         else if (prop_name == "period")
-            def_prop.set_period(prop_value);
+            def_prop.set_event_period(prop_value);
         else if (prop_name == "archive_abs_change")
-            def_prop.set_archive_abs_change(prop_value);
+            def_prop.set_archive_event_abs_change(prop_value);
         else if (prop_name == "archive_rel_change")
-            def_prop.set_archive_rel_change(prop_value);
+            def_prop.set_archive_event_rel_change(prop_value);
         else if (prop_name == "archive_period")
-            def_prop.set_archive_period(prop_value);
+            def_prop.set_archive_event_period(prop_value);
     }
 }
 

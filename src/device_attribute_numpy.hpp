@@ -210,7 +210,7 @@ namespace PyDeviceAttribute {
             raise_(PyExc_TypeError, isImage? non_valid_image : non_valid_spectrum);
 
         // -- Allocate memory for the new data object
-        std::auto_ptr<TangoArrayType> value;
+        unique_pointer<TangoArrayType> value;
         TangoScalarType* buffer = TangoArrayType::allocbuf(nelems);
         try {
             value.reset(new TangoArrayType(nelems, nelems, buffer, true));

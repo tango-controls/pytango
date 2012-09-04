@@ -2409,63 +2409,147 @@ def __doc_UserDefaultAttrProp():
     """ )
     
     document_method("set_abs_change", """
-    set_abs_change(self, def_abs_change) -> None
+    set_abs_change(self, def_abs_change) -> None <= DEPRECATED
 
             Set default change event abs_change property. 
 
         Parameters :  
             - def_abs_change : (str) the user default change event abs_change property 
         Return     : None
+        
+        Deprecated since PyTango 8.0. Please use set_event_abs_change instead.
+    """ )
+
+    document_method("set_event_abs_change", """
+    set_event_abs_change(self, def_abs_change) -> None
+
+            Set default change event abs_change property. 
+
+        Parameters :  
+            - def_abs_change : (str) the user default change event abs_change property 
+        Return     : None
+        
+        New in PyTango 8.0
     """ )
     
     document_method("set_rel_change", """
-    set_rel_change(self, def_rel_change) -> None
+    set_rel_change(self, def_rel_change) -> None <= DEPRECATED
 
             Set default change event rel_change property. 
 
         Parameters :  
             - def_rel_change : (str) the user default change event rel_change property 
         Return     : None
+        
+        Deprecated since PyTango 8.0. Please use set_event_rel_change instead.
+    """ )
+
+    document_method("set_event_rel_change", """
+    set_event_rel_change(self, def_rel_change) -> None
+
+            Set default change event rel_change property. 
+
+        Parameters :  
+            - def_rel_change : (str) the user default change event rel_change property 
+        Return     : None
+        
+        New in PyTango 8.0
     """ )
     
     document_method("set_period", """ 
-    set_period(self, def_period) -> None
+    set_period(self, def_period) -> None <= DEPRECATED
 
             Set default periodic event period property. 
 
         Parameters :  
             - def_period : (str) the user default periodic event period property 
         Return     : None
+        
+        Deprecated since PyTango 8.0. Please use set_event_period instead.
     """ )
 
+    document_method("set_event_period", """ 
+    set_event_period(self, def_period) -> None
+
+            Set default periodic event period property. 
+
+        Parameters :  
+            - def_period : (str) the user default periodic event period property 
+        Return     : None
+        
+        New in PyTango 8.0
+    """ )
+    
     document_method("set_archive_abs_change", """
-    set_archive_abs_change(self, def_archive_abs_change) -> None
+    set_archive_abs_change(self, def_archive_abs_change) -> None <= DEPRECATED
 
             Set default archive event abs_change property. 
 
         Parameters :  
             - def_archive_abs_change : (str) the user default archive event abs_change property 
         Return     : None
+        
+        Deprecated since PyTango 8.0. Please use set_archive_event_abs_change instead.
     """ )
 
+    document_method("set_archive_event_abs_change", """
+    set_archive_event_abs_change(self, def_archive_abs_change) -> None
+
+            Set default archive event abs_change property. 
+
+        Parameters :  
+            - def_archive_abs_change : (str) the user default archive event abs_change property 
+        Return     : None
+        
+        New in PyTango 8.0
+    """ )
+    
     document_method("set_archive_rel_change", """
-    set_archive_rel_change(self, def_archive_rel_change) -> None
+    set_archive_rel_change(self, def_archive_rel_change) -> None <= DEPRECATED
 
             Set default archive event rel_change property. 
 
         Parameters :  
             - def_archive_rel_change : (str) the user default archive event rel_change property 
         Return     : None
+        
+        Deprecated since PyTango 8.0. Please use set_archive_event_rel_change instead.
+    """ )
+
+    document_method("set_archive_event_rel_change", """
+    set_archive_event_rel_change(self, def_archive_rel_change) -> None
+
+            Set default archive event rel_change property. 
+
+        Parameters :  
+            - def_archive_rel_change : (str) the user default archive event rel_change property 
+        Return     : None
+        
+        New in PyTango 8.0
     """ )
     
     document_method("set_archive_period", """
-    set_archive_period(self, def_archive_period) -> None
+    set_archive_period(self, def_archive_period) -> None <= DEPRECATED
 
             Set default archive event period property. 
 
         Parameters :  
             - def_archive_period : (str) t
         Return     : None
+        
+        Deprecated since PyTango 8.0. Please use set_archive_event_period instead.
+    """ )
+
+    document_method("set_archive_event_period", """
+    set_archive_event_period(self, def_archive_period) -> None
+
+            Set default archive event period property. 
+
+        Parameters :  
+            - def_archive_period : (str) t
+        Return     : None
+        
+        New in PyTango 8.0
     """ )
     
 def device_server_init(doc=True):

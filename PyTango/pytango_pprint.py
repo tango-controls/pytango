@@ -42,7 +42,7 @@ from ._PyTango import (StdStringVector, StdLongVector, CommandInfoList,
     AttributeEventInfo, AttributeInfoEx,
     DeviceAttribute, DeviceAttributeHistory, DeviceData, DeviceDataHistory,
     DbDatum, DbDevInfo, DbDevImportInfo, DbDevExportInfo, DbServerInfo,
-    GroupElement, GroupReply, GroupAttrReply, GroupCmdReply,
+    GroupReply, GroupAttrReply, GroupCmdReply,
     DevError, EventData, AttrConfEventData, DataReadyEventData,
     TimeVal, DevFailed, CmdArgType)
 
@@ -132,7 +132,7 @@ def __registerStructStr():
         AttributeEventInfo, AttributeInfoEx,
         DeviceAttribute, DeviceAttributeHistory, DeviceData, DeviceDataHistory,
         DbDatum, DbDevInfo, DbDevImportInfo, DbDevExportInfo, DbServerInfo,
-        GroupElement, GroupReply, GroupAttrReply, GroupCmdReply,
+        GroupReply, GroupAttrReply, GroupCmdReply,
         DevError, EventData, AttrConfEventData, DataReadyEventData,
         AttributeConfig, AttributeConfig_2, AttributeConfig_3,
         ChangeEventProp, PeriodicEventProp, ArchiveEventProp,

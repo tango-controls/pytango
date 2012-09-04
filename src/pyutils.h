@@ -25,6 +25,8 @@
 
 #include <boost/python.hpp>
 
+namespace bopy = boost::python;
+
 #define arg_(a) boost::python::arg(a)
 
 #if PY_MAJOR_VERSION >= 3

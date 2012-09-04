@@ -123,6 +123,24 @@ void insert_scalar<Tango::DEV_BOOLEAN>(boost::python::object &o, CORBA::Any &any
     any <<= any_value;
 }
 
+template<>
+void insert_scalar<Tango::DEV_ENCODED>(boost::python::object &o, CORBA::Any &any)
+{
+    bopy::object p0 = o[0];
+    bopy::object p1 = o[1];
+
+    const char* encoded_format = bopy::extract<const char *> (p0.ptr());
+    const char* encoded_data = bopy::extract<const char *> (p1.ptr());
+    
+    CORBA::ULong nb = bopy::len(p1);
+    Tango::DevVarCharArray arr(nb, nb, (CORBA::Octet*)encoded_data, false);
+    Tango::DevEncoded *data = new Tango::DevEncoded;
+    data->encoded_format = CORBA::string_dup(encoded_format);
+    data->encoded_data = arr;
+
+    any <<= data;
+}
+
 template<long tangoArrayTypeConst>
 void insert_array(boost::python::object &o, CORBA::Any &any)
 {   
@@ -163,6 +181,21 @@ void extract_scalar<Tango::DEV_STRING>(const CORBA::Any &any, boost::python::obj
 template<>
 void extract_scalar<Tango::DEV_VOID>(const CORBA::Any &any, boost::python::object &o)
 {}
+
+template<>
+void extract_scalar<Tango::DEV_ENCODED>(const CORBA::Any &any, boost::python::object &o)
+{
+    Tango::DevEncoded* data;
+
+    if ((any >>= data) == false)
+        throw_bad_type(Tango::CmdArgTypeName[Tango::DEV_ENCODED]);
+    
+    bopy::str encoded_format(data[0].encoded_format);
+    bopy::str encoded_data((const char*)data[0].encoded_data.get_buffer(),
+                           data[0].encoded_data.length());
+    
+    o = boost::python::make_tuple(encoded_format, encoded_data);
+}
 
 #ifndef DISABLE_PYTANGO_NUMPY
 /// This callback is run to delete Tango::DevVarXArray* objects.
@@ -262,7 +295,7 @@ CORBA::Any *PyCmd::execute(Tango::DeviceImpl *dev, const CORBA::Any &param_any)
         
         CORBA::Any *ret_any;
         allocate_any(ret_any);
-        std::auto_ptr<CORBA::Any> ret_any_guard(ret_any);
+        unique_pointer<CORBA::Any> ret_any_guard(ret_any);
 
         // It does: ret_any = ret_py_obj
         TANGO_DO_ON_DEVICE_DATA_TYPE(out_type, 
