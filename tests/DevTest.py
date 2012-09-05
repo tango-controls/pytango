@@ -44,11 +44,11 @@ class EventCallBack:
 class DevTest(PyTango.Device_4Impl):
     def __init__(self,cl,name):
         PyTango.Device_4Impl.__init__(self,cl,name)
-        print 'In DevTest __init__'
+        print('In DevTest __init__')
         DevTest.init_device(self)
 
     def init_device(self):
-        print 'In Python init_device method'
+        print('In Python init_device method')
         self.set_state(PyTango.DevState.ON)
 
         self.Short_attr_except = False
@@ -110,12 +110,12 @@ class DevTest(PyTango.Device_4Impl):
 #------------------------------------------------------------------
 
     def delete_device(self):
-        print "[Device delete_device method] for device",self.get_name()
+        print('[Device delete_device method] for device',self.get_name())
 
 #------------------------------------------------------------------
 
     def signal_handler(self,in_sig):
-        print "[Device signal handler] received signal number",in_sig," for device",self.get_name()
+        print('[Device signal handler] received signal number',in_sig,' for device',self.get_name())
 
 #------------------------------------------------------------------
 
@@ -138,14 +138,14 @@ class DevTest(PyTango.Device_4Impl):
 #------------------------------------------------------------------
 
     def is_IOVoid_allowed(self):
-        print "In is_IOVoid_allowed method"
+        print('In is_IOVoid_allowed method')
         if (self.get_state() == PyTango.DevState.ON):
             return True
         else:
             return False
 
     def IOVoid(self):
-        print '[IOVoid::execute] '
+        print('[IOVoid::execute] ')
 
 #------------------------------------------------------------------
 
@@ -156,12 +156,12 @@ class DevTest(PyTango.Device_4Impl):
             return False
 
     def IOBool(self,in_bool):
-        print "[IOBool::execute] received number",in_bool," type = ",type(in_bool)
+        print('[IOBool::execute] received number',in_bool,' type = ',type(in_bool))
         if (in_bool == True):
             in_bool = False
         else:
             in_bool = True
-        print "[IOBool::execute] return number",in_bool
+        print('[IOBool::execute] return number',in_bool)
         return in_bool;
 
 #------------------------------------------------------------------
@@ -173,9 +173,9 @@ class DevTest(PyTango.Device_4Impl):
             return False
 
     def IOShort(self,in_data):
-        print "[IOShort::execute] received number",in_data," type = ",type(in_data)
+        print('[IOShort::execute] received number',in_data,' type = ',type(in_data))
         in_data = in_data * 2;
-        print "[IOShort::execute] return number",in_data
+        print('[IOShort::execute] return number',in_data)
         return in_data;
 
 #------------------------------------------------------------------
@@ -187,9 +187,9 @@ class DevTest(PyTango.Device_4Impl):
             return False
 
     def IOLong(self,in_data):
-        print "[IOLong::execute] received number",in_data," type = ",type(in_data)
+        print('[IOLong::execute] received number',in_data,' type = ',type(in_data))
         in_data = in_data * 2;
-        print "[IOLong::execute] return number",in_data
+        print('[IOLong::execute] return number',in_data)
         return in_data;
 
 #------------------------------------------------------------------
@@ -201,9 +201,9 @@ class DevTest(PyTango.Device_4Impl):
             return False
 
     def IOFloat(self,in_data):
-        print "[IOFloat::execute] received number",in_data," type = ",type(in_data)
+        print('[IOFloat::execute] received number',in_data,' type = ',type(in_data))
         in_data = in_data * 2;
-        print "[IOFloat::execute] return number",in_data
+        print('[IOFloat::execute] return number',in_data)
         return in_data;
 
 #------------------------------------------------------------------
@@ -215,9 +215,9 @@ class DevTest(PyTango.Device_4Impl):
             return False
 
     def IODouble(self,in_data):
-        print "[IODouble::execute] received number",in_data," type = ",type(in_data)
+        print('[IODouble::execute] received number',in_data,' type = ',type(in_data))
         in_data = in_data * 2;
-        print "[IODouble::execute] return number",in_data
+        print('[IODouble::execute] return number',in_data)
         return in_data;
 
 #------------------------------------------------------------------
@@ -229,9 +229,9 @@ class DevTest(PyTango.Device_4Impl):
             return False
 
     def IOUShort(self,in_data):
-        print "[IOUShort::execute] received number",in_data," type = ",type(in_data)
+        print('[IOUShort::execute] received number',in_data,' type = ',type(in_data))
         in_data = in_data * 2;
-        print "[IOUShort::execute] return number",in_data
+        print('[IOUShort::execute] return number',in_data)
         return in_data;
 
 #------------------------------------------------------------------
@@ -243,9 +243,9 @@ class DevTest(PyTango.Device_4Impl):
             return False
 
     def IOULong(self,in_data):
-        print "[IOULong::execute] received number",in_data," type = ",type(in_data)
+        print('[IOULong::execute] received number',in_data,' type = ',type(in_data))
         in_data = in_data * 2;
-        print "[IOULong::execute] return number",in_data
+        print('[IOULong::execute] return number',in_data)
         return in_data;
 
 #------------------------------------------------------------------
@@ -257,12 +257,12 @@ class DevTest(PyTango.Device_4Impl):
             return False
 
     def IOString(self,in_data):
-        print "[IOString::execute] received string",in_data," type = ",type(in_data)
+        print("[IOString::execute] received string",in_data," type = ",type(in_data))
         l = range(len(in_data) - 1,-1,-1)
         out_data=""
         for i in l:
             out_data = out_data + in_data[i]
-        print "[IOString::execute] return string",out_data
+        print("[IOString::execute] return string",out_data)
 #        self.y = out_data
         return out_data;
 
@@ -279,9 +279,9 @@ class DevTest(PyTango.Device_4Impl):
         out_index=0
         out_data=[]
         for i in l:
-            print "[IOCharArray::execute] received char",in_data[out_index]
+            print("[IOCharArray::execute] received char",in_data[out_index])
             out_data.append(in_data[i])
-            print "[IOStringArray::execute] return char",out_data[out_index]
+            print("[IOStringArray::execute] return char",out_data[out_index])
             out_index = out_index+1
         return out_data
 
@@ -296,9 +296,9 @@ class DevTest(PyTango.Device_4Impl):
     def IOShortArray(self,in_data):
         l = range(len(in_data));
         for i in l:
-            print "[IOShortArray::execute] received number",in_data[i]
+            print("[IOShortArray::execute] received number",in_data[i])
             in_data[i] = in_data[i] * 2
-            print "[IOShortArray::execute] return number",in_data[i]
+            print("[IOShortArray::execute] return number",in_data[i])
         return in_data
 
 
@@ -313,9 +313,9 @@ class DevTest(PyTango.Device_4Impl):
     def IOLongArray(self,in_data):
         l = range(len(in_data));
         for i in l:
-            print "[IOLongArray::execute] received number",in_data[i]
+            print("[IOLongArray::execute] received number",in_data[i])
             in_data[i] = in_data[i] * 2
-            print "[IOLongArray::execute] return number",in_data[i]
+            print("[IOLongArray::execute] return number",in_data[i])
         return in_data
 
 #------------------------------------------------------------------
@@ -329,9 +329,9 @@ class DevTest(PyTango.Device_4Impl):
     def IOFloatArray(self,in_data):
         l = range(len(in_data));
         for i in l:
-            print "[IOFloatArray::execute] received number",in_data[i]
+            print("[IOFloatArray::execute] received number",in_data[i])
             in_data[i] = in_data[i] * 2
-            print "[IOFloatArray::execute] return number",in_data[i]
+            print("[IOFloatArray::execute] return number",in_data[i])
         return in_data
 
 #------------------------------------------------------------------
@@ -345,9 +345,9 @@ class DevTest(PyTango.Device_4Impl):
     def IODoubleArray(self,in_data):
         l = range(len(in_data));
         for i in l:
-            print "[IODoubleArray::execute] received number",in_data[i]
+            print("[IODoubleArray::execute] received number",in_data[i])
             in_data[i] = in_data[i] * 2
-            print "[IODoubleArray::execute] return number",in_data[i]
+            print("[IODoubleArray::execute] return number",in_data[i])
         return in_data
 
 #------------------------------------------------------------------
@@ -361,9 +361,9 @@ class DevTest(PyTango.Device_4Impl):
     def IOUShortArray(self,in_data):
         l = range(len(in_data));
         for i in l:
-            print "[IOUShortArray::execute] received number",in_data[i]
+            print("[IOUShortArray::execute] received number",in_data[i])
             in_data[i] = in_data[i] * 2
-            print "[IOUShortArray::execute] return number",in_data[i]
+            print("[IOUShortArray::execute] return number",in_data[i])
         return in_data
 
 #------------------------------------------------------------------
@@ -377,9 +377,9 @@ class DevTest(PyTango.Device_4Impl):
     def IOULongArray(self,in_data):
         l = range(len(in_data));
         for i in l:
-            print "[IOULongArray::execute] received number",in_data[i]
+            print("[IOULongArray::execute] received number",in_data[i])
             in_data[i] = in_data[i] * 2
-            print "[IOULongArray::execute] return number",in_data[i]
+            print("[IOULongArray::execute] return number",in_data[i])
         return in_data
 
 #------------------------------------------------------------------
@@ -395,9 +395,9 @@ class DevTest(PyTango.Device_4Impl):
         out_index=0
         out_data=[]
         for i in l:
-            print "[IOStringArray::execute] received String",in_data[out_index]
+            print("[IOStringArray::execute] received String",in_data[out_index])
             out_data.append(in_data[i])
-            print "[IOStringArray::execute] return String",out_data[out_index]
+            print("[IOStringArray::execute] return String",out_data[out_index])
             out_index = out_index+1
         return out_data
 
@@ -412,14 +412,14 @@ class DevTest(PyTango.Device_4Impl):
     def IOLongString(self,in_data):
         l = range(len(in_data[0]))
         for i in l:
-            print "[IOLongString::execute] received number",in_data[0][i]
+            print("[IOLongString::execute] received number",in_data[0][i])
             in_data[0][i] = in_data[0][i] * 2
-            print "[IOLongString::execute] return number",in_data[0][i]
+            print("[IOLongString::execute] return number",in_data[0][i])
 
         l = range(len(in_data[1]))
         for i in l:
-            print "[IOLongString::execute] received string",in_data[1][i]
-            print "[IOLongString::execute] return string",in_data[1][i]
+            print("[IOLongString::execute] received string",in_data[1][i])
+            print("[IOLongString::execute] return string",in_data[1][i])
         return in_data
 
 #------------------------------------------------------------------
@@ -433,14 +433,14 @@ class DevTest(PyTango.Device_4Impl):
     def IODoubleString(self,in_data):
         l = range(len(in_data[0]))
         for i in l:
-            print "[IODoubleString::execute] received number",in_data[0][i]
+            print("[IODoubleString::execute] received number",in_data[0][i])
             in_data[0][i] = in_data[0][i] * 2
-            print "[IODoubleString::execute] return number",in_data[0][i]
+            print("[IODoubleString::execute] return number",in_data[0][i])
 
         l = range(len(in_data[1]))
         for i in l:
-            print "[IODoubleString::execute] received string",in_data[1][i]
-            print "[IODoubleString::execute] return string",in_data[1][i]
+            print("[IODoubleString::execute] received string",in_data[1][i])
+            print("[IODoubleString::execute] return string",in_data[1][i])
         return in_data
 
 #------------------------------------------------------------------
