@@ -51,6 +51,16 @@ PyTango.ipython.load_config(config)
 # Put any additional environment here
 """
 
+def is_installed(ipydir=None, profile='tango'):
+    ipython_dir = ipydir or get_ipython_dir()
+    try:
+        p_dir = ProfileDir.find_profile_dir_by_name(ipython_dir, profile)
+    except ProfileDirError:
+        return False
+    config_file_name = BaseIPythonApplication.config_file_name.default_value
+    abs_config_file_name = os.path.join(p_dir.location, config_file_name)
+    return os.path.isfile(abs_config_file_name)
+
 def install(ipydir=None, verbose=True, profile='tango'):
     if verbose:
         out = sys.stdout
@@ -73,7 +83,7 @@ def install(ipydir=None, verbose=True, profile='tango'):
     if not create_config:
         return
 
-    out.write("Installing tango extension to ipython... ")
+    out.write(u"Installing tango extension to ipython... ")
     out.flush()
 
     profile = __PROFILE.format(pytangover=PyTango.Release.version,
@@ -81,8 +91,8 @@ def install(ipydir=None, verbose=True, profile='tango'):
     with open(abs_config_file_name, "w") as f:
         f.write(profile)
         f.close()
-    out.write("[DONE]\n\n")
-    out.write("""\
+    out.write(u"[DONE]\n\n")
+    out.write(u"""\
 To start ipython with tango interface simply type on the command line:
 %% ipython --profile=tango
 

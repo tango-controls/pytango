@@ -399,7 +399,6 @@ The way to do this is by editing your default ipython configuration file:
         extensions = getattr(i_shell_app, 'extensions', [])
         extensions.append('PyTango.ipython')
         i_shell_app.extensions = extensions
-        i_shell_app.ignore_old_config=True
     
     for more information on how to configure IPython >= 0.11 please check the
     `IPython configuration <http://ipython.org/ipython-doc/dev/config/ipython.html#configuring-the-ipython-command-line-application>`_

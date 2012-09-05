@@ -90,6 +90,30 @@ def has_numpy(with_src=True):
         ret &= has_c_numpy()
     return ret
 
+def get_script_files():
+    scripts_dir = abspath('scripts')
+    scripts = []
+    items = os.listdir(scripts_dir)
+    for item in items:
+        # avoid hidden files
+        if item.startswith("."):
+            continue
+        abs_item = os.path.join(scripts_dir, item)
+        # avoid non files
+        if not os.path.isfile(abs_item):
+            continue
+        # avoid files that have any extension
+        if len(os.path.splitext(abs_item)[1]) > 0:
+            continue
+        # avoid compiled version of script
+        if item.endswith('c') and item[:-1] in items:
+            continue
+        # avoid any core dump... of course there isn't any :-) but just in case
+        if item.startswith('core'):
+            continue
+        scripts.append('scripts/' + item)
+    return scripts
+
 class build(dftbuild):
     
     user_options = dftbuild.user_options + \
@@ -279,7 +303,9 @@ def main():
     package_data = {
         'PyTango' : [],
     }
-
+    
+    scripts = get_script_files()
+    
     data_files = []
 
     classifiers = [
@@ -486,6 +512,7 @@ def main():
         classifiers      = classifiers,
         package_data     = package_data,
         data_files       = data_files,
+        scripts          = scripts,
         provides         = provides,
         keywords         = Release.keywords,
         requires         = requires,

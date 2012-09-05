@@ -82,6 +82,7 @@ Version history
 |            | Bug fixes:                                                                                                                                                                   |
 |            |     - from sourceforge:                                                                                                                                                      |
 |            |         - `3023857: DevEncoded write attribute not supported <https://sourceforge.net/tracker/?func=detail&aid=3023857&group_id=57612&atid=484769>`_                         |
+|            |         - `3521545: [pytango] problem with tango profile <https://sourceforge.net/tracker/?func=detail&aid=3521545&group_id=57612&atid=484769>`_                             |
 |            |         - `3530535: PyTango group writting fails <https://sourceforge.net/tracker/?func=detail&aid=3530535&group_id=57612&atid=484769>`_                                     |
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 7.2.3      | Features:                                                                                                                                                                    |

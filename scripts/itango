@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 ################################################################################
 ##
 ## This file is part of PyTango, a python binding for Tango
@@ -21,11 +23,17 @@
 ##
 ################################################################################
 
-__all__ = ['load_ipython_extension', 'unload_ipython_extension', 'load_config',
-           'install']
+"""The itango startup file. This executable is actually an extension of the 
+   ipython file that can be found in <prefix>/ipython (prefix usually being in 
+   linux '/usr/bin'"""
 
-from PyTango.ipython.ipython_00_11 import *
+__all__ = [ "main" ]
 
-#rewrite 0.11's load config
-from .ipython_00_12 import load_config
-
+__docformat__ = 'restructuredtext'
+    
+def main():
+    import PyTango.ipython
+    PyTango.ipython.run()
+    
+if __name__ == '__main__':
+    main()

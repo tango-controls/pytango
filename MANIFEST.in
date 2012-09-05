@@ -1,5 +1,5 @@
 recursive-include PyTango *.py
-recursive-include PyTango3 *.py
+recursive-include cPyTango *.py
 recursive-include IPython *.py
 recursive-include win *.sln *.vcproj
 
@@ -7,6 +7,7 @@ include winsetup.py
 
 graft src
 graft doc
+graft tests
 
 global-exclude *.pyc
 global-exclude *.pyo

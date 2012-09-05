@@ -49,20 +49,22 @@ if ipv >= [0, 10] and ipv < [0, 11]:
     from . import ipython_00_10
     init_ipython = ipython_00_10.init_ipython
     install = ipython_00_10.install
+    is_installed = ipython_00_10.is_installed
+    __run = ipython_00_10.run
     load_config = None
     load_ipython_extension = None
     unload_ipython_extension = None
-elif ipv >= [0, 11] and ipv < [0, 12]:
+elif ipv >= [0, 11] and ipv < [1, 0]:
     from . import ipython_00_11
     init_ipython = None
     install = ipython_00_11.install
+    is_installed = ipython_00_11.is_installed
+    __run = ipython_00_11.run
     load_config = ipython_00_11.load_config
     load_ipython_extension = ipython_00_11.load_ipython_extension
     unload_ipython_extension = ipython_00_11.unload_ipython_extension
-elif ipv >= [0, 12] and ipv < [1, 0]:
-    from . import ipython_00_12
-    init_ipython = None
-    install = ipython_00_12.install
-    load_config = ipython_00_12.load_config
-    load_ipython_extension = ipython_00_12.load_ipython_extension
-    unload_ipython_extension = ipython_00_12.unload_ipython_extension
+
+def run():
+    if not is_installed():
+        install(verbose=False)
+    __run()

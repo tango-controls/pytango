@@ -966,3 +966,18 @@ def init_ipython(ip, store=True, pytango=True, colors=True, console=True, magic=
     if magic:   init_magic(ip)
     
     _tango_init = True
+
+def run():
+    argv = sys.argv
+
+    try:
+        for i, arg in enumerate(argv[:1]):
+            if arg.startswith('--profile='):
+                break
+        else:
+            argv.append("--profile=tango")
+    except:
+        pass    
+        
+    shell = IPython.Shell.start()
+    shell.mainloop()
