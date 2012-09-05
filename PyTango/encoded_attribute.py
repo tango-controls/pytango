@@ -34,7 +34,7 @@ import collections
 from ._PyTango import EncodedAttribute, ExtractAs, _ImageFormat
 from ._PyTango import constants
 
-from .utils import is_pure_str
+from .utils import is_pure_str, is_seq
 
 if constants.NUMPY_SUPPORT:
     try:
@@ -122,7 +122,7 @@ def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
 
 def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, quality=0, format=_ImageFormat.RawImage):
     """Internal usage only"""
-    if not isinstance(gray8, collections.Sequence):
+    if not is_seq(gray8):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
     
@@ -155,7 +155,7 @@ def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, qual
             raise IndexError("Expected sequence with at least one row")
         
         row0 = gray8[0]
-        if not isinstance(row0, collections.Sequence):
+        if not is_seq(row0):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
                              "bytearray) inside a sequence")
         width = len(row0)
@@ -198,7 +198,7 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
                enc.encode_gray16(data)
                attr.set_value(data)
     """
-    if not isinstance(gray16, collections.Sequence):
+    if not is_seq(gray16):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
     
@@ -232,7 +232,7 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
             raise IndexError("Expected sequence with at least one row")
         
         row0 = gray16[0]
-        if not isinstance(row0, collections.Sequence):
+        if not is_seq(row0):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
                              "bytearray) inside a sequence")
         width = len(row0)
@@ -317,7 +317,7 @@ def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
     
 def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, quality=0, format=_ImageFormat.RawImage):
     """Internal usage only"""
-    if not isinstance(rgb24, collections.Sequence):
+    if not is_seq(rgb24):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
     
@@ -350,7 +350,7 @@ def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, qual
             raise IndexError("Expected sequence with at least one row")
         
         row0 = rgb24[0]
-        if not isinstance(row0, collections.Sequence):
+        if not is_seq(row0):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
                              "bytearray) inside a sequence")
         width = len(row0)
@@ -393,7 +393,7 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
                enc.encode_jpeg_rgb32(data)
                attr.set_value(data)
     """
-    if not isinstance(rgb32, collections.Sequence):
+    if not is_seq(rgb32):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
     
@@ -426,7 +426,7 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
             raise IndexError("Expected sequence with at least one row")
         
         row0 = rgb32[0]
-        if not isinstance(row0, collections.Sequence):
+        if not is_seq(row0):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
                              "bytearray) inside a sequence")
         width = len(row0)

@@ -28,8 +28,8 @@ This is an internal PyTango module.
 from __future__ import with_statement
 from __future__ import print_function
 
-__all__ = [ "is_pure_str", "is_non_str_seq", "is_integer", "is_number",
-            "is_scalar_type", "is_array_type", "is_numerical_type",
+__all__ = [ "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
+            "is_number", "is_scalar_type", "is_array_type", "is_numerical_type",
             "is_int_type", "is_float_type", "obj_2_str", "seqStr_2_obj",
             "document_method", "document_static_method", "document_enum",
             "CaselessList", "CaselessDict", "EventCallBack", "get_home",
@@ -122,8 +122,11 @@ __number_klasses = tuple(__number_klasses)
 def is_pure_str(obj):
     return isinstance(obj , __str_klasses)
 
+def is_seq(obj):
+    return isinstance(obj, (collections.Sequence, bytearray))
+
 def is_non_str_seq(obj):
-    return isinstance(obj, collections.Sequence) and not is_pure_str(obj)
+    return is_seq(obj) and not is_pure_str(obj)
 
 def is_integer(obj):
     return isinstance(obj, __int_klasses)
