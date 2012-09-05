@@ -29,11 +29,9 @@ __all__ = [ "AttrData" ]
 
 __docformat__ = "restructuredtext"
 
-import operator
-
 from ._PyTango import Except, CmdArgType, AttrDataFormat, AttrWriteType, \
     DispLevel, UserDefaultAttrProp, Attr, SpectrumAttr, ImageAttr
-import collections
+from .utils import is_non_str_seq
 
 
 class AttrData(object):
@@ -90,7 +88,7 @@ class AttrData(object):
         # check for well defined attribute info
         
         # check parameter
-        if not isinstance(attr_info, collections.Sequence):
+        if not is_non_str_seq(attr_info):
             throw_ex("Wrong data type for value for describing attribute %s in "
                      "class %s\nMust be a sequence with 1 or 2 elements" 
                      % (attr_name, name))
@@ -111,7 +109,7 @@ class AttrData(object):
         
         attr_info_len = len(attr_info)
         # check parameter
-        if not isinstance(attr_info, collections.Sequence) or \
+        if not is_non_str_seq(attr_info) or \
            attr_info_len < 3 or attr_info_len > 5:
             throw_ex("Wrong data type for describing mandatory information for "
                      "attribute %s in class %s\nMust be a sequence with 3, 4 "

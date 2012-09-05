@@ -184,9 +184,46 @@ class 'Libera' will show up as possible completions.
     BO01/DI/BPM-01  BO01/DI/BPM-03  BO01/DI/BPM-05  BO01/DI/BPM-07  BO01/DI/BPM-09  BO01/DI/BPM-11
     BO01/DI/BPM-02  BO01/DI/BPM-04  BO01/DI/BPM-06  BO01/DI/BPM-08  BO01/DI/BPM-10
     
-    ITango [1]: bpm1 = Libera("BO01/DI/BPM-
+    ITango [1]: bpm1 = Libera("BO01/DI/BPM-01")
+
+Customized device representation
+--------------------------------
+
+When you use ipython >= 0.11 with a Qt console frontend::
+
+    $ itango qtconsole
     
+typing a variable containing a tango device object followend by :kbd:`Enter`
+will present you with a customized representation of the object instead of the
+usual :func:`repr` :
+
+    .. image:: itango06.png
+
+You can customize the icon that itango displays for a specific device.
+The first thing to do is to copy the image file into
+:mod:`PyTango.ipython.resource` installation directory (if you don't have
+permissions to do so, copy the image into a directory of your choosing
+and make sure it is accessible from itango).
+
+If you want to use the image for all devices of a certain tango class, just
+add a new tango class property called *__icon*. You can do it with jive or, of
+course, with itango itself::
+
+    db.put_class_property("Libera", dict(__icon="libera.png"))
     
+    # if you placed your image in a directory different than PyTango.ipython.resource
+    # then, instead you have to specify the absolute directory
+    
+    db.put_class_property("Libera", dict(__icon="/home/homer/.config/itango/libera.png"))
+
+If you need different images for different devices of the same class, you can
+specify an *__icon* property at the device level (which takes precedence over
+the class property value, if defined)::
+
+    db.put_device_property("BO01/DI/BPM-01", dict(__icon="libera2.png"))
+
+
+
 List tango devices, classes, servers
 --------------------------------------
 
