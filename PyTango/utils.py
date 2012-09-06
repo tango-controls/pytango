@@ -44,7 +44,7 @@ import numbers
 
 from ._PyTango import StdStringVector, StdDoubleVector, \
     DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
-    EventData, AttrConfEventData, DataReadyEventData
+    EventData, AttrConfEventData, DataReadyEventData, DevFailed
 from ._PyTango import constants
 
 _scalar_int_types = (CmdArgType.DevShort, CmdArgType.DevUShort,
@@ -1020,4 +1020,60 @@ def from_version_str_to_hex_str(version_str):
 
 def from_version_str_to_int(version_str):
     return int(from_version_str_to_hex_str(version_str, 16))
+
+def __server_run(classes, args=None, msg_stream=sys.stderr):
+    import PyTango
+    if msg_stream is None:
+        import io
+        msg_stream = io.BytesIO()
+    
+    if args is None:
+        args = sys.argv
+    util = PyTango.Util(args)
+
+    for klass_name, (klass_klass, klass) in classes.items():
+        util.add_class(klass_klass, klass, klass_name)
+    u_instance = PyTango.Util.instance()
+    u_instance.server_init()
+    msg_stream.write("Ready to accept request\n")
+    u_instance.server_run()
+    
+def server_run(classes, args=None, msg_stream=sys.stderr):
+    """Provides a simple way to run a tango server. It handles exceptions
+       by writting a message to the msg_stream
+       
+       For example, if you want to expose a server of type "MyServer" which
+       is defined by tango classes `MyServerClass` and `MyServer` then::
+       
+           import PyTango
+           PyTango.server_run({"MyServer": (MyServerClass, MyServer)})
+        
+       :param classes:
+           a dictionary where keyword is the tango class name and value is a 
+           sequence of Tango Class python class, and Tango python class
+       :type classes: dict
+       
+       :param args:
+           list of command line arguments [default: None, meaning use sys.argv]
+       :type args: list
+       
+       :param msg_stream:
+           stream where to put messages [default: sys.stderr]
+       
+       .. versionadded:: 8.0.0"""
+       
+    if msg_stream is None:
+        import io
+        msg_stream = io.BytesIO()
+    write = msg_stream.write
+    try:
+        return __server_run(classes, args=args)
+        write("Exiting:\n")
+    except KeyboardInterrupt:
+        write("Exiting: Keyboard interrupt\n")
+    except DevFailed as df:
+        write("Exiting: Server exited with PyTango.DevFailed:\n" + str(df) + "\n")
+    except Exception as e:
+        write("Exiting: Server exited with unforseen exception:\n" + str(e) + "\n")
+    write("\nExited\n")
 

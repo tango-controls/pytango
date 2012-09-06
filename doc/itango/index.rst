@@ -23,6 +23,7 @@ and you should get something like this:
 
 .. image:: itango00.png
     :align: center
+    :width: 75%
 
 .. toctree::
     :maxdepth: 1

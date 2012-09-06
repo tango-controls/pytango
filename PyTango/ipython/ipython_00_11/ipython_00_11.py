@@ -1060,7 +1060,7 @@ def load_config(config):
     d.update(IPython.utils.coloransi.TermColors.__dict__)
 
     so = Struct(
-        tango_banner="""%(Blue)shint: Try typing: mydev = Device("%(LightBlue)s<tab>%(Normal)s""")
+        tango_banner="""%(Blue)shint: Try typing: mydev = Device("%(LightBlue)s<tab>%(Normal)s\n""")
 
     so = config.get("tango_options", so)
 

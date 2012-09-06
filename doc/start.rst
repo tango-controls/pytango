@@ -26,12 +26,12 @@ Dependencies on other libraries
 
     digraph dependencies {
         size="6,3";
-        PyTango     [shape=box, label="PyTango 7.2"];
-        Python      [shape=box, label="Python >=2.4"];
+        PyTango     [shape=box, label="PyTango 8.0"];
+        Python      [shape=box, label="Python >=2.6"];
         boostpython [shape=box, label="boost python"];
         boostp1     [shape=box, label="boost >=1.33"];
         boostp2     [shape=box, label="boost >=1.41"];
-        Tango       [shape=box, label="Tango >=7.2"];
+        Tango       [shape=box, label="Tango >=8.0.5"];
         omniORB     [shape=box, label="omniORB >=4"];
         numpy       [shape=box, label="numpy >=1.1.0"];
         IPython     [shape=box, label="IPython >=0.10"];
@@ -48,9 +48,9 @@ Dependencies on other libraries
 Don't be scared by the graph. Probably most of the packages are already installed.
 The current PyTango version has four major dependencies:
 
-- python (>= 2.4) (http://www.python.org/)
+- python (>= 2.6) (http://www.python.org/)
 - omniORB (http://omniorb.sourceforge.net/)
-- Tango (>= 7.2.0) (http://www.tango-controls.org/)
+- Tango (>= 8.0.5) (http://www.tango-controls.org/)
 - boost python (http://www.boost.org):
     if python >= 2.6.3 then: boost-python >= 1.41
     else: boost-python >= 1.33
@@ -71,8 +71,8 @@ Linux
 ~~~~~
 
 The PyTango team does **not** provide a precompiled binary for Linux since this
-would mean having to provide 12 different binaries: one for each major python
-version (2.4, 2.5, 2.6, 2.7, 3.0 and 3.1) times 2 for both 32bits and 64bits.
+would mean having to provide at least 10 different binaries: one for each major
+python version (2.6, 2.7, 3.0, 3.1 and 3.2) times 2 for both 32bits and 64bits.
 
 Tango contributers have written packages for *at least* ubuntu and debian linux
 distributions. Check the **Ubuntu GNU/Linux binary distribution** chapter under
@@ -92,25 +92,27 @@ Windows XP/Vista/7. The complete list of binaries can be downloaded from
 .. _PyTango-7.2.3.win32-py2.7.msi: http://pypi.python.org/packages/2.7/P/PyTango/PyTango-7.2.3.win32-py2.7.msi
 .. _PyTango-7.2.3.win32-py2.7.exe: http://pypi.python.org/packages/2.7/P/PyTango/PyTango-7.2.3.win32-py2.7.exe
 
-+----------------------------------+--------------------------------------------------+----------------------------------------------+
-| version                          | Dependencies                                     | Compilation env.                             |
-+==================================+==================================================+==============================================+
-| `PyTango-7.2.3.win32-py2.6.msi`_ | - Tango C++ >= 7.2.6 and < 8.0                   | - Tango 7.2.6 windows distribution           |
-| `PyTango-7.2.3.win32-py2.6.exe`_ | - Python 2.6.x (where x >= 0)                    | - Python 2.6.6                               |
-|                                  | - numpy 1.x (where x >= 1. Recommended x >= 5)   | - Numpy 1.5                                  |
-|                                  |                                                  | - boost-python 1.41 mutithreaded dll         |
-|                                  |                                                  | - Visual Studio 8.0 (2005)                   |
-|                                  |                                                  | - Windows XP Pro 2002 SP3                    |
-|                                  |                                                  | - PC: Intel Xeon E5440 @ 2.83GHz 1GB RAM     |
-+----------------------------------+--------------------------------------------------+----------------------------------------------+
-| `PyTango-7.2.3.win32-py2.7.msi`_ | - Tango C++ >= 7.2.6 and < 8.0                   | - Tango 7.2.6 windows distribution           |
-| `PyTango-7.2.3.win32-py2.7.exe`_ | - Python 2.7.x (where x >= 0)                    | - Python 2.7.2                               |
-|                                  | - numpy 1.x (where x >= 1. Recommended x >= 5)   | - Numpy 1.5                                  |
-|                                  |                                                  | - boost-python 1.47 mutithreaded dll         |
-|                                  |                                                  | - Visual Studio 8.0 (2005)                   |
-|                                  |                                                  | - Windows XP Pro 2002 SP3                    |
-|                                  |                                                  | - PC: Intel Xeon E5440 @ 2.83GHz 1GB RAM     |
-+----------------------------------+--------------------------------------------------+----------------------------------------------+
+.. only:: html
+
+    +----------------------------------+--------------------------------------------------+----------------------------------------------+
+    | version                          | Dependencies                                     | Compilation env.                             |
+    +==================================+==================================================+==============================================+
+    | `PyTango-7.2.3.win32-py2.6.msi`_ | - Tango C++ >= 7.2.6 and < 8.0                   | - Tango 7.2.6 windows distribution           |
+    | `PyTango-7.2.3.win32-py2.6.exe`_ | - Python 2.6.x (where x >= 0)                    | - Python 2.6.6                               |
+    |                                  | - numpy 1.x (where x >= 1. Recommended x >= 5)   | - Numpy 1.5                                  |
+    |                                  |                                                  | - boost-python 1.41 mutithreaded dll         |
+    |                                  |                                                  | - Visual Studio 8.0 (2005)                   |
+    |                                  |                                                  | - Windows XP Pro 2002 SP3                    |
+    |                                  |                                                  | - PC: Intel Xeon E5440 @ 2.83GHz 1GB RAM     |
+    +----------------------------------+--------------------------------------------------+----------------------------------------------+
+    | `PyTango-7.2.3.win32-py2.7.msi`_ | - Tango C++ >= 7.2.6 and < 8.0                   | - Tango 7.2.6 windows distribution           |
+    | `PyTango-7.2.3.win32-py2.7.exe`_ | - Python 2.7.x (where x >= 0)                    | - Python 2.7.2                               |
+    |                                  | - numpy 1.x (where x >= 1. Recommended x >= 5)   | - Numpy 1.5                                  |
+    |                                  |                                                  | - boost-python 1.47 mutithreaded dll         |
+    |                                  |                                                  | - Visual Studio 8.0 (2005)                   |
+    |                                  |                                                  | - Windows XP Pro 2002 SP3                    |
+    |                                  |                                                  | - PC: Intel Xeon E5440 @ 2.83GHz 1GB RAM     |
+    +----------------------------------+--------------------------------------------------+----------------------------------------------+
 
 Until version 7.2.2 (due to internal incompatibilities between tango C++ API
 and PyTango), PyTango had to be shipped with an internal copy of tango and
@@ -266,23 +268,16 @@ test
 
 If you have IPython_ installed, the best way to test your PyTango installation
 is by starting the new PyTango CLI called :ref:`itango` by typing on the command
-line:
+line::
 
-    #. IPython <= 0.10::
-
-        $ ipython -p tango
-
-    #.IPython > 0.10::
-
-        $ ipython --profile=tango
-
+    $ itango
 
 then, in ITango type:
 
 .. sourcecode:: itango
 
     ITango [1]: PyTango.Release.version
-    Result [1]: '7.2.3'
+    Result [1]: '8.0.0'
 
 (if you are wondering, :ref:`itango` automaticaly does ``import PyTango`` for you!)
 
@@ -290,13 +285,9 @@ If you don't have IPython_ installed, to test the installation start a python co
 and type:
 
     >>> import PyTango
-    >>> print PyTango.Release.version
-    7.2.3
+    >>> PyTango.Release.version
+    '8.0.0'
 
-.. toctree::
-    :hidden:
-
-    Quick tour <quicktour>
-    Quick tour (original) <quicktour_old>
     
 .. _IPython: http://ipython.scipy.org/
+

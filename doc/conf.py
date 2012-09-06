@@ -69,7 +69,7 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = 'contents'
 
 # General information about the project.
 project = u'PyTango'
@@ -151,7 +151,7 @@ html_theme = 'default'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = 'logo.png'
+html_logo = '_static/logo.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -172,11 +172,11 @@ html_static_path = ['_static']
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+html_sidebars = {'index': ['indexsidebar.html']}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
-#html_additional_pages = {}
+html_additional_pages = { 'index' : 'index.html' }
 
 # If false, no module index is generated.
 #html_use_modindex = True
@@ -219,13 +219,18 @@ latex_font_size = '10pt'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'PyTango.tex', u'PyTango Documentation',
+  ('contents', 'PyTango.tex', u'PyTango Documentation',
    u'PyTango team', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-latex_logo = 'logo.png'
+latex_logo = '_static/logo.png'
+
+latex_elements = {
+    'fontpkg': '\\usepackage{palatino}',
+}
+latex_show_urls = 'footnote'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -246,6 +251,7 @@ intersphinx_mapping = {
     'http://docs.python.org/dev': None,
     'http://docs.scipy.org/doc/scipy/reference' : None,
     'http://docs.scipy.org/doc/numpy' : None,
+    'http://ipython.org/ipython-doc/stable/' : None,
 }
 
 def copy_spaces(origin):

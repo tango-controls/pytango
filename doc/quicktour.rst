@@ -1,57 +1,54 @@
 .. _quick-tour:
 
-A quick tour
-------------
+Quick tour
+============
 
 This quick tour will guide you through the first steps on using PyTango.
 This is the new quick tour guide based on the :ref:`itango` console.
 You can still find the old version of this tour based on a simple python
 console :ref:`here <quick-tour-old>`.
 
+Quick tour on the client side
+-----------------------------
+
 Check PyTango version
 ~~~~~~~~~~~~~~~~~~~~~
 
-Start an ipython tango console with:
+Start an ipython tango console with::
 
-    #. on IPython <= 0.10:
-    
-        ipython -p tango
-        
-    #. on IPython > 0.10:
-    
-        ipython --profile=tango
+    $ itango
 
 and type:
 
     .. sourcecode:: itango
 
         ITango [1]: PyTango.__version__
-        Result [1]: '7.1.2'
+        Result [1]: '8.0.0'
 
         ITango [2]: PyTango.__version_long__
-        Result [2]: '7.1.2dev0'
+        Result [2]: '8.0.0dev0'
 
         ITango [3]: PyTango.__version_number__
-        Result [3]: 712
+        Result [3]: 800
 
         ITango [4]: PyTango.__version_description__
-        Result [4]: 'This version implements the C++ Tango 7.1 API.'
+        Result [4]: 'This version implements the C++ Tango 8.0 API.'
 
 or alternatively:
 
     .. sourcecode:: itango
 
         ITango [1]: PyTango.Release.version
-        Result [1]: '7.1.2'
+        Result [1]: '8.0.0'
 
         ITango [2]: PyTango.Release.version_long
-        Result [2]: '7.1.2dev0'
+        Result [2]: '8.0.0dev0'
 
         ITango [3]: PyTango.Release.version_number
-        Result [3]: 712
+        Result [3]: 800
 
         ITango [4]: PyTango.Release.version_description
-        Result [4]: 'This version implements the C++ Tango 7.1 API.'
+        Result [4]: 'This version implements the C++ Tango 8.0 API.'
 
 .. tip::
 
@@ -72,7 +69,7 @@ From a client (This is only possible since PyTango 7.0.0)
         ITango [1]: import PyTango.constants
 
         ITango [2]: PyTango.constants.TgLibVers
-        Result [2]: '7.1.1'
+        Result [2]: '8.0.0'
 
 From a server you can alternatively do::
     
@@ -116,14 +113,14 @@ determine if it is running or not.
 .. note::
     Did you notice that you didn't write PyTango.DeviceProxy but instead just
     DeviceProxy? This is because :ref:`itango` automatically exports the
-    :class:`PyTango.DeviceProxy`, :class:`PyTango.AttributeProxy`,
-    :class:`PyTango.Database` and :class:`PyTango.Group` classes to the
+    :class:`~PyTango.DeviceProxy`, :class:`~PyTango.AttributeProxy`,
+    :class:`PyTango.Database` and :class:`~PyTango.Group` classes to the
     namespace. If you are writting code outside :ref:`itango` you **MUST**
     use the `PyTango` module prefix.
 
 .. tip::
 
-    When typing the device name in the :class:`PyTango.DeviceProxy` creation
+    When typing the device name in the :class:`~PyTango.DeviceProxy` creation
     line, try pressing the <tab> key. You should get a list of devices::
     
         tangotest = DeviceProxy("sys<tab>
@@ -376,36 +373,37 @@ API should be accessed from Python.
                             
         ITango [24]: axis1.command_inout("AxisStop")
 
-A quick tour of Tango device server binding through an example
---------------------------------------------------------------
+Quick tour on the server side
+-----------------------------
 
-To write a tango device server in python, you need to import two modules in your script which are:
+To write a tango device server in python, you must first import the
+:mod:`PyTango` module in your code.
 
-1. The PyTango module
+Below is the python code for a Tango device server with two commands and two
+attributes. The commands are:
 
-2. The python sys module provided in the classical python distribution
+1. IOLOng which receives a Tango Long and return it multiply by 2. This command
+   is allowed only if the device is in the ON state.
 
-The following in the python script for a Tango device server with two commands and two attributes. The commands are:
-
-1. IOLOng which receives a Tango Long and return it multiply by 2. This command is allowed only if the device is in the ON state.
-
-2. IOStringArray which receives an array of Tango strings and which returns it but in the reverse order. This command is only allowed if the device is in the ON state.
+2. IOStringArray which receives an array of Tango strings and which returns it
+   but in the reverse order. This command is only allowed if the device is in
+   the ON state.
 
 The attributes are:
 
-1. Long_attr wich is a Tango long attribute, Scalar and Read only with a minimum alarm set to 1000 and a maximum alarm set to 1500
+1. Long_attr wich is a Tango long attribute, Scalar and Read only with a
+   minimum alarm set to 1000 and a maximum alarm set to 1500
 
 2. Short_attr_rw which is a Tango short attribute, Scalar and Read/Write
 
 The following code is the complete device server code::
 
     import PyTango
-    import sys
 
-    class PyDsExp(PyTango.Device_3Impl):
+    class PyDsExp(PyTango.Device_4Impl):
 
         def __init__(self,cl,name):
-            PyTango.Device_3Impl.__init__(self,cl,name)
+            PyTango.Device_4Impl.__init__(self,cl,name)
             self.debug_stream('In PyDsExp __init__')
             PyDsExp.init_device(self)
 
@@ -415,14 +413,12 @@ The following code is the complete device server code::
             self.attr_short_rw = 66
             self.attr_long = 1246
 
-    #------------------------------------------------------------------
-
         def delete_device(self):
             self.debug_stream('[delete_device] for device %s ' % self.get_name())
 
-    #------------------------------------------------------------------
-    # COMMANDS
-    #------------------------------------------------------------------
+        #------------------------------------------------------------------
+        # COMMANDS
+        #------------------------------------------------------------------
 
         def is_IOLong_allowed(self):
             return self.get_state() == PyTango.DevState.ON
@@ -432,8 +428,6 @@ The following code is the complete device server code::
             in_data = in_data * 2;
             self.debug_stream('[IOLong::execute] return number %s' % str(in_data))
             return in_data;
-
-    #------------------------------------------------------------------
 
         def is_IOStringArray_allowed(self):
             return self.get_state() == PyTango.DevState.ON
@@ -450,58 +444,32 @@ The following code is the complete device server code::
             self.y = out_data
             return out_data
 
-    #------------------------------------------------------------------
-    # ATTRIBUTES
-    #------------------------------------------------------------------
+        #------------------------------------------------------------------
+        # ATTRIBUTES
+        #------------------------------------------------------------------
 
         def read_attr_hardware(self, data):
             self.debug_stream('In read_attr_hardware')
 
-    #------------------------------------------------------------------
-
         def read_Long_attr(self, the_att):
             self.debug_stream('[PyDsExp::read_attr] attribute name Long_attr')
-
-            # Before PyTango 7.0.0
-            #PyTango.set_attribute_value(the_att, self.attr_long)
-
-            # Now:
             the_att.set_value(self.attr_long)
-
-    #------------------------------------------------------------------
 
         def read_Short_attr_rw(self, the_att):
             self.debug_stream('[PyDsExp::read_attr] attribute name Short_attr_rw')
-
-            # Before PyTango 7.0.0
-            #PyTango.set_attribute_value(the_att, self.attr_short_rw)
-            
-            # Now:
             the_att.set_value(self.attr_short_rw)
-
-    #------------------------------------------------------------------
 
         def write_Short_attr_rw(self, the_att):
             self.debug_stream('In write_Short_attr_rw for attribute %s' % the_att.get_name())
-
-            # Before PyTango 7.0.0
-            #data = []
-            #PyTango.get_write_value(the_att, data)
-
-            # Now:
             data = the_att.get_write_value()
             self.attr_short_rw = data[0]
 
-    #------------------------------------------------------------------
-    # CLASS
-    #------------------------------------------------------------------
-
+    
     class PyDsExpClass(PyTango.DeviceClass):
 
         def __init__(self, name):
             PyTango.DeviceClass.__init__(self, name)
-            self.set_type("TestDevice")
-            print 'In PyDsExpClass __init__'
+            self.set_type("PyDsExp")
 
         cmd_list = { 'IOLong' : [ [ PyTango.ArgType.DevLong, "Number" ],
                                   [ PyTango.ArgType.DevLong, "Number * 2" ] ],
@@ -518,21 +486,17 @@ The following code is the complete device server code::
                                            PyTango.AttrDataFormat.SCALAR,
                                            PyTango.AttrWriteType.READ_WRITE ] ]
         }
+    
+    
+    def main():
+        PyTango.server_run({"PyDsExp" : (PyDsExpClass, PyDsExp)})
 
     if __name__ == '__main__':
-        try:
-            util = PyTango.Util(sys.argv)
-            
-            # 
-            # Deprecated: util.add_TgClass(PyDsExpClass, PyDsExp, 'PyDsExp')
-            util.add_class(PyDsExpClass, PyDsExp, 'PyDsExp')
-            
-            U = PyTango.Util.instance()
-            U.server_init()
-            U.server_run()
-        except PyTango.DevFailed,e:
-            print '-------> Received a DevFailed exception:',e
-        except Exception,e:
-            print '-------> An unforeseen exception occured....',e
+        main()
 
+.. toctree::
+    :hidden:
+
+    Quick tour (original) <quicktour_old>
+    
 .. _IPython: http://ipython.scipy.org/

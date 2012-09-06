@@ -577,7 +577,7 @@ Here is the code for the $HOME/.ipython/ipy_profile_orbit.py:
 
 Then start your CLI with::
 
-    ipython -p orbit
+    $ ipython --profile=orbit
 
 and you will have something like this
 
@@ -642,18 +642,6 @@ To stop monitoring the attribute:
 
 .. note::
     Type 'mon?' to see detailed information about this magic command
-
-.. warning::
-     
-    Experimental: The monitor table can be shown in a GUI. For this feature to 
-    be available you need two things:
-
-        #. Have PyQt4 (>= 4.1) installed
-        #. Start itango with '-q4thread' support: 'ipython -q4thread -p itango'
-
-    When you type '%mon' the following table should appear:
-
-        .. image:: itango04.png
 
 .. _IPython: http://ipython.org/
 .. _Tango: http://www.tango-controls.org/

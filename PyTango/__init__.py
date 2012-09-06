@@ -86,6 +86,8 @@ __all__ = [ 'AccessControlType', 'ApiUtil', 'ArchiveEventInfo',
 
 __docformat__ = "restructuredtext"
 
+import sys
+
 try:
     from ._PyTango import DeviceProxy
 except ImportError as ie:
@@ -98,7 +100,6 @@ except ImportError as ie:
     print("You must leave this directory first before using PyTango, otherwise the")
     print("source distribution will conflict with the installed PyTango")
     print(80*"-")
-    import sys
     sys.exit(1)
 
 from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
@@ -166,6 +167,7 @@ from .globals import get_class, get_classes, get_cpp_class, get_cpp_classes, \
     delete_class_list, class_list, cpp_class_list, constructed_class
 from .utils import is_scalar_type, is_array_type, is_numerical_type, \
     is_int_type, is_float_type, obj_2_str, seqStr_2_obj
+from .utils import server_run
 from .tango_numpy import NumpyType, numpy_type, numpy_spectrum, numpy_image
 
 from .pytango_init import init as __init

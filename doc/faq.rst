@@ -268,7 +268,7 @@ In order to tell tango the dimensions of the image you had to specify them as::
     dim_y = 2
     attr.set_value(image, dim_x, dim_y)
 
-In PyTango7 it is still supported, but the preferred way is to use a
+In PyTango 8 it is still supported, but the preferred way is to use a
 sequence of sequences (instead of a flat sequence), so the dimensions
 are inherent and not needed anymore::
 
@@ -305,16 +305,16 @@ This is what you would do with PyTango <= 3.0.4::
     print "flatList =", flatList
     # flatList = [ 1, 2, 3, 4 ]
 
-You can still do it with PyTango7. However I recommend::
+You can still do it with PyTango 8. However I recommend::
 
     image = attr.get_write_value()
     print "image =", image
     # image = numpy.array([[1, 2], [3, 4]])
 
-If PyTango7 is compiled without numpy support, you will get a sequence
+If PyTango 8 is compiled without numpy support, you will get a sequence
 of sequences, which makes more sense than a flat list.
 
-If PyTango7 is compiled with numpy support it does not only makes more sense
+If PyTango 8 is compiled with numpy support it does not only makes more sense
 but it is also considerably **faster and memory friendlier**.
 
 If PyTango is compiled with numpy support but you prefer a list of lists for

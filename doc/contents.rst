@@ -11,6 +11,7 @@ Contents
     :maxdepth: 2
 
     start
+    quicktour
     itango/index
     API <api>
     faq
@@ -19,3 +20,6 @@ Contents
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+**Last update:** |today|
+
