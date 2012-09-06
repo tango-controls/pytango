@@ -39,12 +39,6 @@ Tango_ homepage where you will find plenty of documentation, FAQ and tutorials.
         - `Latest stable <http://www.tango-controls.org/static/PyTango/latest/doc/html>`_
         - `7.2.3 <http://www.tango-controls.org/static/PyTango/v723/doc/html/index.html>`_
         - `7.1.6 <http://www.tango-controls.org/static/PyTango/v716/doc/html/index.html>`_
-
-.. toctree::
-    :hidden:
-
-    contents
-
     
 :Last Update: |today|
 
