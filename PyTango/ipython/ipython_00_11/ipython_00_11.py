@@ -543,7 +543,6 @@ def get_alias_list():
 
 def __exc_handler(ip, etype, value, tb, tb_offset=None):
     global _TG_EXCEPTIONS
-    print(etype)
     user_ns = get_user_ns()
     if etype in _TG_EXCEPTIONS:
         global _TANGO_ERR
@@ -890,26 +889,6 @@ def complete(text):
     outcomps = sorted(comps)
     return outcomps
 
-
-__DEV_HTML_TEMPLATE = """\
-<table border="0" cellpadding="2">
-<tr><td rowspan="7" valign="middle" align="center"><img src="{icon}" height="128"/></td>
-    <td>Name:</td><td><b>{name}</b></td></tr>
-<tr><td>Alias:</td><td>{alias}</td></tr>
-<tr><td>Database:</td><td>{database}</td></tr>
-<tr><td>Type:</td><td>{dev_class}</td></tr>
-<tr><td>Server:</td><td>{server_id}</td></tr>
-<tr><td>Server host:</td><td>{server_host}</td></tr>
-<tr><td>Documentation:</td><td><a target="_blank" href="{doc_url}">{doc_url}</a></td></tr>
-</table>"""
-
-__DB_HTML_TEMPLATE = """\
-<table border="0" cellpadding="2">
-<tr><td rowspan="2" valign="middle" align="center"><img src="{icon}" height="128"/></td>
-    <td><b>{name}</b></td></tr>
-<tr><td>{info}</td></tr>
-</table>"""
-
 __DIRNAME = os.path.dirname(os.path.abspath(__file__))
 __RES_DIR = os.path.join(__DIRNAME, os.path.pardir, 'resource')
 
@@ -952,6 +931,18 @@ def __get_device_icon(dev_proxy, klass="Device"):
         icon = os.path.join(__RES_DIR, "device.png")
     return icon
 
+__DEV_HTML_TEMPLATE = """\
+<table border="0" cellpadding="2" width="100%">
+<tr><td width="140" rowspan="7" valign="middle" align="center"><img src="{icon}" height="128"/></td>
+    <td width="140">Name:</td><td><b>{name}</b></td></tr>
+<tr><td width="140">Alias:</td><td>{alias}</td></tr>
+<tr><td width="140">Database:</td><td>{database}</td></tr>
+<tr><td width="140">Type:</td><td>{dev_class}</td></tr>
+<tr><td width="140">Server:</td><td>{server_id}</td></tr>
+<tr><td width="140">Server host:</td><td>{server_host}</td></tr>
+<tr><td width="140">Documentation:</td><td><a target="_blank" href="{doc_url}">{doc_url}</a></td></tr>
+</table>"""
+
 def display_deviceproxy_html(dev_proxy):
     """displayhook function for PyTango.DeviceProxy, rendered as HTML"""
     try:
@@ -986,6 +977,13 @@ def display_deviceproxy_html(dev_proxy):
 
     return __DEV_HTML_TEMPLATE.format(**fmt)
 
+__DB_HTML_TEMPLATE = """\
+<table border="0" cellpadding="2" width="100%">
+<tr><td width="140" rowspan="2" valign="middle" align="center"><img src="{icon}" height="128"/></td>
+    <td><b>{name}</b></td></tr>
+<tr><td>{info}</td></tr>
+</table>"""
+
 def display_database_html(db):
     """displayhook function for PyTango.Database, rendered as HTML"""
     fmt = dict()
@@ -1007,11 +1005,115 @@ def display_database_html(db):
 
     return __DB_HTML_TEMPLATE.format(**fmt)
 
+__DEV_ATTR_RW_HTML_TEMPLATE = """\
+<table border="0" cellpadding="2" width="100%">
+<tr><td colspan="2" bgcolor="{bgcolor}">{name} ({type}, {data_format}, {quality}) at {time}</td></tr>
+<tr><td bgcolor="#EEEEEE" width="140">value{r_dim}:</td>
+    <td bgcolor="#EEEEEE">{value}</td></tr>
+<tr><td bgcolor="#EEEEEE" width="140">w_value{w_dim}:</td>
+    <td bgcolor="#EEEEEE">{w_value}</td></tr>
+</table>"""
+
+__DEV_ATTR_RO_HTML_TEMPLATE = """\
+<table border="0" cellpadding="2" width="100%">
+<tr><td colspan="2" bgcolor="{bgcolor}">{name} ({type}, {data_format}, {quality}) at {time}</td></tr>
+<tr><td bgcolor="#EEEEEE" width="140">value{r_dim}:</td>
+    <td bgcolor="#EEEEEE">{value}</td></tr>
+</table>"""
+
+__DEV_ATTR_ERR_HTML_TEMPLATE = """\
+<table border="0" cellpadding="2" width="100%">
+<tr><td bgcolor="#FF0000">{name} ({type}, {data_format}, {quality}) at {time}</td></tr>
+<tr><td bgcolor="#EEEEEE">{error}</td></tr>
+</table>"""
+
+QUALITY_TO_HEXCOLOR_STR = {
+    PyTango.AttrQuality.ATTR_VALID : ("#00FF00", "#000000"),
+    PyTango.AttrQuality.ATTR_INVALID : ("#808080", "#FFFFFF"),    
+    PyTango.AttrQuality.ATTR_ALARM : ("#FF8C00", "#FFFFFF"),    
+    PyTango.AttrQuality.ATTR_WARNING : ("#FF8C00", "#FFFFFF"),    
+    PyTango.AttrQuality.ATTR_CHANGING : ("#80A0FF", "#000000"),
+    None : ("#808080", "#000000"), 
+}
+
+def display_deviceattribute_html(da):
+    """displayhook function for PyTango.DeviceAttribute, rendered as HTML"""
+    fmt = dict(name=da.name, type=da.type, data_format=da.data_format)
+    template = None
+    if da.has_failed:
+        fmt['error'] = "\n".join(map(str, da.get_err_stack())).replace("\n", "<br/>")
+        
+        template = __DEV_ATTR_ERR_HTML_TEMPLATE
+    else:
+        rd, wd = da.r_dimension, da.w_dimension
+        if wd.dim_x == 0 and wd.dim_y == 0 and da.w_value is None:
+            template = __DEV_ATTR_RO_HTML_TEMPLATE
+        else:
+            template = __DEV_ATTR_RW_HTML_TEMPLATE
+            fmt['w_value'] = str(da.w_value)
+            if da.data_format == PyTango.AttrDataFormat.SCALAR:
+                fmt['w_dim'] = ""
+            else:
+                fmt['w_dim'] = "<br/>(%d, %d)" % (wd.dim_x, wd.dim_y)
+        fmt['bgcolor'], fmt['fgcolor'] = QUALITY_TO_HEXCOLOR_STR[da.quality]
+        fmt['quality'] = str(da.quality)
+        if da.data_format == PyTango.AttrDataFormat.SCALAR:
+            fmt['r_dim'] = ""
+        else:
+            fmt['r_dim'] = "<br/>(%d, %d)" % (rd.dim_x, rd.dim_y)
+        fmt['value'] = str(da.value)
+        fmt['time'] = str(da.time.todatetime())
+    return template.format(**fmt)
+
+__GROUP_HTML_TEMPLATE = """\
+<table border="0" cellpadding="2" width="100%">
+<tr><td width="100" bgcolor="#EEEEEE">Name:</td><td bgcolor="#EEEEEE">{name}</td></tr>
+<tr><td width="100" bgcolor="#EEEEEE">Size:</td><td bgcolor="#EEEEEE">{size}</td></tr>
+<tr><td width="100" bgcolor="#EEEEEE">Devices:</td><td bgcolor="#EEEEEE">{devices}</td></tr>
+</table>"""
+
+def display_group_html(group):
+    devices = group.get_device_list()
+    devices = ", ".join(devices)
+    fmt=dict(name=group.get_name(), size=group.get_size(), devices=devices) 
+    return __GROUP_HTML_TEMPLATE.format(**fmt)
+
+__GROUP_REPLY_HTML_TEMPLATE = """\
+<table border="0" cellpadding="2" width="100%">
+<tr><td bgcolor="#EEEEEE">{name}</td></tr>
+<tr><td>{data}</td></tr>    
+"""
+
+__GROUP_REPLY_ERR_HTML_TEMPLATE = """\
+<table border="0" cellpadding="2" width="100%">
+<tr><td bgcolor="#FF0000">{name}</td></tr>
+<tr><td bgcolor="#EEEEEE">{error}</td></tr>
+</table>"""
+    
+def display_groupreply_html(gr):
+    fmt = dict(name="%s/%s" % (gr.dev_name(), gr.obj_name()))
+    template = None
+    if gr.has_failed():
+        fmt['error'] = "\n".join(map(str, gr.get_err_stack())).replace("\n", "<br/>")
+        template = __GROUP_REPLY_ERR_HTML_TEMPLATE
+    else:
+        template = __GROUP_REPLY_HTML_TEMPLATE
+        data = gr.get_data()
+        if isinstance(data, PyTango.DeviceAttribute):
+            data = display_deviceattribute_html(data)
+        fmt["data"] = data
+        
+    ret = template.format(**fmt)
+    return ret
+
 def init_display(ip):
     html_formatter = ip.display_formatter.formatters["text/html"]
     html_formatter.for_type(PyTango.DeviceProxy, display_deviceproxy_html)
     html_formatter.for_type(PyTango.Database, display_database_html)
-
+    html_formatter.for_type(PyTango.DeviceAttribute, display_deviceattribute_html)
+    html_formatter.for_type(PyTango.Group, display_group_html)
+    html_formatter.for_type(PyTango.GroupAttrReply, display_groupreply_html)
+    html_formatter.for_type(PyTango.GroupCmdReply, display_groupreply_html)
 
 from IPython.utils.traitlets import Unicode
 from IPython.frontend.qt.console.rich_ipython_widget import RichIPythonWidget
