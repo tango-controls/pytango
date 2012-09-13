@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% set title = 'PyTango documentation' %}
+{% block body %}
+
+<h1>Welcome to PyTango documentation!</h1>
+
+<p>
+    PyTango is a python module that exposes to <a class="reference external" href="http://www.python.org/">Python</a>
+    the complete <a class="reference external" href="http://www.tango-controls.org/">Tango</a> C++ API
+    (including both client and server).
+
+</p>
+
+<p>
+    This means that you can write not only tango applications (scripts, CLIs, GUIs)
+    that access tango device servers but also tango device servers themselves, all
+    of this in pure python.
+</p>
+
+<div class="figure align-center">
+<img alt="ITango" src="_static/banner.png" style="width: 70%;" />
+</div>
+
+<p>
+    Check out the <a class="reference internal" href="start.html#getting-started"><em>getting started guide</em></a>
+    to learn how to build and/or install PyTango and after that the <a class="reference internal" href="quicktour.html#quick-tour"><em>quick tour</em></a>
+    can help you with the first steps in the PyTango world.
+</p>
+
+<p>
+    If you need help understanding what Tango itself really is, you can check the
+    <a class="reference external" href="http://www.tango-controls.org/">Tango</a>
+    homepage where you will find plenty of documentation, FAQ and tutorials.
+</p>
+
+<p>
+    A PDF version can be downloaded from <a href="PyTango.pdf">here</a>.
+</p>
+<p>
+    For convenience here are the links to other versions:<br/>
+    <a href="http://www.tango-controls.org/static/PyTango/development/doc/html">Development</a>
+    &nbsp;
+    <a href="http://www.tango-controls.org/static/PyTango/latest/doc/html">Latest stable</a>
+    &nbsp;
+    <a href="http://www.tango-controls.org/static/PyTango/v723/doc/html">7.2.3</a>
+</p>
+
+{% endblock %}
