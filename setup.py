@@ -25,6 +25,7 @@ import os
 import sys
 import platform
 import imp
+import io
 
 from distutils.core import setup, Extension
 from distutils.cmd import Command
@@ -80,9 +81,20 @@ def uniquify(seq):
     [ no_dups.append(i) for i in seq if not no_dups.count(i) ]
     return no_dups
 
+def get_c_numpy():
+    NUMPY_ROOT = os.environ.get('NUMPY_ROOT')
+    if NUMPY_ROOT is not None:
+        d = os.path.join(NUMPY_ROOT, 'include','numpy')
+        if os.path.isdir(d):
+            return d
+    if numpy is None:
+        return None
+    d = os.path.join(numpy.__path__[0], 'core', 'include')
+    if os.path.isdir(d):
+        return d
+
 def has_c_numpy():
-    NUMPY_ROOT = os.environ.get('NUMPY_ROOT', '/usr')
-    return os.path.isdir(os.path.join(NUMPY_ROOT, 'include','numpy'))
+    return get_c_numpy() is not None
 
 def has_numpy(with_src=True):
     ret = numpy is not None
@@ -135,7 +147,7 @@ class build(dftbuild):
     def run(self):
         if numpy is None:
             self.warn('NOT using numpy: it is not available')
-        elif not has_c_numpy():
+        elif get_c_numpy() is None:
             self.warn("NOT using numpy: numpy available but C source is not")
         
         if IPython and not self.without_ipython:
@@ -193,8 +205,8 @@ class build_ext(dftbuild_ext):
             # mimic tango check to activate C++0x extension
             import subprocess
             compiler = self.compiler.compiler
-            gcc_ver = subprocess.check_output(compiler + ["-dumpversion"])
-            gcc_ver = gcc_ver.strip().decode().split(".")
+            pipe = subprocess.Popen(compiler + ["-dumpversion"], stdout=subprocess.PIPE).stdout
+            gcc_ver = pipe.readlines()[0].decode().strip().split(".")
             gcc_ver = list(map(int, gcc_ver))
             if gcc_ver >= [4,3,3]:
                 self.use_cpp_0x = True
@@ -268,12 +280,12 @@ class install(dftinstall):
 
 
 def main():
-    BOOST_ROOT = OMNI_ROOT = TANGO_ROOT = NUMPY_ROOT = '/usr'
+    BOOST_ROOT = OMNI_ROOT = TANGO_ROOT = '/usr'
 
     TANGO_ROOT = os.environ.get('TANGO_ROOT', TANGO_ROOT)
     OMNI_ROOT  = os.environ.get('OMNI_ROOT', OMNI_ROOT)
     BOOST_ROOT = os.environ.get('BOOST_ROOT', BOOST_ROOT)
-    NUMPY_ROOT = os.environ.get('NUMPY_ROOT', NUMPY_ROOT)
+    numpy_c_include = get_c_numpy()
     
     Release = get_release_info()
 
@@ -342,10 +354,9 @@ def main():
     if os.path.isdir(_tango_root_inc):
         include_dirs.append(_tango_root_inc)
 
-    include_dirs.extend([
-        os.path.join(OMNI_ROOT, 'include'),
-        os.path.join(NUMPY_ROOT, 'include'),
-    ])
+    include_dirs.append(os.path.join(OMNI_ROOT, 'include'))
+    if numpy_c_include is not None:
+        include_dirs.append(numpy_c_include)
 
     #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
     # library directories
