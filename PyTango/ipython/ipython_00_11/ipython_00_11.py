@@ -1216,7 +1216,7 @@ def load_config(config):
     #kernel_app = config.IPKernelApp
     ipython_widget = config.IPythonWidget
     ipython_widget.in_prompt  = 'ITango [<span class="in-prompt-number">%i</span>]: '
-    ipython_widget.out_prompt = '   Out [<span class="out-prompt-number">%i</span>]: '
+    ipython_widget.out_prompt = 'Result [<span class="out-prompt-number">%i</span>]: '
     
     #zmq_i_shell = config.ZMQInteractiveShell
     

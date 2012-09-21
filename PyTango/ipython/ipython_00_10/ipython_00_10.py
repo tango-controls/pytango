@@ -890,8 +890,8 @@ def init_console(ip):
 
     so = ip.user_ns.get("tango_options", so)
     
-    o.colors = "Tango"
-    o.prompt_in1 = "ITango <$DB_NAME> [\\#]: "
+    #o.colors = "Tango"
+    o.prompt_in1 = "ITango [\\#]: "
     o.prompt_out = "Result [\\#]: "
     banner = """
 %(Purple)sITango %(version)s%(Normal)s -- An interactive %(Purple)sTango%(Normal)s client.
