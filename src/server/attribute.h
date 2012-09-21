@@ -60,11 +60,16 @@ namespace PyAttribute
     boost::python::object get_properties_3(Tango::Attribute &,
                                            boost::python::object &);
 
+    boost::python::object get_properties_multi_attr_prop(Tango::Attribute &,
+                                                    boost::python::object &);
+
     void set_properties(Tango::Attribute &, boost::python::object &,
                         boost::python::object &);
     
     void set_properties_3(Tango::Attribute &, boost::python::object &,
                           boost::python::object &);
+
+    void set_properties_multi_attr_prop(Tango::Attribute &, boost::python::object &);
 };
 
 

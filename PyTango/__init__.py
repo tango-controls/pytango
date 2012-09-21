@@ -64,7 +64,7 @@ __all__ = [ 'AccessControlType', 'ApiUtil', 'ArchiveEventInfo',
 'GroupReply', 'GroupReplyList', 'IMAGE', 'ImageAttr', 'InfoIt',
 'KeepAliveCmdCode', 'Level', 'LockCmdCode', 'LockerInfo', 'LockerLanguage',
 'LogIt', 'LogLevel', 'LogTarget', 'Logger', 'Logging', 'MessBoxType',
-'MultiAttribute', 'MultiClassAttribute', 'NamedDevFailed',
+'MultiAttribute', 'MultiAttrProp', 'MultiClassAttribute', 'NamedDevFailed',
 'NamedDevFailedList', 'NonDbDevice', 'NonSupportedFeature',
 'NotAllowed', 'NumpyType', 'PeriodicEventInfo', 'PeriodicEventProp',
 'PollCmdCode', 'PollDevice',
@@ -157,7 +157,7 @@ from .log4tango import TangoStream, LogIt, DebugIt, InfoIt, WarnIt, \
     ErrorIt, FatalIt
 from .device_server import ChangeEventProp, PeriodicEventProp, \
     ArchiveEventProp, AttributeAlarm, EventProperties, AttributeConfig, \
-    AttributeConfig_2, AttributeConfig_3
+    AttributeConfig_2, AttributeConfig_3, MultiAttrProp
 from .attribute_proxy import AttributeProxy
 from .group import Group
 from .pyutil import Util

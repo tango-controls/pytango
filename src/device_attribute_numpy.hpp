@@ -39,7 +39,7 @@ namespace PyDeviceAttribute {
     template<long type>
     static void _dev_var_x_array_deleter(void * ptr_)
     {
-        TANGO_DO_ON_ATTRIBUTE_DATA_TYPE(type,
+        TANGO_DO_ON_ATTRIBUTE_DATA_TYPE_ID(type,
             delete static_cast<TANGO_const2arraytype(tangoTypeConst)*>(ptr_);
         );
     }
@@ -48,7 +48,7 @@ namespace PyDeviceAttribute {
     static void _dev_var_x_array_deleter(PyObject* obj)
     {
         void * ptr_ = PyCapsule_GetPointer(obj, NULL);
-        TANGO_DO_ON_ATTRIBUTE_DATA_TYPE(type,
+        TANGO_DO_ON_ATTRIBUTE_DATA_TYPE_ID(type,
             delete static_cast<TANGO_const2arraytype(tangoTypeConst)*>(ptr_);
         );
     }

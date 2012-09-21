@@ -209,7 +209,7 @@ void extract_scalar<Tango::DEV_ENCODED>(const CORBA::Any &any, boost::python::ob
          template<long type>
          static void dev_var_x_array_deleter__(void * ptr_)
          {
-             TANGO_DO_ON_ATTRIBUTE_DATA_TYPE(type,
+             TANGO_DO_ON_ATTRIBUTE_DATA_TYPE_ID(type,
                  delete static_cast<TANGO_const2type(tangoTypeConst)*>(ptr_);
              );
          }
@@ -218,7 +218,7 @@ void extract_scalar<Tango::DEV_ENCODED>(const CORBA::Any &any, boost::python::ob
          static void dev_var_x_array_deleter__(PyObject* obj)
          {
              void * ptr_ = PyCapsule_GetPointer(obj, NULL);
-             TANGO_DO_ON_ATTRIBUTE_DATA_TYPE(type,
+             TANGO_DO_ON_ATTRIBUTE_DATA_TYPE_ID(type,
                  delete static_cast<TANGO_const2type(tangoTypeConst)*>(ptr_);
              );
          }
@@ -275,7 +275,7 @@ CORBA::Any *PyCmd::execute(Tango::DeviceImpl *dev, const CORBA::Any &param_any)
         // So, the result is that param_py = param_any.
         // It is done with some template magic.
         boost::python::object param_py;
-        TANGO_DO_ON_DEVICE_DATA_TYPE(in_type, 
+        TANGO_DO_ON_DEVICE_DATA_TYPE_ID(in_type,
             extract_scalar<tangoTypeConst>(param_any, param_py);
         , 
             extract_array<tangoTypeConst>(param_any, param_py);
@@ -298,7 +298,7 @@ CORBA::Any *PyCmd::execute(Tango::DeviceImpl *dev, const CORBA::Any &param_any)
         unique_pointer<CORBA::Any> ret_any_guard(ret_any);
 
         // It does: ret_any = ret_py_obj
-        TANGO_DO_ON_DEVICE_DATA_TYPE(out_type, 
+        TANGO_DO_ON_DEVICE_DATA_TYPE_ID(out_type,
             insert_scalar<tangoTypeConst>(ret_py_obj, *ret_any);
         ,
             insert_array<tangoTypeConst>(ret_py_obj, *ret_any);

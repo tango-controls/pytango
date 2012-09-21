@@ -90,7 +90,7 @@ namespace PyWAttribute
 		if(type == Tango::DEV_ENCODED)
 			type = Tango::DEV_UCHAR;
 
-		TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(type, return __get_min_value, att);
+		TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_min_value, att);
         return 0;
     }
 
@@ -112,7 +112,7 @@ namespace PyWAttribute
 		if(type == Tango::DEV_ENCODED)
 			type = Tango::DEV_UCHAR;
 
-		TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(type, return __get_max_value, att);
+		TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_max_value, att);
         return 0;
     }
 
@@ -171,7 +171,7 @@ namespace PyWAttribute
 			else if(tangoTypeConst == Tango::DEV_ENCODED)
 				tangoTypeConst = Tango::DEV_UCHAR;
 
-			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(tangoTypeConst, _set_min_value, self, value);
+			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, _set_min_value, self, value);
     	}
     }
 
@@ -230,7 +230,7 @@ namespace PyWAttribute
 			else if(tangoTypeConst == Tango::DEV_ENCODED)
 				tangoTypeConst = Tango::DEV_UCHAR;
 
-			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(tangoTypeConst, _set_max_value, self, value);
+			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, _set_max_value, self, value);
     	}
     }
 /// @}
@@ -331,7 +331,7 @@ namespace PyWAttribute
 
         if (format == Tango::SCALAR)
         {
-            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(type, __set_write_value_scalar,
+            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __set_write_value_scalar,
                                               att, value);
         }
         else
@@ -348,7 +348,7 @@ namespace PyWAttribute
                         o.str(),
                         "set_value()");
             }
-            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(type, __set_write_value_array,
+            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __set_write_value_array,
                                               att, value,
                                               PySequence_Size(value.ptr()), 0);
         }
@@ -387,7 +387,7 @@ namespace PyWAttribute
                         o.str(),
                         "set_write_value()");
             }
-            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(type, __set_write_value_array,
+            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __set_write_value_array,
                                               att, value, x, 0);
         }
     }
@@ -425,7 +425,7 @@ namespace PyWAttribute
                         o.str(),
                         (const char *)"set_write_value()");
             }
-            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(type, __set_write_value_array,
+            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __set_write_value_array,
                                               att, value, x, y);
         }
     }
@@ -531,18 +531,18 @@ namespace PyWAttribute
         const bool isScalar = fmt == Tango::SCALAR;
 
         if (isScalar) {
-            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(type, __get_write_value_scalar, att, &value);
+            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __get_write_value_scalar, att, &value);
         } else {
             switch (extract_as) {
                 case PyTango::ExtractAsNumpy: {
 #               ifndef DISABLE_PYTANGO_NUMPY
-                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(type,
+                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type,
                         __get_write_value_array_numpy, att, &value);
                     break;
 #               endif
                 }
                 case PyTango::ExtractAsList: {
-                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(type,
+                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type,
                         __get_write_value_array_lists, att, &value);
                     break;
                 }

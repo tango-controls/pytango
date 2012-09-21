@@ -328,6 +328,37 @@ boost::python::object to_py(const Tango::PeriodicEventProp &);
 boost::python::object to_py(const Tango::ArchiveEventProp &);
 boost::python::object to_py(const Tango::EventProperties &);
 
+template<typename T>
+void to_py(Tango::MultiAttrProp<T> &multi_attr_prop, boost::python::object &py_multi_attr_prop)
+{
+    if(py_multi_attr_prop.ptr() == Py_None)
+    {
+        PYTANGO_MOD
+        py_multi_attr_prop = pytango.attr("MultiAttrProp")();
+    }
+
+    py_multi_attr_prop.attr("label") = multi_attr_prop.label;
+    py_multi_attr_prop.attr("description") = multi_attr_prop.description;
+    py_multi_attr_prop.attr("unit") = multi_attr_prop.unit;
+    py_multi_attr_prop.attr("standard_unit") = multi_attr_prop.standard_unit;
+    py_multi_attr_prop.attr("display_unit") = multi_attr_prop.display_unit;
+    py_multi_attr_prop.attr("format") = multi_attr_prop.format;
+    py_multi_attr_prop.attr("min_value") = multi_attr_prop.min_value.get_str();
+    py_multi_attr_prop.attr("max_value") = multi_attr_prop.max_value.get_str();
+    py_multi_attr_prop.attr("min_alarm") = multi_attr_prop.min_alarm.get_str();
+    py_multi_attr_prop.attr("max_alarm") = multi_attr_prop.max_alarm.get_str();
+    py_multi_attr_prop.attr("min_warning") = multi_attr_prop.min_warning.get_str();
+    py_multi_attr_prop.attr("max_warning") = multi_attr_prop.max_warning.get_str();
+    py_multi_attr_prop.attr("delta_t") = multi_attr_prop.delta_t.get_str();
+    py_multi_attr_prop.attr("delta_val") = multi_attr_prop.delta_val.get_str();
+    py_multi_attr_prop.attr("event_period") = multi_attr_prop.event_period.get_str();
+    py_multi_attr_prop.attr("archive_period") = multi_attr_prop.archive_period.get_str();
+    py_multi_attr_prop.attr("rel_change") = multi_attr_prop.rel_change.get_str();
+    py_multi_attr_prop.attr("abs_change") = multi_attr_prop.abs_change.get_str();
+    py_multi_attr_prop.attr("archive_rel_change") = multi_attr_prop.archive_rel_change.get_str();
+    py_multi_attr_prop.attr("archive_abs_change") = multi_attr_prop.archive_abs_change.get_str();
+}
+
 boost::python::object to_py(const Tango::AttributeConfig &, 
                             boost::python::object py_attr_conf);
 boost::python::object to_py(const Tango::AttributeConfig_2 &,

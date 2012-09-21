@@ -519,19 +519,19 @@ namespace PyDeviceAttribute
                         case PyTango::ExtractAsNumpy:
                         case PyTango::ExtractAsTuple:
                         case PyTango::ExtractAsList:
-                            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(data_type, 
+                            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                                 _update_scalar_values, self, py_value);
                             break;
                         case PyTango::ExtractAsBytes:
-                            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(data_type,
+                            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                                 _update_value_as_bin, self, py_value, true);
                             break;
                         case PyTango::ExtractAsByteArray:
-                            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(data_type,
+                            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                                 _update_value_as_bin, self, py_value, false);
                             break;
                         case PyTango::ExtractAsString:
-                            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(data_type,
+                            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                                 _update_value_as_string, self, py_value);
                             break;
                         case PyTango::ExtractAsNothing:
@@ -542,7 +542,7 @@ namespace PyDeviceAttribute
                 {
                     if (extract_as != PyTango::ExtractAsNothing)
                     {
-                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(data_type, 
+                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                             _update_scalar_values, self, py_value);
                     }
                 }
@@ -555,28 +555,28 @@ namespace PyDeviceAttribute
                     default:
                     case PyTango::ExtractAsNumpy:
 #                   ifndef DISABLE_PYTANGO_NUMPY
-                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(data_type, 
+                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                             _update_array_values, self, is_image, py_value);
                         break;
 #                   endif
                     case PyTango::ExtractAsTuple:
-                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(data_type,
+                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                             _update_array_values_as_tuples, self, is_image, py_value);
                         break;
                     case PyTango::ExtractAsList:
-                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(data_type,
+                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                             _update_array_values_as_lists, self, is_image, py_value);
                         break;
                     case PyTango::ExtractAsBytes:
-                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(data_type,
+                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                             _update_value_as_bin, self, py_value, true);
                         break;
                     case PyTango::ExtractAsByteArray:
-                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(data_type,
+                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                             _update_value_as_bin, self, py_value, false);
                         break;
                     case PyTango::ExtractAsString:
-                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE(data_type,
+                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                             _update_value_as_string, self, py_value);
                         break;
                     case PyTango::ExtractAsNothing:
@@ -667,7 +667,7 @@ namespace PyDeviceAttribute
         switch(data_format)
         {
             case Tango::SCALAR:
-                TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE( data_type, _fill_scalar_attribute, self, py_value );
+                TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_scalar_attribute, self, py_value );
                 break;
             case Tango::IMAGE:
                 isImage = true;
@@ -683,14 +683,14 @@ namespace PyDeviceAttribute
                 // standard types and C++ are.
 #               ifdef DISABLE_PYTANGO_NUMPY
                 {
-                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE( data_type, _fill_list_attribute, self, isImage, py_value );
+                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_list_attribute, self, isImage, py_value );
                 }
 #               else
                 {
                     if (PyArray_Check(py_value.ptr()))
-                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE( data_type, _fill_numpy_attribute, self, isImage, py_value );
+                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_numpy_attribute, self, isImage, py_value );
                     else
-                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE( data_type, _fill_list_attribute, self, isImage, py_value );
+                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_list_attribute, self, isImage, py_value );
                     break;
                 }
 #               endif

@@ -162,7 +162,7 @@ namespace PyDeviceData {
     {
         Tango::DeviceData &self = boost::python::extract<Tango::DeviceData &>(py_self);
         
-        TANGO_DO_ON_DEVICE_DATA_TYPE(self.get_type(),
+        TANGO_DO_ON_DEVICE_DATA_TYPE_ID(self.get_type(),
             return extract_scalar<tangoTypeConst>(self);
         ,
             return extract_array<tangoTypeConst>(self, py_self, extract_as);
@@ -172,7 +172,7 @@ namespace PyDeviceData {
 
     void insert(Tango::DeviceData &self, long data_type, object py_value)
     {
-        TANGO_DO_ON_DEVICE_DATA_TYPE(data_type,
+        TANGO_DO_ON_DEVICE_DATA_TYPE_ID(data_type,
             insert_scalar<tangoTypeConst>(self, py_value);
         , 
             insert_array<tangoTypeConst>(self, py_value);

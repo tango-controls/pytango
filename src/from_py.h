@@ -289,6 +289,425 @@ void from_py_object(boost::python::object &, Tango::AttributeConfig &);
 void from_py_object(boost::python::object &, Tango::AttributeConfig_2 &);
 void from_py_object(boost::python::object &, Tango::AttributeConfig_3 &);
 
+template<typename T>
+void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_prop)
+{
+	multi_attr_prop.label = bopy::extract<string>(bopy::str(py_obj.attr("label")));
+	multi_attr_prop.description = bopy::extract<string>(bopy::str(py_obj.attr("description")));
+	multi_attr_prop.unit = bopy::extract<string>(bopy::str(py_obj.attr("unit")));
+	multi_attr_prop.standard_unit = bopy::extract<string>(bopy::str(py_obj.attr("standard_unit")));
+	multi_attr_prop.display_unit = bopy::extract<string>(bopy::str(py_obj.attr("display_unit")));
+	multi_attr_prop.format = bopy::extract<string>(bopy::str(py_obj.attr("format")));
+
+	bopy::extract<string> min_value(py_obj.attr("min_value"));
+	if(min_value.check())
+		multi_attr_prop.min_value = min_value();
+	else
+		multi_attr_prop.min_value = boost::python::extract<T>(py_obj.attr("min_value"));
+
+	bopy::extract<string> max_value(py_obj.attr("max_value"));
+	if(max_value.check())
+		multi_attr_prop.max_value = max_value();
+	else
+		multi_attr_prop.max_value = boost::python::extract<T>(py_obj.attr("max_value"));
+
+	bopy::extract<string> min_alarm(py_obj.attr("min_alarm"));
+	if(min_alarm.check())
+		multi_attr_prop.min_alarm = min_alarm();
+	else
+		multi_attr_prop.min_alarm = boost::python::extract<T>(py_obj.attr("min_alarm"));
+
+	bopy::extract<string> max_alarm(py_obj.attr("max_alarm"));
+	if(max_alarm.check())
+		multi_attr_prop.max_alarm = max_alarm();
+	else
+		multi_attr_prop.max_alarm = boost::python::extract<T>(py_obj.attr("max_alarm"));
+
+	bopy::extract<string> min_warning(py_obj.attr("min_warning"));
+	if(min_warning.check())
+		multi_attr_prop.min_warning = min_warning();
+	else
+		multi_attr_prop.min_warning = boost::python::extract<T>(py_obj.attr("min_warning"));
+
+	bopy::extract<string> max_warning(py_obj.attr("max_warning"));
+	if(max_warning.check())
+		multi_attr_prop.max_warning = max_warning();
+	else
+		multi_attr_prop.max_warning = boost::python::extract<T>(py_obj.attr("max_warning"));
+
+	bopy::extract<string> delta_t(py_obj.attr("delta_t"));
+	if(delta_t.check())
+		multi_attr_prop.delta_t = delta_t();
+	else
+		multi_attr_prop.delta_t = boost::python::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
+
+	bopy::extract<string> delta_val(py_obj.attr("delta_val"));
+	if(delta_val.check())
+		multi_attr_prop.delta_val = delta_val();
+	else
+		multi_attr_prop.delta_val = boost::python::extract<T>(py_obj.attr("delta_val"));
+
+	bopy::extract<string> event_period(py_obj.attr("event_period"));
+	if(event_period.check())
+		multi_attr_prop.event_period = event_period();
+	else
+		multi_attr_prop.event_period = boost::python::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
+
+	bopy::extract<string> archive_period(py_obj.attr("archive_period"));
+	if(archive_period.check())
+		multi_attr_prop.archive_period = archive_period();
+	else
+		multi_attr_prop.archive_period = boost::python::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
+
+	bopy::extract<string> rel_change(py_obj.attr("rel_change"));
+	if(rel_change.check())
+		multi_attr_prop.rel_change = rel_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("rel_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.rel_change = change_vec;
+		}
+		else
+			multi_attr_prop.rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
+	}
+
+	bopy::extract<string> abs_change(py_obj.attr("abs_change"));
+	if(abs_change.check())
+		multi_attr_prop.abs_change = abs_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("abs_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.abs_change = change_vec;
+		}
+		else
+			multi_attr_prop.abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
+	}
+
+	bopy::extract<string> archive_rel_change(py_obj.attr("archive_rel_change"));
+	if(archive_rel_change.check())
+		multi_attr_prop.archive_rel_change = archive_rel_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_rel_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.archive_rel_change = change_vec;
+		}
+		else
+			multi_attr_prop.archive_rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
+	}
+
+	bopy::extract<string> archive_abs_change(py_obj.attr("archive_abs_change"));
+	if(archive_abs_change.check())
+		multi_attr_prop.archive_abs_change = archive_abs_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_abs_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.archive_abs_change = change_vec;
+		}
+		else
+			multi_attr_prop.archive_abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_abs_change")); // Property type is Tango::DevDouble!
+	}
+}
+
+template<>
+inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<Tango::DevEncoded> &multi_attr_prop)
+{
+	multi_attr_prop.label = bopy::extract<string>(bopy::str(py_obj.attr("label")));
+	multi_attr_prop.description = bopy::extract<string>(bopy::str(py_obj.attr("description")));
+	multi_attr_prop.unit = bopy::extract<string>(bopy::str(py_obj.attr("unit")));
+	multi_attr_prop.standard_unit = bopy::extract<string>(bopy::str(py_obj.attr("standard_unit")));
+	multi_attr_prop.display_unit = bopy::extract<string>(bopy::str(py_obj.attr("display_unit")));
+	multi_attr_prop.format = bopy::extract<string>(bopy::str(py_obj.attr("format")));
+
+	bopy::extract<string> min_value(py_obj.attr("min_value"));
+	if(min_value.check())
+		multi_attr_prop.min_value = min_value();
+	else
+		multi_attr_prop.min_value = boost::python::extract<Tango::DevUChar>(py_obj.attr("min_value"));
+
+	bopy::extract<string> max_value(py_obj.attr("max_value"));
+	if(max_value.check())
+		multi_attr_prop.max_value = max_value();
+	else
+		multi_attr_prop.max_value = boost::python::extract<Tango::DevUChar>(py_obj.attr("max_value"));
+
+	bopy::extract<string> min_alarm(py_obj.attr("min_alarm"));
+	if(min_alarm.check())
+		multi_attr_prop.min_alarm = min_alarm();
+	else
+		multi_attr_prop.min_alarm = boost::python::extract<Tango::DevUChar>(py_obj.attr("min_alarm"));
+
+	bopy::extract<string> max_alarm(py_obj.attr("max_alarm"));
+	if(max_alarm.check())
+		multi_attr_prop.max_alarm = max_alarm();
+	else
+		multi_attr_prop.max_alarm = boost::python::extract<Tango::DevUChar>(py_obj.attr("max_alarm"));
+
+	bopy::extract<string> min_warning(py_obj.attr("min_warning"));
+	if(min_warning.check())
+		multi_attr_prop.min_warning = min_warning();
+	else
+		multi_attr_prop.min_warning = boost::python::extract<Tango::DevUChar>(py_obj.attr("min_warning"));
+
+	bopy::extract<string> max_warning(py_obj.attr("max_warning"));
+	if(max_warning.check())
+		multi_attr_prop.max_warning = max_warning();
+	else
+		multi_attr_prop.max_warning = boost::python::extract<Tango::DevUChar>(py_obj.attr("max_warning"));
+
+	bopy::extract<string> delta_t(py_obj.attr("delta_t"));
+	if(delta_t.check())
+		multi_attr_prop.delta_t = delta_t();
+	else
+		multi_attr_prop.delta_t = boost::python::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
+
+	bopy::extract<string> delta_val(py_obj.attr("delta_val"));
+	if(delta_val.check())
+		multi_attr_prop.delta_val = delta_val();
+	else
+		multi_attr_prop.delta_val = boost::python::extract<Tango::DevUChar>(py_obj.attr("delta_val"));
+
+	bopy::extract<string> event_period(py_obj.attr("event_period"));
+	if(event_period.check())
+		multi_attr_prop.event_period = event_period();
+	else
+		multi_attr_prop.event_period = boost::python::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
+
+	bopy::extract<string> archive_period(py_obj.attr("archive_period"));
+	if(archive_period.check())
+		multi_attr_prop.archive_period = archive_period();
+	else
+		multi_attr_prop.archive_period = boost::python::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
+
+	bopy::extract<string> rel_change(py_obj.attr("rel_change"));
+	if(rel_change.check())
+		multi_attr_prop.rel_change = rel_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("rel_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.rel_change = change_vec;
+		}
+		else
+			multi_attr_prop.rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
+	}
+
+	bopy::extract<string> abs_change(py_obj.attr("abs_change"));
+	if(abs_change.check())
+		multi_attr_prop.abs_change = abs_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("abs_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.abs_change = change_vec;
+		}
+		else
+			multi_attr_prop.abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
+	}
+
+	bopy::extract<string> archive_rel_change(py_obj.attr("archive_rel_change"));
+	if(archive_rel_change.check())
+		multi_attr_prop.archive_rel_change = archive_rel_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_rel_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.archive_rel_change = change_vec;
+		}
+		else
+			multi_attr_prop.archive_rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
+	}
+
+	bopy::extract<string> archive_abs_change(py_obj.attr("archive_abs_change"));
+	if(archive_abs_change.check())
+		multi_attr_prop.archive_abs_change = archive_abs_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_abs_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.archive_abs_change = change_vec;
+		}
+		else
+			multi_attr_prop.archive_abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_abs_change")); // Property type is Tango::DevDouble!
+	}
+}
+
+template<>
+inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<Tango::DevString> &multi_attr_prop)
+{
+	string empty_str("");
+
+	multi_attr_prop.label = bopy::extract<string>(bopy::str(py_obj.attr("label")));
+	multi_attr_prop.description = bopy::extract<string>(bopy::str(py_obj.attr("description")));
+	multi_attr_prop.unit = bopy::extract<string>(bopy::str(py_obj.attr("unit")));
+	multi_attr_prop.standard_unit = bopy::extract<string>(bopy::str(py_obj.attr("standard_unit")));
+	multi_attr_prop.display_unit = bopy::extract<string>(bopy::str(py_obj.attr("display_unit")));
+	multi_attr_prop.format = bopy::extract<string>(bopy::str(py_obj.attr("format")));
+
+	bopy::extract<string> min_value(py_obj.attr("min_value"));
+	if(min_value.check())
+		multi_attr_prop.min_value = min_value();
+	else
+		multi_attr_prop.min_value = empty_str;
+
+	bopy::extract<string> max_value(py_obj.attr("max_value"));
+	if(max_value.check())
+		multi_attr_prop.max_value = max_value();
+	else
+		multi_attr_prop.max_value = empty_str;
+
+	bopy::extract<string> min_alarm(py_obj.attr("min_alarm"));
+	if(min_alarm.check())
+		multi_attr_prop.min_alarm = min_alarm();
+	else
+		multi_attr_prop.min_alarm = empty_str;
+
+	bopy::extract<string> max_alarm(py_obj.attr("max_alarm"));
+	if(max_alarm.check())
+		multi_attr_prop.max_alarm = max_alarm();
+	else
+		multi_attr_prop.max_alarm = empty_str;
+
+	bopy::extract<string> min_warning(py_obj.attr("min_warning"));
+	if(min_warning.check())
+		multi_attr_prop.min_warning = min_warning();
+	else
+		multi_attr_prop.min_warning = empty_str;
+
+	bopy::extract<string> max_warning(py_obj.attr("max_warning"));
+	if(max_warning.check())
+		multi_attr_prop.max_warning = max_warning();
+	else
+		multi_attr_prop.max_warning = empty_str;
+
+	bopy::extract<string> delta_t(py_obj.attr("delta_t"));
+	if(delta_t.check())
+		multi_attr_prop.delta_t = delta_t();
+	else
+		multi_attr_prop.delta_t = boost::python::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
+
+	bopy::extract<string> delta_val(py_obj.attr("delta_val"));
+	if(delta_val.check())
+		multi_attr_prop.delta_val = delta_val();
+	else
+		multi_attr_prop.delta_val = empty_str;
+
+	bopy::extract<string> event_period(py_obj.attr("event_period"));
+	if(event_period.check())
+		multi_attr_prop.event_period = event_period();
+	else
+		multi_attr_prop.event_period = boost::python::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
+
+	bopy::extract<string> archive_period(py_obj.attr("archive_period"));
+	if(archive_period.check())
+		multi_attr_prop.archive_period = archive_period();
+	else
+		multi_attr_prop.archive_period = boost::python::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
+
+	bopy::extract<string> rel_change(py_obj.attr("rel_change"));
+	if(rel_change.check())
+		multi_attr_prop.rel_change = rel_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("rel_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.rel_change = change_vec;
+		}
+		else
+			multi_attr_prop.rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
+	}
+
+	bopy::extract<string> abs_change(py_obj.attr("abs_change"));
+	if(abs_change.check())
+		multi_attr_prop.abs_change = abs_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("abs_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.abs_change = change_vec;
+		}
+		else
+			multi_attr_prop.abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
+	}
+
+	bopy::extract<string> archive_rel_change(py_obj.attr("archive_rel_change"));
+	if(archive_rel_change.check())
+		multi_attr_prop.archive_rel_change = archive_rel_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_rel_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.archive_rel_change = change_vec;
+		}
+		else
+			multi_attr_prop.archive_rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
+	}
+
+	bopy::extract<string> archive_abs_change(py_obj.attr("archive_abs_change"));
+	if(archive_abs_change.check())
+		multi_attr_prop.archive_abs_change = archive_abs_change();
+	else
+	{
+		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_abs_change"));
+		if(PySequence_Check(prop_py_obj.ptr()))
+		{
+			vector<Tango::DevDouble> change_vec;
+			for(long i = 0; i < len(prop_py_obj); i++)
+				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			multi_attr_prop.archive_abs_change = change_vec;
+		}
+		else
+			multi_attr_prop.archive_abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_abs_change")); // Property type is Tango::DevDouble!
+	}
+}
+
 void from_py_object(boost::python::object &, Tango::AttributeConfigList &);
 void from_py_object(boost::python::object &, Tango::AttributeConfigList_2 &);
 void from_py_object(boost::python::object &, Tango::AttributeConfigList_3 &);
