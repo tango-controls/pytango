@@ -176,37 +176,6 @@ DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_ULONG64, Tango::DevULong64, PyLong_AsUns
 DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_FLOAT, double, PyFloat_AsDouble)
 DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_DOUBLE, double, PyFloat_AsDouble)
 
-inline char* obj_to_new_char(PyObject* obj_ptr)
-{
-    Tango::DevString ret = NULL;
-    if(PyUnicode_Check(obj_ptr))
-    {
-        PyObject* obj_bytes_ptr = PyUnicode_AsLatin1String(obj_ptr);
-        ret = CORBA::string_dup(PyBytes_AsString(obj_bytes_ptr));
-        Py_DECREF(obj_bytes_ptr);
-    }
-    else
-    {
-        ret = CORBA::string_dup(PyBytes_AsString(obj_ptr));
-    }
-    return ret;
-}
-
-inline char* obj_to_new_char(boost::python::object &obj)
-{
-    return obj_to_new_char(obj.ptr());
-}
-
-
-/// @bug Not a bug per se, but you should keep in mind: It returns a new
-/// string, so if you pass it to Tango with a release flag there will be
-/// no problems, but if you have to use it yourself then you must remember
-/// to delete[] it!
-inline Tango::DevString PyString_AsCorbaString(PyObject* obj_ptr)
-{
-    return obj_to_new_char(obj_ptr);
-}
-
 // DEFINE_FAST_TANGO_FROMPY(Tango::DEV_STRING, PyString_AsString)
 DEFINE_FAST_TANGO_FROMPY(Tango::DEV_STRING, PyString_AsCorbaString)
 

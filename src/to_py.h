@@ -34,8 +34,10 @@ struct DevEncoded_to_tuple
     static inline PyObject* convert(Tango::DevEncoded const& a)
     {
         boost::python::str encoded_format(a.encoded_format);
-        boost::python::str encoded_data(
-            (const char*)a.encoded_data.get_buffer(), a.encoded_data.length());
+        bopy::object encoded_data = bopy::object(
+            bopy::handle<>(PyBytes_FromStringAndSize(
+                (const char*)a.encoded_data.get_buffer(),
+                (Py_ssize_t)a.encoded_data.length())));
         boost::python::object result = boost::python::make_tuple(encoded_format, encoded_data);
         return boost::python::incref(result.ptr());
     }

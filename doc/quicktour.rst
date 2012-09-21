@@ -323,28 +323,28 @@ API should be accessed from Python.
 
         ITango [3]: # Getting Device Properties
         ITango [4]: property_names = ["AxisBoxAttachement",
-                           ....:                   "AxisEncoderType",
-                           ....:                   "AxisNumber",
-                           ....:                   "CurrentAcceleration",
-                           ....:                   "CurrentAccuracy",
-                           ....:                   "CurrentBacklash",
-                           ....:                   "CurrentDeceleration",
-                           ....:                   "CurrentDirection",
-                           ....:                   "CurrentMotionAccuracy",
-                           ....:                   "CurrentOvershoot",
-                           ....:                   "CurrentRetry",
-                           ....:                   "CurrentScale",
-                           ....:                   "CurrentSpeed",
-                           ....:                   "CurrentVelocity",
-                           ....:                   "EncoderMotorRatio",
-                           ....:                   "logging_level",
-                           ....:                   "logging_target",
-                           ....:                   "UserEncoderRatio",
-                           ....:                   "UserOffset"]
-        
+              ....:                   "AxisEncoderType",
+              ....:                   "AxisNumber",
+              ....:                   "CurrentAcceleration",
+              ....:                   "CurrentAccuracy",
+              ....:                   "CurrentBacklash",
+              ....:                   "CurrentDeceleration",
+              ....:                   "CurrentDirection",
+              ....:                   "CurrentMotionAccuracy",
+              ....:                   "CurrentOvershoot",
+              ....:                   "CurrentRetry",
+              ....:                   "CurrentScale",
+              ....:                   "CurrentSpeed",
+              ....:                   "CurrentVelocity",
+              ....:                   "EncoderMotorRatio",
+              ....:                   "logging_level",
+              ....:                   "logging_target",
+              ....:                   "UserEncoderRatio",
+              ....:                   "UserOffset"]
+       
         ITango [5]: axis_properties = axis1.get_property(property_names)
         ITango [6]: for prop in axis_properties.keys():
-                           ....:     print "%s: %s" % (prop, axis_properties[prop][0])
+              ....:     print "%s: %s" % (prop, axis_properties[prop][0])
 
         ITango [7]: # Changing Properties
         ITango [8]: axis_properties["AxisBoxAttachement"] = ["microxas/motorisation/galilbox"]
@@ -355,8 +355,8 @@ API should be accessed from Python.
         ITango [12]: # Reading attributes
         ITango [13]: att_list = axis.get_attribute_list()
         ITango [14]: for att in att_list:
-                            ....:     att_val = axis.read_attribute(att)
-                            ....:     print "%s: %s" % (att.name, att_val.value)
+               ....:     att_val = axis.read_attribute(att)
+               ....:     print "%s: %s" % (att.name, att_val.value)
 
         ITango [15]: # Changing some attribute values
         ITango [16]: axis1.write_attribute("AxisBackslash", 0.5)
@@ -368,8 +368,8 @@ API should be accessed from Python.
         ITango [21]: pos1=axis1.read_attribute("AxisCurrentPosition")
         ITango [22]: axis1.command_inout("AxisBackward")
         ITango [23]: while pos1.value > 1000.0:
-                            ....:     pos1 = axis1.read_attribute("AxisCurrentPosition")
-                            ....:     print "position axis 1 = ", pos1.value
+               ....:     pos1 = axis1.read_attribute("AxisCurrentPosition")
+               ....:     print "position axis 1 = ", pos1.value
                             
         ITango [24]: axis1.command_inout("AxisStop")
 

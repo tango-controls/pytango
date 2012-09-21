@@ -243,6 +243,15 @@ PyObject* from_char_to_str(const std::string& in,
                            const char* encoding=NULL, /* defaults to latin-1 */
                            const char* errors="strict");
 
+bopy::object from_char_to_str2(const char* in, Py_ssize_t size=-1, 
+                               const char* encoding=NULL, /* defaults to latin-1 */
+                               const char* errors="strict");
+
+bopy::object from_char_to_str2(const std::string& in,
+                               const char* encoding=NULL, /* defaults to latin-1 */
+                               const char* errors="strict");
+
+
 void from_str_to_char(PyObject* in, std::string& out);
 
 inline void raise_(PyObject *type, const char *message)
