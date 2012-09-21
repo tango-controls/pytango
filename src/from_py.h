@@ -58,7 +58,7 @@ Tango::DevString PyString_AsCorbaString(PyObject* obj_ptr);
  * @param[in] py_value python sequence object or a single string
  * @param[out] result std string vector to be filled
  */
-void convert2array(const boost::python::object &py_value, StdStringVector & result);
+void convert2array(const bopy::object &py_value, StdStringVector & result);
 
 /**
  * Converter from python sequence of characters to a Tango::DevVarCharArray
@@ -66,7 +66,7 @@ void convert2array(const boost::python::object &py_value, StdStringVector & resu
  * @param[in] py_value python sequence object or a single string
  * @param[out] result Tango char array to be filled
  */
-void convert2array(const boost::python::object &py_value, Tango::DevVarCharArray & result);
+void convert2array(const bopy::object &py_value, Tango::DevVarCharArray & result);
 
 /**
  * Converter from python sequence to a Tango CORBA sequence
@@ -75,12 +75,12 @@ void convert2array(const boost::python::object &py_value, Tango::DevVarCharArray
  * @param[out] result CORBA sequence to be filled
  */
 template<typename TangoElementType>
-void convert2array(const boost::python::object &py_value, _CORBA_Sequence<TangoElementType> & result)
+void convert2array(const bopy::object &py_value, _CORBA_Sequence<TangoElementType> & result)
 {
-    size_t size = boost::python::len(py_value);
+    size_t size = bopy::len(py_value);
     result.length(size);
     for (size_t i=0; i < size; ++i) {
-        TangoElementType ch = boost::python::extract<TangoElementType>(py_value[i]);
+        TangoElementType ch = bopy::extract<TangoElementType>(py_value[i]);
         result[i] = ch;
     }
 }
@@ -92,7 +92,7 @@ void convert2array(const boost::python::object &py_value, _CORBA_Sequence<TangoE
  * @param[in] py_value python sequence object or a single string
  * @param[out] result Tango string array to be filled
  */
-void convert2array(const boost::python::object &py_value, Tango::DevVarStringArray & result);
+void convert2array(const bopy::object &py_value, Tango::DevVarStringArray & result);
 
 inline void raise_convert2array_DevVarDoubleStringArray()
 {
@@ -108,7 +108,7 @@ inline void raise_convert2array_DevVarDoubleStringArray()
  * @param[in] py_value python sequence object
  * @param[out] result Tango array to be filled
  */
-void convert2array(const boost::python::object &py_value, Tango::DevVarDoubleStringArray & result);
+void convert2array(const bopy::object &py_value, Tango::DevVarDoubleStringArray & result);
 
 inline void raise_convert2array_DevVarLongStringArray()
 {
@@ -124,7 +124,7 @@ inline void raise_convert2array_DevVarLongStringArray()
  * @param[in] py_value python sequence object
  * @param[out] result Tango array to be filled
  */
-void convert2array(const boost::python::object &py_value, Tango::DevVarLongStringArray & result);
+void convert2array(const bopy::object &py_value, Tango::DevVarLongStringArray & result);
 
 /**
  * Convert a python sequence into a C++ container
@@ -133,7 +133,7 @@ void convert2array(const boost::python::object &py_value, Tango::DevVarLongStrin
 template <typename ContainerType = StdStringVector >
 struct from_sequence
 {
-    static inline void convert(boost::python::object seq, ContainerType& a)
+    static inline void convert(bopy::object seq, ContainerType& a)
     {
         typedef typename ContainerType::value_type T;
         PyObject *seq_ptr = seq.ptr();
@@ -141,13 +141,13 @@ struct from_sequence
         for(Py_ssize_t i = 0; i < len; ++i)
         {
             PyObject *o_ptr = PySequence_GetItem(seq_ptr, i);
-            T s = boost::python::extract<T>(o_ptr);
+            T s = bopy::extract<T>(o_ptr);
             a.push_back(s);
-            boost::python::decref(o_ptr);
+            bopy::decref(o_ptr);
         }
     }
 
-    static inline void convert(boost::python::object seq, Tango::DbData& a)
+    static inline void convert(bopy::object seq, Tango::DbData& a)
     {
         PyObject *seq_ptr = seq.ptr();
         Py_ssize_t len = PySequence_Length(seq_ptr);
@@ -182,27 +182,27 @@ struct from_sequence
      * @param[in] d the python dictionary to be translated
      * @param[out] db_data the array of DbDatum to be filled
      */
-    static inline void convert(boost::python::dict d, Tango::DbData& db_data)
+    static inline void convert(bopy::dict d, Tango::DbData& db_data)
     {
-        boost::python::object it = d.iteritems();
-        int len = boost::python::extract<int>(d.attr("__len__")()) ;
+        bopy::object it = d.iteritems();
+        int len = bopy::extract<int>(d.attr("__len__")()) ;
         for(int i = 0 ; i < len; ++i)
         {
-            boost::python::tuple pair = (boost::python::tuple)it.attr("next")();
-            boost::python::object key = pair[0];
-            boost::python::object value = pair[1];
+            bopy::tuple pair = (bopy::tuple)it.attr("next")();
+            bopy::object key = pair[0];
+            bopy::object value = pair[1];
 
-            boost::python::extract<Tango::DbDatum> ext(value);
+            bopy::extract<Tango::DbDatum> ext(value);
             if(ext.check())
             {
                 db_data.push_back(ext());
                 continue;
             }
             
-            char const* key_str = boost::python::extract<char const*>(key);
+            char const* key_str = bopy::extract<char const*>(key);
             Tango::DbDatum db_datum(key_str);
             
-            boost::python::extract<char const*> value_str(value);
+            bopy::extract<char const*> value_str(value);
             
             if(value_str.check())
             {
@@ -216,8 +216,8 @@ struct from_sequence
                 }
                 else
                 {
-                    boost::python::object str_value = value.attr("__str__")();
-                    boost::python::extract<char const*> str_value_str(str_value);
+                    bopy::object str_value = value.attr("__str__")();
+                    bopy::extract<char const*> str_value_str(str_value);
                     db_datum.value_string.push_back(str_value_str());
                 }
             }
@@ -242,9 +242,9 @@ class CSequenceFromPython
     SequenceT* m_seq;
     bool m_own;
     public:
-    CSequenceFromPython(boost::python::object &py_obj)
+    CSequenceFromPython(bopy::object &py_obj)
     {
-        boost::python::extract<SequenceT*> ext(py_obj);
+        bopy::extract<SequenceT*> ext(py_obj);
         if (ext.check()) {
             m_seq = ext();
             m_own = false;
@@ -279,18 +279,18 @@ class CSequenceFromPython
     }
 };
 
-void from_py_object(boost::python::object &, Tango::AttributeAlarm &);
-void from_py_object(boost::python::object &, Tango::ChangeEventProp &);
-void from_py_object(boost::python::object &, Tango::PeriodicEventProp &);
-void from_py_object(boost::python::object &, Tango::ArchiveEventProp &);
-void from_py_object(boost::python::object &, Tango::EventProperties &);
+void from_py_object(bopy::object &, Tango::AttributeAlarm &);
+void from_py_object(bopy::object &, Tango::ChangeEventProp &);
+void from_py_object(bopy::object &, Tango::PeriodicEventProp &);
+void from_py_object(bopy::object &, Tango::ArchiveEventProp &);
+void from_py_object(bopy::object &, Tango::EventProperties &);
 
-void from_py_object(boost::python::object &, Tango::AttributeConfig &);
-void from_py_object(boost::python::object &, Tango::AttributeConfig_2 &);
-void from_py_object(boost::python::object &, Tango::AttributeConfig_3 &);
+void from_py_object(bopy::object &, Tango::AttributeConfig &);
+void from_py_object(bopy::object &, Tango::AttributeConfig_2 &);
+void from_py_object(bopy::object &, Tango::AttributeConfig_3 &);
 
 template<typename T>
-void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_prop)
+void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_prop)
 {
 	multi_attr_prop.label = bopy::extract<string>(bopy::str(py_obj.attr("label")));
 	multi_attr_prop.description = bopy::extract<string>(bopy::str(py_obj.attr("description")));
@@ -303,77 +303,77 @@ void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T> &mult
 	if(min_value.check())
 		multi_attr_prop.min_value = min_value();
 	else
-		multi_attr_prop.min_value = boost::python::extract<T>(py_obj.attr("min_value"));
+		multi_attr_prop.min_value = bopy::extract<T>(py_obj.attr("min_value"));
 
 	bopy::extract<string> max_value(py_obj.attr("max_value"));
 	if(max_value.check())
 		multi_attr_prop.max_value = max_value();
 	else
-		multi_attr_prop.max_value = boost::python::extract<T>(py_obj.attr("max_value"));
+		multi_attr_prop.max_value = bopy::extract<T>(py_obj.attr("max_value"));
 
 	bopy::extract<string> min_alarm(py_obj.attr("min_alarm"));
 	if(min_alarm.check())
 		multi_attr_prop.min_alarm = min_alarm();
 	else
-		multi_attr_prop.min_alarm = boost::python::extract<T>(py_obj.attr("min_alarm"));
+		multi_attr_prop.min_alarm = bopy::extract<T>(py_obj.attr("min_alarm"));
 
 	bopy::extract<string> max_alarm(py_obj.attr("max_alarm"));
 	if(max_alarm.check())
 		multi_attr_prop.max_alarm = max_alarm();
 	else
-		multi_attr_prop.max_alarm = boost::python::extract<T>(py_obj.attr("max_alarm"));
+		multi_attr_prop.max_alarm = bopy::extract<T>(py_obj.attr("max_alarm"));
 
 	bopy::extract<string> min_warning(py_obj.attr("min_warning"));
 	if(min_warning.check())
 		multi_attr_prop.min_warning = min_warning();
 	else
-		multi_attr_prop.min_warning = boost::python::extract<T>(py_obj.attr("min_warning"));
+		multi_attr_prop.min_warning = bopy::extract<T>(py_obj.attr("min_warning"));
 
 	bopy::extract<string> max_warning(py_obj.attr("max_warning"));
 	if(max_warning.check())
 		multi_attr_prop.max_warning = max_warning();
 	else
-		multi_attr_prop.max_warning = boost::python::extract<T>(py_obj.attr("max_warning"));
+		multi_attr_prop.max_warning = bopy::extract<T>(py_obj.attr("max_warning"));
 
 	bopy::extract<string> delta_t(py_obj.attr("delta_t"));
 	if(delta_t.check())
 		multi_attr_prop.delta_t = delta_t();
 	else
-		multi_attr_prop.delta_t = boost::python::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
+		multi_attr_prop.delta_t = bopy::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
 
 	bopy::extract<string> delta_val(py_obj.attr("delta_val"));
 	if(delta_val.check())
 		multi_attr_prop.delta_val = delta_val();
 	else
-		multi_attr_prop.delta_val = boost::python::extract<T>(py_obj.attr("delta_val"));
+		multi_attr_prop.delta_val = bopy::extract<T>(py_obj.attr("delta_val"));
 
 	bopy::extract<string> event_period(py_obj.attr("event_period"));
 	if(event_period.check())
 		multi_attr_prop.event_period = event_period();
 	else
-		multi_attr_prop.event_period = boost::python::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
+		multi_attr_prop.event_period = bopy::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
 
 	bopy::extract<string> archive_period(py_obj.attr("archive_period"));
 	if(archive_period.check())
 		multi_attr_prop.archive_period = archive_period();
 	else
-		multi_attr_prop.archive_period = boost::python::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
+		multi_attr_prop.archive_period = bopy::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
 
 	bopy::extract<string> rel_change(py_obj.attr("rel_change"));
 	if(rel_change.check())
 		multi_attr_prop.rel_change = rel_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("rel_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.rel_change = change_vec;
 		}
 		else
-			multi_attr_prop.rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
 	}
 
 	bopy::extract<string> abs_change(py_obj.attr("abs_change"));
@@ -381,16 +381,16 @@ void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T> &mult
 		multi_attr_prop.abs_change = abs_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("abs_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.abs_change = change_vec;
 		}
 		else
-			multi_attr_prop.abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.abs_change = bopy::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
 	}
 
 	bopy::extract<string> archive_rel_change(py_obj.attr("archive_rel_change"));
@@ -398,16 +398,16 @@ void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T> &mult
 		multi_attr_prop.archive_rel_change = archive_rel_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_rel_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_rel_change = change_vec;
 		}
 		else
-			multi_attr_prop.archive_rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.archive_rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
 	}
 
 	bopy::extract<string> archive_abs_change(py_obj.attr("archive_abs_change"));
@@ -415,21 +415,21 @@ void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T> &mult
 		multi_attr_prop.archive_abs_change = archive_abs_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_abs_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_abs_change = change_vec;
 		}
 		else
-			multi_attr_prop.archive_abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_abs_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.archive_abs_change = bopy::extract<Tango::DevDouble>(py_obj.attr("archive_abs_change")); // Property type is Tango::DevDouble!
 	}
 }
 
 template<>
-inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<Tango::DevEncoded> &multi_attr_prop)
+inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::DevEncoded> &multi_attr_prop)
 {
 	multi_attr_prop.label = bopy::extract<string>(bopy::str(py_obj.attr("label")));
 	multi_attr_prop.description = bopy::extract<string>(bopy::str(py_obj.attr("description")));
@@ -442,77 +442,77 @@ inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T
 	if(min_value.check())
 		multi_attr_prop.min_value = min_value();
 	else
-		multi_attr_prop.min_value = boost::python::extract<Tango::DevUChar>(py_obj.attr("min_value"));
+		multi_attr_prop.min_value = bopy::extract<Tango::DevUChar>(py_obj.attr("min_value"));
 
 	bopy::extract<string> max_value(py_obj.attr("max_value"));
 	if(max_value.check())
 		multi_attr_prop.max_value = max_value();
 	else
-		multi_attr_prop.max_value = boost::python::extract<Tango::DevUChar>(py_obj.attr("max_value"));
+		multi_attr_prop.max_value = bopy::extract<Tango::DevUChar>(py_obj.attr("max_value"));
 
 	bopy::extract<string> min_alarm(py_obj.attr("min_alarm"));
 	if(min_alarm.check())
 		multi_attr_prop.min_alarm = min_alarm();
 	else
-		multi_attr_prop.min_alarm = boost::python::extract<Tango::DevUChar>(py_obj.attr("min_alarm"));
+		multi_attr_prop.min_alarm = bopy::extract<Tango::DevUChar>(py_obj.attr("min_alarm"));
 
 	bopy::extract<string> max_alarm(py_obj.attr("max_alarm"));
 	if(max_alarm.check())
 		multi_attr_prop.max_alarm = max_alarm();
 	else
-		multi_attr_prop.max_alarm = boost::python::extract<Tango::DevUChar>(py_obj.attr("max_alarm"));
+		multi_attr_prop.max_alarm = bopy::extract<Tango::DevUChar>(py_obj.attr("max_alarm"));
 
 	bopy::extract<string> min_warning(py_obj.attr("min_warning"));
 	if(min_warning.check())
 		multi_attr_prop.min_warning = min_warning();
 	else
-		multi_attr_prop.min_warning = boost::python::extract<Tango::DevUChar>(py_obj.attr("min_warning"));
+		multi_attr_prop.min_warning = bopy::extract<Tango::DevUChar>(py_obj.attr("min_warning"));
 
 	bopy::extract<string> max_warning(py_obj.attr("max_warning"));
 	if(max_warning.check())
 		multi_attr_prop.max_warning = max_warning();
 	else
-		multi_attr_prop.max_warning = boost::python::extract<Tango::DevUChar>(py_obj.attr("max_warning"));
+		multi_attr_prop.max_warning = bopy::extract<Tango::DevUChar>(py_obj.attr("max_warning"));
 
 	bopy::extract<string> delta_t(py_obj.attr("delta_t"));
 	if(delta_t.check())
 		multi_attr_prop.delta_t = delta_t();
 	else
-		multi_attr_prop.delta_t = boost::python::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
+		multi_attr_prop.delta_t = bopy::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
 
 	bopy::extract<string> delta_val(py_obj.attr("delta_val"));
 	if(delta_val.check())
 		multi_attr_prop.delta_val = delta_val();
 	else
-		multi_attr_prop.delta_val = boost::python::extract<Tango::DevUChar>(py_obj.attr("delta_val"));
+		multi_attr_prop.delta_val = bopy::extract<Tango::DevUChar>(py_obj.attr("delta_val"));
 
 	bopy::extract<string> event_period(py_obj.attr("event_period"));
 	if(event_period.check())
 		multi_attr_prop.event_period = event_period();
 	else
-		multi_attr_prop.event_period = boost::python::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
+		multi_attr_prop.event_period = bopy::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
 
 	bopy::extract<string> archive_period(py_obj.attr("archive_period"));
 	if(archive_period.check())
 		multi_attr_prop.archive_period = archive_period();
 	else
-		multi_attr_prop.archive_period = boost::python::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
+		multi_attr_prop.archive_period = bopy::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
 
 	bopy::extract<string> rel_change(py_obj.attr("rel_change"));
 	if(rel_change.check())
 		multi_attr_prop.rel_change = rel_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("rel_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.rel_change = change_vec;
 		}
 		else
-			multi_attr_prop.rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
 	}
 
 	bopy::extract<string> abs_change(py_obj.attr("abs_change"));
@@ -520,16 +520,16 @@ inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T
 		multi_attr_prop.abs_change = abs_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("abs_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.abs_change = change_vec;
 		}
 		else
-			multi_attr_prop.abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.abs_change = bopy::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
 	}
 
 	bopy::extract<string> archive_rel_change(py_obj.attr("archive_rel_change"));
@@ -537,16 +537,16 @@ inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T
 		multi_attr_prop.archive_rel_change = archive_rel_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_rel_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_rel_change = change_vec;
 		}
 		else
-			multi_attr_prop.archive_rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.archive_rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
 	}
 
 	bopy::extract<string> archive_abs_change(py_obj.attr("archive_abs_change"));
@@ -554,21 +554,21 @@ inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T
 		multi_attr_prop.archive_abs_change = archive_abs_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_abs_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_abs_change = change_vec;
 		}
 		else
-			multi_attr_prop.archive_abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_abs_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.archive_abs_change = bopy::extract<Tango::DevDouble>(py_obj.attr("archive_abs_change")); // Property type is Tango::DevDouble!
 	}
 }
 
 template<>
-inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<Tango::DevString> &multi_attr_prop)
+inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::DevString> &multi_attr_prop)
 {
 	string empty_str("");
 
@@ -619,7 +619,7 @@ inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T
 	if(delta_t.check())
 		multi_attr_prop.delta_t = delta_t();
 	else
-		multi_attr_prop.delta_t = boost::python::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
+		multi_attr_prop.delta_t = bopy::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
 
 	bopy::extract<string> delta_val(py_obj.attr("delta_val"));
 	if(delta_val.check())
@@ -631,29 +631,29 @@ inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T
 	if(event_period.check())
 		multi_attr_prop.event_period = event_period();
 	else
-		multi_attr_prop.event_period = boost::python::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
+		multi_attr_prop.event_period = bopy::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
 
 	bopy::extract<string> archive_period(py_obj.attr("archive_period"));
 	if(archive_period.check())
 		multi_attr_prop.archive_period = archive_period();
 	else
-		multi_attr_prop.archive_period = boost::python::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
+		multi_attr_prop.archive_period = bopy::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
 
 	bopy::extract<string> rel_change(py_obj.attr("rel_change"));
 	if(rel_change.check())
 		multi_attr_prop.rel_change = rel_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("rel_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.rel_change = change_vec;
 		}
 		else
-			multi_attr_prop.rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
 	}
 
 	bopy::extract<string> abs_change(py_obj.attr("abs_change"));
@@ -661,16 +661,16 @@ inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T
 		multi_attr_prop.abs_change = abs_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("abs_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.abs_change = change_vec;
 		}
 		else
-			multi_attr_prop.abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.abs_change = bopy::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
 	}
 
 	bopy::extract<string> archive_rel_change(py_obj.attr("archive_rel_change"));
@@ -678,16 +678,16 @@ inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T
 		multi_attr_prop.archive_rel_change = archive_rel_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_rel_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_rel_change = change_vec;
 		}
 		else
-			multi_attr_prop.archive_rel_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.archive_rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
 	}
 
 	bopy::extract<string> archive_abs_change(py_obj.attr("archive_abs_change"));
@@ -695,19 +695,19 @@ inline void from_py_object(boost::python::object &py_obj, Tango::MultiAttrProp<T
 		multi_attr_prop.archive_abs_change = archive_abs_change();
 	else
 	{
-		boost::python::object prop_py_obj = boost::python::object(py_obj.attr("archive_abs_change"));
+		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
 			vector<Tango::DevDouble> change_vec;
-			for(long i = 0; i < len(prop_py_obj); i++)
-				change_vec.push_back(boost::python::extract<Tango::DevDouble>(prop_py_obj[i]));
+			for(long i = 0; i < bopy::len(prop_py_obj); i++)
+				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_abs_change = change_vec;
 		}
 		else
-			multi_attr_prop.archive_abs_change = boost::python::extract<Tango::DevDouble>(py_obj.attr("archive_abs_change")); // Property type is Tango::DevDouble!
+			multi_attr_prop.archive_abs_change = bopy::extract<Tango::DevDouble>(py_obj.attr("archive_abs_change")); // Property type is Tango::DevDouble!
 	}
 }
 
-void from_py_object(boost::python::object &, Tango::AttributeConfigList &);
-void from_py_object(boost::python::object &, Tango::AttributeConfigList_2 &);
-void from_py_object(boost::python::object &, Tango::AttributeConfigList_3 &);
+void from_py_object(bopy::object &, Tango::AttributeConfigList &);
+void from_py_object(bopy::object &, Tango::AttributeConfigList_2 &);
+void from_py_object(bopy::object &, Tango::AttributeConfigList_3 &);
