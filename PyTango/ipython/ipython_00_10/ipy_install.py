@@ -67,15 +67,15 @@ def install(ipydir=None,verbose=True):
             return
     profile = __PROFILE.format(pytangover=PyTango.Release.version, ipyver=IPython.Release.version)
     
-    out.write(u"Installing tango extension to ipython... ")
+    out.write("Installing tango extension to ipython... ")
     out.flush()
     try:
         f = open(f_name, "w")
         f.write(profile)
         f.close()
-        out.write(u"[DONE]\n\n")
+        out.write("[DONE]\n\n")
     except:
-        out.write(u"[FAILED]\n\n")
+        out.write("[FAILED]\n\n")
         raise
     
     ipy_user_config = os.path.join(IPython.genutils.get_ipython_dir(), 'ipy_user_conf.py')

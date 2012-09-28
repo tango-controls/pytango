@@ -83,7 +83,7 @@ def install(ipydir=None, verbose=True, profile='tango'):
     if not create_config:
         return
 
-    out.write(u"Installing tango extension to ipython... ")
+    out.write("Installing tango extension to ipython... ")
     out.flush()
 
     profile = __PROFILE.format(pytangover=PyTango.Release.version,
@@ -91,8 +91,8 @@ def install(ipydir=None, verbose=True, profile='tango'):
     with open(abs_config_file_name, "w") as f:
         f.write(profile)
         f.close()
-    out.write(u"[DONE]\n\n")
-    out.write(u"""\
+    out.write("[DONE]\n\n")
+    out.write("""\
 To start ipython with tango interface simply type on the command line:
 %% ipython --profile=tango
 
