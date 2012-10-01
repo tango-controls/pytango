@@ -97,7 +97,7 @@ INCLUDE_DIRS = \
     $(PY_INC) \
     $(NUMPY_INC)
 
-CCFLAGS = -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -fPIC -std=c++0x $(INCLUDE_DIRS)
+CCFLAGS = -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -fPIC -std=c++0x -DPYTANGO_HAS_UNIQUE_PTR $(INCLUDE_DIRS)
 
 LIB_NAME = _PyTango.so
 LIB_NAME_STATIC = _PyTangoStatic.so

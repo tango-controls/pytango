@@ -111,10 +111,11 @@ determine if it is running or not.
         Result [8]: 'The device is in RUNNING state.'
 
 .. note::
-    Did you notice that you didn't write PyTango.DeviceProxy but instead just
-    DeviceProxy? This is because :ref:`itango` automatically exports the
+
+    Did you notice that you didn't write `PyTango.DeviceProxy` but instead just
+    `DeviceProxy` ? This is because :ref:`itango` automatically exports the
     :class:`~PyTango.DeviceProxy`, :class:`~PyTango.AttributeProxy`,
-    :class:`PyTango.Database` and :class:`~PyTango.Group` classes to the
+    :class:`~PyTango.Database` and :class:`~PyTango.Group` classes to the
     namespace. If you are writting code outside :ref:`itango` you **MUST**
     use the `PyTango` module prefix.
 

@@ -1933,9 +1933,9 @@ def __doc_Database():
     """ )
 
     document_method("unexport_event", """
-    export_event(self, event) -> None
+    unexport_event(self, event) -> None
 
-            Export an event to the database.
+            Un-export an event from the database.
 
         Parameters :
             - event : (str) event

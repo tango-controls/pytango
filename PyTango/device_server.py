@@ -1303,7 +1303,7 @@ def __doc_Attribute():
     """ )
 
     document_method("is_rds_alarm", """
-    is_rds_alarmself) -> bool
+    is_rds_alarm(self) -> bool
 
             Check if the attribute is in RDS alarm condition.
 
