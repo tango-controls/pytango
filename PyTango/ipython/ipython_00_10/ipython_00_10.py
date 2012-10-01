@@ -89,29 +89,29 @@ class DeviceClassCompleter(object):
 def __DeviceProxy_completer(ip, evt):
     db = __get_db()
     if db is None: return
-    ret = db._db_cache.devices.keys()
+    ret = list(db._db_cache.devices.keys())
     ret.extend(db._db_cache.aliases.keys())
     return ret
 
 def __DeviceClass_completer(ip, evt):
     db = __get_db()
     if db is None: return
-    return db._db_cache.klasses.keys()
+    return list(db._db_cache.klasses.keys())
 
 def __DeviceAlias_completer(ip, evt):
     db = __get_db()
     if db is None: return
-    return db._db_cache.aliases.keys()
+    return list(db._db_cache.aliases.keys())
 
 def __AttributeAlias_completer(ip, evt):
     db = __get_db()
     if db is None: return
-    return db._db_cache.attr_aliases.keys()
+    return list(db._db_cache.attr_aliases.keys())
 
 def __PureDeviceProxy_completer(ip, evt):
     db = __get_db()
     if db is None: return
-    return db._db_cache.devices.keys()
+    return list(db._db_cache.devices.keys())
 
 def __AttributeProxy_completer(ip, evt):
     db = __get_db()
@@ -128,7 +128,7 @@ def __AttributeProxy_completer(ip, evt):
     dev_name = None
     if n == 0:
         # means it can be an attr alias, a device name has alias or as full device name
-        ret = cache.get("attr_aliases").keys()
+        ret = list(cache.get("attr_aliases").keys())
         ret.extend([ d+"/" for d in devs ])
         ret.extend([ d+"/" for d in dev_aliases ])
         # device alias found!
@@ -203,7 +203,7 @@ def __get_device_subscriptions(dev_name):
         return data[4]
 
 def __switchdb_completer(ip, evt):
-    return __get_store(ip, "database_list").keys()
+    return list(__get_store(ip, "database_list").keys())
 
 __monitor_completer = __AttributeProxy_completer
 
