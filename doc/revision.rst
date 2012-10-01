@@ -81,7 +81,8 @@ Version history
 | 8.0.1      | Bug fixes:                                                                                                                                                                   |
 |            |     - from sourceforge:                                                                                                                                                      |
 |            |         - `3570970: [pytango] problem during the python3 building <https://sourceforge.net/tracker/?func=detail&aid=3570970&group_id=57612&atid=484769>`_                    |
-|            |         - `3570972: [pytango] [pytango] warning/error when building 8.0.0 <https://sourceforge.net/tracker/?func=detail&aid=3570972&group_id=57612&atid=484769>`_            |
+|            |         - `3570972: [pytango] warning/error when building 8.0.0 <https://sourceforge.net/tracker/?func=detail&aid=3570972&group_id=57612&atid=484769>`_                      |
+|            |         - `3570975: [pytango] problem during use of python3 version <https://sourceforge.net/tracker/?func=detail&aid=3570975&group_id=57612&atid=484769>`_                  |
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.0.0      | Features:                                                                                                                                                                    |
 |            |     - Implemented tango C++ 8.0 API                                                                                                                                          |
