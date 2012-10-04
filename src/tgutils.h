@@ -176,7 +176,7 @@ DEF_TANGO_SCALAR_ARRAY_NAMES( DEV_ULONG64, DEVVAR_ULONG64ARRAY );
 
 #define __TANGO_DEPEND_ON_TYPE_AUX_NAME(tid_, DOIT) \
     case Tango:: tid_: { \
-        typedef typename TANGO_const2type(Tango:: tid_) TangoType; \
+        typedef TANGO_const2type(Tango:: tid_) TangoType; \
         DOIT; \
         break; \
     }

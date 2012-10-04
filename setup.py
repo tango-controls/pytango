@@ -215,7 +215,7 @@ class build_ext(dftbuild_ext):
     def build_extension(self, ext):
         if self.use_cpp_0x:
             ext.extra_compile_args += ['-std=c++0x']
-            ext.define_macros += [ ('PYTANGO_HAS_UNIQUE_PTR', '') ]
+            ext.define_macros += [ ('PYTANGO_HAS_UNIQUE_PTR', '1') ]
         dftbuild_ext.build_extension(self, ext)
 
 if sphinx:

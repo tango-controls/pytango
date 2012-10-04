@@ -67,7 +67,7 @@ History of modifications:
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 21/09/12 | `8.14 <http://www.tango-controls.org/static/PyTango/v800/doc/html/index.html>`_  | Update to PyTango 8.0.0                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| --/--/12 | `8.15 <http://www.tango-controls.org/static/PyTango/v800/doc/html/index.html>`_  | Update to PyTango 8.0.1                             | T\. Coutinho          |
+| --/--/12 | `8.15 <http://www.tango-controls.org/static/PyTango/v801/doc/html/index.html>`_  | Update to PyTango 8.0.1                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _version-history:
@@ -81,8 +81,10 @@ Version history
 | 8.0.1      | Bug fixes:                                                                                                                                                                   |
 |            |     - from sourceforge:                                                                                                                                                      |
 |            |         - `3570970: [pytango] problem during the python3 building <https://sourceforge.net/tracker/?func=detail&aid=3570970&group_id=57612&atid=484769>`_                    |
+|            |         - `3570971: [pytango] itango does not work without qtconsole <https://sourceforge.net/tracker/?func=detail&aid=3570971&group_id=57612&atid=484769>`_                 |
 |            |         - `3570972: [pytango] warning/error when building 8.0.0 <https://sourceforge.net/tracker/?func=detail&aid=3570972&group_id=57612&atid=484769>`_                      |
 |            |         - `3570975: [pytango] problem during use of python3 version <https://sourceforge.net/tracker/?func=detail&aid=3570975&group_id=57612&atid=484769>`_                  |
+|            |         - `3574099: [pytango] compile error with gcc < 4.5 <https://sourceforge.net/tracker/?func=detail&aid=3574099&group_id=57612&atid=484769>`_                           |
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.0.0      | Features:                                                                                                                                                                    |
 |            |     - Implemented tango C++ 8.0 API                                                                                                                                          |
