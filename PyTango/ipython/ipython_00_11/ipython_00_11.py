@@ -1115,21 +1115,27 @@ def init_display(ip):
     html_formatter.for_type(PyTango.GroupAttrReply, display_groupreply_html)
     html_formatter.for_type(PyTango.GroupCmdReply, display_groupreply_html)
 
-from IPython.utils.traitlets import Unicode
-from IPython.frontend.qt.console.rich_ipython_widget import RichIPythonWidget
+# overwrite the original IPython Qt widget with our own so we can put a
+# customized banner. IPython may have been installed without Qt support so we
+# protect this code agaist an import error
+try:
+    from IPython.utils.traitlets import Unicode
+    from IPython.frontend.qt.console.rich_ipython_widget import RichIPythonWidget
 
-class ITangoConsole(RichIPythonWidget):
+    class ITangoConsole(RichIPythonWidget):
+        
+        banner = Unicode(config=True)
+
+        def _banner_default(self):
+            config = get_config()
+            return config.ITangoConsole.banner
+
+    import IPython.frontend.qt.console.qtconsoleapp
+    IPythonQtConsoleApp = IPython.frontend.qt.console.qtconsoleapp.IPythonQtConsoleApp
+    IPythonQtConsoleApp.widget_factory = ITangoConsole      
+except ImportError:
+    pass
     
-    banner = Unicode(config=True)
-
-    def _banner_default(self):
-        config = get_config()
-        return config.ITangoConsole.banner
-
-import IPython.frontend.qt.console.qtconsoleapp
-IPythonQtConsoleApp = IPython.frontend.qt.console.qtconsoleapp.IPythonQtConsoleApp
-IPythonQtConsoleApp.widget_factory = ITangoConsole      
-
 def init_ipython(ip=None, store=True, pytango=True, colors=True, console=True,
                  magic=True):
 
