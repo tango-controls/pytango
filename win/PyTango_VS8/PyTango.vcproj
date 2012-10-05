@@ -21,7 +21,7 @@
 		<Configuration
 			Name="Release_Py26_boost141|Win32"
 			OutputDirectory="..\..\build\lib.$(PlatformName)-2.6\$(ProjectName)"
-			IntermediateDirectory="..\..\build\temp.$(PlatformName)\python26\$(ConfigurationName)"
+			IntermediateDirectory="..\..\build\temp.$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -46,8 +46,8 @@
 				AdditionalOptions="-Zm200"
 				Optimization="3"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="&quot;C:\Python26\Lib\site-packages\numpy\core\include&quot;;&quot;c:\Program Files\boost\boost_1_41&quot;;C:\Python26\include;&quot;C:\Program Files\tango\win32_vc8\win32_dll\include&quot;;Z:\PyTangoWin\PyTango\src\server;Z:\PyTangoWin\PyTango\src"
-				PreprocessorDefinitions="WIN32;NDEBUG;LOG4TANGO_HAS_DLL;TANGO_HAS_DLL"
+				AdditionalIncludeDirectories="C:\Python26\include;&quot;C:\Python26\Lib\site-packages\numpy\core\include&quot;;&quot;C:\Program Files\tango\win32_vc8\win32_dll\include&quot;;&quot;C:\Program Files\boost\boost_1_41&quot;;Z:\PyTangoWin\PyTango\src\server;Z:\PyTangoWin\PyTango\src"
+				PreprocessorDefinitions="WIN32;NDEBUG;LOG4TANGO_HAS_DLL;TANGO_HAS_DLL;BOOST_PYTHON_STATIC_LIB"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
 				UsePrecompiledHeader="1"
@@ -70,6 +70,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="true"
 				AdditionalDependencies="tango.lib log4tango.lib omniORB414_rt.lib omniDynamic414_rt.lib omnithread34_rt.lib COS414_rt.lib"
 				OutputFile="$(OutDir)\_PyTango.pyd"
 				LinkIncremental="1"
@@ -202,9 +203,9 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release_Py27_boost147|Win32"
+			Name="Release_Py27_boost147_static|Win32"
 			OutputDirectory="..\..\build\lib.$(PlatformName)-2.7\$(ProjectName)"
-			IntermediateDirectory="..\..\build\temp.$(PlatformName)\python27\$(ConfigurationName)"
+			IntermediateDirectory="..\..\build\temp.$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -229,8 +230,8 @@
 				AdditionalOptions="-Zm200"
 				Optimization="3"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="C:\Python27\include;&quot;C:\Python27\Lib\site-packages\numpy\core\include&quot;;&quot;c:\Program Files\boost\boost_1_47&quot;;&quot;C:\Program Files\tango\win32_vc8\win32_dll\include&quot;;Z:\PyTangoWin\PyTango\src\server;Z:\PyTangoWin\PyTango\src"
-				PreprocessorDefinitions="WIN32;NDEBUG;LOG4TANGO_HAS_DLL;TANGO_HAS_DLL"
+				AdditionalIncludeDirectories="C:\Python27\include;&quot;C:\Python27\Lib\site-packages\numpy\core\include&quot;;&quot;c:\Program Files\boost\boost_1_47&quot;;&quot;C:\Program Files\tango\win32_vc8\win32\include&quot;;Z:\PyTangoWin\PyTango\src;Z:\PyTangoWin\PyTango\src\server"
+				PreprocessorDefinitions="WIN32;_USRDLL;_WINDLL;NDEBUG;BOOST_PYTHON_STATIC_LIB;_WINSTATIC"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
 				UsePrecompiledHeader="1"
@@ -253,6 +254,560 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="tango.lib log4tango.lib mswsock.lib ws2_32.lib comctl32.lib"
+				OutputFile="$(OutDir)\_PyTango.pyd"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\Python27\libs;&quot;C:\Program Files\tango\win32_vc8\win32\lib&quot;;&quot;C:\Program Files\boost\boost_1_47\lib&quot;"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="0"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="Starting setup.py bdist_msi"
+				CommandLine="c:\python27\python $(SolutionDir)\..\..\winsetup.py"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release_Py27_boost147_static|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="-Zm200"
+				Optimization="3"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="&quot;C:\Python26\Lib\site-packages\numpy\core\include&quot;;&quot;c:\Program Files\boost\boost_1_41&quot;;C:\Python26\include;&quot;C:\Program Files\tango\win64_vc8\win64_dll\include&quot;;Z:\PyTangoWin\PyTango\src\server;Z:\PyTangoWin\PyTango\src"
+				PreprocessorDefinitions="WIN64;NDEBUG;LOG4TANGO_HAS_DLL;TANGO_HAS_DLL"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="precompiled_header.hpp"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="0"
+				CompileAs="0"
+				DisableSpecificWarnings="4005;4996;4250"
+				ErrorReporting="1"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="tango.lib log4tango.lib omniORB414_rt.lib omniDynamic414_rt.lib omnithread34_rt.lib COS414_rt.lib"
+				OutputFile="$(OutDir)\_PyTango.pyd"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\Python26\libs;&quot;C:\Program Files\tango\win64_vc8\win64_dll\lib&quot;;&quot;C:\Program Files\boost\boost_1_41\lib&quot;"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="0"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="Starting setup.py bdist_msi"
+				CommandLine="c:\python26\python $(SolutionDir)\..\..\winsetup.py"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release_Py27_boost1461|Win32"
+			OutputDirectory="..\..\build\lib.$(PlatformName)-2.7\$(ProjectName)"
+			IntermediateDirectory="..\..\build\temp.$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="-Zm200"
+				Optimization="3"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="C:\Python27\include;&quot;C:\Python27\Lib\site-packages\numpy\core\include&quot;;&quot;c:\Program Files\boost\boost_1_46_1&quot;;&quot;C:\Program Files\tango\win32_vc8\win32_dll\include&quot;;Z:\PyTangoWin\PyTango\src\server;Z:\PyTangoWin\PyTango\src"
+				PreprocessorDefinitions="WIN32;NDEBUG;LOG4TANGO_HAS_DLL;TANGO_HAS_DLL;BOOST_PYTHON_STATIC_LIB"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="precompiled_header.hpp"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="0"
+				CompileAs="0"
+				DisableSpecificWarnings="4005;4996;4250"
+				ErrorReporting="1"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="tango.lib log4tango.lib omniORB414_rt.lib omniDynamic414_rt.lib omnithread34_rt.lib COS414_rt.lib"
+				OutputFile="$(OutDir)\_PyTango.pyd"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\Python27\libs;&quot;C:\Program Files\tango\win32_vc8\win32_dll\lib&quot;;&quot;C:\Program Files\boost\boost_1_46_1\lib&quot;"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="0"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="Starting setup.py bdist_msi"
+				CommandLine="c:\python27\python $(SolutionDir)\..\..\winsetup.py"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release_Py27_boost1461|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="-Zm200"
+				Optimization="3"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="&quot;C:\Python26\Lib\site-packages\numpy\core\include&quot;;&quot;c:\Program Files\boost\boost_1_41&quot;;C:\Python26\include;&quot;C:\Program Files\tango\win64_vc8\win64_dll\include&quot;;Z:\PyTangoWin\PyTango\src\server;Z:\PyTangoWin\PyTango\src"
+				PreprocessorDefinitions="WIN64;NDEBUG;LOG4TANGO_HAS_DLL;TANGO_HAS_DLL"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="precompiled_header.hpp"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="0"
+				CompileAs="0"
+				DisableSpecificWarnings="4005;4996;4250"
+				ErrorReporting="1"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="tango.lib log4tango.lib omniORB414_rt.lib omniDynamic414_rt.lib omnithread34_rt.lib COS414_rt.lib"
+				OutputFile="$(OutDir)\_PyTango.pyd"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\Python26\libs;&quot;C:\Program Files\tango\win64_vc8\win64_dll\lib&quot;;&quot;C:\Program Files\boost\boost_1_41\lib&quot;"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="0"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="Starting setup.py bdist_msi"
+				CommandLine="c:\python26\python $(SolutionDir)\..\..\winsetup.py"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release_Py26_boost141_static|Win32"
+			OutputDirectory="..\..\build\lib.$(PlatformName)-2.6\$(ProjectName)"
+			IntermediateDirectory="..\..\build\temp.$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="-Zm200"
+				Optimization="3"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="C:\Python26\include;&quot;C:\Python26\Lib\site-packages\numpy\core\include&quot;;&quot;C:\Program Files\boost\boost_1_44&quot;;&quot;C:\Program Files\tango\win32_vc8\win32\include&quot;;Z:\PyTangoWin\PyTango\src;Z:\PyTangoWin\PyTango\src\server"
+				PreprocessorDefinitions="WIN32;_USRDLL;_WINDLL;NDEBUG;BOOST_PYTHON_STATIC_LIB;_WINSTATIC"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="precompiled_header.hpp"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="0"
+				CompileAs="0"
+				DisableSpecificWarnings="4005;4996;4250"
+				ErrorReporting="1"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkLibraryDependencies="true"
+				AdditionalOptions="/VERBOSE:LIB /FORCE:MULTIPLE"
+				AdditionalDependencies="tango.lib log4tango.lib mswsock.lib ws2_32.lib comctl32.lib"
+				OutputFile="$(OutDir)\_PyTango.pyd"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\Python26\libs;&quot;C:\Program Files\tango\win32_vc8\win32\lib&quot;;&quot;C:\Program Files\boost\boost_1_44\lib&quot;"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames=""
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="0"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="Starting setup.py bdist_msi"
+				CommandLine="c:\python26\python $(SolutionDir)\..\..\winsetup.py"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release_Py26_boost141_static|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="-Zm200"
+				Optimization="3"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="&quot;C:\Python26\Lib\site-packages\numpy\core\include&quot;;&quot;c:\Program Files\boost\boost_1_41&quot;;C:\Python26\include;&quot;C:\Program Files\tango\win64_vc8\win64_dll\include&quot;;Z:\PyTangoWin\PyTango\src\server;Z:\PyTangoWin\PyTango\src"
+				PreprocessorDefinitions="WIN64;NDEBUG;LOG4TANGO_HAS_DLL;TANGO_HAS_DLL"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="precompiled_header.hpp"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="0"
+				CompileAs="0"
+				DisableSpecificWarnings="4005;4996;4250"
+				ErrorReporting="1"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="tango.lib log4tango.lib omniORB414_rt.lib omniDynamic414_rt.lib omnithread34_rt.lib COS414_rt.lib"
+				OutputFile="$(OutDir)\_PyTango.pyd"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\Python26\libs;&quot;C:\Program Files\tango\win64_vc8\win64_dll\lib&quot;;&quot;C:\Program Files\boost\boost_1_41\lib&quot;"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="0"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="Starting setup.py bdist_msi"
+				CommandLine="c:\python26\python $(SolutionDir)\..\..\winsetup.py"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release_Py27_boost147|Win32"
+			OutputDirectory="..\..\build\lib.$(PlatformName)-2.7\$(ProjectName)"
+			IntermediateDirectory="..\..\build\temp.$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="-Zm200"
+				Optimization="3"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="C:\Python27\include;&quot;C:\Python27\Lib\site-packages\numpy\core\include&quot;;&quot;C:\Program Files\tango\win32_vc8\win32_dll\include&quot;;&quot;C:\Program Files\boost\boost_1_47&quot;;Z:\PyTangoWin\PyTango\src\server;Z:\PyTangoWin\PyTango\src"
+				PreprocessorDefinitions="WIN32;NDEBUG;LOG4TANGO_HAS_DLL;TANGO_HAS_DLL;BOOST_PYTHON_STATIC_LIB"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="precompiled_header.hpp"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="0"
+				CompileAs="0"
+				DisableSpecificWarnings="4005;4996;4250"
+				ErrorReporting="1"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkLibraryDependencies="true"
 				AdditionalDependencies="tango.lib log4tango.lib omniORB414_rt.lib omniDynamic414_rt.lib omnithread34_rt.lib COS414_rt.lib"
 				OutputFile="$(OutDir)\_PyTango.pyd"
 				LinkIncremental="1"
