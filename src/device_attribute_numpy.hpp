@@ -225,7 +225,9 @@ namespace PyDeviceAttribute {
         iter = (PyArrayIterObject *)PyArray_IterNew(array);
         if (!iter)
             throw_error_already_set();
-        object iter_guard(handle<>(iter));
+
+        handle<> _h((PyObject *)iter);
+        object iter_guard(_h);
 
         if (isImage) {
             // Why not use PyArray_ITER_NEXT() instead of PyArray_ITER_GOTO()?
