@@ -480,7 +480,6 @@ def main():
     client_dir = src_dir
     server_dir = os.path.join(src_dir, 'server')
     _clientfiles = [ os.path.join(client_dir,fname) for fname in os.listdir(client_dir) if fname.endswith('.cpp') ]
-    _clientfiles.remove(os.path.join(client_dir,"group_element.cpp"))
     _clientfiles.sort()
     _serverfiles = [ os.path.join(server_dir,fname) for fname in os.listdir(server_dir) if fname.endswith('.cpp') ]
     _serverfiles.sort()
