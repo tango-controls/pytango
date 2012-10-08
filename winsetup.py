@@ -28,6 +28,7 @@
 #          Microsoft Visual Studio and not from the command line
 ################################################################################
 
+from __future__ import print_function
 
 import sys
 import os
@@ -43,22 +44,66 @@ setup_name = "setup.py"
 bitmap = osp.join(winsetup_dir, 'doc', 'logo-medium.bmp')
 ver = ".".join(map(str, sys.version_info[:2]))
 
+if len(sys.argv) < 3:
+    print("Need to supply build directory and distribution directory")
+    sys.exit(1)
+
+build_dir = sys.argv[1]
+dist_dir = sys.argv[2]
+
 try:
-    cmd_line = '%s %s build_py --force --no-compile' % (executable, setup_name)
-    os.system(cmd_line)
-
-    cmd_line = '%s %s bdist_msi --skip-build --target-version=%s' \
-               % (executable, setup_name, ver)
-    os.system(cmd_line)
-
-    cmd_line = '%s %s bdist_wininst --skip-build --target-version=%s ' \
-               '--title="PyTango 7" ' \
-               '--bitmap="%s"' % (executable, setup_name, ver, bitmap)
+    cmd_line =  '%s %s ' % (executable, setup_name)
+    cmd_line += 'build_py --force --no-compile ' \
+                '--build-lib=%s ' \
+                % (build_dir,)
+    cmd_line += 'build_scripts --force '
+    cmd_line += 'install_lib --skip-build --build-dir=%s ' \
+                % (build_dir,)
+#    cmd_line += 'install_scripts --skip-build --build-dir=%s ' \
+#                % (build_dir,)
+    cmd_line += 'bdist_msi --skip-build --target-version=%s ' \
+                '--dist-dir=%s ' \
+                % (ver, dist_dir)
+    cmd_line += 'bdist_wininst --skip-build --target-version=%s ' \
+                '--dist-dir=%s ' \
+                '--title="PyTango 8" ' \
+                '--bitmap="%s" ' % (ver, dist_dir, bitmap)
     os.system(cmd_line)
 except:
-    print "Failed:"
+    print("Failed:")
     import traceback
     traceback.print_exc()
     sys.exit(1)
 finally:
     os.chdir(curr_dir)
+
+sys.exit(0)
+
+try:
+    cmd_line = '%s %s build_py --force --no-compile ' \
+               '--build-lib=%s' \
+                % (executable, setup_name, build_dir)
+    os.system(cmd_line)
+
+    cmd_line = '%s %s build_scripts --force' % (executable, setup_name)
+    os.system(cmd_line)
+
+    cmd_line = '%s %s bdist_msi --skip-build --target-version=%s ' \
+               '--dist-dir=%s' \
+               % (executable, setup_name, ver, dist_dir)
+    os.system(cmd_line)
+
+    cmd_line = '%s %s bdist_wininst --skip-build --target-version=%s ' \
+               '--dist-dir=%s ' \
+               '--title="PyTango 8" ' \
+               '--bitmap="%s"' % (executable, setup_name, ver, dist_dir, bitmap)
+    os.system(cmd_line)
+except:
+    print("Failed:")
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
+finally:
+    os.chdir(curr_dir)
+
+sys.exit(0)
