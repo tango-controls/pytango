@@ -65,7 +65,13 @@ void export_device_impl();
 void export_group();
 void export_log4tango();
 
-void init_numpy()
+#if PY_MAJOR_VERSION >= 3
+#define INIT_NUMPY_RET int
+#else
+#define INIT_NUMPY_RET void
+#endif
+
+INIT_NUMPY_RET init_numpy()
 {
 #   ifndef DISABLE_PYTANGO_NUMPY
         import_array();
