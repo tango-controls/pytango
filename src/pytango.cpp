@@ -68,7 +68,7 @@ void export_log4tango();
 void init_numpy()
 {
 #   ifndef DISABLE_PYTANGO_NUMPY
-        import_array1();
+        import_array();
 #   endif
 }
 
