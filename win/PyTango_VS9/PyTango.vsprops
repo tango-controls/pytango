@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<VisualStudioPropertySheet 
+	ProjectType="Visual C++" 
+	Version="8.00" 
+	Name="PyTango"
+	>
+	<UserMacro Name="TangoDir" Value="C:\Program Files (x86)\tango" />
+	<UserMacro Name="BoostDir" Value="C:\Boost" />
+	<UserMacro Name="PythonBaseDir" Value="C:\Python" />
+	<UserMacro Name="BoostIncludeDir" Value="$(BoostDir)\include\boost-1_51" />
+	<UserMacro Name="BoostLibDir" Value="$(BoostDir)\lib" />
+	<UserMacro Name="TangoIncludeDir" Value="$(TangoDir)\$(PlatformName)\include\vc9" />
+	<UserMacro Name="TangoLibDir" Value="$(TangoDir)\$(PlatformName)\lib\vc9_dll" />
+	<UserMacro Name="NumpyRelativeIncludeDir" Value="Lib\site-packages\numpy\core\include" />
+</VisualStudioPropertySheet>

@@ -7,12 +7,35 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		py2.6_bopy1.51.0_shared_release|Win32 = py2.6_bopy1.51.0_shared_release|Win32
 		py2.6_bopy1.51.0_static_release|Win32 = py2.6_bopy1.51.0_static_release|Win32
+		py2.7_bopy1.51.0_shared_release|Win32 = py2.7_bopy1.51.0_shared_release|Win32
+		py2.7_bopy1.51.0_static_release|Win32 = py2.7_bopy1.51.0_static_release|Win32
+		py3.1_bopy1.51.0_shared_release|Win32 = py3.1_bopy1.51.0_shared_release|Win32
+		py3.1_bopy1.51.0_static_release|Win32 = py3.1_bopy1.51.0_static_release|Win32
+		py3.2_bopy1.51.0_shared_release|Win32 = py3.2_bopy1.51.0_shared_release|Win32
+		py3.2_bopy1.51.0_static_release|Win32 = py3.2_bopy1.51.0_static_release|Win32
+
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py2.6_bopy1.51.0_shared_release|Win32.ActiveCfg = py2.6_bopy1.51.0_shared_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py2.6_bopy1.51.0_shared_release|Win32.Build.0 = py2.6_bopy1.51.0_shared_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py2.6_bopy1.51.0_static_release|Win32.ActiveCfg = py2.6_bopy1.51.0_static_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py2.6_bopy1.51.0_static_release|Win32.Build.0 = py2.6_bopy1.51.0_static_release|Win32
+
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py2.7_bopy1.51.0_shared_release|Win32.ActiveCfg = py2.7_bopy1.51.0_shared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py2.7_bopy1.51.0_shared_release|Win32.Build.0 = py2.7_bopy1.51.0_shared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py2.7_bopy1.51.0_static_release|Win32.ActiveCfg = py2.7_bopy1.51.0_static_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py2.7_bopy1.51.0_static_release|Win32.Build.0 = py2.7_bopy1.51.0_static_release|Win32
+
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py3.1_bopy1.51.0_shared_release|Win32.ActiveCfg = py3.1_bopy1.51.0_shared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py3.1_bopy1.51.0_shared_release|Win32.Build.0 = py3.1_bopy1.51.0_shared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py3.1_bopy1.51.0_static_release|Win32.ActiveCfg = py3.1_bopy1.51.0_static_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py3.1_bopy1.51.0_static_release|Win32.Build.0 = py3.1_bopy1.51.0_static_release|Win32
+
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py3.2_bopy1.51.0_shared_release|Win32.ActiveCfg = py3.2_bopy1.51.0_shared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py3.2_bopy1.51.0_shared_release|Win32.Build.0 = py3.2_bopy1.51.0_shared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py3.2_bopy1.51.0_static_release|Win32.ActiveCfg = py3.2_bopy1.51.0_static_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py3.2_bopy1.51.0_static_release|Win32.Build.0 = py3.2_bopy1.51.0_static_release|Win32
+
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
