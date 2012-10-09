@@ -56,7 +56,7 @@ def install(ipydir=None,verbose=True):
     if verbose:
         out = sys.stdout
     else:
-        out = io.StringIO()
+        out = io.BytesIO()
     if ipydir is None and os.path.isfile(f_name):
         print("Warning: The file '%s' already exists." % f_name)
         r = ''
