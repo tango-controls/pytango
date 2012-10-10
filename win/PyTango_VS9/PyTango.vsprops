@@ -4,7 +4,7 @@
 	Version="8.00" 
 	Name="PyTango"
 	>
-	<UserMacro Name="TangoDir" Value="C:\Program Files (x86)\tango" />
+	<UserMacro Name="TangoDir" Value="C:\Program Files\tango" />
 	<UserMacro Name="BoostDir" Value="C:\Boost" />
 	<UserMacro Name="PythonBaseDir" Value="C:\Python" />
 	<UserMacro Name="BoostIncludeDir" Value="$(BoostDir)\include\boost-1_51" />
