@@ -65,18 +65,13 @@ void export_device_impl();
 void export_group();
 void export_log4tango();
 
-#if PY_MAJOR_VERSION >= 3
-#define INIT_NUMPY_RET int
+#ifdef DISABLE_PYTANGO_NUMPY
+void init_numpy(void) {}
+#elif PY_MAJOR_VERSION >= 3
+void* init_numpy(void) { import_array(); return NULL; }
 #else
-#define INIT_NUMPY_RET void
+void init_numpy(void) { import_array(); return; }
 #endif
-
-INIT_NUMPY_RET init_numpy()
-{
-#   ifndef DISABLE_PYTANGO_NUMPY
-        import_array();
-#   endif
-}
 
 BOOST_PYTHON_MODULE(_PyTango)
 {
