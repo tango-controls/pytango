@@ -86,26 +86,26 @@ Steps:
 * Install `Tango C++ 32 bits <http://ftp.esrf.fr/pub/cs/tango/TangoSetup-8.0.5_win32.exe>`_
 * For `Python 2.6 32 bits <http://www.python.org/ftp/python/2.6.6/python-2.6.6.msi>`_
     * `Numpy for python 2.6 <http://pypi.python.org/packages/2.6/n/numpy/numpy-1.6.2.win32-py2.6.exe>`_
-    * `PyTango 8 for python 2.6 <http://pypi.python.org/packages/2.6/P/PyTango/PyTango-8.0.1.win32-py2.6.msi>`_
+    * `PyTango 8 for python 2.6 <http://pypi.python.org/packages/2.6/P/PyTango/PyTango-8.0.2.win32-py2.6.msi>`_
 * For `Python 2.7 32 bits <http://www.python.org/ftp/python/2.7.3/python-2.7.3.msi>`_
     * `Numpy for python 2.7 <http://pypi.python.org/packages/2.7/n/numpy/numpy-1.6.2.win32-py2.7.exe>`_
-    * `PyTango 8 for python 2.7 <http://pypi.python.org/packages/2.7/P/PyTango/PyTango-8.0.1.win32-py2.7.msi>`_
+    * `PyTango 8 for python 2.7 <http://pypi.python.org/packages/2.7/P/PyTango/PyTango-8.0.2.win32-py2.7.msi>`_
 * For `Python 3.1 32 bits <http://www.python.org/ftp/python/3.1.4/python-3.1.4.msi>`_
     * `Numpy for python 3.1 <http://pypi.python.org/packages/3.1/n/numpy/numpy-1.6.2.win32-py3.1.exe>`_
-    * `PyTango 8 for python 3.1 <http://pypi.python.org/packages/3.1/P/PyTango/PyTango-8.0.1.win32-py3.1.msi>`_
+    * `PyTango 8 for python 3.1 <http://pypi.python.org/packages/3.1/P/PyTango/PyTango-8.0.2.win32-py3.1.msi>`_
 * For `Python 3.2 32 bits <http://www.python.org/ftp/python/3.2.3/python-3.2.3.msi>`_
     * `Numpy for python 3.2 <http://pypi.python.org/packages/3.2/n/numpy/numpy-1.6.2.win32-py3.2.exe>`_
-    * `PyTango 8 for python 3.2 <http://pypi.python.org/packages/3.2/P/PyTango/PyTango-8.0.1.win32-py3.2.msi>`_
+    * `PyTango 8 for python 3.2 <http://pypi.python.org/packages/3.2/P/PyTango/PyTango-8.0.2.win32-py3.2.msi>`_
 
 ..
-.. _PyTango-8.0.1.win32-py2.6.msi: http://pypi.python.org/packages/2.6/P/PyTango/PyTango-8.0.1.win32-py2.6.msi
-.. _PyTango-8.0.1.win32-py2.6.exe: http://pypi.python.org/packages/2.6/P/PyTango/PyTango-8.0.1.win32-py2.6.exe
-.. _PyTango-8.0.1.win32-py2.7.msi: http://pypi.python.org/packages/2.7/P/PyTango/PyTango-8.0.1.win32-py2.7.msi
-.. _PyTango-8.0.1.win32-py2.7.exe: http://pypi.python.org/packages/2.7/P/PyTango/PyTango-8.0.1.win32-py2.7.exe
-.. _PyTango-8.0.1.win32-py3.1.msi: http://pypi.python.org/packages/3.1/P/PyTango/PyTango-8.0.1.win32-py3.1.msi
-.. _PyTango-8.0.1.win32-py3.1.exe: http://pypi.python.org/packages/3.1/P/PyTango/PyTango-8.0.1.win32-py3.1.exe
-.. _PyTango-8.0.1.win32-py3.2.msi: http://pypi.python.org/packages/3.2/P/PyTango/PyTango-8.0.1.win32-py3.2.msi
-.. _PyTango-8.0.1.win32-py3.2.exe: http://pypi.python.org/packages/3.2/P/PyTango/PyTango-8.0.1.win32-py3.2.exe
+.. _PyTango-8.0.2.win32-py2.6.msi: http://pypi.python.org/packages/2.6/P/PyTango/PyTango-8.0.2.win32-py2.6.msi
+.. _PyTango-8.0.2.win32-py2.6.exe: http://pypi.python.org/packages/2.6/P/PyTango/PyTango-8.0.2.win32-py2.6.exe
+.. _PyTango-8.0.2.win32-py2.7.msi: http://pypi.python.org/packages/2.7/P/PyTango/PyTango-8.0.2.win32-py2.7.msi
+.. _PyTango-8.0.2.win32-py2.7.exe: http://pypi.python.org/packages/2.7/P/PyTango/PyTango-8.0.2.win32-py2.7.exe
+.. _PyTango-8.0.2.win32-py3.1.msi: http://pypi.python.org/packages/3.1/P/PyTango/PyTango-8.0.2.win32-py3.1.msi
+.. _PyTango-8.0.2.win32-py3.1.exe: http://pypi.python.org/packages/3.1/P/PyTango/PyTango-8.0.2.win32-py3.1.exe
+.. _PyTango-8.0.2.win32-py3.2.msi: http://pypi.python.org/packages/3.2/P/PyTango/PyTango-8.0.2.win32-py3.2.msi
+.. _PyTango-8.0.2.win32-py3.2.exe: http://pypi.python.org/packages/3.2/P/PyTango/PyTango-8.0.2.win32-py3.2.exe
 
 
 Compiling & installing
@@ -235,7 +235,7 @@ then, in ITango type:
 .. sourcecode:: itango
 
     ITango [1]: PyTango.Release.version
-    Result [1]: '8.0.1'
+    Result [1]: '8.0.2'
 
 (if you are wondering, :ref:`itango` automaticaly does ``import PyTango`` for you!)
 
@@ -244,7 +244,7 @@ and type:
 
     >>> import PyTango
     >>> PyTango.Release.version
-    '8.0.1'
+    '8.0.2'
 
     
 .. _IPython: http://ipython.scipy.org/
