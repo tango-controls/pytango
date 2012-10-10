@@ -86,21 +86,39 @@ __all__ = [ 'AccessControlType', 'ApiUtil', 'ArchiveEventInfo',
 
 __docformat__ = "restructuredtext"
 
+import os
 import sys
+
+def __prepare_nt():
+    PATH = os.environ['PATH']
+    tango_root = os.environ.get("TANGO_ROOT")
+    if tango_root is None:
+        tango_root = os.path.join(os.environ["ProgramFiles"], "tango")
+    if sys.hexversion < 0x03030000:
+        vc = "vc9_dll"
+    else:
+        vc = "vc10_dll"
+    tango_dll_path = os.path.join(tango_root,"win32","lib",vc)
+    if tango_dll_path.lower() not in PATH.lower():
+        os.environ['PATH'] += ";" + tango_dll_path
 
 try:
     from ._PyTango import DeviceProxy
 except ImportError as ie:
-    if not ie.args[0].count("_PyTango"):
-        raise ie
-    print(80*"-")
-    print(ie)
-    print(80*"-")
-    print("Probably your current directory is the PyTango's source installation directory.")
-    print("You must leave this directory first before using PyTango, otherwise the")
-    print("source distribution will conflict with the installed PyTango")
-    print(80*"-")
-    sys.exit(1)
+    if ie.args[0].count("_PyTango"):
+        print(80*"-")
+        print(ie)
+        print(80*"-")
+        print("Probably your current directory is the PyTango's source installation directory.")
+        print("You must leave this directory first before using PyTango, otherwise the")
+        print("source distribution will conflict with the installed PyTango")
+        print(80*"-")
+        raise
+    
+    # in windows try to find the location for tango
+    if os.name == 'nt':
+        __prepare_nt()
+        from ._PyTango import DeviceProxy
 
 from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     AsynCall, AsynReplyNotArrived, AttReqType, Attr, AttrConfEventData,
