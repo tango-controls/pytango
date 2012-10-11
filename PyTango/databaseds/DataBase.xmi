@@ -1,0 +1,817 @@
+<?xml version="1.0" encoding="ASCII"?>
+<pogoDsl:PogoSystem xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pogoDsl="http://www.esrf.fr/tango/pogo/PogoDsl">
+  <classes name="DataBase" pogoRevision="8.1">
+    <description description="This class manage the TANGO database." title="TANGO" sourcePath="/home/tcoutinho/allworkspace/tango-database/trunk" language="Python" filestogenerate="XMI   file,Code files" hasMandatoryProperty="false" hasConcreteProperty="false" hasAbstractCommand="false" hasAbstractAttribute="false">
+      <inheritances classname="Device_4Impl" sourcePath="/segfs/tango/templates/AbstractClasses"/>
+      <identification contact="at cells.es - controls" author="controls" emailDomain="cells.es" classFamily="System" siteSpecific="" platform="All Platforms" bus="Not Applicable" manufacturer="none" reference=""/>
+    </description>
+    <commands name="State" description="This command gets the device state (stored in its &lt;i>device_state&lt;/i> data member) and returns it to the caller." execMethod="dev_state" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="none.">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argin>
+      <argout description="State Code">
+        <type xsi:type="pogoDsl:StateType"/>
+      </argout>
+      <status abstract="true" inherited="true" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="Status" description="This command gets the device status (stored in its &lt;i>device_status&lt;/i> data member) and returns it to the caller." execMethod="dev_status" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="none.">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argin>
+      <argout description="Status description">
+        <type xsi:type="pogoDsl:ConstStringType"/>
+      </argout>
+      <status abstract="true" inherited="true" concrete="true" concreteHere="false"/>
+    </commands>
+    <commands name="DbAddDevice" description="Add a Tango class device to a specific device server" execMethod="db_add_device" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Full device server process name&#xA;Str[1] = Device name&#xA;Str[2] = Tango class name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbAddServer" description="Create a device server process entry in database" execMethod="db_add_server" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Full device server name&#xA;Str[1] = Device(s) name&#xA;Str[2] = Tango class name&#xA;Str[n] = Device name&#xA;Str[n + 1] = Tango class name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteAttributeAlias" description="Delete an attribute alias." execMethod="db_delete_attribute_alias" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Attriibute alias name.">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteClassAttribute" description="delete a class attribute and all its properties from database" execMethod="db_delete_class_attribute" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class name&#xA;Str[1] = Attribute name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteClassAttributeProperty" description="delete class attribute properties from database" execMethod="db_delete_class_attribute_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class name&#xA;Str[1] = Attribute name&#xA;Str[2] = Property name&#xA;Str[n] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteClassProperty" description="Delete class properties from database" execMethod="db_delete_class_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class name&#xA;Str[1] = Property name&#xA;Str[n] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteDevice" description="Delete a devcie from database" execMethod="db_delete_device" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="device name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteDeviceAlias" description="Delete a device alias." execMethod="db_delete_device_alias" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="device alias name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteDeviceAttribute" description="Delete  device attribute properties from database" execMethod="db_delete_device_attribute" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[1] = Attribute name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteDeviceAttributeProperty" description="delete a device attribute property from the database" execMethod="db_delete_device_attribute_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[1] = Attribute name&#xA;Str[2] = Property name&#xA;Str[n] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteDeviceProperty" description="Delete device property(ies)" execMethod="db_delete_device_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[1] = Property name&#xA;Str[n] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteProperty" description="Delete free property from database" execMethod="db_delete_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0]  = Object name&#xA;Str[1] = Property name&#xA;Str[n] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteServer" description="Delete server from the database but dont delete device properties" execMethod="db_delete_server" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Device server name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteServerInfo" description="delete info related to a Tango devvice server process" execMethod="db_delete_server_info" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Device server name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbExportDevice" description="Export a device to the database" execMethod="db_export_device" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[1] = CORBA IOR&#xA;Str[2] = Device server process host name&#xA;Str[3] = Device server process PID or string ``null``&#xA;Str[4] = Device server process version">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbExportEvent" description="Export Event channel to database" execMethod="db_export_event" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = event channel name (or factory name)&#xA;Str[1] = CORBA IOR&#xA;Str[2] = Notifd host name&#xA;Str[3] = Notifd pid&#xA;Str[4] = Notifd version">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetAliasDevice" description="Get device name from its alias." execMethod="db_get_alias_device" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Alias name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Device name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetAttributeAlias" description="Get the attribute name for the given alias.&#xA;If alias not found in database, returns an empty string." execMethod="db_get_attribute_alias" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The attribute alias name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="The attribute name (device/attribute)">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetAttributeAliasList" description="Get attribute alias list for a specified filter" execMethod="db_get_attribute_alias_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="attribute alias filter string (eg: att*)">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="attribute aliases">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetClassAttributeList" description="Get attrilute list for a given Tango class with a specified filter" execMethod="db_get_class_attribute_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class name&#xA;Str[1] = Attribute name filter (eg: att*)">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Class attribute name&#xA;Str[n] = Class attribute name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetClassAttributeProperty" description="Get Tango class property(ies) value" execMethod="db_get_class_attribute_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class name&#xA;Str[1] = Attribute name&#xA;Str[n] = Attribute name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Tango class name&#xA;Str[1] = Attribute property  number&#xA;Str[2] = Attribute property 1 name&#xA;Str[3] = Attribute property 1 value&#xA;Str[n + 1] = Attribute property 2 name&#xA;Str[n + 2] = Attribute property 2 value">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetClassAttributeProperty2" description="This command supports array property compared to the old command called&#xA;DbGetClassAttributeProperty. The old command has not been deleted from the&#xA;server for compatibility reasons." execMethod="db_get_class_attribute_property2" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class name&#xA;Str[1] = Attribute name&#xA;Str[n] = Attribute name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Tango class name&#xA;Str[1] = Attribute property  number&#xA;Str[2] = Attribute property 1 name&#xA;Str[3] = Attribute property 1 value number (array case)&#xA;Str[4] = Attribute property 1 value&#xA;Str[n] = Attribute property 1 value (array case)&#xA;Str[n + 1] = Attribute property 2 name&#xA;Str[n + 2] = Attribute property 2 value number (array case)&#xA;Str[n + 3] = Attribute property 2 value&#xA;Str[n + m] = Attribute property 2 value (array case)">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetClassAttributePropertyHist" description="Retrieve Tango class attribute property history" execMethod="db_get_class_attribute_property_hist" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class&#xA;Str[1] = Attribute name&#xA;Str[2] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Attribute name&#xA;Str[1] = Property name&#xA;Str[2] = date&#xA;Str[3] = Property value number (array case)&#xA;Str[4] = Property value 1&#xA;Str[n] = Property value n">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetClassForDevice" description="Get Tango class for the specified device." execMethod="db_get_class_for_device" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Device name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Device Tango class">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetClassInheritanceForDevice" description="Get class inheritance for the specified device." execMethod="db_get_class_inheritance_for_device" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Device name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Classes off the specified device.&#xA;[0] - is the class of the device.&#xA;[1] - is the class from the device class is inherited.&#xA;........and so on">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetClassList" description="Get Tango class list with a specified filter" execMethod="db_get_class_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Filter">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Class list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetClassProperty" description="" execMethod="db_get_class_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class&#xA;Str[1] = Property name&#xA;Str[2] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Tango class&#xA;Str[1] = Property number&#xA;Str[2] = Property name&#xA;Str[3] = Property value number (array case)&#xA;Str[4] = Property value&#xA;Str[n] = Propery value (array case)&#xA;....">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetClassPropertyHist" description="Retrieve Tango class property history" execMethod="db_get_class_property_hist" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class&#xA;Str[1] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Property name&#xA;Str[1] = date&#xA;Str[2] = Property value number (array case)&#xA;Str[3] = Property value 1&#xA;Str[n] = Property value n">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetClassPropertyList" description="Get property list for a given Tango class with a specified filter" execMethod="db_get_class_property_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The filter">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Property name list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceAlias" description="Return alias for device name if found." execMethod="db_get_device_alias" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The device name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="The alias found">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceAliasList" description="Get device alias name with a specific filter" execMethod="db_get_device_alias_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The filter">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Device alias list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceAttributeList" description="Return list of attributes matching the wildcard&#xA; for the specified device" execMethod="db_get_device_attribute_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[1] = Wildcard">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="attribute name list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceAttributeProperty" description="Get device attribute property(ies) value" execMethod="db_get_device_attribute_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[1] = Attribute name&#xA;Str[n] = Attribute name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Device name&#xA;Str[1] = Attribute property  number&#xA;Str[2] = Attribute property 1 name&#xA;Str[3] = Attribute property 1 value&#xA;Str[n + 1] = Attribute property 2 name&#xA;Str[n + 2] = Attribute property 2 value">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceAttributeProperty2" description="Retrieve device attribute properties. This command has the possibility to retrieve&#xA;device attribute properties which are arrays. It is not possible with the old&#xA;DbGetDeviceAttributeProperty command. Nevertheless, the old command has not been&#xA;deleted for compatibility reason" execMethod="db_get_device_attribute_property2" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[1] = Attribute name&#xA;Str[n] = Attribute name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Device name&#xA;Str[1] = Attribute property  number&#xA;Str[2] = Attribute property 1 name&#xA;Str[3] = Attribute property 1 value number (array case)&#xA;Str[4] = Attribute property 1 value&#xA;Str[n] = Attribute property 1 value (array case)&#xA;Str[n + 1] = Attribute property 2 name&#xA;Str[n + 2] = Attribute property 2 value number (array case)&#xA;Str[n + 3] = Attribute property 2 value&#xA;Str[n + m] = Attribute property 2 value (array case)">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceAttributePropertyHist" description="Retrieve device attribute property history" execMethod="db_get_device_attribute_property_hist" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[1] = Attribute name&#xA;Str[2] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Attribute name&#xA;Str[1] = Property name&#xA;Str[2] = date&#xA;Str[3] = Property value number (array case)&#xA;Str[4] = Property value 1&#xA;Str[n] = Property value n">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceClassList" description="Get Tango classes/device list embedded in a specific device server" execMethod="db_get_device_class_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Device server process name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Str[0] = Device name&#xA;Str[1] = Tango class&#xA;Str[n] = Device name&#xA;Str[n + 1] = Tango class">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceDomainList" description="Get list of device domain name matching the specified" execMethod="db_get_device_domain_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The wildcard">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Device name domain list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceExportedList" description="Get a list of exported devices whose names satisfy the filter (wildcard is" execMethod="db_get_device_exported_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="filter">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="list of exported devices">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceFamilyList" description="Get a list of device name families for device name matching the&#xA;specified wildcard" execMethod="db_get_device_family_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The wildcard">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Family list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceInfo" description="Returns info from DbImportDevice and started/stopped dates." execMethod="db_get_device_info" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Device name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Str[0] = Device name&#xA;Str[1] = CORBA IOR&#xA;Str[2] = Device version&#xA;Str[3] = Device Server name&#xA;Str[4] = Device Server process host name&#xA;Str[5] = Started date (or ? if not set)&#xA;Str[6] = Stopped date (or ? if not set)&#xA;Str[7] = Device class&#xA;&#xA;Lg[0] = Device exported flag&#xA;Lg[1] = Device Server process PID (or -1 if not set)">
+        <type xsi:type="pogoDsl:LongStringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceList" description="Get a list of devices for specified server and class." execMethod="db_get_device_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="argin[0] : server name&#xA;argin[1] : class name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="The list of devices for specified server and class.">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceWideList" description="Get a list of devices whose names satisfy the filter." execMethod="db_get_device_wide_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="filter">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="list of exported devices">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceMemberList" description="Get a list of device name members for device name matching the&#xA;specified filter" execMethod="db_get_device_member_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The filter">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Device names member list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceProperty" description="" execMethod="db_get_device_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[1] = Property name&#xA;Str[n] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Device name&#xA;Str[1] = Property number&#xA;Str[2] = Property name&#xA;Str[3] = Property value number (array case)&#xA;Str[4] = Property value 1&#xA;Str[n] = Property value n (array case)&#xA;Str[n + 1] = Property name&#xA;Str[n + 2] = Property value number (array case)&#xA;Str[n + 3] = Property value 1&#xA;Str[n + m] = Property value m">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDevicePropertyHist" description="Retrieve device  property history" execMethod="db_get_device_property_hist" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[2] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Property name&#xA;Str[1] = date&#xA;Str[2] = Property value number (array case)&#xA;Str[3] = Property value 1&#xA;Str[n] = Property value n">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDevicePropertyList" description="Get property list belonging to the specified device and with&#xA;name matching the specified filter" execMethod="db_get_device_property_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = device name&#xA;Str[1] = Filter">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Property name list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDeviceServerClassList" description="Get list of Tango classes for a device server" execMethod="db_get_device_server_class_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="device server process name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="list of classes for this device server">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetExportdDeviceListForClass" description="Query the database for device exported for the specified class." execMethod="db_get_exportd_device_list_for_class" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Class name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Device exported list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetHostList" description="Get host list with name matching the specified filter" execMethod="db_get_host_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The filter">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Host name list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetHostServerList" description="Get list of device server process name running on host with name matching&#xA;the specified filter" execMethod="db_get_host_server_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The filter">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Device server process name list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetHostServersInfo" description="Get info about all servers running on specified host, name, mode and level" execMethod="db_get_host_servers_info" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Host name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Server info for all servers running on specified host">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetInstanceNameList" description="Returns the instance names found for specified server." execMethod="db_get_instance_name_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Server name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="The instance names found for specified server.">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetObjectList" description="Get list of free object defined in database with name&#xA;matching the specified filter" execMethod="db_get_object_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The filter">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Object name list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetProperty" description="Get free object property" execMethod="db_get_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Object name&#xA;Str[1] = Property name&#xA;Str[n] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Object name&#xA;Str[1] = Property number&#xA;Str[2] = Property name&#xA;Str[3] = Property value number (array case)&#xA;Str[4] = Property value 1&#xA;Str[n] = Property value n (array case)&#xA;Str[n + 1] = Property name&#xA;Str[n + 2] = Property value number (array case)&#xA;Str[n + 3] = Property value 1&#xA;Str[n + m] = Property value m">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetPropertyHist" description="Retrieve object  property history" execMethod="db_get_property_hist" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Object name&#xA;Str[2] = Property name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Str[0] = Property name&#xA;Str[1] = date&#xA;Str[2] = Property value number (array case)&#xA;Str[3] = Property value 1&#xA;Str[n] = Property value n">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetPropertyList" description="Get list of property defined for a free object and matching the&#xA;specified filter" execMethod="db_get_property_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Object name&#xA;Str[1] = filter">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="Property name list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetServerInfo" description="Get info about host, mode and level for specified server" execMethod="db_get_server_info" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="server name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="server info">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetServerList" description="Get list of device server process defined in database&#xA;with name matching the specified filter" execMethod="db_get_server_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The filter">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Device server process name list">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetServerNameList" description="Returns the list of server names found for the wildcard specified.&#xA;It returns only the server executable name without instance name as DbGetServerList." execMethod="db_get_server_name_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="wildcard for server names.">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="server names found.">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbImportDevice" description="Import a device from the database" execMethod="db_import_device" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Device name (or alias)">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="Str[0] = device name&#xA;Str[1] = CORBA IOR&#xA;Str[2] = device version&#xA;Str[3] = device server process name&#xA;Str[4] = host name&#xA;Str[5] = Tango class name&#xA;&#xA;Lg[0] = Exported flag&#xA;Lg[1] = Device server process PID">
+        <type xsi:type="pogoDsl:LongStringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbImportEvent" description="Get event channel info from database" execMethod="db_import_event" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="name of event channel or factory">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="export information e.g. IOR">
+        <type xsi:type="pogoDsl:LongStringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbInfo" description="Get miscellaneous numbers on information&#xA;stored in database" execMethod="db_info" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argin>
+      <argout description="Miscellaneous info like:&#xA;- Device defined in database&#xA;- Device marked as exported in database&#xA;- Device server process defined in database&#xA;- Device server process marked as exported in database&#xA;- Device properties defined in database&#xA;- Class properties defined in database&#xA;- Device attribute properties defined in database&#xA;- Class attribute properties defined in database&#xA;- Object properties defined in database">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbPutAttributeAlias" description="Define an alias for an attribute" execMethod="db_put_attribute_alias" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = attribute name&#xA;Str[1] = attribute alias">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbPutClassAttributeProperty" description="Create/Update class attribute property(ies) in database" execMethod="db_put_class_attribute_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class name&#xA;Str[1] = Attribute number&#xA;Str[2] = Attribute name&#xA;Str[3] = Property number&#xA;Str[4] = Property name&#xA;Str[5] = Property value&#xA;.....">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbPutClassAttributeProperty2" description="This command adds support for array properties compared to the previous one&#xA;called DbPutClassAttributeProperty. The old comman is still there for compatibility reason" execMethod="db_put_class_attribute_property2" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class name&#xA;Str[1] = Attribute number&#xA;Str[2] = Attribute name&#xA;Str[3] = Property number&#xA;Str[4] = Property name&#xA;Str[5] = Property value number (array case)&#xA;Str[5] = Property value 1&#xA;Str[n] = Property value n (array case)&#xA;.....">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbPutClassProperty" description="Create / Update class property(ies)" execMethod="db_put_class_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango class name&#xA;Str[1] = Property number&#xA;Str[2] = Property name&#xA;Str[3] = Property value number&#xA;Str[4] = Property value 1&#xA;Str[n] = Property value n&#xA;....">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbPutDeviceAlias" description="Define alias for  a given device name" execMethod="db_put_device_alias" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = device name&#xA;Str[1] = alias name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbPutDeviceAttributeProperty" description="Create/Update device attribute property(ies) in database" execMethod="db_put_device_attribute_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[1] = Attribute number&#xA;Str[2] = Attribute name&#xA;Str[3] = Property number&#xA;Str[4] = Property name&#xA;Str[5] = Property value&#xA;.....">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbPutDeviceAttributeProperty2" description="Put device attribute property. This command adds the possibility to have attribute property&#xA;which are arrays. Not possible with the old DbPutDeviceAttributeProperty command.&#xA;This old command is not deleted for compatibility reasons." execMethod="db_put_device_attribute_property2" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Device name&#xA;Str[1] = Attribute number&#xA;Str[2] = Attribute name&#xA;Str[3] = Property number&#xA;Str[4] = Property name&#xA;Str[5] = Property value number (array case)&#xA;Str[5] = Property value 1&#xA;Str[n] = Property value n (array case)&#xA;.....">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbPutDeviceProperty" description="Create / Update device property(ies)" execMethod="db_put_device_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Tango device name&#xA;Str[1] = Property number&#xA;Str[2] = Property name&#xA;Str[3] = Property value number&#xA;Str[4] = Property value 1&#xA;Str[n] = Property value n&#xA;....">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbPutProperty" description="Create / Update free object property(ies)" execMethod="db_put_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Str[0] = Object name&#xA;Str[1] = Property number&#xA;Str[2] = Property name&#xA;Str[3] = Property value number&#xA;Str[4] = Property value 1&#xA;Str[n] = Property value n&#xA;....">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbPutServerInfo" description="Update server info including host, mode and level" execMethod="db_put_server_info" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="server info">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbUnExportDevice" description="Mark a device as non exported in database" execMethod="db_un_export_device" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Device name">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbUnExportEvent" description="Mark one event channel as non exported in database" execMethod="db_un_export_event" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="name of event channel or factory to unexport">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="none">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbUnExportServer" description="Mark all devices belonging to a specified device server&#xA;process as non exported" execMethod="db_un_export_server" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Device server name (executable/instance)">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="ResetTimingValues" description="Reset the timing attribute values." execMethod="reset_timing_values" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetDataForServerCache" description="This command returns all the data needed by a device server process during its&#xA;startup sequence. The aim of this command is to minimize database access during&#xA;device server startup sequence." execMethod="db_get_data_for_server_cache" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="Elt[0] = DS name (exec_name/inst_name), Elt[1] = Host name">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="All the data needed by the device server during its startup sequence. Precise list depend on the device server">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbDeleteAllDeviceAttributeProperty" description="Delete all attribute properties for the specified device attribute(s)" execMethod="db_delete_all_device_attribute_property" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="str[0] = device name&#xA;Str[1]...str[n] = attribute name(s)">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argin>
+      <argout description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbMySqlSelect" description="This is a very low level command.&#xA;It executes the specified  SELECT command on TANGO database and returns its result without filter." execMethod="db_my_sql_select" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="MySql Select command">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="MySql Select command result&#xA; - svalues : select results&#xA; - lvalue[n] : =0 if svalue[n] is null else =1&#xA; (last lvalue -1) is number of rows, (last lvalue) is number of fields">
+        <type xsi:type="pogoDsl:LongStringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetCSDbServerList" description="Get a list of host:port for all database server defined in the control system" execMethod="db_get_csdb_server_list" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="">
+        <type xsi:type="pogoDsl:VoidType"/>
+      </argin>
+      <argout description="List of host:port with one element for each database server">
+        <type xsi:type="pogoDsl:StringArrayType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetAttributeAlias2" description="Get the attribute alias from the attribute name.&#xA;Returns one empty string if nothing found in database" execMethod="db_get_attribute_alias2" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The attribute name (dev_name/att_name)">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="The attribute alias name (or empty string)">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <commands name="DbGetAliasAttribute" description="Get the attribute name from the given alias.&#xA;If the given alias is not found in database, returns an empty string" execMethod="db_get_alias_attribute" displayLevel="OPERATOR" polledPeriod="0">
+      <argin description="The attribute alias">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argin>
+      <argout description="The attribute name (dev_name/att_name)">
+        <type xsi:type="pogoDsl:StringType"/>
+      </argout>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+    </commands>
+    <attributes name="StoredProcedureRelease" attType="Scalar" rwType="READ" displayLevel="OPERATOR" polledPeriod="0" maxX="0" maxY="0">
+      <dataType xsi:type="pogoDsl:StringType"/>
+      <changeEvent fire="false" libCheckCriteria="false"/>
+      <archiveEvent fire="false" libCheckCriteria="false"/>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+      <properties description="" label="" unit="" standardUnit="" displayUnit="" format="" maxValue="" minValue="" maxAlarm="" minAlarm="" maxWarning="" minWarning="" deltaTime="" deltaValue=""/>
+    </attributes>
+    <attributes name="Timing_average" attType="Spectrum" rwType="READ" displayLevel="OPERATOR" polledPeriod="0" maxX="64" maxY="0">
+      <dataType xsi:type="pogoDsl:DoubleType"/>
+      <changeEvent fire="false" libCheckCriteria="false"/>
+      <archiveEvent fire="false" libCheckCriteria="false"/>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+      <properties description="" label="" unit="" standardUnit="" displayUnit="" format="" maxValue="" minValue="" maxAlarm="" minAlarm="" maxWarning="" minWarning="" deltaTime="" deltaValue=""/>
+    </attributes>
+    <attributes name="Timing_minimum" attType="Spectrum" rwType="READ" displayLevel="OPERATOR" polledPeriod="0" maxX="64" maxY="0">
+      <dataType xsi:type="pogoDsl:DoubleType"/>
+      <changeEvent fire="false" libCheckCriteria="false"/>
+      <archiveEvent fire="false" libCheckCriteria="false"/>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+      <properties description="" label="" unit="" standardUnit="" displayUnit="" format="" maxValue="" minValue="" maxAlarm="" minAlarm="" maxWarning="" minWarning="" deltaTime="" deltaValue=""/>
+    </attributes>
+    <attributes name="Timing_maximum" attType="Spectrum" rwType="READ" displayLevel="OPERATOR" polledPeriod="0" maxX="64" maxY="0">
+      <dataType xsi:type="pogoDsl:DoubleType"/>
+      <changeEvent fire="false" libCheckCriteria="false"/>
+      <archiveEvent fire="false" libCheckCriteria="false"/>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+      <properties description="" label="" unit="" standardUnit="" displayUnit="" format="" maxValue="" minValue="" maxAlarm="" minAlarm="" maxWarning="" minWarning="" deltaTime="" deltaValue=""/>
+    </attributes>
+    <attributes name="Timing_calls" attType="Spectrum" rwType="READ" displayLevel="OPERATOR" polledPeriod="0" maxX="64" maxY="0">
+      <dataType xsi:type="pogoDsl:DoubleType"/>
+      <changeEvent fire="false" libCheckCriteria="false"/>
+      <archiveEvent fire="false" libCheckCriteria="false"/>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+      <properties description="" label="" unit="" standardUnit="" displayUnit="" format="" maxValue="" minValue="" maxAlarm="" minAlarm="" maxWarning="" minWarning="" deltaTime="" deltaValue=""/>
+    </attributes>
+    <attributes name="Timing_index" attType="Spectrum" rwType="READ" displayLevel="OPERATOR" polledPeriod="0" maxX="64" maxY="0">
+      <dataType xsi:type="pogoDsl:StringType"/>
+      <changeEvent fire="false" libCheckCriteria="false"/>
+      <archiveEvent fire="false" libCheckCriteria="false"/>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+      <properties description="" label="" unit="" standardUnit="" displayUnit="" format="" maxValue="" minValue="" maxAlarm="" minAlarm="" maxWarning="" minWarning="" deltaTime="" deltaValue=""/>
+    </attributes>
+    <attributes name="Timing_info" attType="Spectrum" rwType="READ" displayLevel="OPERATOR" polledPeriod="0" maxX="64" maxY="0">
+      <dataType xsi:type="pogoDsl:StringType"/>
+      <changeEvent fire="false" libCheckCriteria="false"/>
+      <archiveEvent fire="false" libCheckCriteria="false"/>
+      <status abstract="false" inherited="false" concrete="true" concreteHere="true"/>
+      <properties description="" label="" unit="" standardUnit="" displayUnit="" format="" maxValue="" minValue="" maxAlarm="" minAlarm="" maxWarning="" minWarning="" deltaTime="" deltaValue=""/>
+    </attributes>
+    <preferences docHome="./doc_html" makefileHome="/home/tcoutinho/local-tango8/share/pogo/preferences"/>
+    <additionalFiles name="DataBaseUtils" path="/mntdirect/_segfs/tango/cppserver/dbase/DataBaseUtils.cpp"/>
+    <additionalFiles name="update_starter" path="/mntdirect/_segfs/tango/cppserver/dbase/update_starter.cpp"/>
+  </classes>
+</pogoDsl:PogoSystem>
