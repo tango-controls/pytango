@@ -252,6 +252,10 @@ intersphinx_mapping = {
     'http://docs.scipy.org/doc/scipy/reference' : None,
     'http://docs.scipy.org/doc/numpy' : None,
     'http://ipython.org/ipython-doc/stable/' : None,
+    'http://api.mongodb.org/python/current/' : None,
+    'http://packages.python.org/CouchDB/' : None,
+    'http://pycassa.github.com/pycassa/' : None,
+    'http://docs.sqlalchemy.org/en/rel_0_7/' : None,
 }
 
 def copy_spaces(origin):

@@ -1,0 +1,328 @@
+
+.. currentmodule:: PyTango.databaseds
+
+===================================================
+TEP 2 - Tango database serverless
+===================================================
+
+================== ====================================================
+ TEP:               2
+================== ====================================================
+ Title:             Tango database serverless
+ Version:           1.0.0
+ Last-Modified:     17-Oct-2012
+ Author:            Tiago Coutinho <tcoutinho@cells.es>
+ Status:            Active
+ Type:              Standards Track
+ Content-Type:      text/x-rst
+ Created:           17-Oct-2012
+ Post-History:      17-Oct-2012
+================== ====================================================
+
+Abstract
+========
+
+This TEP aims to define a python DataBaseds which doesn't need a database server
+behind. It would make tango easier to try out by anyone and it could greatly
+simplify tango installation on small environments (like small, independent
+laboratories).
+
+Motivation
+==========
+
+I was given a openSUSE laptop so that I could do the presentation for the tango
+meeting held in FRMII on October 2012.
+Since I planned to do a demonstration as part of the presentation I installed
+all mysql libraries, omniorb, tango and pytango on this laptop.
+
+During the flight to Munich I realized tango was not working because of a
+strange mysql server configuration done by the openSUSE distribution. I am not a
+mysql expert and I couldn't google for a solution. Also it made me angry to have
+to install all the mysql crap (libmysqlclient, mysqld, mysql-administrator, bla,
+bla) just to have a demo running.
+
+At the time of writting the first version of this TEP I still didn't solve
+the problem! Shame on me!
+
+Also at the same tango meetting during the tango archiving discussions I heard
+fake whispers or changing the tango archiving from MySQL/Oracle to NoSQL.
+
+I started thinking if it could be possible to have an alternative implementation
+of DataBaseds without the need for a mysql server.
+
+Requisites
+==========
+
+    * no dependencies on external packages
+    * no need for a separate database server process (at least, by default)
+    * no need to execute post install scripts to fill database
+    
+
+Step 1 - Gather database information
+=====================================
+
+It turns out that python has a Database API specification (:pep:`249`).
+Python distribution comes natively (>= 2.6) with not one but several persistency options
+(:ref:`persistence`):
+
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+|   module        | Native | Platforms     | API        | Database            | Description                                                             |
++=================+========+===============+============+=====================+=========================================================================+
+| **Native python 2.x**                                                                                                                                 |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`pickle`   | Yes    | all           | dump/load  | file                | python serialization/marchalling module                                 |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`shelve`   | Yes    | all           | dict       | file                | high level persistent, dictionary-like object                           |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`marshal`  | Yes    | all           | dump/load  | file                | Internal Python object serialization                                    |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`anydbm`   | Yes    | all           | dict       | file                | Generic access to DBM-style databases. Wrapper for :mod:`dbhash`,       |
+|                 |        |               |            |                     | :mod:`gdbm`, :mod:`dbm` or :mod:`dumbdbm`                               |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`dbm`      | Yes    | all           | dict       | file                | Simple "database" interface                                             |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`gdbm`     | Yes    | unix          | dict       | file                | GNU's reinterpretation of dbm                                           |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`dbhash`   | Yes    | unix?         | dict       | file                | DBM-style interface to the BSD database library (needs :mod:`bsddb`).   |
+|                 |        |               |            |                     | **Removed in python 3**                                                 |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`bsddb`    | Yes    | unix?         | dict       | file                | Interface to Berkeley DB library. **Removed in python 3**               |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`dumbdbm`  | Yes    | all           | dict       | file                | Portable DBM implementation                                             |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`sqlite3`  | Yes    | all           | DBAPI2     | file, memory        | DB-API 2.0 interface for SQLite databases                               |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| **Native Python 3.x**                                                                                                                                 |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`pickle`   | Yes    | all           | dump/load  | file                | python serialization/marchalling module                                 |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`shelve`   | Yes    | all           | dict       | file                | high level persistent, dictionary-like object                           |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`marshal`  | Yes    | all           | dump/load  | file                | Internal Python object serialization                                    |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`dbm`      | Yes    | all           | dict       | file                | Interfaces to Unix "databases". Wrapper for :mod:`dbm.gnu`,             |
+|                 |        |               |            |                     | :mod:`dbm.ndbm`, :mod:`dbm.dumb`                                        |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`dbm.gnu`  | Yes    | unix          | dict       | file                | GNU's reinterpretation of dbm                                           |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`dbm.ndbm` | Yes    | unix          | dict       | file                | Interface based on ndbm                                                 |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`dbm.dumb` | Yes    | all           | dict       | file                | Portable DBM implementation                                             |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+| :mod:`sqlite3`  | Yes    | all           | DBAPI2     | file, memory        | DB-API 2.0 interface for SQLite databases                               |
++-----------------+--------+---------------+------------+---------------------+-------------------------------------------------------------------------+
+
+**third-party DBAPI2**
+
+.. hlist::
+    :columns: 1
+    
+    * `pyodbc <http://code.google.com/p/pyodbc>`_
+    * `mxODBC <http://www.egenix.com/products/python/mxODBC/>`_
+    * `kinterbasdb <http://www.firebirdsql.org/index.php?op=devel&sub=python>`_
+    * `mxODBC Connect <http://www.egenix.com/products/python/mxODBCConnect/>`_
+    * `MySQLdb <http://sourceforge.net/projects/mysql-python>`_
+    * `psycopg <http://www.initd.org/software/initd/psycopg>`_
+    * `pyPgSQL <http://pypgsql.sourceforge.net/>`_
+    * `PySQLite <http://code.google.com/p/pysqlite/>`_
+    * `adodbapi <http://adodbapi.sourceforge.net/>`_
+    * `pymssql <http://sourceforge.net/projects/pymssql>`_
+    * `sapdbapi <http://www.sapdb.org/sapdbapi.html>`_
+    * `ibm_db <http://code.google.com/p/ibm-db/>`_
+    * `InformixDB <http://informixdb.sourceforge.net/>`_
+
+**third-party NOSQL**
+
+*(these may or not have python DBAPI2 interface)*
+
+    * `CouchDB <http://couchdb.apache.org/>`_ - :mod:`couchdb.client`
+    * `MongoDB <http://www.mongodb.org/>`_ - :mod:`pymongo` - NoSQL database
+    * `Cassandra <http://cassandra.apache.org/>`_ - :mod:`pycassa`
+
+**third-party database abstraction layer**
+
+    * `SQLAlchemy <http://www.sqlalchemy.org/>`_ - :mod:`sqlalchemy` - Python SQL toolkit and Object Relational Mapper
+
+Step 2 - Which module to use?
+=====================================
+
+*herrrr... wrong question!*
+
+The first decision I thought it should made is which python module better
+suites the needs of this TEP. Then I realized I would fall into the same trap as
+the C++ DataBaseds: hard link the server to a specific database implementation
+(in their case MySQL).
+
+I took a closer look at the tables above and I noticed that python persistent
+modules come in two flavors: dict and DBAPI2.
+So naturally the decision I thought it had to be made was: *which flavor to use?*
+
+But then I realized both flavors could be used if we properly design the python
+DataBaseds. 
+
+Step 3 - Architecture
+=====================================
+
+If you step back for a moment and look at the big picture you will see that 
+what we need is really just a mapping between the Tango DataBase set of
+attributes and commands (I will call this `Tango Device DataBase API`) and
+the python database API oriented to tango (I will call this TDB interface).
+
+The TDB interface should be represented by the :class:`ITangoDB`.
+Concrete databases should implement this interface (example, DBAPI2 interface
+should be represented by a class :class:`TangoDBAPI2` implementing :class:`ITangoDB`).
+
+Connection to a concrete ITangoDB should be done through a factory: :class:`TangoDBFactory`
+
+The Tango DataBase device should have no logic. Through basic configuration it
+should be able to ask the :class:`TangoDBFactory` for a concrete :class:`ITangoDB`. The code of
+every command and attribute should be simple forward to the :class:`ITangoDB` object (a
+part of some parameter translation and error handling).
+
+.. graphviz::
+
+    digraph uml {
+        fontname = "Bitstream Vera Sans"
+        fontsize = 8
+
+        node [
+          fontname = "Bitstream Vera Sans"
+          fontsize = 8
+          shape = "record"
+        ]
+
+        edge [
+          fontname = "Bitstream Vera Sans"
+          fontsize = 8
+        ]
+
+        subgraph tangodbPackage {
+            label = "Package tangodb"
+            
+            ITangoDB [
+                label = "{ITangoDB|+ add_device()=0\l+delete_device()=0\l+export_device()=0\l...}"
+            ]
+            
+            DBAPI2 [
+                label = "{TangoDBAPI2}"
+            ]
+
+            Dict [
+                label = "{TangoDBDict}"
+            ]
+
+            DBSqlite3 [
+                label = "{TangoDBSqlite3}"
+            ]
+    
+            mxODBC [
+                label = "{TangoDBmxODBC}"
+            ]
+
+            MySQLdb [
+                label = "{TangoDBMySQLdb}"
+            ]
+            
+            Shelve [
+                label = "{TangoDBShelve}"
+            ]
+            
+            TangoDBFactory [
+                label = "{TangoDBFactory|+get_tango_db(): ITangoDB}"
+            ]
+
+            DBAPI2 -> ITangoDB
+            Dict -> ITangoDB
+            DBSqlite3 -> DBAPI2
+            mxODBC -> DBAPI2
+            MySQLdb -> DBAPI2
+            Shelve -> Dict
+        }
+        
+        DeviceImpl [
+            label = "{Tango::DeviceImpl}"  
+        ]
+        
+        DataBase [
+            label = "{DataBase|+DbAddDevice()\l+DbDeleteDevice()\l+DbExportDevice()\l...}"
+        ]
+
+        DataBase -> DeviceImpl
+    }
+
+Step 4 - The python DataBaseds
+=====================================
+
+If we can make a python device server which has the same set of attributes
+and commands has the existing C++ DataBase (and of course the same semantic
+behavior), the tango DS and tango clients will never know the difference (BTW,
+that's one of the beauties of tango).
+
+The C++ DataBase consists of around 80 commands and 1 mandatory attribute (the
+others are used for profiling) so making a python Tango DataBase device from
+scratch is out of the question.
+
+Fortunately, C++ DataBase is one of the few device servers that were developed
+since the beginning with pogo and were successfully adapted to pogo 8. This
+means there is a precious :download:`DataBase.xmi` available which can be
+loaded to pogo and saved as a python version.
+The result of doing this can be found here :download:`here <database.py>` (this file
+was generated with a beta version of the pogo 8.1 python code generator so
+it may contain errors).
+
+Step 5 - Default database implementation
+===========================================
+
+The decision to which database implementation should be used should obey the
+following rules:
+
+  #. should not require an extra database server process
+  #. should be a native python module
+  #. should implement python DBAPI2
+  
+It came to my attention the :mod:`sqlite3` module would be perfect as a default
+database implementation. This module comes with python since version 2.5 and is
+available in all platforms. It implements the DBAPI2 interface and can store
+persistently in a common OS file or even in memory.
+
+There are many free scripts on the web to translate a mysql database to sqlite3
+so one can use an existing mysql tango database and directly use it with the 
+python DataBaseds with sqlite3 implementation.
+
+Development
+=================
+
+The development is being done in PyTango SVN trunk in the :mod:`PyTango.databaseds`
+module.
+
+You can checkout with::
+
+    $ svn co https://tango-cs.svn.sourceforge.net/svnroot/tango-cs/bindings/PyTango/trunk PyTango-trunk
+    
+Disadvantages
+===============
+
+A serverless, file based, database has some disadvantages when compared to the
+mysql solution:
+
+    * Not possible to distribute load between Tango DataBase DS and database server
+      (example: run the Tango DS in one machine and the database server in another)
+    * Not possible to have two Tango DataBase DS pointing to the same database
+    * Harder to upgrade to newer version of sql tables (specially if using dict
+      based database)
+
+Bare in mind the purpose of this TED is to simplify the process of trying tango
+and to ease installation and configuration on small environments (like small,
+independent laboratories).
+
+References
+============
+
+    * http://wiki.python.org/moin/DbApiCheatSheet
+    * http://wiki.python.org/moin/DbApiModuleComparison
+    * http://wiki.python.org/moin/DatabaseProgramming
+    * http://wiki.python.org/moin/DbApiFaq
+    * :pep:`249`
+    * http://wiki.python.org/moin/ExtendingTheDbApi
+    * http://wiki.python.org/moin/DbApi3
+
