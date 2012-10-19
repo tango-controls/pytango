@@ -25,13 +25,18 @@
 This is an internal PyTango module.
 """
 
+from __future__ import with_statement
+from __future__ import print_function
+
 __all__ = [ "AttrData" ]
 
 __docformat__ = "restructuredtext"
 
+import inspect
+
 from ._PyTango import Except, CmdArgType, AttrDataFormat, AttrWriteType, \
     DispLevel, UserDefaultAttrProp, Attr, SpectrumAttr, ImageAttr
-from .utils import is_non_str_seq
+from .utils import is_non_str_seq, is_pure_str
 
 
 class AttrData(object):
@@ -50,15 +55,90 @@ class AttrData(object):
         self.polling_period = -1
         self.memorized = False
         self.hw_memorized = False
-        self.read_method_name = "read_%s" % name
-        self.write_method_name = "write_%s" % name
-        self.is_allowed_name = "is_%s_allowed" % name
+        if name is None:
+            self.read_method_name = None
+            self.write_method_name = None
+            self.is_allowed_name = None
+        else:
+            self.read_method_name = "read_" + name
+            self.write_method_name = "write_" + name
+            self.is_allowed_name = "is_" + name + "_allowed"
         self.attr_class = None
         self.attr_args = []
         self.att_prop = None
         if attr_info is not None:
             self.from_attr_info(attr_info)
 
+    @classmethod
+    def from_dict(cls, attr_dict):
+        attr_dict = dict(attr_dict)
+        name = attr_dict.pop('name', None)
+        class_name = attr_dict.pop('class_name', None)
+        self = cls(name, class_name)
+        self.attr_type = attr_dict.pop('dtype', CmdArgType.DevDouble)
+        self.attr_format = attr_dict.pop('dformat', AttrDataFormat.SCALAR)
+        self.dim_x = attr_dict.pop('max_dim_x', 1)
+        self.dim_y = attr_dict.pop('max_dim_y', 0)
+        self.display_level = attr_dict.pop('display_level', DispLevel.OPERATOR)
+        self.polling_period = attr_dict.pop('polling_period', -1)
+        self.memorized = attr_dict.pop('memorized', False)
+        self.hw_memorized = attr_dict.pop('hw_memorized', False)
+        
+        is_access_explicit = "access" in attr_dict
+        if is_access_explicit:
+            self.attr_write = attr_dict.pop('access')
+        else:
+            # access is defined by which methods were defined
+            r_explicit, w_explicit = "fread" in attr_dict, "fwrite" in attr_dict
+            if r_explicit and w_explicit:
+                self.attr_write = AttrWriteType.READ_WRITE
+            elif r_explicit:
+                self.attr_write = AttrWriteType.READ
+            elif w_explicit:
+                self.attr_write = AttrWriteType.WRITE
+            else:
+                self.attr_write = AttrWriteType.READ
+            
+        fread = attr_dict.pop('fread', None)
+        if fread is not None:
+            if is_pure_str(fread):
+                self.read_method_name = fread
+            elif inspect.isroutine(fread):
+                self.read_method_name = fread.__name__
+        fwrite = attr_dict.pop('fwrite', None)
+        if fwrite is not None:
+            if is_pure_str(fwrite):
+                self.write_method_name = fwrite
+            elif inspect.isroutine(fwrite):
+                self.write_method_name = fwrite.__name__
+        fisallowed = attr_dict.pop('fisallowed', None)
+        if fisallowed is not None:
+            if is_pure_str(fisallowed):
+                self.is_allowed_name = fisallowed
+            elif inspect.isroutine(fisallowed):
+                self.is_allowed_name = fisallowed.__name__        
+        self.attr_class = attr_dict.pop("klass", self.DftAttrClassMap[self.attr_format])
+        self.attr_args.extend((self.attr_name, self.attr_type, self.attr_write))
+        if not self.attr_format == AttrDataFormat.SCALAR:
+            self.attr_args.append(self.dim_x)
+            if not self.attr_format == AttrDataFormat.SPECTRUM:
+                self.attr_args.append(self.dim_y)
+        if len(attr_dict):
+            self.att_prop = self.__create_user_default_attr_prop(self.attr_name, attr_dict)
+        return self
+    
+    def _set_name(self, name):
+        old_name = self.attr_name
+        self.attr_name = name
+        self.attr_args[0] = name
+        if old_name is None:
+            if self.read_method_name is None:
+                self.read_method_name = "read_" + name
+            if self.write_method_name is None:
+                self.write_method_name = "write_" + name
+            if self.is_allowed_name is None:
+                self.is_allowed_name = "is_" + name + "_allowed"
+    
     def __throw_exception(self, msg, meth="create_attribute()"):
         Except.throw_exception("PyDs_WrongAttributeDefinition", msg, meth)
 
@@ -74,11 +154,11 @@ class AttrData(object):
             elif k == 'delta_time':
                 p.set_delta_t(str(v))
             elif not k_lower in ('display level', 'polling period', 'memorized'):
-                name = self.get_name()
-                msg = "Wrong definition of attribute %s in " \
-                      "class %s\nThe object extra information '%s' " \
-                      "is not recognized!" % (attr_name, name, k)
-                self.__throw_create_attribute_exception(msg)
+                msg = "Wrong definition of attribute. " \
+                      "The object extra information '%s' " \
+                      "is not recognized!" % (k,)
+                Except.throw_exception("PyDs_WrongAttributeDefinition", msg,
+                                       "create_user_default_attr_prop()")
         return p
 
     def from_attr_info(self, attr_info):

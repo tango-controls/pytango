@@ -261,7 +261,17 @@ def __Attribute__set_properties(self, attr_cfg, dev = None):
         else:
             self._set_properties(attr_cfg, dev)
 
-
+def __Attribute__str(self):
+    return '%s(%s)' % (self.__class__.__name__, self.get_name())
+  
+def __init_Attribute():
+    Attribute.__str__ = __Attribute__str
+    Attribute.__repr__ = __Attribute__str
+    Attribute.get_properties = __Attribute__get_properties
+    Attribute.get_properties_2 = __Attribute__get_properties_2
+    Attribute.get_properties_3 = __Attribute__get_properties_3
+    Attribute.set_properties = __Attribute__set_properties
+    
 def __DeviceImpl__get_device_class(self):
     try:
         return self._device_class_instance
@@ -644,17 +654,6 @@ def __Attr__str(self):
 def __init_Attr():
     Attr.__str__ = __Attr__str
     Attr.__repr__ = __Attr__str
-
-def __Attribute__str(self):
-    return '%s(%s)' % (self.__class__.__name__, self.get_name())
-
-def __init_Attribute():
-    Attribute.__str__ = __Attribute__str
-    Attribute.__repr__ = __Attribute__str
-    Attribute.get_properties = __Attribute__get_properties
-    Attribute.get_properties_2 = __Attribute__get_properties_2
-    Attribute.get_properties_3 = __Attribute__get_properties_3
-    Attribute.set_properties = __Attribute__set_properties
 
 def __init_Logger():
     Logger.log = __Logger__log

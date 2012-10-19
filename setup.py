@@ -84,7 +84,7 @@ def uniquify(seq):
 def get_c_numpy():
     NUMPY_ROOT = os.environ.get('NUMPY_ROOT')
     if NUMPY_ROOT is not None:
-        d = os.path.join(NUMPY_ROOT, 'include','numpy')
+        d = os.path.join(NUMPY_ROOT, 'include')
         if os.path.isdir(d):
             return d
     if numpy is None:
@@ -330,7 +330,9 @@ def main():
         'Operating System :: POSIX',
         'Operating System :: POSIX :: Linux',
         'Operating System :: Unix',
+        'Programming Language :: C',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
         'Topic :: Scientific/Engineering',
         'Topic :: Software Development :: Libraries',
     ]

@@ -29,6 +29,8 @@ __all__ = ["db_init"]
 
 __docformat__ = "restructuredtext"
 
+import collections
+
 from ._PyTango import StdStringVector, Database, DbDatum, DbData, \
     DbDevInfo, DbDevInfos, DbDevImportInfo, DbDevExportInfo, DbDevExportInfos, \
     DbHistory, DbServerInfo
@@ -36,7 +38,6 @@ from ._PyTango import StdStringVector, Database, DbDatum, DbData, \
 from .utils import is_pure_str, is_non_str_seq, seq_2_StdStringVector, \
     seq_2_DbDevInfos, seq_2_DbDevExportInfos, seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
-import collections
 
 #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 # DbDatum extension

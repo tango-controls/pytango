@@ -284,7 +284,7 @@ class DeviceClass(_DeviceClass):
     attr_list = {}
 
     def __init__(self, name):
-        _DeviceClass.__init__(self,name)
+        _DeviceClass.__init__(self, name)
         self.dyn_att_added_methods = []
         try:
             pu = self.prop_util = PropUtil()
@@ -321,7 +321,10 @@ class DeviceClass(_DeviceClass):
         """for internal usage only"""
 
         for attr_name, attr_info in self.attr_list.items():
-            attr_data = AttrData(attr_name, self.get_name(), attr_info)
+            if isinstance(attr_info, AttrData):
+                attr_data = attr_info
+            else:
+                attr_data = AttrData(attr_name, self.get_name(), attr_info)
             self.__create_attribute(attr_list, attr_data)
 
     def __create_attribute(self, attr_list, attr_data):

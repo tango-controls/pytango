@@ -30,12 +30,12 @@ __all__ = ["connection_init"]
 __docformat__ = "restructuredtext"
 
 import operator
+import collections
 
 from ._PyTango import Connection, DeviceData, __CallBackAutoDie, CmdArgType, \
     DeviceProxy, Database, ExtractAs
 from .utils import document_method as __document_method
 from .utils import document_static_method as __document_static_method
-import collections
 
 
 def __CallBackAutoDie__cmd_ended_aux(self, fn):

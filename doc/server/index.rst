@@ -998,7 +998,8 @@ Server API
 
 .. toctree::
     :maxdepth: 2
-
+    
+    api2
     device
     device_class
     logging

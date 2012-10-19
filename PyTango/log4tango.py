@@ -104,44 +104,63 @@ class LogIt(object):
         self._show_kwargs = show_kwargs
         self._show_ret = show_ret
 
-    def __compact(self, v, maxlen=25):
+    def __compact_elem(self, v, maxlen=25):
         v = repr(v)
         if len(v) > maxlen:
             v = v[:maxlen-6] + " [...]"
         return v
 
-    def __compact_dict(self, k, v, maxlen=None):
+    def __compact_elems(self, elems):
+        return map(self.__compact_elem, elems)
+
+    def __compact_elems_str(self, elems):
+        return ", ".join(self.__compact_elems(elems))
+
+    def __compact_item(self, k, v, maxlen=None):
         if maxlen is None:
             return "%s=%s" % (k, self.__compact(v))
         return "%s=%s" % (k, self.__compact(v, maxlen=maxlen))
 
-    def is_enabled(self, d):
-        return d.get_logger().is_debug_enabled()
+    def __compact_dict(self, d, maxlen=None):
+        return ( self.__compact_item(k,v) for k,v in d.items() )
 
-    def get_log_func(self, d):
-        return d.debug_stream
+    def __compact_dict_str(self, d, maxlen=None):
+        return ", ".join(self.__compact_dict(d, maxlen=maxlen))
+
+    def is_enabled(self, obj):
+        return obj.get_logger().is_debug_enabled()
+
+    def get_log_func(self, obj):
+        return obj.debug_stream
 
     def __call__(self, f):
         @functools.wraps(f)
         def log_stream(*args, **kwargs):
-            d = args[0]
-            if not self.is_enabled(d):
+            dev = args[0]
+            if not self.is_enabled(dev):
                 return f(*args, **kwargs)
-            in_msg = "-> %s(" % f.__name__
+            log = self.get_log_func(dev)
+            f_name = dev.__class__.__name__ + "." + f.__name__
+            sargs = ""
             if self._show_args:
-                in_msg += ", ".join(map(self.__compact, args[1:]))
+                sargs = self.__compact_elems_str(args[1:])
             if self._show_kwargs:
-                kwargs_str = ( self.__compact_dict(k,v) for k,v in kwargs.items() )
-                in_msg += ", ".join(kwargs_str)
-            in_msg += ")"
-            self.get_log_func(d)(in_msg)
-            ret = f(*args, **kwargs)
-            out_msg = ""
-            if self._show_ret:
-                out_msg += self.__compact(ret) + " "
-            out_msg += "<- %s()" % f.__name__
-            self.get_log_func(d)(out_msg)
-            return ret
+                sargs += self.__compact_dict_str(kwargs)
+            log("-> {0}({1})".format(f_name, sargs))
+            with_exc = True
+            try:
+                ret = f(*args, **kwargs)
+                with_exc = False
+                return ret
+            finally:
+                if with_exc:
+                    log("<- {0}() raised exception!".format(f_name))
+                else:
+                    sret = ""
+                    if self._show_ret:
+                        sret = self.__compact_elem(ret) + " "
+                    log("{0}<- {1}()".format(sret, f_name))
+        log_stream._wrapped = f
         return log_stream
 
 

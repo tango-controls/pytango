@@ -33,7 +33,8 @@ __all__ = [ "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
             "is_int_type", "is_float_type", "obj_2_str", "seqStr_2_obj",
             "document_method", "document_static_method", "document_enum",
             "CaselessList", "CaselessDict", "EventCallBack", "get_home",
-            "from_version_str_to_hex_str", "from_version_str_to_int", ]
+            "from_version_str_to_hex_str", "from_version_str_to_int",
+            "server_run", "decorator" ]
 
 __docformat__ = "restructuredtext"
 
@@ -41,11 +42,13 @@ import sys
 import os
 import collections
 import numbers
+import functools
+import inspect
+import traceback
 
 from ._PyTango import StdStringVector, StdDoubleVector, \
     DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
-    EventData, AttrConfEventData, DataReadyEventData, DevFailed
-from ._PyTango import constants
+    EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants
 
 _scalar_int_types = (CmdArgType.DevShort, CmdArgType.DevUShort,
     CmdArgType.DevInt, CmdArgType.DevLong, CmdArgType.DevULong,
@@ -90,9 +93,27 @@ _scalar_to_array_type = {
     CmdArgType.ConstDevString : CmdArgType.DevVarStringArray,
 }
 
+__device_classes = None
+
+def get_tango_device_classes():
+    global __device_classes
+    if __device_classes is None:
+        import PyTango
+        __device_classes = [PyTango.DeviceImpl]
+        i = 2
+        while True:
+            dc = "Device_{0}Impl".format(i)
+            try:
+               __device_classes.append(getattr(PyTango, dc))
+               i = i + 1
+            except AttributeError:
+                break
+    return __device_classes
+            
 __str_klasses = str,
 __int_klasses = int,
 __number_klasses = numbers.Number,
+__seq_klasses = collections.Sequence, bytearray
 
 __use_unicode = False
 try:
@@ -114,16 +135,18 @@ if constants.NUMPY_SUPPORT:
     import numpy
     __int_klasses = tuple(list(__int_klasses) + [numpy.integer])
     __number_klasses = tuple(list(__number_klasses) + [numpy.number])
-
+    __seq_klasses = tuple(list(__seq_klasses) + [numpy.ndarray])
+    
 __str_klasses = tuple(__str_klasses)
 __int_klasses = tuple(__int_klasses)
 __number_klasses = tuple(__number_klasses)
+__seq_klasses = tuple(__seq_klasses)
 
 def is_pure_str(obj):
     return isinstance(obj , __str_klasses)
 
 def is_seq(obj):
-    return isinstance(obj, (collections.Sequence, bytearray))
+    return isinstance(obj, __seq_klasses)
 
 def is_non_str_seq(obj):
     return is_seq(obj) and not is_pure_str(obj)
@@ -1031,14 +1054,31 @@ def __server_run(classes, args=None, msg_stream=sys.stderr):
         args = sys.argv
     util = PyTango.Util(args)
 
-    for klass_name, (klass_klass, klass) in classes.items():
-        util.add_class(klass_klass, klass, klass_name)
+    if is_seq(classes):
+        for klass_info in classes:
+            if not hasattr(klass_info, '_api') or klass_info._api < 2:
+                raise Exception("When giving a single class, it must implement API2 (see PyTango.api2)")
+            klass_klass = klass_info._DeviceClass
+            klass_name = klass_info._DeviceClassName
+            klass = klass_info
+            util.add_class(klass_klass, klass, klass_name)          
+    else:            
+        for klass_name, klass_info in classes.items():
+            if is_seq(klass_info):
+                klass_klass, klass = klass_info
+            else:
+                if not hasattr(klass_info, '_api') or klass_info._api < 2:
+                    raise Exception("When giving a single class, it must implement API2 (see PyTango.api2)")
+                klass_klass = klass_info._DeviceClass
+                klass_name = klass_info._DeviceClassName
+                klass = klass_info
+            util.add_class(klass_klass, klass, klass_name)
     u_instance = PyTango.Util.instance()
     u_instance.server_init()
     msg_stream.write("Ready to accept request\n")
     u_instance.server_run()
     
-def server_run(classes, args=None, msg_stream=sys.stderr):
+def server_run(classes, args=None, msg_stream=sys.stderr, verbose=False):
     """Provides a simple way to run a tango server. It handles exceptions
        by writting a message to the msg_stream
        
@@ -1073,7 +1113,11 @@ def server_run(classes, args=None, msg_stream=sys.stderr):
         write("Exiting: Keyboard interrupt\n")
     except DevFailed as df:
         write("Exiting: Server exited with PyTango.DevFailed:\n" + str(df) + "\n")
+        if verbose:
+            write(traceback.format_exc())
     except Exception as e:
         write("Exiting: Server exited with unforseen exception:\n" + str(e) + "\n")
+        if verbose:
+            write(traceback.format_exc())
     write("\nExited\n")
 

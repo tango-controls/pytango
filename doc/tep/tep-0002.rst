@@ -1,6 +1,8 @@
 
 .. currentmodule:: PyTango.databaseds
 
+.. _pytango-TEP2:
+
 ===================================================
 TEP 2 - Tango database serverless
 ===================================================

@@ -1,3 +1,8 @@
+
+.. currentmodule:: PyTango.api2
+
+.. _pytango-TEP1:
+
 =================================
 TEP 1 - Device Server API Level 2
 =================================
@@ -6,14 +11,14 @@ TEP 1 - Device Server API Level 2
  TEP:               1   
 ================== ====================================================
  Title:             Device Server API Level 2
- Version:           1.0.0
- Last-Modified:     17-Oct-2012
+ Version:           2.0.0
+ Last-Modified:     18-Oct-2012
  Author:            Tiago Coutinho <tcoutinho@cells.es>
  Status:            Active
  Type:              Standards Track
  Content-Type:      text/x-rst
  Created:           17-Oct-2012
- Post-History:      17-Oct-2012
+ Post-History:      18-Oct-2012
 ================== ====================================================
 
 Abstract
@@ -342,17 +347,21 @@ The final code could look something like this::
     #!/usr/bin/env python
 
     from PyTango import server_run
-    from PyTango.api2 import Device, DeviceMeta, Attr
+    from PyTango.api2 import Device, DeviceMeta, attribute, command, \
+        device_property, class_property
 
 
     class Motor(Device):
         __metaclass__ = DeviceMeta
-        
+
+        position = attribute()
+                        
         def read_position(self, attr):
             attr.set_value(2.3)
         
-        position = Attr()
-        
+        @command()        
+        def move(self, position):
+            pass
         
     def main():
         server_run((Motor,))
@@ -406,10 +415,10 @@ Ok, a pogo generated code could look like this::
             attr.set_value(self.attr_Position_read)
 
         
-        position = Attr(name='position',
-                        dtype=PyTango.DevDouble,
-                        dformat=PyTango.AttrDataFormat.SCALAR,
-                        fread=read_position)
+        position = attribute(name='position',
+                             dtype=PyTango.DevDouble,
+                             dformat=PyTango.AttrDataFormat.SCALAR,
+                             fread=read_position)
         
     def main():
         classes = Motor,
@@ -422,18 +431,24 @@ but still is far more inteligable than the original version.
 
 References
 ==========
+
+Changes
+=======
+
+From 1.0.0 to 2.0.0
+-------------------
     
+* API Changes
+    * changed Attr to attribute
+    * changed Cmd to command
+    * changed Prop to device_property
+    * changed ClassProp to class_property
+
+* Included command and properties in the example
+* Added references to API documentation
 
 Copyright
 =========
 
 This document has been placed in the public domain.
 
-..
-   Local Variables:
-   mode: indented-text
-   indent-tabs-mode: nil
-   sentence-end-double-space: t
-   fill-column: 70
-   coding: utf-8
-   End:
