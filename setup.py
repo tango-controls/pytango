@@ -114,10 +114,6 @@ def get_script_files():
         # avoid non files
         if not os.path.isfile(abs_item):
             continue
-        # avoid files that have any extension
-        if len(os.path.splitext(abs_item)[1]) > 0:
-            continue
-        # avoid compiled version of script
         if item.endswith('c') and item[:-1] in items:
             continue
         # avoid any core dump... of course there isn't any :-) but just in case
