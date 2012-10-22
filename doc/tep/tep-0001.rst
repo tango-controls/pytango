@@ -12,13 +12,12 @@ TEP 1 - Device Server API Level 2
 ================== ====================================================
  Title:             Device Server API Level 2
  Version:           2.0.0
- Last-Modified:     18-Oct-2012
+ Last-Modified:     22-Oct-2012
  Author:            Tiago Coutinho <tcoutinho@cells.es>
  Status:            Active
  Type:              Standards Track
  Content-Type:      text/x-rst
  Created:           17-Oct-2012
- Post-History:      18-Oct-2012
 ================== ====================================================
 
 Abstract
@@ -31,12 +30,281 @@ Rationale
 
 The code for Tango device servers written in Python often obey a pattern. It
 would be nice if non tango experts could create tango device servers without
-having to code some obscure tango related code. Some of the code which
-is repeated over and over again in almost all python device servers could be
-hidden from the tango developer.
+having to code some obscure tango related code.
+It would also be nice if the tango programming interface would be more pythonic.
+The final goal is to make writting tango device servers as easy as::
+
+    class Motor(Device):
+        __metaclass__ = DeviceMeta
+
+        position = attribute()
+                        
+        def read_position(self):
+            return 2.3
+        
+        @command()        
+        def move(self, position):
+            pass
+
+    if __name__ == "__main__":
+        server_run((Motor,))
+    
 
 Places to simplify
 ===================
+
+After looking at most python device servers one can see some patterns:
+
+At `<Device>` class level:
+    
+    #. <Device> always inherits from latest available DeviceImpl from pogo version
+    #. constructor always does the same:
+        #. calls super constructor
+        #. debug message
+        #. calls init_device
+    
+    #. all methods have debug_stream as first instruction
+    #. init_device does additionaly get_device_properties()
+    #. *read attribute* methods follow the pattern::
+    
+           def read_Attr(self, attr):
+             self.debug_stream()
+             value = get_value_from_hardware()
+             attr.set_value(value)
+    
+    #. *write attribute* methods follow the pattern::
+       
+           def write_Attr(self, attr):
+             self.debug_stream()
+             w_value = attr.get_write_value()
+             apply_value_to_hardware(w_value)
+ 
+At `<Device>Class` class level:
+    
+    #. A <Device>Class class exists for every <DeviceName> class
+    #. The <Device>Class class only contains attributes, commands and
+       properties descriptions (no logic)
+    #. The attr_list description always follows the same (non explicit) pattern
+       (and so does cmd_list, class_property_list, device_property_list)
+    #. the syntax for attr_list, cmd_list, etc is far from understandable 
+     
+At `main()` level:
+
+    #. The main() method always does the same:
+        #. create `Util`
+        #. register tango class
+        #. when registering a python class to become a tango class, 99.9% of times
+           the python class name is the same as the tango class name (example:
+           Motor is registered as tango class "Motor")
+        #. call `server_init()`
+        #. call `server_run()`
+
+High level API
+===============
+
+The goals of the high level API are:
+
+Maintain all features of low-level API available from high-level API
+--------------------------------------------------------------------------------
+
+Everything that was done with the low-level API must also be possible to do
+with the new API.
+
+All tango features should be available by direct usage of the new simplified,
+cleaner high-level API and through direct access to the low-level API.
+    
+Automatic inheritance from the latest** :class:`~PyTango.DeviceImpl` 
+--------------------------------------------------------------------------------
+
+Currently Devices need to inherit from a direct Tango device implementation
+(:class:`~PyTango.DeviceImpl`, or :class:`~PyTango.Device_2Impl`,
+:class:`~PyTango.Device_3Impl`, :class:`~PyTango.Device_4Impl`, etc)
+according to the tango version being used during the development.
+
+In order to keep the code up to date with tango, every time a new Tango IDL
+is released, the code of **every** device server needs to be manually
+updated to ihnerit from the newest tango version.
+
+By inheriting from a new high-level :class:`~PyTango.api2.Device` (which
+itself automatically *decides* from which DeviceImpl version it should
+inherit), the device servers are always up to date with the latest tango
+release without need for manual intervention (see :mod:`PyTango.api2`).
+
+Low-level way::
+
+    class Motor(PyTango.Device_4Impl):
+        pass
+    
+High-level way::
+
+    class Motor(PyTango.api2.Device):
+        pass
+    
+Default implementation of :class:`~PyTango.api2.Device` constructor
+--------------------------------------------------------------------------------
+
+99% of the different device classes which inherit from low level
+:class:`~PyTango.DeviceImpl` only implement `__init__` to call their
+`init_device` (see :mod:`PyTango.api2`).
+
+:class:`~PyTango.api2.Device` already calls init_device.
+
+Low-level way::
+
+    class Motor(PyTango.Device_4Impl):
+        
+        def __init__(self, dev_class, name):
+            PyTango.Device_4Impl.__init__(self, dev_class, name)
+            self.init_device()
+    
+High-level way::
+
+    class Motor(PyTango.api2.Device):
+
+        # Nothing to be done!
+        
+        pass
+
+Default implementation of :meth:`~PyTango.api2.Device.init_device`
+--------------------------------------------------------------------------------
+
+99% of different device classes which inherit from low level
+:class:`~PyTango.DeviceImpl` have an implementation of `init_device` which
+*at least* calls :meth:`~PyTango.DeviceImpl.get_device_properties`
+(see :mod:`PyTango.api2`).
+
+:meth:`~PyTango.api2.Device.init_device` already calls :meth:`~PyTango.api2.Device.get_device_properties`.
+
+Low-level way::
+
+    class Motor(PyTango.Device_4Impl):
+        
+        def init_device(self):
+            self.get_device_properties()
+    
+High-level way::
+
+    class Motor(PyTango.api2.Device):
+        # Nothing to be done!
+        pass
+
+Remove the need to code :class:`~PyTango.DeviceClass`
+--------------------------------------------------------------------------------
+
+99% of different device servers only need to implement their own subclass
+of :class:`~PyTango.DeviceClass` to register the attribute, commands,
+device and class properties by using the corresponding
+:obj:`~PyTango.DeviceClass.attr_list`, :obj:`~PyTango.DeviceClass.cmd_list`,
+:obj:`~PyTango.DeviceClass.device_property_list` and :obj:`~PyTango.DeviceClass.class_property_list`.
+
+With the high-level API we completely remove the need to code the
+:class:`~PyTango.DeviceClass` by registering attribute, commands,
+device and class properties in the :class:`~PyTango.api2.Device` with a more
+pythonic API (see :mod:`PyTango.api2`)
+
+
+#. Hide `<Device>Class` class completely
+#. simplify `main()`
+
+Low-level way::
+
+    class Motor(PyTango.Device_4Impl):
+        
+        def read_Position(self, attr):
+            pass
+
+    class MotorClass(PyTango.DeviceClass):
+
+        class_property_list = { }
+        device_property_list = { }
+        cmd_list = { }
+
+        attr_list = {
+            'Position':
+                [[PyTango.DevDouble,
+                PyTango.SCALAR,
+                PyTango.READ]],
+            }
+
+        def __init__(self, name):
+            PyTango.DeviceClass.__init__(self, name)
+            self.set_type(name)
+
+High-level way::
+
+    class Motor(PyTango.api2.Device):
+        
+        position = PyTango.api2.attribute(dtype=float, )
+
+        def read_position(self):
+            pass
+
+Pythonic read/write attribute
+--------------------------------------------------------------------------------
+
+With the low level API, it feels strange for a non tango programmer to have
+to write::
+
+    def read_Position(self, attr):
+        # ...
+        attr.set_value(new_position)
+
+    def read_Position(self, attr):
+        # ...
+        attr.set_value_date_quality(new_position, time.time(), AttrQuality.CHANGING)
+        
+A more pythonic away would be::
+
+    def read_position(self):
+        # ...
+        self.position = new_position
+
+    def read_position(self):
+        # ...
+        self.position = new_position, time.time(), AttrQuality.CHANGING
+
+Or even::
+
+    def read_position(self):
+        # ...
+        return new_position
+
+    def read_position(self):
+        # ...
+        return new_position, time.time(), AttrQuality.CHANGING
+
+Simplify `main()`
+--------------------------------------------------------------------------------
+
+the typical `main()` method could be greatly simplified.
+initializing tango, registering tango classes, initializing and running the
+server loop and managing errors could all be done with the single function
+call to :func:`~PyTango.server_run`
+
+Low-level way::
+
+    def main():
+        try:
+            py = PyTango.Util(sys.argv)
+            py.add_class(MotorClass,Motor,'Motor')
+
+            U = PyTango.Util.instance()
+            U.server_init()
+            U.server_run()
+
+        except PyTango.DevFailed,e:
+            print '-------> Received a DevFailed exception:',e
+        except Exception,e:
+            print '-------> An unforeseen exception occured....',e
+        
+High-level way::
+
+    def main():
+        classes = Motor,
+        PyTango.server_run(classes)
+        
+In practice
+===========
 
 Currently, a pogo generated device server code for a Motor having a double
 attribute `position` would look like this::
@@ -224,7 +492,8 @@ attribute `position` would look like this::
         main()
 
 
-To make things clear, let's analyse the stripified version of the code instead::
+To make things more fair, let's analyse the stripified version of the code
+instead::
 
     import PyTango
     import sys
@@ -274,7 +543,7 @@ To make things clear, let's analyse the stripified version of the code instead::
             'Position':
                 [[PyTango.DevDouble,
                 PyTango.SCALAR,
-                PyTango.READ_WRITE]],
+                PyTango.READ]],
             }
 
         def __init__(self, name):
@@ -300,137 +569,33 @@ To make things clear, let's analyse the stripified version of the code instead::
     if __name__ == '__main__':
         main()
 
-After looking at most python device servers one can see some patterns:
-
-At `<Device>` class level:
-    
-    #. <Device> always inherits from latest available DeviceImpl from pogo version
-    #. constructor always does the same:
-        #. calls super constructor
-        #. debug message
-        #. calls init_device
-    
-    #. all methods have debug_stream as first instruction
-    #. init_device does additionaly get_device_properties()
- 
-At `<Device>Class` class level:
-    
-    #. A <Device>Class class exists for every <DeviceName> class
-    #. The <Device>Class class only contains attributes, commands and
-       properties descriptions (no logic)
-    #. The attr_list description always follows the same (non explicit) pattern
-       (and so does cmd_list, class_property_list, device_property_list)
-    #. the syntax for attr_list, cmd_list, etc is far from understandable 
-     
-At `main()` level:
-
-    #. The main() method always does the same:
-        #. create `Util`
-        #. register tango class
-        #. `server_init()`
-        #. `server_run()`
-
-
-
-High level API
-==============
-
-The goals of the high level API are:
-    
-    #. Automatically inherit from latest DeviceImpl available from current PyTango installation
-    #. add default implementation for `init_device`: debug_stream(), get_device_properties()
-    #. Hide `<Device>Class` class completely
-    #. simplify `main()`
-
-The final code could look something like this::
+And the equivalent API2 version of the code would be::
 
     #!/usr/bin/env python
 
-    from PyTango import server_run
-    from PyTango.api2 import Device, DeviceMeta, attribute, command, \
-        device_property, class_property
+    from PyTango import DebugIt, server_run
+    from PyTango.api2 import Device, DeviceMeta, attribute
 
 
     class Motor(Device):
         __metaclass__ = DeviceMeta
 
         position = attribute()
-                        
-        def read_position(self, attr):
-            attr.set_value(2.3)
-        
-        @command()        
-        def move(self, position):
-            pass
-        
+
+        @DebugIt()
+        def read_position(self):
+            return 1.0
+
     def main():
         server_run((Motor,))
 
     if __name__ == "__main__":
         main()
 
-
-Ok, a pogo generated code could look like this::
-
-    ##############################################################################
-    # File :        Motor.py
-    # Project :     motor project
-    # Author :     tcoutinho
-    #============================================================================
-    #            This file is generated by POGO
-    #    (Program Obviously used to Generate tango Object)
-    #
-    #        (c) - Software Engineering Group - ESRF
-    ##############################################################################
-
-    import PyTango
-    from PyTango.api2 import Device, DeviceMeta, Attr
-
-    # Add additional import
-    #----- PROTECTED REGION ID(Motor.additionnal_import) ENABLED START -----#
-
-    #----- PROTECTED REGION END -----#	//	Motor.additionnal_import
-
-    class Motor(Device):
-        __metaclass__ = DeviceMeta
-
-        #--------- Add you global variables here --------------------------
-        #----- PROTECTED REGION ID(Motor.global_variables) ENABLED START -----#
-
-        #----- PROTECTED REGION END -----#	//	Motor.global_variables
-
-        def init_device(self):
-            Device.init_device(self)
-            self.attr_Position_read = 0.0
-            #----- PROTECTED REGION ID(Motor.init_device) ENABLED START -----#
-            
-            #----- PROTECTED REGION END -----#	//	Motor.init_device
-        
-        # Motor read/write attribute methods        
-
-        def read_position(self, attr):
-            #----- PROTECTED REGION ID(Motor.Position_read) ENABLED START -----#
-            self.attr_Position_read = 1.0
-            #----- PROTECTED REGION END -----#	//	Motor.Position_read
-            attr.set_value(self.attr_Position_read)
-
-        
-        position = attribute(name='position',
-                             dtype=PyTango.DevDouble,
-                             dformat=PyTango.AttrDataFormat.SCALAR,
-                             fread=read_position)
-        
-    def main():
-        classes = Motor,
-        server_run(classes)
-
-    if __name__ == "__main__":
-        main()
-
-but still is far more inteligable than the original version.
-
 References
 ==========
+
+:mod:`PyTango.api2`
 
 Changes
 =======

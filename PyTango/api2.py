@@ -21,7 +21,9 @@
 ##
 ################################################################################
 
-"""This module provides a high level device server API. It implements
+""".. _pytango-api2:
+
+This module provides a high level device server API. It implements
 :ref:`TEP1 <pytango-TEP1>`. It exposes an easier API for developing a tango
 device server.
 
@@ -57,11 +59,18 @@ on the low level :mod:`PyTango` server API:
        
 #. read attribute methods can set attribute return value with::
        
-       self.<attr name> = <value>
+       def read_voltage(self):
+           return value
+       
+       # or 
+       
+       def read_voltage(self):
+           self.voltage = value
        
    instead of::
    
-       attr.set_value(<value>)
+       def read_voltage(self, attr):
+           attr.set_value(value)
 
 :class:`Device` works very well in conjuction with:
 
@@ -99,10 +108,10 @@ Here is an example of a PowerSupply device with:
         host = device_property()
         
         def read_voltage(self):
-            self.voltage = 10.0
+            return 10.0
             
         def read_current(self):
-            self.current = 2.5, time(), AttrQuality.ON
+            return 2.5, time(), AttrQuality.ON
         
         @DebugIt()
         def write_current(self):
@@ -207,7 +216,6 @@ from __future__ import print_function
 __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute", "command",
            "device_property", "class_property"]
 
-import inspect
 import functools
 import __builtin__
 
@@ -313,7 +321,37 @@ def get_tango_type(dtype):
 
 get_tango_type.__doc__ = __type_doc
 
-def check_tango_device_klass_attribute_method(tango_device_klass, method_name):
+def set_complex_value(attr, value):
+    is_tuple = isinstance(value, tuple)
+    dtype, fmt = attr.get_data_type(), attr.get_data_format()
+    if dtype == CmdArgType.DevEncoded:
+        if is_tuple and len(value) == 4:
+            attr.set_value_date_quality(*value)
+        elif is_tuple and len(value) == 3 and is_non_str_seq(value[0]):
+            attr.set_value_date_quality(value[0][0], value[0][1], *value[1:])
+        else:
+            attr.set_value(*value)
+    else:
+        if is_tuple:
+            if len(value) == 3:
+                if fmt == AttrDataFormat.SCALAR:
+                    attr.set_value_date_quality(*value)
+                elif fmt == AttrDataFormat.SPECTRUM:
+                    if is_seq(value[0]):
+                        attr.set_value_date_quality(*value)
+                    else:
+                        attr.set_value(value)
+                else:
+                    if is_seq(value[0]) and is_seq(value[0][0]):
+                        attr.set_value_date_quality(*value)
+                    else:
+                        attr.set_value(value)
+            else:
+                attr.set_value(value)
+        else:
+            attr.set_value(value)
+
+def check_tango_device_klass_attribute_read_method(tango_device_klass, method_name):
     """Checks if method given by it's name for the given DeviceImpl class has
     the correct signature. If a read/write method doesn't have a parameter
     (the traditional Attribute), then the method is wrapped into another method
@@ -323,24 +361,33 @@ def check_tango_device_klass_attribute_method(tango_device_klass, method_name):
     :type tango_device_klass: class
     :param method_name: method to be cheched
     :type attr_data: str"""
-    f_obj = real_f_obj = getattr(tango_device_klass, method_name)
+    read_method = getattr(tango_device_klass, method_name)
 
-    # discover the real method because it may be hidden by a tango decorator
-    # like PyTango.DebugIt. Unfortunately we cannot detect other decorators yet
-    while hasattr(real_f_obj, "_wrapped"):
-        real_f_obj = real_f_obj._wrapped
-    argspec = inspect.getargspec(real_f_obj)
-    if argspec.varargs and len(argspec.varargs):
-        return
-    nb = len(argspec.args) - 1
-    if argspec.defaults:
-        nb -= len(argspec.defaults)
-    if nb > 0:
-        return
-    @functools.wraps(f_obj)
-    def f_attr(self, attr):
-        return f_obj(self)
-    setattr(tango_device_klass, method_name, f_attr)
+    @functools.wraps(read_method)
+    def read_attr(self, attr):
+        ret = read_method(self)
+        if not attr.get_value_flag() and ret is not None:
+            set_complex_value(attr, ret)
+        return ret
+    setattr(tango_device_klass, method_name, read_attr)
+
+def check_tango_device_klass_attribute_write_method(tango_device_klass, method_name):
+    """Checks if method given by it's name for the given DeviceImpl class has
+    the correct signature. If a read/write method doesn't have a parameter
+    (the traditional Attribute), then the method is wrapped into another method
+    which has correct parameter definition to make it work.
+    
+    :param tango_device_klass: a DeviceImpl class
+    :type tango_device_klass: class
+    :param method_name: method to be cheched
+    :type attr_data: str"""
+    write_method = real_f_obj = getattr(tango_device_klass, method_name)
+
+    @functools.wraps(write_method)
+    def write_attr(self, attr):
+        value = attr.get_write_value()
+        return write_method(self, value)
+    setattr(tango_device_klass, method_name, write_attr)
 
 def check_tango_device_klass_attribute_methods(tango_device_klass, attr_data):
     """Checks if the read and write methods have the correct signature. If a 
@@ -352,9 +399,9 @@ def check_tango_device_klass_attribute_methods(tango_device_klass, attr_data):
     :param attr_data: the attribute data information
     :type attr_data: AttrData"""
     if attr_data.attr_write in (AttrWriteType.READ, AttrWriteType.READ_WRITE):
-        check_tango_device_klass_attribute_method(tango_device_klass, attr_data.read_method_name)
+        check_tango_device_klass_attribute_read_method(tango_device_klass, attr_data.read_method_name)
     if attr_data.attr_write in (AttrWriteType.WRITE, AttrWriteType.READ_WRITE):
-        check_tango_device_klass_attribute_method(tango_device_klass, attr_data.write_method_name)
+        check_tango_device_klass_attribute_write_method(tango_device_klass, attr_data.write_method_name)
         
 def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     klass_name = tango_device_klass.__name__
@@ -375,9 +422,15 @@ def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     device_property_list = {}
     cmd_list = {}
     devclass_name = klass_name + "Class"
+    
+    def device_class_constructor(self, name):
+        DeviceClass.__init__(self, name)
+        self.set_type(name)
+    
     devclass_attrs = dict(class_property_list=class_property_list,
                           device_property_list=device_property_list,
                           cmd_list=cmd_list, attr_list=attr_list)
+    devclass_attrs['__init__'] = device_class_constructor
     return type(devclass_name, (DeviceClass,), devclass_attrs)
 
 def init_tango_device_klass(tango_device_klass, attrs=None, tango_class_name=None):
@@ -453,35 +506,8 @@ class AttrData2(AttrData):
         return self.get_attribute(obj)
 
     def __set__(self, obj, value):
-        is_tuple = isinstance(value, tuple)
         attr = self.get_attribute(obj)
-        dtype, fmt = attr.get_data_type(), attr.get_data_format()
-        if dtype == CmdArgType.DevEncoded:
-            if is_tuple and len(value) == 4:
-                attr.set_value_date_quality(*value)
-            elif is_tuple and len(value) == 3 and is_non_str_seq(value[0]):
-                attr.set_value_date_quality(value[0][0], value[0][1], *value[1:])
-            else:
-                attr.set_value(*value)
-        else:
-            if is_tuple:
-                if len(value) == 3:
-                    if fmt == AttrDataFormat.SCALAR:
-                        attr.set_value_date_quality(*value)
-                    elif fmt == AttrDataFormat.SPECTRUM:
-                        if is_seq(value[0]):
-                            attr.set_value_date_quality(*value)
-                        else:
-                            attr.set_value(value)
-                    else:
-                        if is_seq(value[0]) and is_seq(value[0][0]):
-                            attr.set_value_date_quality(*value)
-                        else:
-                            attr.set_value(value)
-                else:
-                    attr.set_value(value)
-            else:
-                attr.set_value(value)
+        set_complex_value(attr, value)
     
     def __delete__(self, obj):
         obj.remove_attribute(self.attr_name)
@@ -494,8 +520,9 @@ def attribute(**kwargs):
 
 attribute.__doc__ = """\
 declares a new tango attribute in a :class:`Device`. To be used like the python
-native :obj:`property` function. To declare a scalar, PyTango.DevDouble, read-only
-attribute called *voltage* in a *PowerSupply* :class:`Device` do::
+native :obj:`property` function. For exampke, to declare a scalar, 
+`PyTango.DevDouble`, read-only attribute called *voltage* in a *PowerSupply*
+:class:`Device` do::
 
     class PowerSupply(Device):
         
@@ -541,9 +568,47 @@ It receives multiple keyword arguments.
     :type fwrite: :obj:`str` or :obj:`callable`
     :param is_allowed: is allowed method name or method object [default: 'is_<attr_name>_allowed']
     :type is_allowed: :obj:`str` or :obj:`callable`
-    :param label: attribute label
-    :type label: obj:`str`
-    
+    :param label: attribute label [default: attribute name]
+    :type label: :obj:`str`
+    :param description: attribute description [default: empty string]
+    :type description: :obj:`str`
+    :param unit: attribute unit [default: empty string]
+    :type unit: :obj:`str`
+    :param standard_unit: attribute standard unit [default: empty string]
+    :type standard_unit: :obj:`str`
+    :param display_unit: attribute display unit [default: empty string]
+    :type display_unit: :obj:`str`
+    :param format: attribute representation format [default: '6.2f']
+    :type format: :obj:`str`    
+    :param min_value: attribute minimum allowed value [default: None]
+    :type min_value: :obj:`str`
+    :param max_value: attribute maximum allowed value [default: None]
+    :type max_value: :obj:`str`
+    :param min_alarm: minimum value to trigger attribute alarm [default: None]
+    :type min_alarm: :obj:`str`
+    :param max_alarm: maxmimum value to trigger attribute alarm [default: None]
+    :type max_alarm: :obj:`str`
+    :param min_warning: minimum value to trigger attribute warning [default: None] 
+    :type min_warning: :obj:`str`
+    :param max_warning: attribute maxmimum value to trigger attribute warning [default: None] 
+    :type max_warning: :obj:`str`
+    :param delta_val: attribute 
+    :type delta_val: :obj:`str`
+    :param delta_t: attribute 
+    :type delta_t: :obj:`str`
+    :param abs_change: attribute 
+    :type abs_change: :obj:`str`
+    :param rel_change: attribute 
+    :type rel_change: :obj:`str`
+    :param period: attribute 
+    :type period: :obj:`str`
+    :param archive_abs_change: attribute 
+    :type archive_abs_change: :obj:`str`
+    :param archive_rel_change: attribute 
+    :type archive_rel_change: :obj:`str`
+    :param archive_period: attribute 
+    :type archive_period: :obj:`str`
+
 .. _pytango-api2-datatypes:
 
 .. rubric:: Data type equivalence 
