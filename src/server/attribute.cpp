@@ -873,7 +873,21 @@ void export_attribute()
         .def("set_max_alarm", &PyAttribute::set_max_alarm)
         .def("set_min_warning", &PyAttribute::set_min_warning)
         .def("set_max_warning", &PyAttribute::set_max_warning)
+        
+        .def("get_value_flag", &Tango::Attribute::get_value_flag)
+        .def("set_value_flag", &Tango::Attribute::set_value_flag)
 
+        .def("get_disp_level", &Tango::Attribute::get_disp_level)
+
+        .def("change_event_subscribed", &Tango::Attribute::change_event_subscribed)
+        .def("periodic_event_subscribed", &Tango::Attribute::periodic_event_subscribed)
+        .def("archive_event_subscribed", &Tango::Attribute::archive_event_subscribed)
+        .def("quality_event_subscribed", &Tango::Attribute::quality_event_subscribed)
+        .def("user_event_subscribed", &Tango::Attribute::user_event_subscribed)
+        
+        .def("use_notifd_event", &Tango::Attribute::use_notifd_event)
+        .def("use_zmq_event", &Tango::Attribute::use_zmq_event)
+        
         .def("get_min_alarm",
 			(PyObject* (*) (Tango::Attribute &))
 			&PyAttribute::get_min_alarm)
