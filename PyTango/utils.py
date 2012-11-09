@@ -265,7 +265,8 @@ def seq_2_StdStringVector(seq, vec=None):
         vec = StdStringVector()
     if not isinstance(vec, StdStringVector):
         raise TypeError('vec must be a PyTango.StdStringVector')
-    for e in seq: vec.append(str(e))
+    for e in seq:
+        vec.append(str(e))
     return vec
 
 def StdStringVector_2_seq(vec, seq=None):
@@ -281,7 +282,8 @@ def StdStringVector_2_seq(vec, seq=None):
     if seq is None: seq = []
     if not isinstance(vec, StdStringVector):
         raise TypeError('vec must be a PyTango.StdStringVector')
-    for e in vec: seq.append(str(e))
+    for e in vec:
+        seq.append(str(e))
     return seq
 
 def seq_2_StdDoubleVector(seq, vec=None):
@@ -300,7 +302,8 @@ def seq_2_StdDoubleVector(seq, vec=None):
         vec = StdDoubleVector()
     if not isinstance(vec, StdDoubleVector):
         raise TypeError('vec must be a PyTango.StdDoubleVector')
-    for e in seq: vec.append(str(e))
+    for e in seq:
+        vec.append(str(e))
     return vec
 
 def StdDoubleVector_2_seq(vec, seq=None):
@@ -1044,7 +1047,7 @@ def from_version_str_to_hex_str(version_str):
 def from_version_str_to_int(version_str):
     return int(from_version_str_to_hex_str(version_str, 16))
 
-def __server_run(classes, args=None, msg_stream=sys.stderr):
+def __server_run(classes, args=None, msg_stream=sys.stderr, util=None):
     import PyTango
     if msg_stream is None:
         import io
@@ -1052,7 +1055,9 @@ def __server_run(classes, args=None, msg_stream=sys.stderr):
     
     if args is None:
         args = sys.argv
-    util = PyTango.Util(args)
+    
+    if util is None:
+        util = PyTango.Util(args)
 
     if is_seq(classes):
         for klass_info in classes:
@@ -1077,21 +1082,48 @@ def __server_run(classes, args=None, msg_stream=sys.stderr):
     u_instance.server_init()
     msg_stream.write("Ready to accept request\n")
     u_instance.server_run()
+    return util
     
-def server_run(classes, args=None, msg_stream=sys.stderr, verbose=False):
+def server_run(classes, args=None, msg_stream=sys.stderr, verbose=False, util=None):
     """Provides a simple way to run a tango server. It handles exceptions
-       by writting a message to the msg_stream
+       by writting a message to the msg_stream.
+
+       The `classes` parameter can be either a sequence of :class:`~PyTango.api2.Device`
+       classes or a dictionary where:
        
-       For example, if you want to expose a server of type "MyServer" which
-       is defined by tango classes `MyServerClass` and `MyServer` then::
+       * key is the tango class name
+       * value is either:
+           #. a :class:`~PyTango.api2.Device` class or
+           #. a a sequence of two elements :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`
+           
+       Example 1: registering and running a PowerSupply inheriting from :class:`~PyTango.api2.Device`::
+       
+           from PyTango import server_run
+           from PyTango.api2 import Device, DeviceMeta
+       
+           class PowerSupply(Device):
+               __metaclass__ = DeviceMeta
+               
+           server_run((PowerSupply,))
+           
+       Example 2: registering and running a MyServer defined by tango classes 
+       `MyServerClass` and `MyServer`::
        
            import PyTango
+
+           class MyServer(PyTango.Device_4Impl):
+               pass
+               
+           class MyServerClass(PyTango.DeviceClass):
+               pass
+       
            PyTango.server_run({"MyServer": (MyServerClass, MyServer)})
-        
+       
        :param classes:
+           a sequence of :class:`~PyTango.api2.Device` classes or
            a dictionary where keyword is the tango class name and value is a 
-           sequence of Tango Class python class, and Tango python class
-       :type classes: dict
+           sequence of Tango Device Class python class, and Tango Device python class
+       :type classes: sequence or dict
        
        :param args:
            list of command line arguments [default: None, meaning use sys.argv]
@@ -1100,14 +1132,25 @@ def server_run(classes, args=None, msg_stream=sys.stderr, verbose=False):
        :param msg_stream:
            stream where to put messages [default: sys.stderr]
        
-       .. versionadded:: 8.0.0"""
+       :param util:
+           PyTango Util object [default: None meaning create a Util instance]
+       :type util: :class:`~PyTango.Util`
+       
+       :return: The Util singleton object
+       :rtype: :class:`~PyTango.Util`
+       
+       .. versionadded:: 8.0.0
+       
+       .. versionchanged:: 8.0.3
+           Added `util` keyword parameter.
+           Returns util object"""
        
     if msg_stream is None:
         import io
         msg_stream = io.BytesIO()
     write = msg_stream.write
     try:
-        return __server_run(classes, args=args)
+        return __server_run(classes, args=args, util=util)
         write("Exiting:\n")
     except KeyboardInterrupt:
         write("Exiting: Keyboard interrupt\n")

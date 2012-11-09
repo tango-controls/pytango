@@ -533,84 +533,60 @@ native :obj:`property` function. For exampke, to declare a scalar,
 
 It receives multiple keyword arguments.
 
-    :param name: alternative attribute name [default: class member name]
-    :type name: :obj:`str`
-    :param dtype: data type (see :ref:`Data type equivalence <pytango-api2-datatypes>`)
-                  [default: :obj:`~PyTango.CmdArgType`\ ``.DevDouble``]
-    :type dtype: :obj:`object`
-    :param dformat: data format [default: :obj:`~PyTango.AttrDataFormat`\ ``.SCALAR``]
-    :type dformat: :obj:`~PyTango.AttrDataFormat`
-    :param max_dim_x: maximum size for x dimension (ignored for 
-                      :obj:`~PyTango.AttrDataFormat`\ ``.SCALAR`` format) [default: 1]
-    :type max_dim_x: :obj:`int`
-    :param max_dim_y: maximum size for y dimension (ignored for
-                      :obj:`~PyTango.AttrDataFormat`\ ``.SCALAR`` and
-                      :obj:`~PyTango.AttrDataFormat`\ ``.SPECTRUM`` formats) [default: 0]
-    :type max_dim_y: :obj:`int`
-    :param display_level: display level [default: :obj:`~PyTango.DisLevel`\ ``.OPERATOR``]
-    :type display_level: :obj:`~PyTango.DispLevel`
-    :param polling_period: polling period [default: -1, meaning no polling] 
-    :type polling_period: :obj:`int`
-    :param memorized: attribute should or not be memorized [default: False]
-    :type memorized: :obj:`bool`
-    :param hw_memorized: attribute write method should be called at startup when
-                         restoring memorize value (dangerous!) [default: False]
-    :type hw_memorized: :obj:`bool`
-    :param access: read/write access. [default: if no fread and no fwrite methods
-                   are given it is :obj:`~PyTango.AttrWriteType`\ ``.READ``. If
-                   only fread is given then :obj:`~PyTango.AttrWriteType`\ ``.READ``.
-                   if only fwrite is given then :obj:`~PyTango.AttrWriteType`\ ``.WRITE``.
-                   if both fread and fwrite are given then :obj:`~PyTango.AttrWriteType`\ ``.READ_WRITE``
-    :type access: :obj:`~PyTango.AttrWriteType`
-    :param fread: read method name or method object [default: 'read_<attr_name>']
-    :type fread: :obj:`str` or :obj:`callable`
-    :param fwrite: write method name or method object [default: 'write_<attr_name>']
-    :type fwrite: :obj:`str` or :obj:`callable`
-    :param is_allowed: is allowed method name or method object [default: 'is_<attr_name>_allowed']
-    :type is_allowed: :obj:`str` or :obj:`callable`
-    :param label: attribute label [default: attribute name]
-    :type label: :obj:`str`
-    :param description: attribute description [default: empty string]
-    :type description: :obj:`str`
-    :param unit: attribute unit [default: empty string]
-    :type unit: :obj:`str`
-    :param standard_unit: attribute standard unit [default: empty string]
-    :type standard_unit: :obj:`str`
-    :param display_unit: attribute display unit [default: empty string]
-    :type display_unit: :obj:`str`
-    :param format: attribute representation format [default: '6.2f']
-    :type format: :obj:`str`    
-    :param min_value: attribute minimum allowed value [default: None]
-    :type min_value: :obj:`str`
-    :param max_value: attribute maximum allowed value [default: None]
-    :type max_value: :obj:`str`
-    :param min_alarm: minimum value to trigger attribute alarm [default: None]
-    :type min_alarm: :obj:`str`
-    :param max_alarm: maxmimum value to trigger attribute alarm [default: None]
-    :type max_alarm: :obj:`str`
-    :param min_warning: minimum value to trigger attribute warning [default: None] 
-    :type min_warning: :obj:`str`
-    :param max_warning: attribute maxmimum value to trigger attribute warning [default: None] 
-    :type max_warning: :obj:`str`
-    :param delta_val: attribute 
-    :type delta_val: :obj:`str`
-    :param delta_t: attribute 
-    :type delta_t: :obj:`str`
-    :param abs_change: attribute 
-    :type abs_change: :obj:`str`
-    :param rel_change: attribute 
-    :type rel_change: :obj:`str`
-    :param period: attribute 
-    :type period: :obj:`str`
-    :param archive_abs_change: attribute 
-    :type archive_abs_change: :obj:`str`
-    :param archive_rel_change: attribute 
-    :type archive_rel_change: :obj:`str`
-    :param archive_period: attribute 
-    :type archive_period: :obj:`str`
+===================== ========================================== ============================================== =======================================================================================
+parameter              type                                       default value                                  description
+===================== ========================================== ============================================== =======================================================================================
+name                   :obj:`str`                                 class member name                              alternative attribute name
+dtype                  :obj:`object`                              :obj:`~PyTango.CmdArgType`\ ``.DevDouble``     data type (see :ref:`Data type equivalence <pytango-api2-datatypes>`)             
+dformat                :obj:`~PyTango.AttrDataFormat`             :obj:`~PyTango.AttrDataFormat`\ ``.SCALAR``    data format
+max_dim_x              :obj:`int`                                 1                                              maximum size for x dimension (ignored for SCALAR format) 
+max_dim_y              :obj:`int`                                 0                                              maximum size for y dimension (ignored for SCALAR and SPECTRUM formats) 
+display_level          :obj:`~PyTango.DispLevel`                  :obj:`~PyTango.DisLevel`\ ``.OPERATOR``        display level
+polling_period         :obj:`int`                                 -1                                             polling period
+memorized              :obj:`bool`                                False                                          attribute should or not be memorized
+hw_memorized           :obj:`bool`                                False                                          write method should be called at startup when restoring memorize value (dangerous!)
+param access           :obj:`~PyTango.AttrWriteType`              :obj:`~PyTango.AttrWriteType`\ ``.READ``       read only/ read write / write only access
+fread                  :obj:`str` or :obj:`callable`              'read_<attr_name>'                             read method name or method object
+fwrite                 :obj:`str` or :obj:`callable`              'write_<attr_name>'                            write method name or method object
+is_allowed             :obj:`str` or :obj:`callable`              'is_<attr_name>_allowed'                       is allowed method name or method object
+label                  :obj:`str`                                 '<attr_name>'                                  attribute label
+description            :obj:`str`                                 ''                                             attribute description
+unit                   :obj:`str`                                 ''                                             physical units the attribute value is in
+standard_unit          :obj:`str`                                 ''                                             physical standard unit
+display_unit           :obj:`str`                                 ''                                             physical display unit (hint for clients)
+format                 :obj:`str`                                 '6.2f'                                         attribute representation format
+min_value              :obj:`str`                                 None                                           minimum allowed value
+max_value              :obj:`str`                                 None                                           maximum allowed value
+min_alarm              :obj:`str`                                 None                                           minimum value to trigger attribute alarm
+max_alarm              :obj:`str`                                 None                                           maximum value to trigger attribute alarm
+min_warning            :obj:`str`                                 None                                           minimum value to trigger attribute warning
+max_warning            :obj:`str`                                 None                                           maximum value to trigger attribute warning
+delta_val              :obj:`str`                                 None
+delta_t                :obj:`str`                                 None
+abs_change             :obj:`str`                                 None                                           minimum value change between events that causes event filter to send the event
+rel_change             :obj:`str`                                 None                                           minimum relative change between events that causes event filter to send the event (%)
+period                 :obj:`str`                                 None
+archive_abs_change     :obj:`str`                                 None
+archive_rel_change     :obj:`str`                                 None
+archive_period         :obj:`str`                                 None
+===================== ========================================== ============================================== =======================================================================================
 
 .. _pytango-api2-datatypes:
 
+The `dtype` parameter in :func:`attribute` is not retricted to the :obj:`~PyTango.CmdArgType options.
+For example, to define a :obj:`~PyTango.CmdArgType`\ ``.DevLong`` attribute you
+have several possibilities:
+
+    #. :obj:`int`
+    #. 'int'
+    #. 'int32'
+    #. 'integer' 
+    #. :obj:`~PyTango.CmdArgType`\ ``.DevLong``
+    #. 'DevLong' 
+    #. :obj:`numpy.int32`
+
+Below is the complete table of equivalences.
+    
 .. rubric:: Data type equivalence 
 
 """ + __type_doc

@@ -275,7 +275,7 @@ namespace PyAttribute
                 
             TangoSys_OMemStream o;
             o << "Wrong Python type for attribute " << att.get_name()
-                << "of type " << arg_type << ". Expected a sequence." << ends;
+              << " of type " << arg_type << ". Expected a sequence." << ends;
 
             Tango::Except::throw_exception(
                     "PyDs_WrongPythonDataTypeForAttribute",

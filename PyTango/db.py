@@ -521,7 +521,9 @@ def __Database__put_device_attribute_property(self, dev_name, value):
                 if is_non_str_seq(v2):
                     seq_2_StdStringVector(v2, db_datum.value_string)
                 else:
-                    db_datum.value_string.append(str(v2))
+                    if not is_pure_str(v2):
+                       v2 = repr(v2)
+                    db_datum.value_string.append(v2)
                 new_value.append(db_datum)
         value = new_value
     else:
