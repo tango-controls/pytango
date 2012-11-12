@@ -180,12 +180,23 @@ void CppDeviceClassWrap::attribute_factory(std::vector<Tango::Attr *> &att_list)
     //
     // make sure we pass the same vector object to the python method
     //
+    AutoPythonGIL python_guard;
+
     object py_att_list(
                 handle<>(
                     to_python_indirect<
                         std::vector<Tango::Attr *>,
                         detail::make_reference_holder>()(att_list)));
-    CALL_DEVCLASS_METHOD_VARGS(_DeviceClass__attribute_factory, py_att_list)
+
+    try
+    {
+        boost::python::call_method<void>(m_self, "_DeviceClass__attribute_factory",
+                                         py_att_list);
+    }
+    catch(boost::python::error_already_set &eas)
+    {
+        handle_python_exception(eas);
+    }
 }
 
 void CppDeviceClassWrap::command_factory()
@@ -198,12 +209,22 @@ void CppDeviceClassWrap::device_name_factory(std::vector<std::string> &dev_list)
     //
     // make sure we pass the same vector object to the python method
     //
+    AutoPythonGIL python_guard;
+    
     object py_dev_list(
                 handle<>(
                     to_python_indirect<
                         std::vector<std::string>,
                         detail::make_reference_holder>()(dev_list)));
-    CALL_DEVCLASS_METHOD_VARGS(device_name_factory, py_dev_list);
+    try
+    {
+        boost::python::call_method<void>(m_self, "device_name_factory",
+                                         py_dev_list);
+    }
+    catch(boost::python::error_already_set &eas)
+    {
+        handle_python_exception(eas);
+    }                        
 }
 
 void CppDeviceClassWrap::device_factory(const Tango::DevVarStringArray *dev_list)
