@@ -28,7 +28,11 @@
 # Makefile to generate the PyTango library
 # Needs the following environment variables to be defined:
 # - TANGO_ROOT
-# - NUMY_ROOT
+# - LOG4TANGO_ROOT
+# - OMNI_ROOT
+# - BOOST_ROOT
+# - ZMQ_ROOT
+# - NUMPY_ROOT
 #
 # if target == install also needs: prefix=<install_dir>
 # ex: make install prefix=/home/homer/.local/lib/python2.6/site-packages
@@ -37,10 +41,6 @@
 # - OBJS_DIR: directory where files will be build (default: objs)
 # - PY3K: if defined use python 3 boost python
 # - PY_VER: use a specific python version (default is empty) (ex: 3.2)
-
-ifndef TANGO_ROOT
-TANGO_ROOT=/usr
-endif
 
 ifdef PY_VER
 PY_EXC=python$(PY_VER)
@@ -88,7 +88,23 @@ LN_STATIC = g++ -pthread -static -Wl,-O1 -Wl,-Bsymbolic-functions
 LN_VER = -Wl,-h -Wl,--strip-all
 BOOST_LIB = boost_python-py$(PY_VER_S)
 LN_LIBS = -ltango -llog4tango -lpthread -lrt -ldl -lomniORB4 -lomniDynamic4 -lomnithread -lCOS4 -l$(BOOST_LIB) -lzmq
-LN_DIRS = -L$(TANGO_ROOT)/lib
+ifdef TANGO_ROOT
+LN_DIRS += -L$(TANGO_ROOT)/lib
+endif
+ifdef LOG4TANGO_ROOT
+LN_DIRS += -L$(LOG4TANGO_ROOT)/lib
+endif
+ifdef OMNI_ROOT
+LN_DIRS += -L$(OMNI_ROOT)/lib
+endif
+ifdef BOOST_ROOT
+LN_DIRS += -L$(BOOST_ROOT)/lib
+endif
+ifdef ZMQ_ROOT
+LN_DIRS += -L$(ZMQ_ROOT)/lib
+endif
+
+#LN_DIRS = -L$(TANGO_ROOT)/lib -L$(LOG4TANGO_ROOT)/lib -L$(OMNI_ROOT)/lib -L$(BOOST_ROOT)/lib -L$(ZMQ_ROOT)/lib
 
 INCLUDE_DIRS = \
     -Isrc \

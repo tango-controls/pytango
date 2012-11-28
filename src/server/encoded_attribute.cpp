@@ -80,7 +80,7 @@ namespace PyEncodedAttribute
             w = PyArray_DIM(py_value_ptr, 1);
             h = PyArray_DIM(py_value_ptr, 0);
             
-            buffer = static_cast<unsigned char*>(PyArray_DATA(py_value_ptr));
+            buffer = (unsigned char*)(PyArray_DATA(py_value_ptr));
             self.encode_gray8(buffer, w, h);
             return;
         }
@@ -194,7 +194,7 @@ namespace PyEncodedAttribute
             w = PyArray_DIM(py_value_ptr, 1);
             h = PyArray_DIM(py_value_ptr, 0);
             
-            buffer = static_cast<unsigned char*>(PyArray_DATA(py_value_ptr));
+            buffer = (unsigned char*)(PyArray_DATA(py_value_ptr));
             self.encode_jpeg_gray8(buffer, w, h, quality);
             return;
         }
@@ -308,7 +308,7 @@ namespace PyEncodedAttribute
             w = PyArray_DIM(py_value_ptr, 1);
             h = PyArray_DIM(py_value_ptr, 0);
             
-            buffer = static_cast<unsigned short*>(PyArray_DATA(py_value_ptr));
+            buffer = (unsigned short*)(PyArray_DATA(py_value_ptr));
             self.encode_gray16(buffer, w, h);
             return;
         }
@@ -418,7 +418,7 @@ namespace PyEncodedAttribute
 #ifndef DISABLE_PYTANGO_NUMPY
         else if (PyArray_Check(py_value_ptr))
         {
-            buffer = static_cast<unsigned char*>(PyArray_DATA(py_value_ptr));
+            buffer = (unsigned char*)(PyArray_DATA(py_value_ptr));
             self.encode_rgb24(buffer, w, h);
             return;
         }
@@ -532,7 +532,7 @@ namespace PyEncodedAttribute
 #ifndef DISABLE_PYTANGO_NUMPY
         else if (PyArray_Check(py_value_ptr))
         {
-            buffer = static_cast<unsigned char*>(PyArray_DATA(py_value_ptr));
+            buffer = (unsigned char*)(PyArray_DATA(py_value_ptr));
             self.encode_jpeg_rgb24(buffer, w, h, quality);
             return;
         }
@@ -646,7 +646,7 @@ namespace PyEncodedAttribute
 #ifndef DISABLE_PYTANGO_NUMPY
         else if (PyArray_Check(py_value_ptr))
         {
-            buffer = static_cast<unsigned char*>(PyArray_DATA(py_value_ptr));
+            buffer = (unsigned char*)(PyArray_DATA(py_value_ptr));
             self.encode_jpeg_rgb32(buffer, w, h, quality);
             return;
         }
