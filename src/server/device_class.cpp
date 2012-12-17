@@ -167,7 +167,9 @@ CppDeviceClassWrap::CppDeviceClassWrap(PyObject *self, const std::string &name)
  * Destructor
  */
 CppDeviceClassWrap::~CppDeviceClassWrap()
-{}
+{
+    CALL_DEVCLASS_METHOD(_DeviceClass__unregister_class)
+}
 
 void CppDeviceClassWrap::init_class()
 {
@@ -304,24 +306,6 @@ namespace PyDeviceClass
         }
         return py_cmd_list;
     }
-        
-    /*
-    void add_device(CppDeviceClass &self, auto_ptr<Tango::DeviceImpl> dev)
-    {
-        self.add_device(dev.get());
-        dev.release();
-    }
-
-    void add_device(CppDeviceClass &self, auto_ptr<Tango::Device_4Impl> dev)
-    {
-        self.add_device(dev.get());
-        dev.release();
-    }
-
-    void (*add_device1)(CppDeviceClass &, auto_ptr<Tango::DeviceImpl>) = &add_device;
-    void (*add_device2)(CppDeviceClass &, auto_ptr<Tango::Device_4Impl>) = &add_device;
-    */
-    
 }
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS (export_device_overload,

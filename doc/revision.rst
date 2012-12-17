@@ -82,6 +82,7 @@ Version history
 +============+==============================================================================================================================================================================+
 | 8.0.3      | Bug fixes:                                                                                                                                                                   |
 |            |     - from sourceforge:                                                                                                                                                      |
+|            |         - `3576353: [pytango] segfault on 'RestartServer' <https://sourceforge.net/tracker/?func=detail&aid=3576353&group_id=57612&atid=484769>`_                            |
 |            |         - `3579062: [pytango] Attribute missing methods <https://sourceforge.net/tracker/?func=detail&aid=3579062&group_id=57612&atid=484769>`_                              |
 |            |         - `3586337: [pytango] Some DeviceClass methods are not python safe <https://sourceforge.net/tracker/?func=detail&aid=3586337&group_id=57612&atid=484769>`_           |
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+

@@ -43,15 +43,29 @@
 # - PY_VER: use a specific python version (default is empty) (ex: 3.2)
 
 ifdef PY_VER
+
+ifdef PY_DEBUG
+PY_EXC=python$(PY_VER)-dbg
+else
 PY_EXC=python$(PY_VER)
+endif # PY_DEBUG
+
 PY_MAJOR=$(shell $(PY_EXC) -c "import sys; sys.stdout.write(str(sys.version_info[0]))")
 PY_MINOR=$(shell $(PY_EXC) -c "import sys; sys.stdout.write(str(sys.version_info[1]))")
+
 else
+
+ifdef PY_DEBUG
+PY_EXC=python-dbg
+else
+PY_EXC=python
+endif # PY_DEBUG
+
 PY_EXC=python
 PY_MAJOR=$(shell $(PY_EXC) -c "import sys; sys.stdout.write(str(sys.version_info[0]))")
 PY_MINOR=$(shell $(PY_EXC) -c "import sys; sys.stdout.write(str(sys.version_info[1]))")
 PY_VER=$(PY_MAJOR).$(PY_MINOR)
-endif
+endif # PY_VER
 
 PY_VER_S=$(PY_MAJOR)$(PY_MINOR)
 
@@ -77,7 +91,12 @@ endif
 
 CC = gcc
 
+ifdef PY_DEBUG
+PY_INC = $(shell python$(PY_VER)-dbg-config --includes)
+else
 PY_INC = $(shell python$(PY_VER)-config --includes)
+endif
+
 NUMPY_INC = -I$(NUMPY_ROOT)/include
 TANGO_INC = -I$(TANGO_ROOT)/include
 PRE_C_H = precompiled_header.hpp

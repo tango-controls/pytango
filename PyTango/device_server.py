@@ -44,7 +44,7 @@ from ._PyTango import DevFailed, DeviceImpl, Device_3Impl, Device_4Impl, \
 from .utils import document_method as __document_method
 from .utils import copy_doc
 from .attr_data import AttrData
-
+from .globals import get_device_class_from_device_impl
 from .log4tango import TangoStream
 
 class AttributeAlarm(object):
@@ -273,10 +273,9 @@ def __init_Attribute():
     Attribute.set_properties = __Attribute__set_properties
     
 def __DeviceImpl__get_device_class(self):
-    try:
-        return self._device_class_instance
-    except AttributeError:
-        return None
+    if self._device_class_instance is None:
+        self._device_class_instance = get_device_class_from_device_impl(self)
+    return self._device_class_instance
 
 def __DeviceImpl__get_device_properties(self, ds_class = None):
     """get_device_properties(self, ds_class = None) -> None

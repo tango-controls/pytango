@@ -1198,7 +1198,6 @@ void export_device_impl()
         .def("_add_attribute", &PyDeviceImpl::add_attribute)
         .def("_remove_attribute", &PyDeviceImpl::remove_attribute,
             remove_attribute_overload())
-        //@TODO .def("get_device_class")
         //@TODO .def("get_db_device")
         .def("is_attribute_polled", &PyDeviceImpl::is_attribute_polled)
         .def("is_command_polled", &PyDeviceImpl::is_command_polled)

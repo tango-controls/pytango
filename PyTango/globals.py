@@ -28,7 +28,9 @@ This is an internal PyTango module.
 __all__ = [ "get_class", "get_classes", "get_cpp_class", "get_cpp_classes",
             "get_constructed_class", "get_constructed_classes",
             "class_factory", "delete_class_list",
-            "class_list", "cpp_class_list", "constructed_class"]
+            "class_list", "cpp_class_list", "constructed_class", "delete_class",
+            "get_device_class_from_device_impl",
+            "get_device_class_from_device_impl_class"]
             
 __docformat__ = "restructuredtext"
 
@@ -83,6 +85,14 @@ def get_constructed_class_by_class(klass):
             return k
     return None
 
+def get_device_class_from_device_impl(device_impl):
+    return get_device_class_from_device_impl_class(device_impl.__class__)
+
+def get_device_class_from_device_impl_class(device_impl_class):
+    for info in get_classes():
+        if info[1] == device_impl_class:
+            return get_constructed_class_by_class(info[0])
+
 #
 # A method to delete Tango classes from Python
 #
@@ -90,7 +100,14 @@ def get_constructed_class_by_class(klass):
 def delete_class_list():
     global constructed_class
     if len(constructed_class) != 0:
-       del(constructed_class[:])
+        del(constructed_class[:])
+
+def delete_class(device_class):
+    constructed_classes = get_constructed_classes()
+    try:
+        constructed_classes.remove(device_class)
+    except ValueError:
+        pass
 
 #
 # A generic class_factory method
