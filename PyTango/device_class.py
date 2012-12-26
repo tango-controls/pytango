@@ -42,7 +42,7 @@ from .utils import is_pure_str, is_non_str_seq, seqStr_2_obj, obj_2_str, \
 from .utils import document_method as __document_method
 
 from .globals import get_class, get_class_by_class, \
-    get_constructed_class_by_class, delete_class
+    get_constructed_class_by_class
 from .attr_data import AttrData
 
 
@@ -309,9 +309,6 @@ class DeviceClass(_DeviceClass):
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, self.get_name())    
     
-    def __unregister_class(self):
-        delete_class(self)
-    
     def __throw_create_attribute_exception(self, msg):
         """Helper method to throw DevFailed exception when inside create_attribute"""
         Except.throw_exception("PyDs_WrongAttributeDefinition", msg, "create_attribute()")
@@ -536,20 +533,20 @@ class DeviceClass(_DeviceClass):
        
         klass = self.__class__
         klass_name = klass.__name__
-
-        info = get_class_by_class(klass)
+        info, klass = get_class_by_class(klass), get_constructed_class_by_class(klass)
+        
         if info is None:
             raise RuntimeError("Device class '%s' is not registered" % klass_name)
 
-        deviceClass = get_constructed_class_by_class(klass)
-        if deviceClass is None:
+        if klass is None:
             raise RuntimeError("Device class '%s' as not been constructed" % klass_name)
         
-        _, deviceImplClass, deviceImplName = info
-        tmp_dev_list = []
+        deviceClassClass, deviceImplClass, deviceImplName = info
+        deviceImplClass._device_class_instance = klass
 
+        tmp_dev_list = []
         for dev_name in device_list:
-            device = deviceImplClass(deviceClass, dev_name)
+            device = deviceImplClass(klass, dev_name)
             self._add_device(device)
             tmp_dev_list.append(device)
 
