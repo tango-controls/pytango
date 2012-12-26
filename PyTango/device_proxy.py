@@ -122,13 +122,12 @@ def __DeviceProxy__setattr(self, name, value):
         if not hasattr(self, '__attr_cache') or name.lower() not in self.__attr_cache:
             self.__refresh_attr_cache()
     except:
-        self.__dict__[name] = value
-        return
+        return super(DeviceProxy, self).__setattr__(name, value)
         
     if name.lower() in self.__attr_cache:
         self.write_attribute(name, value)
     else:
-        self.__dict__[name] = value
+        return super(DeviceProxy, self).__setattr__(name, value)
 
 
 def __DeviceProxy__getAttributeNames(self):
