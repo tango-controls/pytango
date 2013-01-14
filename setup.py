@@ -71,7 +71,7 @@ def abspath(*path):
 
 def get_release_info():
     name = "release"
-    release_dir = abspath('PyTango')
+    release_dir = abspath('src', 'boost', 'python')
     data = imp.find_module(name, [release_dir])
     release = imp.load_module(name, *data)
     return release.Release
@@ -443,12 +443,18 @@ def main():
             'omnithread',
             'COS4',
         ]
-
-        # when building with multiple version of python on debian we need
-        # to link against boost_python-py25/-py26 etc...
-        pyver = "py" + "".join(map(str, platform.python_version_tuple()[:2]))
-        dist = platform.dist()[0].lower()
-        libraries.append('boost_python-' + pyver)
+        
+        boost_library_name = 'boost_python'
+        
+        if 'linux' in sys.platform:
+            dist_name = platform.linux_distribution()[0].lower()
+            debian_based = 'debian' in dist_name or 'ubuntu' in dist_name
+            if debian_based:
+                # when building with multiple version of python on debian we need
+                # to link against boost_python-py25/-py26 etc...
+                pyver = "-py" + "".join(map(str, platform.python_version_tuple()[:2]))
+                boost_library_name += pyver
+        libraries.append(boost_library_name)
 
         library_dirs += [ os.path.join(OMNI_ROOT, 'lib') ]
 
@@ -474,7 +480,7 @@ def main():
 
     include_dirs = uniquify(include_dirs)
     library_dirs = uniquify(library_dirs)
-    src_dir = abspath('src')
+    src_dir = abspath('src', 'boost', 'cpp')
     client_dir = src_dir
     server_dir = os.path.join(src_dir, 'server')
     _clientfiles = [ os.path.join(client_dir,fname) for fname in os.listdir(client_dir) if fname.endswith('.cpp') ]
@@ -515,7 +521,7 @@ def main():
         platforms        = Release.platform,
         license          = Release.license,
         packages         = packages,
-        package_dir      = { 'PyTango' : 'PyTango' },
+        package_dir      = { 'PyTango' : os.path.join('src', 'boost', 'python') },
         py_modules       = py_modules,
         classifiers      = classifiers,
         package_data     = package_data,

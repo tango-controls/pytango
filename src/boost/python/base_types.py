@@ -390,6 +390,7 @@ def __doc_base_types():
         
         - archive_rel_change : (str) relative change that will generate an event
         - archive_abs_change : (str) absolute change that will generate an event
+        - archive_period : (str) archive period
         - extensions : (sequence<str>) extensions (currently not used)"""
 
     EventData.__doc__ = """

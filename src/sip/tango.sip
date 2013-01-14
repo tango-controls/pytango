@@ -21,16 +21,11 @@
    
 *******************************************************************************/
 
-#include "precompiled_header.hpp"
-#include <tango.h>
+%Module(name=Tango, version=0801)
 
-using namespace boost::python;
-
-void export_archive_event_info()
-{
-    class_<Tango::ArchiveEventInfo>("ArchiveEventInfo")
-        .def_readwrite("archive_rel_change", &Tango::ArchiveEventInfo::archive_rel_change)
-        .def_readwrite("archive_abs_change", &Tango::ArchiveEventInfo::archive_abs_change)
-        .def_readwrite("extensions", &Tango::ArchiveEventInfo::extensions)
-    ;
-}
+%Include stdutils.sip
+%Include constants.sip
+%Include connection.sip
+%Include dbdatum.sip
+%Include database.sip
+%Include deviceproxy.sip
