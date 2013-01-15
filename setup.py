@@ -337,7 +337,7 @@ def main():
     # include directories
     #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
-    include_dirs = [ os.path.abspath('src') ]
+    include_dirs = [ os.path.abspath('src', 'boost', 'cpp') ]
 
     _tango_root_inc = os.path.join(TANGO_ROOT, 'include')
     include_dirs.append(_tango_root_inc)
