@@ -88,7 +88,7 @@ class DevTest(PyTango.Device_4Impl):
         self.slow_actua = 0
         self.slow_actua_write = 0
         
-        self.enc_attr_data = bytearray([97,98,99,100])
+        self.enc_attr_data = bytes(bytearray([97,98,99,100]))
         self.enc_attr = ['Which format?', self.enc_attr_data] #''.join(chr(i) for i in self.enc_attr_data).encode('utf-8')]
         self.enc_format_toggle = False
         self.encoded_cmd_ctr = 0
@@ -2189,47 +2189,41 @@ class DevTest(PyTango.Device_4Impl):
 
 
     def write_Short_attr_w(self,the_att):
-        data = []
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
 
 #------------------------------------------------------------------
 
     def write_Long_attr_w(self,the_att):
         print "In write_Long_attr_w for attribute",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Float_attr_w(self,the_att):
         print "In write_Float_attr_w for attribute",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_UShort_attr_w(self,the_att):
         print "In write_UShort_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data;
 
 #------------------------------------------------------------------
 
     def write_UChar_attr_w(self,the_att):
         print "In write_UChar_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Short_attr_rw(self,the_att):
         print "In write_Short_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         self.attr_short_rw = data[0]
 
 #------------------------------------------------------------------
@@ -2241,16 +2235,14 @@ class DevTest(PyTango.Device_4Impl):
 
     def write_Long_attr_with_w2(self,the_att):
         print "In write_Long_attr_with_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         self.attr_long_rw2 = data[0]
 
 #------------------------------------------------------------------
 
     def write_Short_attr_w2(self,the_att):
         print "In write_Short_attr_w2 for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
@@ -2258,111 +2250,98 @@ class DevTest(PyTango.Device_4Impl):
     def write_Double_attr_w(self,the_att):
         print "In write_Double_attr_w for attribute ",the_att.get_name()
         data=[];
-        the_att.get_write_value(data)
+        the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_String_attr_w2(self,the_att):
         print "In write_String_attr_w2 for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_String_attr_w(self,the_att):
         print "In write_String_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Boolean_attr_w(self,the_att):
         print "In write_Boolean_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Short_spec_attr_w(self,the_att):
         print "In write_Short_spec_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Short_ima_attr_w(self,the_att):
         print "In write_Short_ima_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Long_spec_attr_w(self,the_att):
         print "In write_Long_spec_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Double_spec_attr_w(self,the_att):
         print "In write_Double_spec_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_String_spec_attr_w(self,the_att):
         print "In write_String_spec_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Float_spec_attr_w(self,the_att):
         print "In write_Float_spec_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Boolean_spec_attr_w(self,the_att):
         print "In write_Boolean_spec_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_UShort_spec_attr_w(self,the_att):
         print "In write_UShort_spec_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_UChar_spec_attr_w(self,the_att):
         print "In write_UChar_spec_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_String_ima_attr_w(self,the_att):
         print "In write_String_ima_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
@@ -2372,88 +2351,77 @@ class DevTest(PyTango.Device_4Impl):
 
     def write_Float_ima_attr_w(self,the_att):
         print "In write_Float_ima_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_UShort_ima_attr_w(self,the_att):
         print "In write_UShort_ima_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Short_spec_attr_rw(self,the_att):
         print "In write_Short_spec_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_String_spec_attr_rw(self,the_att):
         print "In write_String_spec_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Float_spec_attr_rw(self,the_att):
         print "In write_Float_spec_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_UChar_spec_attr_rw(self,the_att):
         print "In write_UChar_spec_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Short_ima_attr_rw(self,the_att):
         print "In write_Short_ima_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_String_ima_attr_rw(self,the_att):
         print "In write_String_ima_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Boolean_ima_attr_rw(self,the_att):
         print "In write_Boolean_ima_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_UShort_ima_attr_rw(self,the_att):
         print "In write_UShort_ima_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_attr_asyn_write(self,the_att):
         print "In write_attr_asyn_write for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
         time.sleep(2)
 
@@ -2461,8 +2429,7 @@ class DevTest(PyTango.Device_4Impl):
 
     def write_attr_asyn_write_to(self,the_att):
         print "In write_attr_asyn_write_to for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
         time.sleep(4)
 
@@ -2470,8 +2437,7 @@ class DevTest(PyTango.Device_4Impl):
 
     def write_attr_asyn_write_except(self,the_att):
         print "In write_attr_asyn_write_except for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
         time.sleep(2)
         PyTango.Except.throw_exception("aaa","This is a test ","DevTest::write_attr_hardware")
@@ -2480,8 +2446,7 @@ class DevTest(PyTango.Device_4Impl):
 
     def write_slow_actuator(self,the_att):
         print "In write_slow_actuator for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         self.slow_actua = data[0]
         self.slow_actua_write = time.time()
         the_att.set_value(self.slow_actua)
@@ -2491,8 +2456,7 @@ class DevTest(PyTango.Device_4Impl):
 
     def write_fast_actuator(self,the_att):
         print "In write_fast_actuator for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         self.fast_actua = data[0]
         the_att.set_value(self.fast_actua)
         the_att.set_quality(PyTango.AttrQuality.ATTR_CHANGING)
@@ -2502,54 +2466,47 @@ class DevTest(PyTango.Device_4Impl):
 
     def write_Long64_attr_w(self,the_att):
         print "In write_Long64_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Long64_spec_attr_w(self,the_att):
         print "In write_Long64_spec_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Long64_ima_attr_w(self,the_att):
         print "In write_Long64_ima_attr_w for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Long64_attr_rw(self,the_att):
         print "In write_Long64_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Long64_spec_attr_rw(self,the_att):
         print "In write_Long64_spec_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
 #------------------------------------------------------------------
 
     def write_Long64_ima_attr_rw(self,the_att):
         print "In write_Long64_ima_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         print "Attribute value = ",data
 
     def write_Long_spec_attr_rw(self,the_att):
         print "In write_Long_spec_attr_rw for attribute ",the_att.get_name()
-        data=[]
-        the_att.get_write_value(data)
+        data = the_att.get_write_value()
         self.Long_spec_attr_rw = data
         print "Attribute value = ",data
 

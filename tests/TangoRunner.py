@@ -22,15 +22,23 @@ def _printDict(obj):
         print("\t" + str(key) + " : " + str(value))
         
 def _hasFailed(result):
-    '''Checks if any failure occured'''
+    '''Checks if any failure occurred'''
     if result.__class__.__name__ == 'TangoTestResult' and (len(result.errors) != 0 or len(result.failures) != 0):
         return True
     return False
 
+def formatName(name):
+    newName = ''
+    for letter in name:
+        if letter.isupper():
+            newName += ' '
+        newName += letter
+    return newName
+
 class TangoTestSuite(TestSuite):
     '''Tango-tailored Test Suite class'''
-    def __init__(self):
-        super(TangoTestSuite, self).__init__()
+    def __init__(self, tests=()):
+        super(TangoTestSuite, self).__init__(tests)
         
     def __call__(self, *args, **kwds):
         if len(args) > 0:
@@ -47,7 +55,7 @@ class TangoTestSuite(TestSuite):
                 if suiteClass != None.__class__ and all(isinstance(test, TangoTestCase) and test.__class__ == suiteClass for test in self):
                     # print test suite name (only once), truncate the '__loop' suffix and show number of iterations
                     if self.loop == _loopSuite:
-                        suiteName = className
+                        suiteName = formatName(className)
                         if suiteName.endswith(_loopSuffix):
                             suiteName = suiteName[:-len(_loopSuffix)]
                             if _loopSuite > 1:
@@ -71,8 +79,8 @@ class TangoTestSuite(TestSuite):
 
 class TangoTestCase(TestCase):
     '''Tango-tailored Test Case class'''
-    def __init__(self):
-        super(TangoTestCase, self).__init__()
+    def __init__(self, methodName='runTest'):
+        super(TangoTestCase, self).__init__(methodName)
         
     def __call__(self, *args, **kwds):
         if len(args) > 0:
@@ -83,7 +91,7 @@ class TangoTestCase(TestCase):
                 result.loop = 0
                 # print test case name (only once), truncate the '__loop' suffix and show number of iterations
                 if self.loop == _loop and result.loopSuiteDone:
-                    caseName = self._testMethodName
+                    caseName = formatName(self._testMethodName)
                     if caseName.startswith('test_'):
                         caseName = caseName[len('test_'):]
                     if caseName.endswith(_loopSuffix):
@@ -140,6 +148,8 @@ class TangoTestResult(result.TestResult):
         self.dots = verbosity == 2
         self.tangoPrint = verbosity == 1
         self.descriptions = descriptions
+        self.loop = 0
+        self.loopSuite = 0
 
     def getDescription(self, test):
         testString = str(test).split(' ')
@@ -227,6 +237,7 @@ class TangoTestResult(result.TestResult):
 
     def printErrorList(self, flavour, errors):
         for test, err in errors:
+            self.stream.writeln()
             self.stream.writeln(self.separator1)
             self.stream.writeln("%s: %s" % (flavour,self.getDescription(test)))
             self.stream.writeln(self.separator2)
