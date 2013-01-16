@@ -153,16 +153,7 @@ inline PyObject *PyImport_ImportModule_(const std::string &name)
  */
 #define PyCapsule_GetName(capsule) NULL
 
-static int
-PyCapsule_SetName(PyObject *capsule, const char *unused)
-{
-    unused = unused;
-    PyErr_SetString(PyExc_NotImplementedError,
-        "can't use PyCapsule_SetName with CObjects");
-    return 1;
-}
-
-
+static int PyCapsule_SetName(PyObject *capsule, const char *unused);
 
 #define PyCapsule_GetContext(capsule) \
     __PyCapsule_GetField(capsule, descr)
@@ -171,67 +162,7 @@ PyCapsule_SetName(PyObject *capsule, const char *unused)
     __PyCapsule_SetField(capsule, descr, context)
 
 
-static void *
-PyCapsule_Import(const char *name, int no_block)
-{
-    PyObject *object = NULL;
-    void *return_value = NULL;
-    char *trace;
-    size_t name_length = (strlen(name) + 1) * sizeof(char);
-    char *name_dup = (char *)PyMem_MALLOC(name_length);
-
-    if (!name_dup) {
-        return NULL;
-    }
-
-    memcpy(name_dup, name, name_length);
-
-    trace = name_dup;
-    while (trace) {
-        char *dot = strchr(trace, '.');
-        if (dot) {
-            *dot++ = '\0';
-        }
-
-        if (object == NULL) {
-            if (no_block) {
-                object = PyImport_ImportModuleNoBlock(trace);
-            } else {
-                object = PyImport_ImportModule(trace);
-                if (!object) {
-                    PyErr_Format(PyExc_ImportError,
-                        "PyCapsule_Import could not "
-                        "import module \"%s\"", trace);
-                }
-            }
-        } else {
-            PyObject *object2 = PyObject_GetAttrString(object, trace);
-            Py_DECREF(object);
-            object = object2;
-        }
-        if (!object) {
-            goto EXIT;
-        }
-
-        trace = dot;
-    }
-
-    if (PyCObject_Check(object)) {
-        PyCObject *cobject = (PyCObject *)object;
-        return_value = cobject->cobject;
-    } else {
-        PyErr_Format(PyExc_AttributeError,
-            "PyCapsule_Import \"%s\" is not valid",
-            name);
-    }
-
-EXIT:
-    Py_XDECREF(object);
-    if (name_dup) {
-        PyMem_FREE(name_dup);
-    }
-    return return_value;
-}
+static void * PyCapsule_Import(const char *name, int no_block);
 
 #endif /* #if PY_VERSION_HEX < 0x02070000 */
 
