@@ -153,7 +153,7 @@ inline PyObject *PyImport_ImportModule_(const std::string &name)
  */
 #define PyCapsule_GetName(capsule) NULL
 
-static int PyCapsule_SetName(PyObject *capsule, const char *unused);
+int PyCapsule_SetName(PyObject *capsule, const char *unused);
 
 #define PyCapsule_GetContext(capsule) \
     __PyCapsule_GetField(capsule, descr)
@@ -162,7 +162,7 @@ static int PyCapsule_SetName(PyObject *capsule, const char *unused);
     __PyCapsule_SetField(capsule, descr, context)
 
 
-static void * PyCapsule_Import(const char *name, int no_block);
+void * PyCapsule_Import(const char *name, int no_block);
 
 #endif /* #if PY_VERSION_HEX < 0x02070000 */
 

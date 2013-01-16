@@ -123,8 +123,7 @@ void is_method_defined(PyObject *obj, const std::string &method_name,
 
 #ifdef PYCAPSULE_OLD
 
-static int
-PyCapsule_SetName(PyObject *capsule, const char *unused)
+int PyCapsule_SetName(PyObject *capsule, const char *unused)
 {
     unused = unused;
     PyErr_SetString(PyExc_NotImplementedError,
@@ -132,8 +131,7 @@ PyCapsule_SetName(PyObject *capsule, const char *unused)
     return 1;
 }
 
-static void *
-PyCapsule_Import(const char *name, int no_block)
+void *PyCapsule_Import(const char *name, int no_block)
 {
     PyObject *object = NULL;
     void *return_value = NULL;
