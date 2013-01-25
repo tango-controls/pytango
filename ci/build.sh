@@ -18,4 +18,5 @@ else
 		echo "Go to Jenkins dashboard -> Manage Jenkins -> Global Properties, tick Environment Variables and add a key-value pair: name - INSTITUTE, value - YourInstituteName."
 		echo "Check out the project. Go to the 'ci' directory and create a 'YourInstituteName' subdirectory. In the 'YourInstituteName' subdirectory create a 'build.sh' file which will contain the recipe how to build your project. Commit changes."
 	fi
+	exit -1
 fi
