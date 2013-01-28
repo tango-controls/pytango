@@ -2,7 +2,6 @@
 
 pwd
 
-
 if [ ! -z "$INSTITUTE" -a -d "$INSTITUTE" -a -f "$INSTITUTE/build.sh" ]
 then
 	echo "Executing build.sh for $INSTITUTE"
