@@ -2,13 +2,26 @@
 
 echo "## In ALBA/build.sh ##"
 
-pwd
+
+if [ ! -z "$NODE_NAME" -a -f "$NODE_NAME" ]
+then
+	source "$NODE_NAME"
+else
+	echo "The settings file for the node $NODE_NAME does not exist!"
+	exit 1
+fi
+
+
+export TANGO_ROOT=/tmp/jenkins/jobs/TangoLib
+
 
 export LD_LIBRARY_PATH=/tmp/jenkins/jobs/TangoLib/lib:$LD_LIBRARY_PATH
 export CPLUS_INCLUDE_PATH=/tmp/jenkins/jobs/TangoLib/include:$CPLUS_INCLUDE_PATH
 
+
 echo $LD_LIBRARY_PATH
 echo $CPLUS_INCLUDE_PATH
+
 
 cd ../..
 
