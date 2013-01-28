@@ -1,4 +1,4 @@
-export LOG4TANGO_ROOT=/homelocal/sicilia
+export LOG4TANGO_ROOT=/siciliarep/build/lib/log4tango/log4tango.suse121.64
 export OMNI_ROOT=/siciliarep/build/lib/omniORB/omniORB.suse121.64
 export BOOST_ROOT=/siciliarep/build/lib/boost/boost.suse121.64
 export ZMQ_ROOT=/siciliarep/build/lib/zeromq/zeromq.suse121.64

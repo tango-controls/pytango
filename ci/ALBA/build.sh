@@ -12,6 +12,15 @@ else
 fi
 
 
+echo LOG4TANGO_ROOT
+echo $LOG4TANGO_ROOT
+echo OMNI_ROOT
+echo $OMNI_ROOT
+echo BOOST_ROOT
+echo $BOOST_ROOT
+echo ZMQ_ROOT
+echo $ZMQ_ROOT
+
 export TANGO_ROOT=/tmp/jenkins/jobs/TangoLib
 
 
