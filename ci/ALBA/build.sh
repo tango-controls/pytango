@@ -21,11 +21,19 @@ echo $BOOST_ROOT
 echo ZMQ_ROOT
 echo $ZMQ_ROOT
 
+echo C_INCLUDE_PATH
+echo $C_INCLUDE_PATH
+
+echo CPLUS_INCLUDE_PATH
+echo $CPLUS_INCLUDE_PATH
+
+export C_INCLUDE_PATH=/tmp/jenkins/jobs/TangoLib/include:$C_INCLUDE_PATH
+export CPLUS_INCLUDE_PATH=/tmp/jenkins/jobs/TangoLib/include:$CPLUS_INCLUDE_PATH
+
 export TANGO_ROOT=/tmp/jenkins/jobs/TangoLib
 
 
 export LD_LIBRARY_PATH=/tmp/jenkins/jobs/TangoLib/lib:$LD_LIBRARY_PATH
-export CPLUS_INCLUDE_PATH=/tmp/jenkins/jobs/TangoLib/include:$CPLUS_INCLUDE_PATH
 
 
 echo $LD_LIBRARY_PATH
