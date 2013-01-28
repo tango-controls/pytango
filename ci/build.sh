@@ -12,7 +12,7 @@ then
 else
 	if [ ! -z "$INSTITUTE" ]
 	then
-		echo "Failed to execute ci/$INSTITUTE/build.sh!"
+		echo "Failed to execute ci/$INSTITUTE/build.sh !"
 		echo "Make sure ci/$INSTITUTE/build.sh exists"
 	else
 		echo "Mr Jenkins needs additional configuration!"
