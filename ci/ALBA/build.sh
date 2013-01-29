@@ -2,6 +2,9 @@
 
 echo "## In ALBA/build.sh ##"
 
+pwd
+cd ../..
+pwd
 
 python setup.py config --prefix=/tmp/jenkins/jobs/PyTango
 python setup.py install
@@ -17,7 +20,6 @@ else
 	exit 1
 fi
 
-cd ../..
 
 
 echo LOG4TANGO_ROOT
