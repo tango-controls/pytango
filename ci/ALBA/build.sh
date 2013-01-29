@@ -3,6 +3,12 @@
 echo "## In ALBA/build.sh ##"
 
 
+python setup.py config --prefix=/tmp/jenkins/jobs/PyTango
+python setup.py install
+
+exit $?
+
+
 if [ ! -z "$NODE_NAME" -a -f "$NODE_NAME" ]
 then
 	source "$NODE_NAME"
@@ -10,6 +16,8 @@ else
 	echo "The settings file for the node $NODE_NAME does not exist!"
 	exit 1
 fi
+
+cd ../..
 
 
 echo LOG4TANGO_ROOT
