@@ -2,12 +2,8 @@
 
 echo "## In ALBA/build.sh ##"
 
-pwd
-cd ../..
-pwd
-
-python setup.py config --prefix=/tmp/jenkins/jobs/PyTango
-python setup.py install
+python setup.py build
+python setup.py install --prefix=/tmp/jenkins/jobs/PyTango
 
 exit $?
 
