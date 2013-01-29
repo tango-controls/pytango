@@ -2,6 +2,8 @@
 
 echo "## In ALBA/build.sh ##"
 
+cd ../..
+
 python setup.py build
 python setup.py install --prefix=/tmp/jenkins/jobs/PyTango
 
