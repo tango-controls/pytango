@@ -81,8 +81,8 @@ PY_INC = $(shell python$(PY_VER)-config --includes)
 OPTIMIZE_CC = -g -O0
 OPTIMIZE_LN = -O0
 
-NUMPY_INC = -I$(NUMPY_ROOT)/include
-TANGO_INC = -I$(TANGO_ROOT)/include
+#NUMPY_INC = -I$(NUMPY_ROOT)/include
+#TANGO_INC = -I$(TANGO_ROOT)/include
 PRE_C_H = precompiled_header.hpp
 PRE_C_H_O = $(OBJS_DIR)/$(PRE_C_H).gch
 PRE_C = -include$(OBJS_DIR)/$(PRE_C_H)
@@ -91,20 +91,27 @@ LN_STATIC = g++ -pthread -static -Wl,$(OPTIMIZE_LN) -Wl,-Bsymbolic-functions
 LN_VER = -Wl,-h -Wl,--strip-all
 BOOST_LIB = boost_python-py$(PY_VER_S)
 LN_LIBS = -ltango -llog4tango -lpthread -lrt -ldl -lomniORB4 -lomniDynamic4 -lomnithread -lCOS4 -l$(BOOST_LIB) -lzmq
+
 ifdef TANGO_ROOT
 LN_DIRS += -L$(TANGO_ROOT)/lib
+TANGO_INC = -I$(TANGO_ROOT)/include
 endif
 ifdef LOG4TANGO_ROOT
 LN_DIRS += -L$(LOG4TANGO_ROOT)/lib
+LOG4TANGO_INC = -I$(LOG4TANGO_ROOT)/include
 endif
 ifdef OMNI_ROOT
 LN_DIRS += -L$(OMNI_ROOT)/lib
+OMNI_INC = -I$(OMNI_ROOT)/include
 endif
 ifdef BOOST_ROOT
 LN_DIRS += -L$(BOOST_ROOT)/lib
 endif
 ifdef ZMQ_ROOT
 LN_DIRS += -L$(ZMQ_ROOT)/lib
+endif
+ifdef NUMPY_ROOT
+NUMPY_INC += -L$(NUMPY_ROOT)/include
 endif
 
 #LN_DIRS = -L$(TANGO_ROOT)/lib -L$(LOG4TANGO_ROOT)/lib -L$(OMNI_ROOT)/lib -L$(BOOST_ROOT)/lib -L$(ZMQ_ROOT)/lib
@@ -115,7 +122,9 @@ INCLUDE_DIRS = \
     $(TANGO_INC) \
     $(TANGO_INC)/tango \
     $(PY_INC) \
-    $(NUMPY_INC)
+    $(NUMPY_INC) \
+    $(LOG4TANGO_INC) \
+    $(OMNI_INC)
 
 CCFLAGS = -pthread -fno-strict-aliasing -DNDEBUG $(OPTIMIZE_CC) -fwrapv -Wall -fPIC -std=c++0x -DPYTANGO_HAS_UNIQUE_PTR $(INCLUDE_DIRS)
 
