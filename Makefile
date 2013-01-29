@@ -81,7 +81,6 @@ PY_INC = $(shell python$(PY_VER)-config --includes)
 OPTIMIZE_CC = -g -O0
 OPTIMIZE_LN = -O0
 
-#NUMPY_INC = -I$(NUMPY_ROOT)/include
 #TANGO_INC = -I$(TANGO_ROOT)/include
 PRE_C_H = precompiled_header.hpp
 PRE_C_H_O = $(OBJS_DIR)/$(PRE_C_H).gch
@@ -110,9 +109,8 @@ endif
 ifdef ZMQ_ROOT
 LN_DIRS += -L$(ZMQ_ROOT)/lib
 endif
-ifdef NUMPY_ROOT
-NUMPY_INC += -L$(NUMPY_ROOT)/include
-endif
+
+NUMPY_INC = -I$(NUMPY_ROOT)/include
 
 #LN_DIRS = -L$(TANGO_ROOT)/lib -L$(LOG4TANGO_ROOT)/lib -L$(OMNI_ROOT)/lib -L$(BOOST_ROOT)/lib -L$(ZMQ_ROOT)/lib
 
