@@ -30,7 +30,7 @@ echo $CPLUS_INCLUDE_PATH
 echo CPATH
 echo $CPATH
 
-export CPATH=/tmp/jenkins/jobs/TangoLib/include:$CPATH
+export CPATH=/tmp/jenkins/jobs/TangoLib/include
 export C_INCLUDE_PATH=/tmp/jenkins/jobs/TangoLib/include:$C_INCLUDE_PATH
 export CPLUS_INCLUDE_PATH=/tmp/jenkins/jobs/TangoLib/include:$CPLUS_INCLUDE_PATH
 
