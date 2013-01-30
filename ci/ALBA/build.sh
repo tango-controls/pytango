@@ -2,13 +2,6 @@
 
 echo "## In ALBA/build.sh ##"
 
-cd ../..
-
-python setup.py build
-python setup.py install --prefix=/tmp/jenkins/jobs/PyTango
-
-exit $?
-
 
 if [ ! -z "$NODE_NAME" -a -f "$NODE_NAME" ]
 then
@@ -18,6 +11,13 @@ else
 	exit 1
 fi
 
+
+cd ../..
+
+python setup.py build
+python setup.py install --prefix=/tmp/jenkins/jobs/PyTango
+
+exit $?
 
 
 echo LOG4TANGO_ROOT
