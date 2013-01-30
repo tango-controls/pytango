@@ -282,7 +282,7 @@ def main():
     TANGO_ROOT = os.environ.get('TANGO_ROOT', TANGO_ROOT)
     OMNI_ROOT  = os.environ.get('OMNI_ROOT', OMNI_ROOT)
     BOOST_ROOT = os.environ.get('BOOST_ROOT', BOOST_ROOT)
-    BOOST_ROOT = os.environ.get('LOG4TANGO_ROOT', LOG4TANGO_ROOT)
+    LOG4TANGO_ROOT = os.environ.get('LOG4TANGO_ROOT', LOG4TANGO_ROOT)
     numpy_c_include = get_c_numpy()
     
     Release = get_release_info()
