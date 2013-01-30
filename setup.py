@@ -277,7 +277,7 @@ class install(dftinstall):
 
 
 def main():
-    BOOST_ROOT = OMNI_ROOT = TANGO_ROOT = '/usr'
+    LOG4TANGO_ROOT = BOOST_ROOT = OMNI_ROOT = TANGO_ROOT = '/usr'
 
     TANGO_ROOT = os.environ.get('TANGO_ROOT', TANGO_ROOT)
     OMNI_ROOT  = os.environ.get('OMNI_ROOT', OMNI_ROOT)
