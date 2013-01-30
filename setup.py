@@ -379,12 +379,14 @@ def main():
     if not has_numpy():
         macros.append( ('DISABLE_PYTANGO_NUMPY', None) )
 
-    library_dirs = [
-        os.path.join(TANGO_ROOT, 'lib'),
-        os.path.join(BOOST_ROOT, 'lib'),
-        os.path.join(LOG4TANGO_ROOT, 'lib'),
-        os.path.join(ZMQ_ROOT, 'lib'),
-    ]
+    #library_dirs = [os.path.join(f,'lib' if os.stat(os.path.join(f,'lib')) else 'lib64') for f in (TANGO_ROOT,BOOST_ROOT,LOG4TANGO_ROOT,ZMQ_ROOT)]
+    library_dirs = [(d if os.stat(d) else d.replace('lib','lib64')) for d in (os.path.join(f,'lib') for f in (TANGO_ROOT,BOOST_ROOT,LOG4TANGO_ROOT,ZMQ_ROOT))]
+#    library_dirs = [
+#        os.path.join(TANGO_ROOT, 'lib'),
+#        os.path.join(BOOST_ROOT, 'lib'),
+#        #os.path.join(LOG4TANGO_ROOT, 'lib'),
+#        os.path.join(ZMQ_ROOT, 'lib'),
+#    ]                                
 
     if os.name == 'nt':
         include_dirs += [ BOOST_ROOT ]
