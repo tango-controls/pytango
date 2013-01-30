@@ -384,7 +384,7 @@ def main():
         d = os.path.join(f,'lib')
         try: 
             if not os.stat(d): raise Exception('%s_doesnt_exists'%d)
-        except: d.replace('lib','lib64')
+        except: d = d.replace('lib','lib64')
         library_dirs.append(d)
             
     print('library_dirs: %s'%library_dirs)
