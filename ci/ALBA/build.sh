@@ -11,6 +11,7 @@ else
 	exit 1
 fi
 
+export TANGO_ROOT=/tmp/jenkins/jobs/TangoLib
 
 cd ../..
 
