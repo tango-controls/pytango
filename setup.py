@@ -282,6 +282,7 @@ def main():
     TANGO_ROOT = os.environ.get('TANGO_ROOT', TANGO_ROOT)
     OMNI_ROOT  = os.environ.get('OMNI_ROOT', OMNI_ROOT)
     BOOST_ROOT = os.environ.get('BOOST_ROOT', BOOST_ROOT)
+    BOOST_ROOT = os.environ.get('LOG4TANGO_ROOT', LOG4TANGO_ROOT)
     numpy_c_include = get_c_numpy()
     
     Release = get_release_info()
@@ -356,6 +357,7 @@ def main():
     include_dirs.append(os.path.join(OMNI_ROOT, 'include'))
     if numpy_c_include is not None:
         include_dirs.append(numpy_c_include)
+    include_dirs.append(os.path.join(LOG4TANGO_ROOT, 'include'))
 
     #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
     # library directories
