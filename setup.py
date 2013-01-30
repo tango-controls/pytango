@@ -277,12 +277,13 @@ class install(dftinstall):
 
 
 def main():
-    LOG4TANGO_ROOT = BOOST_ROOT = OMNI_ROOT = TANGO_ROOT = '/usr'
+    ZMQ_ROOT = LOG4TANGO_ROOT = BOOST_ROOT = OMNI_ROOT = TANGO_ROOT = '/usr'
 
     TANGO_ROOT = os.environ.get('TANGO_ROOT', TANGO_ROOT)
     OMNI_ROOT  = os.environ.get('OMNI_ROOT', OMNI_ROOT)
     BOOST_ROOT = os.environ.get('BOOST_ROOT', BOOST_ROOT)
     LOG4TANGO_ROOT = os.environ.get('LOG4TANGO_ROOT', LOG4TANGO_ROOT)
+    ZMQ_ROOT = os.environ.get('ZMQ_ROOT', ZMQ_ROOT)
     numpy_c_include = get_c_numpy()
     
     Release = get_release_info()
@@ -382,6 +383,7 @@ def main():
         os.path.join(TANGO_ROOT, 'lib'),
         os.path.join(BOOST_ROOT, 'lib'),
         os.path.join(LOG4TANGO_ROOT, 'lib'),
+        os.path.join(ZMQ_ROOT, 'lib'),
     ]
 
     if os.name == 'nt':
