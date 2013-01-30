@@ -381,6 +381,7 @@ def main():
     library_dirs = [
         os.path.join(TANGO_ROOT, 'lib'),
         os.path.join(BOOST_ROOT, 'lib'),
+        os.path.join(LOG4TANGO_ROOT, 'lib'),
     ]
 
     if os.name == 'nt':
