@@ -383,8 +383,8 @@ def main():
     for f in (TANGO_ROOT,BOOST_ROOT,LOG4TANGO_ROOT,ZMQ_ROOT):
         d = os.path.join(f,'lib')
         try: 
-            if not os.stat(d): raise Exception('%s_doesnt_exists'%d)
-        except: d = d.replace('lib','lib64')
+            if not os.stat(d): raise Exception('%s_doesnt_exist'%d)
+        except: d = os.path.join(f,'lib64')
         library_dirs.append(d)
             
     print('library_dirs: %s'%library_dirs)
