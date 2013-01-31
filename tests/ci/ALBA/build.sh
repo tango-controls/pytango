@@ -1,28 +1,23 @@
 #!/bin/bash
 
-if [ ! -z "$NODE_NAME" -a -f "$NODE_NAME" ]
-then
-	source "$NODE_NAME"
-else
-	echo "The settings file for the node $NODE_NAME does not exist!"
-	echo "Create ci/$INSTITUTE/$NODE_NAME file."
-	exit 1
-fi
-
-export TANGO_ROOT=/tmp/jenkins/jobs/TangoLib
+export PYTHONPATH=/tmp/jenkins/jobs/PyTango
 
 cd ../..
 
-python setup.py build
+python DevTest.py pytomasz &
 
 if [ $? != 0 ]
 then
 	exit $?
 fi
 
-python setup.py install --prefix=/tmp/jenkins/jobs/PyTango
+python TestSuite.py --device1=dev/pytomasz/1
 
-exit $?
+expor EX = $?
+
+ps -ef | grep DevTest.py | awk '{print $2}' | xargs kill -9
+
+exit $EX
 
 
 
