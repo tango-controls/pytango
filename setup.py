@@ -381,10 +381,13 @@ def main():
 
     library_dirs = []
     for f in (TANGO_ROOT,BOOST_ROOT,LOG4TANGO_ROOT,ZMQ_ROOT):
+        is64 = 8 * struct.calcsize("P") == 64
         d = os.path.join(f,'lib')
-        try: 
-            if not os.stat(d): raise Exception('%s_doesnt_exist'%d)
-        except: d = os.path.join(f,'lib64')
+        if is64:
+            d = os.path.join(f,'lib64')
+            try: 
+                if not os.stat(d): raise Exception('%s_doesnt_exist'%d)
+            except: d = os.path.join(f,'lib')
         library_dirs.append(d)
             
     print('library_dirs: %s'%library_dirs)
