@@ -391,7 +391,6 @@ def main():
             except: d = os.path.join(f,'lib')
         library_dirs.append(d)
             
-    print('library_dirs: %s'%library_dirs)
 #    library_dirs = [
 #        os.path.join(TANGO_ROOT, 'lib'),
 #        os.path.join(BOOST_ROOT, 'lib'),
@@ -474,7 +473,14 @@ def main():
                 boost_library_name += pyver
         libraries.append(boost_library_name)
 
-        library_dirs += [ os.path.join(OMNI_ROOT, 'lib') ]
+        is64 = 8 * struct.calcsize("P") == 64
+        omni_lib = os.path.join(OMNI_ROOT, 'lib')
+        if is64:
+            omni_lib = os.path.join(OMNI_ROOT, 'lib64')
+            try: 
+                if not os.stat(d): raise Exception('%s_doesnt_exist'%d)
+            except: omni_lib = os.path.join(OMNI_ROOT, 'lib')
+        library_dirs += [ omni_lib ]
 
 
         # Note for PyTango developers:
