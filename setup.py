@@ -474,17 +474,13 @@ def main():
         libraries.append(boost_library_name)
 
         is64 = 8 * struct.calcsize("P") == 64
-        print('is64 = ' + str(is64))
         omni_lib = os.path.join(OMNI_ROOT, 'lib')
         if is64:
             omni_lib = os.path.join(OMNI_ROOT, 'lib64')
-            print('1. omni_lib = ' + str(omni_lib))
             try: 
                 if not os.stat(d): raise Exception('%s_doesnt_exist'%d)
             except:
                 omni_lib = os.path.join(OMNI_ROOT, 'lib')
-                print('2. omni_lib = ' + str(omni_lib))
-        print('3. omni_lib = ' + str(omni_lib))
         library_dirs += [ omni_lib ]
 
 
