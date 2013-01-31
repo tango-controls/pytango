@@ -9,6 +9,7 @@ from unittest.signals import registerResult
 from unittest import TestCase, TestSuite, suite, util
 from copy import deepcopy
 
+
 __unittest = True
 
 # loop parameters
@@ -115,7 +116,6 @@ class TangoTestCase(TestCase):
                     if not _hasFailed(result) and getattr(result, 'loopSuiteDone', False) and (not self._testMethodName.endswith(_loopSuffix)  or _loop <= 1 or result.loop == _loop):
                         result.stream.writeln(" --> OK")
                     return returnResult
-
 
 class _WritelnDecorator(object):
     """Used to decorate file-like objects with a handy 'writeln' method"""
