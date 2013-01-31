@@ -26,6 +26,7 @@ import sys
 import platform
 import imp
 import io
+import struct
 
 from distutils.core import setup, Extension
 from distutils.cmd import Command
