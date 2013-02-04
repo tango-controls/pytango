@@ -1,0 +1,20 @@
+Brief introduction to PyTango Test Suite
+----------------------------------------
+
+The test sutite consists of:
+- DevTest.py - the testing device
+- TangoRunner.py - the file to be imported in order to get a proper Tango-tailored formatting of the tests output
+- TestSuite.py - the actual test suite.
+
+Please acquaint yourself with the exemplary Test Case in the TestSuite.py file to understand how to create Test Cases, define command line parameters (to provide test cases with user input) set restore points, etc.
+
+To execute the test suite:
+1. Define a test device in the database.
+2. Run the device (DevTest.py)
+3. Execute the test suite (TestSuite.py) providing required parameters in the command line (e.g. the device name).
+
+The PyTango test suite framework is supposed to mimic the functionality of the C++ test suite. Therefore its features and behaviour is similar to the C++ one.
+For more explanation on the Test Suite Framework and its use, please read through the README file in the C++ test suite repository:
+
+http://tango-cs.svn.sourceforge.net/viewvc/tango-cs/api/cpp/cpp_test_suite/trunk/
+
