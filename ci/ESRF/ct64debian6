@@ -1,5 +1,5 @@
 export BOOST_ROOT=/usr/lib
-export OMNI_ROOT=/segfs/tango/release/${realos}
-export TANGO_ROOT=/segfs/tango/release/${realos}
+export OMNI_ROOT=/segfs/tango/release/debian6
+export TANGO_ROOT=/segfs/tango/release/debian6
 export NUMPY_ROOT=/usr/lib/pymodules/python2.6/numpy/core
-export LD_LIBRARY_PATH=/segfs/tango/release/${realos}/lib:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=/segfs/tango/release/debian6/lib:${LD_LIBRARY_PATH}
