@@ -10,10 +10,13 @@ else
 fi
 
 cd ../..
-
+#used system by default
 python setup.py build
 
 if [ $? != 0 ]
+then
+    /segfs/bliss/bin/python2.6 setup.py build
+elif [ $? != 0 ]
 then
 	exit $?
 fi
@@ -22,10 +25,10 @@ case "${realos}" in
 	"debian6_64")
 		python setup.py install --prefix=/tmp/jenkins/jobs/PyTango
 		;; 
-	"redhate_4_32")
+	"redhate4_32")
 		PYTHONPATH=/segfs/bliss/source/python/PyTango/PyTango8/redhate4/lib/python2.6/site-packages/ /segfs/bliss/bin/python2.6 setup.py install --prefix=/tmp/jenkins/jobs/PyTango
 		;;
-	"redhate_5_64")
+	"redhate5_64")
 		PYTHONPATH=/segfs/bliss/source/python/PyTango/PyTango8/redhate5/lib/python2.6/site-packages/ /segfs/bliss/bin/python2.6 setup.py install --prefix=/tmp/jenkins/jobs/PyTango
 		;;
 	"W7_64")
