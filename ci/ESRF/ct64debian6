@@ -1,3 +1,4 @@
+export realos=debian6_64
 export BOOST_ROOT=/usr/lib
 export OMNI_ROOT=/segfs/tango/release/debian6
 export TANGO_ROOT=/segfs/tango/release/debian6

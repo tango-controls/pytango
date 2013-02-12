@@ -9,8 +9,6 @@ else
 	exit 1
 fi
 
-#export TANGO_ROOT=/tmp/jenkins/jobs/TangoLib
-
 cd ../..
 
 python setup.py build
@@ -19,7 +17,6 @@ if [ $? != 0 ]
 then
 	exit $?
 fi
-
 
 case "${realos}" in
 	"debian6_64")
@@ -33,6 +30,7 @@ case "${realos}" in
 		;;
 	*)
 		echo "Not supporting operating system: " ${OSTYPE}
+        exit $?
 		;;
 esac
 
