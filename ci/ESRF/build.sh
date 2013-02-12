@@ -23,11 +23,13 @@ case "${realos}" in
 		python setup.py install --prefix=/tmp/jenkins/jobs/PyTango
 		;; 
 	"redhate_4_32")
-		echo "TODO"
+		PYTHONPATH=/segfs/bliss/source/python/PyTango/PyTango8/redhate4/lib/python2.6/site-packages/ /segfs/bliss/bin/python2.6 setup.py install --prefix=/tmp/jenkins/jobs/PyTango
 		;;
 	"redhate_5_64")
-		echo "TODO"
+		PYTHONPATH=/segfs/bliss/source/python/PyTango/PyTango8/redhate5/lib/python2.6/site-packages/ /segfs/bliss/bin/python2.6 setup.py install --prefix=/tmp/jenkins/jobs/PyTango
 		;;
+	"W7_64")
+        ;;
 	*)
 		echo "Not supporting operating system: " ${OSTYPE}
         exit $?
