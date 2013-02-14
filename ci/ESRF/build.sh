@@ -11,25 +11,35 @@ fi
 
 cd ../..
 #used system by default
-python setup.py build
+
+rm -rf build/*
+
+case "${realos}" in
+	"debian6_64")
+        /usr/bin/python setup.py build
+		;; 
+	*)
+        /segfs/bliss/bin/python2.6 setup.py build
+        ;;
+esac
 
 if [ $? != 0 ]
-then
-    /segfs/bliss/bin/python2.6 setup.py build
-elif [ $? != 0 ]
 then
 	exit $?
 fi
 
 case "${realos}" in
 	"debian6_64")
-		python setup.py install --prefix=/tmp/jenkins/jobs/PyTango
+        rm -rf /segfs/bliss/jenkins/PyTango/debian6/*
+		/usr/bin/python setup.py install --prefix=/segfs/bliss/jenkins/PyTango/debian6
 		;; 
 	"redhate4_32")
-		PYTHONPATH=/segfs/bliss/source/python/PyTango/PyTango8/redhate4/lib/python2.6/site-packages/ /segfs/bliss/bin/python2.6 setup.py install --prefix=/tmp/jenkins/jobs/PyTango
+        rm -rf /segfs/bliss/jenkins/PyTango/redhate4/*
+		/segfs/bliss/bin/python2.6 setup.py install --prefix=/segfs/bliss/jenkins/PyTango/redhate4
 		;;
 	"redhate5_64")
-		PYTHONPATH=/segfs/bliss/source/python/PyTango/PyTango8/redhate5/lib/python2.6/site-packages/ /segfs/bliss/bin/python2.6 setup.py install --prefix=/tmp/jenkins/jobs/PyTango
+        rm -rf /segfs/bliss/jenkins/PyTango/redhate5/*
+		/segfs/bliss/bin/python2.6 setup.py install --prefix=/segfs/bliss/jenkins/PyTango/redhate5
 		;;
 	"W7_64")
         ;;
@@ -38,6 +48,7 @@ case "${realos}" in
         exit $?
 		;;
 esac
+
 
 exit $?
 
