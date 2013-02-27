@@ -1,0 +1,5 @@
+SETX realos windows7
+SETX BOOST_ROOT "C:\Program File (x86)\boost\boost_1_47"
+SETX TANGO_ROOT "C:\Users\falconto\tango\VC9\win32" 
+SETX OMNI_ROOT "C:\Users\falconto\tango\VC9\win32"
+SETX NUMPY_ROOT "C:\Python_27_32\Lib\site-packages\core"
