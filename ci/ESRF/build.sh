@@ -28,10 +28,14 @@ case "${realos}" in
         #redhate4/5
         /segfs/bliss/bin/python2.6 setup.py build
         ;;
-    "windows7_32")
+    "windows7"*)
         #VC9
         /cygdrive/c/Python27_32/python setup.py build
         ;;
+	*)
+		echo "Build - Not supporting operating system: " ${OSTYPE}
+        exit $?
+		;;
 esac
 
 if [ $? != 0 ]
@@ -52,11 +56,11 @@ case "${realos}" in
         rm -rf $INSTALL_DIR/redhate5/*
 		/segfs/bliss/bin/python2.6 setup.py install --prefix=$INSTALL_DIR/redhate5
 		;;
-    "windows7_32")
+    "windows7_32"*)
         /cygdrive/c/Python27_32/python setup.py install --prefix=$INSTALL_DIR/w7_32_VC9
         ;;
 	*)
-		echo "Not supporting operating system: " ${OSTYPE}
+		echo "Install - Not supporting operating system: " ${OSTYPE}
         exit $?
 		;;
 esac
