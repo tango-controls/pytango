@@ -216,10 +216,12 @@ all: build
 build: init $(PRE_C_H_O) $(LIB_NAME)
 
 init:
-	mkdir -p $(OBJS_DIR)
+	@echo Preparing build directories... 
+	@mkdir -p $(OBJS_DIR)
 
 $(PRE_C_H_O): $(SRC_DIR)/$(PRE_C_H)
-	$(CC) $(CCFLAGS) -c $< -o $(PRE_C_H_O)
+	@echo Compiling pre-compiled header...
+	@$(CC) $(CCFLAGS) -c $< -o $(PRE_C_H_O)
 
 #
 # Rule for shared library
@@ -227,39 +229,46 @@ $(PRE_C_H_O): $(SRC_DIR)/$(PRE_C_H)
 
 .SUFFIXES: .o .cpp
 .cpp.o: $(PRE_C_H_O)
-	$(CC) $(CCFLAGS) -c $< -o $*.o
+	@echo Compiling $(<) ...
+	@$(CC) $(CCFLAGS) -c $< -o $*.o
 
 #
 # Rule for API files
 #
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(PRE_C)
+	@echo Compiling $(<) ...
+	@$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(PRE_C)
 
 $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
-	$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(PRE_C)
+	@echo Compiling $(<) ...
+	@$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(PRE_C)
 
 #
 #	The shared libs
 #
 
 $(LIB_NAME): $(OBJS)
-	$(LN) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME) $(LN_VER)
-#	$(LN_STATIC) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME_STATIC) $(LN_VER)
+	@echo Linking shared $(LIB_NAME) ...
+	@$(LN) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME) $(LN_VER)
+#	@$(LN_STATIC) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME_STATIC) $(LN_VER)
 #	objcopy --only-keep-debug $(OBJS_DIR)/$(LIB_NAME) $(OBJS_DIR)/$(LIB_SYMB_NAME)
 #	objcopy --strip-debug --strip-unneeded $(OBJS_DIR)/$(LIB_NAME)
 #	objcopy --add-gnu-debuglink=$(OBJS_DIR)/$(LIB_SYMB_NAME) $(OBJS_DIR)/$(LIB_NAME)
 #	chmod -x $(OBJS_DIR)/$(LIB_SYMB_NAME)
 
 clean:
-	rm -f *.o core
-	rm -f $(SRC_DIR)/*.gch
-	rm -rf $(OBJS_DIR)
+	@echo Cleaning ...
+	@rm -f *.o core
+	@rm -f $(SRC_DIR)/*.gch
+	@rm -rf $(OBJS_DIR)
 
 install-py:
-	mkdir -p $(prefix)/PyTango
-	rsync -r src/boost/python/ $(prefix)/PyTango/
+	@echo Installing python files into $(prefix)/PyTango ...
+	@mkdir -p $(prefix)/PyTango
+	@rsync -r src/boost/python/ $(prefix)/PyTango/
 
 install: build install-py
-	rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/PyTango
+	@echo Installing binary files into $(prefix)/PyTango ...
+	@rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/PyTango
 #	rsync $(OBJS_DIR)/$(LIB_SYMB_NAME) $(prefix)/PyTango
-    
+ 
