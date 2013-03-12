@@ -104,6 +104,9 @@ def has_numpy(with_src=True):
     return ret
 
 def get_script_files():
+    
+    FILTER_OUT = "winpostinstall.py",
+    
     scripts_dir = abspath('scripts')
     scripts = []
     items = os.listdir(scripts_dir)
@@ -119,6 +122,8 @@ def get_script_files():
             continue
         # avoid any core dump... of course there isn't any :-) but just in case
         if item.startswith('core'):
+            continue
+        if item in FILTER_OUT:
             continue
         scripts.append('scripts/' + item)
     return scripts
@@ -205,7 +210,7 @@ class build_ext(dftbuild_ext):
             pipe = subprocess.Popen(compiler + ["-dumpversion"], stdout=subprocess.PIPE).stdout
             gcc_ver = pipe.readlines()[0].decode().strip().split(".")
             gcc_ver = list(map(int, gcc_ver))
-            if gcc_ver >= [4,3,3]:
+            if gcc_ver >= [4,0,0]:
                 self.use_cpp_0x = True
         dftbuild_ext.build_extensions(self)
 
