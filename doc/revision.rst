@@ -86,6 +86,7 @@ Version history
 |            |         - `3579062: [pytango] Attribute missing methods <https://sourceforge.net/tracker/?func=detail&aid=3579062&group_id=57612&atid=484769>`_                              |
 |            |         - `3586337: [pytango] Some DeviceClass methods are not python safe <https://sourceforge.net/tracker/?func=detail&aid=3586337&group_id=57612&atid=484769>`_           |
 |            |         - `3598514: DeviceProxy.__setattr__ break python's descriptors <https://sourceforge.net/tracker/?func=detail&aid=3598514&group_id=57612&atid=484769>`_               |
+|            |         - `3607779: [pytango] IPython 0.10 error <https://sourceforge.net/tracker/?func=detail&aid=3607779&group_id=57612&atid=484769>`_                                     |
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.0.2      | Bug fixes:                                                                                                                                                                   |
 |            |     - from sourceforge:                                                                                                                                                      |

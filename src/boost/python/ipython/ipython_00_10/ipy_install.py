@@ -84,7 +84,7 @@ To start ipython with tango interface simply type on the command line:
 %% ipython -p tango
 
 If you want tango extension to be automaticaly active when you start ipython,
-edit your %s and add the line:
+edit your {0} and add the line:
 import ipy_profile_tango
 
 Next time, just start ipython on the command line:
@@ -98,7 +98,7 @@ For more information goto: http://www.tango-controls.org/static/PyTango/latest/d
 
 Have fun with ITango!
 The PyTango team
-    """ % (ipy_user_config,))
+    """.format(ipy_user_config))
 
 def main():
     d = None
