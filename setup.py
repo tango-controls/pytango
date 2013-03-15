@@ -105,7 +105,7 @@ def has_numpy(with_src=True):
 
 def get_script_files():
     
-    FILTER_OUT = "winpostinstall.py",
+    FILTER_OUT = (), "winpostinstall.py",
     
     scripts_dir = abspath('scripts')
     scripts = []
