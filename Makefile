@@ -227,27 +227,27 @@ $(PRE_C_H_O): $(SRC_DIR)/$(PRE_C_H)
 # Rule for shared library
 #
 
-.SUFFIXES: .o .cpp
-.cpp.o: $(PRE_C_H_O)
-	@echo Compiling $(<) ...
-	@$(CC) $(CCFLAGS) -c $< -o $*.o
+#.SUFFIXES: .o .cpp
+#.cpp.o: $(PRE_C_H_O)
+#	@echo Compiling 1 $(<) ...
+#	@$(CC) $(CCFLAGS) -c $< -o $*.o
 
 #
 # Rule for API files
 #
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@echo Compiling $(<) ...
+	@echo Compiling $(<F) ...
 	@$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(PRE_C)
 
 $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
-	@echo Compiling $(<) ...
+	@echo Compiling $(<F) ...
 	@$(CC) $(CCFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(PRE_C)
 
 #
 #	The shared libs
 #
 
-$(LIB_NAME): $(OBJS)
+$(LIB_NAME): $(PRE_C_H_0) $(OBJS)
 	@echo Linking shared $(LIB_NAME) ...
 	@$(LN) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME) $(LN_VER)
 #	@$(LN_STATIC) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME_STATIC) $(LN_VER)
