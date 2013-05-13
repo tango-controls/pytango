@@ -77,8 +77,8 @@ namespace PyEncodedAttribute
 #ifndef DISABLE_PYTANGO_NUMPY
         else if (PyArray_Check(py_value_ptr))
         {
-            w = PyArray_DIM(py_value_ptr, 1);
-            h = PyArray_DIM(py_value_ptr, 0);
+            w = static_cast<int>(PyArray_DIM(py_value_ptr, 1));
+            h = static_cast<int>(PyArray_DIM(py_value_ptr, 0));
             
             buffer = (unsigned char*)(PyArray_DATA(py_value_ptr));
             self.encode_gray8(buffer, w, h);
@@ -191,8 +191,8 @@ namespace PyEncodedAttribute
 #ifndef DISABLE_PYTANGO_NUMPY
         else if (PyArray_Check(py_value_ptr))
         {
-            w = PyArray_DIM(py_value_ptr, 1);
-            h = PyArray_DIM(py_value_ptr, 0);
+            w = static_cast<int>(PyArray_DIM(py_value_ptr, 1));
+            h = static_cast<int>(PyArray_DIM(py_value_ptr, 0));
             
             buffer = (unsigned char*)(PyArray_DATA(py_value_ptr));
             self.encode_jpeg_gray8(buffer, w, h, quality);
@@ -305,8 +305,8 @@ namespace PyEncodedAttribute
 #ifndef DISABLE_PYTANGO_NUMPY
         else if (PyArray_Check(py_value_ptr))
         {
-            w = PyArray_DIM(py_value_ptr, 1);
-            h = PyArray_DIM(py_value_ptr, 0);
+            w = static_cast<int>(PyArray_DIM(py_value_ptr, 1));
+            h = static_cast<int>(PyArray_DIM(py_value_ptr, 0));
             
             buffer = (unsigned short*)(PyArray_DATA(py_value_ptr));
             self.encode_gray16(buffer, w, h);

@@ -34,49 +34,58 @@ import sys
 import os
 import os.path as osp
 
-executable = sys.executable
+def main():
+    executable = sys.executable
 
-curr_dir = os.getcwd()
+    curr_dir = os.getcwd()
 
-winsetup_dir = osp.dirname(osp.abspath(__file__))
-os.chdir(winsetup_dir)
-setup_name = "setup.py"
-bitmap = osp.join(winsetup_dir, 'doc', 'logo-medium.bmp')
-ver = ".".join(map(str, sys.version_info[:2]))
+    winsetup_dir = osp.dirname(osp.abspath(__file__))
+    os.chdir(winsetup_dir)
+    setup_name = "setup.py"
+    bitmap = osp.join(winsetup_dir, 'doc', 'logo-medium.bmp')
+    ver = ".".join(map(str, sys.version_info[:2]))
 
-if len(sys.argv) < 3:
-    print("Need to supply build directory and distribution directory")
-    sys.exit(1)
+    if len(sys.argv) < 6:
+        print("Need to supply build directory, distribution directory, temporary binary install directory, configuration name and platform name")
+        return 1
 
-build_dir = sys.argv[1]
-dist_dir = sys.argv[2]
+    build_dir, dist_dir, bdist_dir = map(osp.abspath, sys.argv[1:4])
+    config_name, plat_name = sys.argv[4:6]
+#    temp_base_dir = osp.abspath(os.environ["TEMP"])
+#    temp_dir = osp.join(temp_base_dir, "PyTango", config_name)
 
-try:
-    cmd_line =  '%s %s ' % (executable, setup_name)
-    cmd_line += 'build_py --force --no-compile ' \
-                '--build-lib=%s ' \
-                % (build_dir,)
-    cmd_line += 'build_scripts --force '
-    cmd_line += 'install_lib --skip-build --build-dir=%s ' \
-                % (build_dir,)
-#    cmd_line += 'install_scripts --skip-build --build-dir=%s ' \
-#                % (build_dir,)
-    cmd_line += 'bdist_msi --skip-build --target-version=%s ' \
-                '--dist-dir=%s ' \
-                '--install-script=winpostinstall.py ' % (ver, dist_dir)
-    cmd_line += 'bdist_wininst --skip-build --target-version=%s ' \
-                '--dist-dir=%s ' \
-                '--title="PyTango 8" ' \
-                '--bitmap="%s" ' \
-                '--install-script=winpostinstall.py ' % (ver, dist_dir, bitmap)
-    os.system(cmd_line)
-except:
-    print("Failed:")
-    import traceback
-    traceback.print_exc()
-    sys.exit(1)
-finally:
-    os.chdir(curr_dir)
+    try:
+        cmd_line =  '%s %s ' % (executable, setup_name)
+        cmd_line += 'build_py --force --no-compile ' \
+                    '--build-lib=%s ' \
+                    % (build_dir,)
+        cmd_line += 'build_scripts --force '
+        cmd_line += 'install_lib --skip-build --no-compile ' \
+                    '--build-dir=%s ' \
+                    % (build_dir, )
+        cmd_line += 'bdist_msi --skip-build --target-version=%s ' \
+                    '--bdist-dir=%s ' \
+                    '--dist-dir=%s ' \
+                    '--plat-name=%s ' \
+                    '--install-script=winpostinstall.py ' % (ver, bdist_dir, dist_dir, plat_name)
+        cmd_line += 'bdist_wininst --skip-build --target-version=%s ' \
+                    '--bdist-dir=%s ' \
+                    '--dist-dir=%s ' \
+                    '--title="PyTango 8" ' \
+                    '--bitmap="%s" ' \
+                    '--plat-name=%s ' \
+                    '--install-script=winpostinstall.py ' % (ver, bdist_dir, dist_dir, bitmap, plat_name)
+        os.system(cmd_line)
+    except:
+        print("Failed:")
+        import traceback
+        traceback.print_exc()
+        return 2
+    finally:
+        os.chdir(curr_dir)
 
-sys.exit(0)
+    return 0
 
+if __name__ == "__main__":
+    ret = main()
+    sys.exit(ret)

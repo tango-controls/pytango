@@ -348,9 +348,9 @@ namespace PyWAttribute
                         o.str(),
                         "set_value()");
             }
+			long size = static_cast<long>(PySequence_Size(value.ptr()));
             TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __set_write_value_array,
-                                              att, value,
-                                              PySequence_Size(value.ptr()), 0);
+                                              att, value, size, 0);
         }
     }
 

@@ -1,0 +1,558 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <PyTangoBaseFile>_PyTango</PyTangoBaseFile>
+    <PyTangoFileExt>.pyd</PyTangoFileExt>
+    <TangoMajorVer>8</TangoMajorVer>
+    <TangoMinorVer>0</TangoMinorVer>
+    <TangoPatchVer>5</TangoPatchVer>
+    <TangoVer>$(TangoMajorVer).$(TangoMinorVer).$(TangoPatchVer)</TangoVer>
+    <BoostMajorVer>1</BoostMajorVer>
+    <BoostMinorVer>53</BoostMinorVer>
+    <BoostPatchVer>0</BoostPatchVer>
+    <BoostVer>$(BoostMajorVer).$(BoostMinorVer).$(BoostPatchVer)</BoostVer>
+    <TangoBaseDir>C:\tango-$(TangoVer)</TangoBaseDir>
+    <BoostBaseDir>C:\boost-$(BoostVer)</BoostBaseDir>
+    <PythonBaseDir>C:\Python</PythonBaseDir>
+    <VCMajorVer>10</VCMajorVer>
+    <VCMinorVer>0</VCMinorVer>
+    <VCVer>$(VCMajorVer).$(VCMinorVer)</VCVer>
+    <BoostIncludeDir>$(BoostBaseDir)\include\boost-$(BoostMajorVer)_$(BoostMinorVer)</BoostIncludeDir>
+    <BoostLibDir>$(BoostBaseDir)\multi\release\msvc-$(VCVer)\$(Platform)</BoostLibDir>
+    <TangoIncludeDir>$(TangoBaseDir)\$(Platform)\include\vc$(VCMajorVer)</TangoIncludeDir>
+    <TangoLibDir>$(TangoBaseDir)\$(Platform)\lib</TangoLibDir>
+    <PythonDir>C:\Python\$(Platform)</PythonDir>
+    <NumpyRelativeIncludeDir>Lib\site-packages\numpy\core\include</NumpyRelativeIncludeDir>
+    <PyTangoCompileOptions>-Zm200 /MP8</PyTangoCompileOptions>
+    <BaseDir>$(ProjectDir)..\..</BaseDir>
+    <RelPrefixDir>$(Configuration)_$(Platform)_msvc$(VCVer)</RelPrefixDir>
+    <BaseBuildDir>$(BaseDir)\build</BaseBuildDir>
+    <BaseBuildLibDir>$(BaseBuildDir)\lib</BaseBuildLibDir>
+    <BaseTempDir>$(BaseBuildDir)\temp</BaseTempDir>
+    <BaseDistDir>$(BaseBuildDir)\dist</BaseDistDir>
+    <BaseBDistDir>$(BaseBuildDir)\temp_dist</BaseBDistDir>
+    <BuildDir>$(BaseBuildLibDir)\$(RelPrefixDir)</BuildDir>
+    <DistDir>$(BaseDistDir)\$(RelPrefixDir)</DistDir>
+    <TempDir>$(BaseTempDir)\$(RelPrefixDir)</TempDir>
+    <BDistDir>$(BaseBDistDir)\$(RelPrefixDir)</BDistDir>
+    <PyTangoBuildDir>$(BuildDir)\$(ProjectName)</PyTangoBuildDir>
+    <PyTangoTempDir>$(TempDir)\$(ProjectName)</PyTangoTempDir>
+    <BaseSrcDir>$(BaseDir)\src\boost\cpp</BaseSrcDir>
+    <CommonIncludeDirs>$(BoostIncludeDir);$(TangoIncludeDir);$(BaseSrcDir);$(BaseSrcDir)\server</CommonIncludeDirs>
+    <Python26Dir>$(PythonDir)\26</Python26Dir>
+    <Py26>$(Python26Dir)\python</Py26>
+    <Python26IncludeDir>$(Python26Dir)\include</Python26IncludeDir>
+    <Numpy26IncludeDir>$(Python26Dir)\$(NumpyRelativeIncludeDir)</Numpy26IncludeDir>
+    <Python26IncludeDirs>$(Python26IncludeDir);$(Numpy26IncludeDir)</Python26IncludeDirs>
+    <Python26LibDir>$(Python26Dir)\libs</Python26LibDir>
+    <Python27Dir>$(PythonDir)\27</Python27Dir>
+    <Py27>$(Python27Dir)\python</Py27>
+    <Python27IncludeDir>$(Python27Dir)\include</Python27IncludeDir>
+    <Numpy27IncludeDir>$(Python27Dir)\$(NumpyRelativeIncludeDir)</Numpy27IncludeDir>
+    <Python27IncludeDirs>$(Python27IncludeDir);$(Numpy27IncludeDir)</Python27IncludeDirs>
+    <Python27LibDir>$(Python27Dir)\libs</Python27LibDir>
+    <Python31Dir>$(PythonDir)\31</Python31Dir>
+    <Py31>$(Python31Dir)\python</Py31>
+    <Python31IncludeDir>$(Python31Dir)\include</Python31IncludeDir>
+    <Numpy31IncludeDir>$(Python31Dir)\$(NumpyRelativeIncludeDir)</Numpy31IncludeDir>
+    <Python31IncludeDirs>$(Python31IncludeDir);$(Numpy31IncludeDir)</Python31IncludeDirs>
+    <Python31LibDir>$(Python31Dir)\libs</Python31LibDir>
+    <Python32Dir>$(PythonDir)\32</Python32Dir>
+    <Py32>$(Python32Dir)\python</Py32>
+    <Python32IncludeDir>$(Python32Dir)\include</Python32IncludeDir>
+    <Numpy32IncludeDir>$(Python32Dir)\$(NumpyRelativeIncludeDir)</Numpy32IncludeDir>
+    <Python32IncludeDirs>$(Python32IncludeDir);$(Numpy32IncludeDir)</Python32IncludeDirs>
+    <Python32LibDir>$(Python32Dir)\libs</Python32LibDir>
+    <Python33Dir>$(PythonDir)\33</Python33Dir>
+    <Py33>$(Python33Dir)\python</Py33>
+    <Python33IncludeDir>$(Python33Dir)\include</Python33IncludeDir>
+    <Numpy33IncludeDir>$(Python33Dir)\$(NumpyRelativeIncludeDir)</Numpy33IncludeDir>
+    <Python33IncludeDirs>$(Python33IncludeDir);$(Numpy33IncludeDir)</Python33IncludeDirs>
+    <Python33LibDir>$(Python33Dir)\libs</Python33LibDir>
+    <BasePreFlags>WIN32;NDEBUG</BasePreFlags>
+    <PreTangoStaticFlags>_WINSTATIC</PreTangoStaticFlags>
+    <PreTangoSharedFlags>LOG4TANGO_HAS_DLL;TANGO_HAS_DLL</PreTangoSharedFlags>
+    <PreBoostSharedTantoSharedFlags>$(BasePreFlags);$(PreTangoSharedFlags);BOOST_PYTHON_DYNAMIC_LIB</PreBoostSharedTantoSharedFlags>
+    <PreBoostStaticTantoSharedFlags>$(BasePreFlags);$(PreTangoSharedFlags);BOOST_PYTHON_STATIC_LIB</PreBoostStaticTantoSharedFlags>
+    <PreBoostStaticTantoStaticFlags>$(BasePreFlags);$(PreTangoStaticFlags);BOOST_PYTHON_STATIC_LIB</PreBoostStaticTantoStaticFlags>
+    <PreCompHeaderSrc>precompiled_header.hpp</PreCompHeaderSrc>
+    <PreCompHeaderDst>$(TempDir)\$(PyTangoBaseFile)_Boost-$(BoostVer).pch</PreCompHeaderDst>
+    <DatabaseFile>$(TempDir)\$(PyTangoBaseFile)_Boost-$(BoostVer).pdb</DatabaseFile>
+    <BaseDisableWarningFlags>4005;4996;4250</BaseDisableWarningFlags>
+    <omniStaticLibs>COS4.lib;omniORB4.lib;omniDynamic4.lib;omnithread.lib</omniStaticLibs>
+    <omniSharedLibs>COS4_rt.lib;omniORB4_rt.lib;omniDynamic4_rt.lib;omnithread_rt.lib</omniSharedLibs>
+    <BaseTangoLibs>zmq.lib;log4tango.lib;tango.lib</BaseTangoLibs>
+    <BasePyTangoStaticLibs>$(omniStaticLibs);$(BaseTangoLibs);comctl32.lib;ws2_32.lib;mswsock.lib</BasePyTangoStaticLibs>
+    <BasePyTangoSharedLibs>$(omniSharedLibs);$(BaseTangoLibs)</BasePyTangoSharedLibs>
+    <PyTango26StaticLibs>$(BasePyTangoStaticLibs);python26.lib</PyTango26StaticLibs>
+    <PyTango26SharedLibs>$(BasePyTangoSharedLibs);python26.lib</PyTango26SharedLibs>
+    <PyTango27StaticLibs>$(BasePyTangoStaticLibs);python27.lib</PyTango27StaticLibs>
+    <PyTango27SharedLibs>$(BasePyTangoSharedLibs);python27.lib</PyTango27SharedLibs>
+    <PyTango31StaticLibs>$(BasePyTangoStaticLibs);python31.lib</PyTango31StaticLibs>
+    <PyTango31SharedLibs>$(BasePyTangoSharedLibs);python31.lib</PyTango31SharedLibs>
+    <PyTango32StaticLibs>$(BasePyTangoStaticLibs);python32.lib</PyTango32StaticLibs>
+    <PyTango32SharedLibs>$(BasePyTangoSharedLibs);python32.lib</PyTango32SharedLibs>
+    <PyTango33StaticLibs>$(BasePyTangoStaticLibs);python33.lib</PyTango33StaticLibs>
+    <PyTango33SharedLibs>$(BasePyTangoSharedLibs);python33.lib</PyTango33SharedLibs>
+    <BaseBoostSharedRtSharedLibDir>$(BoostLibDir)\shared\runtime_shared</BaseBoostSharedRtSharedLibDir>
+    <BaseBoostStaticRtSharedLibDir>$(BoostLibDir)\static\runtime_shared</BaseBoostStaticRtSharedLibDir>
+    <BaseBoostStaticRtStaticLibDir>$(BoostLibDir)\static\runtime_static</BaseBoostStaticRtStaticLibDir>
+    <Boost26SharedRtSharedLibDir>$(BaseBoostSharedRtSharedLibDir)\26;$(Python26LibDir)</Boost26SharedRtSharedLibDir>
+    <Boost26StaticRtSharedLibDir>$(BaseBoostStaticRtSharedLibDir)\26;$(Python26LibDir)</Boost26StaticRtSharedLibDir>
+    <Boost26StaticRtStaticLibDir>$(BaseBoostStaticRtStaticLibDir)\26;$(Python26LibDir)</Boost26StaticRtStaticLibDir>
+    <Boost27SharedRtSharedLibDir>$(BaseBoostSharedRtSharedLibDir)\27;$(Python27LibDir)</Boost27SharedRtSharedLibDir>
+    <Boost27StaticRtSharedLibDir>$(BaseBoostStaticRtSharedLibDir)\27;$(Python27LibDir)</Boost27StaticRtSharedLibDir>
+    <Boost27StaticRtStaticLibDir>$(BaseBoostStaticRtStaticLibDir)\27;$(Python27LibDir)</Boost27StaticRtStaticLibDir>
+    <Boost31SharedRtSharedLibDir>$(BaseBoostSharedRtSharedLibDir)\31;$(Python31LibDir)</Boost31SharedRtSharedLibDir>
+    <Boost31StaticRtSharedLibDir>$(BaseBoostStaticRtSharedLibDir)\31;$(Python31LibDir)</Boost31StaticRtSharedLibDir>
+    <Boost31StaticRtStaticLibDir>$(BaseBoostStaticRtStaticLibDir)\31;$(Python31LibDir)</Boost31StaticRtStaticLibDir>
+    <Boost32SharedRtSharedLibDir>$(BaseBoostSharedRtSharedLibDir)\32;$(Python32LibDir)</Boost32SharedRtSharedLibDir>
+    <Boost32StaticRtSharedLibDir>$(BaseBoostStaticRtSharedLibDir)\32;$(Python32LibDir)</Boost32StaticRtSharedLibDir>
+    <Boost32StaticRtStaticLibDir>$(BaseBoostStaticRtStaticLibDir)\32;$(Python32LibDir)</Boost32StaticRtStaticLibDir>
+    <Boost33SharedRtSharedLibDir>$(BaseBoostSharedRtSharedLibDir)\33;$(Python33LibDir)</Boost33SharedRtSharedLibDir>
+    <Boost33StaticRtSharedLibDir>$(BaseBoostStaticRtSharedLibDir)\33;$(Python33LibDir)</Boost33StaticRtSharedLibDir>
+    <Boost33StaticRtStaticLibDir>$(BaseBoostStaticRtStaticLibDir)\33;$(Python33LibDir)</Boost33StaticRtStaticLibDir>
+    <Py26BoostSharedTangoSharedLibDir>$(Boost26SharedRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll</Py26BoostSharedTangoSharedLibDir>
+    <Py26BoostStaticTangoSharedLibDir>$(Boost26StaticRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll</Py26BoostStaticTangoSharedLibDir>
+    <Py26BoostStaticTangoStaticLibDir>$(Boost26StaticRtStaticLibDir);$(TangoLibDir)\vc$(VCMajorVer)</Py26BoostStaticTangoStaticLibDir>
+    <Py27BoostSharedTangoSharedLibDir>$(Boost27SharedRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll</Py27BoostSharedTangoSharedLibDir>
+    <Py27BoostStaticTangoSharedLibDir>$(Boost27StaticRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll</Py27BoostStaticTangoSharedLibDir>
+    <Py27BoostStaticTangoStaticLibDir>$(Boost27StaticRtStaticLibDir);$(TangoLibDir)\vc$(VCMajorVer)</Py27BoostStaticTangoStaticLibDir>
+    <Py31BoostSharedTangoSharedLibDir>$(Boost31SharedRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll</Py31BoostSharedTangoSharedLibDir>
+    <Py31BoostStaticTangoSharedLibDir>$(Boost31StaticRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll</Py31BoostStaticTangoSharedLibDir>
+    <Py31BoostStaticTangoStaticLibDir>$(Boost31StaticRtStaticLibDir);$(TangoLibDir)\vc$(VCMajorVer)</Py31BoostStaticTangoStaticLibDir>
+    <Py32BoostSharedTangoSharedLibDir>$(Boost32SharedRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll</Py32BoostSharedTangoSharedLibDir>
+    <Py32BoostStaticTangoSharedLibDir>$(Boost32StaticRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll</Py32BoostStaticTangoSharedLibDir>
+    <Py32BoostStaticTangoStaticLibDir>$(Boost32StaticRtStaticLibDir);$(TangoLibDir)\vc$(VCMajorVer)</Py32BoostStaticTangoStaticLibDir>
+    <Py33BoostSharedTangoSharedLibDir>$(Boost33SharedRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll</Py33BoostSharedTangoSharedLibDir>
+    <Py33BoostStaticTangoSharedLibDir>$(Boost33StaticRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll</Py33BoostStaticTangoSharedLibDir>
+    <Py33BoostStaticTangoStaticLibDir>$(Boost33StaticRtStaticLibDir);$(TangoLibDir)\vc$(VCMajorVer)</Py33BoostStaticTangoStaticLibDir>
+    <WinSetupArgs>$(BaseDir)\winsetup.py $(BuildDir) $(DistDir) $(BDistDir) $(Configuration) $(Platform)</WinSetupArgs>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <_PropertySheetDisplayName>PyTango Project Properties</_PropertySheetDisplayName>
+    <OutDir>$(PyTangoBuildDir)\</OutDir>
+    <IntDir>$(PyTangoTempDir)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalOptions>$(PyTangoCompileOptions) %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(PreCompHeaderDst)</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderFile>$(PreCompHeaderSrc)</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(DatabaseFile)</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>$(BaseDisableWarningFlags);%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ErrorReporting>Prompt</ErrorReporting>
+    </ClCompile>
+    <Link>
+      <ShowProgress>NotSet</ShowProgress>
+      <OutputFile>$(OutDir)$(PyTangoBaseFile)$(PyTangoFileExt)</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(DatabaseFile)</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Message>[PyTango]: Starting python $(WinSetupArgs)</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <PropertyGroup Label="Configuration">
+    <BuildLogFile>$(IntDir)BuildLog.html</BuildLogFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <BuildMacro Include="PyTangoBaseFile">
+      <Value>$(PyTangoBaseFile)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TangoMajorVer">
+      <Value>$(TangoMajorVer)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TangoMinorVer">
+      <Value>$(TangoMinorVer)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TangoPatchVer">
+      <Value>$(TangoPatchVer)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TangoVer">
+      <Value>$(TangoVer)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BoostMajorVer">
+      <Value>$(BoostMajorVer)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BoostMinorVer">
+      <Value>$(BoostMinorVer)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BoostPatchVer">
+      <Value>$(BoostPatchVer)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BoostVer">
+      <Value>$(BoostVer)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TangoBaseDir">
+      <Value>$(TangoBaseDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BoostBaseDir">
+      <Value>$(BoostBaseDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PythonBaseDir">
+      <Value>$(PythonBaseDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VCMajorVer">
+      <Value>$(VCMajorVer)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VCMinorVer">
+      <Value>$(VCMinorVer)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VCVer">
+      <Value>$(VCVer)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BoostIncludeDir">
+      <Value>$(BoostIncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BoostLibDir">
+      <Value>$(BoostLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TangoIncludeDir">
+      <Value>$(TangoIncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TangoLibDir">
+      <Value>$(TangoLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PythonDir">
+      <Value>$(PythonDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="NumpyRelativeIncludeDir">
+      <Value>$(NumpyRelativeIncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTangoCompileOptions">
+      <Value>$(PyTangoCompileOptions)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseDir">
+      <Value>$(BaseDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="RelPrefixDir">
+      <Value>$(RelPrefixDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseBuildDir">
+      <Value>$(BaseBuildDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseBuildLibDir">
+      <Value>$(BaseBuildLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseTempDir">
+      <Value>$(BaseTempDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseDistDir">
+      <Value>$(BaseDistDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseBDistDir">
+      <Value>$(BaseBDistDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BuildDir">
+      <Value>$(BuildDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DistDir">
+      <Value>$(DistDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TempDir">
+      <Value>$(TempDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BDistDir">
+      <Value>$(BDistDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTangoBuildDir">
+      <Value>$(PyTangoBuildDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTangoTempDir">
+      <Value>$(PyTangoTempDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseSrcDir">
+      <Value>$(BaseSrcDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CommonIncludeDirs">
+      <Value>$(CommonIncludeDirs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python26Dir">
+      <Value>$(Python26Dir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py26">
+      <Value>$(Py26)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python26IncludeDir">
+      <Value>$(Python26IncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Numpy26IncludeDir">
+      <Value>$(Numpy26IncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python26IncludeDirs">
+      <Value>$(Python26IncludeDirs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python26LibDir">
+      <Value>$(Python26LibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python27Dir">
+      <Value>$(Python27Dir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py27">
+      <Value>$(Py27)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python27IncludeDir">
+      <Value>$(Python27IncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Numpy27IncludeDir">
+      <Value>$(Numpy27IncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python27IncludeDirs">
+      <Value>$(Python27IncludeDirs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python27LibDir">
+      <Value>$(Python27LibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python31Dir">
+      <Value>$(Python31Dir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py31">
+      <Value>$(Py31)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python31IncludeDir">
+      <Value>$(Python31IncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Numpy31IncludeDir">
+      <Value>$(Numpy31IncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python31IncludeDirs">
+      <Value>$(Python31IncludeDirs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python31LibDir">
+      <Value>$(Python31LibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python32Dir">
+      <Value>$(Python32Dir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py32">
+      <Value>$(Py32)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python32IncludeDir">
+      <Value>$(Python32IncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Numpy32IncludeDir">
+      <Value>$(Numpy32IncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python32IncludeDirs">
+      <Value>$(Python32IncludeDirs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python32LibDir">
+      <Value>$(Python32LibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python33Dir">
+      <Value>$(Python33Dir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py33">
+      <Value>$(Py33)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python33IncludeDir">
+      <Value>$(Python33IncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Numpy33IncludeDir">
+      <Value>$(Numpy33IncludeDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python33IncludeDirs">
+      <Value>$(Python33IncludeDirs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Python33LibDir">
+      <Value>$(Python33LibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BasePreFlags">
+      <Value>$(BasePreFlags)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PreTangoStaticFlags">
+      <Value>$(PreTangoStaticFlags)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PreTangoSharedFlags">
+      <Value>$(PreTangoSharedFlags)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PreBoostSharedTantoSharedFlags">
+      <Value>$(PreBoostSharedTantoSharedFlags)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PreBoostStaticTantoSharedFlags">
+      <Value>$(PreBoostStaticTantoSharedFlags)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PreBoostStaticTantoStaticFlags">
+      <Value>$(PreBoostStaticTantoStaticFlags)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PreCompHeaderSrc">
+      <Value>$(PreCompHeaderSrc)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PreCompHeaderDst">
+      <Value>$(PreCompHeaderDst)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DatabaseFile">
+      <Value>$(DatabaseFile)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseDisableWarningFlags">
+      <Value>$(BaseDisableWarningFlags)</Value>
+    </BuildMacro>
+    <BuildMacro Include="omniStaticLibs">
+      <Value>$(omniStaticLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="omniSharedLibs">
+      <Value>$(omniSharedLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseTangoLibs">
+      <Value>$(BaseTangoLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BasePyTangoStaticLibs">
+      <Value>$(BasePyTangoStaticLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BasePyTangoSharedLibs">
+      <Value>$(BasePyTangoSharedLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTango26StaticLibs">
+      <Value>$(PyTango26StaticLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTango26SharedLibs">
+      <Value>$(PyTango26SharedLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTango27StaticLibs">
+      <Value>$(PyTango27StaticLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTango27SharedLibs">
+      <Value>$(PyTango27SharedLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTango31StaticLibs">
+      <Value>$(PyTango31StaticLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTango31SharedLibs">
+      <Value>$(PyTango31SharedLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTango32StaticLibs">
+      <Value>$(PyTango32StaticLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTango32SharedLibs">
+      <Value>$(PyTango32SharedLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTango33StaticLibs">
+      <Value>$(PyTango33StaticLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PyTango33SharedLibs">
+      <Value>$(PyTango33SharedLibs)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseBoostSharedRtSharedLibDir">
+      <Value>$(BaseBoostSharedRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseBoostStaticRtSharedLibDir">
+      <Value>$(BaseBoostStaticRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseBoostStaticRtStaticLibDir">
+      <Value>$(BaseBoostStaticRtStaticLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost26SharedRtSharedLibDir">
+      <Value>$(Boost26SharedRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost26StaticRtSharedLibDir">
+      <Value>$(Boost26StaticRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost26StaticRtStaticLibDir">
+      <Value>$(Boost26StaticRtStaticLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost27SharedRtSharedLibDir">
+      <Value>$(Boost27SharedRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost27StaticRtSharedLibDir">
+      <Value>$(Boost27StaticRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost27StaticRtStaticLibDir">
+      <Value>$(Boost27StaticRtStaticLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost31SharedRtSharedLibDir">
+      <Value>$(Boost31SharedRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost31StaticRtSharedLibDir">
+      <Value>$(Boost31StaticRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost31StaticRtStaticLibDir">
+      <Value>$(Boost31StaticRtStaticLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost32SharedRtSharedLibDir">
+      <Value>$(Boost32SharedRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost32StaticRtSharedLibDir">
+      <Value>$(Boost32StaticRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost32StaticRtStaticLibDir">
+      <Value>$(Boost32StaticRtStaticLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost33SharedRtSharedLibDir">
+      <Value>$(Boost33SharedRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost33StaticRtSharedLibDir">
+      <Value>$(Boost33StaticRtSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Boost33StaticRtStaticLibDir">
+      <Value>$(Boost33StaticRtStaticLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py26BoostSharedTangoSharedLibDir">
+      <Value>$(Py26BoostSharedTangoSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py26BoostStaticTangoSharedLibDir">
+      <Value>$(Py26BoostStaticTangoSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py26BoostStaticTangoStaticLibDir">
+      <Value>$(Py26BoostStaticTangoStaticLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py27BoostSharedTangoSharedLibDir">
+      <Value>$(Py27BoostSharedTangoSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py27BoostStaticTangoSharedLibDir">
+      <Value>$(Py27BoostStaticTangoSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py27BoostStaticTangoStaticLibDir">
+      <Value>$(Py27BoostStaticTangoStaticLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py31BoostSharedTangoSharedLibDir">
+      <Value>$(Py31BoostSharedTangoSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py31BoostStaticTangoSharedLibDir">
+      <Value>$(Py31BoostStaticTangoSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py31BoostStaticTangoStaticLibDir">
+      <Value>$(Py31BoostStaticTangoStaticLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py32BoostSharedTangoSharedLibDir">
+      <Value>$(Py32BoostSharedTangoSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py32BoostStaticTangoSharedLibDir">
+      <Value>$(Py32BoostStaticTangoSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py32BoostStaticTangoStaticLibDir">
+      <Value>$(Py32BoostStaticTangoStaticLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py33BoostSharedTangoSharedLibDir">
+      <Value>$(Py33BoostSharedTangoSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py33BoostStaticTangoSharedLibDir">
+      <Value>$(Py33BoostStaticTangoSharedLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Py33BoostStaticTangoStaticLibDir">
+      <Value>$(Py33BoostStaticTangoStaticLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="WinSetupArgs">
+      <Value>$(WinSetupArgs)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

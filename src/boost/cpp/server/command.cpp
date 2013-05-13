@@ -132,7 +132,7 @@ void insert_scalar<Tango::DEV_ENCODED>(boost::python::object &o, CORBA::Any &any
     const char* encoded_format = bopy::extract<const char *> (p0.ptr());
     const char* encoded_data = bopy::extract<const char *> (p1.ptr());
     
-    CORBA::ULong nb = bopy::len(p1);
+    CORBA::ULong nb = static_cast<CORBA::ULong>(bopy::len(p1));
     Tango::DevVarCharArray arr(nb, nb, (CORBA::Octet*)encoded_data, false);
     Tango::DevEncoded *data = new Tango::DevEncoded;
     data->encoded_format = CORBA::string_dup(encoded_format);

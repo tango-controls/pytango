@@ -278,7 +278,7 @@ inline typename TANGO_const2type(tangoTypeConst)*
 
     long dim_x;
     long dim_y = 0;
-    long len = PySequence_Size(py_val);
+    Py_ssize_t len = PySequence_Size(py_val);
     bool expectFlatSource;
 
     if (isImage) {
@@ -302,8 +302,8 @@ inline typename TANGO_const2type(tangoTypeConst)*
                         fname + "()");
                 }
 
-                dim_y = len;
-                dim_x = PySequence_Size(py_row0);
+                dim_y = static_cast<long>(len);
+                dim_x = static_cast<long>(PySequence_Size(py_row0));
                 Py_XDECREF(py_row0);
             } else {
                 dim_x = 0;
@@ -325,7 +325,7 @@ inline typename TANGO_const2type(tangoTypeConst)*
                     "PyDs_WrongParameters",
                     "You should not specify dim_y for an spectrum attribute!",
                     fname + "()");
-        dim_x = len;
+        dim_x = static_cast<long>(len);
     }
 
     res_dim_x = dim_x;
@@ -405,141 +405,6 @@ inline typename TANGO_const2type(tangoTypeConst)*
     return tg_ptr;
 }
 
-/*
-template<>
-inline Tango::DevString*
-    fast_python_to_tango_buffer_sequence<Tango::DEV_STRING>(PyObject* py_val, long* pdim_x, long *pdim_y, const std::string &fname, bool isImage, long& res_dim_x, long& res_dim_y)
-{
-    long dim_x;
-    long dim_y = 0;
-    long len = PySequence_Size(py_val);
-    bool expectFlatSource;
-
-    if (isImage) {
-        if (pdim_y) {
-            expectFlatSource = true;
-            dim_x = *pdim_x;
-            dim_y = *pdim_y;
-            long len2 = dim_x*dim_y;
-            if (len2 < len)
-                len = len2;
-        } else {
-            expectFlatSource = false;
-
-            if (len > 0) {
-                PyObject* py_row0 = PySequence_ITEM(py_val, 0);
-                if (!py_row0 || !PySequence_Check(py_row0)) {
-                    Py_XDECREF(py_row0);
-                    Tango::Except::throw_exception(
-                        "PyDs_WrongParameters",
-                        "Expecting a sequence of sequences.",
-                        fname + "()");
-                }
-
-                dim_y = len;
-                dim_x = PySequence_Size(py_row0);
-                Py_XDECREF(py_row0);
-            } else {
-                dim_x = 0;
-            }
-        }
-        len = dim_x*dim_y;
-    } else {
-        expectFlatSource = true;
-        if (pdim_x) {
-            if (*pdim_x > len)
-                Tango::Except::throw_exception(
-                    "PyDs_WrongParameters",
-                    "Specified dim_x is larger than the sequence size",
-                    fname + "()");
-            len = *pdim_x;
-        }
-        if (pdim_y && (*pdim_y!=0))
-            Tango::Except::throw_exception(
-                    "PyDs_WrongParameters",
-                    "You should not specify dim_y for an spectrum attribute!",
-                    fname + "()");
-        dim_x = len;
-    }
-
-    res_dim_x = dim_x;
-    res_dim_y = dim_y;
-
-    if (!PySequence_Check(py_val))
-        Tango::Except::throw_exception(
-            "PyDs_WrongParameters",
-            "Expecting a sequence!",
-            fname + "()");
-
-    /// @bug Why not TangoArrayType::allocbuf(len)? Because
-    /// I will use it in set_value(tg_ptr,...,release=true).
-    /// Tango API makes delete[] tg_ptr instead of freebuf(tg_ptr).
-    /// This is usually the same, but for Tango::DevStringArray the
-    /// behaviour seems different and causes weirdtroubles..
-    Tango::DevString *tg_ptr;
-    tg_ptr = new Tango::DevString[len];
-
-    // The boost extract could be used:
-    // TangoScalarType val = boost::python::extract<TangoScalarType>(elt_ptr);
-    // instead of the code below.
-    // the problem is that extract is considerably slower than our
-    // convert function which only has to deal with the specific tango
-    // data types
-
-    PyObject * py_el = 0;
-    PyObject * py_row = 0;
-    Tango::DevString tg_scalar;
-    long idx = 0;
-    try {
-        if (expectFlatSource) {
-            for (idx = 0; idx < len; ++idx)
-            {
-                py_el = PySequence_ITEM(py_val, idx);
-                if (!py_el)
-                        boost::python::throw_error_already_set();
-                
-                tg_scalar = PyString_AsString(py_el);
-                tg_ptr[idx] = tg_scalar;
-                
-                Py_DECREF(py_el);
-                py_el = 0;
-            }
-        } else {
-            for (long y=0; y < dim_y; ++y) {
-                py_row = PySequence_ITEM(py_val, y);
-                if (!py_row)
-                        boost::python::throw_error_already_set();
-                if (!PySequence_Check(py_row)) {
-                    Tango::Except::throw_exception(
-                        "PyDs_WrongParameters",
-                        "Expecting a sequence of sequences!",
-                        fname + "()");
-                }
-                for (long x=0; x < dim_x; ++x, ++idx) {
-                    py_el = PySequence_ITEM(py_row, x);
-                    if (!py_el)
-                        boost::python::throw_error_already_set();
-                    
-                    tg_scalar = PyString_AsString(py_el);
-                    tg_ptr[x + y*dim_x] = tg_scalar;
-                    
-                    Py_DECREF(py_el);
-                    py_el = 0;
-                }
-                Py_DECREF(py_row);
-                py_row = 0;
-            }
-        }
-    } catch(...) {
-        Py_XDECREF(py_el);
-        Py_XDECREF(py_row);
-        fast_python_to_tango_buffer_deleter__<Tango::DEV_STRING>(tg_ptr, idx);
-        throw;
-    }
-    return tg_ptr;
-}
-*/
-
 template<long tangoArrayTypeConst>
 inline typename TANGO_const2scalartype(tangoArrayTypeConst)*
     fast_python_to_corba_buffer_sequence(PyObject* py_val, long* pdim_x, const std::string &fname, long& res_dim_x)
@@ -548,7 +413,7 @@ inline typename TANGO_const2scalartype(tangoArrayTypeConst)*
     typedef typename TANGO_const2scalartype(tangoArrayTypeConst) TangoScalarType;
 
     long dim_x;
-    long len = PySequence_Size(py_val);
+    Py_ssize_t len = PySequence_Size(py_val);
 
     if (pdim_x) {
         if (*pdim_x > len)
@@ -558,7 +423,7 @@ inline typename TANGO_const2scalartype(tangoArrayTypeConst)*
                 fname + "()");
         len = *pdim_x;
     }
-    dim_x = len;
+    dim_x = static_cast<long>(len);
 
     res_dim_x = dim_x;
 
@@ -568,7 +433,7 @@ inline typename TANGO_const2scalartype(tangoArrayTypeConst)*
             "Expecting a sequence!",
             fname + "()");
 
-     TangoScalarType* tg_ptr = TangoArrayType::allocbuf(len);
+	TangoScalarType* tg_ptr = TangoArrayType::allocbuf(static_cast<Tango::DevULong>(len));
 
     // The boost extract could be used:
     // TangoScalarType val = boost::python::extract<TangoScalarType>(elt_ptr);

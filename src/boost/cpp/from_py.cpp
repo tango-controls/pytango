@@ -83,18 +83,18 @@ void convert2array(const boost::python::object &py_value, Tango::DevVarCharArray
         raise_(PyExc_TypeError, param_must_be_seq);
     }
 
-    size_t size = boost::python::len(py_value);
+    CORBA::ULong size = static_cast<CORBA::ULong>(boost::python::len(py_value));
     result.length(size);
     if (PyBytes_Check(py_value_ptr))
     {
         char *ch = PyBytes_AS_STRING(py_value_ptr);
-        for (size_t i=0; i < size; ++i) {
+        for (CORBA::ULong i=0; i < size; ++i) {
             result[i] = ch[i];
         }
     }
     else
     {
-        for (size_t i=0; i < size; ++i) {
+        for (CORBA::ULong i=0; i < size; ++i) {
             unsigned char *ch = boost::python::extract<unsigned char *>(py_value[i]);
             result[i] = ch[0];
         }
@@ -152,9 +152,9 @@ void convert2array(const object &py_value, Tango::DevVarStringArray & result)
     }
     else
     {
-        size_t size = boost::python::len(py_value);
+        CORBA::ULong size = static_cast<CORBA::ULong>(boost::python::len(py_value));
         result.length(size);
-        for (size_t i=0; i < size; ++i) {
+        for (CORBA::ULong i=0; i < size; ++i) {
             result[i] = CORBA::string_dup(boost::python::extract<char*>(py_value[i]));
         }
     }
@@ -167,7 +167,7 @@ void convert2array(const boost::python::object &py_value, Tango::DevVarDoubleStr
         raise_convert2array_DevVarDoubleStringArray();
     }
     
-    size_t size = boost::python::len(py_value);
+    CORBA::ULong size = static_cast<CORBA::ULong>(boost::python::len(py_value));
     if (size != 2)
     {
         raise_convert2array_DevVarDoubleStringArray();
@@ -188,7 +188,7 @@ void convert2array(const boost::python::object &py_value, Tango::DevVarLongStrin
         raise_convert2array_DevVarLongStringArray();
     }
     
-    size_t size = boost::python::len(py_value);
+    CORBA::ULong size = static_cast<CORBA::ULong>(boost::python::len(py_value));
     if (size != 2)
     {
         raise_convert2array_DevVarLongStringArray();
@@ -331,9 +331,9 @@ void from_py_object(object &py_obj, Tango::AttributeConfigList &attr_conf_list)
         return;
     }
     
-    size_t size = boost::python::len(py_obj);
+    CORBA::ULong size = static_cast<CORBA::ULong>(boost::python::len(py_obj));
     attr_conf_list.length(size);
-    for (size_t i=0; i < size; ++i) {
+    for (CORBA::ULong i=0; i < size; ++i) {
         object tmp = py_obj[i];
         from_py_object(tmp, attr_conf_list[i]);
     }
@@ -350,9 +350,9 @@ void from_py_object(object &py_obj, Tango::AttributeConfigList_2 &attr_conf_list
         return;
     }
     
-    size_t size = boost::python::len(py_obj);
+    CORBA::ULong size = static_cast<CORBA::ULong>(boost::python::len(py_obj));
     attr_conf_list.length(size);
-    for (size_t i=0; i < size; ++i) {
+    for (CORBA::ULong i=0; i < size; ++i) {
         object tmp = py_obj[i];
         from_py_object(tmp, attr_conf_list[i]);
     }
@@ -369,9 +369,9 @@ void from_py_object(object &py_obj, Tango::AttributeConfigList_3 &attr_conf_list
         return;
     }
     
-    size_t size = boost::python::len(py_obj);
+    CORBA::ULong size = static_cast<CORBA::ULong>(boost::python::len(py_obj));
     attr_conf_list.length(size);
-    for (size_t i=0; i < size; ++i) {
+    for (CORBA::ULong i=0; i < size; ++i) {
         object tmp = py_obj[i];
         from_py_object(tmp, attr_conf_list[i]);
     }

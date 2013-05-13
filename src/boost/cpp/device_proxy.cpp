@@ -69,10 +69,10 @@ namespace PyDeviceProxy
     {
         std::vector<std::string> attr_names;
         std::vector<bopy::object> py_values;
-        long size = len(py_list);
+        Py_ssize_t size = len(py_list);
 
         // Fill attr_names and py_values
-        for (long n = 0; n < size; ++n) {
+        for (Py_ssize_t n = 0; n < size; ++n) {
             bopy::object tup = py_list[n];
             std::string attr_name = bopy::extract<std::string>(tup[0]);
             attr_names.push_back(attr_name);

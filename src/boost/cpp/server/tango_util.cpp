@@ -41,8 +41,8 @@ namespace PyUtil
     //
         boost::python::list cpp_class_list =
             extract<boost::python::list>(pytango.attr("get_cpp_classes")());
-        int cl_len = len(cpp_class_list);
-        for(int i = 0; i < cl_len; ++i)
+        Py_ssize_t cl_len = boost::python::len(cpp_class_list);
+        for(Py_ssize_t i = 0; i < cl_len; ++i)
         {
             bopy::tuple class_info = extract<bopy::tuple>(cpp_class_list[i]);
             char *class_name = extract<char *>(class_info[0]);
@@ -59,8 +59,8 @@ namespace PyUtil
     // Make all Python tango class(es) known to C++ and set the PyInterpreter state
     //
         boost::python::list constructed_classes(pytango.attr("get_constructed_classes")());
-        int cc_len = len(constructed_classes);
-        for(int i = 0; i < cc_len; ++i)
+        Py_ssize_t cc_len = boost::python::len(constructed_classes);
+        for(Py_ssize_t i = 0; i < cc_len; ++i)
         {
             CppDeviceClass *cpp_dc = extract<CppDeviceClass *> (constructed_classes[i])();
             dserver->_add_class(cpp_dc);

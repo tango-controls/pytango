@@ -54,7 +54,7 @@ inline typename TANGO_const2type(tangoScalarTypeConst)*
 
     int nd = PyArray_NDIM(py_val);
     npy_intp* dims = PyArray_DIMS(py_val);
-    size_t len = 0;
+    long len = 0;
 
     // Is the array exactly what we need? I mean: The type we need and with
     // continuous aligned memory?
@@ -86,9 +86,9 @@ inline typename TANGO_const2type(tangoScalarTypeConst)*
         if (!dims_ok)
             return fast_python_to_tango_buffer_fallback__();
         
-        len = dims[0]*dims[1];
-        res_dim_x = dims[1];
-        res_dim_y = dims[0];
+        len = static_cast<long>(dims[0]*dims[1]);
+        res_dim_x = static_cast<long>(dims[1]);
+        res_dim_y = static_cast<long>(dims[0]);
     } else {
         // Check: This is an spectrum!
         if (nd != 1)
@@ -107,7 +107,7 @@ inline typename TANGO_const2type(tangoScalarTypeConst)*
                 return fast_python_to_tango_buffer_fallback__();
             len = *pdim_x;
         } else
-            len = dims[0];
+            len = static_cast<long>(dims[0]);
         res_dim_x = len;
         res_dim_y = 0;
     }
@@ -189,7 +189,7 @@ inline typename TANGO_const2scalartype(tangoArrayTypeConst)*
 
     int nd = PyArray_NDIM(py_val);
     npy_intp* dims = PyArray_DIMS(py_val);
-    size_t len = 0;
+    long len = 0;
 
     // Is the array exactly what we need? I mean: The type we need and with
     // continuous aligned memory?
@@ -214,7 +214,7 @@ inline typename TANGO_const2scalartype(tangoArrayTypeConst)*
             return fast_python_to_corba_buffer_fallback__();
         len = *pdim_x;
     } else
-        len = dims[0];
+        len = static_cast<long>(dims[0]);
     res_dim_x = len;
 
 

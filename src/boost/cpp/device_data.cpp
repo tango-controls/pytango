@@ -54,10 +54,10 @@ namespace PyDeviceData {
         {
             object p0 = py_value[0];
             object p1 = py_value[1];
-            const char* encoded_format = extract<const char *> (p0.ptr());
-            const char* encoded_data = extract<const char *> (p1.ptr());
+            const char* encoded_format = extract<const char*> (p0.ptr());
+            const char* encoded_data = extract<const char*> (p1.ptr());
             
-            CORBA::ULong nb = boost::python::len(p1);
+            CORBA::ULong nb = static_cast<CORBA::ULong>(boost::python::len(p1));
             Tango::DevVarCharArray arr(nb, nb, (CORBA::Octet*)encoded_data, false);
             Tango::DevEncoded val;
             val.encoded_format = CORBA::string_dup(encoded_format);

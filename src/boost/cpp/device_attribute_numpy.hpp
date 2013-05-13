@@ -187,7 +187,7 @@ namespace PyDeviceAttribute {
         typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
 
         // -- Check dimensions
-        unsigned long dim_x=0, dim_y=0, nelems=0;
+        Py_ssize_t dim_x=0, dim_y=0, nelems=0;
         bool ok;
         switch (PyArray_NDIM(py_value.ptr())) {
             case 2: // -- Image
@@ -211,9 +211,10 @@ namespace PyDeviceAttribute {
 
         // -- Allocate memory for the new data object
         unique_pointer<TangoArrayType> value;
-        TangoScalarType* buffer = TangoArrayType::allocbuf(nelems);
+		CORBA::ULong unelems = static_cast<CORBA::ULong>(nelems);
+        TangoScalarType* buffer = TangoArrayType::allocbuf(unelems);
         try {
-            value.reset(new TangoArrayType(nelems, nelems, buffer, true));
+            value.reset(new TangoArrayType(unelems, unelems, buffer, true));
         } catch(...) {
             TangoArrayType::freebuf(buffer);
             throw;
@@ -237,9 +238,9 @@ namespace PyDeviceAttribute {
             // the correct number of elements but... I did not know the
             // x and y position it corresponded! Yes, 'iter' has a coordinates
             // field, but it was always [0,0], never updated!!
-            unsigned long coordinates[2];
-            unsigned long &x = coordinates[1];
-            unsigned long &y = coordinates[0];
+            npy_intp coordinates[2];
+            Py_ssize_t &x = coordinates[1];
+            Py_ssize_t &y = coordinates[0];
             for (y=0; y < dim_y; ++y) {
                 for (x=0; x < dim_x; ++x) {
                     PyArray_ITER_GOTO(iter, coordinates);
@@ -262,7 +263,7 @@ namespace PyDeviceAttribute {
         }
 
         // -- Insert into device attribute
-        dev_attr.insert( value.get(), dim_x, dim_y );
+        dev_attr.insert( value.get(), static_cast<int>(dim_x), static_cast<int>(dim_y) );
 
         // -- Final cleaning...
         value.release(); // Do not delete value, it is handled by dev_attr now!

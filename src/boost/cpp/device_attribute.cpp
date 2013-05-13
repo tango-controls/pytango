@@ -597,15 +597,15 @@ namespace PyDeviceAttribute
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
         typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
 
-        long dim_x, dim_y, nelems;
+		CORBA::ULong dim_x, dim_y, nelems;
 
         // -- Check the dimensions
         if (isImage) {
-            dim_y = len(py_value);
-            dim_x = len(py_value[0]);
+			dim_y = static_cast<CORBA::ULong>(boost::python::len(py_value));
+            dim_x = static_cast<CORBA::ULong>(boost::python::len(py_value[0]));
             nelems = dim_x * dim_y;
         } else {
-            dim_x = len(py_value);
+            dim_x = static_cast<CORBA::ULong>(boost::python::len(py_value));
             dim_y = 0;
             nelems = dim_x;
         }
@@ -622,16 +622,16 @@ namespace PyDeviceAttribute
 
         // -- Copy the sequence to the newly created buffer
         if (isImage) {
-            for(long y = 0; y < dim_y; ++y) {
+            for(CORBA::ULong y = 0; y < dim_y; ++y) {
                 object py_sub = py_value[y];
                 if (len(py_sub) != dim_x)
                     raise_(PyExc_TypeError, non_valid_image);
-                for(long x = 0; x < dim_x; ++x) {
+                for(CORBA::ULong x = 0; x < dim_x; ++x) {
                     python_tangocpp<tangoTypeConst>::to_cpp(py_sub[x], buffer[x + y*dim_x]);
                 }
             }
         } else {
-            for(long x = 0; x < dim_x; ++x) {
+            for(CORBA::ULong x = 0; x < dim_x; ++x) {
                 python_tangocpp<tangoTypeConst>::to_cpp(py_value[x], buffer[x]);
             }
         }

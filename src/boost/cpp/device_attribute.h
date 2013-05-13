@@ -201,10 +201,10 @@ namespace PyDeviceAttribute {
         /// mean anything? Does he pretend to take ownership of the pointer or
         /// is he making another copy? what should I do?
         char* encoded_format = const_cast<char*>((boost::python::extract<const char*>(encoded_format_str)()));
-        unsigned int encoded_data_len = boost::python::len(encoded_data_str);
+        Py_ssize_t encoded_data_len = boost::python::len(encoded_data_str);
         unsigned char* encoded_data = reinterpret_cast<unsigned char*>(const_cast<char*>((boost::python::extract<const char*>(encoded_data_str)())));
         // void insert(char *&,unsigned char *&,unsigned int);
-        dev_attr.insert(encoded_format, encoded_data, encoded_data_len);
+        dev_attr.insert(encoded_format, encoded_data, static_cast<unsigned int>(encoded_data_len));
 
         //std::string value = boost::python::extract<std::string>(py_value);
         //dev_attr << value;

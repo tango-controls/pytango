@@ -34,11 +34,11 @@ void PyAttr::set_user_prop(vector<Tango::AttrProperty> &user_prop,
 // Is there any user defined prop. defined ?
 //
 
-    long nb_prop = user_prop.size();
+    size_t nb_prop = user_prop.size();
     if (nb_prop == 0)
         return;
 
-    for (long loop = 0;loop < nb_prop;loop++)
+    for (size_t loop = 0;loop < nb_prop;loop++)
     {
         Tango::AttrProperty  prop = user_prop[loop];
         string &prop_name = prop.get_name();

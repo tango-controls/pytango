@@ -135,9 +135,9 @@ namespace PyGroup
                 attr_info = dev_proxy->get_attribute_config(attr_name);
             }
                         
-            int attr_nb = bopy::len(py_value);
+            Py_ssize_t attr_nb = bopy::len(py_value);
             std::vector<Tango::DeviceAttribute> dev_attr(attr_nb);
-            for(int i = 0; i < attr_nb; ++i)
+            for(Py_ssize_t i = 0; i < attr_nb; ++i)
             {
                 PyDeviceAttribute::reset(dev_attr[i], attr_info, py_value[i]);
             }

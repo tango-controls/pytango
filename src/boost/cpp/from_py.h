@@ -77,11 +77,11 @@ void convert2array(const bopy::object &py_value, Tango::DevVarCharArray & result
 template<typename TangoElementType>
 void convert2array(const bopy::object &py_value, _CORBA_Sequence<TangoElementType> & result)
 {
-    size_t size = bopy::len(py_value);
-    result.length(size);
-    for (size_t i=0; i < size; ++i) {
+    Py_ssize_t size = bopy::len(py_value);
+	result.length(static_cast<CORBA::ULong>(size));
+    for (Py_ssize_t i=0; i < size; ++i) {
         TangoElementType ch = bopy::extract<TangoElementType>(py_value[i]);
-        result[i] = ch;
+        result[static_cast<CORBA::ULong>(i)] = ch;
     }
 }
 
@@ -185,8 +185,8 @@ struct from_sequence
     static inline void convert(bopy::dict d, Tango::DbData& db_data)
     {
         bopy::object it = d.iteritems();
-        int len = bopy::extract<int>(d.attr("__len__")()) ;
-        for(int i = 0 ; i < len; ++i)
+        Py_ssize_t len = bopy::len(d);
+        for(Py_ssize_t i = 0 ; i < len; ++i)
         {
             bopy::tuple pair = (bopy::tuple)it.attr("next")();
             bopy::object key = pair[0];
