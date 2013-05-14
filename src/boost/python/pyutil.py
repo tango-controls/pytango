@@ -209,7 +209,10 @@ def __Util__delete_device(self, klass_name, device_name):
     dc = dimpl.get_device_class()
     dc.device_destroyer(device_name)
 
-    
+def __Util__server_set_event_loop(self, event_loop):
+    self._server_event_loop = event_loop
+    self._server_set_event_loop()
+
 class Util(_Util):
     """
         This class is a used to store TANGO device server process data and to
@@ -691,6 +694,41 @@ def __doc_Util():
         New in PyTango 7.0.0
     """ )
     
+    document_method("server_set_event_loop", """
+    server_set_event_loop(self, event_loop) -> None
+    
+        This method registers an event loop function in a Tango server.
+        This function will be called by the process main thread in an infinite loop
+        The process will not use the classical ORB blocking event loop.
+        It is the user responsability to code this function in a way that it implements
+        some kind of blocking in order not to load the computer CPU. The following 
+        piece of code is an example of how you can use this feature::
+        
+            _LOOP_NB = 1
+            def looping():
+                global _LOOP_NB
+                print "looping", _LOOP_NB
+                time.sleep(0.1)
+                _LOOP_NB += 1
+                return _LOOP_NB > 100
+            
+            def main():
+                py = PyTango.Util(sys.argv)
+                
+                # ...
+
+                U = PyTango.Util.instance()
+                U.server_set_event_loop(looping)
+                U.server_init()
+                U.server_run()
+
+        Parameters : None
+        Return     : None
+        
+        New in PyTango 8.1.0
+    """ )
+
+            
 #    document_static_method("init_python", """
 #    init_python() -> None
 #

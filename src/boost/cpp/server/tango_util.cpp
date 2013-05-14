@@ -162,6 +162,32 @@ namespace PyUtil
         }
         return py_dev_list;
     }
+    
+    inline bool event_loop()
+    {
+        AutoPythonGIL guard;
+        PYTANGO_MOD
+        boost::python::object py_event_loop = pytango.attr("_server_event_loop");
+        boost::python::object py_ret = py_event_loop();
+        bool ret = boost::python::extract<bool>(py_ret);
+        return ret;
+    }
+    
+    inline void server_set_event_loop(Tango::Util& self,
+                                      boost::python::object& py_event_loop)
+    {
+        PYTANGO_MOD
+        if (py_event_loop.is_none())
+        {
+            self.server_set_event_loop(NULL);
+            pytango.attr("_server_event_loop") = py_event_loop;
+        }
+        else
+        {
+            pytango.attr("_server_event_loop") = py_event_loop;
+            self.server_set_event_loop(event_loop);
+        }
+    }
 }
 
 void init_python()
@@ -232,6 +258,7 @@ void export_util()
         .def("get_device_list_by_class", &PyUtil::get_device_list_by_class)
         .def("get_device_by_name", &PyUtil::get_device_by_name)
         .def("get_device_list", &PyUtil::get_device_list)
+        .def("server_set_event_loop", &PyUtil::server_set_event_loop)
         .def_readonly("_UseDb", &Tango::Util::_UseDb)
         .def_readonly("_FileDb", &Tango::Util::_FileDb)
         .def("init_python", init_python)

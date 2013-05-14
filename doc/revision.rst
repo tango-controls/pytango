@@ -69,7 +69,7 @@ History of modifications:
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 10/10/12 | `8.15 <http://www.tango-controls.org/static/PyTango/v802/doc/html/index.html>`_  | Update to PyTango 8.0.2                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| --/--/12 | `8.16 <http://www.tango-controls.org/static/PyTango/v803/doc/html/index.html>`_  | Update to PyTango 8.0.3                             | T\. Coutinho          |
+| --/--/13 | `8.16 <http://www.tango-controls.org/static/PyTango/v810/doc/html/index.html>`_  | Update to PyTango 8.1.0                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _version-history:
@@ -80,7 +80,10 @@ Version history
 +------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | version    | Changes                                                                                                                                                                      |
 +============+==============================================================================================================================================================================+
-| 8.0.3      | Bug fixes:                                                                                                                                                                   |
+| 8.1.0      | Features:                                                                                                                                                                    |
+|            |     - from sourceforge:                                                                                                                                                      |
+|            |         - `88: Implement Util::server_set_event_loop method in python <https://sourceforge.net/p/tango-cs/feature-requests/88>`_                                             |
+|            | Bug fixes:                                                                                                                                                                   |
 |            |     - from sourceforge:                                                                                                                                                      |
 |            |         - `3576353: [pytango] segfault on 'RestartServer' <https://sourceforge.net/tracker/?func=detail&aid=3576353&group_id=57612&atid=484769>`_                            |
 |            |         - `3579062: [pytango] Attribute missing methods <https://sourceforge.net/tracker/?func=detail&aid=3579062&group_id=57612&atid=484769>`_                              |
