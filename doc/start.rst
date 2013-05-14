@@ -303,9 +303,8 @@ Here is the table of compilers and corresponding Visual C++ version used by CPyt
 | Visual C++ 2011      | MSC_VER=1700 |
 +----------------------+--------------+
 
-+-------------------------+-----------------------------+
-|        Python           |              VC++           |
-| version  | architecture |                             |
++----------+--------------+-----------------------------+
+| version  | architecture |            VC++             |
 +==========+==============+=============================+
 |  2.6.6   |   32 bits    | MSC 1500 (Visual C++ 2008)  |
 +----------+--------------+-----------------------------+
@@ -331,7 +330,7 @@ Here is the table of compilers and corresponding Visual C++ version used by CPyt
 **Visual C++ 9.0 (2008) express quick install guide**
 
 1. Download and install VC++ 9.0 (2008) Express Edition
-2. If you need to compile in 64 bits platform:
+2. If you need to compile in 64 bits platform
     2.1. Download and install Windows 7 SDK for .NET Framework 3.5 SP1 [a.k.a. Windows SDK 7.0]
         (**not** Windows SDK 7.1!)
     
@@ -346,7 +345,7 @@ Here is the table of compilers and corresponding Visual C++ version used by CPyt
 1. Download and install VC++ 10.0 (2010) Express Edition
 2. If you need to compile in 64 bits platform follow the instructions
    **in the order they appear** (not doing so may lead to
-   `KB2519277 problem <http://support.microsoft.com/kb/2519277>`_ ):
+   `KB2519277 <http://support.microsoft.com/kb/2519277>`_ problem)
     
     2.1. Visual Studio 2010 SP1
     
