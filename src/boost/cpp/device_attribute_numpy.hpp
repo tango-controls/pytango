@@ -252,7 +252,7 @@ namespace PyDeviceAttribute {
                 }
             }
         } else {
-            for (unsigned long x=0; x < dim_x; ++x) {
+            for (Py_ssize_t x=0; x < dim_x; ++x) {
                 PyObject* dataObj = PyArray_GETITEM(array, iter->dataptr);
                 const object py_data = object( handle<>( dataObj ) );
 
