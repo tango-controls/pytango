@@ -34,6 +34,7 @@ from distutils.command.build import build as dftbuild
 from distutils.command.build_ext import build_ext as dftbuild_ext
 from distutils.command.install import install as dftinstall
 from distutils.unixccompiler import UnixCCompiler
+from distutils.version import StrictVersion as V
 import distutils.sysconfig
 
 try:
@@ -47,8 +48,7 @@ except:
 try:
     import IPython
     _IPY_ROOT = os.path.dirname(os.path.abspath(IPython.__file__))
-    _IPY_VER = list(map(int, IPython.__version__.split(".")[:2]))
-    if _IPY_VER > [0,10]:
+    if V(IPython.__version__) > V('0.10'):
         import IPython.utils.path
         get_ipython_dir = IPython.utils.path.get_ipython_dir
     else:
@@ -184,8 +184,7 @@ class build(dftbuild):
             return False
         if sphinx is None:
             return False
-        v = list(map(int, sphinx.__version__.split(".")))
-        if v <= [0,6,5]:
+        if V(sphinx.__version__) <= V("0.6.5"):
             print("Documentation will not be generated: sphinx version (%s) too low. Needs 0.6.6" % sphinx.__version__)
             return False 
         setup_dir = os.path.dirname(os.path.abspath(__file__))
@@ -208,9 +207,8 @@ class build_ext(dftbuild_ext):
             import subprocess
             compiler = self.compiler.compiler
             pipe = subprocess.Popen(compiler + ["-dumpversion"], stdout=subprocess.PIPE).stdout
-            gcc_ver = pipe.readlines()[0].decode().strip().split(".")
-            gcc_ver = list(map(int, gcc_ver))
-            if gcc_ver >= [4,0,0]:
+            gcc_ver = pipe.readlines()[0].decode().strip()
+            if V(gcc_ver) >= V("4.3.3"):
                 self.use_cpp_0x = True
         dftbuild_ext.build_extensions(self)
 
