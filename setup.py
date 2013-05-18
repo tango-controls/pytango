@@ -153,7 +153,7 @@ class build(dftbuild):
             self.warn("NOT using numpy: numpy available but C source is not")
         
         if IPython and not self.without_ipython:
-            if _IPY_VER > [0,10]:
+            if V(IPython.__version__) > V('0.10'):
                 self.distribution.py_modules.append('IPython.config.profile.tango.ipython_config')
             else:
                 self.distribution.py_modules.append('IPython.Extensions.ipy_profile_tango')
