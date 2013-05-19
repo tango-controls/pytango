@@ -1,34 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
+# Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PyTango", "PyTango.vcxproj", "{764A5ECE-11AE-4363-9A1C-573972A1BADD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		py26_bopyshared_tangoshared_release|Win32 = py26_bopyshared_tangoshared_release|Win32
-		py26_bopyshared_tangoshared_release|x64 = py26_bopyshared_tangoshared_release|x64
-		py26_bopystatic_tangoshared_release|Win32 = py26_bopystatic_tangoshared_release|Win32
-		py26_bopystatic_tangoshared_release|x64 = py26_bopystatic_tangoshared_release|x64
-		py26_bopystatic_tangostatic_release|Win32 = py26_bopystatic_tangostatic_release|Win32
-		py26_bopystatic_tangostatic_release|x64 = py26_bopystatic_tangostatic_release|x64
-		py27_bopyshared_tangoshared_release|Win32 = py27_bopyshared_tangoshared_release|Win32
-		py27_bopyshared_tangoshared_release|x64 = py27_bopyshared_tangoshared_release|x64
-		py27_bopystatic_tangoshared_release|Win32 = py27_bopystatic_tangoshared_release|Win32
-		py27_bopystatic_tangoshared_release|x64 = py27_bopystatic_tangoshared_release|x64
-		py27_bopystatic_tangostatic_release|Win32 = py27_bopystatic_tangostatic_release|Win32
-		py27_bopystatic_tangostatic_release|x64 = py27_bopystatic_tangostatic_release|x64
-		py31_bopyshared_tangoshared_release|Win32 = py31_bopyshared_tangoshared_release|Win32
-		py31_bopyshared_tangoshared_release|x64 = py31_bopyshared_tangoshared_release|x64
-		py31_bopystatic_tangoshared_release|Win32 = py31_bopystatic_tangoshared_release|Win32
-		py31_bopystatic_tangoshared_release|x64 = py31_bopystatic_tangoshared_release|x64
-		py31_bopystatic_tangostatic_release|Win32 = py31_bopystatic_tangostatic_release|Win32
-		py31_bopystatic_tangostatic_release|x64 = py31_bopystatic_tangostatic_release|x64
-		py32_bopyshared_tangoshared_release|Win32 = py32_bopyshared_tangoshared_release|Win32
-		py32_bopyshared_tangoshared_release|x64 = py32_bopyshared_tangoshared_release|x64
-		py32_bopystatic_tangoshared_release|Win32 = py32_bopystatic_tangoshared_release|Win32
-		py32_bopystatic_tangoshared_release|x64 = py32_bopystatic_tangoshared_release|x64
-		py32_bopystatic_tangostatic_release|Win32 = py32_bopystatic_tangostatic_release|Win32
-		py32_bopystatic_tangostatic_release|x64 = py32_bopystatic_tangostatic_release|x64
 		py33_bopyshared_tangoshared_release|Win32 = py33_bopyshared_tangoshared_release|Win32
 		py33_bopyshared_tangoshared_release|x64 = py33_bopyshared_tangoshared_release|x64
 		py33_bopystatic_tangoshared_release|Win32 = py33_bopystatic_tangoshared_release|Win32
@@ -37,52 +13,18 @@ Global
 		py33_bopystatic_tangostatic_release|x64 = py33_bopystatic_tangostatic_release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopyshared_tangoshared_release|Win32.ActiveCfg = py26_bopyshared_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopyshared_tangoshared_release|Win32.Build.0 = py26_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopyshared_tangoshared_release|x64.ActiveCfg = py26_bopyshared_tangoshared_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopyshared_tangoshared_release|x64.Build.0 = py26_bopyshared_tangoshared_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopystatic_tangoshared_release|Win32.ActiveCfg = py26_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopystatic_tangoshared_release|Win32.Build.0 = py26_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopystatic_tangoshared_release|x64.ActiveCfg = py26_bopystatic_tangoshared_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopystatic_tangostatic_release|Win32.ActiveCfg = py26_bopystatic_tangostatic_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopystatic_tangostatic_release|Win32.Build.0 = py26_bopystatic_tangostatic_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopystatic_tangostatic_release|x64.ActiveCfg = py26_bopystatic_tangostatic_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py27_bopyshared_tangoshared_release|Win32.ActiveCfg = py27_bopyshared_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py27_bopyshared_tangoshared_release|Win32.Build.0 = py27_bopyshared_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py27_bopyshared_tangoshared_release|x64.ActiveCfg = py27_bopyshared_tangoshared_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py27_bopystatic_tangoshared_release|Win32.ActiveCfg = py27_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py27_bopystatic_tangoshared_release|Win32.Build.0 = py27_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py27_bopystatic_tangoshared_release|x64.ActiveCfg = py27_bopystatic_tangoshared_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py27_bopystatic_tangostatic_release|Win32.ActiveCfg = py27_bopystatic_tangostatic_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py27_bopystatic_tangostatic_release|Win32.Build.0 = py27_bopystatic_tangostatic_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py27_bopystatic_tangostatic_release|x64.ActiveCfg = py27_bopystatic_tangostatic_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py31_bopyshared_tangoshared_release|Win32.ActiveCfg = py31_bopyshared_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py31_bopyshared_tangoshared_release|Win32.Build.0 = py31_bopyshared_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py31_bopyshared_tangoshared_release|x64.ActiveCfg = py31_bopyshared_tangoshared_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py31_bopystatic_tangoshared_release|Win32.ActiveCfg = py31_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py31_bopystatic_tangoshared_release|Win32.Build.0 = py31_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py31_bopystatic_tangoshared_release|x64.ActiveCfg = py31_bopystatic_tangoshared_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py31_bopystatic_tangostatic_release|Win32.ActiveCfg = py31_bopystatic_tangostatic_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py31_bopystatic_tangostatic_release|Win32.Build.0 = py31_bopystatic_tangostatic_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py31_bopystatic_tangostatic_release|x64.ActiveCfg = py31_bopystatic_tangostatic_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py32_bopyshared_tangoshared_release|Win32.ActiveCfg = py32_bopyshared_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py32_bopyshared_tangoshared_release|Win32.Build.0 = py32_bopyshared_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py32_bopyshared_tangoshared_release|x64.ActiveCfg = py32_bopyshared_tangoshared_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py32_bopystatic_tangoshared_release|Win32.ActiveCfg = py32_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py32_bopystatic_tangoshared_release|Win32.Build.0 = py32_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py32_bopystatic_tangoshared_release|x64.ActiveCfg = py32_bopystatic_tangoshared_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py32_bopystatic_tangostatic_release|Win32.ActiveCfg = py32_bopystatic_tangostatic_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py32_bopystatic_tangostatic_release|Win32.Build.0 = py32_bopystatic_tangostatic_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py32_bopystatic_tangostatic_release|x64.ActiveCfg = py32_bopystatic_tangostatic_release|x64
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopyshared_tangoshared_release|Win32.ActiveCfg = py33_bopyshared_tangoshared_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopyshared_tangoshared_release|Win32.Build.0 = py33_bopyshared_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopyshared_tangoshared_release|x64.ActiveCfg = py33_bopyshared_tangoshared_release|x64
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopyshared_tangoshared_release|x64.ActiveCfg = py33_bopyshared_tangoshared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopyshared_tangoshared_release|x64.Build.0 = py33_bopyshared_tangoshared_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangoshared_release|Win32.ActiveCfg = py33_bopystatic_tangoshared_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangoshared_release|Win32.Build.0 = py33_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangoshared_release|x64.ActiveCfg = py33_bopystatic_tangoshared_release|x64
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangoshared_release|x64.ActiveCfg = py33_bopystatic_tangoshared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangoshared_release|x64.Build.0 = py33_bopystatic_tangoshared_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangostatic_release|Win32.ActiveCfg = py33_bopystatic_tangostatic_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangostatic_release|Win32.Build.0 = py33_bopystatic_tangostatic_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangostatic_release|x64.ActiveCfg = py33_bopystatic_tangostatic_release|x64
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangostatic_release|x64.ActiveCfg = py33_bopystatic_tangostatic_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangostatic_release|x64.Build.0 = py33_bopystatic_tangostatic_release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

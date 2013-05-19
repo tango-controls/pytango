@@ -47,7 +47,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python26IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="1"
 				CompileAs="0"
 			/>
 			<Tool
@@ -90,7 +89,6 @@
 		</Configuration>
 		<Configuration
 			Name="py26_bopyshared_tangoshared_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -118,7 +116,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python26IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="1"
 				CompileAs="0"
 			/>
 			<Tool
@@ -187,7 +184,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python26IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -229,7 +225,6 @@
 		</Configuration>
 		<Configuration
 			Name="py26_bopystatic_tangoshared_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -256,7 +251,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python26IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -325,7 +319,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python26IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="1"
 				CompileAs="2"
 			/>
 			<Tool
@@ -368,7 +361,6 @@
 		</Configuration>
 		<Configuration
 			Name="py26_bopystatic_tangostatic_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -396,7 +388,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python26IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="1"
 				CompileAs="2"
 			/>
 			<Tool
@@ -465,7 +456,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python27IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -507,7 +497,6 @@
 		</Configuration>
 		<Configuration
 			Name="py27_bopyshared_tangoshared_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -534,7 +523,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python27IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -602,7 +590,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python27IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -644,7 +631,6 @@
 		</Configuration>
 		<Configuration
 			Name="py27_bopystatic_tangoshared_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -671,7 +657,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python27IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -740,7 +725,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python27IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="1"
 				CompileAs="2"
 			/>
 			<Tool
@@ -783,7 +767,6 @@
 		</Configuration>
 		<Configuration
 			Name="py27_bopystatic_tangostatic_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -811,7 +794,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python27IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="1"
 				CompileAs="2"
 			/>
 			<Tool
@@ -880,7 +862,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python31IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -922,7 +903,6 @@
 		</Configuration>
 		<Configuration
 			Name="py31_bopyshared_tangoshared_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -949,7 +929,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python31IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1017,7 +996,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python31IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1059,7 +1037,6 @@
 		</Configuration>
 		<Configuration
 			Name="py31_bopystatic_tangoshared_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -1086,7 +1063,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python31IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1155,7 +1131,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python31IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="1"
 				CompileAs="2"
 			/>
 			<Tool
@@ -1198,7 +1173,6 @@
 		</Configuration>
 		<Configuration
 			Name="py31_bopystatic_tangostatic_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -1226,7 +1200,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python31IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="1"
 				CompileAs="2"
 			/>
 			<Tool
@@ -1295,7 +1268,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python32IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1337,7 +1309,6 @@
 		</Configuration>
 		<Configuration
 			Name="py32_bopyshared_tangoshared_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -1364,7 +1335,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python32IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1432,7 +1402,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python32IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1474,7 +1443,6 @@
 		</Configuration>
 		<Configuration
 			Name="py32_bopystatic_tangoshared_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -1501,7 +1469,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python32IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1570,7 +1537,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python32IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="1"
 				CompileAs="2"
 			/>
 			<Tool
@@ -1613,7 +1579,6 @@
 		</Configuration>
 		<Configuration
 			Name="py32_bopystatic_tangostatic_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -1641,7 +1606,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python32IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="1"
 				CompileAs="2"
 			/>
 			<Tool
@@ -1710,7 +1674,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python33IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1752,7 +1715,6 @@
 		</Configuration>
 		<Configuration
 			Name="py33_bopyshared_tangoshared_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -1779,7 +1741,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python33IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1847,7 +1808,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python33IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1889,7 +1849,6 @@
 		</Configuration>
 		<Configuration
 			Name="py33_bopystatic_tangoshared_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -1916,7 +1875,6 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python33IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
-				UsePrecompiledHeader="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1985,7 +1943,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python33IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="1"
 				CompileAs="2"
 			/>
 			<Tool
@@ -2028,7 +1985,6 @@
 		</Configuration>
 		<Configuration
 			Name="py33_bopystatic_tangostatic_release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets=".\PyTango.vsprops"
 			CharacterSet="0"
@@ -2056,7 +2012,6 @@
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python33IncludeDirs)"
 				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="1"
 				CompileAs="2"
 			/>
 			<Tool

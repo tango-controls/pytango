@@ -38,9 +38,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopyshared_tangoshared_release|Win32.ActiveCfg = py26_bopyshared_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopyshared_tangoshared_release|Win32.Build.0 = py26_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopyshared_tangoshared_release|x64.ActiveCfg = py26_bopyshared_tangoshared_release|x64
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopyshared_tangoshared_release|x64.Build.0 = py26_bopyshared_tangoshared_release|x64
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopyshared_tangoshared_release|Win32.Build.0 = py26_bopyshared_tangoshared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopyshared_tangoshared_release|x64.ActiveCfg = py26_bopyshared_tangoshared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopyshared_tangoshared_release|x64.Build.0 = py26_bopyshared_tangoshared_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopystatic_tangoshared_release|Win32.ActiveCfg = py26_bopystatic_tangoshared_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopystatic_tangoshared_release|Win32.Build.0 = py26_bopystatic_tangoshared_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py26_bopystatic_tangoshared_release|x64.ActiveCfg = py26_bopystatic_tangoshared_release|Win32

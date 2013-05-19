@@ -1,102 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="py26_bopyshared_tangoshared_release|Win32">
-      <Configuration>py26_bopyshared_tangoshared_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py26_bopyshared_tangoshared_release|x64">
-      <Configuration>py26_bopyshared_tangoshared_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py26_bopystatic_tangoshared_release|Win32">
-      <Configuration>py26_bopystatic_tangoshared_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py26_bopystatic_tangoshared_release|x64">
-      <Configuration>py26_bopystatic_tangoshared_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py26_bopystatic_tangostatic_release|Win32">
-      <Configuration>py26_bopystatic_tangostatic_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py26_bopystatic_tangostatic_release|x64">
-      <Configuration>py26_bopystatic_tangostatic_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py27_bopyshared_tangoshared_release|Win32">
-      <Configuration>py27_bopyshared_tangoshared_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py27_bopyshared_tangoshared_release|x64">
-      <Configuration>py27_bopyshared_tangoshared_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py27_bopystatic_tangoshared_release|Win32">
-      <Configuration>py27_bopystatic_tangoshared_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py27_bopystatic_tangoshared_release|x64">
-      <Configuration>py27_bopystatic_tangoshared_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py27_bopystatic_tangostatic_release|Win32">
-      <Configuration>py27_bopystatic_tangostatic_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py27_bopystatic_tangostatic_release|x64">
-      <Configuration>py27_bopystatic_tangostatic_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py31_bopyshared_tangoshared_release|Win32">
-      <Configuration>py31_bopyshared_tangoshared_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py31_bopyshared_tangoshared_release|x64">
-      <Configuration>py31_bopyshared_tangoshared_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py31_bopystatic_tangoshared_release|Win32">
-      <Configuration>py31_bopystatic_tangoshared_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py31_bopystatic_tangoshared_release|x64">
-      <Configuration>py31_bopystatic_tangoshared_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py31_bopystatic_tangostatic_release|Win32">
-      <Configuration>py31_bopystatic_tangostatic_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py31_bopystatic_tangostatic_release|x64">
-      <Configuration>py31_bopystatic_tangostatic_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py32_bopyshared_tangoshared_release|Win32">
-      <Configuration>py32_bopyshared_tangoshared_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py32_bopyshared_tangoshared_release|x64">
-      <Configuration>py32_bopyshared_tangoshared_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py32_bopystatic_tangoshared_release|Win32">
-      <Configuration>py32_bopystatic_tangoshared_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py32_bopystatic_tangoshared_release|x64">
-      <Configuration>py32_bopystatic_tangoshared_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py32_bopystatic_tangostatic_release|Win32">
-      <Configuration>py32_bopystatic_tangostatic_release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="py32_bopystatic_tangostatic_release|x64">
-      <Configuration>py32_bopystatic_tangostatic_release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="py33_bopyshared_tangoshared_release|Win32">
       <Configuration>py33_bopyshared_tangoshared_release</Configuration>
       <Platform>Win32</Platform>
@@ -132,181 +36,31 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangostatic_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangostatic_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangoshared_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangoshared_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopyshared_tangoshared_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopyshared_tangoshared_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangostatic_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangostatic_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangoshared_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangoshared_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopyshared_tangoshared_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopyshared_tangoshared_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangostatic_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangostatic_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangoshared_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangoshared_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopyshared_tangoshared_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopyshared_tangoshared_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangostatic_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangostatic_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangoshared_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangoshared_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopyshared_tangoshared_release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopyshared_tangoshared_release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -315,15 +69,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PyTango.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PyTango.props" />
   </ImportGroup>
@@ -331,537 +77,62 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PyTango.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PyTango.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PyTango.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangostatic_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangostatic_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangoshared_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangoshared_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopyshared_tangoshared_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopyshared_tangoshared_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangostatic_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangostatic_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangoshared_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangoshared_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopyshared_tangoshared_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopyshared_tangoshared_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangostatic_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangostatic_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangoshared_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangoshared_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopyshared_tangoshared_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopyshared_tangoshared_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangostatic_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangostatic_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangoshared_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangoshared_release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopyshared_tangoshared_release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PyTango.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopyshared_tangoshared_release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PyTango.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py26_bopyshared_tangoshared_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py26_bopyshared_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py26_bopyshared_tangoshared_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py26_bopyshared_tangoshared_release|x64'">$(PyTangoFileExt)</TargetExt>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangoshared_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangoshared_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangoshared_release|x64'">$(PyTangoFileExt)</TargetExt>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangostatic_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangostatic_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangostatic_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangostatic_release|x64'">$(PyTangoFileExt)</TargetExt>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py27_bopyshared_tangoshared_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py27_bopyshared_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py27_bopyshared_tangoshared_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py27_bopyshared_tangoshared_release|x64'">$(PyTangoFileExt)</TargetExt>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangoshared_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangoshared_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangoshared_release|x64'">$(PyTangoFileExt)</TargetExt>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangostatic_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangostatic_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangostatic_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangostatic_release|x64'">$(PyTangoFileExt)</TargetExt>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py31_bopyshared_tangoshared_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py31_bopyshared_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py31_bopyshared_tangoshared_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py31_bopyshared_tangoshared_release|x64'">$(PyTangoFileExt)</TargetExt>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangoshared_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangoshared_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangoshared_release|x64'">$(PyTangoFileExt)</TargetExt>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangostatic_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangostatic_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangostatic_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangostatic_release|x64'">$(PyTangoFileExt)</TargetExt>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py32_bopyshared_tangoshared_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py32_bopyshared_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py32_bopyshared_tangoshared_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py32_bopyshared_tangoshared_release|x64'">$(PyTangoFileExt)</TargetExt>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangoshared_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangoshared_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangoshared_release|x64'">$(PyTangoFileExt)</TargetExt>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangostatic_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangostatic_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangostatic_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangostatic_release|x64'">$(PyTangoFileExt)</TargetExt>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|x64'">$(PyTangoFileExt)</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|Win32'">.pyd</TargetExt>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|Win32'">$(PyTangoBaseFile)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|x64'">$(PyTangoFileExt)</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|Win32'">.pyd</TargetExt>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|Win32'">$(PyTangoBaseFile)</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|Win32'">.pyd</TargetExt>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|x64'">.pyd</TargetExt>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|x64'">$(PyTangoBaseFile)</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|x64'">.pyd</TargetExt>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|x64'">$(PyTangoBaseFile)</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|Win32'">$(PyTangoFileExt)</TargetExt>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|x64'">$(PyTangoFileExt)</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|x64'">.pyd</TargetExt>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopyshared_tangoshared_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python26IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostSharedTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <CompileAs>Default</CompileAs>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango26SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py26BoostSharedTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py26) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopyshared_tangoshared_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python26IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostSharedTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <CompileAs>Default</CompileAs>
-      <PrecompiledHeader>Create</PrecompiledHeader>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango26SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py26BoostSharedTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py26) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangoshared_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python26IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango26SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py26BoostStaticTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py26) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangoshared_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python26IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango26SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py26BoostStaticTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py26) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangostatic_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python26IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoStaticFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango26StaticLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py26BoostStaticTangoStaticLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py26) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py26_bopystatic_tangostatic_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python26IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoStaticFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango26StaticLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py26BoostStaticTangoStaticLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py26) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopyshared_tangoshared_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python27IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostSharedTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango27SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py27BoostSharedTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py27) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopyshared_tangoshared_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python27IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostSharedTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango27SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py27BoostSharedTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py27) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangoshared_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python27IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango27SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py27BoostStaticTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py27) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangoshared_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python27IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango27SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py27BoostStaticTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py27) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangostatic_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python27IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoStaticFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango27StaticLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py27BoostStaticTangoStaticLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py27) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py27_bopystatic_tangostatic_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python27IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoStaticFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango27StaticLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py27BoostStaticTangoStaticLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py27) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopyshared_tangoshared_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python31IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostSharedTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango31SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py31BoostSharedTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py31) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopyshared_tangoshared_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python31IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostSharedTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango31SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py31BoostSharedTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py31) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangoshared_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python31IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango31SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py31BoostStaticTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py31) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangoshared_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python31IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango31SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py31BoostStaticTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py31) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangostatic_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python31IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoStaticFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango31StaticLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py31BoostStaticTangoStaticLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py31) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py31_bopystatic_tangostatic_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python31IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoStaticFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango31StaticLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py31BoostStaticTangoStaticLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py31) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopyshared_tangoshared_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python32IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostSharedTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango32SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py32BoostSharedTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py32) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopyshared_tangoshared_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python32IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostSharedTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango32SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py32BoostSharedTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py32) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangoshared_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python32IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango32SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py32BoostStaticTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py32) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangoshared_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python32IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango32SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py32BoostStaticTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py32) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangostatic_release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python32IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoStaticFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango32StaticLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py32BoostStaticTangoStaticLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py32) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py32_bopystatic_tangostatic_release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python32IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PreBoostStaticTantoStaticFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(PyTango32StaticLibs);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Py32BoostStaticTangoStaticLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>$(Py32) $(WinSetupArgs)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|Win32'">
     <ClCompile>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python33IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PreBoostSharedTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(PyTango33SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(Py33BoostSharedTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>$(Py33) $(WinSetupArgs)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopyshared_tangoshared_release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
     <ClCompile>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python33IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PreBoostSharedTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(PyTango33SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(Py33BoostSharedTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -870,25 +141,32 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|Win32'">
     <ClCompile>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python33IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PreBoostStaticTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(PyTango33SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(Py33BoostStaticTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>$(Py33) $(WinSetupArgs)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangoshared_release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
     <ClCompile>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python33IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PreBoostStaticTantoSharedFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(PyTango33SharedLibs);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(Py33BoostStaticTangoSharedLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -897,6 +175,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|Win32'">
     <ClCompile>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python33IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PreBoostStaticTantoStaticFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -905,13 +184,18 @@
     <Link>
       <AdditionalDependencies>$(PyTango33StaticLibs);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(Py33BoostStaticTangoStaticLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>$(Py33) $(WinSetupArgs)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='py33_bopystatic_tangostatic_release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
     <ClCompile>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>$(CommonIncludeDirs);$(Python33IncludeDirs);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PreBoostStaticTantoStaticFlags);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -920,6 +204,7 @@
     <Link>
       <AdditionalDependencies>$(PyTango33StaticLibs);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(Py33BoostStaticTangoStaticLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>

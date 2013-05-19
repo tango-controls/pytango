@@ -39,7 +39,7 @@
         Optimization="3"
         WholeProgramOptimization="false"
         BufferSecurityCheck="false"
-        UsePrecompiledHeader="1"
+        UsePrecompiledHeader="0"
         PrecompiledHeaderFile="$(PreCompHeaderDst)"
         PrecompiledHeaderThrough="$(PreCompHeaderSrc)"
         ProgramDataBaseFileName="$(DatabaseFile)"
