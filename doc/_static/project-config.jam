@@ -1,0 +1,19 @@
+import option ; 
+ 
+using msvc : 9.0 : "C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/bin/cl.exe" ; 
+using msvc : 10.0 : "C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/bin/cl.exe" ; 
+
+using python : 2.6 : "C:/Python/win32/26" : : : <address-model>32 <python>2.6 ;
+using python : 2.6 : "C:/Python/x64/26" : : : <address-model>64 <python>2.6 ;
+
+using python : 2.7 : "C:/Python/win32/27" : : : <address-model>32 <python>2.7 ;
+using python : 2.7 : "C:/Python/x64/27" : : : <address-model>64 <python>2.7 ;
+
+using python : 3.2 : "C:/Python/win32/32" : : : <address-model>32 <python>3.2 ;
+using python : 3.2 : "C:/Python/x64/32" : : : <address-model>64 <python>3.2 ;
+
+using python : 3.3 : "C:/Python/win32/33" : : : <address-model>32 <python>3.3 ;
+using python : 3.3 : "C:/Python/x64/33" : : : <address-model>64 <python>3.3 ;
+ 
+option.set keep-going : false ; 
+ 
