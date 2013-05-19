@@ -51,13 +51,7 @@ def remove():
     print ("removing PyTango")
     
 def install():
-    tango = find_tango_dll()
-    if tango is None:
-        print("Could NOT find Tango C++!")
-        install_tango_dll()
-    else:
-        print("Found tango at " + tango)
-        return
+    print ("installing PyTango")
 
 def main():
     if len(sys.argv) < 2:
