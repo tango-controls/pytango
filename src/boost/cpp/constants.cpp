@@ -188,7 +188,7 @@ void export_constants()
     consts_scope.attr("UnitNotSpec") = UnitNotSpec;
     consts_scope.attr("StdUnitNotSpec") = StdUnitNotSpec;
     consts_scope.attr("DispUnitNotSpec") = DispUnitNotSpec;
-    consts_scope.attr("FormatNotSpec") = FormatNotSpec;
+    //consts_scope.attr("FormatNotSpec") = FormatNotSpec;
     consts_scope.attr("NotANumber") = NotANumber;
     consts_scope.attr("MemNotUsed") = MemNotUsed;
     consts_scope.attr("MemAttrPropName") = MemAttrPropName;

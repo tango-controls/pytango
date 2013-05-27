@@ -442,6 +442,9 @@ void export_device_proxy()
         .def("alias", &Tango::DeviceProxy::alias,
             ( arg_("self") ) )
 
+        .def("get_tango_lib_version", &Tango::DeviceProxy::get_tango_lib_version,
+            ( arg_("self") ) )        
+
         .def("ping", &PyDeviceProxy::ping,
             ( arg_("self") ) )
             

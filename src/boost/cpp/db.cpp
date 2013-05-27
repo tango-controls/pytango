@@ -29,6 +29,15 @@ using namespace boost::python;
 
 void export_database();
 
+namespace PyDbServerData {
+
+    static inline boost::python::str get_name(Tango::DbServerData &self)
+    {
+        return boost::python::str(self.get_name());
+    }
+
+};
+
 void export_db()
 {
     // Note: DbDatum in python is extended to support the python sequence API
@@ -59,8 +68,16 @@ void export_db()
         .def_readonly("ior", &Tango::DbDevImportInfo::ior)
         .def_readonly("version", &Tango::DbDevImportInfo::version)
     ;
+    
+    class_<Tango::DbDevFullInfo, bases<Tango::DbDevImportInfo> >("DbDevFullInfo")
+        .def_readonly("class_name", &Tango::DbDevFullInfo::class_name)
+        .def_readonly("ds_full_name", &Tango::DbDevFullInfo::ds_full_name)
+        .def_readonly("started_date", &Tango::DbDevFullInfo::started_date)
+        .def_readonly("stopped_date", &Tango::DbDevFullInfo::stopped_date)
+        .def_readonly("pid", &Tango::DbDevFullInfo::pid)
+    ;
 
-     class_<Tango::DbDevInfo>("DbDevInfo")
+    class_<Tango::DbDevInfo>("DbDevInfo")
         .def_readwrite("name", &Tango::DbDevInfo::name)
         .def_readwrite("_class", &Tango::DbDevInfo::_class)
         .def_readwrite("klass", &Tango::DbDevInfo::_class)
@@ -78,10 +95,23 @@ void export_db()
     ;
 
     class_<Tango::DbServerInfo>("DbServerInfo")
-         .def_readwrite("name", &Tango::DbServerInfo::name)
-         .def_readwrite("host", &Tango::DbServerInfo::host)
-         .def_readwrite("mode", &Tango::DbServerInfo::mode)
-         .def_readwrite("level", &Tango::DbServerInfo::level)
+        .def_readwrite("name", &Tango::DbServerInfo::name)
+        .def_readwrite("host", &Tango::DbServerInfo::host)
+        .def_readwrite("mode", &Tango::DbServerInfo::mode)
+        .def_readwrite("level", &Tango::DbServerInfo::level)
+    ;
+    
+    class_<Tango::DbServerData>("DbServerData",
+        init<const std::string, const std::string>())
+        .def("get_name", &PyDbServerData::get_name)
+        .def("put_in_database", &Tango::DbServerData::put_in_database)
+        .def("already_exist", &Tango::DbServerData::already_exist)
+        .def("remove", 
+             (void (Tango::DbServerData::*) ())
+             &Tango::DbServerData::remove)
+        .def("remove", 
+             (void (Tango::DbServerData::*) (const std::string &))
+             &Tango::DbServerData::remove)
     ;
 
     export_database();

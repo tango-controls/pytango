@@ -52,10 +52,10 @@ class Release:
             - keywords : (seq<str>) list of keywords
             - license : (str) the license"""
     name = 'PyTango'
-    version_info = (8, 0, 3, 'final', 0)
+    version_info = (8, 1, 0, 'dev', 0)
     version = '.'.join(map(str, version_info[:3]))
     version_long = version + ''.join(map(str, version_info[3:]))
-    version_description = 'This version implements the C++ Tango 8.0 API.'
+    version_description = 'This version implements the C++ Tango 8.1 API.'
     version_number = int(version.replace('.',''))
     description = 'A python binding for the Tango control system'
     long_description = 'This module implements the Python Tango Device API ' \
@@ -65,6 +65,6 @@ class Release:
     author_lines = "\n".join([ "%s <%s>" % x for x in authors.values()])
     url = 'http://www.tango-controls.org/static/PyTango/'
     download_url = 'http://pypi.python.org/packages/source/P/PyTango'
-    platform = ['Linux', 'Windows XP/Vista/7']
+    platform = ['Linux', 'Windows XP/Vista/7/8']
     keywords = ['Tango', 'CORBA', 'binding']
     

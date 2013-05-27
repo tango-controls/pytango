@@ -1001,8 +1001,22 @@ def __doc_DeviceProxy():
 
             Return the device alias if one is defined.
             Otherwise, throws exception.
+
+        Return     : (str) device alias
     """ )
 
+    document_method("get_tango_lib_version", """
+    get_tango_lib_version(self) -> int
+
+            Returns the Tango lib version number used by the remote device
+            Otherwise, throws exception.
+
+        Return     : (int) The device Tango lib version as a 3 or 4 digits number.
+                     Possible return value are: 100,200,500,520,700,800,810,...
+        
+        New in PyTango 8.1.0
+    """ )
+    
     document_method("ping", """
     ping(self) -> int
 

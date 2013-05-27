@@ -26,6 +26,7 @@
 // We don't want to waste those seconds for each cpp file, so we
 // use this precompiled header.
 
+//#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 #include <boost/python.hpp>
 #include <boost/version.hpp>
