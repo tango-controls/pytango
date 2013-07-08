@@ -177,7 +177,7 @@ namespace PyUtil
                                       boost::python::object& py_event_loop)
     {
         PYTANGO_MOD
-        if (py_event_loop.is_none())
+        if (py_event_loop.ptr() == Py_None)
         {
             self.server_set_event_loop(NULL);
             pytango.attr("_server_event_loop") = py_event_loop;
