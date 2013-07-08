@@ -624,7 +624,8 @@ namespace PyDeviceAttribute
         if (isImage) {
             for(CORBA::ULong y = 0; y < dim_y; ++y) {
                 object py_sub = py_value[y];
-                if (len(py_sub) != dim_x)
+                CORBA::ULong len_py_sub = static_cast<CORBA::ULong>(boost::python::len(py_sub));
+                if (len_py_sub != dim_x)
                     raise_(PyExc_TypeError, non_valid_image);
                 for(CORBA::ULong x = 0; x < dim_x; ++x) {
                     python_tangocpp<tangoTypeConst>::to_cpp(py_sub[x], buffer[x + y*dim_x]);

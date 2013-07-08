@@ -239,16 +239,18 @@ namespace PyDeviceAttribute {
             // x and y position it corresponded! Yes, 'iter' has a coordinates
             // field, but it was always [0,0], never updated!!
             npy_intp coordinates[2];
-            Py_ssize_t &x = coordinates[1];
-            Py_ssize_t &y = coordinates[0];
-            for (y=0; y < dim_y; ++y) {
-                for (x=0; x < dim_x; ++x) {
+            npy_intp &x = coordinates[1];
+            npy_intp &y = coordinates[0];
+            npy_intp ndim_x = static_cast<npy_intp>(dim_x);
+            npy_intp ndim_y = static_cast<npy_intp>(dim_y);
+            for (y=0; y < ndim_y; ++y) {
+                for (x=0; x < ndim_x; ++x) {
                     PyArray_ITER_GOTO(iter, coordinates);
 
                     PyObject* dataObj = PyArray_GETITEM(array, iter->dataptr);
                     const object py_data = object( handle<>( dataObj ) );
 
-                    buffer[y*dim_x + x] = extract<TangoScalarType>(py_data);
+                    buffer[y*ndim_x + x] = extract<TangoScalarType>(py_data);
                 }
             }
         } else {
