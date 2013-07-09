@@ -844,6 +844,7 @@ namespace PyEncodedAttribute
                 delete [] buffer;
                 break;
             }
+            case PyTango::ExtractAsPyTango3:
             case PyTango::ExtractAsList:
             {
                 ret = PyList_New(height);
@@ -981,6 +982,7 @@ namespace PyEncodedAttribute
                 delete [] buffer;
                 break;
             }
+            case PyTango::ExtractAsPyTango3:
             case PyTango::ExtractAsList:
             {
                 ret = PyList_New(height);
@@ -1138,6 +1140,7 @@ namespace PyEncodedAttribute
                 delete [] buffer;
                 break;
             }
+            case PyTango::ExtractAsPyTango3:
             case PyTango::ExtractAsList:
             {
                 ret = PyList_New(height);

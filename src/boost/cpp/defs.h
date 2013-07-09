@@ -56,6 +56,7 @@ namespace PyTango
         ExtractAsTuple,
         ExtractAsList,
         ExtractAsString,
+        ExtractAsPyTango3,
         ExtractAsNothing
     };
     

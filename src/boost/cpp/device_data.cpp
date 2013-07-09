@@ -146,6 +146,7 @@ namespace PyDeviceData {
                     return to_py_numpy<tangoArrayTypeConst>(tmp_ptr, py_self);
 #                 endif
                 case PyTango::ExtractAsList:
+                case PyTango::ExtractAsPyTango3:
                     return to_py_list(tmp_ptr);
                 case PyTango::ExtractAsTuple:
                     return to_py_tuple(tmp_ptr);

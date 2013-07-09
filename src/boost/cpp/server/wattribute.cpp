@@ -436,6 +436,50 @@ namespace PyWAttribute
 /// @name get_write_value
 /// @{ 
 
+    //
+    // PyTango 3 compatibility
+    //
+
+    template<long tangoTypeConst>
+    void __get_write_value_pytango3(Tango::WAttribute &att, boost::python::list &seq)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+        const TangoScalarType *ptr;
+
+        long length = att.get_write_value_length();
+
+        att.get_write_value(ptr);
+
+        for (long l = 0; l < length; ++l)
+        {
+            seq.append(ptr[l]);
+        }
+    }
+
+    template<>
+    void __get_write_value_pytango3<Tango::DEV_STRING>(Tango::WAttribute &att,
+                                              boost::python::list &seq)
+    {
+        const Tango::ConstDevString *ptr;
+
+        long length = att.get_write_value_length();
+
+        att.get_write_value(ptr);
+
+        for (long l = 0; l < length; ++l)
+        {
+            seq.append(ptr[l]);
+        }
+    }
+
+    inline void get_write_value_pytango3(Tango::WAttribute &att,
+                                boost::python::list &value)
+    {
+        long type = att.get_data_type();
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __get_write_value_pytango3, att, value);
+    }
+
     template<long tangoTypeConst>
     void __get_write_value_scalar(Tango::WAttribute &att, boost::python::object* obj)
     {
@@ -452,6 +496,32 @@ namespace PyWAttribute
         const Tango::ConstDevString *v = NULL;
         att.get_write_value(v);
         *obj = boost::python::object(v[0]);
+    }
+
+    template<long tangoTypeConst>
+    void __get_write_value_array_pytango3(Tango::WAttribute &att, boost::python::object* obj)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+        const TangoScalarType * buffer;
+        att.get_write_value(buffer);
+        size_t length = att.get_write_value_length();
+        
+        boost::python::list o;
+        for (size_t n = 0; n < length; ++n)
+            o.append(buffer[n]);
+        *obj = o;
+    }
+
+    template<>
+    void __get_write_value_array_pytango3<Tango::DEV_STRING>(Tango::WAttribute &att, boost::python::object* obj)
+    {
+        const Tango::ConstDevString *ptr;
+        long length = att.get_write_value_length();
+        att.get_write_value(ptr);
+        boost::python::list o;
+        for (long l = 0; l < length; ++l)
+            o.append(ptr[l]);
     }
 
     template<long tangoTypeConst>
@@ -534,6 +604,11 @@ namespace PyWAttribute
             TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __get_write_value_scalar, att, &value);
         } else {
             switch (extract_as) {
+                case PyTango::ExtractAsPyTango3: {
+                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type,
+                        __get_write_value_array_pytango3, att, &value);
+                    break;
+                }
                 case PyTango::ExtractAsNumpy: {
 #               ifndef DISABLE_PYTANGO_NUMPY
                     TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type,
@@ -587,6 +662,13 @@ void export_wattribute()
         .def("set_write_value",
             (void (*) (Tango::WAttribute &, boost::python::object &, long, long))
             &PyWAttribute::set_write_value)
+
+        // old style get_write_value
+        .def("get_write_value",
+            &PyWAttribute::get_write_value_pytango3,
+            ( arg_("self"), arg_("empty_list")))
+
+        // new style get_write_value
         .def("get_write_value",
             &PyWAttribute::get_write_value,
             ( arg_("self"), arg_("extract_as")=PyTango::ExtractAsNumpy ))
