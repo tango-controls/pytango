@@ -54,7 +54,7 @@ if ipv >= [0, 10] and ipv < [0, 11]:
     load_config = None
     load_ipython_extension = None
     unload_ipython_extension = None
-elif ipv >= [0, 11] and ipv < [1, 0]:
+elif ipv >= [0, 11]:
     from . import ipython_00_11
     init_ipython = None
     install = ipython_00_11.install
