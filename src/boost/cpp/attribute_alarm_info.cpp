@@ -29,6 +29,7 @@ using namespace boost::python;
 void export_attribute_alarm_info()
 {
     class_<Tango::AttributeAlarmInfo>("AttributeAlarmInfo")
+        .enable_pickling()
         .def_readwrite("min_alarm", &Tango::AttributeAlarmInfo::min_alarm)
         .def_readwrite("max_alarm", &Tango::AttributeAlarmInfo::max_alarm)
         .def_readwrite("min_warning", &Tango::AttributeAlarmInfo::min_warning)

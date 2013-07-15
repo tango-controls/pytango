@@ -22,14 +22,16 @@
 *******************************************************************************/
 
 #include "precompiled_header.hpp"
-#include <tango.h>
-
-using namespace boost::python;
+#include "pytgutils.h"
 
 void export_device_attribute_config()
 {
-    class_<Tango::DeviceAttributeConfig>("DeviceAttributeConfig")
-        .def(init<const Tango::DeviceAttributeConfig&>())
+    bopy::class_<Tango::DeviceAttributeConfig>("DeviceAttributeConfig")
+        .def(bopy::init<const Tango::DeviceAttributeConfig&>())
+
+        .enable_pickling()
+//        .def_pickle(PyDeviceAttributeConfig::PickleSuite())
+
         .def_readwrite("name", &Tango::DeviceAttributeConfig::name)
         .def_readwrite("writable", &Tango::DeviceAttributeConfig::writable)
         .def_readwrite("data_format", &Tango::DeviceAttributeConfig::data_format)
@@ -38,8 +40,10 @@ void export_device_attribute_config()
         .def_readwrite("max_dim_y", &Tango::DeviceAttributeConfig::max_dim_y)
         .def_readwrite("description", &Tango::DeviceAttributeConfig::description)
         //.def_readwrite("label", &Tango::DeviceAttributeConfig::label)
-        .add_property("label", make_getter(&Tango::DeviceAttributeConfig::label, return_value_policy<return_by_value>()),
-                               make_setter(&Tango::DeviceAttributeConfig::label, return_value_policy<return_by_value>()))
+        .add_property("label", bopy::make_getter(&Tango::DeviceAttributeConfig::label,
+                                                 bopy::return_value_policy<bopy::return_by_value>()),
+                               bopy::make_setter(&Tango::DeviceAttributeConfig::label,
+                                                 bopy::return_value_policy<bopy::return_by_value>()))
         .def_readwrite("unit", &Tango::DeviceAttributeConfig::unit)
         .def_readwrite("standard_unit", &Tango::DeviceAttributeConfig::standard_unit)
         .def_readwrite("display_unit", &Tango::DeviceAttributeConfig::display_unit)

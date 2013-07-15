@@ -56,8 +56,6 @@ endif
 PY_VER_S=$(PY_MAJOR)$(PY_MINOR)
 
 ifndef NUMPY_ROOT
-# NUMPY_ROOT=$(shell $(PY_EXC) -c "import sys, os, numpy; sys.stdout.write(os.path.dirname(numpy.__file__))")/core
-# NUMPY_INC = -I$(NUMPY_ROOT)/include
 NUMPY_INC = -I$(shell $(PY_EXC) -c "import sys, numpy; sys.stdout.write(numpy.get_include())")
 else
 NUMPY_INC = -I$(NUMPY_ROOT)/include
@@ -76,23 +74,23 @@ endif
 SRC_DIR = src/boost/cpp
 
 ifndef OBJS_DIR
-OBJS_DIR = objs_py$(PY_VER_S)
+OBJS_DIR := objs_py$(PY_VER_S)
 endif
 
 CC = gcc
 
-PY_INC = $(shell python$(PY_VER)-config --includes)
+PY_INC := $(shell python$(PY_VER)-config --includes)
 OPTIMIZE_CC = -g -O0
 OPTIMIZE_LN = -O0
 
-PRE_C_H = precompiled_header.hpp
-PRE_C_H_O = $(OBJS_DIR)/$(PRE_C_H).gch
-PRE_C = -include$(OBJS_DIR)/$(PRE_C_H)
-LN = g++ -pthread -shared -Wl,$(OPTIMIZE_LN) -Wl,-Bsymbolic-functions
-LN_STATIC = g++ -pthread -static -Wl,$(OPTIMIZE_LN) -Wl,-Bsymbolic-functions
-LN_VER = -Wl,-h -Wl,--strip-all
-BOOST_LIB = boost_python-py$(PY_VER_S)
-LN_LIBS = -ltango -llog4tango -lpthread -lrt -ldl -lomniORB4 -lomniDynamic4 -lomnithread -lCOS4 -l$(BOOST_LIB) -lzmq
+PRE_C_H := precompiled_header.hpp
+PRE_C_H_O := $(OBJS_DIR)/$(PRE_C_H).gch
+PRE_C := -include$(OBJS_DIR)/$(PRE_C_H)
+LN := g++ -pthread -shared -Wl,$(OPTIMIZE_LN) -Wl,-Bsymbolic-functions
+LN_STATIC := g++ -pthread -static -Wl,$(OPTIMIZE_LN) -Wl,-Bsymbolic-functions
+LN_VER := -Wl,-h -Wl,--strip-all
+BOOST_LIB := boost_python-py$(PY_VER_S)
+LN_LIBS := -ltango -llog4tango -lpthread -lrt -ldl -lomniORB4 -lomniDynamic4 -lomnithread -lCOS4 -l$(BOOST_LIB) -lzmq
 
 INCLUDE_DIRS =
 ifdef TANGO_ROOT
@@ -124,15 +122,15 @@ INCLUDE_DIRS += \
     $(PY_INC) \
     $(NUMPY_INC)
 
-CCFLAGS = -pthread -fno-strict-aliasing -DNDEBUG $(OPTIMIZE_CC) -fwrapv -Wall -fPIC -std=c++0x -DPYTANGO_HAS_UNIQUE_PTR $(INCLUDE_DIRS)
+CCFLAGS := -pthread -fno-strict-aliasing -DNDEBUG $(OPTIMIZE_CC) -fwrapv -Wall -fPIC -std=c++0x -DPYTANGO_HAS_UNIQUE_PTR $(INCLUDE_DIRS)
 
-LIB_NAME = _PyTango.so
-LIB_NAME_STATIC = _PyTangoStatic.so
-LIB_SYMB_NAME = $(LIB_NAME).dbg
+LIB_NAME := _PyTango.so
+LIB_NAME_STATIC := _PyTangoStatic.so
+LIB_SYMB_NAME := $(LIB_NAME).dbg
 
 
 
-OBJS = \
+OBJS := \
 $(OBJS_DIR)/api_util.o \
 $(OBJS_DIR)/archive_event_info.o \
 $(OBJS_DIR)/attr_conf_event_data.o \
@@ -192,7 +190,7 @@ $(OBJS_DIR)/tango_util.o \
 $(OBJS_DIR)/user_default_attr_prop.o \
 $(OBJS_DIR)/wattribute.o
 
-INC = callback.h \
+INC := callback.h \
 defs.h \
 device_attribute.h \
 exception.h \
@@ -225,15 +223,6 @@ $(PRE_C_H_O): $(SRC_DIR)/$(PRE_C_H)
 	@$(CC) $(CCFLAGS) -c $< -o $(PRE_C_H_O)
 
 #
-# Rule for shared library
-#
-
-#.SUFFIXES: .o .cpp
-#.cpp.o: $(PRE_C_H_O)
-#	@echo Compiling 1 $(<) ...
-#	@$(CC) $(CCFLAGS) -c $< -o $*.o
-
-#
 # Rule for API files
 #
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
@@ -251,11 +240,6 @@ $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
 $(LIB_NAME): $(PRE_C_H_0) $(OBJS)
 	@echo Linking shared $(LIB_NAME) ...
 	@$(LN) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME) $(LN_VER)
-#	@$(LN_STATIC) $(OBJS) $(LN_DIRS) $(LN_LIBS) -o $(OBJS_DIR)/$(LIB_NAME_STATIC) $(LN_VER)
-#	objcopy --only-keep-debug $(OBJS_DIR)/$(LIB_NAME) $(OBJS_DIR)/$(LIB_SYMB_NAME)
-#	objcopy --strip-debug --strip-unneeded $(OBJS_DIR)/$(LIB_NAME)
-#	objcopy --add-gnu-debuglink=$(OBJS_DIR)/$(LIB_SYMB_NAME) $(OBJS_DIR)/$(LIB_NAME)
-#	chmod -x $(OBJS_DIR)/$(LIB_SYMB_NAME)
 
 clean:
 	@echo Cleaning ...
@@ -271,5 +255,4 @@ install-py:
 install: build install-py
 	@echo Installing binary files into $(prefix)/PyTango ...
 	@rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/PyTango
-#	rsync $(OBJS_DIR)/$(LIB_SYMB_NAME) $(prefix)/PyTango
  

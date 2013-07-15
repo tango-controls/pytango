@@ -39,10 +39,11 @@ from ._PyTango import (StdStringVector, StdLongVector, StdDoubleVector, \
     AttributeDimension, AttributeEventInfo, DeviceAttributeConfig, \
     AttributeInfo, AttributeInfoEx, ChangeEventInfo, PeriodicEventInfo, \
     DevCommandInfo, CommandInfo, DataReadyEventData, DeviceInfo, \
-    LockerInfo, PollDevice, TimeVal)
+    LockerInfo, PollDevice, TimeVal, AttrWriteType, AttrDataFormat, DispLevel)
 
 from .utils import document_method, is_integer
 from .utils import document_enum as __document_enum
+from .utils import seq_2_StdStringVector, StdStringVector_2_seq
 
 def __StdVector__add(self, seq):
     ret = seq.__class__(self)
@@ -85,7 +86,184 @@ def __fillVectorClass(klass):
     klass.__imul__ = __StdVector__imul
     klass.__original_getitem = klass.__getitem__
     klass.__getitem__ = __StdVector__getitem
-    
+
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+# DeviceAttributeConfig pickle
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+
+def __DeviceAttributeConfig__getinitargs__(self):
+    return ()
+
+def __DeviceAttributeConfig__getstate__(self):
+    ret = self.name, \
+          int(self.writable), \
+          int(self.data_format), \
+          self.data_type, \
+          self.max_dim_x, \
+          self.max_dim_y, \
+          self.description, \
+          self.label, \
+          self.unit, \
+          self.standard_unit, \
+          self.display_unit, \
+          self.format, \
+          self.min_value, \
+          self.max_value, \
+          self.min_alarm, \
+          self.max_alarm, \
+          self.writable_attr_name, \
+          StdStringVector_2_seq(self.extensions)
+    return ret
+
+def __DeviceAttributeConfig__setstate__(self, state):
+    self.name = state[0]
+    self.writable = AttrWriteType(state[1])
+    self.data_format = AttrDataFormat(state[2])
+    self.data_type = state[3]
+    self.max_dim_x = state[4]
+    self.max_dim_y = state[5]
+    self.description = state[6]
+    self.label = state[7]
+    self.unit = state[8]
+    self.standard_unit = state[9]
+    self.display_unit = state[10]
+    self.format = state[11]
+    self.min_value = state[12]
+    self.max_value = state[13]
+    self.min_alarm = state[14]
+    self.max_alarm = state[15]
+    self.writable_attr_name = state[16]
+    self.extensions = seq_2_StdStringVector(state[17])
+
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+# AttributeInfo pickle
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+
+def __AttributeInfo__getinitargs__(self):
+    return ()
+
+def __AttributeInfo__getstate__(self):
+    ret = list(__DeviceAttributeConfig__getstate__(self))
+    ret.append(int(self.disp_level))
+    return tuple(ret)
+
+def __AttributeInfo__setstate__(self, state):
+    __DeviceAttributeConfig__setstate__(self, state)
+    self.disp_level = DispLevel(state[18])
+
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+# AttributeAlarmInfo pickle
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+
+def __AttributeAlarmInfo__getinitargs__(self):
+    return ()
+
+def __AttributeAlarmInfo__getstate__(self):
+    return self.min_alarm, \
+           self.max_alarm, \
+           self.min_warning, \
+           self.max_warning, \
+           self.delta_t, \
+           self.delta_val, \
+           StdStringVector_2_seq(self.extensions)
+
+def __AttributeAlarmInfo__setstate__(self, state):
+    self.min_alarm = state[0]
+    self.max_alarm = state[1]
+    self.min_warning = state[2]
+    self.max_warning = state[3]
+    self.delta_t = state[4]
+    self.delta_val = state[5]
+    self.extensions = seq_2_StdStringVector(state[6])
+
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+# ChangeEventInfo pickle
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+
+def __ChangeEventInfo__getinitargs__(self):
+    return ()
+
+def __ChangeEventInfo__getstate__(self):
+    return self.rel_change, \
+           self.abs_change, \
+           StdStringVector_2_seq(self.extensions)
+
+def __ChangeEventInfo__setstate__(self, state):
+    self.rel_change = state[0]
+    self.abs_change = state[1]
+    self.extensions = seq_2_StdStringVector(state[2])
+
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+# PeriodicEventInfo pickle
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+
+def __PeriodicEventInfo__getinitargs__(self):
+    return ()
+
+def __PeriodicEventInfo__getstate__(self):
+    return self.period, \
+        StdStringVector_2_seq(self.extensions)
+
+def __PeriodicEventInfo__setstate__(self, state):
+    self.period = state[0]
+    self.extensions = seq_2_StdStringVector(state[1])
+
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+# ArchiveEventInfo pickle
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+
+def __ArchiveEventInfo__getinitargs__(self):
+    return ()
+
+def __ArchiveEventInfo__getstate__(self):
+    return self.archive_rel_change, \
+           self.archive_abs_change, \
+           self.archive_period, \
+           StdStringVector_2_seq(self.extensions)
+
+def __ArchiveEventInfo__setstate__(self, state):
+    self.archive_rel_change = state[0]
+    self.archive_abs_change = state[1]
+    self.archive_period = state[2]
+    self.extensions = seq_2_StdStringVector(state[3])
+
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+# AttributeEventInfo pickle
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+
+def __AttributeEventInfo__getinitargs__(self):
+    return ()
+
+def __AttributeEventInfo__getstate__(self):
+    return self.ch_event, \
+           self.per_event, \
+           self.arch_event
+
+def __AttributeEventInfo__setstate__(self, state):
+    self.ch_event = state[0]
+    self.per_event = state[1]
+    self.arch_event = state[2]
+
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+# AttributeInfoEx pickle
+# -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+
+def __AttributeInfoEx__getinitargs__(self):
+    return ()
+
+def __AttributeInfoEx__getstate__(self):
+    ret = list(__AttributeInfo__getstate__(self))
+    ret.append(self.alarms)
+    ret.append(self.events)
+    ret.append(StdStringVector_2_seq(self.sys_extensions))
+    return tuple(ret)
+
+def __AttributeInfoEx__setstate__(self, state):
+    __AttributeInfo__setstate__(self, state)
+    self.alarms = state[19]
+    self.events = state[20]
+    self.sys_extensions = seq_2_StdStringVector(state[21])
+
 def __init_base_types():
     
     v_klasses = (StdStringVector,StdLongVector,StdDoubleVector,CommandInfoList, \
@@ -96,6 +274,39 @@ def __init_base_types():
 
     for v_klass in v_klasses:
         __fillVectorClass(v_klass)
+
+    DeviceAttributeConfig.__getinitargs__ = __DeviceAttributeConfig__getinitargs__
+    DeviceAttributeConfig.__getstate__ = __DeviceAttributeConfig__getstate__
+    DeviceAttributeConfig.__setstate__ = __DeviceAttributeConfig__setstate__
+
+    AttributeInfo.__getinitargs__ = __AttributeInfo__getinitargs__
+    AttributeInfo.__getstate__ = __AttributeInfo__getstate__
+    AttributeInfo.__setstate__ = __AttributeInfo__setstate__
+
+    AttributeAlarmInfo.__getinitargs__ = __AttributeAlarmInfo__getinitargs__
+    AttributeAlarmInfo.__getstate__ = __AttributeAlarmInfo__getstate__
+    AttributeAlarmInfo.__setstate__ = __AttributeAlarmInfo__setstate__
+
+    ChangeEventInfo.__getinitargs__ = __ChangeEventInfo__getinitargs__
+    ChangeEventInfo.__getstate__ = __ChangeEventInfo__getstate__
+    ChangeEventInfo.__setstate__ = __ChangeEventInfo__setstate__
+
+    PeriodicEventInfo.__getinitargs__ = __PeriodicEventInfo__getinitargs__
+    PeriodicEventInfo.__getstate__ = __PeriodicEventInfo__getstate__
+    PeriodicEventInfo.__setstate__ = __PeriodicEventInfo__setstate__
+
+    ArchiveEventInfo.__getinitargs__ = __ArchiveEventInfo__getinitargs__
+    ArchiveEventInfo.__getstate__ = __ArchiveEventInfo__getstate__
+    ArchiveEventInfo.__setstate__ = __ArchiveEventInfo__setstate__
+
+    AttributeEventInfo.__getinitargs__ = __AttributeEventInfo__getinitargs__
+    AttributeEventInfo.__getstate__ = __AttributeEventInfo__getstate__
+    AttributeEventInfo.__setstate__ = __AttributeEventInfo__setstate__
+
+    AttributeInfoEx.__getinitargs__ = __AttributeInfoEx__getinitargs__
+    AttributeInfoEx.__getstate__ = __AttributeInfoEx__getstate__
+    AttributeInfoEx.__setstate__ = __AttributeInfoEx__setstate__
+    
 
 def __doc_base_types():
     

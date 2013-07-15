@@ -30,7 +30,6 @@ void export_attr_conf_event_data()
 {
     class_<Tango::AttrConfEventData>("AttrConfEventData",
         init<const Tango::AttrConfEventData &>())
-
         // The original Tango::EventData structure has a 'device' field.
         // However, if we returned this directly we would get a different
         // python device each time. So we are doing our weird things to make

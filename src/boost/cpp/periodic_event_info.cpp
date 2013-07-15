@@ -29,6 +29,7 @@ using namespace boost::python;
 void export_periodic_event_info()
 {
     class_<Tango::PeriodicEventInfo>("PeriodicEventInfo")
+        .enable_pickling()
         .def_readwrite("period", &Tango::PeriodicEventInfo::period)
         .def_readwrite("extensions", &Tango::PeriodicEventInfo::extensions)
     ;

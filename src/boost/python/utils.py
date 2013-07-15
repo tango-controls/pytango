@@ -30,11 +30,13 @@ from __future__ import print_function
 
 __all__ = [ "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
             "is_number", "is_scalar_type", "is_array_type", "is_numerical_type",
-            "is_int_type", "is_float_type", "obj_2_str", "seqStr_2_obj",
+            "is_int_type", "is_float_type", "is_bool_type", "is_bin_type",
+            "is_str_type", "obj_2_str", "seqStr_2_obj",
             "document_method", "document_static_method", "document_enum",
             "CaselessList", "CaselessDict", "EventCallBack", "get_home",
             "from_version_str_to_hex_str", "from_version_str_to_int",
-            "server_run", "decorator" ]
+            "server_run", "decorator",
+            "seq_2_StdStringVector", "StdStringVector_2_seq" ]
 
 __docformat__ = "restructuredtext"
 
@@ -60,9 +62,10 @@ _scalar_numerical_types = _scalar_int_types + _scalar_float_types
 
 _scalar_str_types = (CmdArgType.DevString, CmdArgType.ConstDevString,)
 
+_scalar_bool_types = (CmdArgType.DevBoolean,)
+
 _scalar_types = _scalar_numerical_types + _scalar_str_types + \
-    (CmdArgType.DevBoolean, CmdArgType.DevEncoded,
-     CmdArgType.DevUChar, CmdArgType.DevVoid)
+    _scalar_bool_types + (CmdArgType.DevEncoded, CmdArgType.DevUChar)
 
 _array_int_types = (CmdArgType.DevVarShortArray, CmdArgType.DevVarUShortArray,
                     CmdArgType.DevVarLongArray, CmdArgType.DevVarULongArray,
@@ -72,10 +75,15 @@ _array_float_types = (CmdArgType.DevVarFloatArray, CmdArgType.DevVarDoubleArray)
 
 _array_numerical_types = _array_int_types + _array_float_types
 
-_array_types = _array_numerical_types + (CmdArgType.DevVarBooleanArray,
-    CmdArgType.DevVarStringArray,
-    CmdArgType.DevVarCharArray, CmdArgType.DevVarDoubleStringArray,
-    CmdArgType.DevVarLongStringArray)
+_array_str_types = (CmdArgType.DevVarStringArray,)
+
+_array_bool_types = (CmdArgType.DevVarBooleanArray,)
+
+_array_types = _array_numerical_types + _array_bool_types + _array_str_types + \
+    (CmdArgType.DevVarCharArray, 
+     CmdArgType.DevVarDoubleStringArray, CmdArgType.DevVarLongStringArray)
+
+_binary_types = (CmdArgType.DevEncoded, CmdArgType.DevVarCharArray)
 
 _scalar_to_array_type = {
     CmdArgType.DevBoolean : CmdArgType.DevVarBooleanArray,
@@ -248,6 +256,65 @@ def is_float(tg_type, inc_array=False):
     return tg_type in _array_float_types
 
 is_float_type = is_float
+
+def is_bool(tg_type, inc_array=False):
+    """Tells if the given tango type is boolean
+    
+    :param tg_type: tango type
+    :type tg_type: :class:`PyTango.CmdArgType`
+    :param inc_array: (optional, default is False) determines if include array 
+                      in the list of checked types
+    :type inc_array: :py:obj:`bool`
+    
+    :return: True if the given tango type is boolean or False otherwise
+    :rtype: :py:obj:`bool`
+    """
+    global _scalar_bool_types, _array_bool_types
+    if tg_type in _scalar_bool_types:
+        return True
+    if not inc_array:
+        return False
+    return tg_type in _array_bool_types
+
+is_bool_type = is_bool
+
+def is_str(tg_type, inc_array=False):
+    """Tells if the given tango type is string
+    
+    :param tg_type: tango type
+    :type tg_type: :class:`PyTango.CmdArgType`
+    :param inc_array: (optional, default is False) determines if include array 
+                      in the list of checked types
+    :type inc_array: :py:obj:`bool`
+    
+    :return: True if the given tango type is string or False otherwise
+    :rtype: :py:obj:`bool`
+    """
+    global _scalar_str_types, _array_str_types
+    if tg_type in _scalar_str_types:
+        return True
+    if not inc_array:
+        return False
+    return tg_type in _array_str_types
+
+is_str_type = is_str
+
+def is_bin(tg_type, inc_array=False):
+    """Tells if the given tango type is binary
+    
+    :param tg_type: tango type
+    :type tg_type: :class:`PyTango.CmdArgType`
+    :param inc_array: (optional, default is False) determines if include array 
+                      in the list of checked types
+    :type inc_array: :py:obj:`bool`
+    
+    :return: True if the given tango type is binary or False otherwise
+    :rtype: :py:obj:`bool`
+    """
+    global _scalar_bin_types
+    return tg_type in _scalar_bin_types
+
+is_bin_type = is_bin
 
 def seq_2_StdStringVector(seq, vec=None):
     """Converts a python sequence<str> object to a :class:`PyTango.StdStringVector`

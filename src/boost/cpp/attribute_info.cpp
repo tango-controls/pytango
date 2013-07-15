@@ -31,6 +31,7 @@ void export_attribute_info()
     class_<Tango::AttributeInfo, bases<Tango::DeviceAttributeConfig> >
         ("AttributeInfo")
         .def(init<const Tango::AttributeInfo&>())
+        .enable_pickling()
         .def_readwrite("disp_level", &Tango::AttributeInfo::disp_level)
     ;
 }

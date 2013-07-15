@@ -29,6 +29,7 @@ using namespace boost::python;
 void export_attribute_event_info()
 {
     class_<Tango::AttributeEventInfo>("AttributeEventInfo")
+       .enable_pickling()
        .def_readwrite("ch_event", &Tango::AttributeEventInfo::ch_event)
        .def_readwrite("per_event", &Tango::AttributeEventInfo::per_event)
        .def_readwrite("arch_event", &Tango::AttributeEventInfo::arch_event)
