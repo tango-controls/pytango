@@ -188,8 +188,11 @@ void export_constants()
     consts_scope.attr("UnitNotSpec") = UnitNotSpec;
     consts_scope.attr("StdUnitNotSpec") = StdUnitNotSpec;
     consts_scope.attr("DispUnitNotSpec") = DispUnitNotSpec;
+#ifdef FormatNotSpec
     consts_scope.attr("FormatNotSpec") = FormatNotSpec;
-
+#else
+    consts_scope.attr("FormatNotSpec") = FormatNotSpec_FL;
+#endif
     consts_scope.attr("FormatNotSpec_FL") = FormatNotSpec_FL;
     consts_scope.attr("FormatNotSpec_INT") = FormatNotSpec_INT;
     consts_scope.attr("FormatNotSpec_STR") = FormatNotSpec_STR;
