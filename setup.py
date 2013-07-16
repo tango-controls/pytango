@@ -298,7 +298,6 @@ def main():
 
     packages = [
         'PyTango',
-        'PyTango.green',
         'PyTango.ipython',
         'PyTango.ipython.ipython_00_10',
         'PyTango.ipython.ipython_00_11',
