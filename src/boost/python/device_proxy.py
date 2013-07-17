@@ -27,21 +27,92 @@ This is an internal PyTango module.
 
 from __future__ import with_statement
 
-__all__ = ["device_proxy_init"]
+__all__ = ["device_proxy_init", "get_device_proxy"]
 
 __docformat__ = "restructuredtext"
 
+
+import collections
+import numbers
 import threading
 
 from ._PyTango import StdStringVector, DbData, DbDatum, AttributeInfo, \
     AttributeInfoEx, AttributeInfoList, AttributeInfoListEx, DeviceProxy, \
     __CallBackAutoDie, __CallBackPushEvent, EventType, DevFailed, Except, \
-    ExtractAs
+    ExtractAs, GreenMode
+
 from .utils import is_pure_str, is_non_str_seq, is_integer, \
     seq_2_StdStringVector, StdStringVector_2_seq, seq_2_DbData, DbData_2_dict
+    
 from .utils import document_method as __document_method
-import collections
-import numbers
+from .utils import get_green_mode
+
+from .tango_green import result, submit, green
+
+
+def get_device_proxy(*args, **kwargs):
+    """get_device_proxy(self, dev_name, green_mode=None, wait=True, timeout=True) -> DeviceProxy
+    get_device_proxy(self, dev_name, need_check_acc, green_mode=None, wait=True, timeout=True) -> DeviceProxy
+
+    Returns a new :class:`~PyTango.DeviceProxy`.
+    There is no difference between using this function and the direct 
+    :class:`~PyTango.DeviceProxy` constructor if you use the default kwargs.
+     
+    The added value of this function becomes evident when you choose a green_mode
+    to be *Futures* or *Gevent*. The DeviceProxy constructor internally makes some
+    network calls which makes it *slow*. By using one of the *green modes* as 
+    green_mode you are allowing other python code to be executed in a cooperative way.
+
+    .. note::
+        The timeout parameter has no relation with the tango device client side
+        timeout (gettable by :meth:`~PyTango.DeviceProxy.get_timeout_millis` and 
+        settable through :meth:`~PyTango.DeviceProxy.set_timeout_millis`)
+
+    :param dev_name: the device name or alias
+    :type dev_name: str
+    :param need_check_acc: in first version of the function it defaults to True.
+                           Determines if at creation time of DeviceProxy it should check
+                           for channel access (rarely used)
+    :type need_check_acc: bool
+    :param green_mode: determines the mode of execution of the device (including
+                      the way it is created). Defaults to the current global
+                      green_mode (check :func:`~PyTango.utils.get_green_mode` and
+                      :func:`~PyTango.utils.set_green_mode`)
+    :type green_mode: :obj:`~PyTango.GreenMode`
+    :param wait: whether or not to wait for result. If green_mode
+                 Ignored when green_mode is Synchronous (always waits).
+    :type wait: bool
+    :param timeout: The number of seconds to wait for the result.
+                    If None, then there is no limit on the wait time.
+                    Ignored when green_mode is Synchronous or wait is False.
+    :type timeout: float
+    :returns:
+        if green_mode is Synchronous or wait is True:
+            :class:`~PyTango.DeviceProxy`
+        else if green_mode is Futures:
+            :class:`concurrent.futures.Future`
+        else if green_mode is Gevent:
+            :class:`gevent.event.AsynchResult`
+    :throws:
+        * a *DevFailed* if green_mode is Synchronous or wait is True 
+          and there is an error creating the device.
+        * a *concurrent.futures.TimeoutError* if green_mode is Futures,
+          wait is False, timeout is not None and the time to create the device
+          has expired.                            
+        * a *gevent.timeout.Timeout* if green_mode is Gevent, wait is False,
+          timeout is not None and the time to create the device has expired.
+    
+    New in PyTango 8.1.0
+    """
+    # we cannot use the green wrapper because it consumes the green_mode and we
+    # want to forward it to the DeviceProxy constructor
+    green_mode = kwargs.get('green_mode', get_green_mode())
+    wait = kwargs.pop('wait', True)
+    timeout = kwargs.pop('timeout', None)
+    
+    d = submit(green_mode, DeviceProxy, *args, **kwargs)
+    return result(d, green_mode, wait=wait, timeout=timeout)
+
 
 class __TangoInfo(object):
     """Helper class for when DeviceProxy.info() is not available"""
@@ -62,6 +133,44 @@ def __check_read_attribute(dev_attr):
     if dev_attr.has_failed:
         raise DevFailed(*dev_attr.get_err_stack())
     return dev_attr
+
+def __DeviceProxy__init__(self, *args, **kwargs):
+    self.__dict__['_green_mode'] = kwargs.pop('green_mode', get_green_mode())
+    self.__dict__['_executors'] = executors = {}
+    executors[GreenMode.Futures] = kwargs.pop('executor', None)
+    executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
+    return DeviceProxy.__init_orig__(self, *args, **kwargs)
+
+def __DeviceProxy__get_green_mode(self):
+    """Returns the green mode in use by this DeviceProxy.
+    It returns None if it is using the global PyTango green mode
+    (see :func:`PyTango.utils.get_green_mode`).
+    
+    :returns: the green mode in use by this DeviceProxy.
+    :rtype: GreenMode
+
+    .. seealso::
+        :func:`PyTango.utils.get_green_mode`
+        :func:`PyTango.utils.set_green_mode`
+
+    New in PyTango 8.1.0
+    """
+    return self._green_mode
+
+def __DeviceProxy__set_green_mode(self, green_mode=None):
+    """Sets the green mode to be used by this DeviceProxy
+    Setting it to None means use the global PyTango green mode
+    (see :func:`PyTango.utils.get_green_mode`).
+    
+    :param green_mode: the new green mode
+    :type green_mode: GreenMode
+
+    New in PyTango 8.1.0
+    """
+    if green_mode is None:
+        green_mode = get_green_mode()
+    self._green_mode = green_mode
+
 
 def __DeviceProxy__refresh_cmd_cache(self):
     cmd_list = self.command_list_query()
@@ -153,6 +262,12 @@ def __DeviceProxy__contains(self, key):
 
 def __DeviceProxy__read_attribute(self, value, extract_as=ExtractAs.Numpy):
     return __check_read_attribute(self._read_attribute(value, extract_as))
+
+#def __DeviceProxy__read_attribute(self, value, extract_as=ExtractAs.Numpy,
+#                                  green_mode=None, wait=True, timeout=None):
+#    green_mode, submit = submitable(green_mode)
+#    result = submit(__DeviceProxy__read_attribute_raw, self, value, extract_as=extract_as)
+#    return get_result(result, green_mode, wait=wait, timeout=timeout)
 
 def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None, extract_as=ExtractAs.Numpy):
     """
@@ -859,26 +974,44 @@ def __DeviceProxy__str(self):
     info = self._get_info_()
     return "%s(%s)" % (info.dev_class, self.dev_name())
 
+def __DeviceProxy__read_attributes(self, *args, **kwargs):
+    return self._read_attributes(*args, **kwargs)
+
+def __DeviceProxy__write_attribute(self, *args, **kwargs):
+    return self._write_attribute(*args, **kwargs)
+
+def __DeviceProxy__write_attributes(self, *args, **kwargs):
+    return self._write_attributes(*args, **kwargs)
+
 def __init_DeviceProxy():
+    DeviceProxy.__init_orig__ = DeviceProxy.__init__
+    DeviceProxy.__init__ = __DeviceProxy__init__
+
+    DeviceProxy.get_green_mode = __DeviceProxy__get_green_mode
+    DeviceProxy.set_green_mode = __DeviceProxy__set_green_mode
+
     DeviceProxy.__getattr__ = __DeviceProxy__getattr
     DeviceProxy.__setattr__ = __DeviceProxy__setattr
     DeviceProxy.__getitem__ = __DeviceProxy__getitem
     DeviceProxy.__setitem__ = __DeviceProxy__setitem
     DeviceProxy.__contains__ = __DeviceProxy__contains
-
+    
     DeviceProxy._getAttributeNames = __DeviceProxy__getAttributeNames
 
     DeviceProxy.__refresh_cmd_cache = __DeviceProxy__refresh_cmd_cache
     DeviceProxy.__refresh_attr_cache = __DeviceProxy__refresh_attr_cache
 
-    DeviceProxy.read_attribute = __DeviceProxy__read_attribute
+    DeviceProxy.read_attribute = green(__DeviceProxy__read_attribute)
+    DeviceProxy.read_attributes = green(__DeviceProxy__read_attributes)
     DeviceProxy.read_attributes_asynch = __DeviceProxy__read_attributes_asynch
     DeviceProxy.read_attribute_asynch = __DeviceProxy__read_attribute_asynch
     DeviceProxy.read_attribute_reply = __DeviceProxy__read_attribute_reply
     DeviceProxy.write_attributes_asynch = __DeviceProxy__write_attributes_asynch
     DeviceProxy.write_attribute_asynch = __DeviceProxy__write_attribute_asynch
     DeviceProxy.write_attribute_reply = DeviceProxy.write_attributes_reply
-    DeviceProxy.write_read_attribute = __DeviceProxy__write_read_attribute
+    DeviceProxy.write_read_attribute = green(__DeviceProxy__write_read_attribute)
+    DeviceProxy.write_attribute = green(__DeviceProxy__write_attribute)
+    DeviceProxy.write_attributes = green(__DeviceProxy__write_attributes)
 
     DeviceProxy.get_property = __DeviceProxy__get_property
     DeviceProxy.put_property = __DeviceProxy__put_property
@@ -904,7 +1037,7 @@ def __doc_DeviceProxy():
     def document_method(method_name, desc, append=True):
         return __document_method(DeviceProxy, method_name, desc, append)
 
-    DeviceProxy.__doc__ = """
+    DeviceProxy.__doc__ = """\
     DeviceProxy is the high level Tango object which provides the client with
     an easy-to-use interface to TANGO devices. DeviceProxy provides interfaces
     to all TANGO Device interfaces.The DeviceProxy manages timeouts, stateless
@@ -913,6 +1046,51 @@ def __doc_DeviceProxy():
 
     Example :
        dev = PyTango.DeviceProxy("sys/tg_test/1")
+
+    DeviceProxy(dev_name, green_mode=None, wait=True, timeout=True) -> DeviceProxy
+    DeviceProxy(self, dev_name, need_check_acc, green_mode=None, wait=True, timeout=True) -> DeviceProxy
+
+    Creates a new :class:`~PyTango.DeviceProxy`.
+     
+    :param dev_name: the device name or alias
+    :type dev_name: str
+    :param need_check_acc: in first version of the function it defaults to True.
+                           Determines if at creation time of DeviceProxy it should check
+                           for channel access (rarely used)
+    :type need_check_acc: bool
+    :param green_mode: determines the mode of execution of the device (including.
+                      the way it is created). Defaults to the current global
+                      green_mode (check :func:`~PyTango.utils.get_green_mode` and
+                      :func:`~PyTango.utils.set_green_mode`)
+    :type green_mode: :obj:`~PyTango.GreenMode`
+    :param wait: whether or not to wait for result. If green_mode
+                 Ignored when green_mode is Synchronous (always waits).
+    :type wait: bool
+    :param timeout: The number of seconds to wait for the result.
+                    If None, then there is no limit on the wait time.
+                    Ignored when green_mode is Synchronous or wait is False.
+    :type timeout: float
+    :returns:
+        if green_mode is Synchronous or wait is True:
+            :class:`~PyTango.DeviceProxy`
+        elif green_mode is Futures:
+            :class:`concurrent.futures.Future`
+        elif green_mode is Gevent:
+            :class:`gevent.event.AsynchResult`
+    :throws:
+        * :class:`~PyTango.DevFailed` if green_mode is Synchronous or wait is True 
+          and there is an error creating the device.
+        * :class:`concurrent.futures.TimeoutError` if green_mode is Futures,
+          wait is False, timeout is not None and the time to create the device
+          has expired.                            
+        * :class:`gevent.timeout.Timeout` if green_mode is Gevent, wait is False,
+          timeout is not None and the time to create the device has expired.
+
+    .. versionadded:: 8.1.0
+        *green_mode* parameter.
+        *wait* parameter.
+        *timeout* parameter.
+
     """
 
 #-------------------------------------
@@ -1165,16 +1343,29 @@ def __doc_DeviceProxy():
     # set_attribute_config -> in code
 
     document_method("read_attribute", """
-    read_attribute(self, attr_name, extract_as=ExtractAs.Numpy) -> DeviceAttribute
+    read_attribute(self, attr_name, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
 
             Read a single attribute.
 
         Parameters :
             - attr_name  : (str) The name of the attribute to read.
             - extract_as : (ExtractAs) Defaults to numpy.
+            - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
+                           (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
+                           :meth:`~PyTango.DeviceProxy.set_green_mode`).
+            - wait       : (bool) whether or not to wait for result. If green_mode
+                           is *Synchronous*, this parameter is ignored as it always
+                           waits for the result.
+                           Ignored when green_mode is Synchronous (always waits).
+            - timeout    : (float) The number of seconds to wait for the result.
+                           If None, then there is no limit on the wait time.
+                           Ignored when green_mode is Synchronous or wait is False.
+
         Return     : (DeviceAttribute)
         
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device
+                     TimeoutError (green_mode == Futures) If the future didn't finish executing before the given timeout.
+                     Timeout (green_mode == Gevent) If the async result didn't finish executing before the given timeout.
             
     .. versionchanged:: 7.1.4
         For DevEncoded attributes, before it was returning a DeviceAttribute.value
@@ -1189,50 +1380,107 @@ def __doc_DeviceProxy():
         in which case it returns **(format<str>, data<str>)**. Carefull, if
         using python >= 3 data<str> is decoded using default python 
         *utf-8* encoding. This means that PyTango assumes tango DS was written
-        encapsulating string into *utf-8* which is the default python enconding.
+        encapsulating string into *utf-8* which is the default python encoding.
+
+    .. versionadded:: 8.1.0
+        *green_mode* parameter.
+        *wait* parameter.
+        *timeout* parameter.
     """ )
 
     document_method("read_attributes", """
-        read_attributes(self, attr_names, extract_as=ExtractAs.Numpy) -> sequence<DeviceAttribute>
+    read_attributes(self, attr_names, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> sequence<DeviceAttribute>
 
-                Read the list of specified attributes.
+            Read the list of specified attributes.
 
-            Parameters :
-                    - attr_names : (sequence<str>) A list of attributes to read.
-                    - extract_as : (ExtractAs) Defaults to numpy.
-            Return     : (sequence<DeviceAttribute>)
+        Parameters :
+                - attr_names : (sequence<str>) A list of attributes to read.
+                - extract_as : (ExtractAs) Defaults to numpy.
+                - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
+                               (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
+                               :meth:`~PyTango.DeviceProxy.set_green_mode`).
+                - wait       : (bool) whether or not to wait for result. If green_mode
+                               is *Synchronous*, this parameter is ignored as it always
+                               waits for the result.
+                               Ignored when green_mode is Synchronous (always waits).
+                - timeout    : (float) The number of seconds to wait for the result.
+                               If None, then there is no limit on the wait time.
+                               Ignored when green_mode is Synchronous or wait is False.
 
-            Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device
+        Return     : (sequence<DeviceAttribute>)
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device
+                     TimeoutError (green_mode == Futures) If the future didn't finish executing before the given timeout.
+                     Timeout (green_mode == Gevent) If the async result didn't finish executing before the given timeout.
+
+    .. versionadded:: 8.1.0
+        *green_mode* parameter.
+        *wait* parameter.
+        *timeout* parameter.
     """ )
 
     document_method("write_attribute", """
-        write_attribute(self, attr_name, value) -> None
-        write_attribute(self, attr_info, value) -> None
+    write_attribute(self, attr_name, value, green_mode=None, wait=True, timeout=None) -> None
+    write_attribute(self, attr_info, value, green_mode=None, wait=True, timeout=None) -> None
 
-                Write a single attribute.
+            Write a single attribute.
 
-            Parameters :
-                    - attr_name : (str) The name of the attribute to write.
-                    - attr_info : (AttributeInfo)
-                    - value : The value. For non SCALAR attributes it may be any sequence of sequences.
+        Parameters :
+                - attr_name : (str) The name of the attribute to write.
+                - attr_info : (AttributeInfo)
+                - value : The value. For non SCALAR attributes it may be any sequence of sequences.
+                - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
+                               (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
+                               :meth:`~PyTango.DeviceProxy.set_green_mode`).
+                - wait       : (bool) whether or not to wait for result. If green_mode
+                               is *Synchronous*, this parameter is ignored as it always
+                               waits for the result.
+                               Ignored when green_mode is Synchronous (always waits).
+                - timeout    : (float) The number of seconds to wait for the result.
+                               If None, then there is no limit on the wait time.
+                               Ignored when green_mode is Synchronous or wait is False.
 
-            Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked, DevFailed from device
+        Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked, DevFailed from device
+                     TimeoutError (green_mode == Futures) If the future didn't finish executing before the given timeout.
+                     Timeout (green_mode == Gevent) If the async result didn't finish executing before the given timeout.
+
+    .. versionadded:: 8.1.0
+        *green_mode* parameter.
+        *wait* parameter.
+        *timeout* parameter.
     """ )
 
     document_method("write_attributes", """
-    write_attributes(self, name_val) -> None
+    write_attributes(self, name_val, green_mode=None, wait=True, timeout=None) -> None
 
             Write the specified attributes.
 
         Parameters :
                 - name_val: A list of pairs (attr_name, value). See write_attribute
+                - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
+                               (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
+                               :meth:`~PyTango.DeviceProxy.set_green_mode`).
+                - wait       : (bool) whether or not to wait for result. If green_mode
+                               is *Synchronous*, this parameter is ignored as it always
+                               waits for the result.
+                               Ignored when green_mode is Synchronous (always waits).
+                - timeout    : (float) The number of seconds to wait for the result.
+                               If None, then there is no limit on the wait time.
+                               Ignored when green_mode is Synchronous or wait is False.
 
         Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked,
                      DevFailed or NamedDevFailedList from device
+                     TimeoutError (green_mode == Futures) If the future didn't finish executing before the given timeout.
+                     Timeout (green_mode == Gevent) If the async result didn't finish executing before the given timeout.
+
+    .. versionadded:: 8.1.0
+        *green_mode* parameter.
+        *wait* parameter.
+        *timeout* parameter.
     """ )
 
     document_method("write_read_attribute", """
-    write_read_attribute(self, attr_name, value, extract_as=ExtractAs.Numpy) -> DeviceAttribute
+    write_read_attribute(self, attr_name, value, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
 
             Write then read a single attribute in a single network call.
             By default (serialisation by device), the execution of this call in
@@ -1243,8 +1491,15 @@ def __doc_DeviceProxy():
 
         Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked,
                      DevFailed from device, WrongData
+                     TimeoutError (green_mode == Futures) If the future didn't finish executing before the given timeout.
+                     Timeout (green_mode == Gevent) If the async result didn't finish executing before the given timeout.
 
         New in PyTango 7.0.0
+
+    .. versionadded:: 8.1.0
+        *green_mode* parameter.
+        *wait* parameter.
+        *timeout* parameter.
     """ )
 
 #-------------------------------------

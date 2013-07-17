@@ -28,7 +28,8 @@ This is an internal PyTango module.
 from __future__ import with_statement
 from __future__ import print_function
 
-__all__ = [ "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
+__all__ = [ "get_green_mode", "set_green_mode",
+            "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
             "is_number", "is_scalar_type", "is_array_type", "is_numerical_type",
             "is_int_type", "is_float_type", "is_bool_type", "is_bin_type",
             "is_str_type", "obj_2_str", "seqStr_2_obj",
@@ -47,10 +48,13 @@ import numbers
 import functools
 import inspect
 import traceback
+import threading
 
 from ._PyTango import StdStringVector, StdDoubleVector, \
     DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
-    EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants
+    EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
+    GreenMode
+
 
 _scalar_int_types = (CmdArgType.DevShort, CmdArgType.DevUShort,
     CmdArgType.DevInt, CmdArgType.DevLong, CmdArgType.DevULong,
@@ -100,6 +104,31 @@ _scalar_to_array_type = {
     CmdArgType.DevString : CmdArgType.DevVarStringArray,
     CmdArgType.ConstDevString : CmdArgType.DevVarStringArray,
 }
+
+__current_green_mode = GreenMode.Synchronous
+
+def set_green_mode(green_mode=None):
+    """Sets the global default PyTango green mode.
+
+    Advice: Use only in your final application. Don't use this in a python library
+    in order not to interfere with the beavior of other libraries and/or 
+    application where your library is being.
+
+    :param green_mode: the new global default PyTango green mode
+    :type green_mode: GreenMode
+    """
+    global __current_green_mode
+    if green_mode is None:
+        green_mode = GreenMode.Synchronous
+    __current_green_mode = green_mode
+
+def get_green_mode():
+    """Returns the current global default PyTango green mode.
+
+    :returns: the current global default PyTango green mode
+    :rtype: GreenMode
+    """
+    return __current_green_mode
 
 __device_classes = None
 
@@ -596,6 +625,12 @@ def document_method(klass, method_name, d, add=True):
             func.__doc__ = "%s\n%s" % (d, cpp_doc)
             return
     func.__doc__ = d
+    
+    if func.__name__ != method_name:
+        try:
+            func.__name__ = method_name
+        except AttributeError:
+            pass
 
 def document_static_method(klass, method_name, d, add=True):
     meth, func = __get_meth_func(klass, method_name)

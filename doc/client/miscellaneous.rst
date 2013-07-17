@@ -1,6 +1,11 @@
-
-
 .. currentmodule:: PyTango
+
+Green creation of PyTango objects
+---------------------------------
+
+.. autofunction:: get_device_proxy
+
+.. autofunction:: get_attribute_proxy
 
 API util
 --------
@@ -15,6 +20,7 @@ See also `Event configuration information`_
 
 Attribute
 ~~~~~~~~~
+
 .. autoclass:: PyTango.AttributeAlarmInfo
     :members:
 

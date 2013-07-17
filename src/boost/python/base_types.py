@@ -594,6 +594,16 @@ def __doc_base_types():
         - OPERATOR
         - EXPERT
     """ )
+
+    document_enum("GreenMode", """
+    An enumeration representing the GreenMode
+    
+        - Synchronous
+        - Futures
+        - Gevent
+    
+    New in PyTango 8.1.0
+    """ )
     
     ArchiveEventInfo.__doc__ = """
     A structure containing available archiving event information for an attribute

@@ -188,6 +188,12 @@ void export_base_types()
         .value("Nothing", PyTango::ExtractAsNothing)
     ;
 
+    enum_<PyTango::GreenMode>("GreenMode")
+        .value("Synchronous", PyTango::GreenModeSynchronous)
+        .value("Futures", PyTango::GreenModeFutures)
+        .value("Gevent", PyTango::GreenModeGevent)
+    ;
+
     enum_<PyTango::ImageFormat>("_ImageFormat")
         .value("RawImage", PyTango::RawImage)
         .value("JpegImage", PyTango::JpegImage)

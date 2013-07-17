@@ -553,21 +553,21 @@ void export_device_proxy()
             &PyDeviceProxy::read_attribute,
             ( arg_("self"), arg_("attr_name"), arg_("extract_as")=PyTango::ExtractAsNumpy ) )
 
-        .def("read_attributes",
+        .def("_read_attributes",
             &PyDeviceProxy::read_attributes,
             ( arg_("self"), arg_("attr_names"), arg_("extract_as")=PyTango::ExtractAsNumpy ) )
 
-        .def("write_attribute",
+        .def("_write_attribute",
             (void (*)(Tango::DeviceProxy&, const string &, bopy::object ))
             &PyDeviceProxy::write_attribute,
             ( arg_("self"), arg_("attr_name"), arg_("value") ) )
 
-        .def("write_attribute",
+        .def("_write_attribute",
             (void (*)(Tango::DeviceProxy&, const Tango::AttributeInfo &, bopy::object ))
             &PyDeviceProxy::write_attribute,
             ( arg_("self"), arg_("attr_info"), arg_("value") ) )
 
-        .def("write_attributes",
+        .def("_write_attributes",
             &PyDeviceProxy::write_attributes,
             ( arg_("self"), arg_("name_val") ) )
 

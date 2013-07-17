@@ -143,7 +143,7 @@ from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     DeviceImpl, DeviceInfo, DeviceUnlocked, Device_2Impl,
     Device_3Impl, Device_4Impl, DispLevel, EncodedAttribute, ErrSeverity,
     EventData, EventSystemFailed, EventType,
-    Except, ExtractAs, FMT_UNKNOWN, GroupAttrReply, GroupAttrReplyList,
+    Except, ExtractAs, GreenMode, FMT_UNKNOWN, GroupAttrReply, GroupAttrReplyList,
     GroupCmdReply, GroupCmdReplyList, GroupReply, GroupReplyList,
     IMAGE, ImageAttr, KeepAliveCmdCode, Level, LockCmdCode, LockerInfo,
     LockerLanguage, LogLevel, LogTarget, Logger, Logging, MessBoxType,
@@ -176,7 +176,7 @@ from .log4tango import TangoStream, LogIt, DebugIt, InfoIt, WarnIt, \
 from .device_server import ChangeEventProp, PeriodicEventProp, \
     ArchiveEventProp, AttributeAlarm, EventProperties, AttributeConfig, \
     AttributeConfig_2, AttributeConfig_3, MultiAttrProp
-from .attribute_proxy import AttributeProxy
+from .attribute_proxy import AttributeProxy, get_attribute_proxy
 from .group import Group
 from .pyutil import Util
 from .device_class import DeviceClass
@@ -186,6 +186,8 @@ from .globals import get_class, get_classes, get_cpp_class, get_cpp_classes, \
 from .utils import is_scalar_type, is_array_type, is_numerical_type, \
     is_int_type, is_float_type, obj_2_str, seqStr_2_obj
 from .utils import server_run
+from .utils import set_green_mode, get_green_mode
+from .device_proxy import get_device_proxy
 from .tango_numpy import NumpyType, numpy_type, numpy_spectrum, numpy_image
 
 from .pytango_init import init as __init

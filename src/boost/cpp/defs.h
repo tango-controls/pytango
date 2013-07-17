@@ -64,4 +64,10 @@ namespace PyTango
         RawImage,
         JpegImage
     };
+
+    enum GreenMode {
+        GreenModeSynchronous,
+        GreenModeFutures,
+        GreenModeGevent
+    };
 }

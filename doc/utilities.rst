@@ -12,6 +12,10 @@ The Utilities API
     :members:
     :undoc-members:
 
+.. autofunction:: PyTango.utils.get_green_mode
+
+.. autofunction:: PyTango.utils.set_green_mode
+
 .. autofunction:: PyTango.utils.is_scalar_type
     
 .. autofunction:: PyTango.utils.is_array_type

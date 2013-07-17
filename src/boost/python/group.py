@@ -177,8 +177,8 @@ def __init_proxy_Group():
     for fname in proxy_methods:
         proxy_call_define(fname)
     
-    #Group.add.im_func.__doc__ = _RealGroup.add.__doc__
-    #Group.get_group.im_func.__doc__ = _RealGroup.get_group.__doc__
+    #Group.add.__func__.__doc__ = _RealGroup.add.__doc__
+    #Group.get_group.__func__.__doc__ = _RealGroup.get_group.__doc__
     #Group.__doc__ = _RealGroup.__doc__
 
 

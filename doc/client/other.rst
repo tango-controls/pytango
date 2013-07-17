@@ -50,6 +50,9 @@ Enumerations
 
 .. autoclass:: PyTango.DispLevel
 
+.. autoclass:: PyTango.GreenMode
+
+
 Other classes
 ~~~~~~~~~~~~~
 
