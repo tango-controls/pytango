@@ -41,7 +41,7 @@ namespace PyDeviceAttribute {
     typedef unique_pointer<std::vector<Tango::DeviceAttribute> > AutoDevAttrVector;
 /// @}
     
-    template<long tangoTypeConst>
+    template<long tangoTypeConst> static
     void _update_array_values_as_tuples(Tango::DeviceAttribute &self, bool isImage, boost::python::object py_value);
 
     /// Set the value of a DeviceAttribute from python (useful for write*)
