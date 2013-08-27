@@ -588,18 +588,17 @@ def obj_2_str(obj, tg_type):
            :return: a string representation of the given object
            :rtype: :py:obj:`str`
     """
-    ret = ""
     if tg_type in _scalar_types:
         # scalar cases
-        if isinstance(obj, collections.Sequence):
+        if is_pure_str(obj):
+            return obj
+        elif is_non_str_seq(obj):
             if not len(obj):
-                return ret
+                return ""
             obj = obj[0]
-        ret = str(obj).rstrip()
-    else:
-        # sequence cases
-        ret = '\n'.join([ str(i) for i in obj ])
-    return ret
+        return str(obj)
+    # sequence cases
+    return '\n'.join([str(i) for i in obj])
 
 def __get_meth_func(klass, method_name):
     meth = getattr(klass, method_name)
