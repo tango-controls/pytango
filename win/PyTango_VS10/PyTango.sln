@@ -15,16 +15,16 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopyshared_tangoshared_release|Win32.ActiveCfg = py33_bopyshared_tangoshared_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopyshared_tangoshared_release|Win32.Build.0 = py33_bopyshared_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopyshared_tangoshared_release|x64.ActiveCfg = py33_bopyshared_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopyshared_tangoshared_release|x64.Build.0 = py33_bopyshared_tangoshared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopyshared_tangoshared_release|x64.ActiveCfg = py33_bopyshared_tangoshared_release|x64
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopyshared_tangoshared_release|x64.Build.0 = py33_bopyshared_tangoshared_release|x64
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangoshared_release|Win32.ActiveCfg = py33_bopystatic_tangoshared_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangoshared_release|Win32.Build.0 = py33_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangoshared_release|x64.ActiveCfg = py33_bopystatic_tangoshared_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangoshared_release|x64.Build.0 = py33_bopystatic_tangoshared_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangoshared_release|x64.ActiveCfg = py33_bopystatic_tangoshared_release|x64
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangoshared_release|x64.Build.0 = py33_bopystatic_tangoshared_release|x64
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangostatic_release|Win32.ActiveCfg = py33_bopystatic_tangostatic_release|Win32
 		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangostatic_release|Win32.Build.0 = py33_bopystatic_tangostatic_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangostatic_release|x64.ActiveCfg = py33_bopystatic_tangostatic_release|Win32
-		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangostatic_release|x64.Build.0 = py33_bopystatic_tangostatic_release|Win32
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangostatic_release|x64.ActiveCfg = py33_bopystatic_tangostatic_release|x64
+		{764A5ECE-11AE-4363-9A1C-573972A1BADD}.py33_bopystatic_tangostatic_release|x64.Build.0 = py33_bopystatic_tangostatic_release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

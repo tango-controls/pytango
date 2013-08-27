@@ -53,6 +53,8 @@ def main():
     config_name, plat_name = sys.argv[4:6]
 #    temp_base_dir = osp.abspath(os.environ["TEMP"])
 #    temp_dir = osp.join(temp_base_dir, "PyTango", config_name)
+    if plat_name == 'x64':
+        plat_name = 'win-amd64'
 
     try:
         cmd_line =  '%s %s ' % (executable, setup_name)
