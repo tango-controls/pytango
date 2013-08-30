@@ -21,18 +21,17 @@
    
 *******************************************************************************/
 
-%Module Tango 008001000
+class DbDevImportInfo
+{
 
-%Timeline { TANGO_8_0 TANGO_8_1 }
+%TypeHeaderCode
+#include <tango.h>
+using namespace Tango;
+%End
 
-%Platforms {WIN32_PLATFORM POSIX_PLATFORM MACOS_PLATFORM}
-
-%Include std_utils.sip
-%Include constants.sip
-%Include command_info.sip
-%Include db_datum.sip
-%Include db_dev_info.sip
-%Include db_dev_import_info.sip
-%Include connection.sip
-%Include device_proxy.sip
-%Include database.sip
+public :
+    std::string name;
+    long exported;
+    std::string ior;
+    std::string version;
+};
