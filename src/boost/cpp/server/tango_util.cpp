@@ -188,6 +188,66 @@ namespace PyUtil
             self.server_set_event_loop(event_loop);
         }
     }
+    
+    void set_use_db(bool use_db)
+    {
+        Tango::Util::_UseDb = use_db;
+    }
+    
+    std::string get_orb_ior(Tango::Util& self)
+    {
+        Tango::Device_var d = self.get_dserver_device()->_this();
+        return self.get_orb()->object_to_string(d);
+    }
+    
+    void orb_run(Tango::Util& self)
+    {
+        self.get_orb()->run();
+    }
+    
+    bool init_db_ds(Tango::Util& self, boost::python::object py_device, const std::string &db_name)
+    {
+        Tango::DeviceImpl* dbase = boost::python::extract<Tango::DeviceImpl*>(py_device);
+        
+        //
+        // Export devices to the outside world as CORBA named servant and to TANGO
+        // database
+        //
+		Tango::DeviceImpl *dserver;
+        Tango::DevVarStringArray *export_parms = new Tango::DevVarStringArray();
+
+		dserver = self.get_dserver_device();
+		dbase = self.get_device_by_name(db_name);
+        //
+        // export database as named servant 
+        //
+		export_parms->length(5);
+
+        // export dserver object to TANGO database
+
+		Tango::Device_var d = dserver->_this();
+		dserver->set_d_var(Tango::Device::_duplicate(d));
+
+		const char *dserver_str_ior = Tango::Util::instance()->get_orb()->object_to_string(d);
+		const char *str_ior = Tango::Util::instance()->get_orb()->object_to_string(dbase->get_d_var());
+
+        boost::python::tuple dserver_pars = boost::python::make_tuple(dserver->get_name(),
+            dserver_str_ior, self.get_host_name(),
+            self.get_pid_str(), self.get_version_str());   
+        py_device("db_export_device")(dserver_pars);
+
+        // export database object to TANGO database        
+
+        boost::python::tuple pars = boost::python::make_tuple(dbase->get_name(),
+            str_ior, self.get_host_name(),
+            self.get_pid_str(), self.get_version_str());   
+        py_device("db_export_device")(pars);
+
+		delete [] str_ior;
+ 		delete [] dserver_str_ior;
+ 		
+ 		return true;
+   }
 }
 
 void init_python()
@@ -202,6 +262,11 @@ BOOST_PYTHON_FUNCTION_OVERLOADS (server_init_overload, PyUtil::server_init, 1, 2
 
 void export_util()
 {
+    class_<Tango::Interceptors>("Interceptors")
+        .def("create_thread", &Tango::Interceptors::create_thread)
+        .def("delete_thread", &Tango::Interceptors::delete_thread)
+    ;
+    
     class_<Tango::Util, boost::noncopyable>("_Util", no_init)
         .def("init", PyUtil::init,
             return_value_policy<reference_existing_object>())
@@ -263,5 +328,10 @@ void export_util()
         .def_readonly("_FileDb", &Tango::Util::_FileDb)
         .def("init_python", init_python)
         .staticmethod("init_python")
+        .def("set_use_db", &PyUtil::set_use_db)
+        .staticmethod("set_use_db")
+        .def("get_orb_ior", &PyUtil::get_orb_ior)
+        .def("orb_run", &PyUtil::orb_run)
+        .def("init_db_ds", &PyUtil::init_db_ds)
     ;
 }

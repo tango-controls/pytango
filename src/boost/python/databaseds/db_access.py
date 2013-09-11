@@ -11,7 +11,7 @@ from db_errors import *
 
 def get_create_db_statements():
     statements = []
-    with open("create_db_tables.sql.in") as f:
+    with open("create_db_tables.sql") as f:
         lines = f.readlines()
     # strip comments
     lines = ( line for line in lines if not line.startswith('#') )
@@ -21,7 +21,7 @@ def get_create_db_statements():
     lines = lines.replace("ENGINE=MyISAM","")
     statements += lines.split(";")
         
-    with open("create_db.sql.in") as f:
+    with open("create_db.sql") as f:
         lines = f.readlines()
     # strip comments
     lines = ( line for line in lines if not line.lower().startswith('#') )

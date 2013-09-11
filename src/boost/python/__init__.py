@@ -156,7 +156,7 @@ from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     StdNamedDevFailedVector, StdStringVector, SubDevDiag, TimeVal,
     UserDefaultAttrProp, WAttribute, WRITE, WrongData, WrongNameSyntax,
     alarm_flags, asyn_req_type, cb_sub_model, constants,
-    raise_asynch_exception)
+    raise_asynch_exception, Interceptors)
 
 ArgType = CmdArgType
 

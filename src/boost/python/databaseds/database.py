@@ -119,7 +119,7 @@ class DataBase (PyTango.Device_4Impl):
 #------------------------------------------------------------------
     def init_device(self):
         self.debug_stream("In " + self.get_name() + ".init_device()")
-        self.get_device_properties(self.get_device_class())
+        #self.get_device_properties(self.get_device_class())
         self.attr_StoredProcedureRelease_read = ''
         self.attr_Timing_average_read = [0.0]
         self.attr_Timing_minimum_read = [0.0]
@@ -155,7 +155,7 @@ class DataBase (PyTango.Device_4Impl):
     def read_StoredProcedureRelease(self, attr):
         self.debug_stream("In " + self.get_name() + ".read_StoredProcedureRelease()")
         #----- PROTECTED REGION ID(DataBase.StoredProcedureRelease_read) ENABLED START -----#
-        self.attr_StoredProcedureRelease_read = db.get_stored_procedure_release()
+        self.attr_StoredProcedureRelease_read = self.db.get_stored_procedure_release()
         #----- PROTECTED REGION END -----#	//	DataBase.StoredProcedureRelease_read
         attr.set_value(self.attr_StoredProcedureRelease_read)
         
@@ -219,8 +219,6 @@ class DataBase (PyTango.Device_4Impl):
         #----- PROTECTED REGION END -----#	//	DataBase.Timing_info_read
         attr.set_value(self.attr_Timing_info_read)
         
-
-
 
 #------------------------------------------------------------------
 #    Read Attribute Hardware
@@ -647,7 +645,7 @@ class DataBase (PyTango.Device_4Impl):
                    "DataBase::ExportDevice()")        
         
         dev_name, IOR, host, pid, version = argin[:5]
-        if pid.lower() == 'null'):
+        if pid.lower() == 'null':
             pid = "-1"
         self.db.export_device(dev_name, IOR, host, pid, version)
         
@@ -670,7 +668,7 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() +  ".DbExportEvent()")
         #----- PROTECTED REGION ID(DataBase.DbExportEvent) ENABLED START -----#
         
-         if len(argin) < 5:
+        if len(argin) < 5:
             self.warn_stream("DataBase::db_export_event(): insufficient export info for event ")
             th_exc(DB_IncorrectArguments, 
                    "insufficient export info for event",
@@ -2320,17 +2318,26 @@ class DataBaseClass(PyTango.DeviceClass):
 #==================================================================
 def main():
     try:
+        db_name = "sys/database/" + sys.argv[1]
+        PyTango.Util.set_use_db(False)
         py = PyTango.Util(sys.argv)
         py.add_class(DataBaseClass,DataBase,'DataBase')
 
         U = PyTango.Util.instance()
+        
+        U.set_serial_model(PyTango.SerialModel.NO_SYNC)
         U.server_init()
-        U.server_run()
+        dbase = U.get_device_by_name(db_name)
+        U.init_db_ds(dbase, db_name)
+        U.orb_run()
+        #U.server_run()
 
-    except PyTango.DevFailed,e:
-        print '-------> Received a DevFailed exception:',e
-    except Exception,e:
+    except PyTango.DevFailed as df:
+        print '-------> Received a DevFailed exception:',df
+        import traceback;traceback.print_exc()
+    except Exception as e:
         print '-------> An unforeseen exception occured....',e
+        import traceback;traceback.print_exc()
 
 if __name__ == '__main__':
     main()

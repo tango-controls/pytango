@@ -139,6 +139,12 @@ namespace PyDServer
         delete ret;
         return py_ret;
     }
+    
+    void duplicate_d_var(Tango::DServer &self)
+    {
+        Tango::Device_var d = self._this();
+        self.set_d_var(Tango::Device::_duplicate(d));
+    }
 }
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(add_obj_polling_overload, PyDServer::add_obj_polling, 2, 4)
@@ -198,6 +204,7 @@ void export_dserver()
         .def("get_poll_th_pool_size", &Tango::DServer::get_poll_th_pool_size)
         .def("get_opt_pool_usage", &Tango::DServer::get_opt_pool_usage)
         .def("get_poll_th_conf", &Tango::DServer::get_poll_th_conf)
+        .def("duplicate_d_var", &PyDServer::duplicate_d_var)
     ;
     
 }
