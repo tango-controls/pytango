@@ -102,8 +102,6 @@ enum LockCmdCode {
 	LOCK_EXIT
 };
 
-
-
 enum LogLevel {
   	LOG_OFF,
   	LOG_FATAL,
