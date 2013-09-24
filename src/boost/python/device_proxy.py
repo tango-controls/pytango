@@ -983,6 +983,9 @@ def __DeviceProxy__write_attribute(self, *args, **kwargs):
 def __DeviceProxy__write_attributes(self, *args, **kwargs):
     return self._write_attributes(*args, **kwargs)
 
+def __DeviceProxy__ping(self, *args, **kwargs):
+    return self._ping(*args, **kwargs)
+
 def __init_DeviceProxy():
     DeviceProxy.__init_orig__ = DeviceProxy.__init__
     DeviceProxy.__init__ = __DeviceProxy__init__
@@ -1012,6 +1015,8 @@ def __init_DeviceProxy():
     DeviceProxy.write_read_attribute = green(__DeviceProxy__write_read_attribute)
     DeviceProxy.write_attribute = green(__DeviceProxy__write_attribute)
     DeviceProxy.write_attributes = green(__DeviceProxy__write_attributes)
+
+    DeviceProxy.ping = green(__DeviceProxy__ping)   
 
     DeviceProxy.get_property = __DeviceProxy__get_property
     DeviceProxy.put_property = __DeviceProxy__put_property
