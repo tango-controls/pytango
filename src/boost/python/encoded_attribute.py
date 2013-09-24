@@ -1,21 +1,21 @@
 ################################################################################
 ##
 ## This file is part of PyTango, a python binding for Tango
-## 
+##
 ## http://www.tango-controls.org/static/PyTango/latest/doc/html/index.html
 ##
 ## Copyright 2011 CELLS / ALBA Synchrotron, Bellaterra, Spain
-## 
+##
 ## PyTango is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU Lesser General Public License as published by
 ## the Free Software Foundation, either version 3 of the License, or
 ## (at your option) any later version.
-## 
+##
 ## PyTango is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU Lesser General Public License for more details.
-## 
+##
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with PyTango.  If not, see <http://www.gnu.org/licenses/>.
 ##
@@ -44,7 +44,7 @@ if constants.NUMPY_SUPPORT:
         np = None
 else:
     np = None
-    
+
 _allowed_extract = ExtractAs.Numpy, ExtractAs.String, ExtractAs.Tuple, \
                    ExtractAs.List
 
@@ -81,7 +81,7 @@ def __EncodedAttribute_encode_jpeg_gray8(self, gray8, width=0, height=0, quality
                data = numpy.arange(100, dtype=numpy.byte)
                data = numpy.array((data,data,data))
                enc.encode_jpeg_gray8(data)
-               attr.set_value(data)
+               attr.set_value(enc)
     """
     self._generic_encode_gray8(gray8, width=width, height=height, quality=quality, format=_ImageFormat.JpegImage)
 
@@ -116,7 +116,7 @@ def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
                data = numpy.arange(100, dtype=numpy.byte)
                data = numpy.array((data,data,data))
                enc.encode_gray8(data)
-               attr.set_value(data)
+               attr.set_value(enc)
     """
     self._generic_encode_gray8(gray8, width=width, height=height, format=_ImageFormat.RawImage)
 
@@ -125,19 +125,19 @@ def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, qual
     if not is_seq(gray8):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
-    
+
     is_str = is_pure_str(gray8)
     if is_str:
         if not width or not height:
             raise ValueError("When giving a string as data, you must also "
                              "supply width and height")
-    
+
     if np and isinstance(gray8, np.ndarray):
         if gray8.ndim != 2:
             if not width or not height:
                 raise ValueError("When giving a non 2D numpy array, width and "
                                  "height must be supplied")
-            if gray8.nbytes != width*height:
+            if gray8.nbytes != width * height:
                 raise ValueError("numpy array size mismatch")
         else:
             if gray8.itemsize != 1:
@@ -153,7 +153,7 @@ def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, qual
         height = len(gray8)
         if height < 1:
             raise IndexError("Expected sequence with at least one row")
-        
+
         row0 = gray8[0]
         if not is_seq(row0):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
@@ -196,25 +196,25 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
                data = numpy.arange(100, dtype=numpy.int16)
                data = numpy.array((data,data,data))
                enc.encode_gray16(data)
-               attr.set_value(data)
+               attr.set_value(enc)
     """
     if not is_seq(gray16):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
-    
+
     is_str = is_pure_str(gray16)
     if is_str:
         if not width or not height:
             raise ValueError("When giving a string as data, you must also "
                              "supply width and height")
-    
-    
+
+
     if np and isinstance(gray16, np.ndarray):
         if gray16.ndim != 2:
             if not width or not height:
                 raise ValueError("When giving a non 2D numpy array, width and "
                                  "height must be supplied")
-            if gray16.nbytes/2 != width*height:
+            if gray16.nbytes / 2 != width * height:
                 raise ValueError("numpy array size mismatch")
         else:
             if gray16.itemsize != 2:
@@ -225,12 +225,12 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
         if gray16.flags.aligned != True:
             raise TypeError("Currently, only contiguous, aligned numpy arrays "
                             "are supported")
-    
+
     if not is_str and (not width or not height):
         height = len(gray16)
         if height < 1:
             raise IndexError("Expected sequence with at least one row")
-        
+
         row0 = gray16[0]
         if not is_seq(row0):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
@@ -238,7 +238,7 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
         width = len(row0)
         if is_pure_str(row0) or type(row0) == bytearray:
             width /= 2
-    
+
     self._encode_gray16(gray16, width, height)
 
 def __EncodedAttribute_encode_jpeg_rgb24(self, rgb24, width=0, height=0, quality=100.0):
@@ -275,7 +275,7 @@ def __EncodedAttribute_encode_jpeg_rgb24(self, rgb24, width=0, height=0, quality
                # create an 'image' where each pixel is R=0x01, G=0x01, B=0x01
                arr = numpy.ones((10,10,3), dtype=numpy.uint8)
                enc.encode_jpeg_rgb24(data)
-               attr.set_value(data)
+               attr.set_value(enc)
     """
     self._generic_encode_rgb24(rgb24, width=width, height=height, quality=quality, format=_ImageFormat.JpegImage)
 
@@ -311,28 +311,28 @@ def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
                # create an 'image' where each pixel is R=0x01, G=0x01, B=0x01
                arr = numpy.ones((10,10,3), dtype=numpy.uint8)
                enc.encode_rgb24(data)
-               attr.set_value(data)
+               attr.set_value(enc)
     """
     self._generic_encode_rgb24(rgb24, width=width, height=height, format=_ImageFormat.RawImage)
-    
+
 def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, quality=0, format=_ImageFormat.RawImage):
     """Internal usage only"""
     if not is_seq(rgb24):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
-    
+
     is_str = is_pure_str(rgb24)
     if is_str:
         if not width or not height:
             raise ValueError("When giving a string as data, you must also "
                              "supply width and height")
-    
+
     if np and isinstance(rgb24, np.ndarray):
         if rgb24.ndim != 3:
             if not width or not height:
                 raise ValueError("When giving a non 2D numpy array, width and "
                                  "height must be supplied")
-            if rgb24.nbytes/3 != width*height:
+            if rgb24.nbytes / 3 != width * height:
                 raise ValueError("numpy array size mismatch")
         else:
             if rgb24.itemsize != 1:
@@ -343,12 +343,12 @@ def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, qual
         if rgb24.flags.aligned != True:
             raise TypeError("Currently, only contiguous, aligned numpy arrays "
                             "are supported")
-    
+
     if not is_str and (not width or not height):
         height = len(rgb24)
         if height < 1:
             raise IndexError("Expected sequence with at least one row")
-        
+
         row0 = rgb24[0]
         if not is_seq(row0):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
@@ -391,24 +391,24 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
                data = numpy.arange(100, dtype=numpy.int32)
                data = numpy.array((data,data,data))
                enc.encode_jpeg_rgb32(data)
-               attr.set_value(data)
+               attr.set_value(enc)
     """
     if not is_seq(rgb32):
         raise TypeError("Expected sequence (str, numpy.ndarray, list, tuple "
                         "or bytearray) as first argument")
-    
+
     is_str = is_pure_str(rgb32)
     if is_str:
         if not width or not height:
             raise ValueError("When giving a string as data, you must also "
                              "supply width and height")
-    
+
     if np and isinstance(rgb32, np.ndarray):
         if rgb32.ndim != 2:
             if not width or not height:
                 raise ValueError("When giving a non 2D numpy array, width and "
                                  "height must be supplied")
-            if rgb32.nbytes/4 != width*height:
+            if rgb32.nbytes / 4 != width * height:
                 raise ValueError("numpy array size mismatch")
         else:
             if rgb32.itemsize != 4:
@@ -424,7 +424,7 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
         height = len(rgb32)
         if height < 1:
             raise IndexError("Expected sequence with at least one row")
-        
+
         row0 = rgb32[0]
         if not is_seq(row0):
             raise IndexError("Expected sequence (str, numpy.ndarray, list, tuple or "
@@ -553,7 +553,7 @@ def __init_EncodedAttribute():
     EncodedAttribute.decode_gray8 = __EncodedAttribute_decode_gray8
     EncodedAttribute.decode_gray16 = __EncodedAttribute_decode_gray16
     EncodedAttribute.decode_rgb32 = __EncodedAttribute_decode_rgb32
-    
+
 def __doc_EncodedAttribute():
     pass
 
