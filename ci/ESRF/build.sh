@@ -5,7 +5,7 @@ export PATH=$PATH:/cygdrive/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio\
 
 if [ ! -z "$NODE_NAME" -a -f "$NODE_NAME" ]
 then
-	print $NODE_NAME
+	echo $NODE_NAME
 	if [ $NODE_NAME != "ct32windows7" ]
 	then
         source "$NODE_NAME"
@@ -71,7 +71,7 @@ case "${realos}" in
 		/usr/bin/python setup.py install --prefix=$INSTALL_DIR/debian6
 		;; 
 	"debian7_64")
-        rm -rf $INSTALL_DIR/debian6/*
+        rm -rf $INSTALL_DIR/debian7/*
 		/usr/bin/python setup.py install --prefix=$INSTALL_DIR/debian7
 		;; 
 	"redhate4_32")
@@ -83,8 +83,10 @@ case "${realos}" in
 		/segfs/bliss/bin/python2.6 setup.py install --prefix=$INSTALL_DIR/redhate5
 		;;
     "windows7"*)
-        cp -rf /cygdrive/c/Temp/pytango/build_8.1.0_tg8.1.2_boost1.53.0/lib  /cygdrive/s/tango/ci/PyTango/Windows7
-		cp -rf /cygdrive/c/Temp/pytango/build_8.1.0_tg8.1.2_boost1.53.0/dist  /cygdrive/s/tango/ci/PyTango/Windows7
+		INSTALL_DIR="//unixhome/segfs/tango/ci/PyTango/windows7"
+		/bin/rm -rf $INSTALL_DIR/*
+        /bin/cp -rf /cygdrive/c/Temp/pytango/build_8.1.0_tg8.1.2_boost1.53.0/lib  $INSTALL_DIR
+		/bin/cp -rf /cygdrive/c/Temp/pytango/build_8.1.0_tg8.1.2_boost1.53.0/dist  $INSTALL_DIR
         ;;
 	*)
 		echo "Install - Not supporting operating system: " ${OSTYPE}

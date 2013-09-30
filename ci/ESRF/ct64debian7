@@ -1,0 +1,7 @@
+export realos=debian7_64
+export BOOST_ROOT=/usr/lib
+export NUMPY_ROOT=/usr/lib/pyshared/python2.6/numpy/core
+export OMNI_ROOT=/bliss/users/falconto/install/install_dir/tango8
+export TANGO_ROOT=/bliss/users/falconto/install/install_dir/tango8
+export ZMQ_ROOT=/bliss/users/falconto/install/install_dir/zmq
+export LD_LIBRARY_PATH=/bliss/users/falconto/install/install_dir/tango8/lib:/bliss/users/falconto/install/install_dir/zmq/lib:$LD_LIBRARY_PATH
