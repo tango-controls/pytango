@@ -1,21 +1,21 @@
 ################################################################################
 ##
 ## This file is part of PyTango, a python binding for Tango
-## 
+##
 ## http://www.tango-controls.org/static/PyTango/latest/doc/html/index.html
 ##
 ## Copyright 2011 CELLS / ALBA Synchrotron, Bellaterra, Spain
-## 
+##
 ## PyTango is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU Lesser General Public License as published by
 ## the Free Software Foundation, either version 3 of the License, or
 ## (at your option) any later version.
-## 
+##
 ## PyTango is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU Lesser General Public License for more details.
-## 
+##
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with PyTango.  If not, see <http://www.gnu.org/licenses/>.
 ##
@@ -49,22 +49,62 @@ from .pytango_pprint import pytango_pprint_init
 from .pyutil import pyutil_init
 from .time_val import time_val_init
 from ._PyTango import constants
+from ._PyTango import _get_tango_lib_release
 
 __INITIALIZED = False
 __DOC = True
 
+
 def init_constants():
-    
-    tgver = tuple(map(int, constants.TgLibVers.split(".")))
-    tgver_str = "0x%02d%02d%02d00" % (tgver[0], tgver[1], tgver[2])
-    constants.TANGO_VERSION_HEX = int(tgver_str, 16)
-    
+    import sys
+    import platform
+
+    tg_ver = tuple(map(int, constants.TgLibVers.split(".")))
+    tg_ver_str = "0x%02d%02d%02d00" % (tg_ver[0], tg_ver[1], tg_ver[2])
+    constants.TANGO_VERSION_HEX = int(tg_ver_str, 16)
+
+    BOOST_VERSION = ".".join(map(str, (constants.BOOST_MAJOR_VERSION,
+                                       constants.BOOST_MINOR_VERSION,
+                                       constants.BOOST_PATCH_VERSION)))
+    constants.BOOST_VERSION = BOOST_VERSION
+
+    class Compile(object):
+        PY_VERSION = constants.PY_VERSION
+        TANGO_VERSION = constants.TANGO_VERSION
+        BOOST_VERSION = constants.BOOST_VERSION
+        if constants.NUMPY_SUPPORT:
+            NUMPY_VERSION = '0.0.0'
+        else:
+            NUMPY_VERSION = None
+        #UNAME = tuple(map(str, json.loads(constants.UNAME)))
+
+    tg_rt_ver_nb = _get_tango_lib_release()
+    tg_rt_major_ver = tg_rt_ver_nb / 100
+    tg_rt_minor_ver = tg_rt_ver_nb / 10 % 10
+    tg_rt_patch_ver = tg_rt_ver_nb % 10
+    tg_rt_ver = ".".join(map(str, (tg_rt_major_ver, tg_rt_minor_ver,
+                                   tg_rt_patch_ver)))
+
+    class Runtime(object):
+        PY_VERSION = ".".join(map(str, sys.version_info[:3]))
+        TANGO_VERSION = tg_rt_ver
+        BOOST_VERSION = '0.0.0'
+        if constants.NUMPY_SUPPORT:
+            import numpy
+            NUMPY_VERSION = numpy.__version__
+        else:
+            NUMPY_VERSION = None
+        UNAME = platform.uname()
+
+    constants.Compile = Compile
+    constants.Runtime = Runtime
+
 
 def init():
     global __INITIALIZED
     if __INITIALIZED:
         return
-    
+
     global __DOC
     doc = __DOC
     init_constants()
@@ -86,7 +126,7 @@ def init():
     pytango_pprint_init(doc=doc)
     pyutil_init(doc=doc)
     time_val_init(doc=doc)
-    
+
     # must come last: depends on device_proxy.init()
     attribute_proxy_init(doc=doc)
 

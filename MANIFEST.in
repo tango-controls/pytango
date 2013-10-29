@@ -12,8 +12,8 @@ graft tests
 global-exclude *.pyc
 global-exclude *.pyo
 exclude setup.cfg
-exclude .project
-exclude .ropeproject
-exclude .pydevproject
-exclude images/*
+#exclude .project
+#exclude .ropeproject
+#exclude .pydevproject
+exclude images/
 exclude src/precompiled_header.hpp.gch

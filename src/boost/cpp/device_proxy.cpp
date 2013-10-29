@@ -424,10 +424,10 @@ void export_device_proxy()
         .def("get_device_db", &Tango::DeviceProxy::get_device_db,
             bopy::return_value_policy<bopy::reference_existing_object>())
 
-        .def("status", &PyDeviceProxy::status,
+        .def("_status", &PyDeviceProxy::status,
             ( arg_("self") ) )
 
-        .def("state", &PyDeviceProxy::state,
+        .def("_state", &PyDeviceProxy::state,
             ( arg_("self") ) )
 
         .def("adm_name", &Tango::DeviceProxy::adm_name,

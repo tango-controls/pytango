@@ -1,21 +1,21 @@
 ################################################################################
 ##
 ## This file is part of PyTango, a python binding for Tango
-## 
+##
 ## http://www.tango-controls.org/static/PyTango/latest/doc/html/index.html
 ##
 ## Copyright 2011 CELLS / ALBA Synchrotron, Bellaterra, Spain
-## 
+##
 ## PyTango is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU Lesser General Public License as published by
 ## the Free Software Foundation, either version 3 of the License, or
 ## (at your option) any later version.
-## 
+##
 ## PyTango is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU Lesser General Public License for more details.
-## 
+##
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with PyTango.  If not, see <http://www.gnu.org/licenses/>.
 ##
@@ -43,7 +43,7 @@ from ._PyTango import StdStringVector, DbData, DbDatum, AttributeInfo, \
 
 from .utils import is_pure_str, is_non_str_seq, is_integer, \
     seq_2_StdStringVector, StdStringVector_2_seq, seq_2_DbData, DbData_2_dict
-    
+
 from .utils import document_method as __document_method
 from .utils import get_green_mode
 
@@ -52,7 +52,7 @@ from .tango_green import result, submit, green
 
 def get_device_proxy(*args, **kwargs):
     """get_device_proxy(self, dev_name, green_mode=None, wait=True, timeout=True) -> DeviceProxy
-    get_device_proxy(self, dev_name, need_check_acc, green_mode=None, wait=True, timeout=True) -> DeviceProxy
+    get_device_proxy(self, dev_name, need_check_acc, green_mode=None, wait=True, timeout=None) -> DeviceProxy
 
     Returns a new :class:`~PyTango.DeviceProxy`.
     There is no difference between using this function and the direct 
@@ -109,14 +109,14 @@ def get_device_proxy(*args, **kwargs):
     green_mode = kwargs.get('green_mode', get_green_mode())
     wait = kwargs.pop('wait', True)
     timeout = kwargs.pop('timeout', None)
-    
+
     d = submit(green_mode, DeviceProxy, *args, **kwargs)
     return result(d, green_mode, wait=wait, timeout=timeout)
 
 
 class __TangoInfo(object):
     """Helper class for when DeviceProxy.info() is not available"""
-    
+
     def __init__(self):
         self.dev_class = self.dev_type = 'Device'
         self.doc_url = 'http://www.esrf.fr/computing/cs/tango/tango_doc/ds_doc/'
@@ -190,7 +190,7 @@ def __DeviceProxy__getattr(self, name):
     # and the ugly trait_names could be removed.
     if name[:2] == "__" or name == 'trait_names':
         raise AttributeError(name)
-    
+
     name_l = name.lower()
     cmd_info = None
     if not hasattr(self, '__cmd_cache'):
@@ -202,28 +202,28 @@ def __DeviceProxy__getattr(self, name):
         cmd_info = self.__cmd_cache[name_l]
     except:
         pass
-        
+
     if cmd_info is not None:
         d, f = cmd_info
         if f is None:
-            doc =  "%s(%s) -> %s\n\n" % (d.cmd_name, d.in_type, d.out_type)
+            doc = "%s(%s) -> %s\n\n" % (d.cmd_name, d.in_type, d.out_type)
             doc += " -  in (%s): %s\n" % (d.in_type, d.in_type_desc)
             doc += " - out (%s): %s\n" % (d.out_type, d.out_type_desc)
-            def f(*args,**kwds): return self.command_inout(name, *args, **kwds)
+            def f(*args, **kwds): return self.command_inout(name, *args, **kwds)
             f.__doc__ = doc
             self.__cmd_cache[name_l] = d, f
         return f
-    
+
     find_attr = True
     if not hasattr(self, '__attr_cache') or name_l not in self.__attr_cache:
         try:
             self.__refresh_attr_cache()
         except:
             find_attr = False
-    
+
     if not find_attr or name_l not in self.__attr_cache:
         raise AttributeError(name)
-    
+
     return self.read_attribute(name).value
 
 def __DeviceProxy__setattr(self, name, value):
@@ -232,7 +232,7 @@ def __DeviceProxy__setattr(self, name, value):
             self.__refresh_attr_cache()
     except:
         return super(DeviceProxy, self).__setattr__(name, value)
-        
+
     if name.lower() in self.__attr_cache:
         self.write_attribute(name, value)
     else:
@@ -773,7 +773,7 @@ def __DeviceProxy__get_event_map(self):
         self.__dict__['_subscribed_events'] = dict()
     return self._subscribed_events
 
-def __DeviceProxy__subscribe_event ( self, attr_name, event_type, cb_or_queuesize, filters=[], stateless=False, extract_as=ExtractAs.Numpy):
+def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize, filters=[], stateless=False, extract_as=ExtractAs.Numpy):
     """
     subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy) -> int
 
@@ -837,7 +837,7 @@ def __DeviceProxy__subscribe_event ( self, attr_name, event_type, cb_or_queuesiz
             All other parameters are similar to the descriptions given in the
             other subscribe_event() version.
     """
-    
+
     if isinstance(cb_or_queuesize, collections.Callable):
         cb = __CallBackPushEvent()
         cb.push_event = cb_or_queuesize
@@ -845,7 +845,7 @@ def __DeviceProxy__subscribe_event ( self, attr_name, event_type, cb_or_queuesiz
         cb = __CallBackPushEvent()
         cb.push_event = cb_or_queuesize.push_event
     elif is_integer(cb_or_queuesize):
-        cb = cb_or_queuesize # queuesize
+        cb = cb_or_queuesize  # queuesize
     else:
         raise TypeError("Parameter cb_or_queuesize should be a number, a" + \
                     " callable object or an object with a 'push_event' method.")
@@ -986,6 +986,12 @@ def __DeviceProxy__write_attributes(self, *args, **kwargs):
 def __DeviceProxy__ping(self, *args, **kwargs):
     return self._ping(*args, **kwargs)
 
+def __DeviceProxy__state(self, *args, **kwargs):
+    return self._state(*args, **kwargs)
+
+def __DeviceProxy__status(self, *args, **kwargs):
+    return self._status(*args, **kwargs)
+
 def __init_DeviceProxy():
     DeviceProxy.__init_orig__ = DeviceProxy.__init__
     DeviceProxy.__init__ = __DeviceProxy__init__
@@ -998,7 +1004,7 @@ def __init_DeviceProxy():
     DeviceProxy.__getitem__ = __DeviceProxy__getitem
     DeviceProxy.__setitem__ = __DeviceProxy__setitem
     DeviceProxy.__contains__ = __DeviceProxy__contains
-    
+
     DeviceProxy._getAttributeNames = __DeviceProxy__getAttributeNames
 
     DeviceProxy.__refresh_cmd_cache = __DeviceProxy__refresh_cmd_cache
@@ -1012,11 +1018,14 @@ def __init_DeviceProxy():
     DeviceProxy.write_attributes_asynch = __DeviceProxy__write_attributes_asynch
     DeviceProxy.write_attribute_asynch = __DeviceProxy__write_attribute_asynch
     DeviceProxy.write_attribute_reply = DeviceProxy.write_attributes_reply
-    DeviceProxy.write_read_attribute = green(__DeviceProxy__write_read_attribute)
     DeviceProxy.write_attribute = green(__DeviceProxy__write_attribute)
     DeviceProxy.write_attributes = green(__DeviceProxy__write_attributes)
+    DeviceProxy.write_read_attribute = green(__DeviceProxy__write_read_attribute)
 
-    DeviceProxy.ping = green(__DeviceProxy__ping)   
+    DeviceProxy.ping = green(__DeviceProxy__ping)
+
+    DeviceProxy.state = green(__DeviceProxy__state)
+    DeviceProxy.status = green(__DeviceProxy__status)
 
     DeviceProxy.get_property = __DeviceProxy__get_property
     DeviceProxy.put_property = __DeviceProxy__put_property
@@ -1028,16 +1037,16 @@ def __init_DeviceProxy():
 
     DeviceProxy.__get_event_map = __DeviceProxy__get_event_map
     DeviceProxy.__get_event_map_lock = __DeviceProxy__get_event_map_lock
-    DeviceProxy.subscribe_event = __DeviceProxy__subscribe_event
-    DeviceProxy.unsubscribe_event = __DeviceProxy__unsubscribe_event
+    DeviceProxy.subscribe_event = green(__DeviceProxy__subscribe_event)
+    DeviceProxy.unsubscribe_event = green(__DeviceProxy__unsubscribe_event)
     DeviceProxy.__unsubscribe_event_all = __DeviceProxy__unsubscribe_event_all
     DeviceProxy.get_events = __DeviceProxy__get_events
     DeviceProxy.__str__ = __DeviceProxy__str
     DeviceProxy.__repr__ = __DeviceProxy__str
-    
+
     DeviceProxy._get_info_ = __DeviceProxy___get_info_
 
-    
+
 def __doc_DeviceProxy():
     def document_method(method_name, desc, append=True):
         return __document_method(DeviceProxy, method_name, desc, append)
@@ -1120,7 +1129,7 @@ def __doc_DeviceProxy():
 
             All DeviceInfo fields are strings except for the server_version
             which is an integer"
-    """ )
+    """)
 
     document_method("get_device_db", """
     get_device_db(self) -> Database
@@ -1131,7 +1140,7 @@ def __doc_DeviceProxy():
         Return     : (Database) object
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("status", """
     status(self) -> str
@@ -1140,7 +1149,7 @@ def __doc_DeviceProxy():
 
         Parameters : None
         Return     : (str) describing the device status
-    """ )
+    """)
 
     document_method("state", """
     state(self) -> DevState
@@ -1152,7 +1161,7 @@ def __doc_DeviceProxy():
         Example :
                 dev_st = dev.state()
                 if dev_st == DevState.ON : ...
-    """ )
+    """)
 
     document_method("adm_name", """
     adm_name(self) -> str
@@ -1162,7 +1171,7 @@ def __doc_DeviceProxy():
             server, e.g restart it
 
         New in PyTango 3.0.4
-    """ )
+    """)
 
     document_method("description", """
     description(self) -> str
@@ -1171,13 +1180,13 @@ def __doc_DeviceProxy():
 
         Parameters : None
         Return     : (str) describing the device
-    """ )
+    """)
 
     document_method("name", """
     name(self) -> str
 
             Return the device name from the device itself.
-    """ )
+    """)
 
     document_method("alias", """
     alias(self) -> str
@@ -1186,7 +1195,7 @@ def __doc_DeviceProxy():
             Otherwise, throws exception.
 
         Return     : (str) device alias
-    """ )
+    """)
 
     document_method("get_tango_lib_version", """
     get_tango_lib_version(self) -> int
@@ -1198,17 +1207,17 @@ def __doc_DeviceProxy():
                      Possible return value are: 100,200,500,520,700,800,810,...
         
         New in PyTango 8.1.0
-    """ )
-    
+    """)
+
     document_method("ping", """
     ping(self) -> int
 
             A method which sends a ping to the device
 
         Parameters : None
-        Return     : (int) time elapsed in milliseconds
+        Return     : (int) time elapsed in microseconds
         Throws     : exception if device is not alive
-    """ )
+    """)
 
     document_method("black_box", """
     black_box(self, n) -> sequence<str>
@@ -1222,7 +1231,7 @@ def __doc_DeviceProxy():
                      was executed
         Example :
                 print(black_box(4))
-    """ )
+    """)
 
 #-------------------------------------
 #   Device methods
@@ -1248,7 +1257,7 @@ def __doc_DeviceProxy():
                 print(com_info.disp_level)
                 
         See CommandInfo documentation string form more detail
-    """ )
+    """)
 
     document_method("command_list_query", """
     command_list_query(self) -> sequence<CommandInfo>
@@ -1257,7 +1266,7 @@ def __doc_DeviceProxy():
 
         Parameters : None
         Return     : (CommandInfoList) Sequence of CommandInfo objects
-    """ )
+    """)
 
     document_method("import_info", """
     import_info(self) -> DbDevImportInfo
@@ -1275,7 +1284,7 @@ def __doc_DeviceProxy():
 
         All DbDevImportInfo fields are strings except for exported which
         is an integer"
-    """ )
+    """)
 
 #-------------------------------------
 #   Property methods
@@ -1298,7 +1307,7 @@ def __doc_DeviceProxy():
 
         Throws     : ConnectionFailed, CommunicationFailed,
                      DevFailed from device
-    """ )
+    """)
 
     # get_attribute_config -> in code
     # get_attribute_config_ex -> in code
@@ -1315,7 +1324,7 @@ def __doc_DeviceProxy():
 
         Throws     : ConnectionFailed, CommunicationFailed,
                      DevFailed from device
-    """ )
+    """)
 
     document_method("attribute_list_query", """
     attribute_list_query(self) -> sequence<AttributeInfo>
@@ -1329,7 +1338,7 @@ def __doc_DeviceProxy():
 
         Throws     : ConnectionFailed, CommunicationFailed,
                      DevFailed from device
-    """ )
+    """)
 
     document_method("attribute_list_query_ex", """
     attribute_list_query_ex(self) -> sequence<AttributeInfoEx>
@@ -1343,7 +1352,7 @@ def __doc_DeviceProxy():
 
         Throws     : ConnectionFailed, CommunicationFailed,
                      DevFailed from device
-    """ )
+    """)
 
     # set_attribute_config -> in code
 
@@ -1391,7 +1400,7 @@ def __doc_DeviceProxy():
         *green_mode* parameter.
         *wait* parameter.
         *timeout* parameter.
-    """ )
+    """)
 
     document_method("read_attributes", """
     read_attributes(self, attr_names, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> sequence<DeviceAttribute>
@@ -1422,7 +1431,7 @@ def __doc_DeviceProxy():
         *green_mode* parameter.
         *wait* parameter.
         *timeout* parameter.
-    """ )
+    """)
 
     document_method("write_attribute", """
     write_attribute(self, attr_name, value, green_mode=None, wait=True, timeout=None) -> None
@@ -1453,7 +1462,7 @@ def __doc_DeviceProxy():
         *green_mode* parameter.
         *wait* parameter.
         *timeout* parameter.
-    """ )
+    """)
 
     document_method("write_attributes", """
     write_attributes(self, name_val, green_mode=None, wait=True, timeout=None) -> None
@@ -1482,7 +1491,7 @@ def __doc_DeviceProxy():
         *green_mode* parameter.
         *wait* parameter.
         *timeout* parameter.
-    """ )
+    """)
 
     document_method("write_read_attribute", """
     write_read_attribute(self, attr_name, value, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
@@ -1505,7 +1514,7 @@ def __doc_DeviceProxy():
         *green_mode* parameter.
         *wait* parameter.
         *timeout* parameter.
-    """ )
+    """)
 
 #-------------------------------------
 #   History methods
@@ -1523,7 +1532,7 @@ def __doc_DeviceProxy():
 
         Throws     : NonSupportedFeature, ConnectionFailed,
                      CommunicationFailed, DevFailed from device
-    """ )
+    """)
 
     document_method("attribute_history", """
     attribute_history(self, attr_name, depth, extract_as=ExtractAs.Numpy) -> sequence<DeviceAttributeHistory>
@@ -1540,7 +1549,7 @@ def __doc_DeviceProxy():
 
         Throws     : NonSupportedFeature, ConnectionFailed,
                      CommunicationFailed, DevFailed from device
-    """ )
+    """)
 
 #-------------------------------------
 #   Polling administration methods
@@ -1562,7 +1571,7 @@ def __doc_DeviceProxy():
                         - time since data in the ring buffer has not been updated
                         - delta time between the last records in the ring buffer
                         - exception parameters in case of the last execution failed
-    """ )
+    """)
 
     document_method("poll_command", """
     poll_command(self, cmd_name, period) -> None
@@ -1573,7 +1582,7 @@ def __doc_DeviceProxy():
             - cmd_name : (str) command name
             - period   : (int) polling period in milliseconds
         Return     : None
-    """ )
+    """)
 
     document_method("poll_attribute", """
     poll_attribute(self, attr_name, period) -> None
@@ -1584,7 +1593,7 @@ def __doc_DeviceProxy():
             - attr_name : (str) attribute name
             - period    : (int) polling period in milliseconds
         Return     : None
-    """ )
+    """)
 
     document_method("get_command_poll_period", """
     get_command_poll_period(self, cmd_name) -> int
@@ -1594,7 +1603,7 @@ def __doc_DeviceProxy():
         Parameters :
             - cmd_name : (str) command name
         Return     : polling period in milliseconds
-    """ )
+    """)
 
     document_method("get_attribute_poll_period", """
     get_attribute_poll_period(self, attr_name) -> int
@@ -1604,7 +1613,7 @@ def __doc_DeviceProxy():
         Parameters :
             - attr_name : (str) attribute name
         Return     : polling period in milliseconds
-    """ )
+    """)
 
     document_method("is_command_polled", """
     is_command_polled(self, cmd_name) -> bool
@@ -1614,7 +1623,7 @@ def __doc_DeviceProxy():
         Parameters :
             - cmd_name : (str) command name
         Return     : boolean value
-    """ )
+    """)
 
     document_method("is_attribute_polled", """
     is_attribute_polled(self, attr_name) -> bool
@@ -1624,7 +1633,7 @@ def __doc_DeviceProxy():
         Parameters :
             - attr_name : (str) attribute name
         Return     : boolean value
-    """ )
+    """)
 
     document_method("stop_poll_command", """
     stop_poll_command(self, cmd_name) -> None
@@ -1634,7 +1643,7 @@ def __doc_DeviceProxy():
         Parameters :
             - cmd_name : (str) command name
         Return     : None
-    """ )
+    """)
 
     document_method("stop_poll_attribute", """
     stop_poll_attribute(self, attr_name) -> None
@@ -1644,7 +1653,7 @@ def __doc_DeviceProxy():
         Parameters :
             - attr_name : (str) attribute name
         Return     : None
-    """ )
+    """)
 
 #-------------------------------------
 #   Asynchronous methods
@@ -1695,7 +1704,7 @@ def __doc_DeviceProxy():
                      CommunicationFailed, DevFailed from device
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("pending_asynch_call", """
     pending_asynch_call(self) -> int
@@ -1703,7 +1712,7 @@ def __doc_DeviceProxy():
             Return number of device asynchronous pending requests"
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     # write_attributes_asynch -> in code
 
@@ -1744,8 +1753,8 @@ def __doc_DeviceProxy():
         Throws     : AsynCall, AsynReplyNotArrived, CommunicationFailed, DevFailed from device.
 
         New in PyTango 7.0.0
-    """ )
-    
+    """)
+
     document_method("write_attribute_reply", """
     write_attribute_reply(self, id) -> None
 
@@ -1783,7 +1792,7 @@ def __doc_DeviceProxy():
         Throws     : AsynCall, AsynReplyNotArrived, CommunicationFailed, DevFailed from device.
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
 #-------------------------------------
 #   Logging administration methods
@@ -1812,7 +1821,7 @@ def __doc_DeviceProxy():
         Throws     : DevFailed from device
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("remove_logging_target", """
     remove_logging_target(self, target_type_target_name) -> None
@@ -1836,7 +1845,7 @@ def __doc_DeviceProxy():
         Return     : None
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("get_logging_target", """
     get_logging_target(self) -> sequence<str>
@@ -1850,7 +1859,7 @@ def __doc_DeviceProxy():
         Return     : a squence<str> with the logging targets
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("get_logging_level", """
     get_logging_level(self) -> int
@@ -1867,7 +1876,7 @@ def __doc_DeviceProxy():
         Return     : (int) representing the current logging level
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("set_logging_level", """
     set_logging_level(self, (int)level) -> None
@@ -1885,7 +1894,7 @@ def __doc_DeviceProxy():
         Return     : None
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
 #-------------------------------------
 #   Event methods
@@ -1911,7 +1920,7 @@ def __doc_DeviceProxy():
         Throws     : EventSystemFailed
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("get_last_event_date", """
     get_last_event_date(self, event_id) -> TimeVal
@@ -1930,7 +1939,7 @@ def __doc_DeviceProxy():
         Throws     : EventSystemFailed
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("is_event_queue_empty", """
     is_event_queue_empty(self, event_id) -> bool
@@ -1947,7 +1956,7 @@ def __doc_DeviceProxy():
             Throws     : EventSystemFailed
 
             New in PyTango 7.0.0
-    """ )
+    """)
 
 #-------------------------------------
 #   Locking methods
@@ -1992,7 +2001,7 @@ def __doc_DeviceProxy():
         Return     : None
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("unlock", """
     unlock(self, (bool)force) -> None
@@ -2011,7 +2020,7 @@ def __doc_DeviceProxy():
         Return     : None
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("locking_status", """
     locking_status(self) -> str
@@ -2032,7 +2041,7 @@ def __doc_DeviceProxy():
         Return     : a string representing the current locking status
 
         New in PyTango 7.0.0"
-    """ )
+    """)
 
     document_method("is_locked", """
     is_locked(self) -> bool
@@ -2043,7 +2052,7 @@ def __doc_DeviceProxy():
         Return     : (bool) True if the device is locked. Otherwise, False
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("is_locked_by_me", """
     is_locked_by_me(self) -> bool
@@ -2056,7 +2065,7 @@ def __doc_DeviceProxy():
                         Otherwise, False
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("get_locker", """
     get_locker(self, lockinfo) -> bool
@@ -2072,7 +2081,7 @@ def __doc_DeviceProxy():
                      Otherwise, False
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
 def device_proxy_init(doc=True):
     __init_DeviceProxy()

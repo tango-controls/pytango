@@ -357,4 +357,6 @@ void export_base_types()
     export_time_val();
     
     def("raise_asynch_exception", &raise_asynch_exception);
+
+    def("_get_tango_lib_release", &Tango::_convert_tango_lib_release);
 }

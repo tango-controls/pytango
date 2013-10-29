@@ -43,6 +43,25 @@ void export_constants()
     consts_scope.attr("NUMPY_SUPPORT") = true;
 #endif
 
+#ifdef PYTANGO_NUMPY_VERSION
+    consts_scope.attr("NUMPY_VERSION") = PYTANGO_NUMPY_VERSION;
+#else
+    consts_scope.attr("NUMPY_VERSION") = "0.0.0";
+#endif
+
+
+    consts_scope.attr("PY_MAJOR_VERSION") = PY_MAJOR_VERSION;
+    consts_scope.attr("PY_MINOR_VERSION") = PY_MINOR_VERSION;
+    consts_scope.attr("PY_MICRO_VERSION") = PY_MICRO_VERSION;
+    consts_scope.attr("PY_VERSION") = PY_VERSION;
+    consts_scope.attr("PY_VERSION_HEX") = PY_VERSION_HEX;
+
+    consts_scope.attr("BOOST_MAJOR_VERSION") = BOOST_VERSION / 100000;
+    consts_scope.attr("BOOST_MINOR_VERSION") = BOOST_VERSION / 100 % 1000;
+    consts_scope.attr("BOOST_PATCH_VERSION") = BOOST_VERSION % 100;
+    // missing BOOST_VERSION => do it in python
+
+
     //
     // From tango_const.h
     //
@@ -53,8 +72,10 @@ void export_constants()
     consts_scope.attr("TANGO_VERSION_MAJOR") = TANGO_VERSION_MAJOR;
     consts_scope.attr("TANGO_VERSION_MINOR") = TANGO_VERSION_MINOR;
     consts_scope.attr("TANGO_VERSION_PATCH") = TANGO_VERSION_PATCH;
-    
+    consts_scope.attr("TANGO_VERSION") = TgLibVers;
+
     consts_scope.attr("TgLibVers") = TgLibVers;
+    consts_scope.attr("TgLibVersNb") = TgLibVersNb;
     consts_scope.attr("DevVersion") = DevVersion;
     consts_scope.attr("DefaultMaxSeq") = DefaultMaxSeq;
     consts_scope.attr("DefaultBlackBoxDepth") = DefaultBlackBoxDepth;
