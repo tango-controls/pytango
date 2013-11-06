@@ -24,6 +24,8 @@
 #include "precompiled_header.hpp"
 #include <tango.h>
 
+#define TOSTRING(s) #s
+
 using namespace boost::python;
 
 long TANGO_VERSION_HEX;
@@ -44,7 +46,7 @@ void export_constants()
 #endif
 
 #ifdef PYTANGO_NUMPY_VERSION
-    consts_scope.attr("NUMPY_VERSION") = PYTANGO_NUMPY_VERSION;
+    consts_scope.attr("NUMPY_VERSION") = TOSTRING(PYTANGO_NUMPY_VERSION);
 #else
     consts_scope.attr("NUMPY_VERSION") = "0.0.0";
 #endif
