@@ -189,7 +189,7 @@ def __AttributeProxy__put_property(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed
-                    DevFailed from device (DB_SQLError)
+                     DevFailed from device (DB_SQLError)
     """
     if isinstance(value, DbData):
         pass
