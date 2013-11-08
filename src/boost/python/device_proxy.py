@@ -135,7 +135,7 @@ def __check_read_attribute(dev_attr):
     return dev_attr
 
 def __DeviceProxy__init__(self, *args, **kwargs):
-    self.__dict__['_green_mode'] = kwargs.pop('green_mode', get_green_mode())
+    self.__dict__['_green_mode'] = kwargs.pop('green_mode', None)
     self.__dict__['_executors'] = executors = {}
     executors[GreenMode.Futures] = kwargs.pop('executor', None)
     executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
@@ -143,8 +143,6 @@ def __DeviceProxy__init__(self, *args, **kwargs):
 
 def __DeviceProxy__get_green_mode(self):
     """Returns the green mode in use by this DeviceProxy.
-    It returns None if it is using the global PyTango green mode
-    (see :func:`PyTango.utils.get_green_mode`).
     
     :returns: the green mode in use by this DeviceProxy.
     :rtype: GreenMode
@@ -155,7 +153,10 @@ def __DeviceProxy__get_green_mode(self):
 
     New in PyTango 8.1.0
     """
-    return self._green_mode
+    gm = self._green_mode
+    if gm is None:
+        gm = get_green_mode()
+    return gm
 
 def __DeviceProxy__set_green_mode(self, green_mode=None):
     """Sets the green mode to be used by this DeviceProxy
@@ -167,8 +168,6 @@ def __DeviceProxy__set_green_mode(self, green_mode=None):
 
     New in PyTango 8.1.0
     """
-    if green_mode is None:
-        green_mode = get_green_mode()
     self._green_mode = green_mode
 
 

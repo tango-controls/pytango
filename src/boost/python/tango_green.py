@@ -94,8 +94,8 @@ def submitable(obj, green_mode=None):
     :returns: green_mode, submit callable"""
     # determine the efective green_mode
     if green_mode is None:
-        if hasattr(obj, "_green_mode"):
-            green_mode = obj._green_mode
+        if hasattr(obj, "get_green_mode"):
+            green_mode = obj.get_green_mode()
         else:
             green_mode = get_green_mode()
     

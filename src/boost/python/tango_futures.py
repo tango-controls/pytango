@@ -23,20 +23,11 @@
 
 __all__ = ["uses_future", "get_global_executor", "submit", "spawn"] 
 
-__use_future = None
 __global_executor = None
+
 MAX_WORKERS = 8
 MODE = 'thread'
 
-def uses_future():
-    global __use_future
-    if __use_future is None:
-        try:
-            import concurrent.futures
-            __use_future = True
-        except ImportError:
-            __use_future = False
-    return __use_future
 
 def __get_executor_class():
     import concurrent.futures
@@ -47,6 +38,7 @@ def __get_executor_class():
         ret = concurrent.futures.ProcessPoolExecutor
     return ret
 
+
 def get_global_executor():
     global __global_executor
     if __global_executor is None:
@@ -55,7 +47,9 @@ def get_global_executor():
             __global_executor = klass(max_workers=MAX_WORKERS)
     return __global_executor
 
+
 def submit(fn, *args, **kwargs):
     return get_global_executor().submit(fn, *args, **kwargs)
+
 
 spawn = submit

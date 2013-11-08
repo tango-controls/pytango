@@ -25,15 +25,16 @@ from __future__ import absolute_import
 
 __all__ = ["get_global_threadpool", "get_global_executor", "submit", "spawn"]
 
-import gevent
-
 
 def get_global_threadpool():
+    import gevent
     return gevent.get_hub().threadpool
+
 
 def spawn(fn, *args, **kwargs):
     return get_global_threadpool().spawn(fn, *args, **kwargs)
 
 
 get_global_executor = get_global_threadpool
+
 submit = spawn
