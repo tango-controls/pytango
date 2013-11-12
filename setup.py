@@ -22,11 +22,11 @@
 ################################################################################
 
 import os
-import sys
-import platform
 import imp
-import io
+import sys
 import struct
+import platform
+import subprocess
 
 from distutils.core import setup, Extension
 from distutils.cmd import Command
@@ -35,14 +35,13 @@ from distutils.command.build_ext import build_ext as dftbuild_ext
 from distutils.command.install import install as dftinstall
 from distutils.unixccompiler import UnixCCompiler
 from distutils.version import StrictVersion as V
-import distutils.sysconfig
 
 try:
     import sphinx
     import sphinx.util.console
     sphinx.util.console.color_terminal = lambda : False
     from sphinx.setup_command import BuildDoc
-except:
+except ImportError:
     sphinx = None
 
 try:
@@ -64,11 +63,29 @@ except:
     numpy = None
 
 
+is64 = 8 * struct.calcsize("P") == 64
+
+
+def pkg_config(*packages, **config):
+    config_map = {"-I": "include_dirs",
+                "-L": "library_dirs",
+                "-l": "libraries"}
+    cmd = ["pkg-config", "--libs", "--cflags-only-I", " ".join(packages)]
+    result = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
+    for elem in result.split():
+        flag, value = elem[:2], elem[2:]
+        config_values = config.setdefault(config_map.get(flag), [])
+        if value not in config_values:
+            config_values.append(value)
+    return config
+        
+        
 def abspath(*path):
     """A method to determine absolute path for a given relative path to the
     directory where this setup.py script is located"""
     setup_dir = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(setup_dir, *path)
+
 
 def get_release_info():
     name = "release"
@@ -77,10 +94,14 @@ def get_release_info():
     release = imp.load_module(name, *data)
     return release.Release
 
+
 def uniquify(seq):
     no_dups = []
-    [ no_dups.append(i) for i in seq if not no_dups.count(i) ]
+    for elem in seq:
+        if elem not in no_dups:
+            no_dups.append(elem)
     return no_dups
+
 
 def get_c_numpy():
     if numpy is None:
@@ -95,14 +116,17 @@ def get_c_numpy():
         if os.path.isdir(inc):
             return inc
 
+        
 def has_c_numpy():
     return get_c_numpy() is not None
+
 
 def has_numpy(with_src=True):
     ret = numpy is not None
     if with_src:
         ret &= has_c_numpy()
     return ret
+
 
 def get_script_files():
 
@@ -129,6 +153,30 @@ def get_script_files():
         scripts.append('scripts/' + item)
     return scripts
 
+
+def add_lib(name, dirs, sys_libs, lib_name=None, inc_suffix=None):
+    ENV = os.environ.get(name.upper() + '_ROOT')
+    if lib_name is None:
+        lib_name = name
+    if ENV is None:
+        sys_libs.append(lib_name)
+        return
+    else:
+        inc_dir = os.path.join(ENV, 'include')
+        if inc_suffix is not None:
+            inc_dir = os.path.join(inc_dir, inc_suffix)
+        if is64:
+            lib_dir = os.path.join(ENV, 'lib64')
+            if not os.path.isdir(lib_dir):
+                lib_dir = os.path.join(ENV, 'lib')
+
+        if lib_name.startswith('lib'):
+            lib_name = lib_name[3:]
+        dirs['include_dirs'].append(inc_dir)
+        dirs['library_dirs'].append(lib_dir)
+        dirs['libraries'].append(lib_name)
+
+        
 class build(dftbuild):
 
     user_options = dftbuild.user_options + \
@@ -205,7 +253,6 @@ class build_ext(dftbuild_ext):
             #self.compiler.compiler_so = " ".join(compiler_pars)
 
             # mimic tango check to activate C++0x extension
-            import subprocess
             compiler = self.compiler.compiler
             proc = subprocess.Popen(compiler + ["-dumpversion"], stdout=subprocess.PIPE)
             pipe = proc.stdout
@@ -282,17 +329,61 @@ class install(dftinstall):
     sub_commands = list(dftinstall.sub_commands)
     sub_commands.append(('install_html', has_html))
 
-
+    
 def main():
-    ZMQ_ROOT = LOG4TANGO_ROOT = BOOST_ROOT = OMNI_ROOT = TANGO_ROOT = '/usr'
+    #ZMQ_ROOT = LOG4TANGO_ROOT = BOOST_ROOT = OMNI_ROOT = TANGO_ROOT = '/usr'
 
-    TANGO_ROOT = os.environ.get('TANGO_ROOT', TANGO_ROOT)
-    OMNI_ROOT = os.environ.get('OMNI_ROOT', OMNI_ROOT)
-    BOOST_ROOT = os.environ.get('BOOST_ROOT', BOOST_ROOT)
-    LOG4TANGO_ROOT = os.environ.get('LOG4TANGO_ROOT', LOG4TANGO_ROOT)
-    ZMQ_ROOT = os.environ.get('ZMQ_ROOT', ZMQ_ROOT)
+    macros = []
+    
+    directories = dict(include_dirs=[abspath('src', 'boost', 'cpp')],
+                       library_dirs=[],
+                       libraries=[])
+    sys_libs = []
+
+    add_lib('omni', directories, sys_libs, lib_name='omniORB4')
+    add_lib('zmq', directories, sys_libs, lib_name='libzmq')
+    add_lib('tango', directories, sys_libs, inc_suffix='tango')
+    add_lib('log4tango', directories, sys_libs)
+
+    # special boost-python configuration
+
+    BOOST_ROOT = os.environ.get('BOOST_ROOT')
+    boost_library_name = 'boost_python'
+    if BOOST_ROOT is None:
+        if 'linux' in sys.platform:
+            dist_name = platform.linux_distribution()[0].lower()
+            debian_based = 'debian' in dist_name or 'ubuntu' in dist_name
+            if debian_based:
+                # when building with multiple version of python on debian we need
+                # to link against boost_python-py25/-py26 etc...
+                pyver = "-py"
+                pyver += "".join(map(str, platform.python_version_tuple()[:2]))
+                boost_library_name += pyver
+    else:
+        inc_dir = os.path.join(BOOST_ROOT, 'include')
+        if is64:
+            lib_dir = os.path.join(BOOST_ROOT, 'lib64')
+            if not os.path.isdir(lib_dir):
+                lib_dir = os.path.join(BOOST_ROOT, 'lib')
+
+        directories['include_dirs'].append(inc_dir)
+        directories['library_dirs'].append(lib_dir)
+                
+    directories['libraries'].append(boost_library_name)
+
+    # special numpy configuration
+    
     numpy_c_include = get_c_numpy()
+    if numpy_c_include is not None:
+        directories['include_dirs'].append(numpy_c_include)
 
+    if has_numpy():
+        macros.append(('PYTANGO_NUMPY_VERSION', numpy.__version__))
+    else:
+        macros.append(('DISABLE_PYTANGO_NUMPY', None))
+
+    directories = pkg_config(*sys_libs, **directories)
+    
     Release = get_release_info()
 
     author = Release.authors['Coutinho']
@@ -341,184 +432,39 @@ def main():
         'Topic :: Scientific/Engineering',
         'Topic :: Software Development :: Libraries',
     ]
-
-    #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
-    # include directories
-    #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
-
-    include_dirs = [ abspath('src', 'boost', 'cpp') ]
-
-    _tango_root_inc = os.path.join(TANGO_ROOT, 'include')
-    include_dirs.append(_tango_root_inc)
-
-    # $TANGO_ROOT/include/tango exists since tango 7.2.0
-    # we changed the PyTango code include statements from:
-    # #include <tango.h> to:
-    # #include <tango/tango.h>
-    # However tango itself complains that it doesn't know his own header files
-    # if we don't add the $TANGO_ROOT/include/tango directory to the path. So we do it
-    # here
-    _tango_root_inc = os.path.join(_tango_root_inc, 'tango')
-    if os.path.isdir(_tango_root_inc):
-        include_dirs.append(_tango_root_inc)
-
-    include_dirs.append(os.path.join(OMNI_ROOT, 'include'))
-    if numpy_c_include is not None:
-        include_dirs.append(numpy_c_include)
-    include_dirs.append(os.path.join(LOG4TANGO_ROOT, 'include'))
-
-    #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
-    # library directories
-    #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
-
-    libraries = [
-        'tango',
-        'log4tango',
-        'zmq',
+    
+    # Note for PyTango developers:
+    # Compilation time can be greatly reduced by compiling the file
+    # src/precompiled_header.hpp as src/precompiled_header.hpp.gch
+    # and then uncommenting this line. Someday maybe this will be
+    # automated...
+    extra_compile_args = [
+#        '-includesrc/precompiled_header.hpp',
     ]
 
-    extra_compile_args = []
+    extra_link_args = [
+        '-Wl,-h',
+        '-Wl,--strip-all',
+    ]
 
-    extra_link_args = []
+    if please_debug:
+        extra_compile_args += ['-g', '-O0']
+        extra_link_args += ['-g' , '-O0'] 
 
-    macros = []
-
-    if has_numpy():
-        macros.append(('PYTANGO_NUMPY_VERSION', numpy.__version__))
-    else:
-        macros.append(('DISABLE_PYTANGO_NUMPY', None))
-
-    library_dirs = []
-    for f in (TANGO_ROOT, BOOST_ROOT, LOG4TANGO_ROOT, ZMQ_ROOT):
-        is64 = 8 * struct.calcsize("P") == 64
-        d = os.path.join(f, 'lib')
-        if is64:
-            d = os.path.join(f, 'lib64')
-            try:
-                if not os.stat(d): raise Exception('%s_doesnt_exist' % d)
-            except: d = os.path.join(f, 'lib')
-        library_dirs.append(d)
-
-#    library_dirs = [
-#        os.path.join(TANGO_ROOT, 'lib'),
-#        os.path.join(BOOST_ROOT, 'lib'),
-#        #os.path.join(LOG4TANGO_ROOT, 'lib'),
-#        os.path.join(ZMQ_ROOT, 'lib'),
-#    ]
-
-    if os.name == 'nt':
-        include_dirs += [ BOOST_ROOT ]
-
-        if please_debug:
-            libraries += [
-                #'libboost_python-vc80-mt-1_38', Boost in windows autodetects the
-                #proper library to link itself with...
-                'omniORB414d_rt',
-                'omniDynamic414d_rt',
-                'omnithread34d_rt',
-                'COS414d_rt',
-            ]
-            extra_compile_args += []
-            extra_link_args += ['/DEBUG']
-            macros += [ ('_DEBUG', None) ]
-        else:
-            libraries += [
-                #'libboost_python-vc80-mt-1_38', Boost in windows autodetects the
-                #proper library to link itself with...
-                'omniORB414_rt',
-                'omniDynamic414_rt',
-                'omnithread34_rt',
-                'COS414_rt',
-            ]
-
-        library_dirs += [ os.path.join(OMNI_ROOT, 'lib', 'x86_win32') ]
-
-        extra_compile_args += [
-            '/EHsc',
-            '/wd4005',  # supress redefinition of HAVE_STRFTIME between python and omniORB
-            '/wd4996',  # same as /D_SCL_SECURE_NO_WARNINGS
-            '/wd4250',  # supress base class inheritance warning
-        ]
-
-        extra_link_args += []
-
-        macros += [
-            #('_WINDOWS', None),
-            #('_USRDLL', None),
-            #('_TANGO_LIB', None),
-            #('JPG_USE_ASM', None),
-            ('LOG4TANGO_HAS_DLL', None),
-            ('TANGO_HAS_DLL', None),
-            ('WIN32', None),
-        ]
-
-    else:
-        if please_debug:
-            extra_compile_args += ['-g', '-O0']
-            extra_link_args += ['-g' , '-O0']
-
-        include_dirs += [ os.path.join(BOOST_ROOT, 'include') ]
-
-        libraries += [
-            'pthread',
-            'rt',
-            'dl',
-            'omniORB4',
-            'omniDynamic4',
-            'omnithread',
-            'COS4',
-        ]
-
-        boost_library_name = 'boost_python'
-
-        if 'linux' in sys.platform:
-            dist_name = platform.linux_distribution()[0].lower()
-            debian_based = 'debian' in dist_name or 'ubuntu' in dist_name
-            if debian_based:
-                # when building with multiple version of python on debian we need
-                # to link against boost_python-py25/-py26 etc...
-                pyver = "-py" + "".join(map(str, platform.python_version_tuple()[:2]))
-                boost_library_name += pyver
-        libraries.append(boost_library_name)
-
-        is64 = 8 * struct.calcsize("P") == 64
-        omni_lib = os.path.join(OMNI_ROOT, 'lib')
-        if is64:
-            omni_lib = os.path.join(OMNI_ROOT, 'lib64')
-            try:
-                if not os.stat(d): raise Exception('%s_doesnt_exist' % d)
-            except:
-                omni_lib = os.path.join(OMNI_ROOT, 'lib')
-        library_dirs += [ omni_lib ]
-
-
-        # Note for PyTango developers:
-        # Compilation time can be greatly reduced by compiling the file
-        # src/precompiled_header.hpp as src/precompiled_header.hpp.gch
-        # and then uncommenting this line. Someday maybe this will be
-        # automated...
-        extra_compile_args += [
-#            '-includesrc/precompiled_header.hpp',
-        ]
-
-        #if not please_debug:
-        #    extra_compile_args += [ '-g0' ]
-
-        extra_link_args += [
-            '-Wl,-h',
-            '-Wl,--strip-all',
-        ]
-
-        macros += []
-
-    include_dirs = uniquify(include_dirs)
-    library_dirs = uniquify(library_dirs)
+    include_dirs = uniquify(directories['include_dirs'])
+    library_dirs = uniquify(directories['library_dirs'])
+    libraries = uniquify(directories['libraries'])
+        
     src_dir = abspath('src', 'boost', 'cpp')
     client_dir = src_dir
     server_dir = os.path.join(src_dir, 'server')
-    _clientfiles = [ os.path.join(client_dir, fname) for fname in os.listdir(client_dir) if fname.endswith('.cpp') ]
+    _clientfiles = [ os.path.join(client_dir, fname)
+                        for fname in os.listdir(client_dir)
+                            if fname.endswith('.cpp') ]
     _clientfiles.sort()
-    _serverfiles = [ os.path.join(server_dir, fname) for fname in os.listdir(server_dir) if fname.endswith('.cpp') ]
+    _serverfiles = [ os.path.join(server_dir, fname)
+                         for fname in os.listdir(server_dir)
+                             if fname.endswith('.cpp') ]
     _serverfiles.sort()
     _cppfiles = _clientfiles + _serverfiles
 
