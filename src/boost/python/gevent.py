@@ -24,13 +24,14 @@
 """This module exposes a gevent version of :class:`PyTango.DeviceProxy` and
 :class:`PyTango.AttributeProxy"""
 
-__all__ = ["DeviceProxy"]
+__all__ = ["DeviceProxy", "AttributeProxy"]
 
 from functools import partial
 
 from PyTango import GreenMode
 from PyTango.device_proxy import get_device_proxy
 from PyTango.attribute_proxy import get_attribute_proxy
+
 
 DeviceProxy = partial(get_device_proxy, green_mode=GreenMode.Gevent)
 DeviceProxy.__doc__ = """
