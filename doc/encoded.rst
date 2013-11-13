@@ -1,8 +1,8 @@
 
 .. _encoded:
 
-The Tango Encoded Python API
-============================
+Encoded API
+===========
 
 *This feature is only possible since PyTango 7.1.4*
 

@@ -1,5 +1,5 @@
-The Tango Device Python API
-===========================
+Client API
+==========
 
 .. toctree::
     :maxdepth: 2

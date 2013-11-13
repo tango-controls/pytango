@@ -1,5 +1,5 @@
-The Tango Database Python API
-=============================
+Database API
+============
 
 .. currentmodule:: PyTango
 

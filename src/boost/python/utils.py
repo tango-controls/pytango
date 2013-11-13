@@ -1,25 +1,13 @@
-################################################################################
-##
-## This file is part of PyTango, a python binding for Tango
-##
-## http://www.tango-controls.org/static/PyTango/latest/doc/html/index.html
-##
-## Copyright 2011 CELLS / ALBA Synchrotron, Bellaterra, Spain
-##
-## PyTango is free software: you can redistribute it and/or modify
-## it under the terms of the GNU Lesser General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## PyTango is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU Lesser General Public License for more details.
-##
-## You should have received a copy of the GNU Lesser General Public License
-## along with PyTango.  If not, see <http://www.gnu.org/licenses/>.
-##
-################################################################################
+# ------------------------------------------------------------------------------
+# This file is part of PyTango (http://www.tinyurl.com/PyTango)
+#
+# Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
+# Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+#
+# Distributed under the terms of the GNU Lesser General Public License,
+# either version 3 of the License, or (at your option) any later version.
+# See LICENSE.txt for more info.
+# ------------------------------------------------------------------------------
 
 """
 This is an internal PyTango module.
@@ -36,17 +24,14 @@ __all__ = [ "get_green_mode", "set_green_mode",
             "document_method", "document_static_method", "document_enum",
             "CaselessList", "CaselessDict", "EventCallBack", "get_home",
             "from_version_str_to_hex_str", "from_version_str_to_int",
-            "server_run", "decorator",
+            "server_run",
             "seq_2_StdStringVector", "StdStringVector_2_seq" ]
 
 __docformat__ = "restructuredtext"
 
 import os
 import sys
-import inspect
 import numbers
-import functools
-import threading
 import traceback
 import collections
 
@@ -1171,7 +1156,7 @@ def __server_run(classes, args=None, msg_stream=sys.stderr, util=None):
     if is_seq(classes):
         for klass_info in classes:
             if not hasattr(klass_info, '_api') or klass_info._api < 2:
-                raise Exception("When giving a single class, it must implement API2 (see PyTango.api2)")
+                raise Exception("When giving a single class, it must implement HLAPI (see PyTango.hlapi)")
             klass_klass = klass_info._DeviceClass
             klass_name = klass_info._DeviceClassName
             klass = klass_info
@@ -1182,7 +1167,7 @@ def __server_run(classes, args=None, msg_stream=sys.stderr, util=None):
                 klass_klass, klass = klass_info
             else:
                 if not hasattr(klass_info, '_api') or klass_info._api < 2:
-                    raise Exception("When giving a single class, it must implement API2 (see PyTango.api2)")
+                    raise Exception("When giving a single class, it must implement HLAPI (see PyTango.hlapi)")
                 klass_klass = klass_info._DeviceClass
                 klass_name = klass_info._DeviceClassName
                 klass = klass_info
@@ -1197,18 +1182,18 @@ def server_run(classes, args=None, msg_stream=sys.stderr, verbose=False, util=No
     """Provides a simple way to run a tango server. It handles exceptions
        by writting a message to the msg_stream.
 
-       The `classes` parameter can be either a sequence of :class:`~PyTango.api2.Device`
+       The `classes` parameter can be either a sequence of :class:`~PyTango.hlapi.Device`
        classes or a dictionary where:
        
        * key is the tango class name
        * value is either:
-           #. a :class:`~PyTango.api2.Device` class or
+           #. a :class:`~PyTango.hlapi.Device` class or
            #. a a sequence of two elements :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`
            
-       Example 1: registering and running a PowerSupply inheriting from :class:`~PyTango.api2.Device`::
+       Example 1: registering and running a PowerSupply inheriting from :class:`~PyTango.hlapi.Device`::
        
            from PyTango import server_run
-           from PyTango.api2 import Device, DeviceMeta
+           from PyTango.hlapi import Device, DeviceMeta
        
            class PowerSupply(Device):
                __metaclass__ = DeviceMeta
@@ -1229,7 +1214,7 @@ def server_run(classes, args=None, msg_stream=sys.stderr, verbose=False, util=No
            PyTango.server_run({"MyServer": (MyServerClass, MyServer)})
        
        :param classes:
-           a sequence of :class:`~PyTango.api2.Device` classes or
+           a sequence of :class:`~PyTango.hlapi.Device` classes or
            a dictionary where keyword is the tango class name and value is a 
            sequence of Tango Device Class python class, and Tango Device python class
        :type classes: sequence or dict

@@ -1,7 +1,7 @@
 .. currentmodule:: PyTango
 
-Green creation of PyTango objects
----------------------------------
+Green objects
+-------------
 
 PyTango supports cooperative green Tango objects. Since version 8.1 two *green*
 modes have been added: :obj:`~PyTango.GreenMode.Gevent` and
@@ -11,10 +11,10 @@ The :obj:`~PyTango.GreenMode.Gevent` mode uses the well known :mod:`gevent`
 module. The :obj:`~PyTango.GreenMode.Futures` uses the standard python module
 :mod:`concurrent.futures`.
 
-You can set the PyTango green mode at a global level. You can set environment
+You can set the PyTango green mode at a global level. Set the environment
 variable :envvar:`PYTANGO_GREEN_MODE` to either gevent or futures
-(case incensitive). If this environment variable is not defined the mode
-defaults to *Synchronous*.
+(case incensitive). If this environment variable is not defined the PyTango
+global green mode defaults to *Synchronous*.
 
 Currently, at version 8.1, only :class:`DeviceProxy` has been modified to work
 in a green cooperative way. If the work is found to be useful, the same can
@@ -44,7 +44,7 @@ As you can see by the example, the global green mode will affect any previously
 created :class:`DeviceProxy` using the default constructor parameters.
 
 You can specificy green mode on a :class:`DeviceProxy` at creation time.
-You can also change green mode of an object at any time::
+You can also change the green mode at any time::
 
     >>> from PyTango.gevent import DeviceProxy
 
@@ -103,8 +103,8 @@ All of the above methods have been boosted with two extra keyword arguments
 The *wait* parameter is by default set to `True` meaning wait for the request
 to finish (the default semantics when not using green mode).
 If *wait* is set to `True`, the timeout determines the maximum time to wait for
-the method to execute. The default is `None` which means wait forever. If *wait*
-is set to `False`, the *timeout* is ignored.
+the method to execute. The default timeout is `None` which means wait forever.
+If *wait* is set to `False`, the *timeout* is ignored.
 
 If *wait* is set to `True`, the result is the same as executing the 
 *standard* method on a :class:`~PyTango.DeviceProxy`.
@@ -119,7 +119,7 @@ you will need to do something like::
     >>> result
     <gevent.event.AsyncResult at 0x1a74050>
 
-    >>> # this will be the time consuming code
+    >>> # this will be the blocking code
     >>> state = result.get()
     >>> print(state)
     RUNNING
@@ -222,7 +222,7 @@ you will need to do something like::
     >>> result
     <Future at 0x16cb310 state=pending>
 
-    >>> # this will be the time consuming code
+    >>> # this will be the blocking code
     >>> state = result.result()
     >>> print(state)
     RUNNING
@@ -264,6 +264,12 @@ Here is another example using :meth:`~DeviceProxy.read_attribute`::
 Green API
 ~~~~~~~~~
 
+Summary:
+    * :func:`get_green_mode` 
+    * :func:`set_green_mode` 
+    * :func:`PyTango.gevent.DeviceProxy` 
+    * :func:`PyTango.futures.DeviceProxy` 
+
 .. autofunction:: get_green_mode
 
 .. autofunction:: set_green_mode
@@ -274,7 +280,7 @@ Green API
 
 
 Low level API
-~~~~~~~~~~~~~
+#############
 
 .. autofunction:: get_device_proxy
 

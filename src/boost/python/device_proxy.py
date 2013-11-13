@@ -1,25 +1,13 @@
-################################################################################
-##
-## This file is part of PyTango, a python binding for Tango
-##
-## http://www.tango-controls.org/static/PyTango/latest/doc/html/index.html
-##
-## Copyright 2011 CELLS / ALBA Synchrotron, Bellaterra, Spain
-##
-## PyTango is free software: you can redistribute it and/or modify
-## it under the terms of the GNU Lesser General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## PyTango is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU Lesser General Public License for more details.
-##
-## You should have received a copy of the GNU Lesser General Public License
-## along with PyTango.  If not, see <http://www.gnu.org/licenses/>.
-##
-################################################################################
+# ------------------------------------------------------------------------------
+# This file is part of PyTango (http://www.tinyurl.com/PyTango)
+#
+# Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
+# Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+#
+# Distributed under the terms of the GNU Lesser General Public License,
+# either version 3 of the License, or (at your option) any later version.
+# See LICENSE.txt for more info.
+# ------------------------------------------------------------------------------
 
 """
 This is an internal PyTango module.
@@ -932,15 +920,15 @@ def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractA
         queuesize, event_type, attr_name = self.__get_event_map().get(event_id, (None, None, None))
         if event_type is None:
             raise ValueError("Invalid event_id. You are not subscribed to event %s." % str(event_id))
-        if event_type in [  EventType.CHANGE_EVENT,
-                            EventType.QUALITY_EVENT,
-                            EventType.PERIODIC_EVENT,
-                            EventType.ARCHIVE_EVENT,
-                            EventType.USER_EVENT ]:
+        if event_type in ( EventType.CHANGE_EVENT,
+                           EventType.QUALITY_EVENT,
+                           EventType.PERIODIC_EVENT,
+                           EventType.ARCHIVE_EVENT,
+                           EventType.USER_EVENT ):
             return self.__get_data_events(event_id, extract_as)
-        elif event_type in [ EventType.ATTR_CONF_EVENT ]:
+        elif event_type in (EventType.ATTR_CONF_EVENT,):
             return self.__get_attr_conf_events(event_id, extract_as)
-        elif event_type in [ EventType.DATA_READY_EVENT ]:
+        elif event_type in (EventType.DATA_READY_EVENT,):
             return self.__get_data_ready_events(event_id, extract_as)
         else:
             assert (False)
@@ -986,10 +974,68 @@ def __DeviceProxy__ping(self, *args, **kwargs):
     return self._ping(*args, **kwargs)
 
 def __DeviceProxy__state(self, *args, **kwargs):
+    """state(self) -> DevState
+
+            A method which returns the state of the device.
+
+        Parameters : None
+        Return     : (DevState) constant
+        Example :
+                dev_st = dev.state()
+                if dev_st == DevState.ON : ...
+    """
     return self._state(*args, **kwargs)
 
 def __DeviceProxy__status(self, *args, **kwargs):
+    """status(self) -> str
+
+            A method which returns the status of the device as a string.
+
+        Parameters : None
+        Return     : (str) describing the device status
+    """
     return self._status(*args, **kwargs)
+
+def __DeviceProxy__write_attribute_reply(self, *args, **kwargs):
+    """
+    write_attribute_reply(self, id) -> None
+
+            Check if the answer of an asynchronous write_attribute is arrived
+            (polling model). If the reply is arrived and if it is a valid reply,
+            the call returned. If the reply is an exception, it is re-thrown by
+            this call. An exception is also thrown in case of the reply is not
+            yet arrived.
+
+        Parameters :
+            - id : (int) the asynchronous call identifier.
+        Return     : None
+
+        Throws     : AsynCall, AsynReplyNotArrived, CommunicationFailed, DevFailed from device.
+
+        New in PyTango 7.0.0
+
+    write_attribute_reply(self, id, timeout) -> None
+
+            Check if the answer of an asynchronous write_attribute is arrived
+            (polling model). id is the asynchronous call identifier. If the
+            reply is arrived and if it is a valid reply, the call returned. If
+            the reply is an exception, it is re-thrown by this call. If the
+            reply is not yet arrived, the call will wait (blocking the process)
+            for the time specified in timeout. If after timeout milliseconds,
+            the reply is still not there, an exception is thrown. If timeout is
+            set to 0, the call waits until the reply arrived.
+            
+        Parameters :
+            - id      : (int) the asynchronous call identifier.
+            - timeout : (int) the timeout
+            
+        Return     : None
+
+        Throws     : AsynCall, AsynReplyNotArrived, CommunicationFailed, DevFailed from device.
+
+        New in PyTango 7.0.0
+    """
+    return self.write_attributes_reply(*args, **kwargs)
 
 def __init_DeviceProxy():
     DeviceProxy.__init_orig__ = DeviceProxy.__init__
@@ -1009,22 +1055,22 @@ def __init_DeviceProxy():
     DeviceProxy.__refresh_cmd_cache = __DeviceProxy__refresh_cmd_cache
     DeviceProxy.__refresh_attr_cache = __DeviceProxy__refresh_attr_cache
 
+    DeviceProxy.ping = green(__DeviceProxy__ping)
+    DeviceProxy.state = green(__DeviceProxy__state)
+    DeviceProxy.status = green(__DeviceProxy__status)
+
     DeviceProxy.read_attribute = green(__DeviceProxy__read_attribute)
     DeviceProxy.read_attributes = green(__DeviceProxy__read_attributes)
+    DeviceProxy.write_attribute = green(__DeviceProxy__write_attribute)
+    DeviceProxy.write_attributes = green(__DeviceProxy__write_attributes)
+    DeviceProxy.write_read_attribute = green(__DeviceProxy__write_read_attribute)
+
     DeviceProxy.read_attributes_asynch = __DeviceProxy__read_attributes_asynch
     DeviceProxy.read_attribute_asynch = __DeviceProxy__read_attribute_asynch
     DeviceProxy.read_attribute_reply = __DeviceProxy__read_attribute_reply
     DeviceProxy.write_attributes_asynch = __DeviceProxy__write_attributes_asynch
     DeviceProxy.write_attribute_asynch = __DeviceProxy__write_attribute_asynch
-    DeviceProxy.write_attribute_reply = DeviceProxy.write_attributes_reply
-    DeviceProxy.write_attribute = green(__DeviceProxy__write_attribute)
-    DeviceProxy.write_attributes = green(__DeviceProxy__write_attributes)
-    DeviceProxy.write_read_attribute = green(__DeviceProxy__write_read_attribute)
-
-    DeviceProxy.ping = green(__DeviceProxy__ping)
-
-    DeviceProxy.state = green(__DeviceProxy__state)
-    DeviceProxy.status = green(__DeviceProxy__status)
+    DeviceProxy.write_attribute_reply = __DeviceProxy__write_attribute_reply
 
     DeviceProxy.get_property = __DeviceProxy__get_property
     DeviceProxy.put_property = __DeviceProxy__put_property
@@ -1139,27 +1185,6 @@ def __doc_DeviceProxy():
         Return     : (Database) object
 
         New in PyTango 7.0.0
-    """)
-
-    document_method("status", """
-    status(self) -> str
-
-            A method which returns the status of the device as a string.
-
-        Parameters : None
-        Return     : (str) describing the device status
-    """)
-
-    document_method("state", """
-    state(self) -> DevState
-
-            A method which returns the state of the device.
-
-        Parameters : None
-        Return     : (DevState) constant
-        Example :
-                dev_st = dev.state()
-                if dev_st == DevState.ON : ...
     """)
 
     document_method("adm_name", """
@@ -1735,45 +1760,6 @@ def __doc_DeviceProxy():
     write_attributes_reply(self, id, timeout) -> None
 
             Check if the answer of an asynchronous write_attributes is arrived
-            (polling model). id is the asynchronous call identifier. If the
-            reply is arrived and if it is a valid reply, the call returned. If
-            the reply is an exception, it is re-thrown by this call. If the
-            reply is not yet arrived, the call will wait (blocking the process)
-            for the time specified in timeout. If after timeout milliseconds,
-            the reply is still not there, an exception is thrown. If timeout is
-            set to 0, the call waits until the reply arrived.
-            
-        Parameters :
-            - id      : (int) the asynchronous call identifier.
-            - timeout : (int) the timeout
-            
-        Return     : None
-
-        Throws     : AsynCall, AsynReplyNotArrived, CommunicationFailed, DevFailed from device.
-
-        New in PyTango 7.0.0
-    """)
-
-    document_method("write_attribute_reply", """
-    write_attribute_reply(self, id) -> None
-
-            Check if the answer of an asynchronous write_attribute is arrived
-            (polling model). If the reply is arrived and if it is a valid reply,
-            the call returned. If the reply is an exception, it is re-thrown by
-            this call. An exception is also thrown in case of the reply is not
-            yet arrived.
-
-        Parameters :
-            - id : (int) the asynchronous call identifier.
-        Return     : None
-
-        Throws     : AsynCall, AsynReplyNotArrived, CommunicationFailed, DevFailed from device.
-
-        New in PyTango 7.0.0
-
-    write_attribute_reply(self, id, timeout) -> None
-
-            Check if the answer of an asynchronous write_attribute is arrived
             (polling model). id is the asynchronous call identifier. If the
             reply is arrived and if it is a valid reply, the call returned. If
             the reply is an exception, it is re-thrown by this call. If the

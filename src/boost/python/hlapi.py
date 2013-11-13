@@ -1,27 +1,15 @@
-################################################################################
-##
-## This file is part of PyTango, a python binding for Tango
-## 
-## http://www.tango-controls.org/static/PyTango/latest/doc/html/index.html
-##
-## Copyright 2011 CELLS / ALBA Synchrotron, Bellaterra, Spain
-## 
-## PyTango is free software: you can redistribute it and/or modify
-## it under the terms of the GNU Lesser General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-## 
-## PyTango is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU Lesser General Public License for more details.
-## 
-## You should have received a copy of the GNU Lesser General Public License
-## along with PyTango.  If not, see <http://www.gnu.org/licenses/>.
-##
-################################################################################
+# ------------------------------------------------------------------------------
+# This file is part of PyTango (http://www.tinyurl.com/PyTango)
+#
+# Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
+# Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+#
+# Distributed under the terms of the GNU Lesser General Public License,
+# either version 3 of the License, or (at your option) any later version.
+# See LICENSE.txt for more info.
+# ------------------------------------------------------------------------------
 
-""".. _pytango-api2:
+""".. _pytango-hlapi:
 
 This module provides a high level device server API. It implements
 :ref:`TEP1 <pytango-TEP1>`. It exposes an easier API for developing a tango
@@ -93,8 +81,8 @@ Here is an example of a PowerSupply device with:
     from time import time
         
     from PyTango import AttrQuality, DebugIt, server_run
-    from PyTango.api2 import Device, DeviceMeta
-    from PyTango.api2 import attribute, command, device_property
+    from PyTango.hlapi import Device, DeviceMeta
+    from PyTango.hlapi import attribute, command, device_property
 
     class PowerSupply(Device):
         __metaclass__ = DeviceMeta
@@ -406,7 +394,7 @@ def check_tango_device_klass_attribute_methods(tango_device_klass, attr_data):
 def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     klass_name = tango_device_klass.__name__
     if not issubclass(tango_device_klass, (Device)):
-        raise Exception("{0} device must inherit from PyTango.api2.Device".format(klass_name))
+        raise Exception("{0} device must inherit from PyTango.hlapi.Device".format(klass_name))
     
     if attrs is None:
         attrs = tango_device_klass.__dict__
@@ -459,14 +447,14 @@ def DeviceMeta(name, bases, attrs):
     
     Example (python 2.x)::
     
-        from PyTango.api2 import Device, DeviceMeta
+        from PyTango.hlapi import Device, DeviceMeta
 
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
 
     Example (python 3.x)::
     
-        from PyTango.api2 import Device, DeviceMeta
+        from PyTango.hlapi import Device, DeviceMeta
 
         class PowerSupply(Device, metaclass=DeviceMeta):
             pass
@@ -479,8 +467,8 @@ class Device(LatestDeviceImpl):
     
     .. seealso::
         
-        Module :py:mod:`PyTango.api2`
-            Full API2 documentation"""
+        Module :py:mod:`PyTango.hlapi`
+            Full High Level API documentation"""
     
     def __init__(self, cl, name):
         LatestDeviceImpl.__init__(self, cl, name)
@@ -537,41 +525,7 @@ It receives multiple keyword arguments.
 parameter              type                                       default value                                  description
 ===================== ========================================== ============================================== =======================================================================================
 name                   :obj:`str`                                 class member name                              alternative attribute name
-dtype                  :obj:`object`                              :obj:`~PyTango.CmdArgType`\ ``.DevDouble``     data type (see :ref:`Data type equivalence <pytango-api2-datatypes>`)             
-dformat                :obj:`~PyTango.AttrDataFormat`             :obj:`~PyTango.AttrDataFormat`\ ``.SCALAR``    data format
-max_dim_x              :obj:`int`                                 1                                              maximum size for x dimension (ignored for SCALAR format) 
-max_dim_y              :obj:`int`                                 0                                              maximum size for y dimension (ignored for SCALAR and SPECTRUM formats) 
-display_level          :obj:`~PyTango.DispLevel`                  :obj:`~PyTango.DisLevel`\ ``.OPERATOR``        display level
-polling_period         :obj:`int`                                 -1                                             polling period
-memorized              :obj:`bool`                                False                                          attribute should or not be memorized
-hw_memorized           :obj:`bool`                                False                                          write method should be called at startup when restoring memorize value (dangerous!)
-param access           :obj:`~PyTango.AttrWriteType`              :obj:`~PyTango.AttrWriteType`\ ``.READ``       read only/ read write / write only access
-fread                  :obj:`str` or :obj:`callable`              'read_<attr_name>'                             read method name or method object
-fwrite                 :obj:`str` or :obj:`callable`              'write_<attr_name>'                            write method name or method object
-is_allowed             :obj:`str` or :obj:`callable`              'is_<attr_name>_allowed'                       is allowed method name or method object
-label                  :obj:`str`                                 '<attr_name>'                                  attribute label
-description            :obj:`str`                                 ''                                             attribute description
-unit                   :obj:`str`                                 ''                                             physical units the attribute value is in
-standard_unit          :obj:`str`                                 ''                                             physical standard unit
-display_unit           :obj:`str`                                 ''                                             physical display unit (hint for clients)
-format                 :obj:`str`                                 '6.2f'                                         attribute representation format
-min_value              :obj:`str`                                 None                                           minimum allowed value
-max_value              :obj:`str`                                 None                                           maximum allowed value
-min_alarm              :obj:`str`                                 None                                           minimum value to trigger attribute alarm
-max_alarm              :obj:`str`                                 None                                           maximum value to trigger attribute alarm
-min_warning            :obj:`str`                                 None                                           minimum value to trigger attribute warning
-max_warning            :obj:`str`                                 None                                           maximum value to trigger attribute warning
-delta_val              :obj:`str`                                 None
-delta_t                :obj:`str`                                 None
-abs_change             :obj:`str`                                 None                                           minimum value change between events that causes event filter to send the event
-rel_change             :obj:`str`                                 None                                           minimum relative change between events that causes event filter to send the event (%)
-period                 :obj:`str`                                 None
-archive_abs_change     :obj:`str`                                 None
-archive_rel_change     :obj:`str`                                 None
-archive_period         :obj:`str`                                 None
-===================== ========================================== ============================================== =======================================================================================
-
-.. _pytango-api2-datatypes:
+dtype                  :obj:`object`                              :obj:`~PyTango.CmdArgType`\ ``.DevDouble``     data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes:
 
 The `dtype` parameter in :func:`attribute` is not retricted to the :obj:`~PyTango.CmdArgType options.
 For example, to define a :obj:`~PyTango.CmdArgType`\ ``.DevLong`` attribute you
