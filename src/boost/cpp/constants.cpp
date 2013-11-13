@@ -12,7 +12,8 @@
 #include "precompiled_header.hpp"
 #include <tango.h>
 
-#define TOSTRING(s) #s
+#define _TOSTRING(s) #s
+#define TOSTRING(s) _TOSTRING(s)
 
 using namespace boost::python;
 

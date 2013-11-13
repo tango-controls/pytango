@@ -184,7 +184,8 @@ array:
     +-------------------+-----------------------------------+------------------------------------------+
     |"polling period"   |          Any number               | The attribute polling period (mS)        |
     +-------------------+-----------------------------------+------------------------------------------+
-    |  "memorized"      | True or True_without_hard_applied | Define if and how the att. is memorized  |
+    |  "memorized"      | "true" or                         | Define if and how the att. is memorized  |
+    |                   | "true_without_hard_applied"       |                                          |
     +-------------------+-----------------------------------+------------------------------------------+
     |     "label"       |            A string               |       The attribute label                |
     +-------------------+-----------------------------------+------------------------------------------+
@@ -441,83 +442,9 @@ The *attr* parameter is an instance of :class:`Attr`.
 Unlike the commands, the is_allowed method for attributes receives a parameter
 of type :class:`AttReqtype`.
 
-The following table gives information on the mapping between Tango and Python
-data types for attributes:
+Please check :ref:`pytango-data-types` chapter to understand the data types
+that can be used in attribute.
 
-+-------------+-------------+--------------------------------------------------------------+
-| data format | data type   |  python type                                                 |
-+=============+=============+==============================================================+
-| SCALAR      | DEV_BOOLEAN | :py:obj:`bool`                                               |
-+-------------+-------------+--------------------------------------------------------------+
-| SCALAR      | DEV_UCHAR   | :py:obj:`int`                                                |
-+-------------+-------------+--------------------------------------------------------------+
-| SCALAR      | DEV_SHORT   | :py:obj:`int`                                                |
-+-------------+-------------+--------------------------------------------------------------+
-| SCALAR      | DEV_USHORT  | :py:obj:`int`                                                |
-+-------------+-------------+--------------------------------------------------------------+
-| SCALAR      | DEV_LONG    | :py:obj:`int`                                                |
-+-------------+-------------+--------------------------------------------------------------+
-| SCALAR      | DEV_ULONG   | :py:obj:`int`                                                |
-+-------------+-------------+--------------------------------------------------------------+
-| SCALAR      | DEV_LONG64  | :py:obj:`int`/ :py:obj:`long`                                |
-+-------------+-------------+--------------------------------------------------------------+
-| SCALAR      | DEV_ULONG64 | :py:obj:`int`/ :py:obj:`long`                                |
-+-------------+-------------+--------------------------------------------------------------+
-| SCALAR      | DEV_FLOAT   | :py:obj:`float`                                              |
-+-------------+-------------+--------------------------------------------------------------+
-| SCALAR      | DEV_DOUBLE  | :py:obj:`float`                                              |
-+-------------+-------------+--------------------------------------------------------------+
-| SCALAR      | DEV_STRING  | :py:obj:`str`                                                |
-+-------------+-------------+--------------------------------------------------------------+
-| SPECTRUM    | DEV_BOOLEAN | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.bool`)      |
-| or IMAGE    |             | or sequence<:py:obj:`bool`>                                  |
-+-------------+-------------+--------------------------------------------------------------+
-|             | DEV_UCHAR   | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint8`)     |
-|             |             | or sequence<:py:obj:`int`>                                   |
-+-------------+-------------+--------------------------------------------------------------+
-|             | DEV_SHORT   | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int16`)     |
-|             |             | or sequence<:py:obj:`int`>                                   |
-+-------------+-------------+--------------------------------------------------------------+
-|             | DEV_USHORT  | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint16`)    |
-|             |             | or sequence<:py:obj:`int`>                                   |
-+-------------+-------------+--------------------------------------------------------------+
-|             | DEV_LONG    | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int32`)     |
-|             |             | or sequence<:py:obj:`int`>                                   |
-+-------------+-------------+--------------------------------------------------------------+
-|             | DEV_ULONG   | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint32`)    |
-|             |             | or sequence<:py:obj:`int`>                                   |
-+-------------+-------------+--------------------------------------------------------------+
-|             | DEV_LONG64  | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.int64`)     |
-|             |             | or sequence<:py:obj:`int`>                                   |
-+-------------+-------------+--------------------------------------------------------------+
-|             | DEV_ULONG64 | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.uint64`)    |
-|             |             | or sequence<:py:obj:`int`>                                   |
-+-------------+-------------+--------------------------------------------------------------+
-|             | DEV_FLOAT   | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float32`)   |
-|             |             | or sequence<:py:obj:`float`>                                 |
-+-------------+-------------+--------------------------------------------------------------+
-|             | DEV_DOUBLE  | :py:class:`numpy.ndarray` (dtype= :py:obj:`numpy.float64`)   |
-|             |             | or sequence<:py:obj:`float`>                                 |
-+-------------+-------------+--------------------------------------------------------------+
-|             | DEV_STRING  | sequence<:py:obj:`str`>                                      |
-+-------------+-------------+--------------------------------------------------------------+
-
-For SPECTRUM and IMAGES the actual sequence object used depends on the context 
-where the tango data is used, and the availability of :py:mod:`numpy`.
-
-1. for properties the sequence is always a :py:class:`list`. Example:
-    
-    >>> import PyTango
-    >>> db = PyTango.Database()
-    >>> s = db.get_property(["TangoSynchrotrons"])
-    >>> print type(s)
-    <type 'list'>
-
-2. for attribute/command values
-    - :py:class:`numpy.ndarray` if PyTango was compiled with :py:mod:`numpy`
-      support (default) and :py:mod:`numpy` is installed.
-    - :py:class:`list` otherwise
-    
 The following code is an example of how you write code executed when a client
 read an attribute which is called *Long_attr*::
     
@@ -686,7 +613,6 @@ creates a device of some arbitrary class (the example assumes the tango commands
 with two strings. No error processing was done on the code for simplicity sake)::
 
     class MyDevice(PyTango.Device_4Impl):
-        ...
         
         def CreateDevice(self, pars):
             klass_name, dev_name = pars
@@ -713,7 +639,6 @@ For example, if you wish to create a clone of your device, you can create a
 tango command called Clone::
 
     class MyDevice(PyTango.Device_4Impl):
-        ...
         
         def fill_new_device_properties(self, dev_name):
             prop_names = db.get_device_property_list(self.get_name(), "*")

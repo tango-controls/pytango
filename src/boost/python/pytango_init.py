@@ -46,7 +46,7 @@ __DOC = True
 def init_constants():
     import sys
     import platform
-
+    
     tg_ver = tuple(map(int, constants.TgLibVers.split(".")))
     tg_ver_str = "0x%02d%02d%02d00" % (tg_ver[0], tg_ver[1], tg_ver[2])
     constants.TANGO_VERSION_HEX = int(tg_ver_str, 16)
@@ -60,10 +60,7 @@ def init_constants():
         PY_VERSION = constants.PY_VERSION
         TANGO_VERSION = constants.TANGO_VERSION
         BOOST_VERSION = constants.BOOST_VERSION
-        if constants.NUMPY_SUPPORT:
-            NUMPY_VERSION = '0.0.0'
-        else:
-            NUMPY_VERSION = None
+        NUMPY_VERSION = constants.NUMPY_VERSION
         #UNAME = tuple(map(str, json.loads(constants.UNAME)))
 
     tg_rt_ver_nb = _get_tango_lib_release()

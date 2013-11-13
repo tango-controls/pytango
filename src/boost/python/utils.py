@@ -1266,21 +1266,22 @@ def info():
     Runtime = PyTango.constants.Runtime
 
     msg = """\
+PyTango {0.Release.version} {0.Release.version_info}
 PyTango compiled with:
-    Python : {0.PY_VERSION}
-    Numpy  : {0.NUMPY_VERSION}
-    Tango  : {0.TANGO_VERSION}
-    Boost  : {0.BOOST_VERSION}
-
-PyTango runtime is:
     Python : {1.PY_VERSION}
     Numpy  : {1.NUMPY_VERSION}
     Tango  : {1.TANGO_VERSION}
     Boost  : {1.BOOST_VERSION}
 
-PyTango running on:
-{1.UNAME}   
-"""
-    msg = msg.format(Compile, Runtime)
+PyTango runtime is:
+    Python : {2.PY_VERSION}
+    Numpy  : {2.NUMPY_VERSION}
+    Tango  : {2.TANGO_VERSION}
+    Boost  : {2.BOOST_VERSION}
 
-    print(msg)
+PyTango running on:
+{2.UNAME}   
+"""
+    msg = msg.format(PyTango, Compile, Runtime)
+    return msg
+

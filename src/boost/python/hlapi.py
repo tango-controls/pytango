@@ -9,194 +9,7 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-""".. _pytango-hlapi:
-
-This module provides a high level device server API. It implements
-:ref:`TEP1 <pytango-TEP1>`. It exposes an easier API for developing a tango
-device server.
-
-Here is the summary of features which this module exposes and are not available
-on the low level :mod:`PyTango` server API:
-
-#. Automatic inheritance from the latest :class:`~PyTango.DeviceImpl`
-#. default implementation of :meth:`Device.__init__`
-   calls :meth:`Device.init_device`. Around 90% of the
-   different device classes which inherit from low level
-   :class:`~PyTango.DeviceImpl` only implement `__init__` to call their
-   `init_device`
-#. has a default implementation of :meth:`Device.init_device`
-   which calls :meth:`Device.get_device_properties`. Again,
-   90% of existing device classes do that
-#. Automatically creates a hidden :class:`~PyTango.DeviceClass` class 
-#. recognizes :func:`attribute` members and automatically 
-   registers them as tango attributes in the hidden
-   :class:`~PyTango.DeviceClass`
-#. recognizes :class:`command` decorated functions and
-   automatically registers them as tango commands in the hidden
-   :class:`~PyTango.DeviceClass`
-#. recognizes :func:`device_property` members and
-   automatically registers them as tango device properties in the hidden
-   :class:`~PyTango.DeviceClass`
-#. recognizes :func:`class_property` members and
-   automatically registers them as tango class properties in the hidden
-   :class:`~PyTango.DeviceClass`
-#. read and write attribute methods don't need :class:`~PyTango.Attribute`
-   parameter. Access to :class:`~PyTango.Attribute` object is with simple::
-   
-       self.<attr name>
-       
-#. read attribute methods can set attribute return value with::
-       
-       def read_voltage(self):
-           return value
-       
-       # or 
-       
-       def read_voltage(self):
-           self.voltage = value
-       
-   instead of::
-   
-       def read_voltage(self, attr):
-           attr.set_value(value)
-
-:class:`Device` works very well in conjuction with:
-
-#. :meth:`attribute`
-#. :class:`command`
-#. :meth:`device_property`
-#. :meth:`class_property`
-#. :meth:`~PyTango.server_run`
-
-Here is an example of a PowerSupply device with:
-
-#. a read-only double scalar `voltage` attribute
-#. a read/write double scalar `current` attribute
-#. a `ramp` command
-#. a `host` device property
-
-.. code-block:: python
-    :linenos:
-
-    from time import time
-        
-    from PyTango import AttrQuality, DebugIt, server_run
-    from PyTango.hlapi import Device, DeviceMeta
-    from PyTango.hlapi import attribute, command, device_property
-
-    class PowerSupply(Device):
-        __metaclass__ = DeviceMeta
-        
-        voltage = attribute()        
-
-        current = attribute(label="Current", unit="A",
-                            fread="read_current",
-                            fwrite="write_current")
-        
-        host = device_property()
-        
-        def read_voltage(self):
-            return 10.0
-            
-        def read_current(self):
-            return 2.5, time(), AttrQuality.ON
-        
-        @DebugIt()
-        def write_current(self):
-            new_current = self.current.get_write_value()
-        
-        @command()
-        def ramp(self):
-            self.info_stream("Ramping on " + self.host + "...")
-
-    def main():
-        classes = PowerSupply,
-        server_run(classes)
-    
-    if __name__ == "__main__":
-        main()
-
-And here is the equivalent code using the low-level API:
-
-.. code-block:: python
-    :linenos:
-
-    import sys
-    import time
-
-    import PyTango
-
-    class PowerSupply(PyTango.Device_4Impl):
-
-        def __init__(self, devclass, name):
-            PyTango.Device_4Impl.__init__(self, devclass, name)
-            self.init_device()
-        
-        def init_device(self):
-            self.get_device_properties()
-        
-        def read_voltage(self, attr):
-            attr.set_value(10.0)
-            
-        def read_current(self):
-            attr.set_value_date_quality(2.5, time.time(), PyTango.AttrQuality.ON)
-        
-        @PyTango.DebugIt()
-        def write_current(self, attr):
-            new_current = attr.get_write_value()
-        
-        def ramp(self):
-            self.info_stream("Ramping on " + self.host + "...")
-
-
-    class PowerSupplyClass(PyTango.DeviceClass):
-        
-        class_property_list = {}
-
-        device_property_list = {
-            'host':
-                [PyTango.DevString, "host of power supply", "localhost"],
-        }
-
-        cmd_list = {
-            'ramp':
-                [ [PyTango.DevVoid, "nothing"],
-                  [PyTango.DevVoid, "nothing"] ],
-        }
-
-        attr_list = {
-            'voltage':
-                [[PyTango.DevDouble,
-                PyTango.SCALAR,
-                PyTango.READ]],
-            'current':
-                [[PyTango.DevDouble,
-                PyTango.SCALAR,
-                PyTango.READ_WRITE], 
-                { 'label' : 'Current', 'unit' : 'A' }],
-        }
-        
-
-    def main():
-        try:
-            py = PyTango.Util(sys.argv)
-            py.add_class(PowerSupplyClass,PowerSupply,'PowerSupply')
-
-            U = PyTango.Util.instance()
-            U.server_init()
-            U.server_run()
-
-        except PyTango.DevFailed,e:
-            print '-------> Received a DevFailed exception:',e
-        except Exception,e:
-            print '-------> An unforeseen exception occured....',e
-
-    if __name__ == "__main__":
-        main()
-        
-        
-*Pretty cool, uh?*
-"""
+"""High Level API for writting Tango device servers."""
 
 from __future__ import with_statement
 from __future__ import print_function
@@ -463,12 +276,8 @@ def DeviceMeta(name, bases, attrs):
 
 
 class Device(LatestDeviceImpl):
-    """High level DeviceImpl API.
-    
-    .. seealso::
-        
-        Module :py:mod:`PyTango.hlapi`
-            Full High Level API documentation"""
+    """High level DeviceImpl API. All Device specific classes should inherit
+    from this class."""
     
     def __init__(self, cl, name):
         LatestDeviceImpl.__init__(self, cl, name)
@@ -501,14 +310,8 @@ class AttrData2(AttrData):
         obj.remove_attribute(self.attr_name)
     
 def attribute(**kwargs):
-    if 'dtype' in kwargs:
-        kwargs['dtype'] = get_tango_type(kwargs['dtype'])
-    return AttrData2.from_dict(kwargs)
-
-
-attribute.__doc__ = """\
-declares a new tango attribute in a :class:`Device`. To be used like the python
-native :obj:`property` function. For exampke, to declare a scalar, 
+    """declares a new tango attribute in a :class:`Device`. To be used like the python
+native :obj:`property` function. For example, to declare a scalar, 
 `PyTango.DevDouble`, read-only attribute called *voltage* in a *PowerSupply*
 :class:`Device` do::
 
@@ -525,27 +328,45 @@ It receives multiple keyword arguments.
 parameter              type                                       default value                                  description
 ===================== ========================================== ============================================== =======================================================================================
 name                   :obj:`str`                                 class member name                              alternative attribute name
-dtype                  :obj:`object`                              :obj:`~PyTango.CmdArgType`\ ``.DevDouble``     data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes:
+dtype                  :obj:`object`                              :obj:`~PyTango.CmdArgType`\ ``.DevDouble``     data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
+dformat                :obj:`~PyTango.AttrDataFormat`             :obj:`~PyTango.AttrDataFormat`\ ``.SCALAR``    data format
+max_dim_x              :obj:`int`                                 1                                              maximum size for x dimension (ignored for SCALAR format) 
+max_dim_y              :obj:`int`                                 0                                              maximum size for y dimension (ignored for SCALAR and SPECTRUM formats) 
+display_level          :obj:`~PyTango.DispLevel`                  :obj:`~PyTango.DisLevel`\ ``.OPERATOR``        display level
+polling_period         :obj:`int`                                 -1                                             polling period
+memorized              :obj:`bool`                                False                                          attribute should or not be memorized
+hw_memorized           :obj:`bool`                                False                                          write method should be called at startup when restoring memorize value (dangerous!)
+access                 :obj:`~PyTango.AttrWriteType`              :obj:`~PyTango.AttrWriteType`\ ``.READ``       read only/ read write / write only access
+fread                  :obj:`str` or :obj:`callable`              'read_<attr_name>'                             read method name or method object
+fwrite                 :obj:`str` or :obj:`callable`              'write_<attr_name>'                            write method name or method object
+is_allowed             :obj:`str` or :obj:`callable`              'is_<attr_name>_allowed'                       is allowed method name or method object
+label                  :obj:`str`                                 '<attr_name>'                                  attribute label
+description            :obj:`str`                                 ''                                             attribute description
+unit                   :obj:`str`                                 ''                                             physical units the attribute value is in
+standard_unit          :obj:`str`                                 ''                                             physical standard unit
+display_unit           :obj:`str`                                 ''                                             physical display unit (hint for clients)
+format                 :obj:`str`                                 '6.2f'                                         attribute representation format
+min_value              :obj:`str`                                 None                                           minimum allowed value
+max_value              :obj:`str`                                 None                                           maximum allowed value
+min_alarm              :obj:`str`                                 None                                           minimum value to trigger attribute alarm
+max_alarm              :obj:`str`                                 None                                           maximum value to trigger attribute alarm
+min_warning            :obj:`str`                                 None                                           minimum value to trigger attribute warning
+max_warning            :obj:`str`                                 None                                           maximum value to trigger attribute warning
+delta_val              :obj:`str`                                 None
+delta_t                :obj:`str`                                 None
+abs_change             :obj:`str`                                 None                                           minimum value change between events that causes event filter to send the event
+rel_change             :obj:`str`                                 None                                           minimum relative change between events that causes event filter to send the event (%)
+period                 :obj:`str`                                 None
+archive_abs_change     :obj:`str`                                 None
+archive_rel_change     :obj:`str`                                 None
+archive_period         :obj:`str`                                 None
+===================== ========================================== ============================================== ======================================================================================="""
+    if 'dtype' in kwargs:
+        kwargs['dtype'] = get_tango_type(kwargs['dtype'])
+    return AttrData2.from_dict(kwargs)
 
-The `dtype` parameter in :func:`attribute` is not retricted to the :obj:`~PyTango.CmdArgType options.
-For example, to define a :obj:`~PyTango.CmdArgType`\ ``.DevLong`` attribute you
-have several possibilities:
-
-    #. :obj:`int`
-    #. 'int'
-    #. 'int32'
-    #. 'integer' 
-    #. :obj:`~PyTango.CmdArgType`\ ``.DevLong``
-    #. 'DevLong' 
-    #. :obj:`numpy.int32`
-
-Below is the complete table of equivalences.
     
-.. rubric:: Data type equivalence 
-
-""" + __type_doc
-    
-class command:
+def command():
     """TODO"""
     pass
     
@@ -557,3 +378,27 @@ def class_property():
     """TODO"""
     pass
 
+__doc__ = """High Level API for writting Tango device servers.
+
+.. _pytango-hlapi-datatypes:
+
+.. rubric:: Data types
+
+When declaring attributes, properties or commands, one of the most important
+information is the data type. It is given by the keyword argument *dtype*.
+This argument is not retricted to the :obj:`~PyTango.CmdArgType` options.
+
+For example, to define a :obj:`~PyTango.CmdArgType.DevLong` attribute you
+have several possibilities:
+
+    #. :obj:`int`
+    #. 'int'
+    #. 'int32'
+    #. 'integer' 
+    #. :obj:`~PyTango.CmdArgType.DevLong`
+    #. 'DevLong' 
+    #. :obj:`numpy.int32`
+
+Below is the complete table of equivalences.
+
+""" + __type_doc
