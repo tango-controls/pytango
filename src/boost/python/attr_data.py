@@ -264,10 +264,11 @@ class AttrData(object):
                      "attribute %s in class %s\nAttribute information for "
                      "polling period is not an integer" % (attr_name, name))
         
-        self.memorized = extra_info.get("memorized", "false")
-        if self.memorized == "true":
-            self.memorized, self.hw_memorized = True, True
-        elif self.memorized == "true_without_hard_applied":
+        memorized = extra_info.get("memorized", "false").lower()
+        if memorized == "true":
+            self.memorized = True
+            self.hw_memorized = True
+        elif memorized == "true_without_hard_applied":
             self.memorized = True
         else:
             self.memorized = False
