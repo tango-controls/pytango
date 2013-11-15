@@ -39,14 +39,15 @@ PyTango.ipython.load_config(config)
 # Put any additional environment here
 """
 
+_CONFIG_FILE_NAME = 'ipython_config.py'
+
 def is_installed(ipydir=None, profile='tango'):
     ipython_dir = ipydir or get_ipython_dir()
     try:
         p_dir = ProfileDir.find_profile_dir_by_name(ipython_dir, profile)
     except ProfileDirError:
         return False
-    config_file_name = BaseIPythonApplication.config_file_name.default_value
-    abs_config_file_name = os.path.join(p_dir.location, config_file_name)
+    abs_config_file_name = os.path.join(p_dir.location, _CONFIG_FILE_NAME)
     return os.path.isfile(abs_config_file_name)
 
 def install(ipydir=None, verbose=True, profile='tango'):
@@ -60,9 +61,7 @@ def install(ipydir=None, verbose=True, profile='tango'):
         p_dir = ProfileDir.find_profile_dir_by_name(ipython_dir, profile)
     except ProfileDirError:
         p_dir = ProfileDir.create_profile_dir_by_name(ipython_dir, profile)
-    
-    config_file_name = BaseIPythonApplication.config_file_name.default_value
-    abs_config_file_name = os.path.join(p_dir.location, config_file_name)
+    abs_config_file_name = os.path.join(p_dir.location, _CONFIG_FILE_NAME)
     create_config = True
     if os.path.isfile(abs_config_file_name):
         create_config = ask_yes_no("Tango configuration file already exists. "\
