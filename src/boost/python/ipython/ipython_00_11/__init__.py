@@ -15,3 +15,4 @@ __all__ = ['load_ipython_extension', 'unload_ipython_extension', 'load_config',
 from .ipython_10_00 import load_ipython_extension, unload_ipython_extension, \
     load_config, run
 from .ipy_install import install, is_installed
+
