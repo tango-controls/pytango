@@ -865,10 +865,10 @@ def init_console(ip):
     
     TermColors = IPython.ColorANSI.TermColors
     
-    d = { "version" : PyTango.ipython.get_pytango_version(),
-          "pyver" : PyTango.ipython.get_python_version(),
-          "ipyver" : PyTango.ipython.get_ipython_version(),
-          "pytangover" : PyTango.ipython.get_pytango_version() }
+    d = { "version" : str(PyTango.ipython.get_pytango_version()),
+          "pyver" : str(PyTango.ipython.get_python_version()),
+          "ipyver" : str(PyTango.ipython.get_ipython_version()),
+          "pytangover" : str(PyTango.ipython.get_pytango_version()) }
     d.update(TermColors.__dict__)
 
     o = ip.options

@@ -9,14 +9,16 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-__all__ = ["get_executor", "submit", "spawn",
+__all__ = ["get_green_mode", "set_green_mode",
+           "get_executor", "submit", "spawn",
            "get_synch_executor", "synch_submit",
            "get_gevent_executor", "gevent_submit",
-           "get_futures_executor", "futures_submit"
+           "get_futures_executor", "futures_submit",
            "result", "submitable", "green"] 
 
 __docformat__ = "restructuredtext"
 
+import os
 from functools import wraps
 
 from ._PyTango import GreenMode
@@ -24,7 +26,40 @@ from .tango_gevent import get_global_executor as get_gevent_executor
 from .tango_gevent import submit as gevent_submit
 from .tango_futures import get_global_executor as get_futures_executor
 from .tango_futures import submit as futures_submit
-from .utils import get_green_mode
+
+__default_green_mode = GreenMode.Synchronous
+try:
+    __current_green_mode = getattr(GreenMode,
+                                   os.environ.get("PYTANGO_GREEN_MODE",
+                                                  "Synchronous").capitalize())
+except:
+    __current_green_mode = __default_green_mode
+
+
+def set_green_mode(green_mode=None):
+    """Sets the global default PyTango green mode.
+
+    Advice: Use only in your final application. Don't use this in a python library
+    in order not to interfere with the beavior of other libraries and/or 
+    application where your library is being.
+
+    :param green_mode: the new global default PyTango green mode
+    :type green_mode: GreenMode
+    """
+    global __current_green_mode
+    if green_mode is None:
+        green_mode = GreenMode.Synchronous
+    __current_green_mode = green_mode
+
+
+def get_green_mode():
+    """Returns the current global default PyTango green mode.
+
+    :returns: the current global default PyTango green mode
+    :rtype: GreenMode
+    """
+    return __current_green_mode
+
 
 class SynchExecutor(object):
     def submit(self, fn, *args, **kwargs):

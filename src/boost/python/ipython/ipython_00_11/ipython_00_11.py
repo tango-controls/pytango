@@ -1129,10 +1129,10 @@ def load_config(config):
     import PyTango.ipython
     import IPython.utils.coloransi
     
-    d = { "version" : PyTango.ipython.get_pytango_version(),
-          "pyver" : PyTango.ipython.get_python_version(),
-          "ipyver" : PyTango.ipython.get_ipython_version(),
-          "pytangover" : PyTango.ipython.get_pytango_version(), }
+    d = { "version" : str(PyTango.ipython.get_pytango_version()),
+          "pyver" : str(PyTango.ipython.get_python_version()),
+          "ipyver" : str(PyTango.ipython.get_ipython_version()),
+          "pytangover" : str(PyTango.ipython.get_pytango_version()), }
     d.update(IPython.utils.coloransi.TermColors.__dict__)
 
     so = Struct(
@@ -1140,8 +1140,7 @@ def load_config(config):
 
     so = config.get("tango_options", so)
 
-    import PyTango.ipython
-    ipy_ver = PyTango.ipython.get_ipython_version_list()
+    ipy_ver = PyTango.ipython.get_ipython_version()
     
     # ------------------------------------
     # Application
@@ -1155,7 +1154,7 @@ def load_config(config):
     i_shell = config.InteractiveShell
     i_shell.colors = 'Linux'
 
-    if ipy_ver >= [0, 12]:
+    if ipy_ver >= "0.12":
         # ------------------------------------
         # PromptManager (ipython >= 0.12)
         # ------------------------------------

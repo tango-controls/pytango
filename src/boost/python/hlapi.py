@@ -9,7 +9,142 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-"""High Level API for writting Tango device servers."""
+"""High Level API for writting Tango device servers.
+
+.. _pytango-hlapi-datatypes:
+
+.. rubric:: Data types
+
+When declaring attributes, properties or commands, one of the most important
+information is the data type. It is given by the keyword argument *dtype*.
+This argument is not retricted to the :obj:`~PyTango.CmdArgType` options.
+
+For example, to define a *SCALAR* :obj:`~PyTango.CmdArgType.DevLong`
+attribute you have several possibilities:
+
+#. :obj:`int`
+#. 'int'
+#. 'int32'
+#. 'integer' 
+#. :obj:`PyTango.CmdArgType.DevLong`
+#. 'DevLong' 
+#. :obj:`numpy.int32`
+
+To define a *SPECTRUM* attribute simply wrap the scalar data type in any
+python sequence:
+
+* (:obj:`int`,)
+* [:obj:`int`]
+
+To define an *IMAGE* attribute simply wrap the scalar data type in any
+python sequence of sequences:
+
+* ((:obj:`int`,),)
+* [[:obj:`int`]]
+
+Below is the complete table of equivalences.
+
+========================================  ========================================
+ type                                      tango type                             
+========================================  ========================================
+ ``None``                                  ``DevVoid``                            
+ ``DevVoid``                               ``DevVoid``                            
+ ``DevBoolean``                            ``DevBoolean``                         
+ ``DevShort``                              ``DevShort``                           
+ ``DevLong``                               ``DevLong``                            
+ ``DevFloat``                              ``DevFloat``                           
+ ``DevDouble``                             ``DevDouble``                          
+ ``DevUShort``                             ``DevUShort``                          
+ ``DevULong``                              ``DevULong``                           
+ ``DevString``                             ``DevString``                          
+ ``DevVarCharArray``                       ``DevVarCharArray``                    
+ ``DevVarShortArray``                      ``DevVarShortArray``                   
+ ``DevVarLongArray``                       ``DevVarLongArray``                    
+ ``DevVarFloatArray``                      ``DevVarFloatArray``                   
+ ``DevVarDoubleArray``                     ``DevVarDoubleArray``                  
+ ``DevVarUShortArray``                     ``DevVarUShortArray``                  
+ ``DevVarULongArray``                      ``DevVarULongArray``                   
+ ``DevVarStringArray``                     ``DevVarStringArray``                  
+ ``DevVarLongStringArray``                 ``DevVarLongStringArray``              
+ ``DevVarDoubleStringArray``               ``DevVarDoubleStringArray``            
+ ``DevState``                              ``DevState``                           
+ ``DevVarBooleanArray``                    ``DevVarBooleanArray``                 
+ ``DevUChar``                              ``DevUChar``                           
+ ``DevLong64``                             ``DevLong64``                          
+ ``DevULong64``                            ``DevULong64``                         
+ ``DevVarLong64Array``                     ``DevVarLong64Array``                  
+ ``DevVarULong64Array``                    ``DevVarULong64Array``                 
+ ``DevInt``                                ``DevInt``                             
+ ``DevEncoded``                            ``DevEncoded``                         
+ ``chr``                                   ``DevUChar``                           
+ ``'DevBoolean'``                          ``DevBoolean``                         
+ ``'DevDouble'``                           ``DevDouble``                          
+ ``'DevEncoded'``                          ``DevEncoded``                         
+ ``'DevFloat'``                            ``DevFloat``                           
+ ``'DevInt'``                              ``DevInt``                             
+ ``'DevLong'``                             ``DevLong``                            
+ ``'DevLong64'``                           ``DevLong64``                          
+ ``'DevShort'``                            ``DevShort``                           
+ ``'DevState'``                            ``DevState``                           
+ ``'DevString'``                           ``DevString``                          
+ ``'DevUChar'``                            ``DevUChar``                           
+ ``'DevULong'``                            ``DevULong``                           
+ ``'DevULong64'``                          ``DevULong64``                         
+ ``'DevUShort'``                           ``DevUShort``                          
+ ``'DevVarBooleanArray'``                  ``DevVarBooleanArray``                 
+ ``'DevVarCharArray'``                     ``DevVarCharArray``                    
+ ``'DevVarDoubleArray'``                   ``DevVarDoubleArray``                  
+ ``'DevVarDoubleStringArray'``             ``DevVarDoubleStringArray``            
+ ``'DevVarFloatArray'``                    ``DevVarFloatArray``                   
+ ``'DevVarLong64Array'``                   ``DevVarLong64Array``                  
+ ``'DevVarLongArray'``                     ``DevVarLongArray``                    
+ ``'DevVarLongStringArray'``               ``DevVarLongStringArray``              
+ ``'DevVarShortArray'``                    ``DevVarShortArray``
+ ``'DevVarStringArray'``                   ``DevVarStringArray``                  
+ ``'DevVarULong64Array'``                  ``DevVarULong64Array``                 
+ ``'DevVarULongArray'``                    ``DevVarULongArray``                   
+ ``'DevVarUShortArray'``                   ``DevVarUShortArray``                  
+ ``'DevVoid'``                             ``DevVoid``                            
+ ``'None'``                                ``DevVoid``                            
+ ``'bool'``                                ``DevBoolean``                         
+ ``'boolean'``                             ``DevBoolean``                         
+ ``'byte'``                                ``DevUChar``                           
+ ``'bytearray'``                           ``DevEncoded``                         
+ ``'bytes'``                               ``DevEncoded``                         
+ ``'char'``                                ``DevUChar``                           
+ ``'chr'``                                 ``DevUChar``                           
+ ``'double'``                              ``DevDouble``                          
+ ``'float'``                               ``DevDouble``                          
+ ``'float32'``                             ``DevFloat``                           
+ ``'float64'``                             ``DevDouble``                          
+ ``'int'``                                 ``DevLong``                            
+ ``'int16'``                               ``DevShort``                           
+ ``'int32'``                               ``DevLong``                            
+ ``'int64'``                               ``DevLong64``                          
+ ``'str'``                                 ``DevString``                          
+ ``'string'``                              ``DevString``                          
+ ``'text'``                                ``DevString``                          
+ ``'uint'``                                ``DevULong``                           
+ ``'uint16'``                              ``DevUShort``                          
+ ``'uint32'``                              ``DevULong``                           
+ ``'uint64'``                              ``DevULong64``                         
+ :py:obj:`float`                           ``DevDouble``                          
+ :py:obj:`int`                             ``DevLong``                            
+ :py:obj:`str`                             ``DevString``                          
+ :py:obj:`bool`                            ``DevBoolean``                         
+ :py:obj:`bytearray`                       ``DevEncoded``                         
+ :py:obj:`numpy.bool_`                     ``DevBoolean``                         
+ :py:obj:`numpy.int16`                     ``DevShort``                           
+ :py:obj:`numpy.int32`                     ``DevLong``                            
+ :py:obj:`numpy.int64`                     ``DevLong64``                          
+ :py:obj:`numpy.uint8`                     ``DevUChar``                           
+ :py:obj:`numpy.uint16`                    ``DevUShort``                          
+ :py:obj:`numpy.uint32`                    ``DevULong``                           
+ :py:obj:`numpy.uint64`                    ``DevULong64``                         
+ :py:obj:`numpy.float32`                   ``DevFloat``                           
+ :py:obj:`numpy.float64`                   ``DevDouble``                          
+========================================  ========================================
+"""
 
 from __future__ import with_statement
 from __future__ import print_function
@@ -17,15 +152,16 @@ from __future__ import print_function
 __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute", "command",
            "device_property", "class_property"]
 
-import functools
 import __builtin__
+import inspect
+import functools
 
-from ._PyTango import DeviceImpl, Attribute, WAttribute, CmdArgType, \
-    AttrDataFormat, AttrWriteType, DispLevel, constants
+from ._PyTango import DeviceImpl, Attribute, WAttribute, CmdArgType
+from ._PyTango import AttrDataFormat, AttrWriteType, DispLevel, constants
 from .attr_data import AttrData
 from .device_class import DeviceClass
-from .utils import get_tango_device_classes, is_non_str_seq, is_pure_str
-from .log4tango import DebugIt
+from .utils import get_tango_device_classes, is_seq, is_non_str_seq
+from .utils import scalar_to_array_type
 
 API_VERSION = 2
 
@@ -90,38 +226,31 @@ def __build_to_tango_type():
 
         for key,value in FROM_TANGO_TO_NUMPY_TYPE.items():
             ret[value] = key
+    return ret
     
-    head = "{0:40}  {0:40}\n".format(40*"=")
-    doc = "{0} {1:38}    {2:38} \n{0}".format(head,'type','tango type')
-    keys = sorted(ret)
-    for key in keys:
-        value = ret[key]
-        if type(key) == type:
-            key_name = key.__name__
-            if key_name in __builtin__.__dict__:
-                key = ":py:obj:`{0}`".format(key_name)
-            elif key.__module__ == 'numpy':
-                key = ":py:obj:`numpy.{0}`".format(key_name)
-            else:
-                key = "``{0}``".format(key_name)
-        elif is_pure_str(key):
-            key = "``'{0}'``".format(key) 
-        else:
-            key = "``{0}``".format(key)
-        value = "``{0}``".format(value) 
-        doc += " {0:38}    {1:38} \n".format(key, str(value))
-    doc += head
-    return ret, doc
+TO_TANGO_TYPE = __build_to_tango_type()
+
+
+def get_tango_type_format(dtype=None, dformat=None):
+    if dformat is None:
+        dformat = AttrDataFormat.SCALAR
+        if is_non_str_seq(dtype):
+            dtype = dtype[0]
+            dformat = AttrDataFormat.SPECTRUM
+            if is_non_str_seq(dtype):
+                dtype = dtype[0]
+                dformat = AttrDataFormat.IMAGE
+    return TO_TANGO_TYPE[dtype], dformat
+
+
+def from_typeformat_to_type(dtype, dformat):
+    if dformat == AttrDataFormat.SCALAR:
+        return dtype
+    elif dformat == AttrDataFormat.IMAGE:
+        raise TypeError("Cannot translate IMAGE to tango type")
+    return scalar_to_array_type(dtype)
+
     
-TO_TANGO_TYPE, __type_doc = __build_to_tango_type()
-
-
-
-def get_tango_type(dtype):
-    return TO_TANGO_TYPE[dtype]
-
-get_tango_type.__doc__ = __type_doc
-
 def set_complex_value(attr, value):
     is_tuple = isinstance(value, tuple)
     dtype, fmt = attr.get_data_type(), attr.get_data_format()
@@ -182,7 +311,7 @@ def check_tango_device_klass_attribute_write_method(tango_device_klass, method_n
     :type tango_device_klass: class
     :param method_name: method to be cheched
     :type attr_data: str"""
-    write_method = real_f_obj = getattr(tango_device_klass, method_name)
+    write_method = getattr(tango_device_klass, method_name)
 
     @functools.wraps(write_method)
     def write_attr(self, attr):
@@ -207,21 +336,31 @@ def check_tango_device_klass_attribute_methods(tango_device_klass, attr_data):
 def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     klass_name = tango_device_klass.__name__
     if not issubclass(tango_device_klass, (Device)):
-        raise Exception("{0} device must inherit from PyTango.hlapi.Device".format(klass_name))
+        msg = "{0} device must inherit from PyTango.hlapi.Device".format(klass_name)
+        raise Exception(msg)
     
     if attrs is None:
         attrs = tango_device_klass.__dict__
         
     attr_list = {}
-    for attr_name, attr_obj in attrs.items():
-        if isinstance(attr_obj, AttrData2):
-            attr_obj._set_name(attr_name)
-            attr_list[attr_name] = attr_obj
-            check_tango_device_klass_attribute_methods(tango_device_klass, attr_obj)
-            
     class_property_list = {}
     device_property_list = {}
     cmd_list = {}
+
+    for attr_name, attr_obj in attrs.items():
+        if isinstance(attr_obj, attribute):
+            attr_obj._set_name(attr_name)
+            attr_list[attr_name] = attr_obj
+            check_tango_device_klass_attribute_methods(tango_device_klass, attr_obj)
+        elif isinstance(attr_obj, device_property):
+            device_property_list[attr_name] = [attr_obj.dtype, attr_obj.doc, attr_obj.default_value]
+        elif isinstance(attr_obj, class_property):
+            class_property_list[attr_name] = [attr_obj.dtype, attr_obj.doc, attr_obj.default_value]
+        elif inspect.isroutine(attr_obj):
+            if hasattr(attr_obj, "__tango_command__"):
+                cmd_name, cmd_info = attr_obj.__tango_command__
+                cmd_list[cmd_name] = cmd_info
+            
     devclass_name = klass_name + "Class"
     
     def device_class_constructor(self, name):
@@ -293,27 +432,11 @@ class Device(LatestDeviceImpl):
         pass
 
 
-class AttrData2(AttrData):
-    """High level AttrData. To be used """
-    
-    def get_attribute(self, obj):
-        return obj.get_device_attr().get_attr_by_name(self.attr_name)
-        
-    def __get__(self, obj, objtype):
-        return self.get_attribute(obj)
-
-    def __set__(self, obj, value):
-        attr = self.get_attribute(obj)
-        set_complex_value(attr, value)
-    
-    def __delete__(self, obj):
-        obj.remove_attribute(self.attr_name)
-    
-def attribute(**kwargs):
-    """declares a new tango attribute in a :class:`Device`. To be used like the python
-native :obj:`property` function. For example, to declare a scalar, 
-`PyTango.DevDouble`, read-only attribute called *voltage* in a *PowerSupply*
-:class:`Device` do::
+class attribute(AttrData):
+    """declares a new tango attribute in a :class:`Device`. To be used like
+the python native :obj:`property` function. For example, to declare a
+scalar, `PyTango.DevDouble`, read-only attribute called *voltage* in a
+*PowerSupply* :class:`Device` do::
 
     class PowerSupply(Device):
         
@@ -324,81 +447,203 @@ native :obj:`property` function. For example, to declare a scalar,
 
 It receives multiple keyword arguments.
 
-===================== ========================================== ============================================== =======================================================================================
-parameter              type                                       default value                                  description
-===================== ========================================== ============================================== =======================================================================================
-name                   :obj:`str`                                 class member name                              alternative attribute name
-dtype                  :obj:`object`                              :obj:`~PyTango.CmdArgType`\ ``.DevDouble``     data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
-dformat                :obj:`~PyTango.AttrDataFormat`             :obj:`~PyTango.AttrDataFormat`\ ``.SCALAR``    data format
-max_dim_x              :obj:`int`                                 1                                              maximum size for x dimension (ignored for SCALAR format) 
-max_dim_y              :obj:`int`                                 0                                              maximum size for y dimension (ignored for SCALAR and SPECTRUM formats) 
-display_level          :obj:`~PyTango.DispLevel`                  :obj:`~PyTango.DisLevel`\ ``.OPERATOR``        display level
-polling_period         :obj:`int`                                 -1                                             polling period
-memorized              :obj:`bool`                                False                                          attribute should or not be memorized
-hw_memorized           :obj:`bool`                                False                                          write method should be called at startup when restoring memorize value (dangerous!)
-access                 :obj:`~PyTango.AttrWriteType`              :obj:`~PyTango.AttrWriteType`\ ``.READ``       read only/ read write / write only access
-fread                  :obj:`str` or :obj:`callable`              'read_<attr_name>'                             read method name or method object
-fwrite                 :obj:`str` or :obj:`callable`              'write_<attr_name>'                            write method name or method object
-is_allowed             :obj:`str` or :obj:`callable`              'is_<attr_name>_allowed'                       is allowed method name or method object
-label                  :obj:`str`                                 '<attr_name>'                                  attribute label
-description            :obj:`str`                                 ''                                             attribute description
-unit                   :obj:`str`                                 ''                                             physical units the attribute value is in
-standard_unit          :obj:`str`                                 ''                                             physical standard unit
-display_unit           :obj:`str`                                 ''                                             physical display unit (hint for clients)
-format                 :obj:`str`                                 '6.2f'                                         attribute representation format
-min_value              :obj:`str`                                 None                                           minimum allowed value
-max_value              :obj:`str`                                 None                                           maximum allowed value
-min_alarm              :obj:`str`                                 None                                           minimum value to trigger attribute alarm
-max_alarm              :obj:`str`                                 None                                           maximum value to trigger attribute alarm
-min_warning            :obj:`str`                                 None                                           minimum value to trigger attribute warning
-max_warning            :obj:`str`                                 None                                           maximum value to trigger attribute warning
-delta_val              :obj:`str`                                 None
-delta_t                :obj:`str`                                 None
-abs_change             :obj:`str`                                 None                                           minimum value change between events that causes event filter to send the event
-rel_change             :obj:`str`                                 None                                           minimum relative change between events that causes event filter to send the event (%)
-period                 :obj:`str`                                 None
-archive_abs_change     :obj:`str`                                 None
-archive_rel_change     :obj:`str`                                 None
-archive_period         :obj:`str`                                 None
-===================== ========================================== ============================================== ======================================================================================="""
+===================== ================================ ======================================= =======================================================================================
+parameter              type                                       default value                                 description
+===================== ================================ ======================================= =======================================================================================
+name                   :obj:`str`                       class member name                       alternative attribute name
+dtype                  :obj:`object`                    :obj:`~PyTango.CmdArgType.DevDouble`    data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
+dformat                :obj:`~PyTango.AttrDataFormat`   :obj:`~PyTango.AttrDataFormat.SCALAR`   data format
+max_dim_x              :obj:`int`                       1                                       maximum size for x dimension (ignored for SCALAR format) 
+max_dim_y              :obj:`int`                       0                                       maximum size for y dimension (ignored for SCALAR and SPECTRUM formats) 
+display_level          :obj:`~PyTango.DispLevel`        :obj:`~PyTango.DisLevel.OPERATOR`       display level
+polling_period         :obj:`int`                       -1                                      polling period
+memorized              :obj:`bool`                      False                                   attribute should or not be memorized
+hw_memorized           :obj:`bool`                      False                                   write method should be called at startup when restoring memorize value (dangerous!)
+access                 :obj:`~PyTango.AttrWriteType`    :obj:`~PyTango.AttrWriteType.READ`      read only/ read write / write only access
+fget (or fread)        :obj:`str` or :obj:`callable`    'read_<attr_name>'                      read method name or method object
+fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<attr_name>'                     write method name or method object
+is_allowed             :obj:`str` or :obj:`callable`    'is_<attr_name>_allowed'                is allowed method name or method object
+label                  :obj:`str`                       '<attr_name>'                           attribute label
+doc (or description)   :obj:`str`                       ''                                      attribute description
+unit                   :obj:`str`                       ''                                      physical units the attribute value is in
+standard_unit          :obj:`str`                       ''                                      physical standard unit
+display_unit           :obj:`str`                       ''                                      physical display unit (hint for clients)
+format                 :obj:`str`                       '6.2f'                                  attribute representation format
+min_value              :obj:`str`                       None                                    minimum allowed value
+max_value              :obj:`str`                       None                                    maximum allowed value
+min_alarm              :obj:`str`                       None                                    minimum value to trigger attribute alarm
+max_alarm              :obj:`str`                       None                                    maximum value to trigger attribute alarm
+min_warning            :obj:`str`                       None                                    minimum value to trigger attribute warning
+max_warning            :obj:`str`                       None                                    maximum value to trigger attribute warning
+delta_val              :obj:`str`                       None
+delta_t                :obj:`str`                       None
+abs_change             :obj:`str`                       None                                    minimum value change between events that causes event filter to send the event
+rel_change             :obj:`str`                       None                                    minimum relative change between events that causes event filter to send the event (%)
+period                 :obj:`str`                       None
+archive_abs_change     :obj:`str`                       None
+archive_rel_change     :obj:`str`                       None
+archive_period         :obj:`str`                       None
+===================== ================================ ======================================= ======================================================================================="""
+
+    def __init__(self, **kwargs):
+        name = kwargs.pop("name", None)
+        class_name = kwargs.pop("class_name", None)
+        super(attribute, self).__init__(name, class_name)
+        if 'dtype' in kwargs:
+            kwargs['dtype'], kwargs['dformat'] = \
+                get_tango_type_format(kwargs['dtype'], kwargs.get('dformat'))
+        self.build_from_dict(kwargs)
+   
+    def get_attribute(self, obj):
+        return obj.get_device_attr().get_attr_by_name(self.attr_name)
+
+    # --------------------
+    # descriptor interface
+    # --------------------
+    
+    def __get__(self, obj, objtype):
+        return self.get_attribute(obj)
+
+    def __set__(self, obj, value):
+        attr = self.get_attribute(obj)
+        set_complex_value(attr, value)
+    
+    def __delete__(self, obj):
+        obj.remove_attribute(self.attr_name)
+
+        
+def _attribute(**kwargs):
+    """declares a new tango attribute in a :class:`Device`. To be used like
+the python native :obj:`property` function. For example, to declare a
+scalar, `PyTango.DevDouble`, read-only attribute called *voltage* in a
+*PowerSupply* :class:`Device` do::
+
+    class PowerSupply(Device):
+        
+        voltage = attribute()
+        
+        def read_voltage(self):
+            self.voltage = 1.0
+
+It receives multiple keyword arguments.
+
+===================== ================================ ======================================= =======================================================================================
+parameter              type                                       default value                                 description
+===================== ================================ ======================================= =======================================================================================
+name                   :obj:`str`                       class member name                       alternative attribute name
+dtype                  :obj:`object`                    :obj:`~PyTango.CmdArgType.DevDouble`    data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
+dformat                :obj:`~PyTango.AttrDataFormat`   :obj:`~PyTango.AttrDataFormat.SCALAR`   data format
+max_dim_x              :obj:`int`                       1                                       maximum size for x dimension (ignored for SCALAR format) 
+max_dim_y              :obj:`int`                       0                                       maximum size for y dimension (ignored for SCALAR and SPECTRUM formats) 
+display_level          :obj:`~PyTango.DispLevel`        :obj:`~PyTango.DisLevel.OPERATOR`       display level
+polling_period         :obj:`int`                       -1                                      polling period
+memorized              :obj:`bool`                      False                                   attribute should or not be memorized
+hw_memorized           :obj:`bool`                      False                                   write method should be called at startup when restoring memorize value (dangerous!)
+access                 :obj:`~PyTango.AttrWriteType`    :obj:`~PyTango.AttrWriteType.READ`      read only/ read write / write only access
+fget (or fread)        :obj:`str` or :obj:`callable`    'read_<attr_name>'                      read method name or method object
+fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<attr_name>'                     write method name or method object
+is_allowed             :obj:`str` or :obj:`callable`    'is_<attr_name>_allowed'                is allowed method name or method object
+label                  :obj:`str`                       '<attr_name>'                           attribute label
+doc (or description)   :obj:`str`                       ''                                      attribute description
+unit                   :obj:`str`                       ''                                      physical units the attribute value is in
+standard_unit          :obj:`str`                       ''                                      physical standard unit
+display_unit           :obj:`str`                       ''                                      physical display unit (hint for clients)
+format                 :obj:`str`                       '6.2f'                                  attribute representation format
+min_value              :obj:`str`                       None                                    minimum allowed value
+max_value              :obj:`str`                       None                                    maximum allowed value
+min_alarm              :obj:`str`                       None                                    minimum value to trigger attribute alarm
+max_alarm              :obj:`str`                       None                                    maximum value to trigger attribute alarm
+min_warning            :obj:`str`                       None                                    minimum value to trigger attribute warning
+max_warning            :obj:`str`                       None                                    maximum value to trigger attribute warning
+delta_val              :obj:`str`                       None
+delta_t                :obj:`str`                       None
+abs_change             :obj:`str`                       None                                    minimum value change between events that causes event filter to send the event
+rel_change             :obj:`str`                       None                                    minimum relative change between events that causes event filter to send the event (%)
+period                 :obj:`str`                       None
+archive_abs_change     :obj:`str`                       None
+archive_rel_change     :obj:`str`                       None
+archive_period         :obj:`str`                       None
+===================== ================================ ======================================= ======================================================================================="""
     if 'dtype' in kwargs:
-        kwargs['dtype'] = get_tango_type(kwargs['dtype'])
-    return AttrData2.from_dict(kwargs)
+        kwargs['dtype'], kwargs['dformat'] = \
+          get_tango_type_format(kwargs['dtype'], kwargs.get('dformat'))
+    return attribute.from_dict(kwargs)
 
+
+def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
+            dtype_out=None, dformat_out=None, doc_out="",):
+    """declares a new tango command in a :class:`Device`.
+    To be used like a decorator in the methods you want to declare as tango
+    commands. For example, to declare a *ramp* command that receives a
+    `PyTango.DevDouble` parameter called *current*, do::
+
+        class PowerSupply(Device):
+
+            @command(dtype_in=float)
+            def ramp(self, current):
+                self.info_stream("Ramping on %f..." % current)
+
+            # Another more elaborate command
+            
+            @command(dtype_in=float, doc_in="the pressure to be set",
+                     dtype_out=(bool, doc_out="True if it worked, False otherwise")
+            def setPressure(self, pressure):
+                self.info_stream("Setting pressure on %f..." % pressure)
+                
+    :param dtype_in: a :ref:`data type <pytango-hlapi-datatypes>`
+                     describing the type of parameter. Default is None meaning
+                     no parameter.
+    :param dformat_in: parameter data format. Default is None.
+    :type dformat_in: AttrDataFormat
+    :param doc_in: parameter documentation
+    :type doc_in: str
+
+    :param dtype_out: a :ref:`data type <pytango-hlapi-datatypes>`
+                      describing the type of return value. Default is None
+                      meaning no return value.
+    :param dformat_out: return value data format. Default is None.
+    :type dformat_out: AttrDataFormat
+    :param doc_out: return value documentation
+    :type doc_out: str
+
+    """
+    if f is None:
+        return functools.partial(command,
+            dtype_in=dtype_in, dformat_in=dformat_in, doc_in=doc_in,
+            dtype_out=dtype_out, dformat_out=dformat_out, doc_out=doc_out)
+    name = f.__name__
     
-def command():
-    """TODO"""
-    pass
+    dtype_in, dformat_in = get_tango_type_format(dtype_in, dformat_in)
+    dtype_out, dformat_out = get_tango_type_format(dtype_out, dformat_out)
+
+    din = [from_typeformat_to_type(dtype_in, dformat_in), doc_in]
+    dout = [from_typeformat_to_type(dtype_out, dformat_out), doc_out]
+    f.__tango_command__ = name, [din, dout]
+    return f
+
+
+class _property(object):
+
+    def __init__(self, dtype, doc='', default_value=None):
+        self.__value = None
+        dtype = from_typeformat_to_type(*get_tango_type_format(dtype))
+        self.dtype = dtype
+        self.doc = doc
+        self.default_value = default_value
     
-def device_property():
-    """TODO"""
+    def __get__(self, obj, objtype):
+        return self.__value
+
+    def __set__(self, obj, value):
+        self.__value = value
+    
+    def __delete__(self, obj):
+        del self.__value
+
+
+class device_property(_property):
     pass
 
-def class_property():
-    """TODO"""
+
+class class_property(_property):
     pass
-
-__doc__ = """High Level API for writting Tango device servers.
-
-.. _pytango-hlapi-datatypes:
-
-.. rubric:: Data types
-
-When declaring attributes, properties or commands, one of the most important
-information is the data type. It is given by the keyword argument *dtype*.
-This argument is not retricted to the :obj:`~PyTango.CmdArgType` options.
-
-For example, to define a :obj:`~PyTango.CmdArgType.DevLong` attribute you
-have several possibilities:
-
-    #. :obj:`int`
-    #. 'int'
-    #. 'int32'
-    #. 'integer' 
-    #. :obj:`~PyTango.CmdArgType.DevLong`
-    #. 'DevLong' 
-    #. :obj:`numpy.int32`
-
-Below is the complete table of equivalences.
-
-""" + __type_doc

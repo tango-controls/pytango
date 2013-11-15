@@ -500,4 +500,5 @@ The following code is the complete device server code::
 
     Quick tour (original) <quicktour_old>
     
-.. _IPython: http://ipython.scipy.org/
+.. _IPython: http://ipython.org/
+.. _numpy: http://www.numpy.org/

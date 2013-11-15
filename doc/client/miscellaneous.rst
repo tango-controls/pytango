@@ -265,14 +265,14 @@ Green API
 ~~~~~~~~~
 
 Summary:
-    * :func:`get_green_mode` 
-    * :func:`set_green_mode` 
+    * :func:`PyTango.get_green_mode` 
+    * :func:`PyTango.set_green_mode` 
     * :func:`PyTango.gevent.DeviceProxy` 
     * :func:`PyTango.futures.DeviceProxy` 
 
-.. autofunction:: get_green_mode
+.. autofunction:: PyTango.get_green_mode
 
-.. autofunction:: set_green_mode
+.. autofunction:: PyTango.set_green_mode
 
 .. autofunction:: PyTango.gevent.DeviceProxy
 

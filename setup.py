@@ -383,6 +383,7 @@ def main():
         'PyTango.ipython',
         'PyTango.ipython.ipython_00_10',
         'PyTango.ipython.ipython_00_11',
+        'PyTango.ipython.ipython_10_00',        
     ]
 
     py_modules = []

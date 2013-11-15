@@ -5,16 +5,11 @@ The Utilities API
 
 .. autofunction:: PyTango.server_run
 
-
 .. currentmodule:: PyTango.utils
 
 .. autoclass:: PyTango.utils.EventCallBack
     :members:
     :undoc-members:
-
-.. autofunction:: PyTango.utils.get_green_mode
-
-.. autofunction:: PyTango.utils.set_green_mode
 
 .. autofunction:: PyTango.utils.is_scalar_type
     

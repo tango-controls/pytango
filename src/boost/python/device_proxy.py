@@ -19,23 +19,19 @@ __all__ = ["device_proxy_init", "get_device_proxy"]
 
 __docformat__ = "restructuredtext"
 
-
-import collections
-import numbers
 import threading
+import collections
 
 from ._PyTango import StdStringVector, DbData, DbDatum, AttributeInfo, \
     AttributeInfoEx, AttributeInfoList, AttributeInfoListEx, DeviceProxy, \
     __CallBackAutoDie, __CallBackPushEvent, EventType, DevFailed, Except, \
     ExtractAs, GreenMode
 
-from .utils import is_pure_str, is_non_str_seq, is_integer, \
-    seq_2_StdStringVector, StdStringVector_2_seq, seq_2_DbData, DbData_2_dict
-
+from .utils import is_pure_str, is_non_str_seq, is_integer
+from .utils import seq_2_StdStringVector, StdStringVector_2_seq
+from .utils import seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
-from .utils import get_green_mode
-
-from .tango_green import result, submit, green
+from .tango_green import result, submit, green, get_green_mode
 
 
 def get_device_proxy(*args, **kwargs):
@@ -64,8 +60,8 @@ def get_device_proxy(*args, **kwargs):
     :type need_check_acc: bool
     :param green_mode: determines the mode of execution of the device (including
                       the way it is created). Defaults to the current global
-                      green_mode (check :func:`~PyTango.utils.get_green_mode` and
-                      :func:`~PyTango.utils.set_green_mode`)
+                      green_mode (check :func:`~PyTango.get_green_mode` and
+                      :func:`~PyTango.set_green_mode`)
     :type green_mode: :obj:`~PyTango.GreenMode`
     :param wait: whether or not to wait for result. If green_mode
                  Ignored when green_mode is Synchronous (always waits).
@@ -136,8 +132,8 @@ def __DeviceProxy__get_green_mode(self):
     :rtype: GreenMode
 
     .. seealso::
-        :func:`PyTango.utils.get_green_mode`
-        :func:`PyTango.utils.set_green_mode`
+        :func:`PyTango.get_green_mode`
+        :func:`PyTango.set_green_mode`
 
     New in PyTango 8.1.0
     """
@@ -149,7 +145,7 @@ def __DeviceProxy__get_green_mode(self):
 def __DeviceProxy__set_green_mode(self, green_mode=None):
     """Sets the green mode to be used by this DeviceProxy
     Setting it to None means use the global PyTango green mode
-    (see :func:`PyTango.utils.get_green_mode`).
+    (see :func:`PyTango.get_green_mode`).
     
     :param green_mode: the new green mode
     :type green_mode: GreenMode
@@ -1119,8 +1115,8 @@ def __doc_DeviceProxy():
     :type need_check_acc: bool
     :param green_mode: determines the mode of execution of the device (including.
                       the way it is created). Defaults to the current global
-                      green_mode (check :func:`~PyTango.utils.get_green_mode` and
-                      :func:`~PyTango.utils.set_green_mode`)
+                      green_mode (check :func:`~PyTango.get_green_mode` and
+                      :func:`~PyTango.set_green_mode`)
     :type green_mode: :obj:`~PyTango.GreenMode`
     :param wait: whether or not to wait for result. If green_mode
                  Ignored when green_mode is Synchronous (always waits).

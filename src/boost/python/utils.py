@@ -16,11 +16,11 @@ This is an internal PyTango module.
 from __future__ import with_statement
 from __future__ import print_function
 
-__all__ = [ "get_green_mode", "set_green_mode",
-            "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
+__all__ = [ "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
             "is_number", "is_scalar_type", "is_array_type", "is_numerical_type",
             "is_int_type", "is_float_type", "is_bool_type", "is_bin_type",
             "is_str_type", "obj_2_str", "seqStr_2_obj",
+            "scalar_to_array_type",
             "document_method", "document_static_method", "document_enum",
             "CaselessList", "CaselessDict", "EventCallBack", "get_home",
             "from_version_str_to_hex_str", "from_version_str_to_int",
@@ -89,39 +89,6 @@ _scalar_to_array_type = {
     CmdArgType.DevString : CmdArgType.DevVarStringArray,
     CmdArgType.ConstDevString : CmdArgType.DevVarStringArray,
 }
-
-__default_green_mode = GreenMode.Synchronous
-try:
-    __current_green_mode = getattr(GreenMode,
-                                   os.environ.get("PYTANGO_GREEN_MODE",
-                                                  "Synchronous").capitalize())
-except:
-    __current_green_mode = __default_green_mode
-
-
-def set_green_mode(green_mode=None):
-    """Sets the global default PyTango green mode.
-
-    Advice: Use only in your final application. Don't use this in a python library
-    in order not to interfere with the beavior of other libraries and/or 
-    application where your library is being.
-
-    :param green_mode: the new global default PyTango green mode
-    :type green_mode: GreenMode
-    """
-    global __current_green_mode
-    if green_mode is None:
-        green_mode = GreenMode.Synchronous
-    __current_green_mode = green_mode
-
-
-def get_green_mode():
-    """Returns the current global default PyTango green mode.
-
-    :returns: the current global default PyTango green mode
-    :rtype: GreenMode
-    """
-    return __current_green_mode
 
 __device_classes = None
 
@@ -543,7 +510,7 @@ def _seqStr_2_obj_from_type_format(seq, tg_type, tg_format):
     if tg_format == AttrDataFormat.SCALAR:
         return _seqStr_2_obj_from_type(tg_type, seq)
     elif tg_format == AttrDataFormat.SPECTRUM:
-        return _seqStr_2_obj_from_type(_scalar_to_array_type(tg_type), seq)
+        return _seqStr_2_obj_from_type(_scalar_to_array_type[tg_type], seq)
     elif tg_format == AttrDataFormat.IMAGE:
         if tg_type == CmdArgType.DevString:
             return seq
@@ -570,6 +537,9 @@ def _seqStr_2_obj_from_type_format(seq, tg_type, tg_format):
 
     #UNKNOWN_FORMAT
     return _seqStr_2_obj_from_type(tg_type, seq)
+
+def scalar_to_array_type(dtype):
+    return _scalar_to_array_type[dtype]
 
 def obj_2_str(obj, tg_type):
     """Converts a python object into a string according to the given tango type
@@ -1141,7 +1111,8 @@ def from_version_str_to_hex_str(version_str):
 def from_version_str_to_int(version_str):
     return int(from_version_str_to_hex_str(version_str, 16))
 
-def __server_run(classes, args=None, msg_stream=sys.stderr, util=None):
+def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
+                 event_loop=None):
     import PyTango
     if msg_stream is None:
         import io
@@ -1173,12 +1144,15 @@ def __server_run(classes, args=None, msg_stream=sys.stderr, util=None):
                 klass = klass_info
             util.add_class(klass_klass, klass, klass_name)
     u_instance = PyTango.Util.instance()
+    if event_loop is not None:
+        u_instance.server_set_event_loop(event_loop)
     u_instance.server_init()
     msg_stream.write("Ready to accept request\n")
     u_instance.server_run()
     return util
 
-def server_run(classes, args=None, msg_stream=sys.stderr, verbose=False, util=None):
+def server_run(classes, args=None, msg_stream=sys.stdout,
+               verbose=False, util=None, event_loop=None):
     """Provides a simple way to run a tango server. It handles exceptions
        by writting a message to the msg_stream.
 
@@ -1224,11 +1198,14 @@ def server_run(classes, args=None, msg_stream=sys.stderr, verbose=False, util=No
        :type args: list
        
        :param msg_stream:
-           stream where to put messages [default: sys.stderr]
+           stream where to put messages [default: sys.stdout]
        
        :param util:
            PyTango Util object [default: None meaning create a Util instance]
        :type util: :class:`~PyTango.Util`
+
+       :param event_loop: event_loop callable
+       :type event_loop: callable
        
        :return: The Util singleton object
        :rtype: :class:`~PyTango.Util`
@@ -1237,6 +1214,11 @@ def server_run(classes, args=None, msg_stream=sys.stderr, verbose=False, util=No
        
        .. versionchanged:: 8.0.3
            Added `util` keyword parameter.
+           Returns util object
+
+       .. versionchanged:: 8.1.1
+           Changed default msg_stream from *stderr* to *stdout*
+           Added `event_loop` keyword parameter.
            Returns util object"""
 
     if msg_stream is None:
@@ -1244,7 +1226,7 @@ def server_run(classes, args=None, msg_stream=sys.stderr, verbose=False, util=No
         msg_stream = io.BytesIO()
     write = msg_stream.write
     try:
-        return __server_run(classes, args=args, util=util)
+        return __server_run(classes, args=args, util=util, event_loop=event_loop)
         write("Exiting:\n")
     except KeyboardInterrupt:
         write("Exiting: Keyboard interrupt\n")

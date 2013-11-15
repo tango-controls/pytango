@@ -1,0 +1,156 @@
+Windows
+~~~~~~~
+
+On windows, PyTango must be built using MS VC++.
+
+... which is good fun specially if you only have express edition and multiple python versions to build with! 
+
+.. warning::
+   The next chapters are internal notes I have gathered along the years to
+   overcome windows limitations/problems in order to be able to compile PyTango.
+   They are not for the weak of heart, seriously! 
+
+Pre-requisites
+##############
+
+**Python**
+
+Python must be installed in the following directory structure:
+
+    <PythonBaseDir>\\<PlatformName>\\<PythonVersion>
+    
+Where:
+
+    - <PythonBaseDir> is a python base directory choosen by you (ex: :file:`C:\\Python`)
+    - <PlatformName> **must** be either *win32* or *x64*
+    - <PythonVersion> **must** be *26*, *27*, *31*, *32*, *33*
+
+Example: Assuming you choose *C:\\Python* as PythonBaseDir, if you want to build
+PyTango for python 2.7 on 64 bits you must install python in
+:file:`C:\\python\\x64\\27`.
+
+**Visual C++**
+
+Python recommends compiling any python libraries using the same compiler
+version. So, depending on the python version(s) you want PyTango to be
+build, you need VC++ 9.0 (2008) or/and VC++ 10.0 (2010).
+
+Here is the table of compilers and corresponding Visual C++ version used by CPython:
+
++----------------------+--------------+
+| Visual C++ version   | Compiler     |
++======================+==============+
+| Visual C++ 4.x       | MSC_VER=1000 |
++----------------------+--------------+
+| Visual C++ 5         | MSC_VER=1100 |
++----------------------+--------------+
+| Visual C++ 6         | MSC_VER=1200 |
++----------------------+--------------+
+| Visual C++ .NET      | MSC_VER=1300 |
++----------------------+--------------+
+| Visual C++ .NET 2003 | MSC_VER=1310 |
++----------------------+--------------+
+| Visual C++ 2005      | MSC_VER=1400 |
++----------------------+--------------+
+| Visual C++ 2008      | MSC_VER=1500 |
++----------------------+--------------+
+| Visual C++ 2010      | MSC_VER=1600 |
++----------------------+--------------+
+| Visual C++ 2011      | MSC_VER=1700 |
++----------------------+--------------+
+
++----------+--------------+-----------------------------+
+| version  | architecture |            VC++             |
++==========+==============+=============================+
+|  2.6.6   |   32 bits    | MSC 1500 (Visual C++ 2008)  |
++----------+--------------+-----------------------------+
+|  2.6.6   |   64 bits    | MSC 1500 (Visual C++ 2008)  |
++----------+--------------+-----------------------------+
+|  2.7.3   |   32 bits    | MSC 1500 (Visual C++ 2008)  |
++----------+--------------+-----------------------------+
+|  2.7.3   |   64 bits    | MSC 1500 (Visual C++ 2008)  |
++----------+--------------+-----------------------------+
+|  3.1.4   |   32 bits    | MSC 1500 (Visual C++ 2008)  |
++----------+--------------+-----------------------------+
+|  3.1.4   |   64 bits    | MSC 1500 (Visual C++ 2008)  |
++----------+--------------+-----------------------------+
+|  3.2.3   |   32 bits    | MSC 1500 (Visual C++ 2008)  |
++----------+--------------+-----------------------------+
+|  3.2.3   |   64 bits    | MSC 1500 (Visual C++ 2008)  |
++----------+--------------+-----------------------------+
+|  3.3.0   |   32 bits    | MSC 1600 (Visual C++ 2010)  |
++----------+--------------+-----------------------------+
+|  3.3.0   |   64 bits    | MSC 1600 (Visual C++ 2010)  |
++----------+--------------+-----------------------------+
+
+**Visual C++ 9.0 (2008) express quick install guide**
+
+1. Download and install VC++ 9.0 (2008) Express Edition
+2. If you need to compile in 64 bits platform
+    2.1. Download and install Windows 7 SDK for .NET Framework 3.5 SP1 [a.k.a. Windows SDK 7.0]
+        (**not** Windows SDK 7.1!)
+    
+    2.2. The vcvarsall.bat in VC++ 2008 Express looks for the x86_amd64 :file:`vcvarsx86_amd64.bat`
+         in all the wrong places. The easiest way to work around that is to navigate to the
+         :file:`VC\\bin` directory of your VC++ 2008 installation (in my case
+         :file:`C:\\Program Files (x86)\\Microsoft Visual Studio 9.0\\VC\\bin`). Copy :file:`vcvarsx86_amd64.bat`,
+         and paste into the :file:`VC\\bin\\x86_amd64 subdirectory`.
+
+**Visual C++ 10.0 (2010) express quick install guide**
+
+1. Download and install VC++ 10.0 (2010) Express Edition
+2. If you need to compile in 64 bits platform follow the instructions
+   **in the order they appear** (not doing so may lead to
+   `KB2519277 <http://support.microsoft.com/kb/2519277>`_ problem)
+    
+    2.1. Visual Studio 2010 SP1
+    
+    2.2. Download and install Windows 7 SDK for .NET Framework 4.0 [a.k.a. Windows SDK 7.1]
+    
+    2.3. VC++ 2010 doesn't come with vcvarsx86_amd64.bat. But in this case, since the 
+         environment setting tool is different than in VC++ 2008, all you have to do is 
+         create a file called vcvarsx86_amd64.bat in VC\\bin\\x86_amd64 directory of your 
+         VC++ 2010 installation (in my case 
+         C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\bin\\x86_amd64) with the
+         following content:
+         
+             @CALL "C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Bin\\SetEnv.Cmd" /Release /x64
+         
+         (adapt to your Windows SDK installation directory)
+    
+**Boost python**
+
+Boost python DLL, lib and header files must be installed for the specific platform(s)
+and python version(s) you which to build PyTango on. The directory structure for
+the boost headers: 
+
+    <BoostDir>\\include
+
+The directory structure for the boost libraries:
+
+    <BoostDir>\\multi\\release\\<MSVCVersion>\\<PlatformName>\\<Link>\\<RuntimeLink>\\<PythonVersion>
+
+Where:
+    
+    - <BoostDir> the boost base directory (ex: C:\Boost-1.53.0)
+    - <MSVCVersion> may be either *msvc-9.0* or *msvc-10.0*
+    - <PlatformName> **must** be either *win32* or *x64*
+    - <Link> **must** be either *static* or *shared*
+    - <RuntimeLink> **must** be either *static* or *shared*
+      (if Link==static, RuntimeLink can only be *static*)
+    - <PythonVersion> **must** be *26*, *27*, *31*, *32*, *33*
+
+**Boost python multi platform compilation quick build guide**
+    
+    - Download boost source code from http://wwww.boost.org
+    - Extract boost to a directory (ex: c:\\workspace\\boost-1.53.0)
+    - Download and place `boost_python_install.py <>` in your boost extract directory (ex: c:\\workspace\\boost-1.53.0\\boost_python_install.py)
+      (adapt python versions you which to build)
+    - Place the user-config.jam file in %HOMEPATH%%HOMEDIR% (adapt paths and python versions to your system)
+    - Open a console
+    - Switch to the boost directory 
+    - Execute this script using python (ex: C:\\Python\\win32\\26\\python.exe boost_python_install.py)
+
+**Tango**
+
+TODO

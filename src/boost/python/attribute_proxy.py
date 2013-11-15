@@ -25,9 +25,9 @@ import collections
 
 from ._PyTango import StdStringVector, DbData, DbDatum, DeviceProxy
 from ._PyTango import __AttributeProxy as _AttributeProxy
-from .utils import seq_2_StdStringVector, seq_2_DbData, DbData_2_dict, \
-    is_pure_str, is_non_str_seq, get_green_mode
-from .tango_green import result, submit, green
+from .utils import seq_2_StdStringVector, seq_2_DbData, DbData_2_dict
+from .utils import is_pure_str, is_non_str_seq
+from .tango_green import result, submit, get_green_mode
 
 
 def get_attribute_proxy(*args, **kwargs):
@@ -52,8 +52,8 @@ def get_attribute_proxy(*args, **kwargs):
     :type attr_name: str
     :param green_mode: determines the mode of execution of the device (including
                       the way it is created). Defaults to the current global
-                      green_mode (check :func:`~PyTango.utils.get_green_mode` and
-                      :func:`~PyTango.utils.set_green_mode`)
+                      green_mode (check :func:`~PyTango.get_green_mode` and
+                      :func:`~PyTango.set_green_mode`)
     :type green_mode: :obj:`~PyTango.GreenMode`
     :param wait: whether or not to wait for result. If green_mode
                  Ignored when green_mode is Synchronous (always waits).
