@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # -----------------------------------------------------------------------------
 # This file is part of PyTango (http://www.tinyurl.com/PyTango)
 #
@@ -33,6 +31,7 @@ from IPython.terminal.ipapp import launch_new_instance
 
 import PyTango
 import PyTango.utils
+
 
 _TG_EXCEPTIONS = PyTango.DevFailed, PyTango.ConnectionFailed, \
     PyTango.CommunicationFailed, \

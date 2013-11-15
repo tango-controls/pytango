@@ -25,6 +25,7 @@ from IPython.utils.io import ask_yes_no
 
 import PyTango
 
+
 __PROFILE = """\
 #!/usr/bin/env ipython
 \"\"\"An automaticaly generated IPython profile designed to provide a user 
