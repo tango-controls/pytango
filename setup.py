@@ -367,9 +367,7 @@ def main():
     if numpy_c_include is not None:
         directories['include_dirs'].append(numpy_c_include)
 
-    if has_numpy():
-        macros.append(('PYTANGO_NUMPY_VERSION', numpy.__version__))
-    else:
+    if not has_numpy():
         macros.append(('DISABLE_PYTANGO_NUMPY', None))
 
     if 'posix' in os.name:

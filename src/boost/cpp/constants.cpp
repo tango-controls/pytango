@@ -11,9 +11,7 @@
 
 #include "precompiled_header.hpp"
 #include <tango.h>
-
-#define _TOSTRING(s) #s
-#define TOSTRING(s) _TOSTRING(s)
+#include "tango_numpy.h"
 
 using namespace boost::python;
 
@@ -35,7 +33,7 @@ void export_constants()
 #endif
 
 #ifdef PYTANGO_NUMPY_VERSION
-    consts_scope.attr("NUMPY_VERSION") = TOSTRING(PYTANGO_NUMPY_VERSION);
+    consts_scope.attr("NUMPY_VERSION") = NPY_VERSION;
 #else
     consts_scope.attr("NUMPY_VERSION") = "0.0.0";
 #endif
