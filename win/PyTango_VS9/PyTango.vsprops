@@ -99,7 +99,7 @@
 
     <UserMacro Name="PyTangoMajorVer" Value="8" />
     <UserMacro Name="PyTangoMinorVer" Value="1" />
-    <UserMacro Name="PyTangoPatchVer" Value="0" />
+    <UserMacro Name="PyTangoPatchVer" Value="1" />
     <UserMacro Name="PyTangoVer" Value="$(PyTangoMajorVer).$(PyTangoMinorVer).$(PyTangoPatchVer)" />
 
     <UserMacro Name="BoostMajorVer" Value="1" />

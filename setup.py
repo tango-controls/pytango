@@ -157,7 +157,9 @@ def add_lib(name, dirs, sys_libs, lib_name=None, inc_suffix=None):
             lib_dir = os.path.join(ENV, 'lib64')
             if not os.path.isdir(lib_dir):
                 lib_dir = os.path.join(ENV, 'lib')
-
+        else:
+            lib_dir = os.path.join(ENV, 'lib')
+        
         if lib_name.startswith('lib'):
             lib_name = lib_name[3:]
         dirs['include_dirs'].append(inc_dir)
@@ -327,7 +329,7 @@ def main():
                        library_dirs=[],
                        libraries=[])
     sys_libs = []
-
+    
     add_lib('omni', directories, sys_libs, lib_name='omniORB4')
     add_lib('zmq', directories, sys_libs, lib_name='libzmq')
     add_lib('tango', directories, sys_libs, inc_suffix='tango')
@@ -370,7 +372,8 @@ def main():
     else:
         macros.append(('DISABLE_PYTANGO_NUMPY', None))
 
-    directories = pkg_config(*sys_libs, **directories)
+    if 'posix' in os.name:
+        directories = pkg_config(*sys_libs, **directories)
     
     Release = get_release_info()
 

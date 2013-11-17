@@ -809,6 +809,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(PyTango27StaticLibs)"
 				AdditionalLibraryDirectories="$(Py27BoostStaticTangoStaticLibDir)"
+				IgnoreDefaultLibraryNames=""
 				LinkTimeCodeGeneration="1"
 				TargetMachine="17"
 			/>

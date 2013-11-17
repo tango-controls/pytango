@@ -55,15 +55,13 @@ def main():
         cmd_line += 'bdist_msi --skip-build --target-version=%s ' \
                     '--bdist-dir=%s ' \
                     '--dist-dir=%s ' \
-                    '--plat-name=%s ' \
-                    '--install-script=winpostinstall.py ' % (ver, bdist_dir, dist_dir, plat_name)
+                    '--plat-name=%s ' % (ver, bdist_dir, dist_dir, plat_name)
         cmd_line += 'bdist_wininst --skip-build --target-version=%s ' \
                     '--bdist-dir=%s ' \
                     '--dist-dir=%s ' \
                     '--title="PyTango 8" ' \
                     '--bitmap="%s" ' \
-                    '--plat-name=%s ' \
-                    '--install-script=winpostinstall.py ' % (ver, bdist_dir, dist_dir, bitmap, plat_name)
+                    '--plat-name=%s ' % (ver, bdist_dir, dist_dir, bitmap, plat_name)
         os.system(cmd_line)
     except:
         print("Failed:")

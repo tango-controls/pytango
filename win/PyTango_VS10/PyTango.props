@@ -3,9 +3,14 @@
   <PropertyGroup Label="UserMacros">
     <PyTangoBaseFile>_PyTango</PyTangoBaseFile>
     <TangoMajorVer>8</TangoMajorVer>
-    <TangoMinorVer>0</TangoMinorVer>
-    <TangoPatchVer>5</TangoPatchVer>
+    <TangoMinorVer>1</TangoMinorVer>
+    <TangoPatchVer>2</TangoPatchVer>
     <TangoVer>$(TangoMajorVer).$(TangoMinorVer).$(TangoPatchVer)</TangoVer>
+    <PyTangoMajorVer>8</PyTangoMajorVer>
+    <PyTangoMinorVer>1</PyTangoMinorVer>
+    <PyTangoPatchVer>1</PyTangoPatchVer>
+    <PyTangoVer>$(PyTangoMajorVer).$(PyTangoMinorVer).$(PyTangoPatchVer)</PyTangoVer>
+
     <BoostMajorVer>1</BoostMajorVer>
     <BoostMinorVer>53</BoostMinorVer>
     <BoostPatchVer>0</BoostPatchVer>
@@ -25,7 +30,7 @@
     <PyTangoCompileOptions>-Zm200 /MP2 /bigobj</PyTangoCompileOptions>
     <BaseDir>$(ProjectDir)..\..</BaseDir>
     <RelPrefixDir>$(Configuration)_$(Platform)_msvc$(VCVer)</RelPrefixDir>
-    <BaseBuildDir>c:\temp\pytango\build</BaseBuildDir>
+    <BaseBuildDir>c:\temp\pytango\build_$(PyTangoVer)_tg$(TangoVer)_boost$(BoostVer)</BaseBuildDir>
     <BaseBuildLibDir>$(BaseBuildDir)\lib</BaseBuildLibDir>
     <BaseTempDir>$(BaseBuildDir)\temp</BaseTempDir>
     <BaseDistDir>$(BaseBuildDir)\dist</BaseDistDir>
