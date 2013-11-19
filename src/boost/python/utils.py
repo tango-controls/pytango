@@ -24,7 +24,6 @@ __all__ = [ "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
             "document_method", "document_static_method", "document_enum",
             "CaselessList", "CaselessDict", "EventCallBack", "get_home",
             "from_version_str_to_hex_str", "from_version_str_to_int",
-            "server_run",
             "seq_2_StdStringVector", "StdStringVector_2_seq" ]
 
 __docformat__ = "restructuredtext"
@@ -32,7 +31,6 @@ __docformat__ = "restructuredtext"
 import os
 import sys
 import numbers
-import traceback
 import collections
 
 from ._PyTango import StdStringVector, StdDoubleVector, \
@@ -92,6 +90,7 @@ _scalar_to_array_type = {
 
 __device_classes = None
 
+
 def get_tango_device_classes():
     global __device_classes
     if __device_classes is None:
@@ -139,20 +138,26 @@ __int_klasses = tuple(__int_klasses)
 __number_klasses = tuple(__number_klasses)
 __seq_klasses = tuple(__seq_klasses)
 
+
 def is_pure_str(obj):
     return isinstance(obj , __str_klasses)
+
 
 def is_seq(obj):
     return isinstance(obj, __seq_klasses)
 
+
 def is_non_str_seq(obj):
     return is_seq(obj) and not is_pure_str(obj)
+
 
 def is_integer(obj):
     return isinstance(obj, __int_klasses)
 
+
 def is_number(obj):
     return isinstance(obj, __number_klasses)
+
 
 def is_scalar(tg_type):
     """Tells if the given tango type is a scalar
@@ -183,6 +188,7 @@ def is_array(tg_type):
 
 is_array_type = is_array
 
+
 def is_numerical(tg_type, inc_array=False):
     """Tells if the given tango type is numerical
     
@@ -203,6 +209,7 @@ def is_numerical(tg_type, inc_array=False):
     return tg_type in _array_numerical_types
 
 is_numerical_type = is_numerical
+
 
 def is_int(tg_type, inc_array=False):
     """Tells if the given tango type is integer
@@ -225,6 +232,7 @@ def is_int(tg_type, inc_array=False):
 
 is_int_type = is_int
 
+
 def is_float(tg_type, inc_array=False):
     """Tells if the given tango type is float
     
@@ -245,6 +253,7 @@ def is_float(tg_type, inc_array=False):
     return tg_type in _array_float_types
 
 is_float_type = is_float
+
 
 def is_bool(tg_type, inc_array=False):
     """Tells if the given tango type is boolean
@@ -288,6 +297,7 @@ def is_str(tg_type, inc_array=False):
 
 is_str_type = is_str
 
+
 def is_bin(tg_type, inc_array=False):
     """Tells if the given tango type is binary
     
@@ -304,6 +314,7 @@ def is_bin(tg_type, inc_array=False):
     return tg_type in _scalar_bin_types
 
 is_bin_type = is_bin
+
 
 def seq_2_StdStringVector(seq, vec=None):
     """Converts a python sequence<str> object to a :class:`PyTango.StdStringVector`
@@ -325,6 +336,7 @@ def seq_2_StdStringVector(seq, vec=None):
         vec.append(str(e))
     return vec
 
+
 def StdStringVector_2_seq(vec, seq=None):
     """Converts a :class:`PyTango.StdStringVector` to a python sequence<str>
         
@@ -341,6 +353,7 @@ def StdStringVector_2_seq(vec, seq=None):
     for e in vec:
         seq.append(str(e))
     return seq
+
 
 def seq_2_StdDoubleVector(seq, vec=None):
     """Converts a python sequence<float> object to a :class:`PyTango.StdDoubleVector`
@@ -362,6 +375,7 @@ def seq_2_StdDoubleVector(seq, vec=None):
         vec.append(str(e))
     return vec
 
+
 def StdDoubleVector_2_seq(vec, seq=None):
     """Converts a :class:`PyTango.StdDoubleVector` to a python sequence<float>
         
@@ -377,6 +391,7 @@ def StdDoubleVector_2_seq(vec, seq=None):
         raise TypeError('vec must be a PyTango.StdDoubleVector')
     for e in vec: seq.append(float(e))
     return seq
+
 
 def seq_2_DbDevInfos(seq, vec=None):
     """Converts a python sequence<DbDevInfo> object to a :class:`PyTango.DbDevInfos`
@@ -397,6 +412,7 @@ def seq_2_DbDevInfos(seq, vec=None):
     for e in seq: vec.append(e)
     return vec
 
+
 def seq_2_DbDevExportInfos(seq, vec=None):
     """Converts a python sequence<DbDevExportInfo> object to a :class:`PyTango.DbDevExportInfos`
         
@@ -415,6 +431,7 @@ def seq_2_DbDevExportInfos(seq, vec=None):
         raise TypeError('vec must be a PyTango.DbDevExportInfos')
     for e in seq: vec.append(e)
     return vec
+
 
 def seq_2_DbData(seq, vec=None):
     """Converts a python sequence<DbDatum> object to a :class:`PyTango.DbData`
@@ -435,6 +452,7 @@ def seq_2_DbData(seq, vec=None):
     for e in seq: vec.append(e)
     return vec
 
+
 def DbData_2_dict(db_data, d=None):
     if d is None: d = {}
     if not isinstance(db_data, DbData):
@@ -442,6 +460,7 @@ def DbData_2_dict(db_data, d=None):
     for db_datum in db_data:
         d[db_datum.name] = db_datum.value_string
     return d
+
 
 def seqStr_2_obj(seq, tg_type, tg_format=None):
     """Translates a sequence<str> to a sequence of objects of give type and format
@@ -458,6 +477,7 @@ def seqStr_2_obj(seq, tg_type, tg_format=None):
     if tg_format:
         return _seqStr_2_obj_from_type_format(seq, tg_type, tg_format)
     return _seqStr_2_obj_from_type(seq, tg_type)
+
 
 def _seqStr_2_obj_from_type(seq, tg_type):
 
@@ -506,6 +526,7 @@ def _seqStr_2_obj_from_type(seq, tg_type):
 
     return []
 
+
 def _seqStr_2_obj_from_type_format(seq, tg_type, tg_format):
     if tg_format == AttrDataFormat.SCALAR:
         return _seqStr_2_obj_from_type(tg_type, seq)
@@ -538,8 +559,10 @@ def _seqStr_2_obj_from_type_format(seq, tg_type, tg_format):
     #UNKNOWN_FORMAT
     return _seqStr_2_obj_from_type(tg_type, seq)
 
+
 def scalar_to_array_type(dtype):
     return _scalar_to_array_type[dtype]
+
 
 def obj_2_str(obj, tg_type):
     """Converts a python object into a string according to the given tango type
@@ -572,6 +595,7 @@ def __get_meth_func(klass, method_name):
         func = meth.im_func
     return meth, func
 
+
 def copy_doc(klass, fnname):
     """Copies documentation string of a method from the super class into the
     rewritten method of the given class"""
@@ -579,6 +603,7 @@ def copy_doc(klass, fnname):
     meth, func = __get_meth_func(klass, fnname)
     func.__doc__ = base_func.__doc__
 
+    
 def document_method(klass, method_name, d, add=True):
     meth, func = __get_meth_func(klass, method_name)
     if add:
@@ -594,6 +619,7 @@ def document_method(klass, method_name, d, add=True):
         except AttributeError:
             pass
 
+        
 def document_static_method(klass, method_name, d, add=True):
     meth, func = __get_meth_func(klass, method_name)
     if add:
@@ -603,6 +629,7 @@ def document_static_method(klass, method_name, d, add=True):
             return
     meth.__doc__ = d
 
+    
 def document_enum(klass, enum_name, desc, append=True):
     # derived = type(base)('derived', (base,), {'__doc__': 'desc'})
 
@@ -620,6 +647,7 @@ def document_enum(klass, enum_name, desc, append=True):
     # Replace the original enum type with the new one
     setattr(klass, enum_name, derived)
 
+    
 class CaselessList(list):
     """A case insensitive lists that has some caseless methods. Only allows 
     strings as list members. Most methods that would normally return a list, 
@@ -1034,6 +1062,7 @@ class EventCallBack(object):
         elif isinstance(evt, DataReadyEventData):
             return ""
 
+        
 def get_home():
     """
     Find user's home directory if possible. Otherwise raise error.
@@ -1060,6 +1089,7 @@ def get_home():
     else:
         raise RuntimeError('please define environment variable $HOME')
 
+    
 def _get_env_var(env_var_name):
     """
     Returns the value for the given environment name
@@ -1104,141 +1134,14 @@ def _get_env_var(env_var_name):
         if key == env_var_name:
             return val
 
+        
 def from_version_str_to_hex_str(version_str):
     v = map(int, version_str.split('.'));
     return "0x%02d%02d%02d00" % (v[0], v[1], v[2])
 
+
 def from_version_str_to_int(version_str):
     return int(from_version_str_to_hex_str(version_str, 16))
-
-def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
-                 event_loop=None):
-    import PyTango
-    if msg_stream is None:
-        import io
-        msg_stream = io.BytesIO()
-
-    if args is None:
-        args = sys.argv
-
-    if util is None:
-        util = PyTango.Util(args)
-
-    if is_seq(classes):
-        for klass_info in classes:
-            if not hasattr(klass_info, '_api') or klass_info._api < 2:
-                raise Exception("When giving a single class, it must implement HLAPI (see PyTango.hlapi)")
-            klass_klass = klass_info._DeviceClass
-            klass_name = klass_info._DeviceClassName
-            klass = klass_info
-            util.add_class(klass_klass, klass, klass_name)
-    else:
-        for klass_name, klass_info in classes.items():
-            if is_seq(klass_info):
-                klass_klass, klass = klass_info
-            else:
-                if not hasattr(klass_info, '_api') or klass_info._api < 2:
-                    raise Exception("When giving a single class, it must implement HLAPI (see PyTango.hlapi)")
-                klass_klass = klass_info._DeviceClass
-                klass_name = klass_info._DeviceClassName
-                klass = klass_info
-            util.add_class(klass_klass, klass, klass_name)
-    u_instance = PyTango.Util.instance()
-    if event_loop is not None:
-        u_instance.server_set_event_loop(event_loop)
-    u_instance.server_init()
-    msg_stream.write("Ready to accept request\n")
-    u_instance.server_run()
-    return util
-
-def server_run(classes, args=None, msg_stream=sys.stdout,
-               verbose=False, util=None, event_loop=None):
-    """Provides a simple way to run a tango server. It handles exceptions
-       by writting a message to the msg_stream.
-
-       The `classes` parameter can be either a sequence of :class:`~PyTango.hlapi.Device`
-       classes or a dictionary where:
-       
-       * key is the tango class name
-       * value is either:
-           #. a :class:`~PyTango.hlapi.Device` class or
-           #. a a sequence of two elements :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`
-           
-       Example 1: registering and running a PowerSupply inheriting from :class:`~PyTango.hlapi.Device`::
-       
-           from PyTango import server_run
-           from PyTango.hlapi import Device, DeviceMeta
-       
-           class PowerSupply(Device):
-               __metaclass__ = DeviceMeta
-               
-           server_run((PowerSupply,))
-           
-       Example 2: registering and running a MyServer defined by tango classes 
-       `MyServerClass` and `MyServer`::
-       
-           import PyTango
-
-           class MyServer(PyTango.Device_4Impl):
-               pass
-               
-           class MyServerClass(PyTango.DeviceClass):
-               pass
-       
-           PyTango.server_run({"MyServer": (MyServerClass, MyServer)})
-       
-       :param classes:
-           a sequence of :class:`~PyTango.hlapi.Device` classes or
-           a dictionary where keyword is the tango class name and value is a 
-           sequence of Tango Device Class python class, and Tango Device python class
-       :type classes: sequence or dict
-       
-       :param args:
-           list of command line arguments [default: None, meaning use sys.argv]
-       :type args: list
-       
-       :param msg_stream:
-           stream where to put messages [default: sys.stdout]
-       
-       :param util:
-           PyTango Util object [default: None meaning create a Util instance]
-       :type util: :class:`~PyTango.Util`
-
-       :param event_loop: event_loop callable
-       :type event_loop: callable
-       
-       :return: The Util singleton object
-       :rtype: :class:`~PyTango.Util`
-       
-       .. versionadded:: 8.0.0
-       
-       .. versionchanged:: 8.0.3
-           Added `util` keyword parameter.
-           Returns util object
-
-       .. versionchanged:: 8.1.1
-           Changed default msg_stream from *stderr* to *stdout*
-           Added `event_loop` keyword parameter.
-           Returns util object"""
-
-    if msg_stream is None:
-        import io
-        msg_stream = io.BytesIO()
-    write = msg_stream.write
-    try:
-        return __server_run(classes, args=args, util=util, event_loop=event_loop)
-        write("Exiting:\n")
-    except KeyboardInterrupt:
-        write("Exiting: Keyboard interrupt\n")
-    except DevFailed as df:
-        write("Exiting: Server exited with PyTango.DevFailed:\n" + str(df) + "\n")
-        if verbose:
-            write(traceback.format_exc())
-    except Exception as e:
-        write("Exiting: Server exited with unforseen exception:\n" + str(e) + "\n")
-        if verbose:
-            write(traceback.format_exc())
-    write("\nExited\n")
 
 
 def info():

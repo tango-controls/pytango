@@ -173,8 +173,7 @@ from .globals import get_class, get_classes, get_cpp_class, get_cpp_classes, \
     delete_class_list, class_list, cpp_class_list, constructed_class
 from .utils import is_scalar_type, is_array_type, is_numerical_type, \
     is_int_type, is_float_type, obj_2_str, seqStr_2_obj
-from .utils import server_run
-from .tango_green import set_green_mode, get_green_mode
+from .green import set_green_mode, get_green_mode
 from .device_proxy import get_device_proxy
 from .tango_numpy import NumpyType, numpy_type, numpy_spectrum, numpy_image
 

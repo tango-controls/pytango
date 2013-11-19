@@ -27,7 +27,7 @@ from ._PyTango import StdStringVector, DbData, DbDatum, DeviceProxy
 from ._PyTango import __AttributeProxy as _AttributeProxy
 from .utils import seq_2_StdStringVector, seq_2_DbData, DbData_2_dict
 from .utils import is_pure_str, is_non_str_seq
-from .tango_green import result, submit, get_green_mode
+from .green import result, submit, get_green_mode
 
 
 def get_attribute_proxy(*args, **kwargs):

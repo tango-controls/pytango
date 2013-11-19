@@ -101,6 +101,9 @@ AttributeProxy.__doc__ = """
     New in PyTango 8.1.0
 """
 
+Device = DeviceProxy
+Attribute = AttributeProxy
+
 del GreenMode
 del get_device_proxy
 del get_attribute_proxy

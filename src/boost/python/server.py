@@ -150,14 +150,17 @@ from __future__ import with_statement
 from __future__ import print_function
 
 __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute", "command",
-           "device_property", "class_property"]
+           "device_property", "class_property", "server_run"]
 
 import __builtin__
+import sys
 import inspect
 import functools
+import traceback
 
 from ._PyTango import DeviceImpl, Attribute, WAttribute, CmdArgType
 from ._PyTango import AttrDataFormat, AttrWriteType, DispLevel, constants
+from ._PyTango import DevFailed
 from .attr_data import AttrData
 from .device_class import DeviceClass
 from .utils import get_tango_device_classes, is_seq, is_non_str_seq
@@ -281,6 +284,7 @@ def set_complex_value(attr, value):
         else:
             attr.set_value(value)
 
+            
 def check_tango_device_klass_attribute_read_method(tango_device_klass, method_name):
     """Checks if method given by it's name for the given DeviceImpl class has
     the correct signature. If a read/write method doesn't have a parameter
@@ -301,6 +305,7 @@ def check_tango_device_klass_attribute_read_method(tango_device_klass, method_na
         return ret
     setattr(tango_device_klass, method_name, read_attr)
 
+    
 def check_tango_device_klass_attribute_write_method(tango_device_klass, method_name):
     """Checks if method given by it's name for the given DeviceImpl class has
     the correct signature. If a read/write method doesn't have a parameter
@@ -319,6 +324,7 @@ def check_tango_device_klass_attribute_write_method(tango_device_klass, method_n
         return write_method(self, value)
     setattr(tango_device_klass, method_name, write_attr)
 
+    
 def check_tango_device_klass_attribute_methods(tango_device_klass, attr_data):
     """Checks if the read and write methods have the correct signature. If a 
     read/write method doesn't have a parameter (the traditional Attribute),
@@ -332,11 +338,37 @@ def check_tango_device_klass_attribute_methods(tango_device_klass, attr_data):
         check_tango_device_klass_attribute_read_method(tango_device_klass, attr_data.read_method_name)
     if attr_data.attr_write in (AttrWriteType.WRITE, AttrWriteType.READ_WRITE):
         check_tango_device_klass_attribute_write_method(tango_device_klass, attr_data.write_method_name)
+
+
+class _DeviceClass(DeviceClass):
+
+    def __init__(self, name):
+        DeviceClass.__init__(self, name)
+        self.set_type(name)
+
+    def dyn_attr(self, dev_list):
+        """Invoked to create dynamic attributes for the given devices.
+        Default implementation calls
+        :meth:`TT.initialize_dynamic_attributes` for each device
+    
+        :param dev_list: list of devices
+        :type dev_list: :class:`PyTango.DeviceImpl`"""
+
+        for dev in dev_list:
+            init_dyn_attrs = getattr(dev, "initialize_dynamic_attributes", None)
+            if init_dyn_attrs and callable(init_dyn_attrs):
+                try:
+                    init_dyn_attrs()
+                except Exception:
+                    import traceback
+                    dev.warn_stream("Failed to initialize dynamic attributes")
+                    dev.debug_stream("Details: " + traceback.format_exc())
+    
         
 def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     klass_name = tango_device_klass.__name__
     if not issubclass(tango_device_klass, (Device)):
-        msg = "{0} device must inherit from PyTango.hlapi.Device".format(klass_name)
+        msg = "{0} device must inherit from PyTango.server.Device".format(klass_name)
         raise Exception(msg)
     
     if attrs is None:
@@ -360,18 +392,14 @@ def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
             if hasattr(attr_obj, "__tango_command__"):
                 cmd_name, cmd_info = attr_obj.__tango_command__
                 cmd_list[cmd_name] = cmd_info
-            
-    devclass_name = klass_name + "Class"
     
-    def device_class_constructor(self, name):
-        DeviceClass.__init__(self, name)
-        self.set_type(name)
+    devclass_name = klass_name + "Class"
     
     devclass_attrs = dict(class_property_list=class_property_list,
                           device_property_list=device_property_list,
                           cmd_list=cmd_list, attr_list=attr_list)
-    devclass_attrs['__init__'] = device_class_constructor
-    return type(devclass_name, (DeviceClass,), devclass_attrs)
+    return type(devclass_name, (_DeviceClass,), devclass_attrs)
+
 
 def init_tango_device_klass(tango_device_klass, attrs=None, tango_class_name=None):
     klass_name = tango_device_klass.__name__
@@ -384,6 +412,7 @@ def init_tango_device_klass(tango_device_klass, attrs=None, tango_class_name=Non
     tango_device_klass._api = API_VERSION
     return tango_device_klass
 
+
 def create_tango_device_klass(name, bases, attrs):
     klass_name = name
 
@@ -391,7 +420,8 @@ def create_tango_device_klass(name, bases, attrs):
     klass = LatestDeviceImplMeta(klass_name, bases, attrs)
     init_tango_device_klass(klass, attrs)
     return klass
-    
+
+
 def DeviceMeta(name, bases, attrs):
     """The :py:data:`metaclass` callable for :class:`Device`. Every subclass of
     :class:`Device` must have associated this metaclass to itself in order to
@@ -399,14 +429,14 @@ def DeviceMeta(name, bases, attrs):
     
     Example (python 2.x)::
     
-        from PyTango.hlapi import Device, DeviceMeta
+        from PyTango.server import Device, DeviceMeta
 
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
 
     Example (python 3.x)::
     
-        from PyTango.hlapi import Device, DeviceMeta
+        from PyTango.server import Device, DeviceMeta
 
         class PowerSupply(Device, metaclass=DeviceMeta):
             pass
@@ -647,3 +677,133 @@ class device_property(_property):
 
 class class_property(_property):
     pass
+
+
+def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
+                 event_loop=None):
+    import PyTango
+    if msg_stream is None:
+        import io
+        msg_stream = io.BytesIO()
+
+    if args is None:
+        args = sys.argv
+
+    if util is None:
+        util = PyTango.Util(args)
+
+    if is_seq(classes):
+        for klass_info in classes:
+            if not hasattr(klass_info, '_api') or klass_info._api < 2:
+                raise Exception("When giving a single class, it must implement HLAPI (see PyTango.server)")
+            klass_klass = klass_info._DeviceClass
+            klass_name = klass_info._DeviceClassName
+            klass = klass_info
+            util.add_class(klass_klass, klass, klass_name)
+    else:
+        for klass_name, klass_info in classes.items():
+            if is_seq(klass_info):
+                klass_klass, klass = klass_info
+            else:
+                if not hasattr(klass_info, '_api') or klass_info._api < 2:
+                    raise Exception("When giving a single class, it must implement HLAPI (see PyTango.server)")
+                klass_klass = klass_info._DeviceClass
+                klass_name = klass_info._DeviceClassName
+                klass = klass_info
+            util.add_class(klass_klass, klass, klass_name)
+    u_instance = PyTango.Util.instance()
+    if event_loop is not None:
+        u_instance.server_set_event_loop(event_loop)
+    u_instance.server_init()
+    msg_stream.write("Ready to accept request\n")
+    u_instance.server_run()
+    return util
+
+
+def server_run(classes, args=None, msg_stream=sys.stdout,
+               verbose=False, util=None, event_loop=None):
+    """Provides a simple way to run a tango server. It handles exceptions
+       by writting a message to the msg_stream.
+
+       The `classes` parameter can be either a sequence of :class:`~PyTango.server.Device`
+       classes or a dictionary where:
+       
+       * key is the tango class name
+       * value is either:
+           #. a :class:`~PyTango.server.Device` class or
+           #. a a sequence of two elements :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`
+           
+       Example 1: registering and running a PowerSupply inheriting from :class:`~PyTango.server.Device`::
+       
+           from PyTango import server_run
+           from PyTango.server import Device, DeviceMeta
+       
+           class PowerSupply(Device):
+               __metaclass__ = DeviceMeta
+               
+           server_run((PowerSupply,))
+           
+       Example 2: registering and running a MyServer defined by tango classes 
+       `MyServerClass` and `MyServer`::
+       
+           import PyTango
+
+           class MyServer(PyTango.Device_4Impl):
+               pass
+               
+           class MyServerClass(PyTango.DeviceClass):
+               pass
+       
+           PyTango.server_run({"MyServer": (MyServerClass, MyServer)})
+       
+       :param classes:
+           a sequence of :class:`~PyTango.server.Device` classes or
+           a dictionary where keyword is the tango class name and value is a 
+           sequence of Tango Device Class python class, and Tango Device python class
+       :type classes: sequence or dict
+       
+       :param args:
+           list of command line arguments [default: None, meaning use sys.argv]
+       :type args: list
+       
+       :param msg_stream:
+           stream where to put messages [default: sys.stdout]
+       
+       :param util:
+           PyTango Util object [default: None meaning create a Util instance]
+       :type util: :class:`~PyTango.Util`
+
+       :param event_loop: event_loop callable
+       :type event_loop: callable
+       
+       :return: The Util singleton object
+       :rtype: :class:`~PyTango.Util`
+       
+       .. versionadded:: 8.0.0
+       
+       .. versionchanged:: 8.0.3
+           Added `util` keyword parameter.
+           Returns util object
+
+       .. versionchanged:: 8.1.1
+           Changed default msg_stream from *stderr* to *stdout*
+           Added `event_loop` keyword parameter.
+           Returns util object"""
+
+    if msg_stream is None:
+        import io
+        msg_stream = io.BytesIO()
+    write = msg_stream.write
+    try:
+        return __server_run(classes, args=args, util=util, event_loop=event_loop)
+    except KeyboardInterrupt:
+        write("Exiting: Keyboard interrupt\n")
+    except DevFailed as df:
+        write("Exiting: Server exited with PyTango.DevFailed:\n" + str(df) + "\n")
+        if verbose:
+            write(traceback.format_exc())
+    except Exception as e:
+        write("Exiting: Server exited with unforseen exception:\n" + str(e) + "\n")
+        if verbose:
+            write(traceback.format_exc())
+    write("\nExited\n")

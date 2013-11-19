@@ -28,16 +28,11 @@ void export_constants()
 
 #ifdef DISABLE_PYTANGO_NUMPY
     consts_scope.attr("NUMPY_SUPPORT") = false;
+    consts_scope.attr("NUMPY_VERSION") = "0.0.0";
 #else
     consts_scope.attr("NUMPY_SUPPORT") = true;
-#endif
-
-#ifdef PYTANGO_NUMPY_VERSION
     consts_scope.attr("NUMPY_VERSION") = NPY_VERSION;
-#else
-    consts_scope.attr("NUMPY_VERSION") = "0.0.0";
 #endif
-
 
     consts_scope.attr("PY_MAJOR_VERSION") = PY_MAJOR_VERSION;
     consts_scope.attr("PY_MINOR_VERSION") = PY_MINOR_VERSION;

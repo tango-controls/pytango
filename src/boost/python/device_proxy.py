@@ -31,7 +31,7 @@ from .utils import is_pure_str, is_non_str_seq, is_integer
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
 from .utils import seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
-from .tango_green import result, submit, green, get_green_mode
+from .green import result, submit, green, get_green_mode
 
 
 def get_device_proxy(*args, **kwargs):

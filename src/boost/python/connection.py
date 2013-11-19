@@ -24,7 +24,7 @@ from ._PyTango import Connection, DeviceData, __CallBackAutoDie, CmdArgType, \
     DeviceProxy, Database, ExtractAs
 from .utils import document_method as __document_method
 from .utils import document_static_method as __document_static_method
-from .tango_green import green
+from .green import green
 
 
 def __CallBackAutoDie__cmd_ended_aux(self, fn):
