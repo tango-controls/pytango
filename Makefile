@@ -49,6 +49,8 @@ else
 NUMPY_INC = -I$(NUMPY_ROOT)/include
 endif
 
+PYTANGO_NUMPY_VERSION = \"$(shell $(PY_EXC) -c "import sys, numpy; sys.stdout.write(numpy.__version__)")\"
+
 ifndef prefix
 ifdef user
 _PY_DIR=$(shell $(PY_EXC) -c "import sys, os; sys.stdout.write(os.path.split(os.path.join(os.path.dirname(os.__file__)))[1])")
@@ -129,7 +131,7 @@ INCLUDE_DIRS += \
     $(PY_INC) \
     $(NUMPY_INC)
 
-MACROS := -DNDEBUG -DPYTANGO_HAS_UNIQUE_PTR
+MACROS := -DNDEBUG -DPYTANGO_HAS_UNIQUE_PTR -DPYTANGO_NUMPY_VERSION=$(PYTANGO_NUMPY_VERSION)
 CFLAGS := -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC $(OPTIMIZE_CC) $(MACROS) $(TANGO_CFLAGS) $(INCLUDE_DIRS)
 LNFLAGS := $(LN_DIRS) $(LN_LIBS)
 

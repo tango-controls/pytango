@@ -142,8 +142,10 @@ def get_script_files():
     return scripts
 
 
-def add_lib(name, dirs, sys_libs, lib_name=None, inc_suffix=None):
-    ENV = os.environ.get(name.upper() + '_ROOT')
+def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None):
+    if env_name is None:
+        env_name = name.upper() + '_ROOT'
+    ENV = os.environ.get(env_name)
     if lib_name is None:
         lib_name = name
     if ENV is None:
@@ -321,8 +323,6 @@ class install(dftinstall):
 
     
 def main():
-    #ZMQ_ROOT = LOG4TANGO_ROOT = BOOST_ROOT = OMNI_ROOT = TANGO_ROOT = '/usr'
-
     macros = []
     
     directories = dict(include_dirs=[abspath('src', 'boost', 'cpp')],
@@ -369,6 +369,8 @@ def main():
 
     if not has_numpy():
         macros.append(('DISABLE_PYTANGO_NUMPY', None))
+    else:
+        macros.append(('PYTANGO_NUMPY_VERSION', '"' + str(numpy.__version__) + '"'))
 
     if 'posix' in os.name:
         directories = pkg_config(*sys_libs, **directories)
