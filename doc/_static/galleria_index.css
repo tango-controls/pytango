@@ -1,0 +1,10 @@
+.galleria { margin:auto; } 
+.galleria-container { background: transparent; }
+.galleria-thumbnails {visibility:hidden;}
+.galleria-thumbnails-container {visibility:hidden; height:0px;}
+/*
+.galleria-image-nav-left {visibility:hidden;}
+.galleria-image-nav-right {visibility:hidden;}
+.galleria-thumb-nav-left {visibility:hidden;}
+.galleria-thumb-nav-right {visibility:hidden;}
+*/

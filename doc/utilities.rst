@@ -3,8 +3,6 @@
 The Utilities API
 =================
 
-.. autofunction:: PyTango.server_run
-
 .. currentmodule:: PyTango.utils
 
 .. autoclass:: PyTango.utils.EventCallBack

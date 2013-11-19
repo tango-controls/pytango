@@ -1,7 +1,15 @@
-from __future__ import print_function
+# ------------------------------------------------------------------------------
+# This file is part of PyTango (http://www.tinyurl.com/PyTango)
+#
+# Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
+# Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+#
+# Distributed under the terms of the GNU Lesser General Public License,
+# either version 3 of the License, or (at your option) any later version.
+# See LICENSE.txt for more info.
+# ------------------------------------------------------------------------------
 
-"""
-*build boost python script on windows*
+"""*build boost python script on windows*
 
 Purpose
     Build boost-python on multiple architectures (32 and 64bits), with different toolsets (vc9, vc10),
@@ -15,21 +23,25 @@ How to use it
     This script should be used together with another boost configuration file called user-config.jam.
     
     - Download boost source code from http://wwww.boost.org
-    - Extract boost to a directory (ex: c:\workspace\boost-1.53.0)
-    - Place this file in your boost extract directory (ex: c:\workspace\boost-1.53.0\boost_python_install.py)
-    - Place the user-config.jam file in %HOMEPATH%%HOMEDIR%
+    - Extract boost to a directory (ex: :file:`c:\\workspace\\boost-1.53.0`)
+    - Place this file in your boost extract directory
+      (ex: :file:`c:\\workspace\\boost-1.53.0\\boost_python_install.py`)
+    - Place the user-config.jam file in :envvar:`%HOMEPATH%%HOMEDIR%`
     - Open a console
     - Switch to the boost directory 
-    - Execute this script using python (ex: C:\Python\win32\26\python.exe boost_python_install.py
+    - Execute this script using python
+      (ex: :file:`C:\\Python\\win32\\26\\python.exe boost_python_install.py`
 """
+
+from __future__ import print_function
+
+
 # b2 --with-python --prefix=c:\boost-1.53.0 
 #    --libdir=c:\boost-1.53.0\msvc-9.0\Win32\release\shared\threading-multi\26
 #    toolset=msvc-9.0 address-model=32 variant=release link=shared
 #    threading=multi python=2.6 install
 
 import os
-import sys
-import pprint
 import subprocess
 
 boost_version = r"1.53.0"
@@ -75,13 +87,10 @@ def _main():
     
     toolsets = r"msvc-10.0",
     pythons = "3.3",    
-    compile()
+    compile_boost()
         
-def compile():
-    cur_dir = os.path.abspath(os.path.curdir)
-    
+def compile_boost():    
     prefix = r"c:\boost-" + boost_version
-    build_prefix = os.path.join(prefix, "build")
     
     silent_args = ""
     if silent:
@@ -98,8 +107,8 @@ def compile():
     cmd_line_template = base_cmd_line
     for option in options:
         cmd_line_template += " --{0}={{{1}}}".format(option, option)
-    for property in properties:
-        cmd_line_template += " {0}={{{1}}}".format(property, property)
+    for prop in properties:
+        cmd_line_template += " {0}={{{1}}}".format(prop, prop)
     
     cmd_line_template += " {0}".format(stage)
     fh = open("NUL", "w")

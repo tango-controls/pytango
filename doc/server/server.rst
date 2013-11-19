@@ -1,5 +1,5 @@
 
-.. currentmodule:: PyTango.hlapi
+.. currentmodule:: PyTango.server
 
 .. _pytango-hlapi:
 
@@ -15,8 +15,8 @@ high level API::
     
     import time
     from PyTango import server_run
-    from PyTango.hlapi import Device, DeviceMeta
-    from PyTango.hlapi import attribute, command   
+    from PyTango.server import Device, DeviceMeta
+    from PyTango.server import attribute, command   
 
     class Clock(Device):
         __metaclass__ = DeviceMeta
@@ -49,8 +49,8 @@ high level API. The example contains:
     from time import time
 
     from PyTango import AttrQuality, AttrWriteType, DispLevel, server_run
-    from PyTango.hlapi import Device, DeviceMeta, attribute, command
-    from PyTango.hlapi import class_property, device_property
+    from PyTango.server import Device, DeviceMeta, attribute, command
+    from PyTango.server import class_property, device_property
 
     class PowerSupply(Device):
         __metaclass__ = DeviceMeta
@@ -179,8 +179,8 @@ Here is an example of a PowerSupply device with:
     from time import time
         
     from PyTango import AttrQuality, DebugIt, server_run
-    from PyTango.hlapi import Device, DeviceMeta
-    from PyTango.hlapi import attribute, command, device_property
+    from PyTango.server import Device, DeviceMeta
+    from PyTango.server import attribute, command, device_property
 
     class PowerSupply(Device):
         __metaclass__ = DeviceMeta
@@ -298,17 +298,19 @@ And here is the equivalent code using the low-level API:
 API
 ---
 
-.. automodule:: PyTango.hlapi
+.. automodule:: PyTango.server
 
    .. autoclass:: Device
       :show-inheritance:
       :inherited-members:
       :members:
 
-   .. autofunction:: attribute
+   .. autoclass:: attribute
 
    .. autofunction:: command
 
-   .. autofunction:: device_property
+   .. autoclass:: device_property
 
-   .. autofunction:: class_property
+   .. autoclass:: class_property
+
+   .. autofunction:: server_run

@@ -755,7 +755,7 @@ Server API
 .. toctree::
     :maxdepth: 2
     
-    hlapi
+    server
     device
     device_class
     logging
