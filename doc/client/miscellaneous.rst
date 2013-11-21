@@ -12,7 +12,7 @@ module. The :obj:`~PyTango.GreenMode.Futures` uses the standard python module
 :mod:`concurrent.futures`.
 
 You can set the PyTango green mode at a global level. Set the environment
-variable :envvar:`PYTANGO_GREEN_MODE` to either gevent or futures
+variable :envvar:`PYTANGO_GREEN_MODE` to either gevent_ or futures
 (case incensitive). If this environment variable is not defined the PyTango
 global green mode defaults to *Synchronous*.
 
@@ -20,6 +20,8 @@ Currently, at version 8.1, only :class:`DeviceProxy` has been modified to work
 in a green cooperative way. If the work is found to be useful, the same can
 be implemented in the future for :class:`AttributeProxy` and even 
 to :class:`Database`.
+
+
 
 You can also change the active global green mode at any time in your program::
 
@@ -427,3 +429,4 @@ See :class:`DeviceAttribute`.
     :members:
 
 See :class:`DeviceData`.
+

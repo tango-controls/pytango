@@ -1,10 +1,7 @@
 {% extends "layout.html" %}
 {% set title = 'PyTango documentation' %}
-{% set script_files = script_files + ["_static/galleria/galleria-1.3.2.js",
-                                      "_static/galleria_index.js",
-                                      "_static/galleria/themes/classic/galleria.classic.min.js"] %}
-{% set css_files = css_files + ["_static/galleria/themes/classic/galleria.classic.css",
-                                "_static/galleria_index.css"] %}
+
+{% set script_files = script_files + ["_static/slideshow.js"] %}
 
 {% block body %}
 
@@ -18,19 +15,159 @@
   of this in pure python.
 </p>
 
-<div class="galleria"/>
+<div id="gallery" style="width:780px; height:525px; margin:auto;">
 
-<script>
-  Galleria.run(".galleria", config);
-</script>
+  <!-- 1st snap -->
+  <img src="_static/banner1.png" />
+  <!-- 2nd snap -->
+  <img src="_static/banner2.png" />
+
+  <!-- 3rd snap -->
+  <table style="width:100%;"><tr>
+  <td>
+
+<div class="highlight-python"><div class="highlight"><pre>
+<span class="c"># ----------------- server ------------------</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">PyTango.server</span> <span class="kn">import</span> <span class="n">server_run</span>
+<span class="kn">from</span> <span class="nn">PyTango.server</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">DeviceMeta</span>
+<span class="kn">from</span> <span class="nn">PyTango.server</span> <span class="kn">import</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">command</span>
+
+
+<span class="k">class</span> <span class="nc">Clock</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">DeviceMeta</span>
+
+    <span class="n">time</span> <span class="o">=</span> <span class="n">attribute</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">read_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="nd">@command</span><span class="p">(</span><span class="n">dtype_in</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">dtype_out</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">strftime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tformat</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">tformat</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">server_run</span><span class="p">((</span><span class="n">Clock</span><span class="p">,))</span>
+</pre></div>
+</div>
+
+  </td>
+  <td>
+
+<div class="highlight-python"><div class="highlight"><pre>
+<span class="c">$ # ---------------- client -----------------</span>
+
+<span class="n">$ python</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">PyTango</span> <span class="kn">import</span> <span class="n">DeviceProxy</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clock</span> <span class="o">=</span> <span class="n">DeviceProxy</span><span class="p">(</span><span class="s">"my/first/clock"</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clock</span><span class="o">.</span><span class="n">time</span>
+<span class="go">1384447223.774121</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clock</span><span class="o">.</span><span class="n">read_attribute</span><span class="p">(</span><span class="s">"time"</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+<span class="go">1384447252.037578</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clock</span><span class="o">.</span><span class="n">command_inout</span><span class="p">(</span><span class="s">"strftime"</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="s">"%H:%M:%S"</span><span class="p">)</span>
+<span class="go">'17:41:50'</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clock</span><span class="o">.</span><span class="n">status</span><span class="p">()</span>
+<span class="go">The device is in UNKNOWN state.</span>
+
+
+
+</pre></div>
+</div>
+
+  </td>
+  </tr></table>
+
+  <!-- 4th snap -->
+  <table style="width:100%;"><tr>
+  <td>
+
+<div class="highlight-python"><div class="highlight"><pre>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># ---------- gevent client -----------</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">PyTango.gevent</span> <span class="kn">import</span> <span class="n">DeviceProxy</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dev</span> <span class="o">=</span> <span class="n">DeviceProxy</span><span class="p">(</span><span class="s">"sys/tg_test/1"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dev</span><span class="o">.</span><span class="n">get_green_mode</span><span class="p">()</span>
+<span class="go">PyTango.GreenMode.Gevent</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Synchronous but green!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">dev</span><span class="o">.</span><span class="n">state</span><span class="p">())</span>
+<span class="go">RUNNING</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Asynchronous</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">state</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="go">&lt;gevent.event.AsyncResult at 0x1a74050&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+<span class="go">RUNNING</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Synchronous, but green!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">dev</span><span class="o">.</span><span class="n">long_scalar</span><span class="p">)</span>
+<span class="go">832</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Asynchronous</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">read_attribute</span><span class="p">(</span><span class="s">"long_scalar"</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">wait</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="go">&lt;gevent.event.AsyncResult at 0x1a9f54&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+<span class="go">126</span>
+</pre></div>
+</div>
+
+  </td>
+  <td>
+
+<div class="highlight-python"><div class="highlight"><pre>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># ----- concurrent.futures client -----</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">PyTango.futures</span> <span class="kn">import</span> <span class="n">DeviceProxy</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dev</span> <span class="o">=</span> <span class="n">DeviceProxy</span><span class="p">(</span><span class="s">"sys/tg_test/1"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dev</span><span class="o">.</span><span class="n">get_green_mode</span><span class="p">()</span>
+<span class="go">PyTango.GreenMode.Futures</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Synchronous</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">dev</span><span class="o">.</span><span class="n">state</span><span class="p">())</span>
+<span class="go">RUNNING</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Asynchronous</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">state</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="go">&lt;Future at 0x34a9e51 state=pending&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">result</span><span class="p">())</span>
+<span class="go">RUNNING</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Synchronous</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">dev</span><span class="o">.</span><span class="n">long_scalar</span><span class="p">)</span>
+<span class="go">832</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Asynchronous</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">read_attribute</span><span class="p">(</span><span class="s">"long_scalar"</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">wait</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="go">&lt;Future at 0x5d8a17b state=pending&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">result</span><span class="p">())</span>
+<span class="go">126</span>
+</pre></div>
+</div>
+
+  </td>
+  </tr></table>
+
+</div>
 
 <p>
     Check out the <a class="reference internal" href="start.html#getting-started"><em>getting started guide</em></a>
     to learn how to build and/or install PyTango and after that the <a class="reference internal" href="quicktour.html#quick-tour"><em>quick tour</em></a>
     can help you with the first steps in the PyTango world.
-</p>
-
-<p>
     If you need help understanding what Tango itself really is, you can check the
     <a class="reference external" href="http://www.tango-controls.org/">Tango</a>
     homepage where you will find plenty of documentation, FAQ and tutorials.

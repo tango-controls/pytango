@@ -19,6 +19,8 @@ import PyTango
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.append(os.path.abspath('sphinxext'))
 
+needs_sphinx = "1.0"
+
 # -- General configuration -----------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
@@ -227,6 +229,15 @@ latex_show_urls = 'footnote'
 
 # If false, no module index is generated.
 #latex_use_modindex = True
+
+# -- Options for RST -----------------------------------------------------------
+
+rst_epilog = """\
+.. _Tango: http://www.tango-controls.org/
+.. _IPython: http://ipython.org/
+.. _numpy: http://www.numpy.org/
+.. _gevent: http://www.gevent.org/
+"""
 
 # -- Options for reference to other documentation ------------------------------
 

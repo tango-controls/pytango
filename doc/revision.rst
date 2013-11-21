@@ -90,6 +90,8 @@ Version history
 |          | - `573: [pytango] python3 error with unregistered device <https://sourceforge.net/p/tango-cs/bugs/573/>`_                                                         |
 |          | - `611: URGENT fail to write attribute with PyTango 8.0.3 <https://sourceforge.net/p/tango-cs/bugs/611/>`_                                                        |
 |          | - `612: [pytango][8.0.3] failed to build from source on s390 <https://sourceforge.net/p/tango-cs/bugs/612/>`_                                                     |
+|          | - `622: PyTango broken when running on Ubuntu 13 <https://sourceforge.net/p/tango-cs/bugs/622/>`_                                                                 |
+|          | - `628: Problem in installing PyTango 8.0.3 on Scientific Linux 6 <https://sourceforge.net/p/tango-cs/bugs/628/>`_                                                |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.0    | *SKIPPED*                                                                                                                                                         |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+

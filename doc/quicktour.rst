@@ -14,7 +14,7 @@ Quick tour on the client side
 Check PyTango version
 ~~~~~~~~~~~~~~~~~~~~~
 
-Start an ipython tango console with::
+Start an IPython_ tango console with::
 
     $ itango
 
@@ -177,9 +177,9 @@ structures.
         
 .. note::
     notice that the command returns a list of two elements. The first element is
-    a :class:`numpy.ndarray` (assuming PyTango is compiled with numpy support).
+    a :class:`numpy.ndarray` (assuming PyTango is compiled with numpy_ support).
     This is because PyTango does a best effort to convert all numeric array types
-    to numpy arrays.
+    to numpy_ arrays.
     
 Reading and writing attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -500,5 +500,3 @@ The following code is the complete device server code::
 
     Quick tour (original) <quicktour_old>
     
-.. _IPython: http://ipython.org/
-.. _numpy: http://www.numpy.org/
