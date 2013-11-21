@@ -33,9 +33,9 @@ namespace PyDeviceData {
         void insert_scalar(Tango::DeviceData &self, object py_value)
         {
             typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-            TangoScalarType val;
-            val = boost::python::extract<TangoScalarType>(py_value);
-            self << val;
+            TangoScalarType value;
+	    from_py<tangoTypeConst>::convert(py_value.ptr(), value);
+            self << value;
         }
         template <>
         void insert_scalar<Tango::DEV_ENCODED>(Tango::DeviceData &self, object py_value)

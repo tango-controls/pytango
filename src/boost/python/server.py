@@ -17,7 +17,8 @@
 
 When declaring attributes, properties or commands, one of the most important
 information is the data type. It is given by the keyword argument *dtype*.
-This argument is not retricted to the :obj:`~PyTango.CmdArgType` options.
+In order to provide a more *pythonic* interface, this argument is not retricted
+to the :obj:`~PyTango.CmdArgType` options.
 
 For example, to define a *SCALAR* :obj:`~PyTango.CmdArgType.DevLong`
 attribute you have several possibilities:
@@ -33,14 +34,16 @@ attribute you have several possibilities:
 To define a *SPECTRUM* attribute simply wrap the scalar data type in any
 python sequence:
 
-* (:obj:`int`,)
-* [:obj:`int`]
+* using a *tuple*: ``(:obj:`int`,)`` or
+* using a *list*: ``[:obj:`int`]`` or
+* any other sequence type
 
 To define an *IMAGE* attribute simply wrap the scalar data type in any
 python sequence of sequences:
 
-* ((:obj:`int`,),)
-* [[:obj:`int`]]
+* using a *tuple*: ``((:obj:`int`,),)`` or
+* using a *list*: ``[[:obj:`int`]]`` or
+* any other sequence type
 
 Below is the complete table of equivalences.
 
@@ -459,6 +462,11 @@ class Device(LatestDeviceImpl):
     
     def always_executed_hook(self):
         """Tango always_executed_hook. Default implementation does nothing"""
+        pass
+
+    def initialize_dynamic_attributes(self):
+        """Method executed at initializion phase to create dynamic attributes.
+        Default implementation does nothing. Overwrite when necessary."""
         pass
 
 

@@ -91,6 +91,7 @@ struct from_py<tangoTypeConst> \
         { \
             cpy_type cpy_value = FN(o); \
             if(PyErr_Occurred()) { \
+	        PyErr_Clear(); \
                 PyErr_SetString(PyExc_TypeError, "Expecting a numeric type, it is not."); \
                 boost::python::throw_error_already_set();  \
             } \
@@ -123,18 +124,20 @@ struct from_py<tangoTypeConst> \
         { \
             cpy_type cpy_value = FN(o); \
             if(PyErr_Occurred()) { \
+	        PyErr_Clear(); \
                 if(PyArray_CheckScalar(o) && \
                 ( PyArray_DescrFromScalar(o) \
                     == PyArray_DescrFromType(TANGO_const2numpy(tangoTypeConst)))) \
                 { \
                     PyArray_ScalarAsCtype(o, reinterpret_cast<void*>(&tg)); \
                     return; \
-                } else \
+                } else { \
                     PyErr_SetString(PyExc_TypeError, "Expecting a numeric type," \
                         " but it is not. If you use a numpy type instead of" \
                         " python core types, then it must exactly match (ex:" \
-                        " numpy.int32 for PyTango.DevLong)"); \
+                        " numpy.int32 for PyTango.DevLong (1))"); \
                     boost::python::throw_error_already_set();  \
+		} \
             } \
             if (TangoScalarTypeLimits::is_integer) { \
                 if (cpy_value > (cpy_type)TangoScalarTypeLimits::max()) { \
@@ -150,6 +153,8 @@ struct from_py<tangoTypeConst> \
         } \
     };
 #endif // !DISABLE_PYTANGO_NUMPY
+
+
 
 DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_BOOLEAN, long, PyLong_AsLong)
 DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_UCHAR, unsigned long, PyLong_AsUnsignedLong)
@@ -190,6 +195,7 @@ struct array_element_from_py<Tango::DEVVAR_CHARARRAY>
     {
         long cpy_value = PyLong_AsLong(o);
         if(PyErr_Occurred()) {
+            PyErr_Clear();
             PyErr_SetString(PyExc_TypeError, "Expecting a numeric type,"
                 " but it is not");
             boost::python::throw_error_already_set(); 
@@ -211,6 +217,7 @@ struct array_element_from_py<Tango::DEVVAR_CHARARRAY>
     {
         long cpy_value = PyLong_AsLong(o);
         if(PyErr_Occurred()) {
+	    PyErr_Clear();
             if(PyArray_CheckScalar(o) &&
             ( PyArray_DescrFromScalar(o)
                 == PyArray_DescrFromType(TANGO_const2scalarnumpy(tangoArrayTypeConst))))
@@ -221,7 +228,7 @@ struct array_element_from_py<Tango::DEVVAR_CHARARRAY>
                 PyErr_SetString(PyExc_TypeError, "Expecting a numeric type,"
                     " but it is not. If you use a numpy type instead of"
                     " python core types, then it must exactly match (ex:"
-                    " numpy.int32 for PyTango.DevLong)");
+                    " numpy.int32 for PyTango.DevLong (2))");
                 boost::python::throw_error_already_set();
             }
         }
