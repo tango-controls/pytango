@@ -73,7 +73,7 @@ History of modifications:
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 28/08/13 | `8.13 <http://www.tango-controls.org/static/PyTango/v723/doc/html/index.html>`_  | Update to PyTango 7.2.4                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| 26/09/13 | `8.18 <http://www.tango-controls.org/static/PyTango/v810/doc/html/index.html>`_  | Update to PyTango 8.1.0                             | T\. Coutinho          |
+| 22/11/13 | `8.18 <http://www.tango-controls.org/static/PyTango/v810/doc/html/index.html>`_  | Update to PyTango 8.1.1                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _version-history:
@@ -86,20 +86,21 @@ Version history
 +==========+===================================================================================================================================================================+
 | 8.1.1    | Features:                                                                                                                                                         |
 |          | - Implemented tango C++ 8.1 API                                                                                                                                   |
+|          |                                                                                                                                                                   |
 |          | Bug fixes:                                                                                                                                                        |
 |          | - `573: [pytango] python3 error with unregistered device <https://sourceforge.net/p/tango-cs/bugs/573/>`_                                                         |
 |          | - `611: URGENT fail to write attribute with PyTango 8.0.3 <https://sourceforge.net/p/tango-cs/bugs/611/>`_                                                        |
 |          | - `612: [pytango][8.0.3] failed to build from source on s390 <https://sourceforge.net/p/tango-cs/bugs/612/>`_                                                     |
+|          | - `615: Threading problem when setting a DevULong64 attribute <https://sourceforge.net/p/tango-cs/bugs/615/>`_                                                    |
 |          | - `622: PyTango broken when running on Ubuntu 13 <https://sourceforge.net/p/tango-cs/bugs/622/>`_                                                                 |
 |          | - `628: Problem in installing PyTango 8.0.3 on Scientific Linux 6 <https://sourceforge.net/p/tango-cs/bugs/628/>`_                                                |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.0    | *SKIPPED*                                                                                                                                                         |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.0.3    | Features:                                                                                                                                                         |
-|          | - from sourceforge:                                                                                                                                               |
 |          | - `88: Implement Util::server_set_event_loop method in python <https://sourceforge.net/p/tango-cs/feature-requests/88>`_                                          |
+|          |                                                                                                                                                                   |
 |          | Bug fixes:                                                                                                                                                        |
-|          | - from sourceforge:                                                                                                                                               |
 |          | - `3576353: [pytango] segfault on 'RestartServer' <https://sourceforge.net/tracker/?func=detail&aid=3576353&group_id=57612&atid=484769>`_                         |
 |          | - `3579062: [pytango] Attribute missing methods <https://sourceforge.net/tracker/?func=detail&aid=3579062&group_id=57612&atid=484769>`_                           |
 |          | - `3586337: [pytango] Some DeviceClass methods are not python safe <https://sourceforge.net/tracker/?func=detail&aid=3586337&group_id=57612&atid=484769>`_        |
@@ -109,7 +110,6 @@ Version history
 |          | - `605: [pytango] use distutils.version module <https://sourceforge.net/p/tango-cs/bugs/605/>`_                                                                   |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.0.2    | Bug fixes:                                                                                                                                                        |
-|          | - from sourceforge:                                                                                                                                               |
 |          | - `3570970: [pytango] problem during the python3 building <https://sourceforge.net/tracker/?func=detail&aid=3570970&group_id=57612&atid=484769>`_                 |
 |          | - `3570971: [pytango] itango does not work without qtconsole <https://sourceforge.net/tracker/?func=detail&aid=3570971&group_id=57612&atid=484769>`_              |
 |          | - `3570972: [pytango] warning/error when building 8.0.0 <https://sourceforge.net/tracker/?func=detail&aid=3570972&group_id=57612&atid=484769>`_                   |
@@ -122,7 +122,6 @@ Version history
 |          | - Implemented tango C++ 8.0 API                                                                                                                                   |
 |          | - Python 3k compatible                                                                                                                                            |
 |          | Bug fixes:                                                                                                                                                        |
-|          | - from sourceforge:                                                                                                                                               |
 |          | - `3023857: DevEncoded write attribute not supported <https://sourceforge.net/tracker/?func=detail&aid=3023857&group_id=57612&atid=484769>`_                      |
 |          | - `3521545: [pytango] problem with tango profile <https://sourceforge.net/tracker/?func=detail&aid=3521545&group_id=57612&atid=484769>`_                          |
 |          | - `3530535: PyTango group writting fails <https://sourceforge.net/tracker/?func=detail&aid=3530535&group_id=57612&atid=484769>`_                                  |
@@ -133,10 +132,9 @@ Version history
 |          | - `551: [pytango] Some DeviceClass methods are not python safe <https://sourceforge.net/p/tango-cs/bugs/551/>`_                                                   |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 7.2.3    | Features:                                                                                                                                                         |
-|          | - from sourceforge:                                                                                                                                               |
 |          | - `3495607: DeviceClass.device_name_factory is missing <https://sourceforge.net/tracker/?func=detail&aid=3495607&group_id=57612&atid=484772>`_                    |
+|          |                                                                                                                                                                   |
 |          | Bug fixes:                                                                                                                                                        |
-|          | - from sourceforge:                                                                                                                                               |
 |          | - `3103588: documentation of PyTango.Attribute.Group <https://sourceforge.net/tracker/?func=detail&aid=3103588&group_id=57612&atid=484769>`_                      |
 |          | - `3458336: Problem with pytango 7.2.2 <https://sourceforge.net/tracker/?func=detail&aid=3458336&group_id=57612&atid=484769>`_                                    |
 |          | - `3463377: PyTango memory leak in read encoded attribute <https://sourceforge.net/tracker/?func=detail&aid=3463377&group_id=57612&atid=484769>`_                 |
@@ -146,14 +144,13 @@ Version history
 |          | - `3520739: command_history(...) in  PyTango <https://sourceforge.net/tracker/?func=detail&aid=3520739&group_id=57612&atid=484769>`_                              |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 7.2.2    | Features:                                                                                                                                                         |
-|          | - from sourceforge:                                                                                                                                               |
 |          | - `3305251: DS dynamic attributes discards some Attr properties <https://sourceforge.net/tracker/?func=detail&aid=3305251&group_id=57612&atid=484769>`_           |
 |          | - `3365792: DeviceProxy.<cmd_name> could be documented <https://sourceforge.net/tracker/?func=detail&aid=3365792&group_id=57612&atid=484772>`_                    |
 |          | - `3386079: add support for ipython 0.11 <https://sourceforge.net/tracker/?func=detail&aid=3386079&group_id=57612&atid=484772>`_                                  |
 |          | - `3437654: throw python exception as tango exception <https://sourceforge.net/tracker/?func=detail&aid=3437654&group_id=57612&atid=484772>`_                     |
 |          | - `3447477: spock profile installation <https://sourceforge.net/tracker/?func=detail&aid=3447477&group_id=57612&atid=484772>`_                                    |
+|          |                                                                                                                                                                   |
 |          | Bug fixes:                                                                                                                                                        |
-|          | - from sourceforge:                                                                                                                                               |
 |          | - `3372371: write attribute of DevEncoded doesn't work <https://sourceforge.net/tracker/?func=detail&aid=3372371&group_id=57612&atid=484769>`_                    |
 |          | - `3374026: [pytango] pyflakes warning <https://sourceforge.net/tracker/?func=detail&aid=3374026&group_id=57612&atid=484769>`_                                    |
 |          | - `3404771: PyTango.MultiAttribute.get_attribute_list missing <https://sourceforge.net/tracker/?func=detail&aid=3404771&group_id=57612&atid=484769>`_             |
@@ -180,11 +177,9 @@ Version history
 |          | - `3286055: PyTango 7.1.x DS using Tango C++ 7.2.x seg faults on exit <https://sourceforge.net/tracker/?func=detail&aid=3286055&group_id=57612&atid=484769>`_     |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 7.1.4    | Features:                                                                                                                                                         |
-|          | - from sourceforge:                                                                                                                                               |
 |          | - `3274309: Generic Callback for events <https://sourceforge.net/tracker/?func=detail&aid=3274309&group_id=57612&atid=484772>`_                                   |
 |          |                                                                                                                                                                   |
 |          | Bug fixes:                                                                                                                                                        |
-|          | - from sourceforge:                                                                                                                                               |
 |          | - `3011775: Seg Faults due to removed dynamic attributes <https://sourceforge.net/tracker/?func=detail&aid=3011775&group_id=57612&atid=484769>`_                  |
 |          | - `3105169: PyTango 7.1.3 does not compile with Tango 7.2.X <https://sourceforge.net/tracker/?func=detail&aid=3105169&group_id=57612&atid=484769>`_               |
 |          | - `3107243: spock profile does not work with python 2.5 <https://sourceforge.net/tracker/?func=detail&aid=3107243&group_id=57612&atid=484769>`_                   |

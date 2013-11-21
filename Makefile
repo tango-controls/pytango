@@ -260,9 +260,12 @@ $(LIB_NAME): $(PRE_C_H_0) $(OBJS)
 
 clean:
 	@echo Cleaning ...
-	@rm -f *.o core
-	@rm -f $(SRC_DIR)/*.gch
+	@rm -f $(OBJS_DIR)/*.o
+
+clean-all: 
+	@echo Cleaning all...
 	@rm -rf $(OBJS_DIR)
+
 
 install-py:
 	@echo Installing python files into $(prefix)/PyTango ...
