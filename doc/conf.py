@@ -195,12 +195,6 @@ htmlhelp_basename = 'PyTangodoc'
 
 # -- Options for LaTeX output --------------------------------------------------
 
-# The paper size ('letter' or 'a4').
-latex_paper_size = 'a4'
-
-# The font size ('10pt', '11pt' or '12pt').
-latex_font_size = '10pt'
-
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
@@ -214,8 +208,11 @@ latex_logo = '_static/logo.png'
 
 latex_elements = {
     'fontpkg': '\\usepackage{palatino}',
+    'papersize': 'a4paper',
+    'pointsize': '10pt',
+    
 }
-latex_show_urls = 'footnote'
+latex_show_urls = 'no'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
