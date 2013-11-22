@@ -583,27 +583,42 @@ namespace PyDeviceImpl
 
     inline void debug(Tango::DeviceImpl &self, const string &msg)
     {
-        self.get_logger()->debug(msg);
+        if (self.get_logger()->is_debug_enabled()) {
+	    self.get_logger()->debug_stream() 
+	      << log4tango::LogInitiator::_begin_log << msg;
+	}
     }
 
     inline void info(Tango::DeviceImpl &self, const string &msg)
     {
-        self.get_logger()->info(msg);
+        if (self.get_logger()->is_info_enabled()) {
+	    self.get_logger()->info_stream() 
+	      << log4tango::LogInitiator::_begin_log << msg;
+	}
     }
 
     inline void warn(Tango::DeviceImpl &self, const string &msg)
     {
-        self.get_logger()->warn(msg);
+        if (self.get_logger()->is_warn_enabled()) {
+	    self.get_logger()->warn_stream() 
+	      << log4tango::LogInitiator::_begin_log << msg;
+	}
     }
 
     inline void error(Tango::DeviceImpl &self, const string &msg)
     {
-        self.get_logger()->error(msg);
+        if (self.get_logger()->is_error_enabled()) {
+	    self.get_logger()->error_stream() 
+	      << log4tango::LogInitiator::_begin_log << msg;
+	}
     }
 
     inline void fatal(Tango::DeviceImpl &self, const string &msg)
     {
-        self.get_logger()->fatal(msg);
+        if (self.get_logger()->is_fatal_enabled()) {
+	    self.get_logger()->fatal_stream() 
+	      << log4tango::LogInitiator::_begin_log << msg;
+	}
     }
     
     PyObject* get_attribute_config(Tango::DeviceImpl &self, object &py_attr_name_seq)

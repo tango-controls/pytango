@@ -96,6 +96,8 @@ Version history
 |          | - `622: PyTango broken when running on Ubuntu 13 <https://sourceforge.net/p/tango-cs/bugs/622/>`_                                                                 |
 |          | - `626: attribute_history extraction can raised an exception <https://sourceforge.net/p/tango-cs/bugs/626/>`_                                                     |
 |          | - `628: Problem in installing PyTango 8.0.3 on Scientific Linux 6 <https://sourceforge.net/p/tango-cs/bugs/628/>`_                                                |
+|          | - `635: Reading of ULong64 attributes does not work <https://sourceforge.net/p/tango-cs/bugs/635/>`_                                                              |
+|          | - `636: PyTango log messages are not filtered by level <https://sourceforge.net/p/tango-cs/bugs/636/>`_                                                           |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.0    | *SKIPPED*                                                                                                                                                         |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
