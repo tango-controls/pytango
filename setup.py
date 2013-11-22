@@ -268,8 +268,8 @@ if sphinx:
             # code so that the documentation is built on this and not a
             # previously installed version
 
-            build = self.get_finalized_command('build')
-            sys.path.insert(0, os.path.abspath(build.build_lib))
+            build_cmd = self.get_finalized_command('build')
+            sys.path.insert(0, os.path.abspath(build_cmd.build_lib))
             sphinx.setup_command.BuildDoc.run(self)
             sys.path.pop(0)
 
@@ -287,8 +287,8 @@ class install_html(Command):
                                    ('install_html', 'install_dir'))
 
     def run(self):
-        build_doc = self.get_finalized_command('build_doc')
-        src_html_dir = abspath(build_doc.build_dir, 'html')
+        build_doc_cmd = self.get_finalized_command('build_doc')
+        src_html_dir = abspath(build_doc_cmd.build_dir, 'html')
         self.copy_tree(src_html_dir, self.install_dir)
 
 
@@ -313,7 +313,8 @@ class install(dftinstall):
         # install_data seems to be, in practice, the proper install_base on all
         # different systems.
         if self.install_html is None:
-            self.install_html = os.path.join(self.install_data, 'share', 'doc', 'PyTango', 'html')
+            self.install_html = os.path.join(self.install_data,
+                                             'share', 'doc', 'PyTango', 'html')
 
     def has_html(self):
         return sphinx is not None
