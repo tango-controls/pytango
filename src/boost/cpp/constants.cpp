@@ -31,7 +31,11 @@ void export_constants()
     consts_scope.attr("NUMPY_VERSION") = "0.0.0";
 #else
     consts_scope.attr("NUMPY_SUPPORT") = true;
+#ifdef PYTANGO_NUMPY_VERSION
     consts_scope.attr("NUMPY_VERSION") = PYTANGO_NUMPY_VERSION;
+#else
+    consts_scope.attr("NUMPY_VERSION") = "0.0.0";
+#endif
 #endif
 
     consts_scope.attr("PY_MAJOR_VERSION") = PY_MAJOR_VERSION;
