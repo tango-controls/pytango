@@ -352,10 +352,11 @@ def main():
                 boost_library_name += pyver
     else:
         inc_dir = os.path.join(BOOST_ROOT, 'include')
+        lib_dir = os.path.join(BOOST_ROOT, 'lib')
         if is64:
             lib_dir = os.path.join(BOOST_ROOT, 'lib64')
             if not os.path.isdir(lib_dir):
-                lib_dir = os.path.join(BOOST_ROOT, 'lib')
+                lib_dir = os.path.join(BOOST_ROOT, 'lib')                
 
         directories['include_dirs'].append(inc_dir)
         directories['library_dirs'].append(lib_dir)
