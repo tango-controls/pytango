@@ -82,7 +82,7 @@ namespace PyAttribute
         */
         unique_pointer<TangoScalarType> cpp_val(new TangoScalarType);
         
-        from_py<tangoTypeConst>::convert(value, *cpp_val);
+        from_py<tangoTypeConst>::convert(value.ptr(), *cpp_val);
         att.set_value(cpp_val.release(), 1, 0, true);
     }
 

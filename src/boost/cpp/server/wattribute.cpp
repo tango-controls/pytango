@@ -231,13 +231,16 @@ namespace PyWAttribute
                                          boost::python::object &value)
     {
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-        extract<TangoScalarType> val(value.ptr());
+        /*extract<TangoScalarType> val(value.ptr());
         if (!val.check())
         {
             throw_wrong_python_data_type(att.get_name(), "set_write_value()");
         }
-        TangoScalarType cpp_val = val;
-        att.set_write_value(cpp_val);
+        TangoScalarType cpp_value = val;
+	*/
+	TangoScalarType cpp_value;
+	from_py<tangoTypeConst>::convert(value.ptr(), cpp_value);
+        att.set_write_value(cpp_value);
     }
 
     template<>

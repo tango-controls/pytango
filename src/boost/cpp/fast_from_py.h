@@ -135,7 +135,7 @@ struct from_py<tangoTypeConst> \
                     PyErr_SetString(PyExc_TypeError, "Expecting a numeric type," \
                         " but it is not. If you use a numpy type instead of" \
                         " python core types, then it must exactly match (ex:" \
-                        " numpy.int32 for PyTango.DevLong (1))"); \
+                        " numpy.int32 for PyTango.DevLong)"); \
                     boost::python::throw_error_already_set();  \
 		} \
             } \
@@ -155,6 +155,18 @@ struct from_py<tangoTypeConst> \
 #endif // !DISABLE_PYTANGO_NUMPY
 
 
+/* Allow for downcast */
+
+inline unsigned PY_LONG_LONG PyLong_AsUnsignedLongLong_2(PyObject *pylong)
+{
+  unsigned PY_LONG_LONG result = PyLong_AsUnsignedLongLong(pylong);
+  if(PyErr_Occurred())
+  {
+    PyErr_Clear();
+    result = PyLong_AsUnsignedLong(pylong);
+  }
+  return result;
+}
 
 DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_BOOLEAN, long, PyLong_AsLong)
 DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_UCHAR, unsigned long, PyLong_AsUnsignedLong)
@@ -165,7 +177,7 @@ DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_ULONG, unsigned long, PyLong_AsUnsignedL
 DEFINE_FAST_TANGO_FROMPY(Tango::DEV_STATE, PyLong_AsLong)
 
 DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_LONG64, Tango::DevLong64, PyLong_AsLongLong)
-DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_ULONG64, Tango::DevULong64, PyLong_AsUnsignedLongLong)
+DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_ULONG64, Tango::DevULong64, PyLong_AsUnsignedLongLong_2)
 DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_FLOAT, double, PyFloat_AsDouble)
 DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_DOUBLE, double, PyFloat_AsDouble)
 
@@ -228,7 +240,7 @@ struct array_element_from_py<Tango::DEVVAR_CHARARRAY>
                 PyErr_SetString(PyExc_TypeError, "Expecting a numeric type,"
                     " but it is not. If you use a numpy type instead of"
                     " python core types, then it must exactly match (ex:"
-                    " numpy.int32 for PyTango.DevLong (2))");
+                    " numpy.int32 for PyTango.DevLong)");
                 boost::python::throw_error_already_set();
             }
         }
