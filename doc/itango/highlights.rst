@@ -643,5 +643,4 @@ To stop monitoring the attribute:
 .. note::
     Type 'mon?' to see detailed information about this magic command
 
-.. _IPython: http://ipython.org/
-.. _Tango: http://www.tango-controls.org/
+

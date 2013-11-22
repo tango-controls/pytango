@@ -38,5 +38,3 @@ Plus an additional set o Tango_ specific features:
 Check the :ref:`itango-highlights` to see how to put these feature to good use
 :-)
 
-.. _IPython: http://ipython.org/
-.. _Tango: http://www.tango-controls.org/

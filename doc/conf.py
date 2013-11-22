@@ -234,9 +234,13 @@ latex_show_urls = 'footnote'
 
 rst_epilog = """\
 .. _Tango: http://www.tango-controls.org/
+.. _Python: http://python.org/
 .. _IPython: http://ipython.org/
 .. _numpy: http://www.numpy.org/
 .. _gevent: http://www.gevent.org/
+.. _boost-python: http://www.boost.org/libs/python/
+.. _PyPi: https://pypi.python.org/pypi/PyTango/
+
 """
 
 # -- Options for reference to other documentation ------------------------------

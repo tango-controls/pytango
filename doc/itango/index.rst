@@ -30,8 +30,3 @@ and you should get something like this:
 
     features
     highlights
-
---------------------------------------------------------------------------------
-
-.. _IPython: http://ipython.org/
-.. _Tango: http://www.tango-controls.org/

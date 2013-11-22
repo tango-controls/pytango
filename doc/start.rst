@@ -35,7 +35,7 @@ are available from the major official distribution repositories):
 * `numpy`_ 
 * `IPython`_ (optional, highly recommended)
 
-Then install PyTango either from through pip::
+Then install PyTango either from pip::
 
     $ pip install PyTango
 
@@ -121,9 +121,3 @@ python console and type:
     >>> PyTango.Release.version
     '8.0.2'
 
-
-.. _Python: http://python.org/
-.. _IPython: http://ipython.org/
-.. _numpy: http://www.numpy.org/
-.. _boost-python: http://www.boost.org/libs/python/‎
-.. _PyPi: https://pypi.python.org/pypi/PyTango/
