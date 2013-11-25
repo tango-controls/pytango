@@ -50,7 +50,6 @@ try:
 except:
     numpy = None
 
-
 is64 = 8 * struct.calcsize("P") == 64
 
 
@@ -59,7 +58,9 @@ def pkg_config(*packages, **config):
                 "-L": "library_dirs",
                 "-l": "libraries"}
     cmd = ["pkg-config", "--libs", "--cflags-only-I", " ".join(packages)]
-    result = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    result = proc.wait()
+    result = str(proc.communicate()[0].decode("utf-8"))
     for elem in result.split():
         flag, value = elem[:2], elem[2:]
         config_values = config.setdefault(config_map.get(flag), [])
@@ -260,6 +261,7 @@ class build_ext(dftbuild_ext):
             ext.define_macros += [ ('PYTANGO_HAS_UNIQUE_PTR', '1') ]
         dftbuild_ext.build_extension(self, ext)
 
+        
 if sphinx:
     class build_doc(BuildDoc):
 
@@ -326,16 +328,19 @@ class install(dftinstall):
 def main():
     macros = []
     
-    directories = dict(include_dirs=[abspath('src', 'boost', 'cpp')],
-                       library_dirs=[],
-                       libraries=[])
+    directories = {
+        'include_dirs': [],
+        'library_dirs': [],
+        'libraries':    ['tango', 'log4tango', 'zmq',
+                         'omniDynamic4', 'COS4', 'omniORB4', 'omnithread'],
+    }
     sys_libs = []
     
     add_lib('omni', directories, sys_libs, lib_name='omniORB4')
     add_lib('zmq', directories, sys_libs, lib_name='libzmq')
     add_lib('tango', directories, sys_libs, inc_suffix='tango')
     add_lib('log4tango', directories, sys_libs)
-
+    add_lib('tango', directories, sys_libs, inc_suffix='tango')
     # special boost-python configuration
 
     BOOST_ROOT = os.environ.get('BOOST_ROOT')
@@ -445,10 +450,6 @@ def main():
         extra_compile_args += ['-g', '-O0']
         extra_link_args += ['-g' , '-O0'] 
 
-    include_dirs = uniquify(directories['include_dirs'])
-    library_dirs = uniquify(directories['library_dirs'])
-    libraries = uniquify(directories['libraries'])
-        
     src_dir = abspath('src', 'boost', 'cpp')
     client_dir = src_dir
     server_dir = os.path.join(src_dir, 'server')
@@ -461,6 +462,10 @@ def main():
                              if fname.endswith('.cpp') ]
     _serverfiles.sort()
     _cppfiles = _clientfiles + _serverfiles
+
+    include_dirs = uniquify(directories['include_dirs'] + [client_dir, server_dir])
+    library_dirs = uniquify(directories['library_dirs'])
+    libraries = uniquify(directories['libraries'])
 
     _pytango = Extension(
         name='_PyTango',
@@ -506,6 +511,8 @@ def main():
         ext_package='PyTango',
         ext_modules=[_pytango],
         cmdclass=cmdclass)
+
+    return dist
 
 if __name__ == "__main__":
     main()

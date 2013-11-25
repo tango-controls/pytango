@@ -31,6 +31,7 @@ def default_install(*args, **kwargs):
 
 init_ipython = default_init_ipython
 install = default_install
+is_installed = lambda : False
 
 ipv = get_ipython_version()
 
