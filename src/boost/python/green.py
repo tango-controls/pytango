@@ -47,8 +47,15 @@ def set_green_mode(green_mode=None):
     :type green_mode: GreenMode
     """
     global __current_green_mode
-    if green_mode is None:
-        green_mode = GreenMode.Synchronous
+    if __current_green_mode == green_mode:
+        return
+    if green_mode == GreenMode.Gevent:
+        # check if we can change to gevent mode
+        import PyTango.gevent
+    elif green_mode == GreenMode.Futures:
+        # check if we can change to futures mode
+        import PyTango.futures
+        
     __current_green_mode = green_mode
 
 

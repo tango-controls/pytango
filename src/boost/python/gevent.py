@@ -12,13 +12,35 @@
 """This module exposes a gevent version of :class:`PyTango.DeviceProxy` and
 :class:`PyTango.AttributeProxy"""
 
-__all__ = ["DeviceProxy", "AttributeProxy"]
+from __future__ import absolute_import
+
+__all__ = ["DeviceProxy", "AttributeProxy", "check_requirements"]
 
 from functools import partial
-
+    
 from PyTango import GreenMode
 from PyTango.device_proxy import get_device_proxy
 from PyTango.attribute_proxy import get_attribute_proxy
+
+
+def check_requirements():
+    try:
+        import gevent
+    except ImportError:
+        raise ImportError("No module named gevent. You need to install " \
+                          "gevent module to have access to PyTango gevent " \
+                          "green mode. Consider using the futures green mode " \
+                          "instead")
+
+    import distutils.version
+    gevent_version = ".".join(map(str, gevent.version_info[:3]))
+    if distutils.version.StrictVersion(gevent_version) < "1.0":
+        raise ImportError("You need gevent >= 1.0. You are using %s. " \
+                          "Consider using the futures green mode instead" \
+                          % gevent_version)
+
+
+check_requirements()    
 
 
 DeviceProxy = partial(get_device_proxy, green_mode=GreenMode.Gevent)
