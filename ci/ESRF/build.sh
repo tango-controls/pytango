@@ -1,7 +1,6 @@
 #!/bin/bash
 #export CYGWIN="${CYGWIN} nodosfilewarning"
 INSTALL_DIR=/segfs/tango/ci/PyTango
-export PATH=$PATH:/cygdrive/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio\ 9.0/Common7/IDE 
 
 if [ ! -z "$NODE_NAME" -a -f "$NODE_NAME" ]
 then
@@ -31,28 +30,32 @@ case "${realos}" in
         /segfs/bliss/bin/python2.6 setup.py build
         ;;
 	"windows7")
-		pyVersion="py26, py27"
-		platform="Win32, x64"
-		SLN="C:\jenkins\workspace\PyTango\OperatingSystems\Windows64-VC10\win\PyTango_VS9\PyTango.sln"
-		LIBNAME="PyTango.vcproj"
-		#devenv="C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe" 
 		cd /cygdrive/c
+        export PATH=$PATH:/cygdrive/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio\ 9.0/Common7/IDE 
+        export PATH=$PATH:/cygdrive/c/Windows/Microsoft.Net/Framework64/v4.0.30319
 		/bin/rm -rf /cygdrive/c/Temp/pytango
-		pyVersion="py26"
-		platform="Win32"
+		LIBNAME="PyTango.vcproj"
+		pyVersion="py26, py27, py33"
+		platform="Win32, x64"
 		SLN="C:\jenkins\workspace\PyTango\OperatingSystems\Windows64-VC10\win\PyTango_VS9\PyTango.sln"
 		LIBNAME="PyTango.vcproj"
 		#devenv="\cygdrive\c\Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio\ 9.0/Common7/IDE/devenv.exe"
 		for pv in $pyVersion
 		do
-		   for p in $platform
-		   do
-			   pyN=${pv:2:4}
-			   MODE=$pv"_bopystatic_tangostatic_release|"$p
-			   OUTFILE="c:/Temp/log_${p}_"${pyN}
-			   MAKE_CMD="devenv.exe $SLN /project PyTango.vcproj /rebuild $MODE /projectconfig $MODE /out $OUTFILE"
-			   $MAKE_CMD
-		   done
+		    for p in $platform
+		    do
+		        pyN=${pv:2:4}
+			    MODE=$pv"_bopystatic_tangostatic_release|"$p
+			    OUTFILE="c:/Temp/log_${p}_"${pyN}
+                if [ "$pyN" -eq 33 ]
+                then
+                    SLN="C:\jenkins\workspace\PyTango\OperatingSystems\Windows64-VC10\win\PyTango_VS10\PyTango.sln"
+			        MAKE_CMD="MSBuild.exe $SLN /project PyTango.vcproj /rebuild $MODE /projectconfig $MODE /out $OUTFILE"
+                else          
+			        MAKE_CMD="devenv.exe $SLN /project PyTango.vcproj /rebuild $MODE /projectconfig $MODE /out $OUTFILE"
+                fi
+			    $MAKE_CMD
+		    done
 		done
         ;;
 	*)
