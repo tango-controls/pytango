@@ -156,17 +156,16 @@ def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None)
         inc_dir = os.path.join(ENV, 'include')
         if inc_suffix is not None:
             inc_dir = os.path.join(inc_dir, inc_suffix)
+        lib_dirs = [os.path.join(ENV, 'lib')]
         if is64:
-            lib_dir = os.path.join(ENV, 'lib64')
-            if not os.path.isdir(lib_dir):
-                lib_dir = os.path.join(ENV, 'lib')
-        else:
-            lib_dir = os.path.join(ENV, 'lib')
+            lib64_dir = os.path.join(ENV, 'lib64')
+            if os.path.isdir(lib64_dir):
+                lib_dirs.insert(0, lib64_dir)
         
         if lib_name.startswith('lib'):
             lib_name = lib_name[3:]
         dirs['include_dirs'].append(inc_dir)
-        dirs['library_dirs'].append(lib_dir)
+        dirs['library_dirs'].extend(lib_dir)
         dirs['libraries'].append(lib_name)
 
         
@@ -339,8 +338,7 @@ def main():
     add_lib('omni', directories, sys_libs, lib_name='omniORB4')
     add_lib('zmq', directories, sys_libs, lib_name='libzmq')
     add_lib('tango', directories, sys_libs, inc_suffix='tango')
-    add_lib('log4tango', directories, sys_libs)
-    add_lib('tango', directories, sys_libs, inc_suffix='tango')
+
     # special boost-python configuration
 
     BOOST_ROOT = os.environ.get('BOOST_ROOT')
@@ -357,14 +355,14 @@ def main():
                 boost_library_name += pyver
     else:
         inc_dir = os.path.join(BOOST_ROOT, 'include')
-        lib_dir = os.path.join(BOOST_ROOT, 'lib')
+        lib_dirs = [os.path.join(BOOST_ROOT, 'lib')]
         if is64:
-            lib_dir = os.path.join(BOOST_ROOT, 'lib64')
-            if not os.path.isdir(lib_dir):
-                lib_dir = os.path.join(BOOST_ROOT, 'lib')                
+            lib64_dir = os.path.join(BOOST_ROOT, 'lib64')
+            if os.path.isdir(lib64_dir):
+                lib_dirs.insert(0, lib64_dir)
 
         directories['include_dirs'].append(inc_dir)
-        directories['library_dirs'].append(lib_dir)
+        directories['library_dirs'].extend(lib_dirs)
                 
     directories['libraries'].append(boost_library_name)
 
