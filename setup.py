@@ -165,7 +165,7 @@ def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None)
         if lib_name.startswith('lib'):
             lib_name = lib_name[3:]
         dirs['include_dirs'].append(inc_dir)
-        dirs['library_dirs'].extend(lib_dir)
+        dirs['library_dirs'].extend(lib_dirs)
         dirs['libraries'].append(lib_name)
 
         
