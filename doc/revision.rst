@@ -73,7 +73,7 @@ History of modifications:
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 28/08/13 | `8.13 <http://www.tango-controls.org/static/PyTango/v723/doc/html/index.html>`_  | Update to PyTango 7.2.4                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| 22/11/13 | `8.18 <http://www.tango-controls.org/static/PyTango/v810/doc/html/index.html>`_  | Update to PyTango 8.1.1                             | T\. Coutinho          |
+| 27/11/13 | `8.18 <http://www.tango-controls.org/static/PyTango/v810/doc/html/index.html>`_  | Update to PyTango 8.1.1                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _version-history:
@@ -98,6 +98,7 @@ Version history
 |          | - `628: Problem in installing PyTango 8.0.3 on Scientific Linux 6 <https://sourceforge.net/p/tango-cs/bugs/628/>`_                                                |
 |          | - `635: Reading of ULong64 attributes does not work <https://sourceforge.net/p/tango-cs/bugs/635/>`_                                                              |
 |          | - `636: PyTango log messages are not filtered by level <https://sourceforge.net/p/tango-cs/bugs/636/>`_                                                           |
+|          | - `637: [pytango] segfault doing write_attribute on Group <https://sourceforge.net/p/tango-cs/bugs/637/>`_                                                        |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.0    | *SKIPPED*                                                                                                                                                         |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+

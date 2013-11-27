@@ -51,8 +51,8 @@ class Release:
     license = 'LGPL'
     authors = { 'Coutinho' : ('Tiago Coutinho' , 'coutinho@esrf.fr') }
     author_lines = "\n".join([ "%s <%s>" % x for x in authors.values()])
-    url = 'http://www.tango-controls.org/static/PyTango/'
-    download_url = 'http://pypi.python.org/packages/source/P/PyTango'
+    url = 'http://www.tinyurl.com/PyTango/'
+    download_url = 'http://pypi.python.org/pypi/PyTango'
     platform = ['Linux', 'Windows XP/Vista/7/8']
     keywords = ['Tango', 'CORBA', 'binding']
     

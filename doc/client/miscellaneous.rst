@@ -159,11 +159,10 @@ gevent mode
 
 .. warning::
    Before using gevent mode please note that at the time of writing this
-   documentation, *PyTango.gevent* requires an unreleased version 1.0 of
-   gevent (the last official version of gevent is 0.13.6 which was released
-   more than 2.5 years ago). Also take into account that gevent_ is *not*
-   available on python 3.
-   So please consider using the *Futures* mode instead.
+   documentation, *PyTango.gevent* requires the latest version 1.0 of
+   gevent (which has been released the day before :-P). Also take into 
+   account that gevent_ 1.0 is *not* available on python 3.
+   Please consider using the *Futures* mode instead.
 
 Using gevent_ cooperative mode in PyTango is relatively easy::
 
