@@ -9,7 +9,7 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-"""High Level API for writting Tango device servers.
+"""High Level API for writing Tango device servers.
 
 .. _pytango-hlapi-datatypes:
 
@@ -17,7 +17,7 @@
 
 When declaring attributes, properties or commands, one of the most important
 information is the data type. It is given by the keyword argument *dtype*.
-In order to provide a more *pythonic* interface, this argument is not retricted
+In order to provide a more *pythonic* interface, this argument is not restricted
 to the :obj:`~PyTango.CmdArgType` options.
 
 For example, to define a *SCALAR* :obj:`~PyTango.CmdArgType.DevLong`

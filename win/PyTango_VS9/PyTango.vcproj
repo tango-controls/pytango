@@ -183,7 +183,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python26IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -250,7 +250,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python26IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -317,7 +317,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python26IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
 				RuntimeLibrary="0"
 				CompileAs="2"
 			/>
@@ -386,7 +386,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python26IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
 				RuntimeLibrary="0"
 				CompileAs="2"
 			/>
@@ -589,7 +589,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python27IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -656,7 +656,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python27IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -723,7 +723,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python27IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
 				RuntimeLibrary="0"
 				CompileAs="2"
 			/>
@@ -792,7 +792,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python27IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
 				RuntimeLibrary="0"
 				CompileAs="2"
 			/>
@@ -996,7 +996,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python31IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1063,7 +1063,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python31IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1130,7 +1130,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python31IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
 				RuntimeLibrary="0"
 				CompileAs="2"
 			/>
@@ -1199,7 +1199,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python31IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
 				RuntimeLibrary="0"
 				CompileAs="2"
 			/>
@@ -1402,7 +1402,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python32IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1469,7 +1469,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python32IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1536,7 +1536,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python32IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
 				RuntimeLibrary="0"
 				CompileAs="2"
 			/>
@@ -1605,7 +1605,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python32IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
 				RuntimeLibrary="0"
 				CompileAs="2"
 			/>
@@ -1808,7 +1808,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python33IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1875,7 +1875,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python33IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoSharedFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1942,7 +1942,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python33IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
 				RuntimeLibrary="0"
 				CompileAs="2"
 			/>
@@ -2011,7 +2011,7 @@
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python33IncludeDirs)"
-				PreprocessorDefinitions="$(PreBoostStaticTantoStaticFlags)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
 				RuntimeLibrary="0"
 				CompileAs="2"
 			/>
@@ -2054,7 +2054,415 @@
 				CommandLine="$(Py33) $(WinSetupArgs)"
 			/>
 		</Configuration>
-	</Configurations>
+
+		<Configuration
+			Name="py34_bopyshared_tangoshared_release|Win32"
+			ConfigurationType="2"
+			InheritedPropertySheets=".\PyTango.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python34IncludeDirs)"
+				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$(PyTango34SharedLibs)"
+				AdditionalLibraryDirectories="$(Py34BoostSharedTangoSharedLibDir)"
+				LinkTimeCodeGeneration="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="$(Py34) $(WinSetupArgs)"
+			/>
+		</Configuration>
+		<Configuration
+			Name="py34_bopyshared_tangoshared_release|x64"
+			ConfigurationType="2"
+			InheritedPropertySheets=".\PyTango.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python34IncludeDirs)"
+				PreprocessorDefinitions="$(PreBoostSharedTantoSharedFlags)"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$(PyTango34SharedLibs)"
+				AdditionalLibraryDirectories="$(Py34BoostSharedTangoSharedLibDir)"
+				LinkTimeCodeGeneration="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="$(Py34) $(WinSetupArgs)"
+			/>
+		</Configuration>
+		<Configuration
+			Name="py34_bopystatic_tangoshared_release|Win32"
+			ConfigurationType="2"
+			InheritedPropertySheets=".\PyTango.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python34IncludeDirs)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$(PyTango34SharedLibs)"
+				AdditionalLibraryDirectories="$(Py34BoostStaticTangoSharedLibDir)"
+				LinkTimeCodeGeneration="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="$(Py34) $(WinSetupArgs)"
+			/>
+		</Configuration>
+		<Configuration
+			Name="py34_bopystatic_tangoshared_release|x64"
+			ConfigurationType="2"
+			InheritedPropertySheets=".\PyTango.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python34IncludeDirs)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoSharedFlags)"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$(PyTango34SharedLibs)"
+				AdditionalLibraryDirectories="$(Py34BoostStaticTangoSharedLibDir)"
+				LinkTimeCodeGeneration="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="$(Py34) $(WinSetupArgs)"
+			/>
+		</Configuration>
+		<Configuration
+			Name="py34_bopystatic_tangostatic_release|Win32"
+			ConfigurationType="2"
+			InheritedPropertySheets=".\PyTango.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python34IncludeDirs)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
+				RuntimeLibrary="0"
+				CompileAs="2"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$(PyTango34StaticLibs)"
+				AdditionalLibraryDirectories="$(Py34BoostStaticTangoStaticLibDir)"
+				LinkTimeCodeGeneration="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="$(Py34) $(WinSetupArgs)"
+			/>
+		</Configuration>
+		<Configuration
+			Name="py34_bopystatic_tangostatic_release|x64"
+			ConfigurationType="2"
+			InheritedPropertySheets=".\PyTango.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="$(CommonIncludeDirs);$(Python34IncludeDirs)"
+				PreprocessorDefinitions="$(PreBoostStaticTangoStaticFlags)"
+				RuntimeLibrary="0"
+				CompileAs="2"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$(PyTango34StaticLibs)"
+				AdditionalLibraryDirectories="$(Py34BoostStaticTangoStaticLibDir)"
+				LinkTimeCodeGeneration="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="$(Py34) $(WinSetupArgs)"
+			/>
+		</Configuration>
+
+    </Configurations>
 	<References>
 	</References>
 	<Files>

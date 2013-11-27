@@ -126,7 +126,7 @@
     <UserMacro Name="NumpyRelativeIncludeDir" Value="Lib\site-packages\numpy\core\include" />
 
     <!-- Internal: DO NOT CHANGE -->
-    <UserMacro Name="PyTangoCompileOptions" Value="-Zm200 /MP8 /bigobj" />
+    <UserMacro Name="PyTangoCompileOptions" Value="-Zm200 /MP4 /bigobj" />
 
     <UserMacro Name="BaseDir" Value="$(ProjectDir)..\.." />
     <UserMacro Name="RelPrefixDir" Value="$(ConfigurationName)_$(PlatformName)_msvc$(VCVer)" />
@@ -185,13 +185,20 @@
     <UserMacro Name="Python33IncludeDirs" Value="$(Python33IncludeDir);$(Numpy33IncludeDir)" />
     <UserMacro Name="Python33LibDir" Value="$(Python33Dir)\libs" />
 
+    <UserMacro Name="Python34Dir" Value="$(PythonDir)\34" />
+    <UserMacro Name="Py34" Value="$(Python34Dir)\python" />
+    <UserMacro Name="Python34IncludeDir" Value="$(Python34Dir)\include" />
+    <UserMacro Name="Numpy34IncludeDir" Value="$(Python34Dir)\$(NumpyRelativeIncludeDir)" />
+    <UserMacro Name="Python34IncludeDirs" Value="$(Python34IncludeDir);$(Numpy34IncludeDir)" />
+    <UserMacro Name="Python34LibDir" Value="$(Python34Dir)\libs" />
+
     <UserMacro Name="BasePreFlags" Value="WIN32;NDEBUG" />
     <UserMacro Name="PreTangoStaticFlags" Value="_WINSTATIC" />
     <UserMacro Name="PreTangoSharedFlags" Value="LOG4TANGO_HAS_DLL;TANGO_HAS_DLL" />
 
-    <UserMacro Name="PreBoostSharedTantoSharedFlags" Value="$(BasePreFlags);$(PreTangoSharedFlags);BOOST_PYTHON_DYNAMIC_LIB" />
-    <UserMacro Name="PreBoostStaticTantoSharedFlags" Value="$(BasePreFlags);$(PreTangoSharedFlags);BOOST_PYTHON_STATIC_LIB" />
-    <UserMacro Name="PreBoostStaticTantoStaticFlags" Value="$(BasePreFlags);$(PreTangoStaticFlags);BOOST_PYTHON_STATIC_LIB" />
+    <UserMacro Name="PreBoostSharedTangoSharedFlags" Value="$(BasePreFlags);$(PreTangoSharedFlags);BOOST_PYTHON_DYNAMIC_LIB" />
+    <UserMacro Name="PreBoostStaticTangoSharedFlags" Value="$(BasePreFlags);$(PreTangoSharedFlags);BOOST_PYTHON_STATIC_LIB" />
+    <UserMacro Name="PreBoostStaticTangoStaticFlags" Value="$(BasePreFlags);$(PreTangoStaticFlags);BOOST_PYTHON_STATIC_LIB" />
 
     <UserMacro Name="PreCompHeaderSrc" Value="precompiled_header.hpp" />
     <UserMacro Name="PreCompHeaderDst" Value="$(TempDir)\$(PyTangoBaseFile)_Boost-$(BoostVer).pch" />
@@ -220,6 +227,9 @@
     <UserMacro Name="PyTango33StaticLibs" Value="$(BasePyTangoStaticLibs) python33.lib" />
     <UserMacro Name="PyTango33SharedLibs" Value="$(BasePyTangoSharedLibs) python33.lib" />
 
+    <UserMacro Name="PyTango34StaticLibs" Value="$(BasePyTangoStaticLibs) python34.lib" />
+    <UserMacro Name="PyTango34SharedLibs" Value="$(BasePyTangoSharedLibs) python34.lib" />
+
     <UserMacro Name="BaseBoostSharedRtSharedLibDir" Value="$(BoostLibDir)\shared\runtime_shared" />
     <UserMacro Name="BaseBoostStaticRtSharedLibDir" Value="$(BoostLibDir)\static\runtime_shared" />
     <UserMacro Name="BaseBoostStaticRtStaticLibDir" Value="$(BoostLibDir)\static\runtime_static" />
@@ -244,6 +254,10 @@
     <UserMacro Name="Boost33StaticRtSharedLibDir" Value="$(BaseBoostStaticRtSharedLibDir)\33;$(Python33LibDir)" />
     <UserMacro Name="Boost33StaticRtStaticLibDir" Value="$(BaseBoostStaticRtStaticLibDir)\33;$(Python33LibDir)" />
 
+    <UserMacro Name="Boost34SharedRtSharedLibDir" Value="$(BaseBoostSharedRtSharedLibDir)\34;$(Python34LibDir)" />
+    <UserMacro Name="Boost34StaticRtSharedLibDir" Value="$(BaseBoostStaticRtSharedLibDir)\34;$(Python34LibDir)" />
+    <UserMacro Name="Boost34StaticRtStaticLibDir" Value="$(BaseBoostStaticRtStaticLibDir)\34;$(Python34LibDir)" />
+
     <UserMacro Name="Py26BoostSharedTangoSharedLibDir" Value="$(Boost26SharedRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll" />
     <UserMacro Name="Py26BoostStaticTangoSharedLibDir" Value="$(Boost26StaticRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll" />
     <UserMacro Name="Py26BoostStaticTangoStaticLibDir" Value="$(Boost26StaticRtStaticLibDir);$(TangoLibDir)\vc$(VCMajorVer)" />
@@ -263,6 +277,10 @@
     <UserMacro Name="Py33BoostSharedTangoSharedLibDir" Value="$(Boost33SharedRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll" />
     <UserMacro Name="Py33BoostStaticTangoSharedLibDir" Value="$(Boost33StaticRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll" />
     <UserMacro Name="Py33BoostStaticTangoStaticLibDir" Value="$(Boost33StaticRtStaticLibDir);$(TangoLibDir)\vc$(VCMajorVer)" />
+
+    <UserMacro Name="Py34BoostSharedTangoSharedLibDir" Value="$(Boost34SharedRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll" />
+    <UserMacro Name="Py34BoostStaticTangoSharedLibDir" Value="$(Boost34StaticRtSharedLibDir);$(TangoLibDir)\vc$(VCMajorVer)_dll" />
+    <UserMacro Name="Py34BoostStaticTangoStaticLibDir" Value="$(Boost34StaticRtStaticLibDir);$(TangoLibDir)\vc$(VCMajorVer)" />
 
     <UserMacro Name="WinSetupArgs" Value="$(BaseDir)\winsetup.py $(BuildDir) $(DistDir) $(BDistDir) $(ConfigurationName) $(PlatformName)" />
 

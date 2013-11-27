@@ -27,7 +27,7 @@
     <TangoLibDir>$(TangoBaseDir)\$(Platform)\lib</TangoLibDir>
     <PythonDir>C:\Python\$(Platform)</PythonDir>
     <NumpyRelativeIncludeDir>Lib\site-packages\numpy\core\include</NumpyRelativeIncludeDir>
-    <PyTangoCompileOptions>-Zm200 /MP2 /bigobj</PyTangoCompileOptions>
+    <PyTangoCompileOptions>-Zm200 /MP4 /bigobj</PyTangoCompileOptions>
     <BaseDir>$(ProjectDir)..\..</BaseDir>
     <RelPrefixDir>$(Configuration)_$(Platform)_msvc$(VCVer)</RelPrefixDir>
     <BaseBuildDir>c:\temp\pytango\build_$(PyTangoVer)_tg$(TangoVer)_boost$(BoostVer)</BaseBuildDir>
@@ -52,9 +52,9 @@
     <BasePreFlags>WIN32;NDEBUG</BasePreFlags>
     <PreTangoStaticFlags>_WINSTATIC</PreTangoStaticFlags>
     <PreTangoSharedFlags>LOG4TANGO_HAS_DLL;TANGO_HAS_DLL</PreTangoSharedFlags>
-    <PreBoostSharedTantoSharedFlags>$(BasePreFlags);$(PreTangoSharedFlags);BOOST_PYTHON_DYNAMIC_LIB</PreBoostSharedTantoSharedFlags>
-    <PreBoostStaticTantoSharedFlags>$(BasePreFlags);$(PreTangoSharedFlags);BOOST_PYTHON_STATIC_LIB</PreBoostStaticTantoSharedFlags>
-    <PreBoostStaticTantoStaticFlags>$(BasePreFlags);$(PreTangoStaticFlags);BOOST_PYTHON_STATIC_LIB</PreBoostStaticTantoStaticFlags>
+    <PreBoostSharedTangoSharedFlags>$(BasePreFlags);$(PreTangoSharedFlags);BOOST_PYTHON_DYNAMIC_LIB</PreBoostSharedTangoSharedFlags>
+    <PreBoostStaticTangoSharedFlags>$(BasePreFlags);$(PreTangoSharedFlags);BOOST_PYTHON_STATIC_LIB</PreBoostStaticTangoSharedFlags>
+    <PreBoostStaticTangoStaticFlags>$(BasePreFlags);$(PreTangoStaticFlags);BOOST_PYTHON_STATIC_LIB</PreBoostStaticTangoStaticFlags>
     <PreCompHeaderSrc>precompiled_header.hpp</PreCompHeaderSrc>
     <PreCompHeaderDst>$(TempDir)\$(PyTangoBaseFile)_Boost-$(BoostVer).pch</PreCompHeaderDst>
     <DatabaseFile>$(TempDir)\$(PyTangoBaseFile)_Boost-$(BoostVer).pdb</DatabaseFile>
@@ -263,14 +263,14 @@
     <BuildMacro Include="PreTangoSharedFlags">
       <Value>$(PreTangoSharedFlags)</Value>
     </BuildMacro>
-    <BuildMacro Include="PreBoostSharedTantoSharedFlags">
-      <Value>$(PreBoostSharedTantoSharedFlags)</Value>
+    <BuildMacro Include="PreBoostSharedTangoSharedFlags">
+      <Value>$(PreBoostSharedTangoSharedFlags)</Value>
     </BuildMacro>
-    <BuildMacro Include="PreBoostStaticTantoSharedFlags">
-      <Value>$(PreBoostStaticTantoSharedFlags)</Value>
+    <BuildMacro Include="PreBoostStaticTangoSharedFlags">
+      <Value>$(PreBoostStaticTangoSharedFlags)</Value>
     </BuildMacro>
-    <BuildMacro Include="PreBoostStaticTantoStaticFlags">
-      <Value>$(PreBoostStaticTantoStaticFlags)</Value>
+    <BuildMacro Include="PreBoostStaticTangoStaticFlags">
+      <Value>$(PreBoostStaticTangoStaticFlags)</Value>
     </BuildMacro>
     <BuildMacro Include="PreCompHeaderSrc">
       <Value>$(PreCompHeaderSrc)</Value>
