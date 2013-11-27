@@ -103,10 +103,29 @@ namespace PyGroup
         if(!dev_proxy)
         {   
             Tango::DeviceAttribute dev_attr;
+            dev_attr.set_name(attr_name.c_str());
             AutoPythonAllowThreads guard;
             return self.write_attribute_asynch(dev_attr, forward);
         }
         
+        // Try to see if we can get attribute information from any device in
+        // the group
+        Tango::AttributeInfoEx attr_info;
+        bool has_attr_info = false;
+        {
+            AutoPythonAllowThreads guard;
+            for(long dev_idx = 1; dev_idx <= self.get_size(); ++dev_idx)
+            {
+                try
+                {
+                    attr_info = self[dev_idx]->get_attribute_config(attr_name);
+                    has_attr_info = true;
+                    break;
+                }
+                catch(...) {}
+            }
+        }
+
         if(multi)
         {
             if(!PySequence_Check(py_value.ptr()))
@@ -116,28 +135,37 @@ namespace PyGroup
                        "(ex: list or tuple)" );
             }
             
-            Tango::AttributeInfoEx attr_info;
-            {
-                AutoPythonAllowThreads guard;
-                attr_info = dev_proxy->get_attribute_config(attr_name);
-            }
-                        
             Py_ssize_t attr_nb = bopy::len(py_value);
             std::vector<Tango::DeviceAttribute> dev_attr(attr_nb);
-            for(Py_ssize_t i = 0; i < attr_nb; ++i)
+
+            if (has_attr_info)
             {
-                PyDeviceAttribute::reset(dev_attr[i], attr_info, py_value[i]);
+                for(Py_ssize_t i = 0; i < attr_nb; ++i)
+                {
+                    PyDeviceAttribute::reset(dev_attr[i], attr_info, py_value[i]);
+                }
             }
-            
+            else
+            {
+                for(Py_ssize_t i = 0; i < attr_nb; ++i)
+                {
+                    dev_attr[i].set_name(attr_name.c_str());
+                }
+            }
             AutoPythonAllowThreads guard;
             return self.write_attribute_asynch(dev_attr, forward);
         }
         else
         {
             Tango::DeviceAttribute dev_attr;
-            Tango::DeviceProxy* dev_proxy = self.get_device(1);
-            if (dev_proxy)
-                PyDeviceAttribute::reset(dev_attr, attr_name, *dev_proxy, py_value);
+            if (has_attr_info)
+            {
+                PyDeviceAttribute::reset(dev_attr, attr_info, py_value);
+            }
+            else
+            {
+                dev_attr.set_name(attr_name.c_str());
+            }
             // If !dev_proxy (no device added in self or his children) then we
             // don't initialize dev_attr. As a result, the reply will be empty.
             /// @todo or should we raise an exception instead?

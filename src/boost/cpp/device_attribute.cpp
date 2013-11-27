@@ -692,7 +692,7 @@ namespace PyDeviceAttribute
     reset(Tango::DeviceAttribute & self, const Tango::AttributeInfo &attr_info,
           bopy::object py_value)
     {
-        self.set_name(const_cast<std::string&>(attr_info.name));
+        self.set_name(attr_info.name.c_str());
         reset_values(self, attr_info.data_type, attr_info.data_format, py_value);
     }
 
@@ -700,12 +700,18 @@ namespace PyDeviceAttribute
     reset(Tango::DeviceAttribute & self, const std::string &attr_name,
           Tango::DeviceProxy &dev_proxy, bopy::object py_value)
     {
+        self.set_name(attr_name.c_str());
         Tango::AttributeInfoEx attr_info;
         {
             AutoPythonAllowThreads guard;
-            attr_info = dev_proxy.get_attribute_config(attr_name);
+            try
+            {
+                attr_info = dev_proxy.get_attribute_config(attr_name);
+            }
+            catch(...)
+            {}
         }
-        reset(self, attr_info, py_value);
+        reset_values(self, attr_info.data_type, attr_info.data_format, py_value);
     }
 
 };
