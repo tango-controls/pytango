@@ -15,28 +15,29 @@
   of this in pure python.
 </p>
 
-<div id="gallery" style="width:780px; height:525px; margin:auto;">
+<div id="gallery" style="width:610px; height:415px; margin:auto;">
 
-  <!-- 1st snap -->
   <img src="_static/banner1.png" />
-  <!-- 2nd snap -->
-  <img src="_static/banner2.png" />
-  <!-- 3rd snap -->
-  <img src="_static/banner3.png" />
 
-  <!-- 4th snap -->
+  <img src="_static/banner2.png" />
+
+  <iframe src="_static/ipython_tango.html" style="width:600px; height:411px;border: 0; "></iframe>
+
+  <iframe src="_static/ipython_db.html" style="width:600px; height:411px;border: 0; "></iframe>
+
+  <iframe src="_static/ipython_motor.html" style="width:600px; height:411px;border: 0; "></iframe>
+
   <table style="width:100%;"><tr>
   <td>
 
-<div class="highlight-python"><div class="highlight"><pre>
-<span class="c"># ----------------- server ------------------</span>
 
+<div class="highlight-python"><div class="highlight"><pre style="font-size: 10px;">
+<span class="c"># ----------------- server ------------------</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">from</span> <span class="nn">PyTango.server</span> <span class="kn">import</span> <span class="n">server_run</span>
 <span class="kn">from</span> <span class="nn">PyTango.server</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">DeviceMeta</span>
 <span class="kn">from</span> <span class="nn">PyTango.server</span> <span class="kn">import</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">command</span>
-
 
 <span class="k">class</span> <span class="nc">Clock</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">DeviceMeta</span>
@@ -58,7 +59,7 @@
   </td>
   <td>
 
-<div class="highlight-python"><div class="highlight"><pre>
+<div class="highlight-python"><div class="highlight"><pre style="font-size: 10px;">
 <span class="c">$ # ---------------- client -----------------</span>
 
 <span class="n">$ python</span>
@@ -80,20 +81,18 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">clock</span><span class="o">.</span><span class="n">status</span><span class="p">()</span>
 <span class="go">The device is in UNKNOWN state.</span>
 
-
-
 </pre></div>
 </div>
 
   </td>
   </tr></table>
 
-  <!-- 5th snap -->
   <table style="width:100%;"><tr>
   <td>
 
-<div class="highlight-python"><div class="highlight"><pre>
+<div class="highlight-python"><div class="highlight"><pre style="font-size: 10px;">
 <span class="gp">&gt;&gt;&gt; </span><span class="c"># ---------- gevent client -----------</span>
+
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">PyTango.gevent</span> <span class="kn">import</span> <span class="n">DeviceProxy</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dev</span> <span class="o">=</span> <span class="n">DeviceProxy</span><span class="p">(</span><span class="s">"sys/tg_test/1"</span><span class="p">)</span>
@@ -128,8 +127,9 @@
   </td>
   <td>
 
-<div class="highlight-python"><div class="highlight"><pre>
+<div class="highlight-python"><div class="highlight"><pre style="font-size: 10px;">
 <span class="gp">&gt;&gt;&gt; </span><span class="c"># ----- concurrent.futures client -----</span>
+
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">PyTango.futures</span> <span class="kn">import</span> <span class="n">DeviceProxy</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dev</span> <span class="o">=</span> <span class="n">DeviceProxy</span><span class="p">(</span><span class="s">"sys/tg_test/1"</span><span class="p">)</span>
