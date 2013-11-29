@@ -91,7 +91,7 @@
     />
 
     <UserMacro Name="PyTangoBaseFile" Value="_PyTango" />
-
+	
     <UserMacro Name="TangoMajorVer" Value="8" />
     <UserMacro Name="TangoMinorVer" Value="1" />
     <UserMacro Name="TangoPatchVer" Value="2" />
@@ -106,9 +106,10 @@
     <UserMacro Name="BoostMinorVer" Value="53" />
     <UserMacro Name="BoostPatchVer" Value="0" />
     <UserMacro Name="BoostVer" Value="$(BoostMajorVer).$(BoostMinorVer).$(BoostPatchVer)" />
-
-    <UserMacro Name="TangoBaseDir" Value="C:\tango-$(TangoVer)" />
-    <UserMacro Name="BoostBaseDir" Value="C:\boost-$(BoostVer)" />
+	
+	<UserMacro Name="RootDir" Value="C:\Users\coutinho\bin" />
+    <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango-$(TangoVer)" />
+    <UserMacro Name="BoostBaseDir" Value="$(RootDir)\boost-$(BoostVer)" />
     <UserMacro Name="PythonBaseDir" Value="C:\Python" />
 
     <UserMacro Name="VCMajorVer" Value="9" />
@@ -122,8 +123,9 @@
 
     <UserMacro Name="TangoIncludeDir" Value="$(TangoBaseDir)\$(PlatformName)\include\vc$(VCMajorVer)" />
     <UserMacro Name="TangoLibDir" Value="$(TangoBaseDir)\$(PlatformName)\lib" />
+	<UserMacro Name="TangoLibDir_Debug" Value="$(TangoBaseDir)\$(PlatformName)\lib" />
 
-    <UserMacro Name="PythonDir" Value="C:\Python\$(PlatformName)" />
+    <UserMacro Name="PythonDir" Value="$(PythonBaseDir)\$(PlatformName)" />
     <UserMacro Name="NumpyRelativeIncludeDir" Value="Lib\site-packages\numpy\core\include" />
 
     <!-- Internal: DO NOT CHANGE -->
@@ -132,7 +134,7 @@
     <UserMacro Name="BaseDir" Value="$(ProjectDir)..\.." />
     <UserMacro Name="RelPrefixDir" Value="$(ConfigurationName)_$(PlatformName)_msvc$(VCVer)" />
 
-    <UserMacro Name="BaseBuildDir" Value="c:\temp\pytango\build_$(PyTangoVer)_tg$(TangoVer)_boost$(BoostVer)" />
+    <UserMacro Name="BaseBuildDir" Value="$(RootDir)\pytango\build_$(PyTangoVer)_tg$(TangoVer)_boost$(BoostVer)" />
     <UserMacro Name="BaseBuildLibDir" Value="$(BaseBuildDir)\lib" />
     <UserMacro Name="BaseTempDir" Value="$(BaseBuildDir)\temp" />
     <UserMacro Name="BaseDistDir" Value="$(BaseBuildDir)\dist" />

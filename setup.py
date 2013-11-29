@@ -42,14 +42,19 @@ try:
         import IPython.genutils
         get_ipython_dir = IPython.genutils.get_ipython_dir
     _IPY_LOCAL = str(get_ipython_dir())
-except:
+except ImportError:
     IPython = None
 
 try:
     import numpy
-except:
+except ImportError:
     numpy = None
 
+try:
+    import py2exe
+except ImportError:
+    py2exe = None
+    
 is64 = 8 * struct.calcsize("P") == 64
 
 
@@ -485,7 +490,7 @@ def main():
     if sphinx:
         cmdclass['build_doc'] = build_doc
 
-    dist = setup(
+    opts = dict(
         name='PyTango',
         version=Release.version,
         description=Release.description,
@@ -509,7 +514,11 @@ def main():
         ext_package='PyTango',
         ext_modules=[_pytango],
         cmdclass=cmdclass)
-
+    
+    if py2exe:
+        opts['console'] = get_script_files()
+    
+    dist = setup(**opts)
     return dist
 
 if __name__ == "__main__":
