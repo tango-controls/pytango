@@ -13,7 +13,8 @@
 
 from __future__ import print_function
 
-__all__ = ["load_config", "load_ipython_extension", "unload_ipython_extension"]
+__all__ = ["load_config", "load_ipython_extension", "unload_ipython_extension",
+           "run"]
 
 import os
 import re
@@ -1290,7 +1291,7 @@ def unload_ipython_extension(ipython):
     #print "Unloading PyTango IPython extension"
     pass
 
-def run():
+def run(qt=False):
 
     # overwrite the original IPython Qt widget with our own so we can put a
     # customized banner. IPython may have been installed without Qt support so we
@@ -1323,6 +1324,10 @@ def run():
             argv.append("--profile=tango")
     except:
         pass    
-        
-    launch_new_instance()
     
+    if qt:
+        if not 'qtconsole' in argv:
+            argv.insert(1, 'qtconsole')
+            argv.append('--pylab=inline')
+    
+    launch_new_instance()

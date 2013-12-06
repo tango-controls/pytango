@@ -10,7 +10,7 @@
 # -----------------------------------------------------------------------------
 
 __all__ = ["init_ipython", "install", "load_ipython_extension",
-           "unload_ipython_extension", "load_config"]
+           "unload_ipython_extension", "load_config", "run", "run_qt"]
 
 from .common import get_python_version
 from .common import get_ipython_version
@@ -32,6 +32,9 @@ def default_install(*args, **kwargs):
 init_ipython = default_init_ipython
 install = default_install
 is_installed = lambda : False
+
+__run = None
+__run_qt = None
 
 ipv = get_ipython_version()
 
@@ -67,3 +70,8 @@ def run():
     if not is_installed():
         install(verbose=False)
     __run()
+
+def run_qt():
+    if not is_installed():
+        install(verbose=False)
+    __run(qt=True)

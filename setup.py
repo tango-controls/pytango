@@ -50,11 +50,6 @@ try:
 except ImportError:
     numpy = None
 
-try:
-    import py2exe
-except ImportError:
-    py2exe = None
-    
 is64 = 8 * struct.calcsize("P") == 64
 
 
@@ -124,9 +119,12 @@ def has_numpy(with_src=True):
 
 def get_script_files():
 
-    FILTER_OUT = (),  # "winpostinstall.py",
+    FILTER_OUT = [],  # "winpostinstall.py",
 
-    scripts_dir = abspath('scripts')
+    if os.name != "nt":
+        FILTER_OUT.append("pytango_winpostinstall.py")
+    
+    scripts_dir = abspath("scripts")
     scripts = []
     items = os.listdir(scripts_dir)
     for item in items:
@@ -207,7 +205,7 @@ class build(dftbuild):
         dftbuild.run(self)
 
         if self.strip_lib:
-            if os.name == 'posix':
+            if 'posix' in os.name:
                 has_objcopy = os.system("type objcopy") == 0
                 if has_objcopy:
                     d = abspath(self.build_lib, "PyTango")
@@ -417,7 +415,9 @@ def setup_args():
     scripts = get_script_files()
 
     data_files = []
-
+    if os.name == 'nt':
+        data_files.append(('scripts', ['doc/_static/itango.ico']))
+    
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Environment :: Other Environment',

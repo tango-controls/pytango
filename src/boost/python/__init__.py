@@ -78,36 +78,47 @@ import os
 import sys
 
 def __prepare_nt():
-    PATH = os.environ['PATH']
+    import struct
+    PATH = os.environ.get('PATH')
+    if PATH is None:
+        os.environ["PATH"] = PATH = ""
     tango_root = os.environ.get("TANGO_ROOT")
     if tango_root is None:
         tango_root = os.path.join(os.environ["ProgramFiles"], "tango")
+    tango_root = tango_root.lower()
+    
     if sys.hexversion < 0x03030000:
         vc = "vc9_dll"
     else:
         vc = "vc10_dll"
-    tango_dll_path = os.path.join(tango_root,"win32","lib",vc)
-    if tango_dll_path.lower() not in PATH.lower():
-        os.environ['PATH'] += ";" + tango_dll_path
+    is64 = 8 * struct.calcsize("P") == 64
+    if is64:
+        arch = "win64"
+    else:
+        arch = "win32"
+    tango_dll_path = os.path.join(tango_root, arch, "lib", vc)
+    tango_dll_path = tango_dll_path.lower()
+    if os.path.exists(tango_dll_path) and \
+       tango_dll_path not in PATH.lower():
+            os.environ['PATH'] += ";" + tango_dll_path
+    else:
+        # Tango C++ could not be found on the system... 
+        # ... use PyTango's private Tango C++ library
+        tango_dll_path = os.path.dirname(os.path.abspath(__file__))
+        tango_dll_path = os.path.join(tango_dll_path, "_tango_dll_")
+        if os.path.exists(tango_dll_path):
+            os.environ['PATH'] += ";" + tango_dll_path
 
-try:
-    from ._PyTango import DeviceProxy
-except ImportError as ie:
-    if ie.args[0].count("_PyTango"):
-        print(80*"-")
-        print(ie)
-        print(80*"-")
-        print("Probably your current directory is the PyTango's source installation directory.")
-        print("You must leave this directory first before using PyTango, otherwise the")
-        print("source distribution will conflict with the installed PyTango")
-        print(80*"-")
-        raise
-    
-    # in windows try to find the location for tango
-    if os.name == 'nt':
+if os.name == 'nt':
+    try:
+        import _PyTango
+    except ImportError as ie:
+        # in windows try to find the location for tango
         __prepare_nt()
-        from ._PyTango import DeviceProxy
-
+        import _PyTango
+else:
+    import _PyTango
+        
 from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     AsynCall, AsynReplyNotArrived, AttReqType, Attr, AttrConfEventData,
     AttrDataFormat, AttrList, AttrProperty, AttrQuality, AttrReadEvent,
@@ -128,7 +139,7 @@ from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     DevVarULong64Array, DevVarULongArray, DevVarUShortArray, DevVoid,
     DeviceAttribute, DeviceAttributeConfig, DeviceAttributeHistory,
     DeviceData, DeviceDataList, DeviceDataHistory, DeviceDataHistoryList,
-    DeviceImpl, DeviceInfo, DeviceUnlocked, Device_2Impl,
+    DeviceImpl, DeviceInfo, DeviceProxy, DeviceUnlocked, Device_2Impl,
     Device_3Impl, Device_4Impl, DispLevel, EncodedAttribute, ErrSeverity,
     EventData, EventSystemFailed, EventType,
     Except, ExtractAs, GreenMode, FMT_UNKNOWN, GroupAttrReply, GroupAttrReplyList,
@@ -179,4 +190,7 @@ from .tango_numpy import NumpyType, numpy_type, numpy_spectrum, numpy_image
 
 from .pytango_init import init as __init
 __init()
+
+import atexit
+atexit.register(_PyTango._leavefunc)
 

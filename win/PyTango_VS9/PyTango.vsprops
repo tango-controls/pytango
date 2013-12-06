@@ -91,7 +91,7 @@
     />
 
     <UserMacro Name="PyTangoBaseFile" Value="_PyTango" />
-	
+    
     <UserMacro Name="TangoMajorVer" Value="8" />
     <UserMacro Name="TangoMinorVer" Value="1" />
     <UserMacro Name="TangoPatchVer" Value="2" />
@@ -106,9 +106,10 @@
     <UserMacro Name="BoostMinorVer" Value="53" />
     <UserMacro Name="BoostPatchVer" Value="0" />
     <UserMacro Name="BoostVer" Value="$(BoostMajorVer).$(BoostMinorVer).$(BoostPatchVer)" />
-	
-	<UserMacro Name="RootDir" Value="C:\Users\coutinho\bin" />
-    <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango-$(TangoVer)" />
+    
+    <UserMacro Name="RootDir" Value="C:\Users\coutinho\bin" />
+    <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango" />
+    <!-- <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango-$(TangoVer)-debug" /> -->
     <UserMacro Name="BoostBaseDir" Value="$(RootDir)\boost-$(BoostVer)" />
     <UserMacro Name="PythonBaseDir" Value="C:\Python" />
 
@@ -123,13 +124,13 @@
 
     <UserMacro Name="TangoIncludeDir" Value="$(TangoBaseDir)\$(PlatformName)\include\vc$(VCMajorVer)" />
     <UserMacro Name="TangoLibDir" Value="$(TangoBaseDir)\$(PlatformName)\lib" />
-	<UserMacro Name="TangoLibDir_Debug" Value="$(TangoBaseDir)\$(PlatformName)\lib" />
+    <UserMacro Name="TangoLibDir_Debug" Value="$(TangoBaseDir)\$(PlatformName)\lib" />
 
     <UserMacro Name="PythonDir" Value="$(PythonBaseDir)\$(PlatformName)" />
     <UserMacro Name="NumpyRelativeIncludeDir" Value="Lib\site-packages\numpy\core\include" />
 
     <!-- Internal: DO NOT CHANGE -->
-    <UserMacro Name="PyTangoCompileOptions" Value="-Zm200 /MP4 /bigobj" />
+    <UserMacro Name="PyTangoCompileOptions" Value="-Zm200 /MP8 /bigobj" />
 
     <UserMacro Name="BaseDir" Value="$(ProjectDir)..\.." />
     <UserMacro Name="RelPrefixDir" Value="$(ConfigurationName)_$(PlatformName)_msvc$(VCVer)" />
@@ -181,7 +182,7 @@
     <UserMacro Name="Python32IncludeDirs" Value="$(Python32IncludeDir);$(Numpy32IncludeDir)" />
     <UserMacro Name="Python32LibDir" Value="$(Python32Dir)\libs" />
 
-    <UserMacro Name="BasePreFlags" Value="WIN32;NDEBUG" />
+    <UserMacro Name="BasePreFlags" Value="WIN32" />
     <UserMacro Name="PreTangoStaticFlags" Value="_WINSTATIC" />
     <UserMacro Name="PreTangoSharedFlags" Value="LOG4TANGO_HAS_DLL;TANGO_HAS_DLL" />
 
@@ -195,16 +196,17 @@
 
     <UserMacro Name="BaseDisableWarningFlags" Value="4005;4996;4250" />
 
+    <UserMacro Name="BaseLibs" Value="comctl32.lib ws2_32.lib mswsock.lib" />
     <UserMacro Name="omniStaticLibs" Value="COS4.lib    omniORB4.lib    omniDynamic4.lib    omnithread.lib   " />
     <UserMacro Name="omniSharedLibs" Value="COS4_rt.lib omniORB4_rt.lib omniDynamic4_rt.lib omnithread_rt.lib" />
-    <UserMacro Name="BaseTangoLibs" Value="zmq.lib log4tango.lib tango.lib" />
-    <UserMacro Name="BasePyTangoStaticLibs" Value="$(omniStaticLibs) $(BaseTangoLibs) comctl32.lib ws2_32.lib mswsock.lib" />
+    <UserMacro Name="BaseTangoLibs" Value="zmq.lib log4tango.lib tango.lib $(BaseLibs)" />
+    <UserMacro Name="BasePyTangoStaticLibs" Value="$(omniStaticLibs) $(BaseTangoLibs)" />
     <UserMacro Name="BasePyTangoSharedLibs" Value="$(omniSharedLibs) $(BaseTangoLibs)" />
 
     <UserMacro Name="omniStaticLibs_Debug" Value="COS4d.lib    omniORB4d.lib    omniDynamic4d.lib    omnithreadd.lib   " />
     <UserMacro Name="omniSharedLibs_Debug" Value="COS4_rtd.lib omniORB4_rtd.lib omniDynamic4_rtd.lib omnithread_rtd.lib" />
-    <UserMacro Name="BaseTangoLibs_Debug" Value="zmqd.lib log4tangod.lib tangod.lib" />
-    <UserMacro Name="BasePyTangoStaticLibs_Debug" Value="$(omniStaticLibs_Debug) $(BaseTangoLibs_Debug) comctl32.lib ws2_32.lib mswsock.lib" />
+    <UserMacro Name="BaseTangoLibs_Debug" Value="zmqd.lib log4tangod.lib tangod.lib $(BaseLibs)" />
+    <UserMacro Name="BasePyTangoStaticLibs_Debug" Value="$(omniStaticLibs_Debug) $(BaseTangoLibs_Debug)" />
     <UserMacro Name="BasePyTangoSharedLibs_Debug" Value="$(omniSharedLibs_Debug) $(BaseTangoLibs_Debug)" />
 
     

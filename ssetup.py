@@ -22,6 +22,9 @@ def main():
         "console_scripts": [
             "itango = PyTango.ipython:run",
         ],
+        "gui_scripts": [
+            "itango-qt = PyTango.ipython:run_qt",
+        ],
     }
     dist = setuptools.setup(**sargs)
     return dist
