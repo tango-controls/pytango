@@ -47,6 +47,7 @@ using the high level API. The example contains:
     :linenos:
 
     from time import time
+    from numpy.random import random_sample
 
     from PyTango import AttrQuality, AttrWriteType, DispLevel, server_run
     from PyTango.server import Device, DeviceMeta, attribute, command
@@ -84,12 +85,31 @@ using the high level API. The example contains:
 
         def get_current(self):
             return 2.3456, time(), AttrQuality.ATTR_WARNING
-     
+	
+	def set_current(self, current):
+	    print("Current set to %f" % current)
+	
+	def get_noise(self):
+	    return random_sample((1024, 1024))
+
+	@command(dtype_in=float)
+	def ramp(self, value):
+	    print("Ramping up...")
+
 
 *Pretty cool, uh?*
 
 API
 ---
+
+.. hlist::
+
+   * :class:`~PyTango.server.Device`
+   * :class:`~PyTango.server.attribute`
+   * :class:`~PyTango.server.command`
+   * :class:`~PyTango.server.device_property`
+   * :class:`~PyTango.server.class_property`
+   * :func:`~PyTango.server.server_run`
 
 .. automodule:: PyTango.server
 

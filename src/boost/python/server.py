@@ -521,7 +521,13 @@ period                 :obj:`str`                       None
 archive_abs_change     :obj:`str`                       None
 archive_rel_change     :obj:`str`                       None
 archive_period         :obj:`str`                       None
-===================== ================================ ======================================= ======================================================================================="""
+===================== ================================ ======================================= =======================================================================================
+
+.. note::
+    avoid using *dformat* parameter. If you need a SPECTRUM attribute of say,
+    boolean type, use instead ``dtype=(bool,)``.
+
+"""
 
     def __init__(self, **kwargs):
         name = kwargs.pop("name", None)
@@ -551,57 +557,6 @@ archive_period         :obj:`str`                       None
 
         
 def _attribute(**kwargs):
-    """declares a new tango attribute in a :class:`Device`. To be used like
-the python native :obj:`property` function. For example, to declare a
-scalar, `PyTango.DevDouble`, read-only attribute called *voltage* in a
-*PowerSupply* :class:`Device` do::
-
-    class PowerSupply(Device):
-        
-        voltage = attribute()
-        
-        def read_voltage(self):
-            self.voltage = 1.0
-
-It receives multiple keyword arguments.
-
-===================== ================================ ======================================= =======================================================================================
-parameter              type                                       default value                                 description
-===================== ================================ ======================================= =======================================================================================
-name                   :obj:`str`                       class member name                       alternative attribute name
-dtype                  :obj:`object`                    :obj:`~PyTango.CmdArgType.DevDouble`    data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
-dformat                :obj:`~PyTango.AttrDataFormat`   :obj:`~PyTango.AttrDataFormat.SCALAR`   data format
-max_dim_x              :obj:`int`                       1                                       maximum size for x dimension (ignored for SCALAR format) 
-max_dim_y              :obj:`int`                       0                                       maximum size for y dimension (ignored for SCALAR and SPECTRUM formats) 
-display_level          :obj:`~PyTango.DispLevel`        :obj:`~PyTango.DisLevel.OPERATOR`       display level
-polling_period         :obj:`int`                       -1                                      polling period
-memorized              :obj:`bool`                      False                                   attribute should or not be memorized
-hw_memorized           :obj:`bool`                      False                                   write method should be called at startup when restoring memorize value (dangerous!)
-access                 :obj:`~PyTango.AttrWriteType`    :obj:`~PyTango.AttrWriteType.READ`      read only/ read write / write only access
-fget (or fread)        :obj:`str` or :obj:`callable`    'read_<attr_name>'                      read method name or method object
-fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<attr_name>'                     write method name or method object
-is_allowed             :obj:`str` or :obj:`callable`    'is_<attr_name>_allowed'                is allowed method name or method object
-label                  :obj:`str`                       '<attr_name>'                           attribute label
-doc (or description)   :obj:`str`                       ''                                      attribute description
-unit                   :obj:`str`                       ''                                      physical units the attribute value is in
-standard_unit          :obj:`str`                       ''                                      physical standard unit
-display_unit           :obj:`str`                       ''                                      physical display unit (hint for clients)
-format                 :obj:`str`                       '6.2f'                                  attribute representation format
-min_value              :obj:`str`                       None                                    minimum allowed value
-max_value              :obj:`str`                       None                                    maximum allowed value
-min_alarm              :obj:`str`                       None                                    minimum value to trigger attribute alarm
-max_alarm              :obj:`str`                       None                                    maximum value to trigger attribute alarm
-min_warning            :obj:`str`                       None                                    minimum value to trigger attribute warning
-max_warning            :obj:`str`                       None                                    maximum value to trigger attribute warning
-delta_val              :obj:`str`                       None
-delta_t                :obj:`str`                       None
-abs_change             :obj:`str`                       None                                    minimum value change between events that causes event filter to send the event
-rel_change             :obj:`str`                       None                                    minimum relative change between events that causes event filter to send the event (%)
-period                 :obj:`str`                       None
-archive_abs_change     :obj:`str`                       None
-archive_rel_change     :obj:`str`                       None
-archive_period         :obj:`str`                       None
-===================== ================================ ======================================= ======================================================================================="""
     if 'dtype' in kwargs:
         kwargs['dtype'], kwargs['dformat'] = \
           get_tango_type_format(kwargs['dtype'], kwargs.get('dformat'))
@@ -624,10 +579,14 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
             # Another more elaborate command
             
             @command(dtype_in=float, doc_in="the pressure to be set",
-                     dtype_out=(bool, doc_out="True if it worked, False otherwise")
-            def setPressure(self, pressure):
-                self.info_stream("Setting pressure on %f..." % pressure)
-                
+                     dtype_out=bool, doc_out="True if it worked, False otherwise")
+            def pressurize(self, pressure):
+                self.info_stream("Pressurizing to %f..." % pressure)
+
+    .. note::
+        avoid using *dformat* parameter. If you need a SPECTRUM attribute of
+        say, boolean type, use instead ``dtype=(bool,)``.
+                    
     :param dtype_in: a :ref:`data type <pytango-hlapi-datatypes>`
                      describing the type of parameter. Default is None meaning
                      no parameter.

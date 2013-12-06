@@ -15,10 +15,10 @@ from __future__ import print_function
 
 __all__ = ["load_config", "load_ipython_extension", "unload_ipython_extension"]
 
-import sys
 import os
 import re
 import io
+import sys
 import operator
 import textwrap
 
@@ -398,12 +398,12 @@ def mon(self, parameter_s=''):
             raise UsageError("%mon -d: must provide an attribute to unmonitor")
         else:
             try:
-                dev, sep, attr = todel.rpartition("/")
+                dev, _, attr = todel.rpartition("/")
                 subscriptions = __get_device_subscriptions(dev)
-                id = subscriptions[attr.lower()]
+                attr_id = subscriptions[attr.lower()]
                 del subscriptions[attr.lower()]
                 d = __get_device_proxy(dev)
-                d.unsubscribe_event(id)
+                d.unsubscribe_event(attr_id)
                 print("Stopped monitoring '%s'" % todel)
             except KeyError:
                 raise UsageError("%%mon -d: Not monitoring '%s'" % todel)
@@ -413,22 +413,23 @@ def mon(self, parameter_s=''):
             toadd = args[0]
         except IndexError:
             raise UsageError("%mon -a: must provide an attribute to monitor")
-        dev, sep, attr = toadd.rpartition("/")
+        dev, _, attr = toadd.rpartition("/")
         subscriptions = __get_device_subscriptions(dev)
-        id = subscriptions.get(attr.lower())
-        if id is not None:
+        attr_id = subscriptions.get(attr.lower())
+        if attr_id is not None:
             raise UsageError("%%mon -a: Already monitoring '%s'" % toadd)
         d = __get_device_proxy(dev)
         w = __get_event_log()
         model = w.model()
-        id = d.subscribe_event(attr, PyTango.EventType.CHANGE_EVENT, model, [])
-        subscriptions[attr.lower()] = id
+        attr_id = d.subscribe_event(attr, PyTango.EventType.CHANGE_EVENT,
+                                    model, [])
+        subscriptions[attr.lower()] = attr_id
         print("'%s' is now being monitored. Type 'mon' to see all events" % toadd)
     elif 'r' in opts:
         for d, v in db._db_cache.devices.items():
             d, subs = v[3], v[4]
-            for id in subs.values():
-                d.unsubscribe_event(id)
+            for _id in subs.values():
+                d.unsubscribe_event(_id)
             v[4] = {}
     elif 'i' in opts:
         try:
@@ -742,7 +743,7 @@ def init_db(parameter_s=''):
     
     r = db.command_inout("DbMySqlSelect", query)
     row_nb, column_nb = r[0][-2], r[0][-1]
-    results, data = r[0][:-2], r[1]
+    data = r[1]
     assert row_nb == len(data) / column_nb
     devices, aliases, servers, klasses = data[0::4], data[1::4], data[2::4], data[3::4]
 
@@ -795,7 +796,7 @@ def init_db(parameter_s=''):
 
     r = db.command_inout("DbMySqlSelect", query)
     row_nb, column_nb = r[0][-2], r[0][-1]
-    results, data = r[0][:-2], r[1]
+    data = r[1]
     assert row_nb == len(data) / column_nb
     attributes, aliases = data[0::2], data[1::2]
     
@@ -879,7 +880,7 @@ def complete(text):
 __DIRNAME = os.path.dirname(os.path.abspath(__file__))
 __RES_DIR = os.path.join(__DIRNAME, os.path.pardir, 'resource')
 
-class __TangoInfo(object):
+class __TangoDeviceInfo(object):
     """Helper class for when DeviceProxy.info() is not available"""
     
     def __init__(self, dev):
@@ -893,6 +894,69 @@ class __TangoInfo(object):
         self.server_host = 'Unknown'
         self.server_id = 'Unknown'
         self.server_version = 1
+    
+        
+def __get_device_class_icon(klass="Device"):
+    icon_prop = "__icon"
+    db = __get_db()
+    try:
+        icon_filename = db.get_class_property(klass, icon_prop)[icon_prop]
+        if icon_filename:
+            icon_filename = icon_filename[0]
+        else:            
+            icon_filename = klass.lower() + os.path.extsep + "png"
+    except:
+        icon_filename = klass.lower() + os.path.extsep + "png"
+    
+    if os.path.isabs(icon_filename):
+        icon = icon_filename
+    else:
+        icon = os.path.join(__RES_DIR, icon_filename)
+    if not os.path.isfile(icon):
+        icon = os.path.join(__RES_DIR, "_class.png")
+    return icon
+
+
+__DEV_CLASS_HTML_TEMPLATE = """\
+<table border="0" cellpadding="2" width="100%">
+<tr><td width="140" rowspan="7" valign="middle" align="center"><img src="{icon}" height="128"/></td>
+    <td width="140">Name:</td><td><b>{name}</b></td></tr>
+<tr><td width="140">Super class:</td><td>{super_class}</td></tr>
+<tr><td width="140">Database:</td><td>{database}</td></tr>
+<tr><td width="140">Description:</td><td>{description}</td></tr>
+<tr><td width="140">Documentation:</td><td><a target="_blank" href="{doc_url}">{doc_url}</a></td></tr>
+</table>"""
+
+def __get_class_property_str(dev_class, prop_name, default=""):
+    data = __get_db().get_class_property(dev_class, prop_name)[prop_name]
+    if len(data):
+        return data[0]
+    else:
+        return default
+
+def display_deviceclass_html(dev_class):
+    """displayhook function for PyTango.DeviceProxy, rendered as HTML"""
+    fmt = dict(name=dev_class)
+    db = __get_db()
+    try:
+        fmt["database"] = db.get_db_host() + ":" + db.get_db_port()
+    except:
+        try:
+            fmt["database"] = db.get_file_name()
+        except:
+            fmt["database"]  = "Unknown"
+
+    doc_url = __get_class_property_str(dev_class, "doc_url", "www.tango-controls.org")
+    try:
+        fmt["doc_url"] = doc_url[doc_url.index("http"):]
+    except ValueError:
+        fmt["doc_url"] = doc_url
+    
+    fmt['icon'] = __get_device_class_icon(dev_class)
+    fmt['super_class'] = __get_class_property_str(dev_class, "InheritedFrom", "DeviceImpl")
+    fmt['description'] = __get_class_property_str(dev_class, "Description", "A Tango device class")
+    return __DEV_CLASS_HTML_TEMPLATE.format(**fmt)
+
 
 def __get_device_icon(dev_proxy, klass="Device"):
     icon_prop = "__icon"
@@ -935,7 +999,7 @@ def display_deviceproxy_html(dev_proxy):
     try:
         info = dev_proxy.info()
     except:
-        info = __TangoInfo(dev_proxy)
+        info = __TangoDeviceInfo(dev_proxy)
     name = dev_proxy.dev_name()
     fmt = dict(dev_class=info.dev_class, server_id=info.server_id,
                server_host=info.server_host, name=name)
@@ -1153,18 +1217,12 @@ def load_config(config):
     i_shell = config.InteractiveShell
     i_shell.colors = 'Linux'
 
-    if ipy_ver >= "0.12":
-        # ------------------------------------
-        # PromptManager (ipython >= 0.12)
-        # ------------------------------------
-        prompt = config.PromptManager
-        prompt.in_template = 'ITango [\\#]: '
-        prompt.out_template = 'Result [\\#]: '
-    else:
-        # (Deprecated in ipython >= 0.12 use PromptManager.in_template)
-        i_shell.prompt_in1 = 'ITango [\\#]: '
-        # (Deprecated in ipython >= 0.12 use PromptManager.out_template)
-        i_shell.prompt_out = 'Result [\\#]: '
+    # ------------------------------------
+    # PromptManager (ipython >= 0.12)
+    # ------------------------------------
+    prompt = config.PromptManager
+    prompt.in_template = 'ITango [\\#]: '
+    prompt.out_template = 'Result [\\#]: '
     
     # ------------------------------------
     # InteractiveShellApp

@@ -329,7 +329,7 @@ class install(dftinstall):
     sub_commands.append(('install_html', has_html))
 
     
-def main():
+def setup_args():
     macros = []
     
     directories = {
@@ -515,11 +515,10 @@ def main():
         ext_modules=[_pytango],
         cmdclass=cmdclass)
     
-    if py2exe:
-        opts['console'] = get_script_files()
-    
-    dist = setup(**opts)
-    return dist
+    return opts
+
+def main():
+    return setup(**setup_args())
 
 if __name__ == "__main__":
     main()

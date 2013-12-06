@@ -126,13 +126,13 @@ INCLUDE_DIRS += -I$(ZMQ_ROOT)/include
 endif
 
 INCLUDE_DIRS += \
-    -I$(SRC_DIR) \
-    -I$(SRC_DIR)/server \
     $(PY_INC) \
     $(NUMPY_INC)
 
+QUOTE_INCLUDE_DIRS = -iquote $(SRC_DIR)
+
 MACROS := -DNDEBUG -DPYTANGO_HAS_UNIQUE_PTR -DPYTANGO_NUMPY_VERSION=$(PYTANGO_NUMPY_VERSION)
-CFLAGS := -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC $(OPTIMIZE_CC) $(MACROS) $(TANGO_CFLAGS) $(INCLUDE_DIRS)
+CFLAGS := -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC $(OPTIMIZE_CC) $(MACROS) $(TANGO_CFLAGS) $(INCLUDE_DIRS) $(QUOTE_INCLUDE_DIRS)
 LNFLAGS := $(LN_DIRS) $(LN_LIBS)
 
 LIB_NAME := _PyTango.so

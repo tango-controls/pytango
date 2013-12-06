@@ -15,7 +15,7 @@
 #include <boost/python.hpp>
 #include <tango.h>
 
-#include <server/device_class.h>
+#include "server/device_class.h"
 
 /**
  * A wrapper around the Tango::DeviceImpl class
