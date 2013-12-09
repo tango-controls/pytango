@@ -122,6 +122,12 @@ namespace PyDeviceAttribute {
     template<typename TDeviceAttribute>
     boost::python::object convert_to_python(const unique_pointer<std::vector<TDeviceAttribute> >& dev_attr_vec, Tango::DeviceProxy & dev_proxy, PyTango::ExtractAs extract_as)
     {
+		if (dev_attr_vec->empty())
+		{
+			boost::python::list ls;
+			return ls;
+		}
+
         update_data_format(dev_proxy, &(*dev_attr_vec)[0], dev_attr_vec->size());
 
         // Convert the c++ vector of DeviceAttribute into a pythonic list
