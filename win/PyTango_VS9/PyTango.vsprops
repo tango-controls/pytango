@@ -99,17 +99,21 @@
 
     <UserMacro Name="PyTangoMajorVer" Value="8" />
     <UserMacro Name="PyTangoMinorVer" Value="1" />
-    <UserMacro Name="PyTangoPatchVer" Value="1" />
+    <UserMacro Name="PyTangoPatchVer" Value="2" />
     <UserMacro Name="PyTangoVer" Value="$(PyTangoMajorVer).$(PyTangoMinorVer).$(PyTangoPatchVer)" />
 
     <UserMacro Name="BoostMajorVer" Value="1" />
     <UserMacro Name="BoostMinorVer" Value="53" />
     <UserMacro Name="BoostPatchVer" Value="0" />
     <UserMacro Name="BoostVer" Value="$(BoostMajorVer).$(BoostMinorVer).$(BoostPatchVer)" />
-    
-    <UserMacro Name="RootDir" Value="C:\Users\coutinho\bin" />
-    <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango" />
-    <!-- <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango-$(TangoVer)-debug" /> -->
+  
+    <!-- Tiago Coutinho personal configuration -->
+    <!-- <UserMacro Name="RootDir" Value="C:\Users\coutinho\bin" /> -->
+    <!-- <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango" /> -->
+
+    <UserMacro Name="RootDir" Value="C:\" />
+    <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango-$(TangoVer)" />
+  
     <UserMacro Name="BoostBaseDir" Value="$(RootDir)\boost-$(BoostVer)" />
     <UserMacro Name="PythonBaseDir" Value="C:\Python" />
 
