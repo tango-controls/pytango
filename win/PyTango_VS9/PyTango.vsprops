@@ -108,10 +108,9 @@
     <UserMacro Name="BoostVer" Value="$(BoostMajorVer).$(BoostMinorVer).$(BoostPatchVer)" />
   
     <!-- Tiago Coutinho personal configuration -->
-    <!-- <UserMacro Name="RootDir" Value="C:\Users\coutinho\bin" /> -->
-    <!-- <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango" /> -->
+    <-- <UserMacro Name="RootDir" Value="C:\Users\coutinho\bin" /> -->
+    <UserMacro Name="RootDir" Value="C:" />
 
-    <UserMacro Name="RootDir" Value="C:\" />
     <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango-$(TangoVer)" />
   
     <UserMacro Name="BoostBaseDir" Value="$(RootDir)\boost-$(BoostVer)" />
@@ -213,7 +212,6 @@
     <UserMacro Name="BasePyTangoStaticLibs_Debug" Value="$(omniStaticLibs_Debug) $(BaseTangoLibs_Debug)" />
     <UserMacro Name="BasePyTangoSharedLibs_Debug" Value="$(omniSharedLibs_Debug) $(BaseTangoLibs_Debug)" />
 
-    
     <UserMacro Name="PyTango26StaticLibs" Value="$(BasePyTangoStaticLibs) python26.lib" />
     <UserMacro Name="PyTango26SharedLibs" Value="$(BasePyTangoSharedLibs) python26.lib" />
 
