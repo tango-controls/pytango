@@ -42,7 +42,7 @@ try:
         import IPython.genutils
         get_ipython_dir = IPython.genutils.get_ipython_dir
     _IPY_LOCAL = str(get_ipython_dir())
-except ImportError:
+except:
     IPython = None
 
 try:
@@ -67,8 +67,8 @@ def pkg_config(*packages, **config):
         if value not in config_values:
             config_values.append(value)
     return config
-        
-        
+
+
 def abspath(*path):
     """A method to determine absolute path for a given relative path to the
     directory where this setup.py script is located"""
@@ -105,7 +105,7 @@ def get_c_numpy():
         if os.path.isdir(inc):
             return inc
 
-        
+
 def has_c_numpy():
     return get_c_numpy() is not None
 
@@ -119,11 +119,11 @@ def has_numpy(with_src=True):
 
 def get_script_files():
 
-    FILTER_OUT = [],  # "winpostinstall.py",
+    FILTER_OUT = []  # "winpostinstall.py",
 
     if os.name != "nt":
         FILTER_OUT.append("pytango_winpostinstall.py")
-    
+
     scripts_dir = abspath("scripts")
     scripts = []
     items = os.listdir(scripts_dir)
@@ -164,14 +164,14 @@ def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None)
             lib64_dir = os.path.join(ENV, 'lib64')
             if os.path.isdir(lib64_dir):
                 lib_dirs.insert(0, lib64_dir)
-        
+
         if lib_name.startswith('lib'):
             lib_name = lib_name[3:]
         dirs['include_dirs'].append(inc_dir)
         dirs['library_dirs'].extend(lib_dirs)
         dirs['libraries'].append(lib_name)
 
-        
+
 class build(dftbuild):
 
     user_options = dftbuild.user_options + \
@@ -263,7 +263,7 @@ class build_ext(dftbuild_ext):
             ext.define_macros += [ ('PYTANGO_HAS_UNIQUE_PTR', '1') ]
         dftbuild_ext.build_extension(self, ext)
 
-        
+
 if sphinx:
     class build_doc(BuildDoc):
 
@@ -326,10 +326,10 @@ class install(dftinstall):
     sub_commands = list(dftinstall.sub_commands)
     sub_commands.append(('install_html', has_html))
 
-    
+
 def setup_args():
     macros = []
-    
+
     directories = {
         'include_dirs': [],
         'library_dirs': [],
@@ -337,7 +337,7 @@ def setup_args():
                          'omniDynamic4', 'COS4', 'omniORB4', 'omnithread'],
     }
     sys_libs = []
-    
+
     add_lib('omni', directories, sys_libs, lib_name='omniORB4')
     add_lib('zmq', directories, sys_libs, lib_name='libzmq')
     add_lib('tango', directories, sys_libs, inc_suffix='tango')
@@ -366,11 +366,11 @@ def setup_args():
 
         directories['include_dirs'].append(inc_dir)
         directories['library_dirs'].extend(lib_dirs)
-                
+
     directories['libraries'].append(boost_library_name)
 
     # special numpy configuration
-    
+
     numpy_c_include = get_c_numpy()
     if numpy_c_include is not None:
         directories['include_dirs'].append(numpy_c_include)
@@ -382,7 +382,7 @@ def setup_args():
 
     if 'posix' in os.name:
         directories = pkg_config(*sys_libs, **directories)
-    
+
     Release = get_release_info()
 
     author = Release.authors['Coutinho']
@@ -394,7 +394,7 @@ def setup_args():
         'PyTango.ipython',
         'PyTango.ipython.ipython_00_10',
         'PyTango.ipython.ipython_00_11',
-        'PyTango.ipython.ipython_10_00',        
+        'PyTango.ipython.ipython_10_00',
     ]
 
     py_modules = []
@@ -417,7 +417,7 @@ def setup_args():
     data_files = []
     if os.name == 'nt':
         data_files.append(('scripts', ['doc/_static/itango.ico']))
-    
+
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Environment :: Other Environment',
@@ -434,7 +434,7 @@ def setup_args():
         'Topic :: Scientific/Engineering',
         'Topic :: Software Development :: Libraries',
     ]
-    
+
     # Note for PyTango developers:
     # Compilation time can be greatly reduced by compiling the file
     # src/precompiled_header.hpp as src/precompiled_header.hpp.gch
@@ -451,7 +451,7 @@ def setup_args():
 
     if please_debug:
         extra_compile_args += ['-g', '-O0']
-        extra_link_args += ['-g' , '-O0'] 
+        extra_link_args += ['-g' , '-O0']
 
     src_dir = abspath('src', 'boost', 'cpp')
     client_dir = src_dir
@@ -514,7 +514,7 @@ def setup_args():
         ext_package='PyTango',
         ext_modules=[_pytango],
         cmdclass=cmdclass)
-    
+
     return opts
 
 def main():

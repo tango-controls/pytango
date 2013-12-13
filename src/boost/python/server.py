@@ -50,102 +50,129 @@ Below is the complete table of equivalences.
 ========================================  ========================================
  type                                      tango type                             
 ========================================  ========================================
- ``None``                                  ``DevVoid``                            
- ``DevVoid``                               ``DevVoid``                            
- ``DevBoolean``                            ``DevBoolean``                         
- ``DevShort``                              ``DevShort``                           
- ``DevLong``                               ``DevLong``                            
- ``DevFloat``                              ``DevFloat``                           
- ``DevDouble``                             ``DevDouble``                          
- ``DevUShort``                             ``DevUShort``                          
- ``DevULong``                              ``DevULong``                           
- ``DevString``                             ``DevString``                          
- ``DevVarCharArray``                       ``DevVarCharArray``                    
- ``DevVarShortArray``                      ``DevVarShortArray``                   
- ``DevVarLongArray``                       ``DevVarLongArray``                    
- ``DevVarFloatArray``                      ``DevVarFloatArray``                   
- ``DevVarDoubleArray``                     ``DevVarDoubleArray``                  
- ``DevVarUShortArray``                     ``DevVarUShortArray``                  
- ``DevVarULongArray``                      ``DevVarULongArray``                   
- ``DevVarStringArray``                     ``DevVarStringArray``                  
- ``DevVarLongStringArray``                 ``DevVarLongStringArray``              
- ``DevVarDoubleStringArray``               ``DevVarDoubleStringArray``            
+ ``None``                                  ``DevVoid``
+ ``'None'``                                ``DevVoid``
+ ``DevVoid``                               ``DevVoid``
+ ``'DevVoid'``                             ``DevVoid``
+
  ``DevState``                              ``DevState``                           
- ``DevVarBooleanArray``                    ``DevVarBooleanArray``                 
- ``DevUChar``                              ``DevUChar``                           
- ``DevLong64``                             ``DevLong64``                          
- ``DevULong64``                            ``DevULong64``                         
- ``DevVarLong64Array``                     ``DevVarLong64Array``                  
- ``DevVarULong64Array``                    ``DevVarULong64Array``                 
- ``DevInt``                                ``DevInt``                             
- ``DevEncoded``                            ``DevEncoded``                         
- ``chr``                                   ``DevUChar``                           
- ``'DevBoolean'``                          ``DevBoolean``                         
- ``'DevDouble'``                           ``DevDouble``                          
- ``'DevEncoded'``                          ``DevEncoded``                         
- ``'DevFloat'``                            ``DevFloat``                           
- ``'DevInt'``                              ``DevInt``                             
- ``'DevLong'``                             ``DevLong``                            
- ``'DevLong64'``                           ``DevLong64``                          
- ``'DevShort'``                            ``DevShort``                           
  ``'DevState'``                            ``DevState``                           
- ``'DevString'``                           ``DevString``                          
- ``'DevUChar'``                            ``DevUChar``                           
- ``'DevULong'``                            ``DevULong``                           
- ``'DevULong64'``                          ``DevULong64``                         
- ``'DevUShort'``                           ``DevUShort``                          
- ``'DevVarBooleanArray'``                  ``DevVarBooleanArray``                 
- ``'DevVarCharArray'``                     ``DevVarCharArray``                    
- ``'DevVarDoubleArray'``                   ``DevVarDoubleArray``                  
- ``'DevVarDoubleStringArray'``             ``DevVarDoubleStringArray``            
- ``'DevVarFloatArray'``                    ``DevVarFloatArray``                   
- ``'DevVarLong64Array'``                   ``DevVarLong64Array``                  
- ``'DevVarLongArray'``                     ``DevVarLongArray``                    
- ``'DevVarLongStringArray'``               ``DevVarLongStringArray``              
+
+ :py:obj:`bool`                            ``DevBoolean``
+ ``'bool'``                                ``DevBoolean``
+ ``'boolean'``                             ``DevBoolean``
+ ``DevBoolean``                            ``DevBoolean``
+ ``'DevBoolean'``                          ``DevBoolean``
+ :py:obj:`numpy.bool_`                     ``DevBoolean``
+
+ ``'char'``                                ``DevUChar``
+ ``'chr'``                                 ``DevUChar``
+ ``'byte'``                                ``DevUChar``
+ ``chr``                                   ``DevUChar``
+ ``DevUChar``                              ``DevUChar``
+ ``'DevUChar'``                            ``DevUChar``
+ :py:obj:`numpy.uint8`                     ``DevUChar``
+
+ ``'int16'``                               ``DevShort``
+ ``DevShort``                              ``DevShort``
+ ``'DevShort'``                            ``DevShort``
+ :py:obj:`numpy.int16`                     ``DevShort``
+
+ ``'uint16'``                              ``DevUShort``
+ ``DevUShort``                             ``DevUShort``
+ ``'DevUShort'``                           ``DevUShort``
+ :py:obj:`numpy.uint16`                    ``DevUShort``
+
+ :py:obj:`int`                             ``DevLong``
+ ``'int'``                                 ``DevLong``
+ ``'int32'``                               ``DevLong``
+ ``DevLong``                               ``DevLong``
+ ``'DevLong'``                             ``DevLong``
+ :py:obj:`numpy.int32`                     ``DevLong``
+
+ ``'uint'``                                ``DevULong``
+ ``'uint32'``                              ``DevULong``
+ ``DevULong``                              ``DevULong``
+ ``'DevULong'``                            ``DevULong``
+ :py:obj:`numpy.uint32`                    ``DevULong``
+
+ ``'int64'``                               ``DevLong64``
+ ``DevLong64``                             ``DevLong64``
+ ``'DevLong64'``                           ``DevLong64``
+ :py:obj:`numpy.int64`                     ``DevLong64``
+ 
+ ``'uint64'``                              ``DevULong64``
+ ``DevULong64``                            ``DevULong64``
+ ``'DevULong64'``                          ``DevULong64``
+ :py:obj:`numpy.uint64`                    ``DevULong64``
+
+ ``DevInt``                                ``DevInt``                             
+ ``'DevInt'``                              ``DevInt``                             
+ 
+ ``'float32'``                             ``DevFloat``
+ ``DevFloat``                              ``DevFloat``
+ ``'DevFloat'``                            ``DevFloat``
+ :py:obj:`numpy.float32`                   ``DevFloat``
+ 
+ :py:obj:`float`                           ``DevDouble``
+ ``'double'``                              ``DevDouble``
+ ``'float'``                               ``DevDouble``
+ ``'float64'``                             ``DevDouble``
+ ``DevDouble``                             ``DevDouble``
+ ``'DevDouble'``                           ``DevDouble``
+ :py:obj:`numpy.float64`                   ``DevDouble``
+ 
+ :py:obj:`str`                             ``DevString``
+ ``'str'``                                 ``DevString``
+ ``'string'``                              ``DevString``
+ ``'text'``                                ``DevString``
+ ``DevString``                             ``DevString``
+ ``'DevString'``                           ``DevString``
+ 
+ :py:obj:`bytearray`                       ``DevEncoded``
+ ``'bytearray'``                           ``DevEncoded``
+ ``'bytes'``                               ``DevEncoded``
+ ``DevEncoded``                            ``DevEncoded``
+ ``'DevEncoded'``                          ``DevEncoded``
+
+ ``DevVarBooleanArray``                    ``DevVarBooleanArray``
+ ``'DevVarBooleanArray'``                  ``DevVarBooleanArray``
+ 
+ ``DevVarCharArray``                       ``DevVarCharArray``
+ ``'DevVarCharArray'``                     ``DevVarCharArray``
+ 
+ ``DevVarShortArray``                      ``DevVarShortArray``
  ``'DevVarShortArray'``                    ``DevVarShortArray``
- ``'DevVarStringArray'``                   ``DevVarStringArray``                  
- ``'DevVarULong64Array'``                  ``DevVarULong64Array``                 
- ``'DevVarULongArray'``                    ``DevVarULongArray``                   
- ``'DevVarUShortArray'``                   ``DevVarUShortArray``                  
- ``'DevVoid'``                             ``DevVoid``                            
- ``'None'``                                ``DevVoid``                            
- ``'bool'``                                ``DevBoolean``                         
- ``'boolean'``                             ``DevBoolean``                         
- ``'byte'``                                ``DevUChar``                           
- ``'bytearray'``                           ``DevEncoded``                         
- ``'bytes'``                               ``DevEncoded``                         
- ``'char'``                                ``DevUChar``                           
- ``'chr'``                                 ``DevUChar``                           
- ``'double'``                              ``DevDouble``                          
- ``'float'``                               ``DevDouble``                          
- ``'float32'``                             ``DevFloat``                           
- ``'float64'``                             ``DevDouble``                          
- ``'int'``                                 ``DevLong``                            
- ``'int16'``                               ``DevShort``                           
- ``'int32'``                               ``DevLong``                            
- ``'int64'``                               ``DevLong64``                          
- ``'str'``                                 ``DevString``                          
- ``'string'``                              ``DevString``                          
- ``'text'``                                ``DevString``                          
- ``'uint'``                                ``DevULong``                           
- ``'uint16'``                              ``DevUShort``                          
- ``'uint32'``                              ``DevULong``                           
- ``'uint64'``                              ``DevULong64``                         
- :py:obj:`float`                           ``DevDouble``                          
- :py:obj:`int`                             ``DevLong``                            
- :py:obj:`str`                             ``DevString``                          
- :py:obj:`bool`                            ``DevBoolean``                         
- :py:obj:`bytearray`                       ``DevEncoded``                         
- :py:obj:`numpy.bool_`                     ``DevBoolean``                         
- :py:obj:`numpy.int16`                     ``DevShort``                           
- :py:obj:`numpy.int32`                     ``DevLong``                            
- :py:obj:`numpy.int64`                     ``DevLong64``                          
- :py:obj:`numpy.uint8`                     ``DevUChar``                           
- :py:obj:`numpy.uint16`                    ``DevUShort``                          
- :py:obj:`numpy.uint32`                    ``DevULong``                           
- :py:obj:`numpy.uint64`                    ``DevULong64``                         
- :py:obj:`numpy.float32`                   ``DevFloat``                           
- :py:obj:`numpy.float64`                   ``DevDouble``                          
+ 
+ ``DevVarLongArray``                       ``DevVarLongArray``
+ ``'DevVarLongArray'``                     ``DevVarLongArray``
+ 
+ ``DevVarLong64Array``                     ``DevVarLong64Array``
+ ``'DevVarLong64Array'``                   ``DevVarLong64Array``
+ 
+ ``DevVarULong64Array``                    ``DevVarULong64Array``
+ ``'DevVarULong64Array'``                  ``DevVarULong64Array``
+ 
+ ``DevVarFloatArray``                      ``DevVarFloatArray``
+ ``'DevVarFloatArray'``                    ``DevVarFloatArray``
+ 
+ ``DevVarDoubleArray``                     ``DevVarDoubleArray``
+ ``'DevVarDoubleArray'``                   ``DevVarDoubleArray``
+ 
+ ``DevVarUShortArray``                     ``DevVarUShortArray``
+ ``'DevVarUShortArray'``                   ``DevVarUShortArray``
+ 
+ ``DevVarULongArray``                      ``DevVarULongArray``
+ ``'DevVarULongArray'``                    ``DevVarULongArray``
+ 
+ ``DevVarStringArray``                     ``DevVarStringArray``
+ ``'DevVarStringArray'``                   ``DevVarStringArray``
+ 
+ ``DevVarLongStringArray``                 ``DevVarLongStringArray``
+ ``'DevVarLongStringArray'``               ``DevVarLongStringArray``
+ 
+ ``DevVarDoubleStringArray``               ``DevVarDoubleStringArray``
+ ``'DevVarDoubleStringArray'``             ``DevVarDoubleStringArray``
 ========================================  ========================================
 """
 
@@ -213,7 +240,7 @@ def __build_to_tango_type():
         if key.startswith("Dev"):
             value = getattr(CmdArgType, key)
             ret[key] = ret[value] = value
-            
+
     if constants.NUMPY_SUPPORT:
         import numpy
         FROM_TANGO_TO_NUMPY_TYPE = { \
@@ -230,10 +257,10 @@ def __build_to_tango_type():
                      CmdArgType.DevFloat : numpy.float32,
         }
 
-        for key,value in FROM_TANGO_TO_NUMPY_TYPE.items():
+        for key, value in FROM_TANGO_TO_NUMPY_TYPE.items():
             ret[value] = key
     return ret
-    
+
 TO_TANGO_TYPE = __build_to_tango_type()
 
 
@@ -256,7 +283,7 @@ def from_typeformat_to_type(dtype, dformat):
         raise TypeError("Cannot translate IMAGE to tango type")
     return scalar_to_array_type(dtype)
 
-    
+
 def set_complex_value(attr, value):
     is_tuple = isinstance(value, tuple)
     dtype, fmt = attr.get_data_type(), attr.get_data_format()
@@ -287,7 +314,7 @@ def set_complex_value(attr, value):
         else:
             attr.set_value(value)
 
-            
+
 def check_tango_device_klass_attribute_read_method(tango_device_klass, method_name):
     """Checks if method given by it's name for the given DeviceImpl class has
     the correct signature. If a read/write method doesn't have a parameter
@@ -308,7 +335,7 @@ def check_tango_device_klass_attribute_read_method(tango_device_klass, method_na
         return ret
     setattr(tango_device_klass, method_name, read_attr)
 
-    
+
 def check_tango_device_klass_attribute_write_method(tango_device_klass, method_name):
     """Checks if method given by it's name for the given DeviceImpl class has
     the correct signature. If a read/write method doesn't have a parameter
@@ -327,7 +354,7 @@ def check_tango_device_klass_attribute_write_method(tango_device_klass, method_n
         return write_method(self, value)
     setattr(tango_device_klass, method_name, write_attr)
 
-    
+
 def check_tango_device_klass_attribute_methods(tango_device_klass, attr_data):
     """Checks if the read and write methods have the correct signature. If a 
     read/write method doesn't have a parameter (the traditional Attribute),
@@ -366,17 +393,17 @@ class _DeviceClass(DeviceClass):
                     import traceback
                     dev.warn_stream("Failed to initialize dynamic attributes")
                     dev.debug_stream("Details: " + traceback.format_exc())
-    
-        
+
+
 def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     klass_name = tango_device_klass.__name__
     if not issubclass(tango_device_klass, (Device)):
         msg = "{0} device must inherit from PyTango.server.Device".format(klass_name)
         raise Exception(msg)
-    
+
     if attrs is None:
         attrs = tango_device_klass.__dict__
-        
+
     attr_list = {}
     class_property_list = {}
     device_property_list = {}
@@ -395,9 +422,9 @@ def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
             if hasattr(attr_obj, "__tango_command__"):
                 cmd_name, cmd_info = attr_obj.__tango_command__
                 cmd_list[cmd_name] = cmd_info
-    
+
     devclass_name = klass_name + "Class"
-    
+
     devclass_attrs = dict(class_property_list=class_property_list,
                           device_property_list=device_property_list,
                           cmd_list=cmd_list, attr_list=attr_list)
@@ -450,7 +477,7 @@ def DeviceMeta(name, bases, attrs):
 class Device(LatestDeviceImpl):
     """High level DeviceImpl API. All Device specific classes should inherit
     from this class."""
-    
+
     def __init__(self, cl, name):
         LatestDeviceImpl.__init__(self, cl, name)
         self.init_device()
@@ -459,7 +486,7 @@ class Device(LatestDeviceImpl):
         """Tango init_device method. Default implementation calls
         :meth:`get_device_properties`"""
         self.get_device_properties()
-    
+
     def always_executed_hook(self):
         """Tango always_executed_hook. Default implementation does nothing"""
         pass
@@ -477,6 +504,7 @@ scalar, `PyTango.DevDouble`, read-only attribute called *voltage* in a
 *PowerSupply* :class:`Device` do::
 
     class PowerSupply(Device):
+        __metaclass__ = DeviceMeta
         
         voltage = attribute()
         
@@ -537,25 +565,25 @@ archive_period         :obj:`str`                       None
             kwargs['dtype'], kwargs['dformat'] = \
                 get_tango_type_format(kwargs['dtype'], kwargs.get('dformat'))
         self.build_from_dict(kwargs)
-   
+
     def get_attribute(self, obj):
         return obj.get_device_attr().get_attr_by_name(self.attr_name)
 
     # --------------------
     # descriptor interface
     # --------------------
-    
+
     def __get__(self, obj, objtype):
         return self.get_attribute(obj)
 
     def __set__(self, obj, value):
         attr = self.get_attribute(obj)
         set_complex_value(attr, value)
-    
+
     def __delete__(self, obj):
         obj.remove_attribute(self.attr_name)
 
-        
+
 def _attribute(**kwargs):
     if 'dtype' in kwargs:
         kwargs['dtype'], kwargs['dformat'] = \
@@ -571,7 +599,8 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
     `PyTango.DevDouble` parameter called *current*, do::
 
         class PowerSupply(Device):
-
+            __metaclass__ = DeviceMeta
+            
             @command(dtype_in=float)
             def ramp(self, current):
                 self.info_stream("Ramping on %f..." % current)
@@ -609,7 +638,7 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
             dtype_in=dtype_in, dformat_in=dformat_in, doc_in=doc_in,
             dtype_out=dtype_out, dformat_out=dformat_out, doc_out=doc_out)
     name = f.__name__
-    
+
     dtype_in, dformat_in = get_tango_type_format(dtype_in, dformat_in)
     dtype_out, dformat_out = get_tango_type_format(dtype_out, dformat_out)
 
@@ -627,13 +656,13 @@ class _property(object):
         self.dtype = dtype
         self.doc = doc
         self.default_value = default_value
-    
+
     def __get__(self, obj, objtype):
         return self.__value
 
     def __set__(self, obj, value):
         self.__value = value
-    
+
     def __delete__(self, obj):
         del self.__value
 
