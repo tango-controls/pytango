@@ -108,7 +108,7 @@
     <UserMacro Name="BoostVer" Value="$(BoostMajorVer).$(BoostMinorVer).$(BoostPatchVer)" />
   
     <!-- Tiago Coutinho personal configuration -->
-    <-- <UserMacro Name="RootDir" Value="C:\Users\coutinho\bin" /> -->
+    <!-- <UserMacro Name="RootDir" Value="C:\Users\coutinho\bin" /> -->
     <UserMacro Name="RootDir" Value="C:" />
 
     <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango-$(TangoVer)" />

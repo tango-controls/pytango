@@ -32,25 +32,27 @@ case "${realos}" in
 	"windows7")
 		cd /cygdrive/c
         export PATH=$PATH:/cygdrive/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio\ 9.0/Common7/IDE 
-        export PATH=$PATH:/cygdrive/c/Windows/Microsoft.Net/Framework64/v4.0.30319
-		/bin/rm -rf /cygdrive/c/Temp/pytango
+        #export PATH=$PATH:/cygdrive/c/Windows/Microsoft.Net/Framework64/v4.0.30319
+		/bin/rm -rf /cygdrive/c/pytango
 		LIBNAME="PyTango.vcproj"
-		pyVersion="py26, py27, py33"
-		platform="Win32, x64"
+		pyVersion="py26 py27"
+		platform="Win32 x64"
 		SLN="C:\jenkins\workspace\PyTango\OperatingSystems\Windows64-VC10\win\PyTango_VS9\PyTango.sln"
 		LIBNAME="PyTango.vcproj"
-		#devenv="\cygdrive\c\Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio\ 9.0/Common7/IDE/devenv.exe"
 		for pv in $pyVersion
 		do
 		    for p in $platform
 		    do
 		        pyN=${pv:2:4}
 			    MODE=$pv"_bopystatic_tangostatic_release|"$p
-			    OUTFILE="c:/Temp/log_${p}_"${pyN}
+			    OUTFILE="c:/Temp/log_"${p}"_"${pyN}
+                echo "BUILD_"$pv"_"$p
                 if [ "$pyN" -eq 33 ]
                 then
-                    SLN="C:\jenkins\workspace\PyTango\OperatingSystems\Windows64-VC10\win\PyTango_VS10\PyTango.sln"
-			        MAKE_CMD="MSBuild.exe $SLN /project PyTango.vcproj /rebuild $MODE /projectconfig $MODE /out $OUTFILE"
+                    SLN="C:\jenkins\workspace\PyTango\OperatingSystems\Windows64-VC10\win\PyTango_VS10"
+					MODE=$pv"_bopystatic_tangostatic_release"
+					MAKE_CMD="MSBuild.exe $SLN/PyTango.vcxproj /p:Platform=$p /t:rebuild /p:Configuration=$MODE /v:quiet /flp:LogFile=$OUTFILE;Summary;ShowCommandLine;Verbosity=minimal"
+                    #MsBuild.exe $SLN /t:Rebuild /p:Configuration=py33_bopystatic_tangostatic_release /p:Platform=x86 /flp:LogFile=C:/Temp/log_
                 else          
 			        MAKE_CMD="devenv.exe $SLN /project PyTango.vcproj /rebuild $MODE /projectconfig $MODE /out $OUTFILE"
                 fi
@@ -89,8 +91,8 @@ case "${realos}" in
     "windows7"*)
 		INSTALL_DIR="//unixhome/segfs/tango/ci/PyTango/windows7"
 		/bin/rm -rf $INSTALL_DIR/* || echo "Error executing rm command"
-        /bin/cp -rf /cygdrive/c/Temp/pytango/build_8.1.0_tg8.1.2_boost1.53.0/lib  $INSTALL_DIR || echo "Error executing cp command, LIB"
-		/bin/cp -rf /cygdrive/c/Temp/pytango/build_8.1.0_tg8.1.2_boost1.53.0/dist  $INSTALL_DIR || echo "Error executing cp command, DIST"
+        /bin/cp -rf /cygdrive/c/pytango/build_8.1.2_tg8.1.2_boost1.53.0/lib  $INSTALL_DIR || echo "Error executing cp command, LIB"
+		/bin/cp -rf /cygdrive/c/pytango/build_8.1.2_tg8.1.2_boost1.53.0/dist  $INSTALL_DIR || echo "Error executing cp command, DIST"
 		/bin/chmod -R 755  $INSTALL_DIR || echo "Error executing chmod command"
         ;;
 	*)
