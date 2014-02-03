@@ -159,6 +159,65 @@ struct convert_PySequence_to_CORBA_Sequence
     
 };
 
+#if PY_VERSION_HEX < 0x03000000
+bool is_str(PyObject* obj)
+{
+    return PyString_Check(obj) || PyUnicode_Check(obj);
+}
+
+struct StdString_from_python_str_unicode
+{
+    StdString_from_python_str_unicode()
+    {
+        boost::python::converter::registry::push_back(
+          &convertible,
+          &construct,
+          boost::python::type_id<std::string>());
+    }
+ 
+    // Determine if obj_ptr can be converted in a std::string
+    static void* convertible(PyObject* obj)
+    {
+        if (!is_str(obj))
+        {
+            return 0;
+        }
+        return obj;
+    }
+ 
+    // Convert obj_ptr into a std::string
+    static void construct(PyObject* obj,
+                          boost::python::converter::rvalue_from_python_stage1_data* data)
+    {
+      bool decref = false;
+
+      if (PyUnicode_Check(obj))
+      {
+          decref = true;
+          obj = PyUnicode_AsLatin1String(obj);
+      }
+      
+      const char* value = PyBytes_AsString(obj);
+ 
+      // Grab pointer to memory into which to construct the new std::string
+      void* storage = (
+        (boost::python::converter::rvalue_from_python_storage<std::string>*)
+        data)->storage.bytes;
+ 
+      // in-place construct the new std::string using the character data
+      // extraced from the python object
+      new (storage) std::string(value);
+ 
+      // Stash the memory chunk pointer for later use by boost.python
+      data->convertible = storage;
+
+      if (decref)
+          Py_DECREF(obj);
+    }
+};
+
+#endif // PY_VERSION_HEX < 0x03000000
+
 int raise_asynch_exception(long thread_id, boost::python::object exp_klass)
 {
     return PyThreadState_SetAsyncExc(thread_id, exp_klass.ptr());
@@ -317,7 +376,11 @@ void export_base_types()
     convert_numpy_to_integer<Tango::DEV_ULONG>();
     convert_numpy_to_integer<Tango::DEV_LONG64>();
     convert_numpy_to_integer<Tango::DEV_ULONG64>();
-    
+
+#if PY_VERSION_HEX < 0x03000000
+    StdString_from_python_str_unicode();
+#endif
+
     // from tango_const.h
     export_poll_device();
 

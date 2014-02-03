@@ -20,7 +20,7 @@ __docformat__ = "restructuredtext"
 import operator
 
 from ._PyTango import __Group as _RealGroup, StdStringVector
-from .utils import seq_2_StdStringVector
+from .utils import seq_2_StdStringVector, is_pure_str
 from .utils import document_method as __document_method
 import collections
 
@@ -54,7 +54,7 @@ class Group:
     same attribute(s)/command(s) to be able to do parallel requests."""
     
     def __init__(self, name):
-        if isinstance(name, str):
+        if is_pure_str(name):
             name = _RealGroup(name)
         if not isinstance(name, _RealGroup):
             raise TypeError("Constructor expected receives a str")

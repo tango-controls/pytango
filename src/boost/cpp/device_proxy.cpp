@@ -372,6 +372,16 @@ namespace PyDeviceProxy
         return get_events__aux<Tango::DataReadyEventData, Tango::DataReadyEventDataList>
                                                 (py_self, event_id);
     }
+
+    static boost::shared_ptr<Tango::DeviceProxy> makeDeviceProxy1(const std::string& name)
+    {
+        return boost::shared_ptr<Tango::DeviceProxy>(new Tango::DeviceProxy(name.c_str()));
+    }
+
+    static boost::shared_ptr<Tango::DeviceProxy> makeDeviceProxy2(const std::string& name, bool b)
+    {
+      return boost::shared_ptr<Tango::DeviceProxy>(new Tango::DeviceProxy(name.c_str(), b));
+    }
 };
 
 void export_device_proxy()
@@ -394,6 +404,8 @@ void export_device_proxy()
         .def(bopy::init<const char *>())
         .def(bopy::init<const char *, bool>())
         .def(bopy::init<const Tango::DeviceProxy &>())
+        .def("__init__", boost::python::make_constructor(PyDeviceProxy::makeDeviceProxy1))
+        .def("__init__", boost::python::make_constructor(PyDeviceProxy::makeDeviceProxy2))
 
         //
         // Pickle

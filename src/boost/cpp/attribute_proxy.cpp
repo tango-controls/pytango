@@ -32,6 +32,16 @@ namespace PyAttributeProxy
             return bopy::make_tuple(ret);
         }
     };
+
+    static boost::shared_ptr<Tango::AttributeProxy> makeAttributeProxy1(const std::string& name)
+    {
+        return boost::shared_ptr<Tango::AttributeProxy>(new Tango::AttributeProxy(name.c_str()));
+    }
+
+    static boost::shared_ptr<Tango::AttributeProxy> makeAttributeProxy2(const Tango::DeviceProxy *dev, const std::string& name)
+    {
+      return boost::shared_ptr<Tango::AttributeProxy>(new Tango::AttributeProxy(dev, name.c_str()));
+    }
 }
 
 void export_attribute_proxy()
@@ -46,14 +56,13 @@ void export_attribute_proxy()
     void (Tango::AttributeProxy::*delete_property_)(std::string &) =
         &Tango::AttributeProxy::delete_property;
 
-    bopy::class_<Tango::AttributeProxy> AttributeProxy(
-        "__AttributeProxy",
-        bopy::init<const char *>())
+    bopy::class_<Tango::AttributeProxy> AttributeProxy("__AttributeProxy",
+        bopy::init<const Tango::AttributeProxy &>())
     ;
 
     AttributeProxy
-        .def(bopy::init<const Tango::DeviceProxy *, const char *>())
-        .def(bopy::init<const Tango::AttributeProxy &>())
+        .def("__init__", boost::python::make_constructor(PyAttributeProxy::makeAttributeProxy1))
+        .def("__init__", boost::python::make_constructor(PyAttributeProxy::makeAttributeProxy2))
 
         //
         // Pickle
