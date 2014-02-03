@@ -87,23 +87,23 @@ PRE_C_H := precompiled_header.hpp
 PRE_C_H_O := $(OBJS_DIR)/$(PRE_C_H).gch
 PRE_C := -include$(OBJS_DIR)/$(PRE_C_H)
 
-LN := g++ -pthread -shared -Wl,$(OPTIMIZE_LN) -Wl,-Bsymbolic-functions -z defs
+LN := g++ -pthread -shared -Wl,$(OPTIMIZE_LN) -Wl,-Bsymbolic-functions #-z defs
 LN_STATIC := g++ -pthread -static -Wl,$(OPTIMIZE_LN) -Wl,-Bsymbolic-functions
 
 LN_VER := -Wl,-h -Wl,--strip-all
 
-LN_LIBS := -l$(BOOST_LIB) -lpython$(PY_VER)
+LN_LIBS := -l$(BOOST_LIB) -lpython$(PY_VER) -ltango
 
 INCLUDE_DIRS =
 
 ifdef TANGO_ROOT
 LN_DIRS += -L$(TANGO_ROOT)/lib
 INCLUDE_DIRS += -I$(TANGO_ROOT)/include -I$(TANGO_ROOT)/include/tango
-LN_LIBS += -ltango -lomniDynamic4 -lCOS4 -llog4tango -lzmq -lomniORB4 -lomnithread
+#LN_LIBS += -ltango -lomniDynamic4 -lCOS4 -llog4tango -lzmq -lomniORB4 -lomnithread
 else
 LN_DIRS += `pkg-config --libs-only-L tango`
 INCLUDE_DIRS += `pkg-config --cflags-only-I tango`
-LN_LIBS += `pkg-config --libs-only-l tango`
+#LN_LIBS += `pkg-config --libs-only-l tango`
 endif
 
 ifdef LOG4TANGO_ROOT
