@@ -680,9 +680,9 @@ namespace PyDeviceAttribute
                         TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_numpy_attribute, self, isImage, py_value );
                     else
                         TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_list_attribute, self, isImage, py_value );
-                    break;
                 }
 #               endif
+                break;
             default:
                 raise_(PyExc_TypeError, "unsupported data_format.");
         }

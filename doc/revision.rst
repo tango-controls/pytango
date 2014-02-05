@@ -88,6 +88,7 @@ Version history
 +==========+===================================================================================================================================================================+
 | 8.1.2    | Bug fixes:                                                                                                                                                        |
 |          | - `648: PyTango unicode method parameters fail <https://sourceforge.net/p/tango-cs/bugs/648/>`_                                                                   |
+|          | - `649: write_attribute of spectrum/image fails in PyTango without numpy <https://sourceforge.net/p/tango-cs/bugs/649/>`_                                         |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.1    | Features:                                                                                                                                                         |
 |          | - Implemented tango C++ 8.1 API                                                                                                                                   |
