@@ -54,10 +54,12 @@ is64 = 8 * struct.calcsize("P") == 64
 
 
 def pkg_config(*packages, **config):
-    config_map = {"-I": "include_dirs",
-                "-L": "library_dirs",
-                "-l": "libraries"}
-    cmd = ["pkg-config", "--libs", "--cflags-only-I", " ".join(packages)]
+    config_map = {
+        "-I": "include_dirs",
+        "-L": "library_dirs",
+        "-l": "libraries",
+    }
+    cmd = ["pkg-config", "--cflags-only-I", " ".join(packages)]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     result = proc.wait()
     result = str(proc.communicate()[0].decode("utf-8"))
@@ -157,18 +159,20 @@ def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None)
         return
     else:
         inc_dir = os.path.join(ENV, 'include')
+        dirs['include_dirs'].append(inc_dir)
         if inc_suffix is not None:
             inc_dir = os.path.join(inc_dir, inc_suffix)
+            dirs['include_dirs'].append(inc_dir)
+
         lib_dirs = [os.path.join(ENV, 'lib')]
         if is64:
             lib64_dir = os.path.join(ENV, 'lib64')
             if os.path.isdir(lib64_dir):
                 lib_dirs.insert(0, lib64_dir)
-
+        dirs['library_dirs'].extend(lib_dirs)
+        
         if lib_name.startswith('lib'):
             lib_name = lib_name[3:]
-        dirs['include_dirs'].append(inc_dir)
-        dirs['library_dirs'].extend(lib_dirs)
         dirs['libraries'].append(lib_name)
 
 
@@ -333,8 +337,7 @@ def setup_args():
     directories = {
         'include_dirs': [],
         'library_dirs': [],
-        'libraries':    ['tango', 'log4tango', 'zmq',
-                         'omniDynamic4', 'COS4', 'omniORB4', 'omnithread'],
+        'libraries':    ['tango'],
     }
     sys_libs = []
 
