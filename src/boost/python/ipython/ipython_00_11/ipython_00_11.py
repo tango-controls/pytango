@@ -536,7 +536,7 @@ def __exc_handler(ip, etype, value, tb, tb_offset=None):
         global _TANGO_ERR
         user_ns[_TANGO_ERR] = etype, value, tb, tb_offset
         if len(value.args):
-            v = value[0]
+            v = value.args[0]
             print("%s: %s" % (v.reason ,v.desc))
         else:
             print("Empty DevFailed")
