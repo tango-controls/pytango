@@ -35,16 +35,19 @@ def get_ipython_version():
     """Returns the current IPython version"""
     import IPython
     v = None
-    try:
+    if hasattr(IPython, "version_info"):
+        v = '.'.join(map(str, IPython.version_info[:3]))
+    else:
         try:
-            v = IPython.Release.version
-        except:
             try:
-                v = IPython.release.version
+                v = IPython.Release.version
             except:
-                pass
-    except:
-        pass
+                try:
+                    v = IPython.release.version
+                except:
+                    pass
+        except:
+            pass
     return StrictVersion(v)
 
 #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
