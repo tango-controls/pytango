@@ -281,8 +281,7 @@ inline typename TANGO_const2type(tangoTypeConst)*
     fast_python_to_tango_buffer_sequence(PyObject* py_val, long* pdim_x, long *pdim_y, const std::string &fname, bool isImage, long& res_dim_x, long& res_dim_y)
 {
     typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-    typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
-
+ 
     long dim_x;
     long dim_y = 0;
     Py_ssize_t len = PySequence_Size(py_val);

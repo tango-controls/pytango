@@ -33,7 +33,6 @@ inline typename TANGO_const2type(tangoScalarTypeConst)*
     fast_python_to_tango_buffer_numpy(PyObject* py_val, long* pdim_x, long* pdim_y, const std::string &fname, bool isImage, long& res_dim_x, long& res_dim_y)
 {
     typedef typename TANGO_const2type(tangoScalarTypeConst) TangoScalarType;
-    typedef typename TANGO_const2arraytype(tangoScalarTypeConst) TangoArrayType;
     static const int typenum = TANGO_const2numpy(tangoScalarTypeConst);
     
     if (!PyArray_Check(py_val)) {

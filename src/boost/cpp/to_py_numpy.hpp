@@ -17,8 +17,6 @@
 template <long tangoArrayTypeConst>
 inline boost::python::object to_py_numpy(const typename TANGO_const2type(tangoArrayTypeConst)* tg_array, boost::python::object parent)
 {
-    typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
-
     static const int typenum = TANGO_const2scalarnumpy(tangoArrayTypeConst);
 
     if (tg_array == 0) {

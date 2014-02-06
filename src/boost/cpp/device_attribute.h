@@ -175,10 +175,6 @@ namespace PyDeviceAttribute {
     template<>
     inline void _fill_scalar_attribute<Tango::DEV_ENCODED>(Tango::DeviceAttribute & dev_attr, const boost::python::object & py_value)
     {
-        static const long tangoTypeConst = Tango::DEV_ENCODED;
-        typedef TANGO_const2type(tangoTypeConst) TangoScalarType;
-        typedef TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
-
         /// @todo test it!!
 
         /// @todo Now I am accepting 2 strings: encoded_format, encoded_data. This

@@ -252,7 +252,6 @@ namespace PyAttribute
             bool isImage)
     {
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-        typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
 
         if (!PySequence_Check(value.ptr()))
         {
