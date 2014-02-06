@@ -55,7 +55,7 @@ def install(ipydir=None, verbose=True, profile='tango'):
     if verbose:
         out = sys.stdout
     else:
-        out = io.BytesIO()
+        out = io.StringIO()
     
     ipython_dir = ipydir or get_ipython_dir()
     try:

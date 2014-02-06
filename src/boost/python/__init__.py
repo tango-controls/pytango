@@ -111,13 +111,13 @@ def __prepare_nt():
 
 if os.name == 'nt':
     try:
-        import _PyTango
+        from . import _PyTango
     except ImportError as ie:
         # in windows try to find the location for tango
         __prepare_nt()
-        import _PyTango
+        from . import _PyTango
 else:
-    import _PyTango
+    from . import _PyTango
         
 from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     AsynCall, AsynReplyNotArrived, AttReqType, Attr, AttrConfEventData,
