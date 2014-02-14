@@ -183,8 +183,10 @@ __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute", "command",
            "device_property", "class_property", "server_run"]
 
 import __builtin__
+
 import sys
 import inspect
+import operator
 import functools
 import traceback
 
@@ -675,8 +677,33 @@ class class_property(_property):
     pass
 
 
+def __to_cb(post_init_callback):
+    if post_init_callback is None:
+        return lambda : None
+
+    err_msg = "post_init_callback must be a callable or " \
+              "sequence <callable [, args, [, kwargs]]>"
+    if operator.isCallable(post_init_callback):
+        return post_init_callback
+    elif is_non_str_seq(post_init_callback):
+        length = len(post_init_callback)
+        if length < 1 or length > 3:
+            raise TypeError(err_msg)
+        cb = post_init_callback[0]
+        if not operator.isCallable(cb):
+            raise TypeError(err_msg)
+        args, kwargs = [], {}
+        if length > 1:
+            args = post_init_callback[1]
+        if length > 2:
+            kwargs = post_init_callback[2]
+        return functools.partial(cb, *args, **kwargs)
+
+    raise TypeError(err_msg)
+    
+
 def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
-                 event_loop=None):
+                 event_loop=None, post_init_callback=None):
     import PyTango
     if msg_stream is None:
         import io
@@ -684,6 +711,8 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
 
     if args is None:
         args = sys.argv
+
+    post_init_callback = __to_cb(post_init_callback)
 
     if util is None:
         util = PyTango.Util(args)
@@ -707,28 +736,36 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
                 klass_name = klass_info._DeviceClassName
                 klass = klass_info
             util.add_class(klass_klass, klass, klass_name)
+
     u_instance = PyTango.Util.instance()
     if event_loop is not None:
         u_instance.server_set_event_loop(event_loop)
     u_instance.server_init()
+    post_init_callback()
     msg_stream.write("Ready to accept request\n")
     u_instance.server_run()
     return util
 
 
 def server_run(classes, args=None, msg_stream=sys.stdout,
-               verbose=False, util=None, event_loop=None):
+               verbose=False, util=None, event_loop=None,
+               post_init_callback=None):
     """Provides a simple way to run a tango server. It handles exceptions
        by writting a message to the msg_stream.
 
        The `classes` parameter can be either a sequence of :class:`~PyTango.server.Device`
        classes or a dictionary where:
+
+       The optional `post_init_callback` can be a callable (without arguments)
+       or a tuple where the first element is the callable, the second is a list
+       of arguments(optional) and the third is a dictionary of keyword arguments
+       (also optional). Examples::
        
        * key is the tango class name
        * value is either:
            #. a :class:`~PyTango.server.Device` class or
            #. a a sequence of two elements :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`
-           
+
        Example 1: registering and running a PowerSupply inheriting from :class:`~PyTango.server.Device`::
        
            from PyTango import server_run
@@ -772,6 +809,10 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
        :param event_loop: event_loop callable
        :type event_loop: callable
        
+       :param post_init_callback: an optional callback that is executed between
+                                  the calls Util.server_init and Util.server_run
+       :type post_init_callback: callable or tuple (see description above)
+
        :return: The Util singleton object
        :rtype: :class:`~PyTango.Util`
        
@@ -784,14 +825,19 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
        .. versionchanged:: 8.1.1
            Changed default msg_stream from *stderr* to *stdout*
            Added `event_loop` keyword parameter.
-           Returns util object"""
+           Returns util object
 
+       .. versionchanged:: 8.1.2
+           Added `post_init_callback` keyword parameter
+    """
     if msg_stream is None:
         import io
         msg_stream = io.BytesIO()
     write = msg_stream.write
     try:
-        return __server_run(classes, args=args, util=util, event_loop=event_loop)
+        return __server_run(classes, args=args, msg_stream=msg_stream,
+                            util=util, event_loop=event_loop,
+                            post_init_callback=post_init_callback)
     except KeyboardInterrupt:
         write("Exiting: Keyboard interrupt\n")
     except DevFailed as df:
@@ -803,3 +849,15 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
         if verbose:
             write(traceback.format_exc())
     write("\nExited\n")
+
+def run(classes, args=None, msg_stream=sys.stdout,
+        verbose=False, util=None, event_loop=None,
+        post_init_callback=None):
+    """Just an alias to :func:`~PyTango.server.server_run`
+    """
+    return server_run(classes, args=args, msg_stream=msg_stream,
+                      verbose=verbose, util=util, event_loop=event_loop,
+                      post_init_callback=post_init_callback)
+
+run.__doc__ += server_run.__doc__
+
