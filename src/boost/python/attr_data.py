@@ -274,8 +274,13 @@ class AttrData(object):
             throw_ex("Wrong polling period in attribute information for "
                      "attribute %s in class %s\nAttribute information for "
                      "polling period is not an integer" % (attr_name, name))
-        
-        memorized = extra_info.get("memorized", "false").lower()
+
+        try:
+            memorized = extra_info.get("memorized", "false").lower()
+        except:
+            throw_ex("Wrong memorized value. for attribute %s in class %s."
+                     "Allowed valued are the strings \"true\", \"false\" and "
+                     "\"true_without_hard_applied\" (case incensitive)")
         if memorized == "true":
             self.memorized = True
             self.hw_memorized = True
