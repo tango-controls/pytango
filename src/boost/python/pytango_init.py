@@ -64,8 +64,8 @@ def init_constants():
         #UNAME = tuple(map(str, json.loads(constants.UNAME)))
 
     tg_rt_ver_nb = _get_tango_lib_release()
-    tg_rt_major_ver = tg_rt_ver_nb / 100
-    tg_rt_minor_ver = tg_rt_ver_nb / 10 % 10
+    tg_rt_major_ver = tg_rt_ver_nb // 100
+    tg_rt_minor_ver = tg_rt_ver_nb // 10 % 10
     tg_rt_patch_ver = tg_rt_ver_nb % 10
     tg_rt_ver = ".".join(map(str, (tg_rt_major_ver, tg_rt_minor_ver,
                                    tg_rt_patch_ver)))
