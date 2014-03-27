@@ -413,12 +413,10 @@ def __DeviceImpl___remove_attr_meth(self,attr_name):
             delattr(self.__class__, allo_meth_name)
         cl.dyn_att_added_methods.remove(attr_name)
 
-def __join_msg(msg):
-    return ' '.join(map(str, msg))
 
-def __DeviceImpl__debug_stream(self, *msg):
+def __DeviceImpl__debug_stream(self, msg, *args):
     """
-    debug_stream(self, *msg) -> None
+    debug_stream(self, msg, *args) -> None
 
             Sends the given message to the tango debug stream.
 
@@ -430,11 +428,11 @@ def __DeviceImpl__debug_stream(self, *msg):
             - msg : (str) the message to be sent to the debug stream
         Return     : None
     """
-    self.__debug_stream(__join_msg(msg))
+    self.__debug_stream(msg % args)
 
-def __DeviceImpl__info_stream(self, *msg):
+def __DeviceImpl__info_stream(self, msg, *args):
     """
-    info_stream(self, *msg) -> None
+    info_stream(self, msg, *args) -> None
 
             Sends the given message to the tango info stream.
 
@@ -446,11 +444,11 @@ def __DeviceImpl__info_stream(self, *msg):
             - msg : (str) the message to be sent to the info stream
         Return     : None
     """
-    self.__info_stream(__join_msg(msg))
+    self.__info_stream(msg % args)
     
-def __DeviceImpl__warn_stream(self, *msg):
+def __DeviceImpl__warn_stream(self, msg, *args):
     """
-    warn_stream(self, *msg) -> None
+    warn_stream(self, msg, *args) -> None
 
             Sends the given message to the tango warn stream.
 
@@ -462,11 +460,11 @@ def __DeviceImpl__warn_stream(self, *msg):
             - msg : (str) the message to be sent to the warn stream
         Return     : None
     """
-    self.__warn_stream(__join_msg(msg))
+    self.__warn_stream(msg % args)
     
-def __DeviceImpl__error_stream(self, *msg):
+def __DeviceImpl__error_stream(self, msg, *args):
     """
-    error_stream(self, *msg) -> None
+    error_stream(self, msg, *args) -> None
 
             Sends the given message to the tango error stream.
 
@@ -478,11 +476,11 @@ def __DeviceImpl__error_stream(self, *msg):
             - msg : (str) the message to be sent to the error stream
         Return     : None
     """
-    self.__error_stream(__join_msg(msg))
+    self.__error_stream(msg % args)
     
-def __DeviceImpl__fatal_stream(self, *msg):
+def __DeviceImpl__fatal_stream(self, msg, *args):
     """
-    fatal_stream(self, *msg) -> None
+    fatal_stream(self, msg, *args) -> None
 
             Sends the given message to the tango fatal stream.
 
@@ -494,7 +492,7 @@ def __DeviceImpl__fatal_stream(self, *msg):
             - msg : (str) the message to be sent to the fatal stream
         Return     : None
     """
-    self.__fatal_stream(__join_msg(msg))
+    self.__fatal_stream(msg % args)
 
 @property
 def __DeviceImpl__debug(self):
@@ -549,22 +547,25 @@ def __init_DeviceImpl():
     DeviceImpl.log_error = __DeviceImpl__error
     DeviceImpl.log_fatal = __DeviceImpl__fatal
 
-def __Logger__log(self, level, *msg):
+def __Logger__log(self, level, msg, *args):
     """
-    log(self, level, *msg) -> None
+    log(self, level, msg, *args) -> None
 
             Sends the given message to the tango the selected stream.
 
         Parameters :
             - level: (Level.LevelLevel) Log level
             - msg : (str) the message to be sent to the stream
+            - args: (seq<str>) list of optional message arguments
         Return     : None
-    """
-    self.__log(level, __join_msg(msg))
 
-def __Logger__log_unconditionally(self, level, *msg):
+    .. versionchanged: 
     """
-    log_unconditionally(self, level, *msg) -> None
+    self.__log(level, msg % args)
+
+def __Logger__log_unconditionally(self, level, msg, *args):
+    """
+    log_unconditionally(self, level, msg, *args) -> None
 
             Sends the given message to the tango the selected stream,
             without checking the level.
@@ -572,69 +573,75 @@ def __Logger__log_unconditionally(self, level, *msg):
         Parameters :
             - level: (Level.LevelLevel) Log level
             - msg : (str) the message to be sent to the stream
+            - args: (seq<str>) list of optional message arguments
         Return     : None
     """
-    self.__log_unconditionally(level, __join_msg(msg))
+    self.__log_unconditionally(level, msg % args)
 
-def __Logger__debug(self, *msg):
+def __Logger__debug(self, msg, *args):
     """
-    debug(self, *msg) -> None
+    debug(self, msg, *args) -> None
 
             Sends the given message to the tango debug stream.
 
         Parameters :
             - msg : (str) the message to be sent to the debug stream
+            - args: (seq<str>) list of optional message arguments
         Return     : None
     """
-    self.__debug(__join_msg(msg))
+    self.__debug(msg % args)
 
-def __Logger__info(self, *msg):
+def __Logger__info(self, msg, *args):
     """
-    info(self, *msg) -> None
+    info(self, msg, *args) -> None
 
             Sends the given message to the tango info stream.
 
         Parameters :
             - msg : (str) the message to be sent to the info stream
+            - args: (seq<str>) list of optional message arguments
         Return     : None
     """
-    self.__info(__join_msg(msg))
+    self.__info(msg % args)
 
-def __Logger__warn(self, *msg):
+def __Logger__warn(self, msg, *args):
     """
-    warn(self, *msg) -> None
+    warn(self, msg, *args) -> None
 
             Sends the given message to the tango warn stream.
 
         Parameters :
             - msg : (str) the message to be sent to the warn stream
+            - args: (seq<str>) list of optional message arguments
         Return     : None
     """
-    self.__warn(__join_msg(msg))
+    self.__warn(msg % args)
 
-def __Logger__error(self, *msg):
+def __Logger__error(self, msg, *args):
     """
-    error(self, *msg) -> None
+    error(self, msg, *args) -> None
 
             Sends the given message to the tango error stream.
 
         Parameters :
             - msg : (str) the message to be sent to the error stream
+            - args: (seq<str>) list of optional message arguments
         Return     : None
     """
-    self.__error(__join_msg(msg))
+    self.__error(msg % args)
 
-def __Logger__fatal(self, *msg):
+def __Logger__fatal(self, msg, *args):
     """
-    fatal(self, *msg) -> None
+    fatal(self, msg, *args) -> None
 
             Sends the given message to the tango fatal stream.
 
         Parameters :
             - msg : (str) the message to be sent to the fatal stream
+            - args: (seq<str>) list of optional message arguments
         Return     : None
     """
-    self.__fatal(__join_msg(msg))
+    self.__fatal(msg % args)
 
 def __Attr__str(self):
     return '%s(%s)' % (self.__class__.__name__, self.get_name())
