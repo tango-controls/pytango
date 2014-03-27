@@ -1068,6 +1068,32 @@ def __doc_DeviceImpl():
         New in PyTango 7.1.2
     """ )
 
+    document_method("get_attribute_poll_period", """
+    get_attribute_poll_period(self, attr_name) -> int
+
+            Returns the attribute polling period (ms) or 0 if the attribute
+            is not polled.
+
+        Parameters :
+            - attr_name : (str) attribute name
+        Return     : (int) attribute polling period (ms) or 0 if it is not polled
+        
+        New in PyTango 8.0.0
+    """ )
+
+    document_method("get_command_poll_period", """
+    get_command_poll_period(self, cmd_name) -> int
+
+            Returns the command polling period (ms) or 0 if the command
+            is not polled.
+
+        Parameters :
+            - cmd_name : (str) command name
+        Return     : (int) command polling period (ms) or 0 if it is not polled
+        
+        New in PyTango 8.0.0
+    """ )
+    
     document_method("check_command_exists", """
     check_command_exists(self) -> None
 
