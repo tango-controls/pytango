@@ -235,6 +235,15 @@ namespace PyDeviceImpl
         attr.fire_change_event();
     }
 
+    // Special variantion for encoded data type
+    inline void push_change_event(Tango::DeviceImpl &self, str &name, str &str_data,
+                                  object &data)
+    {
+        SAFE_PUSH(self, attr, name)
+        PyAttribute::set_value(attr, str_data, data);
+        attr.fire_change_event();
+    }
+
     inline void push_change_event(Tango::DeviceImpl &self, str &name, object &data,
                                   long x)
     {
@@ -260,6 +269,15 @@ namespace PyDeviceImpl
     // Special variantion for encoded data type
     inline void push_change_event(Tango::DeviceImpl &self, str &name, str &str_data,
                                   str &data, double t, Tango::AttrQuality quality)
+    {
+        SAFE_PUSH(self, attr, name)
+        PyAttribute::set_value_date_quality(attr, str_data, data, t, quality);
+        attr.fire_change_event();
+    }
+
+    // Special variantion for encoded data type
+    inline void push_change_event(Tango::DeviceImpl &self, str &name, str &str_data,
+                                  object &data, double t, Tango::AttrQuality quality)
     {
         SAFE_PUSH(self, attr, name)
         PyAttribute::set_value_date_quality(attr, str_data, data, t, quality);
@@ -299,9 +317,18 @@ namespace PyDeviceImpl
         SAFE_PUSH_ARCHIVE_EVENT(self, name, data);
     }
 
-    // Special variantion for encoded data type
+    // Special variation for encoded data type
     inline void push_archive_event(Tango::DeviceImpl &self, str &name, str &str_data,
                                    str &data)
+    {
+        SAFE_PUSH(self, attr, name)
+        PyAttribute::set_value(attr, str_data, data);
+        attr.fire_archive_event();
+    }
+
+    // Special variation for encoded data type
+    inline void push_archive_event(Tango::DeviceImpl &self, str &name, str &str_data,
+                                   object &data)
     {
         SAFE_PUSH(self, attr, name)
         PyAttribute::set_value(attr, str_data, data);
@@ -333,6 +360,15 @@ namespace PyDeviceImpl
     // Special variantion for encoded data type
     inline void push_archive_event(Tango::DeviceImpl &self, str &name, str &str_data,
                                    str &data, double t, Tango::AttrQuality quality)
+    {
+        SAFE_PUSH(self, attr, name)
+        PyAttribute::set_value_date_quality(attr, str_data, data, t, quality);
+        attr.fire_archive_event();
+    }
+
+    // Special variantion for encoded data type
+    inline void push_archive_event(Tango::DeviceImpl &self, str &name, str &str_data,
+                                   object &data, double t, Tango::AttrQuality quality)
     {
         SAFE_PUSH(self, attr, name)
         PyAttribute::set_value_date_quality(attr, str_data, data, t, quality);
@@ -377,6 +413,16 @@ namespace PyDeviceImpl
         attr.fire_event(filt_names_, filt_vals_);
     }
 
+    // Special variantion for encoded data type
+    inline void push_event(Tango::DeviceImpl &self, str &name,
+                           object &filt_names, object &filt_vals,
+                           str &str_data, object &data)
+    {
+        AUX_SAFE_PUSH_EVENT(self, name, filt_names, filt_vals)
+        PyAttribute::set_value(attr, str_data, data);
+        attr.fire_event(filt_names_, filt_vals_);
+    }
+
     inline void push_event(Tango::DeviceImpl &self, str &name,
                            object &filt_names, object &filt_vals, object &data,
                            long x)
@@ -406,6 +452,17 @@ namespace PyDeviceImpl
     inline void push_event(Tango::DeviceImpl &self, str &name,
                            object &filt_names, object &filt_vals,
                            str &str_data, str &data,
+                           double t, Tango::AttrQuality quality)
+    {
+        AUX_SAFE_PUSH_EVENT(self, name, filt_names, filt_vals)
+        PyAttribute::set_value_date_quality(attr, str_data, data, t, quality);
+        attr.fire_event(filt_names_, filt_vals_);
+    }
+
+    // Special variantion for encoded data type
+    inline void push_event(Tango::DeviceImpl &self, str &name,
+                           object &filt_names, object &filt_vals,
+                           str &str_data, object &data,
                            double t, Tango::AttrQuality quality)
     {
         AUX_SAFE_PUSH_EVENT(self, name, filt_names, filt_vals)
@@ -1255,6 +1312,10 @@ void export_device_impl()
             &PyDeviceImpl::push_change_event)
 
         .def("push_change_event",
+            (void (*) (Tango::DeviceImpl &, str &, str &, object &))
+            &PyDeviceImpl::push_change_event)
+
+        .def("push_change_event",
             (void (*) (Tango::DeviceImpl &, str &, object &, long))
             &PyDeviceImpl::push_change_event)
 
@@ -1268,6 +1329,10 @@ void export_device_impl()
 
         .def("push_change_event",
             (void (*) (Tango::DeviceImpl &, str &, str &, str &, double, Tango::AttrQuality))
+            &PyDeviceImpl::push_change_event)
+
+        .def("push_change_event",
+            (void (*) (Tango::DeviceImpl &, str &, str &, object &, double, Tango::AttrQuality))
             &PyDeviceImpl::push_change_event)
 
         .def("push_change_event",
@@ -1292,6 +1357,10 @@ void export_device_impl()
             &PyDeviceImpl::push_archive_event)
 
         .def("push_archive_event",
+            (void (*) (Tango::DeviceImpl &, str &, str &, object &))
+            &PyDeviceImpl::push_archive_event)
+
+        .def("push_archive_event",
             (void (*) (Tango::DeviceImpl &, str &, object &, long))
             &PyDeviceImpl::push_archive_event)
 
@@ -1305,6 +1374,10 @@ void export_device_impl()
 
         .def("push_archive_event",
             (void (*) (Tango::DeviceImpl &, str &, str &, str &, double, Tango::AttrQuality))
+            &PyDeviceImpl::push_archive_event)
+
+        .def("push_archive_event",
+            (void (*) (Tango::DeviceImpl &, str &, str &, object &, double, Tango::AttrQuality))
             &PyDeviceImpl::push_archive_event)
 
         .def("push_archive_event",
@@ -1328,6 +1401,10 @@ void export_device_impl()
             &PyDeviceImpl::push_event)
 
         .def("push_event",
+            (void (*) (Tango::DeviceImpl &, str &, object &, object &, str &, object &))
+            &PyDeviceImpl::push_event)
+
+        .def("push_event",
             (void (*) (Tango::DeviceImpl &, str &, object &, object &, object &, long))
             &PyDeviceImpl::push_event)
 
@@ -1341,6 +1418,10 @@ void export_device_impl()
 
         .def("push_event",
             (void (*) (Tango::DeviceImpl &, str &, object &, object &, str &, str &, double, Tango::AttrQuality))
+            &PyDeviceImpl::push_event)
+
+        .def("push_event",
+            (void (*) (Tango::DeviceImpl &, str &, object &, object &, str &, object &, double, Tango::AttrQuality))
             &PyDeviceImpl::push_event)
 
         .def("push_event",

@@ -22,6 +22,9 @@ namespace PyAttribute
     void set_value(Tango::Attribute &, boost::python::str &,
                    boost::python::str &);
 
+    void set_value(Tango::Attribute &, boost::python::str &,
+                   boost::python::object &);
+
     void set_value(Tango::Attribute &, boost::python::object &, long);
 
     void set_value(Tango::Attribute &, boost::python::object &, long, long);
@@ -31,6 +34,10 @@ namespace PyAttribute
 
     void set_value_date_quality(Tango::Attribute &, boost::python::str &,
                                 boost::python::str &, double,
+                                Tango::AttrQuality);
+
+    void set_value_date_quality(Tango::Attribute &, boost::python::str &,
+                                boost::python::object &, double,
                                 Tango::AttrQuality);
 
     void set_value_date_quality(Tango::Attribute &, boost::python::object &,
