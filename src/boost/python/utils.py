@@ -37,7 +37,7 @@ from ._PyTango import StdStringVector, StdDoubleVector, \
     DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
     EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
     GreenMode
-
+from .constants import AlrmValueNotSpec, StatusNotSet
 
 _scalar_int_types = (CmdArgType.DevShort, CmdArgType.DevUShort,
     CmdArgType.DevInt, CmdArgType.DevLong, CmdArgType.DevULong,
@@ -88,7 +88,11 @@ _scalar_to_array_type = {
     CmdArgType.ConstDevString : CmdArgType.DevVarStringArray,
 }
 
+__NO_STR_VALUE = AlrmValueNotSpec, StatusNotSet
+
 __device_classes = None
+
+bool_ = lambda value_str : value_str.lower() == "true"
 
 
 def get_tango_device_classes():
@@ -564,7 +568,33 @@ def scalar_to_array_type(dtype):
     return _scalar_to_array_type[dtype]
 
 
-def obj_2_str(obj, tg_type):
+def str_2_obj(obj_str, tg_type=None):
+    """Converts a string into an object according to the given tango type
+    
+           :param obj_str: the string to be converted
+           :type obj_str: :py:obj:`str`
+           :param tg_type: tango type
+           :type tg_type: :class:`PyTango.CmdArgType`
+           :return: an object calculated from the given string
+           :rtype: :py:obj:`object`
+    """
+    if tg_type is None:
+        return obj_str
+    f = str
+    if is_scalar_type(tg_type):
+        if is_numerical_type(tg_type):
+            if obj_str in __NO_STR_VALUE:
+                return None
+        if is_int_type(tg_type):
+            f = int
+        elif is_float_type(tg_type):
+            f = float
+        elif is_bool_type(tg_type):
+            f = bool_
+    return f(obj_str)
+
+
+def obj_2_str(obj, tg_type=None):
     """Converts a python object into a string according to the given tango type
     
            :param obj: the object to be converted
@@ -574,6 +604,8 @@ def obj_2_str(obj, tg_type):
            :return: a string representation of the given object
            :rtype: :py:obj:`str`
     """
+    if tg_type is None:
+        return obj
     if tg_type in _scalar_types:
         # scalar cases
         if is_pure_str(obj):
@@ -585,6 +617,7 @@ def obj_2_str(obj, tg_type):
         return str(obj)
     # sequence cases
     return '\n'.join([str(i) for i in obj])
+
 
 def __get_meth_func(klass, method_name):
     meth = getattr(klass, method_name)
