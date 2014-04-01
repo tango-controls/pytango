@@ -873,8 +873,8 @@ def __doc_DeviceImpl():
                      attribute type and format.
                      for SPECTRUM and IMAGE attributes, data can be any type of sequence of elements
                      compatible with the attribute type
-            - str_data : (str) special variation for DevEncoded data type. In this case 'data' must also
-                         be a str.
+            - str_data : (str) special variation for DevEncoded data type. In this case 'data' must
+                         be a str or an object with the buffer interface.
             - except: (DevFailed) Instead of data, you may want to send an exception.
             - dim_x : (int) the attribute x length. Default value is 1
             - dim_y : (int) the attribute y length. Default value is 0
@@ -901,8 +901,8 @@ def __doc_DeviceImpl():
                      attribute type and format.
                      for SPECTRUM and IMAGE attributes, data can be any type of sequence of elements
                      compatible with the attribute type
-            - str_data : (str) special variation for DevEncoded data type. In this case 'data' must also
-                         be a str.
+            - str_data : (str) special variation for DevEncoded data type. In this case 'data' must
+                         be a str or an object with the buffer interface.
             - except: (DevFailed) Instead of data, you may want to send an exception.
             - dim_x : (int) the attribute x length. Default value is 1
             - dim_y : (int) the attribute y length. Default value is 0
@@ -930,8 +930,8 @@ def __doc_DeviceImpl():
                      attribute type and format.
                      for SPECTRUM and IMAGE attributes, data can be any type of sequence of elements
                      compatible with the attribute type
-            - str_data : (str) special variation for DevEncoded data type. In this case 'data' must also
-                         be a str.
+            - str_data : (str) special variation for DevEncoded data type. In this case 'data' must
+                         be a str or an object with the buffer interface.
             - dim_x : (int) the attribute x length. Default value is 1
             - dim_y : (int) the attribute y length. Default value is 0
             - time_stamp : (double) the time stamp
@@ -1562,8 +1562,8 @@ def __doc_Attribute():
                      for IMAGE attributes.
                      The recommended sequence is a C continuous and aligned numpy
                      array, as it can be optimized.
-            - str_data : (str) special variation for DevEncoded data type. In this case 'data' must also
-                         be a str.
+            - str_data : (str) special variation for DevEncoded data type. In this case 'data' must
+                         be a str or an object with the buffer interface.
             - dim_x : (int) [DEPRECATED] the attribute x length. Default value is 1
             - dim_y : (int) [DEPRECATED] the attribute y length. Default value is 0
         Return     : None
@@ -1588,8 +1588,8 @@ def __doc_Attribute():
                      for IMAGE attributes.
                      The recommended sequence is a C continuous and aligned numpy
                      array, as it can be optimized.
-            - str_data : (str) special variation for DevEncoded data type. In this case 'data' must also
-                         be a str.
+            - str_data : (str) special variation for DevEncoded data type. In this case 'data' must
+                         be a str or an object with the buffer interface.
             - dim_x : (int) [DEPRECATED] the attribute x length. Default value is 1
             - dim_y : (int) [DEPRECATED] the attribute y length. Default value is 0
             - time_stamp : (double) the time stamp
