@@ -89,6 +89,7 @@ Version history
 | 8.1.2    | Features:                                                                                                                                                         |
 |          | - `98: PyTango.server.server_run needs additional post_init_callback parameter <https://sourceforge.net/p/tango-cs/feature-requests/98>`_                         |
 |          | - `102: DevEncoded attribute should support a python buffer object <https://sourceforge.net/p/tango-cs/feature-requests/102>`_                                    |
+|          | - `103: Make creation of *EventData objects possible in PyTango <https://sourceforge.net/p/tango-cs/feature-requests/103>`_                                       |
 |          |                                                                                                                                                                   |
 |          | Bug fixes:                                                                                                                                                        |
 |          | - `641: python3 error handling issue <https://sourceforge.net/p/tango-cs/bugs/641/>`_                                                                             |
