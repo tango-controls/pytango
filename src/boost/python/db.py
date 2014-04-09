@@ -1044,7 +1044,7 @@ def __doc_Database():
             Example :
                 dev_info = DbDevInfo()
                 dev_info.name = 'my/own/device'
-                dev_info.class = 'MyDevice'
+                dev_info._class = 'MyDevice'
                 dev_info.server = 'MyServer/test'
                 db.add_device(dev_info)
 
