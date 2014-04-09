@@ -30,6 +30,12 @@
 # - PY3K: if defined use python 3 boost python
 # - PY_VER: use a specific python version (default is empty) (ex: 3.2)
 
+# Build "in parallel":
+# make prepare && make -j5 
+#
+# Install "in parallel":
+# make prepare && make -j5 && make install prefix=<install dir>
+
 ifdef PY_VER
 PY_EXC=python$(PY_VER)
 PY_MAJOR=$(shell $(PY_EXC) -c "import sys; sys.stdout.write(str(sys.version_info[0]))")
@@ -72,10 +78,10 @@ CC = gcc
 PY_INC := $(shell python$(PY_VER)-config --includes)
 
 ifdef optimize
-OPTIMIZE_CC = -g -O2
+OPTIMIZE_CC = -O2
 OPTIMIZE_LN = -O2
 else
-OPTIMIZE_CC = -g -O0
+OPTIMIZE_CC = -O0
 OPTIMIZE_LN = -O0
 endif
 
@@ -132,7 +138,7 @@ INCLUDE_DIRS += \
 QUOTE_INCLUDE_DIRS = -iquote $(SRC_DIR)
 
 MACROS := -DNDEBUG -DPYTANGO_HAS_UNIQUE_PTR -DPYTANGO_NUMPY_VERSION=$(PYTANGO_NUMPY_VERSION)
-CFLAGS := -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC $(OPTIMIZE_CC) $(MACROS) $(TANGO_CFLAGS) $(INCLUDE_DIRS) $(QUOTE_INCLUDE_DIRS)
+CFLAGS := -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC -g $(OPTIMIZE_CC) $(MACROS) $(TANGO_CFLAGS) $(INCLUDE_DIRS) $(QUOTE_INCLUDE_DIRS)
 LNFLAGS := $(LN_DIRS) $(LN_LIBS)
 
 LIB_NAME := _PyTango.so
@@ -216,63 +222,91 @@ command.h \
 device_class.h \
 device_impl.h
 
+LINKER=$(LN) $(LNFLAGS) $(OBJS) $(LN_VER)
+
+LINK_TASK=link
 ifdef optimize
-LINKER=$(LN) $(LNFLAGS) $(OBJS) $(LN_VER) -o $(OBJS_DIR)/$(LIB_NAME).full ; strip --strip-all -o $(OBJS_DIR)/$(LIB_NAME) $(OBJS_DIR)/$(LIB_NAME).full
-else
-LINKER=$(LN) $(LNFLAGS) $(OBJS) $(LN_VER) -o $(OBJS_DIR)/$(LIB_NAME)
+LINK_TASK=link-opt
 endif
+
+OK=OK!
 
 #-----------------------------------------------------------------
 
 all: build
 
-build: init $(PRE_C_H_O) $(LIB_NAME)
+prepare: init $(PRE_C_H_O)
+
+build: init prepare $(LINK_TASK)
 
 init:
 	@echo Using python $(PY_VER)
 	@echo CFLAGS  = $(CFLAGS)
 	@echo LNFLAGS = $(LNFLAGS)
-	@echo Preparing build directories... 
+	@echo -n "Preparing build directories... " 
 	@mkdir -p $(OBJS_DIR)
+	@echo $(OK)
 
 $(PRE_C_H_O): $(SRC_DIR)/$(PRE_C_H)
-	@echo Compiling pre-compiled header...
+	@echo -n "Compiling pre-compiled header... "
 	@$(CC) $(CFLAGS) -c $< -o $(PRE_C_H_O)
+	@echo $(OK)
 
 #
 # Rule for API files
 #
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@echo Compiling $(<F) ...
+	@echo -n "Compiling $(<F)... "
 	@$(CC) $(CFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(PRE_C)
+	@echo Done!
 
 $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
-	@echo Compiling $(<F) ...
+	@echo -n "Compiling $(<F)... "
 	@$(CC) $(CFLAGS) -c $< -o $(OBJS_DIR)/$*.o $(PRE_C)
+	@echo $(OK)
 
 #
 #	The shared libs
 #
 
-$(LIB_NAME): $(PRE_C_H_0) $(OBJS)
-	@echo Linking shared $(LIB_NAME) ...
-	@$(LINKER)
+link: prepare $(OBJS)
+	@echo -n "Linking shared $(LIB_NAME)... "
+	@$(LINKER) -o $(OBJS_DIR)/$(LIB_NAME)
+	@echo $(OK)
+
+link-opt: link
+	@echo Optimizing shared $(LIB_NAME)
+	@echo -n "  Building separate debug file... "
+	@objcopy --only-keep-debug $(OBJS_DIR)/$(LIB_NAME) $(OBJS_DIR)/$(LIB_NAME).dbg
+	@echo $(OK)
+	@echo -n "  Stripping $(LIB_NAME)... "
+	@objcopy --strip-debug --strip-unneeded $(OBJS_DIR)/$(LIB_NAME)
+	@echo $(OK)
+	@echo -n "  Linking $(LIB_NAME) with debug file... "
+	@objcopy --add-gnu-debuglink=$(OBJS_DIR)/$(LIB_NAME).dbg $(OBJS_DIR)/$(LIB_NAME)
+	@echo $(OK)
 
 clean:
-	@echo Cleaning ...
+	@echo -n Cleaning ...
 	@rm -f $(OBJS_DIR)/*.o
+	@echo $(OK)
 
 clean-all: 
-	@echo Cleaning all...
+	@echo -n Cleaning all...
 	@rm -rf $(OBJS_DIR)
-
+	@echo $(OK)
 
 install-py:
-	@echo Installing python files into $(prefix)/PyTango ...
+	@echo -n "Installing python files into $(prefix)/PyTango... "
 	@mkdir -p $(prefix)/PyTango
 	@rsync -r src/boost/python/ $(prefix)/PyTango/
+	@echo $(OK)
 
-install: build install-py
-	@echo Installing binary files into $(prefix)/PyTango ...
+install-lib:
+	@echo -n "Installing binary files into $(prefix)/PyTango... "
 	@rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/PyTango
- 
+	@echo $(OK)
+
+install-all: install-py install-lib
+
+install: build install-all
