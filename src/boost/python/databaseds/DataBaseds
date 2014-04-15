@@ -3,7 +3,7 @@
 import database
 
 def main():
-    database.run()
+    database.main(embedded=False)
     
 if __name__ == '__main__':
     main()
