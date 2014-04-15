@@ -21,8 +21,8 @@ INSERT INTO object_history_id VALUES (0);
 INSERT INTO device VALUES ('sys/database/2',NULL,'sys','database','2','nada','nada','nada','DataBaseds/2','nada','DataBase','nada','nada','nada','nada');
 INSERT INTO device VALUES ('dserver/DataBaseds/2',NULL,'dserver','DataBaseds','2','nada','nada','nada','DataBaseds/2','nada','DServer','nada','nada','nada','nada');
 
-INSERT INTO device VALUES ('sys/database/pydb-test',NULL,'sys','database','pydb','nada','nada','nada','DataBaseds/pydb','nada','DataBase','nada','nada','nada','nada');
-INSERT INTO device VALUES ('dserver/DataBaseds/pydb-test',NULL,'dserver','DataBaseds','2','nada','nada','nada','DataBaseds/pydb','nada','DServer','nada','nada','nada','nada');
+INSERT INTO device VALUES ('sys/database/pydb-test',NULL,'sys','database','pydb','nada','nada','nada','DataBaseds/pydb-test','nada','DataBase','nada','nada','nada','nada');
+INSERT INTO device VALUES ('dserver/DataBaseds/pydb-test',NULL,'dserver','DataBaseds','2','nada','nada','nada','DataBaseds/pydb-test','nada','DServer','nada','nada','nada','nada');
 
 #
 # Create entry for test device server in device table

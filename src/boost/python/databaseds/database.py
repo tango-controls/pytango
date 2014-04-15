@@ -2363,7 +2363,7 @@ class DataBaseClass(PyTango.DeviceClass):
 def __run():
     """Runs the Database DS as a standalone database"""
 
-    db_name = "sys/database/" + args[1]
+    db_name = "sys/database/" + sys.argv[1]
     set_db_name(db_name)
 
     PyTango.Util.set_use_db(False)
