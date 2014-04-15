@@ -151,7 +151,7 @@ class DataBase (PyTango.Device_4Impl):
 
         self.db = db_access.Tango_sqlite3()
 
-
+        logging.info("Finished init_device")
         #----- PROTECTED REGION END -----#	//	DataBase.init_device
 
 #------------------------------------------------------------------
@@ -2359,44 +2359,77 @@ class DataBaseClass(PyTango.DeviceClass):
 #    DataBase class main method
 #
 #==================================================================
-def main():
-    log_fmt = '%(threadName)-14s %(levelname)-8s %(asctime)s %(name)s: %(message)s'
+
+def __run():
+    """Runs the Database DS as a standalone database"""
+
+    db_name = "sys/database/" + args[1]
+    set_db_name(db_name)
+
+    PyTango.Util.set_use_db(False)
+    py_util = PyTango.Util(sys.argv)
+    py_util.add_class(DataBaseClass, DataBase, 'DataBase')
+
+    util = PyTango.Util.instance()
+    dbi = DbInter()
+    util.set_interceptors(dbi)
+    util.set_serial_model(PyTango.SerialModel.NO_SYNC)
+    util.server_init()
+
+    dserver = util.get_dserver_device()
+    dserver.duplicate_d_var()
+    dserver_name = dserver.get_name()
+    dserver_ior = util.get_dserver_ior(dserver)
+
+    dbase = util.get_device_by_name(db_name)
+    dbase_name = dbase.get_name()
+    dbase_ior = util.get_device_ior(dbase)
+        
+    host = util.get_host_name()
+    pid = util.get_pid_str()
+    version = util.get_version_str()
+        
+    dbase.DbExportDevice([dserver_name, dserver_ior, host, pid, version])
+    dbase.DbExportDevice([dbase_name, dbase_ior, host, pid, version])
+
+    print("Ready to accept request")
+    util.orb_run()
+
+
+def __run_embedded():
+    """Runs the Database device server embeded in another TANGO Database
+    (just like any other TANGO device server)"""
+
+    db_name = "sys/database/" + sys.argv[1]
+    set_db_name(db_name)
+
+    py_util = PyTango.Util(sys.argv)
+    py_util.add_class(DataBaseClass, DataBase, 'DataBase')
+
+    util = PyTango.Util.instance()
+    util.server_init()
+    print("Ready to accept request")
+    util.server_run()
+
+
+def main(embedded=False):
+    log_fmt = '%(threadName)s %(levelname)-8s %(asctime)s %(name)s: %(message)s'
     logging.basicConfig(format=log_fmt, stream=sys.stdout, level=logging.INFO)
+    
+    f = __run
+    if embedded:
+        f = __run_embedded
     try:
-        db_name = "sys/database/" + sys.argv[1]
-        set_db_name(db_name)
-        PyTango.Util.set_use_db(False)
-        py = PyTango.Util(sys.argv)
-        py.add_class(DataBaseClass, DataBase, 'DataBase')
-
-        U = PyTango.Util.instance()
-        dbi = DbInter()
-        U.set_interceptors(dbi)
-        U.set_serial_model(PyTango.SerialModel.NO_SYNC)
-        U.server_init()
-        dserver = U.get_dserver_device()
-        dbase = U.get_device_by_name(db_name)
-
-        dserver.duplicate_d_var()
-
-        pars = [dserver.get_name(), U.get_dserver_ior(dserver),
-                U.get_host_name(), U.get_pid_str(), U.get_version_str()]
-        dbase.DbExportDevice(pars)
-
-        pars[0] = dbase.get_name()
-        pars[1] = U.get_device_ior(dbase)
-        dbase.DbExportDevice(pars)
-
-        print "Ready to accept request"
-        U.orb_run()
-
-
+        return f()
     except PyTango.DevFailed as df:
         print '-------> Received a DevFailed exception:', df
-        import traceback;traceback.print_exc()
+        import traceback;
+        traceback.print_exc()
     except Exception as e:
         print '-------> An unforeseen exception occured....', e
-        import traceback;traceback.print_exc()
+        import traceback;
+        traceback.print_exc()
 
+    
 if __name__ == '__main__':
-    main()
+    run_embeded()
