@@ -166,6 +166,17 @@ class Tango_dbapi2(object):
         else:
             return row[0]
 
+
+    def send_starter_cmd(self, starter_dev_names):
+        for name in starter_dev_names:
+            pos = name.find('.')
+            if pos != -1:
+                name = name[0:pos]
+            dev = PyTango.DeviceProxy(name)
+            dev.UpdateServersInfo()
+            
+            
+
     # TANGO API
 
     def get_stored_procedure_release(self):
@@ -224,7 +235,7 @@ class Tango_dbapi2(object):
                 'DELETE FROM property_attribute_class WHERE class = ? AND ' \
                 'attribute = ? and name = ?', (klass_name, attr_name, prop_name))
             # mark this property as deleted
-            hist_id = self.get_id('class_attibute', cursor=cursor)
+            hist_id = self.get_id('class_attribute', cursor=cursor)
             cursor.execute(\
                 'INSERT INTO property_attribute_class_hist (class, attribute, ' \
                 'name, id, count, value) VALUES ' \
@@ -363,7 +374,7 @@ class Tango_dbapi2(object):
 
         # Update host's starter to update controlled servers list
         if self.fire_to_starter and previous_host:
-            # TODO send to starter
+            self.send_starter_cmd(previous_host)
             pass
 
     @use_cursor
@@ -377,9 +388,17 @@ class Tango_dbapi2(object):
         cursor = self.cursor
         do_fire = False
         previous_host = None
+
         if self.fire_to_starter:
-            # TODO send to starter
-            pass
+            if dev_name[0:8] == "dserver/":
+                # Get database server name
+                tango_util = PyTango.Util.instance()
+                db_serv = tango_util.get_ds_name()
+                adm_dev_name = "dserver/" + db_serv.lower()
+                if dev_name != adm_dev_name and dev_name[0:16] != "dserver/starter/":
+                    do_fire = True
+                    previous_host = self.get_device_host(dev_name)
+
         cursor.execute('SELECT server FROM device WHERE name LIKE ?', (dev_name,))
         row = cursor.fetchone()
         if row is None:
@@ -398,7 +417,11 @@ class Tango_dbapi2(object):
         cursor.execute('UPDATE server SET host=? WHERE name LIKE ?', (host, server))
 
         if do_fire:
-            # TODO send to starter
+            hosts = []
+            hosts.append(host)
+            if previous_host != "" and previous_host != "nada" and previous_host != host:
+                hosts.append(previous_host)
+            self.send_starter_cmd(hosts)
             pass
 
     @use_cursor
@@ -448,7 +471,7 @@ class Tango_dbapi2(object):
         return [ row[0] for row in cursor.fetchall() ]
 
     @use_cursor
-    def get_class_attribute_property(self, clas_name, attributes):
+    def get_class_attribute_property(self, class_name, attributes):
         cursor = self.cursor
         stmt = 'SELECT name,value FROM property_attribute_class WHERE class=? AND attribute LIKE ?'
         result = [class_name, str(len(attributes))]
@@ -463,19 +486,79 @@ class Tango_dbapi2(object):
         return result
 
     @use_cursor
-    def get_class_attribute_property2(self, clas_name, attributes):
+    def get_class_attribute_property2(self, class_name, attributes):
         cursor = self.cursor
         stmt = 'SELECT name,value FROM property_attribute_class WHERE class=? AND attribute LIKE ? ORDER BY name,count'
         result = [class_name, str(len(attributes))]
-        # TODO: NOT DONE YET!
         for attribute in attributes:
             cursor.execute(stmt, (class_name, attribute))
             rows = cursor.fetchall()
-            result.append(attribute)
-            result.append(str(len(rows)))
+            result.append(attribute) 
+            j = 0
+            new_prop = True
+            nb_props = 0
+            prop_size = 0
+            prop_names = []
+            prop_sizes = []
+            prop_values = []
             for row in rows:
-                result.append(row[0])
-                result.append(row[1])
+                prop_values.append(row[1])
+                if j == 0:
+                    old_name = row[0]
+                else:
+                    name = row[0]
+                    if name != old_name:
+                        new_prop = True
+                        old_name = name
+                    else:
+                        new_prop = False
+                j  = j + 1
+                if new_prop == True:
+                    nb_props = nb_props + 1
+                    prop_names.append(row[0])
+                    if prop_size != 0:
+                        prop_sizes.append(prop_size)
+                    prop_size = 1
+                else:
+                    prop_size = prop_size + 1
+                    
+            result.append(str(nb_props))
+            j = 0
+            k = 0
+            for name in prop_names:
+                result.append(name)
+                result.append(prop_sizes[j])
+                for i in range(0, prop_sizes[j]):
+                    result.append(prop_values[k])
+                    k = k + 1
+                j = j + 1
+        return result
+
+    @use_cursor
+    def get_class_attribute_property_hist(self, class_name, attribute, prop_name):
+        cursor = self.cursor
+        stmt = 'SELECT  DISTINCT id FROM property_attribute_class_hist WHERE class=? AND attribute LIKE ? AND name LIKE ? ORDER by date ASC'
+        
+        result = []
+        
+        cursor.execute(stmt, (class_name, attribute, prop_name))
+        
+        for row in cursor.fetchall():
+            idr = row[0]
+        
+            stmt = 'SELECT DATE_FORMAT(date,\'%Y-%m-%d %H:%i:%s\'),value,attribute,name,count FROM property_attribute_class_hist WHERE id =? AND class =?'
+            
+            cursor.execute(stmt, (idr, class_name))
+        
+            rows = cursor.fetchall()
+        
+            result.append(rows[2])
+            result.append(rows[3])
+            result.append(rows[0])
+            result.append(str(rows[4]))
+            for value in rows[1]:
+                result.append(value)
+
         return result
 
     @use_cursor
@@ -502,7 +585,970 @@ class Tango_dbapi2(object):
         return [ row[0] for row in cursor.fetchall() ]
 
 
+    @use_cursor
+    def get_class_property(self, class_name, properties):        
+        cursor = self.cursor
+        stmt = 'SELECT count,value FROM property_class WHERE class=? AND name LIKE ? ORDER BY count'
+        result.append(class_name)
+        result.append(len(properties))
+        for prop_name in properties:
+            cursor.execute(stmt, (class_name, prop_name))
+            rows = cursor.fetchall()
+            result.append(prop_name)
+            result.append(str(len(rows)))
+            for row in rows:
+                result.append(row[1])
+        return result
+        
+    @use_cursor
+    def get_class_property_hist(self, class_name, prop_name):
+        cursor = self.cursor
+        stmt = 'SELECT  DISTINCT id FROM property_class_hist WHERE class=? AND AND name LIKE ? ORDER by date ASC'
+        
+        result = []
+        
+        cursor.execute(stmt, (class_name, prop_name))
+        
+        for row in cursor.fetchall():
+            idr = row[0]
+        
+            stmt = 'SELECT DATE_FORMAT(date,\'%Y-%m-%d %H:%i:%s\'),value,name,count FROM property_class_hist WHERE id =? AND class =?'
+            
+            cursor.execute(stmt, (idr, class_name))
+        
+            rows = cursor.fetchall()
+        
+            result.append(rows[2])
+            result.append(rows[0])
+            result.append(str(rows[3]))
+            for value in rows[1]:
+                result.append(value)
 
+        return result      
+        
+    @use_cursor
+    def get_class_property_list(self, class_name):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT name FROM property_class WHERE class LIKE ? order by NAME',
+                       (class_name,))
+        return [ row[0] for row in cursor.fetchall() ]
+
+    @use_cursor
+    def get_device_alias(self, dev_name):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT alias FROM device WHERE name LIKE ?',
+                       (dev_name,))
+        row = cursor.fetchone()
+        if row is None:
+            th_exc(DB_DeviceNotDefined,
+                   "No alias found for device '" + dev_name + "'",
+                   "DataBase::GetDeviceAlias()")
+        return row[0]
+
+    @use_cursor
+    def get_device_alias_list(self, alias):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT alias FROM device WHERE alias LIKE ? ORDER BY alias',
+                       (alias,))
+        return [ row[0] for row in cursor.fetchall() ]
+
+    @use_cursor
+    def get_device_attribute_list(self, dev_name, attribute):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT  attribute FROM property_attribute_device WHERE device=?  AND attribute LIKE ? ORDER BY attribute',
+                       (dev_name, attribute,))
+        return [ row[0] for row in cursor.fetchall() ]
+
+
+    @use_cursor
+    def get_device_attribute_property(self, dev_name, attributes):
+        cursor = self.cursor
+        stmt = 'SELECT name,value FROM property_attribute_device WHERE device=? AND attribute LIKE ?'
+        result = [dev_name, str(len(attributes))]
+        for attribute in attributes:
+            cursor.execute(stmt, (dev_name, attribute))
+            rows = cursor.fetchall()
+            result.append(attribute)
+            result.append(str(len(rows)))
+            for row in rows:
+                result.append(row[0])
+                result.append(row[1])
+        return result  
+
+    @use_cursor
+    def get_device_attribute_property2(self, dev_name, attributes):
+        cursor = self.cursor
+        stmt = 'SELECT name,value FROM property_attribute_device WHERE device=? AND attribute LIKE ? ORDER BY name,count' 
+        result = [dev_name, str(len(attributes))]
+        for attribute in attributes:
+            cursor.execute(stmt, (dev_name, attribute))
+            rows = cursor.fetchall()
+            result.append(attribute) 
+            j = 0
+            new_prop = True
+            nb_props = 0
+            prop_size = 0
+            prop_names = []
+            prop_sizes = []
+            prop_values = []
+            for row in rows:
+                prop_values.append(row[1])
+                if j == 0:
+                    old_name = row[0]
+                else:
+                    name = row[0]
+                    if name != old_name:
+                        new_prop = True
+                        old_name = name
+                    else:
+                        new_prop = False
+                j  = j + 1
+                if new_prop == True:
+                    nb_props = nb_props + 1
+                    prop_names.append(row[0])
+                    if prop_size != 0:
+                        prop_sizes.append(prop_size)
+                    prop_size = 1
+                else:
+                    prop_size = prop_size + 1
+                    
+            result.append(str(nb_props))
+            j = 0
+            k = 0
+            for name in prop_names:
+                result.append(name)
+                result.append(prop_sizes[j])
+                for i in range(0, prop_sizes[j]):
+                    result.append(prop_values[k])
+                    k = k + 1
+                j = j + 1
+        return result
+
+    @use_cursor
+    def get_device_attribute_property_hist(self, dev_name, attribute, prop_name):
+        cursor = self.cursor
+        stmt = 'SELECT  DISTINCT id FROM property_attribute_device_hist WHERE device=? AND attribute LIKE ? AND name LIKE ? ORDER by date ASC'
+        
+        result = []
+        
+        cursor.execute(stmt, (dev_name, attribute, prop_name))
+        
+        for row in cursor.fetchall():
+            idr = row[0]
+        
+            stmt = 'SELECT DATE_FORMAT(date,\'%Y-%m-%d %H:%i:%s\'),value,attribute,name,count FROM property_attribute_device_hist WHERE id =? AND device =? ORDER BY count ASC'
+            
+            cursor.execute(stmt, (idr, class_name))
+        
+            rows = cursor.fetchall()
+        
+            result.append(rows[2])
+            result.append(rows[3])
+            result.append(rows[0])
+            result.append(str(rows[4]))
+            for value in rows[1]:
+                result.append(value)
+
+        return result
+
+    
+    @use_cursor
+    def get_device_class_list(self, server_name):
+        cursor = self.cursor
+        result = []
+        cursor.execute('SELECT name,class FROM device WHERE server =?  ORDER BY name',
+                       (server_name,))
+        for row in cursor.fetchall():
+            result.append(row[0])
+            result.append(row[1])
+        
+        return result
+
+    @use_cursor
+    def get_device_domain_list(self, wildcard):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT domain FROM device WHERE name LIKE ? OR alias LIKE ? ORDER BY domain',
+                       (wildcard,wildcard))
+        return [ row[0] for row in cursor.fetchall() ]
+
+   
+    @use_cursor
+    def get_device_exported_list(self, wildcard):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT name FROM device WHERE (name LIKE ? OR alias LIKE ?) AND exported=1 ORDER BY name',
+                       (wildcard,wildcard))
+        return [ row[0] for row in cursor.fetchall() ]   
+
+    @use_cursor
+    def get_device_family_list(self, wildcard):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT family FROM device WHERE name LIKE ? OR alias LIKE ? ORDER BY family',
+                       (wildcard,wildcard))
+        return [ row[0] for row in cursor.fetchall() ]   
+    
+    @use_cursor
+    def get_device_info(self, dev_name):
+        cursor = self.cursor
+        cursor.execute('SELECT exported,ior,version,pid,server,host,started,stopped,class FROM device WHERE name =?  or alias =?',
+                       (dev_name,dev_name))
+        result_long = []
+        result_str = []
+        for row in cursor.fetchall():
+            if ((row[4] == None) or (row[5] == None)):
+                th_exc(DB_SQLError,
+                       "Wrong info in database for device '" + dev_name + "'",
+                       "DataBase::GetDeviceInfo()")
+            result_str.append(dev_name)
+            if raw[1] != None:
+                result_str.append(str(raw[1]))
+            else:
+               result_str.append("")
+            result_str.append(str(raw[2]))
+            result_str.append(str(raw[4]))
+            result_str.append(str(raw[5]))
+           
+            for i in range(0,2):
+                cursor.execute('SELECT DATE_FORMAT(?,\'%D-%M-%Y at %H:%i:%s\')', raw[6 + i])
+                tmp_date = cursor.fetchone()
+                if tmp_date == None:
+                    result_str.append("?")
+                else:               
+                    result_str.append(str(tmp_date))
+
+            for i in range(0,2):
+                if raw[i] != None:
+                    result_long.append(raw[i])
+
+        result = (result_long, result_str)
+        return result
+
+    @use_cursor
+    def get_device_list(self,server_name, class_name ):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT name FROM device WHERE server LIKE ? AND class LIKE ? ORDER BY name',
+                       (server_name, class_name))
+        return [ row[0] for row in cursor.fetchall() ]
+    
+    @use_cursor
+    def get_device_wide_list(self, wildcard):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT name FROM device WHERE name LIKE ? ORDER BY name',
+                       (wildcard))
+        return [ row[0] for row in cursor.fetchall() ]
+    
+    @use_cursor
+    def get_device_member_list(self, wildcard):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT  member FROM device WHERE name LIKE ? ORDER BY member',
+                       (wildcard))
+        return [ row[0] for row in cursor.fetchall() ]    
+
+    
+    @use_cursor
+    def get_device_property(self, dev_name, properties):
+        cursor = self.cursor
+        stmt = 'SELECT count,value,name FROM property_device WHERE device = ? AND name LIKE ?  ORDER BY count'
+        result = []
+        result.append(dev_name)
+        result.append(str(len(properties)))
+        for prop in properties:
+            result.append(prop)
+            tmp_name = replace_wildcard(prop)
+            cursor.execute(stmt, (dev_name, tmp_name))
+            rows = cursor.fetchall()
+            result.append(attribute)
+            result.append(str(len(rows)))
+            for row in rows:
+                result.append(row[1])
+        return result    
+
+    @use_cursor
+    def get_device_property_hist(self, device_name, prop_name):
+        cursor = self.cursor
+        stmt = 'SELECT  DISTINCT id FROM property_device_hist WHERE device=? AND name LIKE ? ORDER by date ASC'
+        
+        result = []
+	
+        tmp_name   = replace_wildcard(prop_name);
+        
+        cursor.execute(stmt, (class_name, device_name, tmp_name))
+
+        stmt = 'SELECT DATE_FORMAT(date,\'%Y-%m-%d %H:%i:%s\'),value,name,count FROM property_device_hist WHERE id =? AND device =? ORDER BY count ASC'
+
+        for row in cursor.fetchall():
+            idr = row[0]
+            cursor.execute(stmt, (idr, device_name))
+            rows = cursor.fetchall()
+            result.append(rows[2])
+            result.append(rows[0])
+            result.append(str(rows[3]))
+            for value in rows[1]:
+                result.append(value)
+
+        return result
+
+    @use_cursor
+    def get_device_server_class_list(self, server_name):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT  class FROM device WHERE server LIKE ? ORDER BY class',
+                       (sever_name,))
+        return [ row[0] for row in cursor.fetchall() ]
+   
+    @use_cursor
+    def get_exported_device_list_for_class(self, class_name):
+        cursor = self.cursor
+        cursor.execute('SELECT  DISTINCT name FROM device WHERE class LIKE ? AND exported=1 ORDER BY name',
+                       (class_name,))
+        return [ row[0] for row in cursor.fetchall() ]   
+    
+    @use_cursor
+    def get_host_list(self, host_name):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT host FROM device WHERE host LIKE ?  ORDER BY host',
+                       (host_name,))
+        return [ row[0] for row in cursor.fetchall() ]       
+    
+    @use_cursor
+    def get_host_server_list(self, host_name):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT server FROM device WHERE host LIKE ?  ORDER BY server',
+                       (host_name,))
+        return [ row[0] for row in cursor.fetchall() ]     
+     
+     
+    def get_host_servers_info(self, host_name):
+        servers = self.get_host_server_list(host_name)
+        result = []
+        for server in servers:
+            result.append(server)
+            info = self.get_server_info(server)
+            result.append(info[2]) 
+            result.append(info[3])
+        return result
+
+     
+    def get_instance_name_list(self, server_name):
+        server_name = server_name + "\*"
+        server_list = self.get_server_list(server_name)
+        result = []
+        for server in server_list:
+            names = server.split("/")
+            result.append(names[1])
+        return result
+
+    @use_cursor
+    def get_object_list(self, name):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT object FROM property WHERE object LIKE ?  ORDER BY object',
+                       (name,))
+        return [ row[0] for row in cursor.fetchall() ]
+
+    @use_cursor
+    def get_property(self, object_name, properties):
+        cursor = self.cursor
+        result = []
+        result.append(object_name)
+        result.append(str(len(properties))) 
+        stmt = 'SELECT count,value,name FROM property WHERE object LIKE ?  AND name LIKE ? ORDER BY count'
+        for prop_name in properties:
+            result.append(prop_name)
+            prop_name = replace_wildcard(prop_name)
+            cursor.execute(stmt, (object_name,prop_name))
+            rows = cursor.fetchall()
+            n_rows = len(rows)
+            result.append(n_rows)
+            if n_rows:
+                for row in rows:
+                    result.append(row[1])
+                else:
+                    result.append(" ")
+        return result
+
+
+    @use_cursor
+    def get_property_hist(self, object_name, prop_name):
+        cursor = self.cursor
+        result = []
+        
+        stmt = 'SELECT  DISTINCT id FROM property_hist WHERE object=? AND name LIKE ? ORDER by date'        
+        prop_name = replace_wildcard(prop_name)        
+        cursor.execute(stmt, (object_name, prop_name))
+
+        stmt = 'SELECT DATE_FORMAT(date,\'%Y-%m-%d %H:%i:%s\'),value,name,count FROM property_hist WHERE id =? AND object =?'
+        for row in cursor.fetchall():
+            idr = row[0]
+            
+            cursor.execute(stmt, (idr, object_name))
+            rows = cursor.fetchall()
+            count = len(rows)
+            if rows[3] == 0:
+                count = 0
+            result.append(rows[2])
+            result.append(rows[0])
+            result.append(str(count))
+            for tmp_row in rows:
+                result.append(tmp_row[1])
+
+        return result
+
+    @use_cursor
+    def get_property_list(self, object_name, wildcard):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT name FROM property WHERE object LIKE ? AND name LIKE ? ORDER BY name',
+                       (object_name,wildcard))
+        return [ row[0] for row in cursor.fetchall() ]
+
+    @use_cursor
+    def get_server_info(self, server_name):
+        cursor = self.cursor
+        cursor.execute('SELECT host,mode,level FROM server WHERE name =?',
+                       (server_name,))
+        result = []
+        result.append(server_name)
+        row = cursor.fetchone()
+        if row is None:
+            result.append(" ")
+            result.append(" ")
+            result.append(" ")
+        else:
+            result.append(row[0])
+            result.append(row[1])
+            result.append(row[2])
+            
+        return result
+     
+    @use_cursor
+    def get_server_list(self, wildcard):
+        cursor = self.cursor
+        cursor.execute('SELECT DISTINCT server FROM device WHERE server LIKE ? ORDER BY server',
+                       (wildcard,))
+        return [ row[0] for row in cursor.fetchall() ]
+
+    def get_server_list(self, wildcard):
+        result = []
+        server_list = self.get_server_list(wildcard)
+        for server in server_list:
+            found = 0
+            server_name = server.split("/")[0]
+            for res in result:
+                if server_name.lower() == res.lower():
+                    found = 1
+            if not found:
+                result.append(server_name)
+        return result
+
+    @use_cursor
+    def import_device(self, dev_name):
+        cursor = self.cursor
+        result_long = []
+        result_str = []
+        # Search first by server name and if nothing found by alias
+        # Using OR takes much more time
+        cursor.execute('"SELECT exported,ior,version,pid,server,host,class FROM device WHERE name =?',
+                       (dev_name,))
+        rows = cursor.fetchall()
+        if len(rows) == 0:
+            cursor.execute('"SELECT exported,ior,version,pid,server,host,class FROM device WHERE alias =?',
+                           (dev_name,))
+            rows = cursor.fetchall()
+            if len(rows) == 0:
+                th_exc(DB_DeviceNotDefined,
+                       "device " + dev_name + " not defined in the database !",
+                       "DataBase::ImportDevice()")
+        for row in rows:
+            result_str.append(dev_name)
+            result_str.append(row[2])
+            result_str.append(row[4])
+            result_str.append(row[5])
+            result_str.append(row[6])
+            if row[1] != None:
+                result_str.append(row[1])
+            else:
+                result_str.append("")
+            result_long.append(row[0])
+            result_long.append(row[3])
+        result = (result_long, result_str)
+        return result    
+     
+    @use_cursor
+    def import_event(self, event_name):
+        cursor = self.cursor
+        result_long = []
+        result_str = []
+        cursor.execute('"SELECT exported,ior,version,pid,host FROM event WHERE name =?',
+                       (event_name,))
+        rows = cursor.fetchall()
+        if len(rows) == 0:
+            th_exc(DB_DeviceNotDefined,
+                   "event " + event_name + " not defined in the database !",
+                   "DataBase::ImportEvent()")
+        for row in rows:
+            result_str.append(event_name)
+            result_str.append(row[1])
+            result_str.append(row[2])
+            result_str.append(row[4])
+            exported = -1
+            if row[0] != None:
+                exported = row[0]
+            result_long.append(exported)
+            result_long.append(row[3])
+        result = (result_long, result_str)
+        return result
+
+     
+    @use_cursor
+    def info(self):
+        cursor = self.cursor
+        result = []
+         # db name
+        info_str = "TANGO Database " + self.db_name
+        result.append(info_str)
+         # new line
+        result.append("")
+         # get start time of database
+        cursor.execute('SELECT started FROM device WHERE name =?',
+                       (self.db_name,))
+        row = cursor.fetchone()
+        info_str = "Running since ..." + str(row[0])
+        result.append(info_str)
+        # new line
+        result.append("")
+        # get number of devices defined
+        cursor.execute('SELECT COUNT(*) FROM device')
+        row = cursor.fetchone()
+        info_str = "Devices defined = " + str(row[0])
+        result.append(info_str)
+        # get number of devices exported
+        cursor.execute('SELECT COUNT(*) FROM device WHERE exported = 1')
+        row = cursor.fetchone()
+        info_str = "Devices exported = " + str(row[0])
+        result.append(info_str)
+        # get number of device servers defined
+        cursor.execute('SELECT COUNT(*) FROM device WHERE class = \"DServer\" ')
+        row = cursor.fetchone()
+        info_str = "Device servers defined = " + str(row[0])
+        result.append(info_str)
+        # get number of device servers exported
+        cursor.execute('SELECT COUNT(*) FROM device WHERE class = \"DServer\"  AND exported = 1')
+        row = cursor.fetchone()
+        info_str = "Device servers exported = " + str(row[0])
+        result.append(info_str)
+        # new line
+        result.append("")
+        # get number of device properties
+        cursor.execute('SELECT COUNT(*) FROM property_device')
+        row = cursor.fetchone()
+        info_str = "Device properties defineed = " + str(row[0])
+        cursor.execute('SELECT COUNT(*) FROM property_device_hist')
+        row = cursor.fetchone()
+        info_str = info_str + " [History lgth = " + str(row[0]) + "]"
+        result.append(info_str)
+        # get number of class properties
+        cursor.execute('SELECT COUNT(*) FROM property_class')
+        row = cursor.fetchone()
+        info_str = "Class properties defined = " + str(row[0])
+        cursor.execute('SELECT COUNT(*) FROM property_class_hist')
+        row = cursor.fetchone()
+        info_str = info_str + " [History lgth = " + str(row[0]) + "]"
+        result.append(info_str)
+        # get number of device attribute properties
+        cursor.execute('SELECT COUNT(*) FROM property_attribute_device')
+        row = cursor.fetchone()
+        info_str = "Device attribute properties defined = " + str(row[0])
+        cursor.execute('SELECT COUNT(*) FROM property_attribute_device_hist')
+        row = cursor.fetchone()
+        info_str = info_str + " [History lgth = " + str(row[0]) + "]"
+        result.append(info_str)
+        # get number of class attribute properties
+        cursor.execute('SELECT COUNT(*) FROM property_attribute_class')
+        row = cursor.fetchone()
+        info_str = "Class attribute properties defined = " + str(row[0])
+        cursor.execute('SELECT COUNT(*) FROM property_attribute_class_hist')
+        row = cursor.fetchone()
+        info_str = info_str + " [History lgth = " + str(row[0]) + "]"
+        result.append(info_str)
+        # get number of object properties
+        cursor.execute('SELECT COUNT(*) FROM property')
+        row = cursor.fetchone()
+        info_str = "Object properties defined = " + str(row[0])
+        cursor.execute('SELECT COUNT(*) FROM property_hist')
+        row = cursor.fetchone()
+        info_str = info_str + " [History lgth = " + str(row[0]) + "]"
+        result.append(info_str)
+        
+        return result
+         
+    @use_cursor
+    def put_attribute_alias(self, attribute_name, attribute_alias):
+        cursor = self.cursor
+        attribute_name = attribute_name.lower()
+        # first check if this alias exists
+        cursor.execute('SELECT alias from attribute_alias WHERE alias=? AND name <> ? ',
+                       (attribute_alias,attribute_name))
+        rows = cursor.fetchall()
+        if len(rows) > 0:
+            self.warn_stream("DataBase::DbPutAttributeAlias(): this alias exists already ")
+            th_exc(DB_SQLError,
+                   "alias " + attribute_alias + " already exists !",
+                   "DataBase::DbPutAttributeAlias()")
+        tmp_names = attribute_name.split("/")
+        if len(tmp_names) != 4:
+            self.warn_stream("DataBase::DbPutAttributeAlias(): attribute name has bad syntax, must have 3 / in it")
+            th_exc(DB_SQLError,
+                   "attribute name " + attribute_name + " has bad syntax, must have 3 / in it",
+                   "DataBase::DbPutAttributeAlias()")
+         # first delete the current entry (if any)
+        cursor.execute('DELETE FROM attribute_alias WHERE name=?',
+                       (attribute_name,))
+         # update the new value for this tuple
+        tmp_device = tmp_names[0] + "/" + tmp_names[1] + "/" + tmp_names[2]
+        tmp_attribute = tmp_names[3]
+        cursor.execute('INSERT attribute_alias SET alias=? ,name=?, device=?,updated=NOW()',
+                       (attribute_alias, tmp_device, tmp_attribute)) 
+
+         
+    @use_cursor
+    def put_class_attribute_property(self, class_name, nb_attributes, attr_prop_list):
+        cursor = self.cursor
+        k = 0
+        for i in range(0,nb_attributes):
+            tmp_attribute = attr_prop_list[k]
+            nb_properties = int(attr_prop_list[k+1])
+            for j in range(k+2,k+nb_properties*2+2,2):
+                tmp_name = attr_prop_list[j]
+                tmp_value = attr_prop_list[j+1]
+                 # first delete the tuple (device,name,count) from the property table
+                cursor.execute('DELETE FROM property_attribute_class WHERE class LIKE ? AND attribute LIKE ? AND name LIKE ?', (class_name, tmp_attribute, tmp_name))
+                # then insert the new value for this tuple
+                cursor.execute('INSERT INTO property_attribute_class SET class=? ,attribute=?,name=?,count=\'1\',value=?,updated=NULL,accessed=NULL', (class_name, tmp_attribute, tmp_name, tmp_value))
+                # then insert the new value into the history table
+                hist_id = self.get_id("class_attribute", cursor=cursor)
+                cursor.execute('INSERT INTO property_attribute_class_hist SET class=?,attribute=?,name=?,id=?,count=\'1\',value=?', (class_name, tmp_attribute, tmp_name,hist_id,tmp_value))
+
+                self.purge_att_property("property_attribute_class_hist", "class",
+                                        class_name, tmp_attribute, tmp_name, cursor=cursor)
+            k = k + nb_properties*2+2
+
+    @use_cursor
+    def put_class_attribute_property2(self, class_name, nb_attributes, attr_prop_list):
+        cursor = self.cursor
+        k = 0
+        for i in range(0,nb_attributes):
+            tmp_attribute = attr_prop_list[k]
+            nb_properties = int(attr_prop_list[k+1])
+            for jj in range(0,nb_properties,1):
+                j = k + 2
+                tmp_name = attr_prop_list[j]
+                # first delete the tuple (device,name,count) from the property table
+                cursor.execute('DELETE FROM property_attribute_class WHERE class LIKE ? AND attribute LIKE ? AND name LIKE ?', (class_name, tmp_attribute, tmp_name))
+                n_rows = attr_prop_list[j+1]
+                tmp_count = 0
+                for l in range(j+1,j+n_rows+1,1):
+                    tmp_value = attr_prop_list[l+1]
+                    tmp_count = tmp_count + 1
+                    # then insert the new value for this tuple
+                    cursor.execute('INSERT INTO property_attribute_class SET class=? ,attribute=?,name=?,count=?,value=?,updated=NULL,accessed=NULL', (class_name, tmp_attribute, tmp_name, str(tmp_count), tmp_value))
+                    # then insert the new value into the history table
+                    hist_id = self.get_id("class_attribute", cursor=cursor)
+                    cursor.execute('INSERT INTO property_attribute_class_hist SET class=?,attribute=?,name=?,id=?,count=?,value=?', (class_name, tmp_attribute, tmp_name,hist_id, str(tmp_count),tmp_value))
+
+                    self.purge_att_property("property_attribute_class_hist", "class",
+                                            class_name, tmp_attribute, tmp_name, cursor=cursor)
+                k = k + n_rows + 2
+            k = k + 2    
+
+    @use_cursor
+    def put_class_property(self, class_name, nb_properties, attr_prop_list):
+        cursor = self.cursor
+        k = 0
+        for i in range(0,nb_properties):
+            tmp_count = 0
+            tmp_name = attr_prop_list[k]
+            n_rows = attr_prop_list[k+1]
+             # first delete all tuples (device,name) from the property table
+            cursor.execute('DELETE FROM property_class WHERE class LIKE ? AND name LIKE ?', (class_name, tmp_name))
+
+            for j in range(k+2,k+n_rows+2,1):
+                tmp_value = attr_prop_list[j]
+                tmp_count = tmp_count+1
+                # then insert the new value for this tuple
+                cursor.execute('INSERT INTO property_class SET class=? ,name=?,count=?,value=?,updated=NULL,accessed=NULL', (class_name, tmp_name, str(tmp_count), tmp_value))
+                # then insert the new value into the history table
+                hist_id = self.get_id("class", cursor=cursor)
+                cursor.execute('INSERT INTO property_class_hist SET class=?,name=?,id=?,count=?,value=?', (class_name, tmp_name,hist_id, str(tmp_count),tmp_value))
+                self.purge_att_property("property_class_hist", "class",
+                                        class_name, tmp_name, cursor=cursor)
+            k = k + n_rows + 2
+
+    @use_cursor
+    def put_device_alias(self, device_name, device_alias):
+        cursor = self.cursor
+        device_name = device_name.lower()
+        # first check if this alias exists
+        cursor.execute('SELECT alias from device WHERE alias=? AND name <>?',
+                       (device_alias, device_name))
+        rows = cursor.fetchall()
+        if len(rows) > 0:
+            self.warn_stream("DataBase::DbPutDeviceAlias(): this alias exists already ")
+            th_exc(DB_SQLError,
+                   "alias " + device_alias + " already exists !",
+                   "DataBase::DbPutDeviceAlias()")
+        # update the new value for this tuple
+        cursor.execute('UPDATE device SET alias=? ,started=NOW() where name LIKE ?',
+                       (device_alias, device_name)) 
+
+    @use_cursor
+    def put_device_attribute_property(self, device_name, nb_attributes, attr_prop_list):
+        cursor = self.cursor
+        k = 0
+        for i in range(0,nb_attributes):
+            tmp_attribute = attr_prop_list[k]
+            nb_properties = int(attr_prop_list[k+1])
+            for j in range(k+2,k+nb_properties*2+2,2):
+                tmp_name = attr_prop_list[j]
+                tmp_value = attr_prop_list[j+1]
+                # first delete the tuple (device,name,count) from the property table
+                cursor.execute('DELETE FROM property_attribute_device WHERE device LIKE ? AND attribute LIKE ? AND name LIKE ?', (device_name, tmp_attribute, tmp_name))
+                # then insert the new value for this tuple
+                cursor.execute('INSERT INTO property_attribute_device SET device=? ,attribute=?,name=?,count=\'1\',value=?,updated=NULL,accessed=NULL', (device_name, tmp_attribute, tmp_name, tmp_value))
+                # then insert the new value into the history table
+                hist_id = self.get_id("device_attribute", cursor=cursor)
+                cursor.execute('INSERT INTO property_attribute_device_hist SET device=?,attribute=?,name=?,id=?,count=\'1\',value=?', (device_name, tmp_attribute, tmp_name,hist_id,tmp_value))
+
+                self.purge_att_property("property_attribute_device_hist", "device",
+                                         device_name, tmp_attribute, tmp_name, cursor=cursor)
+            k = k + nb_properties*2+2         
+
+
+    @use_cursor
+    def put_device_attribute_property2(self, device_name, nb_attributes, attr_prop_list):
+        cursor = self.cursor
+        k = 0
+        for i in range(0,nb_attributes):
+            tmp_attribute = attr_prop_list[k]
+            nb_properties = int(attr_prop_list[k+1])
+            for jj in range(0,nb_properties,1):
+                j = k + 2
+                tmp_name = attr_prop_list[j]
+                # first delete the tuple (device,name,count) from the property table
+                cursor.execute('DELETE FROM property_attribute_device WHERE device LIKE ? AND attribute LIKE ? AND name LIKE ?', (device_name, tmp_attribute, tmp_name))
+                n_rows = attr_prop_list[j+1]
+                tmp_count = 0
+                for l in range(j+1,j+n_rows+1,1):
+                    tmp_value = attr_prop_list[l+1]
+                    tmp_count = tmp_count + 1
+                    # then insert the new value for this tuple
+                    cursor.execute('INSERT INTO property_attribute_device SET device=? ,attribute=?,name=?,count=?,value=?,updated=NULL,accessed=NULL', (device_name, tmp_attribute, tmp_name, str(tmp_count), tmp_value))
+                    # then insert the new value into the history table
+                    hist_id = self.get_id("device_attribute", cursor=cursor)
+                    cursor.execute('INSERT INTO property_attribute_device_hist SET device=?,attribute=?,name=?,id=?,count=?,value=?', (device_name, tmp_attribute, tmp_name,hist_id, str(tmp_count),tmp_value))
+
+                    self.purge_att_property("property_attribute_device_hist", "device",
+                                            device_name, tmp_attribute, tmp_name, cursor=cursor)
+                k = k + n_rows + 2
+            k = k + 2    
+
+    @use_cursor
+    def put_device_property(self, device_name, nb_properties, attr_prop_list):
+        cursor = self.cursor
+        k = 0
+        hist_id = self.get_id("device", cursor=cursor)
+        for i in range(0,nb_properties):
+            tmp_count = 0
+            tmp_name = attr_prop_list[k]
+            n_rows = attr_prop_list[k+1]
+            # first delete all tuples (device,name) from the property table
+            cursor.execute('DELETE FROM property_device WHERE device LIKE ? AND name LIKE ?', (device_name, tmp_name))
+
+            for j in range(k+2,k+n_rows+2,1):
+                tmp_value = attr_prop_list[j]
+                tmp_count = tmp_count+1
+                # then insert the new value for this tuple
+                cursor.execute('INSERT INTO property_device SET device=? ,name=?,count=?,value=?,updated=NULL,accessed=NULL', (device_name, tmp_name, str(tmp_count), tmp_value))
+                # then insert the new value into the history table
+                cursor.execute('INSERT INTO property_device_hist SET device=?,name=?,id=?,count=?,value=?', (device_name, tmp_name,hist_id, str(tmp_count),tmp_value))
+            self.purge_att_property("property_device_hist", "device",
+                                    device_name, tmp_name, cursor=cursor)
+            k = k + n_rows + 2
+
+    @use_cursor
+    def put_property(self, object_name, nb_properties, attr_prop_list):
+        cursor = self.cursor
+        k = 0
+        hist_id = self.get_id("object", cursor=cursor)
+        for i in range(0,nb_properties):
+            tmp_count = 0
+            tmp_name = attr_prop_list[k]
+            n_rows = attr_prop_list[k+1]
+            # first delete the property from the property table
+            cursor.execute('DELETE FROM property WHERE object =? AND name =?', (object_name, tmp_name))
+
+            for j in range(k+2,k+n_rows+2,1):
+                tmp_value = attr_prop_list[j]
+                tmp_count = tmp_count+1
+                # then insert the new value for this tuple
+                cursor.execute('INSERT INTO property SET object=? ,name=?,count=?,value=?,updated=NULL,accessed=NULL', (object_name, tmp_name, str(tmp_count), tmp_value))
+                # then insert the new value into the history table
+                cursor.execute('INSERT INTO property_hist SET object=?,name=?,id=?,count=?,value=?', (object_name, tmp_name,hist_id, str(tmp_count),tmp_value))
+            self.purge_att_property("property_hist", "object",
+                                    object_name, tmp_name, cursor=cursor)
+            k = k + n_rows + 2
+
+    @use_cursor
+    def put_server_info(self, tmp_server, tmp_host, tmp_mode, tmp_level, tmp_extra):
+        cursor = self.cursor         
+         # If it is an empty host name -> get previous host where running
+        previous_host = ""
+        if self.fire_to_starter:
+            if tmp_host == "":
+                adm_dev_name = "dserver/" + tmp_server
+                previous_host = self.get_device_host(adm_dev_name)
+        # first delete the server from the server table         
+        cursor.execute('DELETE FROM server WHERE name=?', (tmp_server,))
+        # insert the new info for this server
+        cursor.execute('INSERT INTO server SET name=? ,host=? ,mode=? ,level=?', ( tmp_server, tmp_host, tmp_mode, tmp_level))
+        #  Update host's starter to update controlled servers list
+        if self.fire_to_starter:
+            hosts = []
+            if previous_host == "":
+                hosts.append(tmp_host)
+            else:
+                hosts.append(previous_host)
+            self.send_starter_cmd(hosts)
+                 
+    @use_cursor
+    def uexport_device(self, dev_name):
+        cursor = self.cursor         
+        self._info("un-export device(dev_name=%s)", dev_name)
+        cursor.execute('UPDATE device SET exported=0,stopped=NOW() WHERE name LIKE ?', (dev_name,))
+        
+    @use_cursor
+    def uexport_event(self, event_name):
+        cursor = self.cursor         
+        self._info("un-export event (event_name=%s)", event_name)
+        cursor.execute('UPDATE event SET exported=0,stopped=NOW() WHERE name LIKE ?', (event_name,))
+                               
+    @use_cursor
+    def uexport_server(self, server_name):
+        cursor = self.cursor         
+        self._info("un-export all devices from server ", server_name)
+        cursor.execute('UPDATE device SET exported=0,stopped=NOW() WHERE server LIKE ?', (server_name,))
+        
+    @use_cursor
+    def delete_all_device_attribute_property(self, dev_name, attr_list):
+        cursor = self.cursor  
+        for attr_name in attr_list:
+            self._info("_delete_all_device_attribute_property(): delete device %s attribute %s property(ies) from database", dev_name, attr_name)
+             #Is there something to delete ?   
+            cursor.execute('SELECT DISTINCT name FROM property_attribute_device WHERE device =? AND attribute = ?', (dev_name,attr_name))
+            rows = cursor.fetchall()
+            if len(rows) != 0:
+                cursor.execute('DELETE FROM property_attribute_device WHERE device = ? AND attribute = ?', (dev_name,attr_name))
+            # Mark this property as deleted
+            for row in rows:
+                hist_id = self.get_id('device_attribute', cursor=cursor)
+                cursor.execute('INSERT INTO property_attribute_device_hist SET device=?,attribute=?,name=?,id=?,count=\'0\',value=\'DELETED\'', (dev_name,attr_name,row[0], hist_id))
+                self.purge_att_property("property_attribute_device_hist", "device",
+                                         dev_name, attr_name, row[0], cursor=cursor)
+                
+    @use_cursor
+    def my_sql_select(self, cmd):
+        cursor = self.cursor
+        cursor.execute(cmd)
+        result_long = []
+        result_str = []
+        rows = cursor.fetchall()
+        nb_fields = 0
+        for row in rows:
+            if row == None:
+                result_str.append("")
+                result_long.append(0)
+            else:
+                for field in row:
+                    nb_fields = nb_fields + 1
+                    if field != None:
+                        result_str.append(str(field))
+                        result_long.append(1)
+                    else:                        
+                        result_str.append("")
+                        result_long.append(0)
+        result_long.append(len(rows))
+        result_long.append(nb_fields)
+                    
+        result = (result_long, result_str)
+        return result
+
+
+
+    @use_cursor
+    def get_csdb_server_list(self):
+        cursor = self.cursor
+        
+        cursor.execute('SELECT DISTINCT ior FROM device WHERE exported=1 AND domain=\'sys\' AND family=\'database\'')
+        return [ row[0] for row in cursor.fetchall() ]
+     
+    @use_cursor
+    def get_attribute_alias2(self, attr_name):
+        cursor = self.cursor
+        cursor.execute('SELECT alias from attribute_alias WHERE name LIKE ? ',(attr_name,))        
+        return [ row[0] for row in cursor.fetchall() ]
+    
+    @use_cursor
+    def get_alias_attribute(self, alias_name):
+        cursor = self.cursor
+        cursor.execute('SELECT name from attribute_alias WHERE alias LIKE ? ',(alias_name,))        
+        return [ row[0] for row in cursor.fetchall() ]     
+    
+    @use_cursor
+    def rename_server(self, old_name, new_name):
+        cursor = self.cursor
+        # Check that the new name is not already used
+        new_adm_name = "dserver/" + new_name
+        cursor.execute('SELECT name from device WHERE name = ? ',(new_adm_name,))
+        rows = cursor.fetchall()
+        if len(rows) != 0:
+            th_exc(DB_SQLError,
+                   "Device server process name " + attribute_alias + "is already used !",
+                   "DataBase::DbRenameServer()")
+            
+        # get host where running
+        previous_host = ""
+        if self.fire_to_starter:
+            try:
+                adm_dev = "dserver/" + old_name
+                previous_host = self.get_device_host(adm_dev)
+            except:
+                th_exc(DB_IncorrectServerName,
+                       "Server " + old_name + "not defined in database!",
+                       "DataBase::DbRenameServer()")
+        # Change ds exec name. This means
+        #  1 - Update the device's server column
+        #  2 - Change the ds admin device name
+        #  3 - Change admin device property (if any)
+        #  4 - Change admin device attribute property (if any)
+     
+        old_adm_name = "dserver/" + old_name
+        tmp_new = new_name.split('/')
+        new_exec = tmp_new[0]
+        new_inst = tmp_new[1]    
+        new_adm_name = "dserver/" + new_name
+        
+        cursor.execute('UPDATE device SET name =?, family =?, mamber =? WHERE name =?', (new_adm_name, new_exec, new_inst, old_adm_name))
+        
+        cursor.execute('UPDATE property_device set device=? WHERE device=?', (new_adm_name, old_adm_name))
+        
+        cursor.execute('UPDATE property_attribute_device set device=? WHERE device=?', (new_adm_name, old_adm_name))
+              
+        #  Update host's starter to update controlled servers list
+        if self.fire_to_starter:
+            hosts = []
+            if previous_host == "":
+                hosts.append(tmp_host)
+            else:
+                hosts.append(previous_host)
+            self.send_starter_cmd(hosts)
+
+   
 class Tango_sqlite3(Tango_dbapi2):
 
     DB_API_NAME = 'sqlite3'

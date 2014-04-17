@@ -33,6 +33,9 @@ __docformat__ = 'restructuredtext'
 import PyTango
 import sys
 # Add additional import
+
+import time
+
 #----- PROTECTED REGION ID(DataBase.additionnal_import) ENABLED START -----#
 
 import logging
@@ -99,6 +102,18 @@ def replace_wildcard(text):
     text = text.replace("*", "%")
     return text
 
+class TimeStructure:
+    def __init__(self):
+        self.average = 0
+        self.minimum = 0
+        self.maximum = 0
+        self.maximum = 0
+        self.total_elapsed = 0
+        self.calls = 0
+        self.index = ''
+
+
+cmd_list = ["DbImportDevice", "DbExportDevice", "DbGetHostServerList", "DbGetHostList","DbGetServerList", "DbGetDevicePropertyList", "DbGetClassPropertyList", "DbGetDeviceMemberList", "DbGetDeviceFamilyList", "DbGetDeviceDomainList", "DbGetDeviceProperty", "DbPutDeviceProperty",  "DbDeleteDeviceProperty", "DbInfo", "DbGetDeviceClassList", "DbGetDeviceAttributeProperty", "DbPutDeviceAttributeProperty", "DbGetDeviceAttributeProperty2", "DbPutDeviceAttributeProperty2", "DbUnExportServer", "DbGetDeviceExportedList", "DbExportEvent", "DbImportEvent", "DbGetDataForServerCache", "DbPutClassProperty", "DbMySqlSelect"]
 
 #----- PROTECTED REGION END -----#	//	DataBase.additionnal_import
 
@@ -111,6 +126,24 @@ def replace_wildcard(text):
 class DataBase (PyTango.Device_4Impl):
 
 #--------- Add you global variables here --------------------------
+
+    def  update_timing_stats(self, time_before, time_after, cmd_name):
+        tmp_time = self.timing_maps[cmd_name]
+        time_elapsed = (time_after - time_before) * 1000.
+        tmp_time.total_elapsed = tmp_time.total_elapsed + time_elapsed
+        if time_elapsed > tmp_time.maximum:
+            tmp_time.maximum = time_elapsed
+        if time_elapsed < tmp_time.minimum or tmp_time.minimum == 0:
+            tmp_time.minimum = time_elapsed
+        tmp_time.calls = tmp_time.calls + 1
+        tmp_time.average = tmp_time.total_elapsed/tmp_time.calls
+
+    def init_timing_stats(self):
+        self.timing_maps = {}
+        for cmd in cmd_list:
+            self.timing_maps[cmd] = TimeStructure()
+            self.timing_maps[cmd].index = cmd
+
 #----- PROTECTED REGION ID(DataBase.global_variables) ENABLED START -----#
 
     def get_device_properties(self, device_klass):
@@ -147,9 +180,12 @@ class DataBase (PyTango.Device_4Impl):
         self.attr_Timing_calls_read = [0.0]
         self.attr_Timing_index_read = ['']
         self.attr_Timing_info_read = ['']
+        self.init_timing_stats()
         #----- PROTECTED REGION ID(DataBase.init_device) ENABLED START -----#
 
         self.db = db_access.Tango_sqlite3()
+
+        self.set_state(PyTango.DevState.ON)
 
         logging.info("Finished init_device")
         #----- PROTECTED REGION END -----#	//	DataBase.init_device
@@ -186,6 +222,10 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".read_Timing_average()")
         #----- PROTECTED REGION ID(DataBase.Timing_average_read) ENABLED START -----#
 
+        self.attr_Timing_average_read[:] = []
+        for tmp_name in cmd_list:
+            self.attr_Timing_average_read.append(self.timing_maps[tmp_name].average)
+        
         #----- PROTECTED REGION END -----#	//	DataBase.Timing_average_read
         attr.set_value(self.attr_Timing_average_read)
 
@@ -195,6 +235,10 @@ class DataBase (PyTango.Device_4Impl):
     def read_Timing_minimum(self, attr):
         self.debug_stream("In " + self.get_name() + ".read_Timing_minimum()")
         #----- PROTECTED REGION ID(DataBase.Timing_minimum_read) ENABLED START -----#
+
+        self.attr_Timing_minimum_read[:] = []
+        for tmp_name in cmd_list:
+            self.attr_Timing_minimum_read.append(self.timing_maps[tmp_name].minimum)
 
         #----- PROTECTED REGION END -----#	//	DataBase.Timing_minimum_read
         attr.set_value(self.attr_Timing_minimum_read)
@@ -206,6 +250,10 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".read_Timing_maximum()")
         #----- PROTECTED REGION ID(DataBase.Timing_maximum_read) ENABLED START -----#
 
+        self.attr_Timing_maximum_read[:] = []
+        for tmp_name in cmd_list:
+            self.attr_Timing_maximum_read.append(self.timing_maps[tmp_name].maximum)
+
         #----- PROTECTED REGION END -----#	//	DataBase.Timing_maximum_read
         attr.set_value(self.attr_Timing_maximum_read)
 
@@ -215,6 +263,10 @@ class DataBase (PyTango.Device_4Impl):
     def read_Timing_calls(self, attr):
         self.debug_stream("In " + self.get_name() + ".read_Timing_calls()")
         #----- PROTECTED REGION ID(DataBase.Timing_calls_read) ENABLED START -----#
+
+        self.attr_Timing_calls_read[:] = []
+        for tmp_name in cmd_list:
+            self.attr_Timing_calls_read.append(self.timing_maps[tmp_name].calls)
 
         #----- PROTECTED REGION END -----#	//	DataBase.Timing_calls_read
         attr.set_value(self.attr_Timing_calls_read)
@@ -226,6 +278,9 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".read_Timing_index()")
         #----- PROTECTED REGION ID(DataBase.Timing_index_read) ENABLED START -----#
 
+        for tmp_name in cmd_list:
+            self.attr_Timing_index_read.append(self.timing_maps[tmp_name].index)
+
         #----- PROTECTED REGION END -----#	//	DataBase.Timing_index_read
         attr.set_value(self.attr_Timing_index_read)
 
@@ -235,7 +290,17 @@ class DataBase (PyTango.Device_4Impl):
     def read_Timing_info(self, attr):
         self.debug_stream("In " + self.get_name() + ".read_Timing_info()")
         #----- PROTECTED REGION ID(DataBase.Timing_info_read) ENABLED START -----#
+        self.attr_Timing_info_read[:] = []   
+        util = PyTango.Util.instance()
+        self.attr_Timing_info_read.append("TANGO Database Timing info on host " + util.get_host_name())
+        self.attr_Timing_info_read.append(" ")
+        self.attr_Timing_info_read.append("command	average	minimum	maximum	calls")
+        self.attr_Timing_info_read.append(" ")
 
+                                          
+        for tmp_name in cmd_list:
+            tmp_info = "%41s\t%6.3f\t%6.3f\t%6.3f\t%.0f"%(tmp_name, self.timing_maps[tmp_name].average, self.timing_maps[tmp_name].minimum, self.timing_maps[tmp_name].maximum, self.timing_maps[tmp_name].calls)
+            self.attr_Timing_info_read.append(tmp_info)
         #----- PROTECTED REGION END -----#	//	DataBase.Timing_info_read
         attr.set_value(self.attr_Timing_info_read)
 
@@ -318,8 +383,6 @@ class DataBase (PyTango.Device_4Impl):
                    "DataBase::AddServer()")
         server_name = argin[0]
 
-        db = self.db
-        cursor = db.get_cursor()
         for i in range((len(argin) - 1) / 2):
             d_name, klass_name = argin[i * 2 + 1], argin[i * 2 + 2]
             ret, dev_name, dfm = check_device_name(d_name)
@@ -327,10 +390,9 @@ class DataBase (PyTango.Device_4Impl):
                 th_exc(DB_IncorrectDeviceName,
                       "device name (" + d_name + ") syntax error (should be [tango:][//instance/]domain/family/member)",
                       "DataBase::AddServer()")
-            db.add_device(server_name, (dev_name, dfm) , klass_name, cursor=cursor)
+            self.db.add_device(server_name, (dev_name, dfm) , klass_name)
 
-        cursor.connection.commit()
-        cursor.close()
+
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbAddServer
 
@@ -401,12 +463,8 @@ class DataBase (PyTango.Device_4Impl):
 
         klass_name, attr_name = argin[:2]
 
-        db = self.db
-        cursor = db.get_cursor()
         for prop_name in argin[2:]:
-            db.delete_class_attribute_property(klass_name, attr_name, prop_name, cursor=cursor)
-        cursor.connection.commit()
-        cursor.close()
+            self.db.delete_class_attribute_property(klass_name, attr_name, prop_name)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbDeleteClassAttributeProperty
 
@@ -427,12 +485,8 @@ class DataBase (PyTango.Device_4Impl):
 
         klass_name = argin[0]
 
-        db = self.db
-        cursor = db.get_cursor()
         for prop_name in argin[1:]:
-            db.delete_class_property(prop_name, cursor=cursor)
-        cursor.connection.commit()
-        cursor.close()
+            self.db.delete_class_property(prop_name)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbDeleteClassProperty
 
@@ -500,7 +554,7 @@ class DataBase (PyTango.Device_4Impl):
 
         ret, dev_name, dfm = check_device_name(argin)
         if not ret:
-            self.warn_stream("DataBase::db_delete_device_attribute(): device name " + dev_name + " incorrect ")
+            self.warn_stream("DataBase::db_delete_device_attribute(): device name " + argin + " incorrect ")
             th_exc(DB_IncorrectDeviceName,
                    "failed to delete device attribute, device name incorrect",
                    "DataBase::DeleteDeviceAttribute()")
@@ -535,17 +589,14 @@ class DataBase (PyTango.Device_4Impl):
 
         ret, dev_name, dfm = check_device_name(argin)
         if not ret:
-            self.warn_stream("DataBase::db_delete_device_attribute_property(): device name " + dev_name + " incorrect ")
+            self.warn_stream("DataBase::db_delete_device_attribute_property(): device name " + argin + " incorrect ")
             th_exc(DB_IncorrectDeviceName,
                    "failed to delete device attribute property, device name incorrect",
                    "DataBase::DeleteDeviceAttributeProperty()")
 
-        db = self.db
-        cursor = db.get_cursor()
+ 
         for prop_name in argin[2:]:
-            self.db.delete_device_attribute_property(dev_name, attr_name, prop_name, cursor=cursor)
-        cursor.connection.commit()
-        cursor.close()
+            self.db.delete_device_attribute_property(dev_name, attr_name, prop_name)
 
 
 
@@ -566,13 +617,14 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbDeleteDeviceProperty()")
         #----- PROTECTED REGION ID(DataBase.DbDeleteDeviceProperty) ENABLED START -----#
 
+        time_before = time.time()
+
         dev_name = argin[0]
-        db = self.db
-        cursor = db.get_cursor()
         for prop_name in argin[1:]:
             self.db.delete_device_property(dev_name, prop_name)
-        cursor.connection.commit()
-        cursor.close()
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbDeleteDeviceProperty")
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbDeleteDeviceProperty
 
@@ -591,13 +643,9 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbDeleteProperty()")
         #----- PROTECTED REGION ID(DataBase.DbDeleteProperty) ENABLED START -----#
 
-        obj_name = argin[0];
-        db = self.db
-        cursor = db.get_cursor()
+        obj_name = argin[0]
         for prop_name in argin[1:]:
             self.db.delete_property(obj_name, prop_name)
-        cursor.connection.commit()
-        cursor.close()
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbDeleteProperty
 
@@ -657,7 +705,7 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVoid """
         self.debug_stream("In " + self.get_name() + ".DbExportDevice()")
         #----- PROTECTED REGION ID(DataBase.DbExportDevice) ENABLED START -----#
-
+        time_before = time.time()
         if len(argin) < 5:
             self.warn_stream("DataBase::DbExportDevice(): insufficient export info for device ")
             th_exc(DB_IncorrectArguments,
@@ -665,9 +713,12 @@ class DataBase (PyTango.Device_4Impl):
                    "DataBase::ExportDevice()")
 
         dev_name, IOR, host, pid, version = argin[:5]
+        dev_name = dev_name.lower()
         if pid.lower() == 'null':
             pid = "-1"
         self.db.export_device(dev_name, IOR, host, pid, version)
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbExportDevice")
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbExportDevice
 
@@ -688,6 +739,7 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbExportEvent()")
         #----- PROTECTED REGION ID(DataBase.DbExportEvent) ENABLED START -----#
 
+        time_before = time.time()
         if len(argin) < 5:
             self.warn_stream("DataBase::db_export_event(): insufficient export info for event ")
             th_exc(DB_IncorrectArguments,
@@ -697,6 +749,8 @@ class DataBase (PyTango.Device_4Impl):
         event, IOR, host, pid, version = argin[:5]
         event = replace_wildcard(event.lower())
         self.db.export_event(event, IOR, host, pid, version)
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbExportEvent")
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbExportEvent
 
@@ -785,10 +839,7 @@ class DataBase (PyTango.Device_4Impl):
         #----- PROTECTED REGION ID(DataBase.DbGetClassAttributeList) ENABLED START -----#
 
         class_name = argin[0]
-        if len(argin) > 1:
-            wildcard = replace_wildcard(argin[1])
-        else:
-            wildcard = "%"
+        wildcard = replace_wildcard(argin[1])
 
         argout = self.db.get_class_attribute_list(class_name, wildcard)
 
@@ -817,7 +868,7 @@ class DataBase (PyTango.Device_4Impl):
         #----- PROTECTED REGION ID(DataBase.DbGetClassAttributeProperty) ENABLED START -----#
 
         class_name = argin[0]
-        argout = self.db.get_class_attribute_property(clas_name, argout[1:])
+        argout = self.db.get_class_attribute_property(class_name, argin[1:])
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetClassAttributeProperty
         return argout
@@ -850,7 +901,7 @@ class DataBase (PyTango.Device_4Impl):
         #----- PROTECTED REGION ID(DataBase.DbGetClassAttributeProperty2) ENABLED START -----#
 
         class_name = argin[0]
-        argout = self.db.get_class_attribute_property2(clas_name, argout[1:])
+        argout = self.db.get_class_attribute_property2(class_name, argin[1:])
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetClassAttributeProperty2
         return argout
@@ -875,7 +926,10 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetClassAttributePropertyHist()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetClassAttributePropertyHist) ENABLED START -----#
-
+        class_name = argin[0]
+        attribute = replace_wildcard(argin[1])
+        prop_name = replace_wildcard(argin[2])
+        argout = self.db.get_class_attribute_property_hist(class_name, attribute, prop_name)
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetClassAttributePropertyHist
         return argout
 
@@ -962,6 +1016,8 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetClassProperty) ENABLED START -----#
 
+        class_name = argin[0]
+        argout = self.db.get_class_property(class_name,argint[1:])
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetClassProperty
         return argout
 
@@ -984,6 +1040,10 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetClassPropertyHist) ENABLED START -----#
 
+        class_name = argin[0]
+        prop_name = argin[1]
+        argout = self.db.get_class_property_hist(class_name, prop_name)
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetClassPropertyHist
         return argout
 
@@ -1000,6 +1060,16 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetClassPropertyList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetClassPropertyList) ENABLED START -----#
+        time_before = time.time()
+        if not argin:
+            argin = "%"
+        else:
+            argin = replace_wildcard(argin)
+
+        argout = self.db.get_class_property_list(argin)
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbDeleteDeviceProperty")
+        
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetClassPropertyList
         return argout
@@ -1018,6 +1088,15 @@ class DataBase (PyTango.Device_4Impl):
         argout = ''
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceAlias) ENABLED START -----#
 
+        ret, dev_name, dfm = check_device_name(argin)
+        if not ret:
+            th_exc(DB_IncorrectDeviceName,
+                  "device name (" + argin + ") syntax error (should be [tango:][//instance/]domain/family/member)",
+                  "DataBase::DbGetDeviceAlias()")
+
+        argout = self.db.get_device_alias(dev_name)
+
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceAlias
         return argout
 
@@ -1034,6 +1113,12 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetDeviceAliasList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceAliasList) ENABLED START -----#
+        if not argin:
+            argin = "%"
+        else:
+            argin = replace_wildcard(argin)
+
+        argout = self.db.get_device_alias_list(argin)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceAliasList
         return argout
@@ -1053,6 +1138,15 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetDeviceAttributeList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceAttributeList) ENABLED START -----#
+
+        dev_name = argin[0]
+        wildcard = argin[1]
+        if not wildcard:
+            wildcard = "%"
+        else:
+            wildcard = replace_wildcard(wildcard)
+
+        argout = self.db.get_device_attribute_list(dev_name, wildcard)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceAttributeList
         return argout
@@ -1077,6 +1171,11 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetDeviceAttributeProperty()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceAttributeProperty) ENABLED START -----#
+        time_before = time.time()
+        dev_name = argin[0]
+        argout = self.db.get_device_attribute_property(class_name, argin[1:])
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetDeviceAttributeProperty")
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceAttributeProperty
         return argout
@@ -1109,6 +1208,13 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceAttributeProperty2) ENABLED START -----#
 
+        time_before = time.time()
+
+        dev_name = argin[0]
+        argout = self.db.get_device_attribute_property2(class_name, argin[1:])
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetDeviceAttributeProperty2")
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceAttributeProperty2
         return argout
 
@@ -1133,6 +1239,11 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceAttributePropertyHist) ENABLED START -----#
 
+        dev_name = argin[0]
+        attribute = replace_wildcard(argin[1])
+        prop_name = replace_wildcard(argin[2])
+        argout = self.db.get_device_attribute_property_hist(dev_name, attribute, prop_name)
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceAttributePropertyHist
         return argout
 
@@ -1153,6 +1264,12 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceClassList) ENABLED START -----#
 
+        time_before = time.time()
+        
+        argout = self.db.get_device_class_list(argin)
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetDeviceClassList")
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceClassList
         return argout
 
@@ -1170,6 +1287,12 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceDomainList) ENABLED START -----#
 
+        time_before = time.time()
+        argin = replace_wildcard(argin)
+        argout = self.db.get_device_domain_list(argin)
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetDeviceDomainList")
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceDomainList
         return argout
 
@@ -1187,6 +1310,14 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceExportedList) ENABLED START -----#
 
+        time_before = time.time()
+        
+        argin = replace_wildcard(argin)
+        argout = self.db.get_device_exported_list(argin)
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetDeviceExportedList")
+
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceExportedList
         return argout
 
@@ -1204,6 +1335,13 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetDeviceFamilyList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceFamilyList) ENABLED START -----#
+
+        time_before = time.time()
+
+        argin = replace_wildcard(argin)
+        argout = self.db.get_device_family_list(argin)
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetDeviceFamilyList")
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceFamilyList
         return argout
@@ -1230,8 +1368,16 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVarLongStringArray """
         self.debug_stream("In " + self.get_name() + ".DbGetDeviceInfo()")
         argout = [0], ['']
-        #----- PROTECTED REGION ID(DataBase.DbGetDeviceInfo) ENABLED START -----#
 
+        #----- PROTECTED REGION ID(DataBase.DbGetDeviceInfo) ENABLED START -----#
+        ret, dev_name, dfm = check_device_name(argin)
+        if not ret:
+            th_exc(DB_IncorrectDeviceName,
+                  "device name (" + argin + ") syntax error (should be [tango:][//instance/]domain/family/member)",
+                  "DataBase::DbGetDeviceAlias()")
+
+        argout = self.db.get_device_info(dev_name)
+ 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceInfo
         return argout
 
@@ -1249,7 +1395,10 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetDeviceList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceList) ENABLED START -----#
-
+        server_name = replace_wildcard(argin[0])
+        class_name = replace_wildcard(argin[1])
+        argout = self.db.get_device_list(server_name, class_name)
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceList
         return argout
 
@@ -1266,7 +1415,10 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetDeviceWideList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceWideList) ENABLED START -----#
-
+        
+        argin = replace_wildcard(argin)
+        argout = self.db.get_device_wide_list(argin)
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceWideList
         return argout
 
@@ -1284,6 +1436,13 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetDeviceMemberList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceMemberList) ENABLED START -----#
+
+        time_before = time.time()
+
+        argin = replace_wildcard(argin)
+        argout = self.db.get_device_member_list(argin)
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetDeviceMemberList")
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceMemberList
         return argout
@@ -1313,6 +1472,13 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceProperty) ENABLED START -----#
 
+        time_before = time.time()
+
+        device_name = argin[0]
+        argout = self.db.get_device_property(device_name, argin[1:])
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetDeviceProperty")
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceProperty
         return argout
 
@@ -1323,7 +1489,7 @@ class DataBase (PyTango.Device_4Impl):
         """ Retrieve device  property history
         
         :param argin: Str[0] = Device name
-        Str[2] = Property name
+        Str[1] = Property name
         :type: PyTango.DevVarStringArray
         :return: Str[0] = Property name
         Str[1] = date
@@ -1334,6 +1500,11 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetDevicePropertyHist()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDevicePropertyHist) ENABLED START -----#
+
+        device_name = argin[0]
+        prop_name = argin[1]
+        argout = self.db.get_device_property_hist(device_name, prop_name)
+        
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDevicePropertyHist
         return argout
@@ -1354,6 +1525,17 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDevicePropertyList) ENABLED START -----#
 
+        time_before = time.time()
+        
+        device_name = argin[0]
+        prop_filter = argin[1]
+    
+        prop_filter = replace_wildcard(prop_filter)
+            
+        argout = self.db.get_device_property_list(device_name, prop_filter)
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetDevicePropertyList")
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDevicePropertyList
         return argout
 
@@ -1370,6 +1552,10 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetDeviceServerClassList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDeviceServerClassList) ENABLED START -----#
+        
+        argin = replace_wildcard(argin)
+            
+        argout = self.db.get_server_class_list(argin)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDeviceServerClassList
         return argout
@@ -1387,6 +1573,10 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetExportdDeviceListForClass()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetExportdDeviceListForClass) ENABLED START -----#
+        
+        argin = replace_wildcard(argin)
+            
+        argout = self.db.get_exported_device_list_for_class(argin)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetExportdDeviceListForClass
         return argout
@@ -1404,6 +1594,14 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetHostList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetHostList) ENABLED START -----#
+
+        time_before = time.time()
+        
+        argin = replace_wildcard(argin)           
+        argout = self.db.get_host_list(argin)
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetHostList")
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetHostList
         return argout
@@ -1423,6 +1621,15 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetHostServerList) ENABLED START -----#
 
+        time_before = time.time()
+        
+        argin = replace_wildcard(argin)            
+        argout = self.db.get_host_server_list(argin)
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetHostServerList")
+
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetHostServerList
         return argout
 
@@ -1439,6 +1646,10 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetHostServersInfo()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetHostServersInfo) ENABLED START -----#
+        
+        argin = replace_wildcard(argin)
+            
+        argout = self.db.get_host_servers_info(argin)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetHostServersInfo
         return argout
@@ -1456,7 +1667,9 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetInstanceNameList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetInstanceNameList) ENABLED START -----#
-
+        
+        argout = self.db.get_instance_name_list(argin)
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetInstanceNameList
         return argout
 
@@ -1474,7 +1687,10 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetObjectList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetObjectList) ENABLED START -----#
-
+        
+        argin = replace_wildcard(argin)
+        argout = self.db.get_object_list(argin)
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetObjectList
         return argout
 
@@ -1503,6 +1719,9 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetProperty) ENABLED START -----#
 
+        object_name = argin[0]
+        argout = self.db.get_property(object_name, argin[1:])
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetProperty
         return argout
 
@@ -1525,6 +1744,10 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetPropertyHist) ENABLED START -----#
 
+        object_name = argin[0]
+        prop_name = argin[1]
+        argout = self.db.get_property_hist(object_name, prop_name)
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetPropertyHist
         return argout
 
@@ -1544,6 +1767,11 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetPropertyList) ENABLED START -----#
 
+        object_name = argin[0]
+        wildcard = replace_wildcard(argin[1])
+
+        argout = self.db.get_property_list(object_name, wildcard)
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetPropertyList
         return argout
 
@@ -1560,6 +1788,8 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetServerInfo()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetServerInfo) ENABLED START -----#
+        
+        argout = self.db.get_server_info(argin)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetServerInfo
         return argout
@@ -1579,6 +1809,14 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetServerList) ENABLED START -----#
 
+        time_before = time.time()
+
+        argin = replace_wildcard(argin)
+        argout = self.db.get_server_list(argin)
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbGetServerList")
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetServerList
         return argout
 
@@ -1595,7 +1833,10 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVarStringArray """
         self.debug_stream("In " + self.get_name() + ".DbGetServerNameList()")
         argout = ['']
-        #----- PROTECTED REGION ID(DataBase.DbGetServerNameList) ENABLED START -----#
+        #----- PROTECTED REGION ID(DataBase.DbGetServerNameList) ENABLED START ----
+
+        argin = replace_wildcard(argin)
+        argout = self.db.get_server_name_list(argin)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetServerNameList
         return argout
@@ -1622,6 +1863,13 @@ class DataBase (PyTango.Device_4Impl):
         argout = [0], ['']
         #----- PROTECTED REGION ID(DataBase.DbImportDevice) ENABLED START -----#
 
+        time_before = time.time()
+        
+        argout = self.db.import_device(argin.lower())
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbImportDevice")
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbImportDevice
         return argout
 
@@ -1638,6 +1886,16 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbImportEvent()")
         argout = [0], ['']
         #----- PROTECTED REGION ID(DataBase.DbImportEvent) ENABLED START -----#
+
+        time_before = time.time()
+        
+        argin = replace_wildcard(argin.lower())
+
+        argout = self.db.import_event(argin)
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbImportEvent")
+        
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbImportEvent
         return argout
@@ -1666,6 +1924,13 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbInfo) ENABLED START -----#
 
+        time_before = time.time()
+
+        argout = self.db.info()
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbInfo")
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbInfo
         return argout
 
@@ -1682,6 +1947,16 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVoid """
         self.debug_stream("In " + self.get_name() + ".DbPutAttributeAlias()")
         #----- PROTECTED REGION ID(DataBase.DbPutAttributeAlias) ENABLED START -----#
+
+        if len(argin) < 2:
+            self.warn_stream("DataBase::DbPutAttributeAlias(): insufficient number of arguments ")
+            th_exc(DB_IncorrectArguments,
+                   "insufficient number of arguments to put attribute alias",
+                   "DataBase::DbPutAttributeAlias()")
+
+        attribute_name = argin[0]
+        attribute_alias = argin[1]
+        self.db.put_attribute_alias(attribute_name, attribute_alias)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbPutAttributeAlias
 
@@ -1703,7 +1978,16 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVoid """
         self.debug_stream("In " + self.get_name() + ".DbPutClassAttributeProperty()")
         #----- PROTECTED REGION ID(DataBase.DbPutClassAttributeProperty) ENABLED START -----#
-
+        
+        class_name = argin[0]
+        nb_attributes = int(argin[1])
+        
+        
+        self.info_stream("DataBase::DbPutClassAttributeProperty(): put " + str(nb_attributes) + " attributes for class " + class_name)
+        
+        self.db.put_class_attribute_property(class_name, nb_attributes, argin[2:])
+        
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbPutClassAttributeProperty
 
 #------------------------------------------------------------------
@@ -1727,7 +2011,13 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVoid """
         self.debug_stream("In " + self.get_name() + ".DbPutClassAttributeProperty2()")
         #----- PROTECTED REGION ID(DataBase.DbPutClassAttributeProperty2) ENABLED START -----#
-
+        class_name = argin[0]
+        nb_attributes = int(argin[1])
+        
+        self.info_stream("DataBase::DbPutClassAttributeProperty2(): put " + str(nb_attributes) + " attributes for class " + class_name)
+        
+        self.db.put_class_attribute_property2(class_name, nb_attributes, argin[2:])
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbPutClassAttributeProperty2
 
 #------------------------------------------------------------------
@@ -1749,6 +2039,19 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbPutClassProperty()")
         #----- PROTECTED REGION ID(DataBase.DbPutClassProperty) ENABLED START -----#
 
+        time_before = time.time()
+
+        class_name = argin[0]
+        nb_properties = int(argin[1])
+        
+        self.info_stream("DataBase::DbPutClassProperty(): put " + str(nb_properties) + " attributes for class " + class_name)
+        
+        self.db.put_class_property(class_name, properties, argin[2:])
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbPutClassProperty")
+
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbPutClassProperty
 
 #------------------------------------------------------------------
@@ -1765,6 +2068,18 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbPutDeviceAlias()")
         #----- PROTECTED REGION ID(DataBase.DbPutDeviceAlias) ENABLED START -----#
 
+        if len(argin) < 2:
+            self.warn_stream("DataBase::DbPutDeviceAlias(): insufficient number of arguments ")
+            th_exc(DB_IncorrectArguments,
+                   "insufficient number of arguments to put device alias",
+                   "DataBase::DbPutDeviceAlias()")
+
+        device_name = argin[0]
+        device_alias = argin[1]
+        self.db.put_device_alias(device_name, device_alias)
+
+
+        
         #----- PROTECTED REGION END -----#	//	DataBase.DbPutDeviceAlias
 
 #------------------------------------------------------------------
@@ -1785,6 +2100,18 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVoid """
         self.debug_stream("In " + self.get_name() + ".DbPutDeviceAttributeProperty()")
         #----- PROTECTED REGION ID(DataBase.DbPutDeviceAttributeProperty) ENABLED START -----#
+
+        time_before = time.time()
+
+        device_name = argin[0]
+        nb_attributes = int(argin[1])
+              
+        self.info_stream("DataBase::DbPutDeviceAttributeProperty(): put " + str(nb_attributes) + " attributes for device " + device_name)
+        
+        self.db.put_device_attribute_property(device_name, nb_attributes, argin[2:])
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbPutDeviceAttributeProperty")
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbPutDeviceAttributeProperty
 
@@ -1811,6 +2138,19 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbPutDeviceAttributeProperty2()")
         #----- PROTECTED REGION ID(DataBase.DbPutDeviceAttributeProperty2) ENABLED START -----#
 
+        time_before = time.time()
+
+        device_name = argin[0]
+        nb_attributes = int(argin[1])
+        
+        self.info_stream("DataBase::DbPutDeviceAttributeProperty2(): put " + str(nb_attributes) + " attributes for device " + device_name)
+        
+        self.db.put_device_attribute_property2(device_name, nb_attributes, argin[2:])
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbPutDeviceAttributeProperty2")
+
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbPutDeviceAttributeProperty2
 
 #------------------------------------------------------------------
@@ -1831,6 +2171,18 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVoid """
         self.debug_stream("In " + self.get_name() + ".DbPutDeviceProperty()")
         #----- PROTECTED REGION ID(DataBase.DbPutDeviceProperty) ENABLED START -----#
+
+        time_before = time.time()
+
+        device_name = argin[0]
+        nb_properties = int(argin[1])
+        
+        self.info_stream("DataBase::DbPutDeviceProperty(): put " + str(nb_properties) + " attributes for device " + device_name)
+        
+        self.db.put_device_property(device_name, properties, argin[2:])
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbPutDeviceProperty")
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbPutDeviceProperty
 
@@ -1853,6 +2205,13 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbPutProperty()")
         #----- PROTECTED REGION ID(DataBase.DbPutProperty) ENABLED START -----#
 
+        object_name = argin[0]
+        nb_properties = int(argin[1])
+        
+        self.info_stream("DataBase::DbPutProperty(): put " + str(nb_properties) + " attributes for object " + object_name)
+        
+        self.db.put_property(object_name, properties, argin[2:])
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbPutProperty
 
 #------------------------------------------------------------------
@@ -1867,6 +2226,25 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVoid """
         self.debug_stream("In " + self.get_name() + ".DbPutServerInfo()")
         #----- PROTECTED REGION ID(DataBase.DbPutServerInfo) ENABLED START -----#
+
+        if len(argin) < 4:
+            self.warn_stream("DataBase::DbPutServerInfo(): insufficient number of arguments ")
+            th_exc(DB_IncorrectArguments,
+                   "insufficient server info",
+                   "DataBase::DbPutServerInfo()")
+
+        tmp_server = argin[0].lower()
+        tmp_host = argin[1]
+        tmp_mode = argin[2]
+        tmp_level = argin[3]
+        tmp_extra = []
+        if len(argin) > 4:
+            tmp_extra = argin[4:]
+        
+        tmp_len = len(argin) - 1
+        self.info_stream("DataBase::DbPutServerInfo(): put " + tmp_len + "  export info for device " + tmp_server)
+
+        self.db.put_server_info(tmp_server, tmp_host, tmp_mode, tmp_level, tmp_extra)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbPutServerInfo
 
@@ -1883,6 +2261,10 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbUnExportDevice()")
         #----- PROTECTED REGION ID(DataBase.DbUnExportDevice) ENABLED START -----#
 
+        dev_name = argin[0].lower()
+
+        self.db.unexport_device(dev_name)
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbUnExportDevice
 
 #------------------------------------------------------------------
@@ -1897,6 +2279,10 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVoid """
         self.debug_stream("In " + self.get_name() + ".DbUnExportEvent()")
         #----- PROTECTED REGION ID(DataBase.DbUnExportEvent) ENABLED START -----#
+
+        event_name = argin[0].lower()
+
+        self.db.unexport_event(event_name)
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbUnExportEvent
 
@@ -1914,6 +2300,15 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbUnExportServer()")
         #----- PROTECTED REGION ID(DataBase.DbUnExportServer) ENABLED START -----#
 
+        time_before = time.time()
+
+        server_name = argin[0].lower()
+
+        self.db.unexport_server(server_name)
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbUnExportServer")
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbUnExportServer
 
 #------------------------------------------------------------------
@@ -1928,6 +2323,12 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVoid """
         self.debug_stream("In " + self.get_name() + ".ResetTimingValues()")
         #----- PROTECTED REGION ID(DataBase.ResetTimingValues) ENABLED START -----#
+        for tmp_timing in timing_maps.itervalues():
+            tmp_timing.average = 0.
+            tmp_timing.minimum = 0.
+            tmp_timing.maximum = 0.
+            tmp_timing.total_elapsed = 0.
+            tmp_timing.calls = 0.
 
         #----- PROTECTED REGION END -----#	//	DataBase.ResetTimingValues
 
@@ -1947,6 +2348,13 @@ class DataBase (PyTango.Device_4Impl):
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetDataForServerCache) ENABLED START -----#
 
+        time_before = time.time()
+
+        ##  TODO
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbDbGetDataForServerCache")
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetDataForServerCache
         return argout
 
@@ -1963,6 +2371,23 @@ class DataBase (PyTango.Device_4Impl):
         :rtype: PyTango.DevVoid """
         self.debug_stream("In " + self.get_name() + ".DbDeleteAllDeviceAttributeProperty()")
         #----- PROTECTED REGION ID(DataBase.DbDeleteAllDeviceAttributeProperty) ENABLED START -----#
+
+        if len(argin) < 2:
+            self.warn_stream("DataBase::DbDeleteAllDeviceAttributeProperty(): insufficient number of arguments ")
+            th_exc(DB_IncorrectArguments,
+                   "insufficient number of arguments to delete all device attribute(s) property",
+                   "DataBase::DbDeleteAllDeviceAttributeProperty()")
+
+        dev_name = argin[0]
+
+        ret, d_name, dfm = check_device_name(dev_name)
+        
+        if not ret:
+            th_exc(DB_IncorrectDeviceName,
+                  "device name (" + argin + ") syntax error (should be [tango:][//instance/]domain/family/member)",
+                  "DataBase::DbDeleteAllDeviceAttributeProperty()")
+
+        self.db.delete_all_device_attribute_property(dev_name, argin[1:])
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbDeleteAllDeviceAttributeProperty
 
@@ -1984,6 +2409,30 @@ class DataBase (PyTango.Device_4Impl):
         argout = [0], ['']
         #----- PROTECTED REGION ID(DataBase.DbMySqlSelect) ENABLED START -----#
 
+        time_before = time.time()
+
+        tmp_argin = argin.lower()
+        
+        #  Check if SELECT key is alread inside command
+
+        cmd = argin
+        tmp_argin = argin.lower()
+        pos = tmp_argin.find('select')
+        if pos == -1:
+            cmd = "SELECT " + cmd
+
+        pos = tmp_argin.find(';')
+        if pos != -1 and len(tmp_argin) > (pos + 1):
+            th_exc(DB_IncorrectArguments,
+                   "SQL command not valid: " + argin,
+                   "DataBase::ExportDevice()")
+        logging.info("DataBase::db_my_sql_select(): \n %s" % cmd)
+        
+        argout = self.db.my_sql_select(cmd)
+
+        time_after = time.time()
+        self.update_timing_stats(time_before, time_after, "DbMySqlSelect")
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbMySqlSelect
         return argout
 
@@ -2000,6 +2449,8 @@ class DataBase (PyTango.Device_4Impl):
         self.debug_stream("In " + self.get_name() + ".DbGetCSDbServerList()")
         argout = ['']
         #----- PROTECTED REGION ID(DataBase.DbGetCSDbServerList) ENABLED START -----#
+
+        argout = self.db.get_csdb_server_list()
 
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetCSDbServerList
         return argout
@@ -2019,6 +2470,9 @@ class DataBase (PyTango.Device_4Impl):
         argout = ''
         #----- PROTECTED REGION ID(DataBase.DbGetAttributeAlias2) ENABLED START -----#
 
+        attr_name = argin[0]
+        argout = self.db.get_attribute_alias2(attr_name)
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetAttributeAlias2
         return argout
 
@@ -2037,9 +2491,47 @@ class DataBase (PyTango.Device_4Impl):
         argout = ''
         #----- PROTECTED REGION ID(DataBase.DbGetAliasAttribute) ENABLED START -----#
 
+        alias_name = argin[0]
+        argout = self.db.get_alias_attribute(alias_name)
+
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetAliasAttribute
         return argout
 
+#------------------------------------------------------------------
+#    DbRenameServer command:
+#------------------------------------------------------------------
+    def DbRenameServer(self, argin):
+        """ Rename a device server process
+        
+        :param argin: str[0] = old device server name (exec/instance)
+        str[1] =  new device server name (exec/instance)
+        :type: PyTango.DevVarStringArray
+        :return: 
+        :rtype: PyTango.DevVoid """
+        self.debug_stream("In " + self.get_name() + ".DbRenameServer()")
+        #----- PROTECTED REGION ID(DataBase.DbRenameServer) ENABLED START -----#
+
+        if len(argin) < 2:
+            self.warn_stream("DataBase::DbRenameServer(): insufficient number of arguments ")
+            th_exc(DB_IncorrectArguments,
+                   "insufficient number of arguments (two required: old name and new name",
+                   "DataBase::DbRenameServer")
+        
+
+        old_name = argin[0]
+        new_name = argin[1]
+        
+        if ('/' not in argin[0]) or ('/' not in argin[1]):
+            self.warn_stream("DataBase::DbRenameServer(): wrong syntax in command args ")
+            th_exc(DB_IncorrectArguments,
+                   "Wrong syntax in command args (ds_exec_name/inst_name)",
+                   "DataBase::DbRenameServer")
+
+        self.db.rename_server(old_name, new_name)
+            
+        
+
+        #----- PROTECTED REGION END -----#	//	DataBase.DbRenameServer
 
 #==================================================================
 #
@@ -2306,6 +2798,9 @@ class DataBaseClass(PyTango.DeviceClass):
         'DbGetAliasAttribute':
             [[PyTango.DevString, "The attribute alias"],
             [PyTango.DevString, "The attribute name (dev_name/att_name)"]],
+        'DbRenameServer':
+            [[PyTango.DevVoid, "none"],
+            [PyTango.DevVarStringArray, "s[0] = old device server name (exec/instance)\ns[1] = new device server name (exec/instance)"]],
         }
 
 
