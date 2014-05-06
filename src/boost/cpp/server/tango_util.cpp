@@ -200,7 +200,20 @@ namespace PyUtil
     
     void orb_run(Tango::Util& self)
     {
+        AutoPythonAllowThreads guard;
         self.get_orb()->run();
+    }
+
+    boost::python::str get_pid_str(Tango::Util& self)
+    {
+        boost::python::str ret = self.get_pid_str().c_str();
+        return ret;
+    }
+
+    boost::python::str get_version_str(Tango::Util& self)
+    {
+        boost::python::str ret = self.get_version_str().c_str();
+        return ret;
     }
 }
 
@@ -242,12 +255,10 @@ void export_util()
             return_value_policy<copy_non_const_reference>())
         .def("get_host_name", &Tango::Util::get_host_name,
             return_value_policy<copy_non_const_reference>())
-        .def("get_pid_str", &Tango::Util::get_pid_str,
-            return_value_policy<copy_non_const_reference>())
+        .def("get_pid_str", &PyUtil::get_pid_str)
         .def("get_pid", &Tango::Util::get_pid)
         .def("get_tango_lib_release", &Tango::Util::get_tango_lib_release)
-        .def("get_version_str", &Tango::Util::get_version_str,
-            return_value_policy<copy_non_const_reference>())
+        .def("get_version_str", &PyUtil::get_version_str)
         .def("get_server_version", &Tango::Util::get_server_version,
             return_value_policy<copy_non_const_reference>())
         .def("set_server_version", &Tango::Util::set_server_version)
