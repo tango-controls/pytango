@@ -13,7 +13,6 @@
 
 import sys
 import os
-import io
 
 import IPython.genutils
 import PyTango
@@ -38,13 +37,16 @@ def is_installed(ipydir=None):
     return os.path.isfile(f_name)
     
 
-def install(ipydir=None,verbose=True):
+def install(ipydir=None, verbose=True, profile='tango'):
     install_dir = ipydir or IPython.genutils.get_ipython_dir()
     f_name = os.path.join(install_dir, 'ipy_profile_tango.py')
     if verbose:
-        out = sys.stdout
+        def out(msg):
+            sys.stdout.write(msg)
+            sys.stdout.flush()
     else:
-        out = io.BytesIO()
+        out = lambda x : None
+            
     if ipydir is None and os.path.isfile(f_name):
         print("Warning: The file '%s' already exists." % f_name)
         r = ''
@@ -55,19 +57,18 @@ def install(ipydir=None,verbose=True):
             return
     profile = __PROFILE.format(pytangover=PyTango.Release.version, ipyver=IPython.Release.version)
     
-    out.write("Installing tango extension to ipython... ")
-    out.flush()
+    out("Installing tango extension to ipython... ")
     try:
         f = open(f_name, "w")
         f.write(profile)
         f.close()
-        out.write("[DONE]\n\n")
+        out("[DONE]\n\n")
     except:
-        out.write("[FAILED]\n\n")
+        out("[FAILED]\n\n")
         raise
     
     ipy_user_config = os.path.join(IPython.genutils.get_ipython_dir(), 'ipy_user_conf.py')
-    out.write("""\
+    out("""\
 To start ipython with tango interface simply type on the command line:
 %% ipython -p tango
 
