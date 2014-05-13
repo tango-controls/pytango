@@ -14,9 +14,10 @@ Here is a simple example on how to write a *Clock* device server using the
 high level API::
     
     import time
-    from PyTango.server import server_run
+    from PyTango.server import run
     from PyTango.server import Device, DeviceMeta
     from PyTango.server import attribute, command   
+
 
     class Clock(Device):
         __metaclass__ = DeviceMeta
@@ -32,7 +33,8 @@ high level API::
 
 
     if __name__ == "__main__":
-        server_run((Clock,))
+        run((Clock,))
+
 
 Here is a more complete  example on how to write a *PowerSupply* device server
 using the high level API. The example contains:

@@ -13,14 +13,12 @@ Contents
     start
     quicktour
     itango/index
+    green
     API <api>
+    How to <howto>
+    FAQ <faq>
     TEP <tep>
-    faq
     History of changes <revision>
     
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
 **Last update:** |today|
 

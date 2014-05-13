@@ -1,502 +1,249 @@
-.. _quick-tour:
+.. _pytango-quick-tour:
 
 Quick tour
-============
+==========
 
 This quick tour will guide you through the first steps on using PyTango.
-This is the new quick tour guide based on the :ref:`itango` console.
-You can still find the old version of this tour based on a simple python
-console :ref:`here <quick-tour-old>`.
 
-Quick tour on the client side
------------------------------
+Fundamental TANGO concepts
+--------------------------
 
-Check PyTango version
-~~~~~~~~~~~~~~~~~~~~~
+Before you begin there are some fundamental TANGO concepts you should be aware of.
 
-Start an IPython_ tango console with::
+Tango consists basically of a set of **devices** running somewhere on the network.
 
-    $ itango
+A device is identified by a unique case insensitive name in the format 
+*<domain>/<family>/<member>*. Examples: `LAB-01/PowerSupply/01`, 
+`ID21/OpticsHutch/energy`. 
 
-and type:
+Each device has a series of *attributes*, *properties* and *commands*. 
 
-    .. sourcecode:: itango
+An attribute is identified by a name in a device. It has a value that can 
+be read. Some attributes can also be changed (read-write attributes).
 
-        ITango [1]: PyTango.__version__
-        Result [1]: '8.0.0'
+A property is identified by a name in a device. Usually, devices properties are
+used to provide a way to configure a device. 
 
-        ITango [2]: PyTango.__version_long__
-        Result [2]: '8.0.0dev0'
+A command is also identified by a name. A command may or not receive a parameter
+and may or not return a value when it is executed.
 
-        ITango [3]: PyTango.__version_number__
-        Result [3]: 800
+Any device has **at least** a *State* and *Status* attributes and *State*,
+*Status* and *Init* commands. Reading the *State* or *Status* attributes has 
+the same effect as executing the *State* or *Status* commands.
 
-        ITango [4]: PyTango.__version_description__
-        Result [4]: 'This version implements the C++ Tango 8.0 API.'
+Each device as an associated *TANGO Class*. Most of the times the TANGO class 
+has the same name as the object oriented programming class which implements it
+but that is not mandatory. 
 
-or alternatively:
+TANGO devices *live* inside a operating system process called *TANGO Device Server*.
+This server acts as a container of devices. A device server can host multiple
+devices of multiple TANGO classes. Devices are, therefore, only accessible when
+the corresponding TANGO Device Server is running.
 
-    .. sourcecode:: itango
+A special TANGO device server called the *TANGO Database Server* will act as
+a naming service between TANGO servers and clients. This server has a known 
+address where it can be reached. The machines that run TANGO Device Servers 
+and/or TANGO clients, should export an environment variable called
+:envvar:`TANGO_HOST` that points to the TANGO Database server address. Example:
+``TANGO_HOST=homer.lab.eu:10000``
 
-        ITango [1]: PyTango.Release.version
-        Result [1]: '8.0.0'
+Minimum setup
+-------------
 
-        ITango [2]: PyTango.Release.version_long
-        Result [2]: '8.0.0dev0'
+This chapter assumes you have already installed PyTango.
 
-        ITango [3]: PyTango.Release.version_number
-        Result [3]: 800
+To explore PyTango you should have a running Tango system. If you are working in
+a facility/institute that uses Tango, this has probably already been prepared
+for you. You need to ask your facility/institute tango contact for the
+:envvar:`TANGO_HOST` variable where Tango system is running. 
 
-        ITango [4]: PyTango.Release.version_description
-        Result [4]: 'This version implements the C++ Tango 8.0 API.'
+If you are working in an isolate machine you first need to make sure the Tango
+system is installed and running (`Tango howtos <http://www.tango-controls.org/howtos>`_).
 
-.. tip::
+Most examples here connect to a device called *sys/tg_test/1* that runs in a 
+TANGO server called *TangoTest* with the instance name *test*.
+This server comes with the TANGO installation. The TANGO installation
+also registers the *test* instance. All you have to do is start the TangoTest 
+server on a console::
 
-    When typing, try pressing <tab>. Since ITango has autocomplete embedded you
-    should get a list of possible completions. Example::
-    
-        PyTango.Release.<tab>
-        
-    Should get a list of all members of :class:`PyTango.Release` class.
-
-Check Tango C++ version
-~~~~~~~~~~~~~~~~~~~~~~~
-
-From a client (This is only possible since PyTango 7.0.0)
-
-    .. sourcecode:: itango
-
-        ITango [1]: import PyTango.constants
-
-        ITango [2]: PyTango.constants.TgLibVers
-        Result [2]: '8.0.0'
-
-From a server you can alternatively do::
-    
-    u = PyTango.Util.instance()
-    tg_cpp_lib_ver = u.get_tango_lib_release()
-    
-
-Test the connection to the Device and get it's current state
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-One of the most basic examples is to get a reference to a device and
-determine if it is running or not.
-
-    .. sourcecode:: itango
-        
-        ITango [1]: # What is a DeviceProxy, really?
-        ITango [1]: DeviceProxy?
-        DeviceProxy is the high level Tango object which provides the client with
-        an easy-to-use interface to TANGO devices. DeviceProxy provides interfaces
-        to all TANGO Device interfaces.The DeviceProxy manages timeouts, stateless
-        connections and reconnection if the device server is restarted. To create
-        a DeviceProxy, a Tango Device name must be set in the object constructor.
-
-        Example :
-           dev = PyTango.DeviceProxy("sys/tg_test/1")
-           
-        ITango [2]: tangotest = DeviceProxy("sys/tg_test/1")
-
-        ITango [3]: # ping it
-        ITango [4]: tangotest.ping()
-        Result [4]: 110
-
-        ITango [5]: # Lets test the state
-        ITango [6]: tangotest.state()
-        Result [6]: PyTango._PyTango.DevState.RUNNING
-
-        ITango [7]: # And now the status
-        ITango [8]: tangotest.status()
-        Result [8]: 'The device is in RUNNING state.'
+    $ TangoTest test
+    Ready to accept request
 
 .. note::
+   if you receive a message saying that the server is already running, 
+   it just means that somebody has already started the test server so you don't
+   need to do anything.
 
-    Did you notice that you didn't write `PyTango.DeviceProxy` but instead just
-    `DeviceProxy` ? This is because :ref:`itango` automatically exports the
-    :class:`~PyTango.DeviceProxy`, :class:`~PyTango.AttributeProxy`,
-    :class:`~PyTango.Database` and :class:`~PyTango.Group` classes to the
-    namespace. If you are writting code outside :ref:`itango` you **MUST**
-    use the `PyTango` module prefix.
+Client
+------
 
-.. tip::
-
-    When typing the device name in the :class:`~PyTango.DeviceProxy` creation
-    line, try pressing the <tab> key. You should get a list of devices::
+Finally you can get your hands dirty. The first thing to do is start a python
+console and import the :mod:`PyTango` module. The following example shows
+how to create a proxy to an existing TANGO device, how to read and write
+attributes and execute commands from a python console::
     
-        tangotest = DeviceProxy("sys<tab>
-        
-    Better yet (and since the Tango Class of 'sys/tg_test/1' is 'TangoTest'),
-    try doing::
+    >>> import PyTango
     
-        tangotest = TangoTest("<tab>
+    >>> # create a device object 
+    >>> test_device = PyTango.DeviceProxy("sys/tg_test/1")
 
-    Now the list of devices should be reduced to the ones that belong to the 
-    'TangoTest' class. Note that TangoTest only works in ITango. If you are 
-    writting code outside :ref:`itango` you **MUST** use 
-    :class:`PyTango.DeviceProxy` instead.
+    >>> # every device has a state and status which can be checked with:
+    >>> print(test_device.state())
+    RUNNING
+
+    >>> print(test_device.status())
+    The device is in RUNNING state.
+
+    >>> # this device has an attribute called "long_scalar". Let's see which value it has...
+    >>> data = test_device.read_attribute("long_scalar")
+
+    >>> # ...PyTango provides a shortcut to do the same:
+    >>> data = test_device["long_scalar"]
+
+    >>> # the result of reading an attribute is a DeviceAttribute python object. 
+    >>> # It has a member called "value" which contains the value of the attribute
+    >>> data.value
+    136
+
+    >>> # Check the complete DeviceAttribute members:
+    >>> print(data)
+    DeviceAttribute[
+    data_format = SCALAR
+          dim_x = 1
+          dim_y = 0
+     has_failed = False
+       is_empty = False
+           name = 'long_scalar'
+        nb_read = 1
+     nb_written = 1
+        quality = ATTR_VALID
+    r_dimension = AttributeDimension(dim_x = 1, dim_y = 0)
+           time = TimeVal(tv_nsec = 0, tv_sec = 1399450183, tv_usec = 323990)
+           type = DevLong
+          value = 136
+        w_dim_x = 1
+        w_dim_y = 0
+    w_dimension = AttributeDimension(dim_x = 1, dim_y = 0)
+        w_value = 0]
+
+    >>> # PyTango provides a handy pythonic shortcut to read the attribute value:
+    >>> test_device.long_scalar
+    136 
+
+    >>> # Setting an attribute value is equally easy:
+    >>> test_device.write_attribute("long_scalar", 8776)
+
+    >>> # ... and a handy shortcut to do the same exists as well:
+    >>> test_device.long_scalar = 8776
+
+    >>> # TangoTest has a command called "DevDouble" which receives a number 
+    >>> # as parameter and returns the same number as a result. Let's
+    >>> # execute this command:
+    >>> test_device.command_inout("DevDouble", 45.67)
+    45.67
+
+    >>> # PyTango provides a handy shortcut: it exports commands as device methods:
+    >>> test_device.DevDouble(45.67)
+    45.67
+
+    >>> # Introspection: check the list of attributes:
+    >>> test_device.get_attribute_list()
+    ['ampli', 'boolean_scalar', 'double_scalar', '...', 'State', 'Status']
     
-Execute commands with scalar arguments on a Device
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    >>> 
 
-As you can see in the following example, when scalar types are used, PyTango
-automatically manages the data types, and writing scripts is quite easy.
+This is just the tip of the iceberg. Check the :class:`~PyTango.DeviceProxy` for
+the complete API. 
 
-    .. sourcecode:: itango
+PyTango comes with an integrated IPython_ based console called :ref:`itango`.
+It provides helpers to simplify console usage. You can use this console instead
+of the traditional python console. Be aware, though, that many of the *tricks*
+you can do in an :ref:`itango` console cannot be done in a python program.
+
+Server
+------
+
+Since PyTango 8.1 it has become much easier to program a Tango device server.
+PyTango provides some helpers that allow developers to simplify the programming
+of a Tango device server.
+
+Before creating a server you need to decide:
+
+1. The name of the device server (example: `PowerSupplyDS`). This will be
+   the mandatory name of your python file.
+2. The Tango Class name of your device (example: `PowerSupply`). In our 
+   example we will use the same name as the python class name.
+3. the list of attributes of the device, their data type, access (read-only vs
+   read-write), data_format (scalar, 1D, 2D)
+4. the list of commands, their parameters and their result
+
+In our example we will write a fake power supply device server. The server
+will be called `PowerSupplyDS`. There will be a class called `PowerSupply`
+which will have attributes:
+
+* *voltage* (scalar, read-only, numeric)
+* *current* (scalar, read_write, numeric, expert mode) 
+* *noise* (2D, read-only, numeric)
+
+commands:
+
+* *TurnOn* (argument: None, result: None)
+* *TurnOff* (argument: None, result: None)
+* *Ramp* (param: scalar, numeric; result: bool)
+
+properties:
+
+* *host* (string representing the host name of the actual power supply)
+* *port* (port number in the host with default value = 9788)
+
+Here is the code for the :file:`PowerSupplyDS.py`
+
+.. literalinclude:: _static/PowerSupplyDS.py
+    :linenos:
+
+The server API :ref:`pytango-hlapi`.
+
+Before running this brand new server we need to register it in the Tango system.
+You can do it with Jive (`Jive->Edit->Create server`):
+
+.. image:: _static/jive_powersupply.png
+
+... or in a python script::
+
+    >>> import PyTango
     
-        ITango [1]: tangotest = TangoTest("sys/tg_test/1")
-
-        ITango [2]: # classical way
-        ITango [2]: r = tangotest.command_inout("DevString", "Hello, world!")
-
-        ITango [3]: print "Result of execution of DevString command =", r
-        Result of execution of DevString command = Hello, world!
-
-        ITango [4]: # 'pythonic' way
-        ITango [5]: tangotest.DevString("Hello, world!")
-        Result [5]: 'Hello, world!'
-        
-        ITango [6]: # type is automatically managed by PyTango
-        ITango [7]: tangotest.DevULong(12456)
-        Result [7]: 12456
-
-Execute commands with more complex types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In this case you have to use put your arguments data in the correct python
-structures.
-
-    .. sourcecode:: itango
+    >>> dev_info = PyTango.DbDevInfo()
+    >>> dev_info.server = "PowerSupplyDS/test"
+    >>> dev_info._class = "PowerSupply"
+    >>> dev_info.name = "test/power_supply/1"
     
-        ITango [1]: tangotest = TangoTest("sys/tg_test/1")
+    >>> db = PyTango.Database()
+    >>> db.add_device(dev_info)
 
-        ITango [2]: argin = [1, 2, 3], ["Hello", "World"]
+After, you can run the server on a console with::
 
-        ITango [3]: tango_test.DevVarLongArray(argin)
-        Result [3]: [array([1, 2, 3]), ['Hello', 'World']]
-        
-.. note::
-    notice that the command returns a list of two elements. The first element is
-    a :class:`numpy.ndarray` (assuming PyTango is compiled with numpy_ support).
-    This is because PyTango does a best effort to convert all numeric array types
-    to numpy_ arrays.
+    $ python PowerSupplyDS.py test
+    Ready to accept request
+
+Now you can access it from a python console::
+
+    >>> import PyTango
+
+    >>> power_supply = PyTango.DeviceProxy("test/power/supply/1")
+    >>> power_supply.state()
+    STANDBY
+
+    >>> power_supply.current = 2.3
     
-Reading and writing attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    >>> power_supply.current
+    2.3
 
-Basic read/write attribute operations.
-
-    .. sourcecode:: itango
+    >>> power_supply.PowerOn()
+    >>> power_supply.Ramp(2.1)
+    True
     
-        ITango [1]: # Read a scalar attribute
-        ITango [2]: print tangotest.read_attribute("long_scalar")
-        DeviceAttribute[
-        data_format = PyTango._PyTango.AttrDataFormat.SCALAR
-              dim_x = 1
-              dim_y = 0
-         has_failed = False
-           is_empty = False
-               name = 'long_scalar'
-            nb_read = 1
-         nb_written = 1
-            quality = PyTango._PyTango.AttrQuality.ATTR_VALID
-        r_dimension = AttributeDimension(dim_x = 1, dim_y = 0)
-               time = TimeVal(tv_nsec = 0, tv_sec = 1281084943, tv_usec = 461730)
-               type = PyTango._PyTango.CmdArgType.DevLong
-              value = 239
-            w_dim_x = 1
-            w_dim_y = 0
-        w_dimension = AttributeDimension(dim_x = 1, dim_y = 0)
-            w_value = 0]
-            
-        ITango [3]: # Read a spectrum attribute
-        ITango [4]: print tangotest.read_attribute("double_spectrum")
-        DeviceAttribute[
-        data_format = PyTango._PyTango.AttrDataFormat.SPECTRUM
-              dim_x = 20
-              dim_y = 0
-         has_failed = False
-           is_empty = False
-               name = 'double_spectrum'
-            nb_read = 20
-         nb_written = 20
-            quality = PyTango._PyTango.AttrQuality.ATTR_VALID
-        r_dimension = AttributeDimension(dim_x = 20, dim_y = 0)
-               time = TimeVal(tv_nsec = 0, tv_sec = 1281085195, tv_usec = 244760)
-               type = PyTango._PyTango.CmdArgType.DevDouble
-              value = array([  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.,
-                11.,  12.,  13.,  14.,  15.,  16.,  17.,  18.,  19.])
-            w_dim_x = 20
-            w_dim_y = 0
-        w_dimension = AttributeDimension(dim_x = 20, dim_y = 0)
-            w_value = array([  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.,  10.,
-                11.,  12.,  13.,  14.,  15.,  16.,  17.,  18.,  19.])]
+    >>> power_supply.state()
+    ON
 
-        ITango [5]: # Write a scalar attribute
-        ITango [6]: scalar_value = 18
-        ITango [7]: tangotest.write_attribute("long_scalar", scalar_value)
-
-        ITango [8]: # Write a spectrum attribute
-        ITango [9]: spectrum_value = numpy.random.rand(100)*10
-        ITango [10]: tangotest.write_attribute("double_spectrum", spectrum_value)
-        
-        
-        ITango [11]: # Write an image attribute
-        ITango [12]: image_value = numpy.random.randint(0,10,size=(10,10))
-        ITango [13]: tangotest.write_attribute("long_image", image_value)
-
-.. tip::
-    
-    If you are only interested in the attribute's read value you can do insted:
-    
-    .. sourcecode:: itango
-        
-            ITango [1]: tangotest.long_scalar
-            Result [1]: 239
-    
-    The same is valid for writting a new value to an attribute:
-    
-    .. sourcecode:: itango
-        
-            ITango [1]: tangotest.long_scalar = 18
-    
-.. note::
-
-    If PyTango is compiled with numpy support the values got when reading
-    a spectrum or an image will be numpy arrays. This results in a faster and
-    more memory efficient PyTango. You can also use numpy to specify the values when
-    writing attributes, especially if you know the exact attribute type.::
-
-        # Creating an unitialized double spectrum of 1000 elements
-        spectrum_value = PyTango.numpy_spectrum(PyTango.DevDouble, 1000)
-
-        # Creating an spectrum with a range
-        # Note that I do NOT use PyTango.DevLong here, BUT PyTango.NumpyType.DevLong
-        # numpy functions do not understand normal python types, so there's a
-        # translation available in PyTango.NumpyType
-        spectrum_value = numpy.arange(5, 1000, 2, PyTango.NumpyType.DevLong)
-
-        # Creating a 2x2 long image from an existing one
-        image_value = PyTango.numpy_image(PyTango.DevLong, [[1,2],[3,4]])
-
-Registering devices
-~~~~~~~~~~~~~~~~~~~
-
-Defining devices in the Tango DataBase:
-
-    .. sourcecode:: itango
-    
-        ITango [1]: # The 3 devices name we want to create
-        ITango [2]: # Note: these 3 devices will be served by the same DServer
-        ITango [3]: new_device_name1="px1/tdl/mouse1"
-        ITango [4]: new_device_name2="px1/tdl/mouse2"
-        ITango [5]: new_device_name3="px1/tdl/mouse3"
-
-        ITango [6]: # Define the Tango Class served by this DServer
-        ITango [7]: new_device_info_mouse = PyTango.DbDevInfo()
-        ITango [8]: new_device_info_mouse._class = "Mouse"
-        ITango [9]: new_device_info_mouse.server = "ds_Mouse/server_mouse"
-
-        ITango [10]: # add the first device
-        ITango [11]: new_device_info_mouse.name = new_device_name1
-        ITango [12]: db.add_device(new_device_info_mouse)
-
-        ITango [13]: # add the next device
-        ITango [14]: new_device_info_mouse.name = new_device_name2
-        ITango [15]: db.add_device(new_device_info_mouse)
-
-        ITango [16]: # add the third device
-        ITango [17]: new_device_info_mouse.name = new_device_name3
-        ITango [18]: db.add_device(new_device_info_mouse)
-
-Setting up Device properties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A more complex example using python subtilities.
-The following python script example (containing some functions and instructions
-manipulating a Galil motor axis device server) gives an idea of how the Tango
-API should be accessed from Python.
-
-    .. sourcecode:: itango
-    
-        ITango [1]: # connecting to the motor axis device
-        ITango [2]: axis1 = DeviceProxy ("microxas/motorisation/galilbox")
-
-        ITango [3]: # Getting Device Properties
-        ITango [4]: property_names = ["AxisBoxAttachement",
-              ....:                   "AxisEncoderType",
-              ....:                   "AxisNumber",
-              ....:                   "CurrentAcceleration",
-              ....:                   "CurrentAccuracy",
-              ....:                   "CurrentBacklash",
-              ....:                   "CurrentDeceleration",
-              ....:                   "CurrentDirection",
-              ....:                   "CurrentMotionAccuracy",
-              ....:                   "CurrentOvershoot",
-              ....:                   "CurrentRetry",
-              ....:                   "CurrentScale",
-              ....:                   "CurrentSpeed",
-              ....:                   "CurrentVelocity",
-              ....:                   "EncoderMotorRatio",
-              ....:                   "logging_level",
-              ....:                   "logging_target",
-              ....:                   "UserEncoderRatio",
-              ....:                   "UserOffset"]
-       
-        ITango [5]: axis_properties = axis1.get_property(property_names)
-        ITango [6]: for prop in axis_properties.keys():
-              ....:     print "%s: %s" % (prop, axis_properties[prop][0])
-
-        ITango [7]: # Changing Properties
-        ITango [8]: axis_properties["AxisBoxAttachement"] = ["microxas/motorisation/galilbox"]
-        ITango [9]: axis_properties["AxisEncoderType"] = ["1"]
-        ITango [10]: axis_properties["AxisNumber"] = ["6"]
-        ITango [11]: axis1.put_property(axis_properties)
-
-        ITango [12]: # Reading attributes
-        ITango [13]: att_list = axis.get_attribute_list()
-        ITango [14]: for att in att_list:
-               ....:     att_val = axis.read_attribute(att)
-               ....:     print "%s: %s" % (att.name, att_val.value)
-
-        ITango [15]: # Changing some attribute values
-        ITango [16]: axis1.write_attribute("AxisBackslash", 0.5)
-        ITango [17]: axis1.write_attribute("AxisDirection", 1.0)
-        ITango [18]: axis1.write_attribute("AxisVelocity", 1000.0)
-        ITango [19]: axis1.write_attribute("AxisOvershoot", 500.0)
-
-        ITango [20]: # Testing some device commands
-        ITango [21]: pos1=axis1.read_attribute("AxisCurrentPosition")
-        ITango [22]: axis1.command_inout("AxisBackward")
-        ITango [23]: while pos1.value > 1000.0:
-               ....:     pos1 = axis1.read_attribute("AxisCurrentPosition")
-               ....:     print "position axis 1 = ", pos1.value
-                            
-        ITango [24]: axis1.command_inout("AxisStop")
-
-Quick tour on the server side
------------------------------
-
-To write a tango device server in python, you must first import the
-:mod:`PyTango` module in your code.
-
-Below is the python code for a Tango device server with two commands and two
-attributes. The commands are:
-
-1. IOLOng which receives a Tango Long and return it multiply by 2. This command
-   is allowed only if the device is in the ON state.
-
-2. IOStringArray which receives an array of Tango strings and which returns it
-   but in the reverse order. This command is only allowed if the device is in
-   the ON state.
-
-The attributes are:
-
-1. Long_attr wich is a Tango long attribute, Scalar and Read only with a
-   minimum alarm set to 1000 and a maximum alarm set to 1500
-
-2. Short_attr_rw which is a Tango short attribute, Scalar and Read/Write
-
-The following code is the complete device server code::
-
-    import PyTango
-
-    class PyDsExp(PyTango.Device_4Impl):
-
-        def __init__(self,cl,name):
-            PyTango.Device_4Impl.__init__(self,cl,name)
-            self.debug_stream('In PyDsExp __init__')
-            PyDsExp.init_device(self)
-
-        def init_device(self):
-            self.debug_stream('In Python init_device method')
-            self.set_state(PyTango.DevState.ON)
-            self.attr_short_rw = 66
-            self.attr_long = 1246
-
-        def delete_device(self):
-            self.debug_stream('[delete_device] for device %s ' % self.get_name())
-
-        #------------------------------------------------------------------
-        # COMMANDS
-        #------------------------------------------------------------------
-
-        def is_IOLong_allowed(self):
-            return self.get_state() == PyTango.DevState.ON
-
-        def IOLong(self, in_data):
-            self.debug_stream('[IOLong::execute] received number %s' % str(in_data))
-            in_data = in_data * 2;
-            self.debug_stream('[IOLong::execute] return number %s' % str(in_data))
-            return in_data;
-
-        def is_IOStringArray_allowed(self):
-            return self.get_state() == PyTango.DevState.ON
-
-        def IOStringArray(self, in_data):
-            l = range(len(in_data)-1, -1, -1);
-            out_index=0
-            out_data=[]
-            for i in l:
-                self.debug_stream('[IOStringArray::execute] received String' % in_data[out_index])
-                out_data.append(in_data[i])
-                self.debug_stream('[IOStringArray::execute] return String %s' %out_data[out_index])
-                out_index += 1
-            self.y = out_data
-            return out_data
-
-        #------------------------------------------------------------------
-        # ATTRIBUTES
-        #------------------------------------------------------------------
-
-        def read_attr_hardware(self, data):
-            self.debug_stream('In read_attr_hardware')
-
-        def read_Long_attr(self, the_att):
-            self.debug_stream('[PyDsExp::read_attr] attribute name Long_attr')
-            the_att.set_value(self.attr_long)
-
-        def read_Short_attr_rw(self, the_att):
-            self.debug_stream('[PyDsExp::read_attr] attribute name Short_attr_rw')
-            the_att.set_value(self.attr_short_rw)
-
-        def write_Short_attr_rw(self, the_att):
-            self.debug_stream('In write_Short_attr_rw for attribute %s' % the_att.get_name())
-            data = the_att.get_write_value()
-            self.attr_short_rw = data[0]
-
-    
-    class PyDsExpClass(PyTango.DeviceClass):
-
-        def __init__(self, name):
-            PyTango.DeviceClass.__init__(self, name)
-            self.set_type("PyDsExp")
-
-        cmd_list = { 'IOLong' : [ [ PyTango.ArgType.DevLong, "Number" ],
-                                  [ PyTango.ArgType.DevLong, "Number * 2" ] ],
-                     'IOStringArray' : [ [ PyTango.ArgType.DevVarStringArray, "Array of string" ],
-                                         [ PyTango.ArgType.DevVarStringArray, "This reversed array"] ],
-        }
-
-        attr_list = { 'Long_attr' : [ [ PyTango.ArgType.DevLong ,
-                                        PyTango.AttrDataFormat.SCALAR ,
-                                        PyTango.AttrWriteType.READ],
-                                      { 'min alarm' : 1000, 'max alarm' : 1500 } ],
-
-                     'Short_attr_rw' : [ [ PyTango.ArgType.DevShort,
-                                           PyTango.AttrDataFormat.SCALAR,
-                                           PyTango.AttrWriteType.READ_WRITE ] ]
-        }
-    
-    
-    def main():
-        PyTango.server_run({"PyDsExp" : (PyDsExpClass, PyDsExp)})
-
-    if __name__ == '__main__':
-        main()
-
-.. toctree::
-    :hidden:
-
-    Quick tour (original) <quicktour_old>
+Next steps: Check out the :ref:`pytango-api`.
     

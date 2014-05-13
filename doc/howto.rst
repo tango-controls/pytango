@@ -2,37 +2,439 @@
 
 .. highlight:: python
    :linenothreshold: 3
-   
-.. _server:
-   
-Server API
-==========
 
+======
+How to
+======
+
+Check the default TANGO host
+----------------------------
+
+.. todo::
+   write this how to
+
+
+Work with Groups
+----------------
+
+.. todo:: 
+   write this how to
+
+Handle errors
+-------------
+
+.. todo:: 
+   write this how to
+
+Check TANGO version
+-------------------
+
+.. todo:: 
+   write this how to
+
+Report a bug
+------------
+
+.. todo:: 
+   write this how to
+
+Write a server
+--------------
+
+Before reading this chapter you should be aware of the TANGO basic concepts.
 This chapter does not explain what a Tango device or a device server is.
-This is explained in details in "The Tango control system manual" available at
-http://www.tango-controls.org/TangoKernel.
-The device server described in the following example is a Tango device server
-with one Tango class called *PyDsExp*. This class has two commands called
-*IOLong* and *IOStringArray* and two attributes called *Long_attr* and
-*Short_attr_rw*.
+This is explained in details in the
+`Tango control system manual <http://www.tango-controls.org/TangoKernel>`_
 
-Importing python modules
-------------------------
+Since version 8.1, PyTango provides a helper module which simplifies the 
+development of a Tango device server. This helper is provided through the
+:mod:`PyTango.server` module.
 
-To write a Python script which is a Tango device server, you need to import 
-two modules which are:
+Here is a simple example on how to write a *Clock* device server using the
+high level API::
+    
+    import time
+    from PyTango.server import run
+    from PyTango.server import Device, DeviceMeta
+    from PyTango.server import attribute, command   
 
-1. The :mod:`PyTango` module which is the Python to C++ interface
-2. The Python classical :mod:`sys` module
 
-This could be done with code like (supposing the PYTHONPATH environment variable
-is correctly set)::
+    class Clock(Device):
+        __metaclass__ = DeviceMeta
 
-    import PyTango
-    import sys
+        time = attribute()
+
+        def read_time(self):
+            return time.time()
+
+        @command(din_type=str, dout_type=str)
+        def strftime(self, format):
+            return time.strftime(format)
+
+
+    if __name__ == "__main__":
+        run((Clock,))
+
+
+Here is a more complete  example on how to write a *PowerSupply* device server
+using the high level API. The example contains:
+
+#. a read-only double scalar attribute called *voltage*
+#. a read/write double scalar expert attribute *current*
+#. a read-only double image attribute called *noise*
+#. a *ramp* command
+#. a *host* device property
+#. a *port* class property
+
+.. code-block:: python
+    :linenos:
+
+    from time import time
+    from numpy.random import random_sample
+
+    from PyTango import AttrQuality, AttrWriteType, DispLevel, server_run
+    from PyTango.server import Device, DeviceMeta, attribute, command
+    from PyTango.server import class_property, device_property
+
+    class PowerSupply(Device):
+        __metaclass__ = DeviceMeta
+
+        voltage = attribute()
+
+        current = attribute(label="Current", dtype=float,
+                            display_level=DispLevel.EXPERT,
+                            access=AttrWriteType.READ_WRITE,
+                            unit="A", format="8.4f",
+                            min_value=0.0, max_value=8.5,
+                            min_alarm=0.1, max_alarm=8.4,
+                            min_warning=0.5, max_warning=8.0,
+                            fget="get_current", fset="set_current",
+                            doc="the power supply current")
+    
+        noise = attribute(label="Noise", dtype=((float,),),
+                          max_dim_x=1024, max_dim_y=1024,
+                          fget="get_noise")
+ 
+        host = device_property(dtype=str)
+        port = class_property(dtype=int, default_value=9788)
+
+        def read_voltage(self):
+            self.info_stream("get voltage(%s, %d)" % (self.host, self.port))
+            return 10.0
+
+        def get_current(self):
+            return 2.3456, time(), AttrQuality.ATTR_WARNING
+    
+        def set_current(self, current):
+            print("Current set to %f" % current)
+    
+        def get_noise(self):
+            return random_sample((1024, 1024))
+
+        @command(dtype_in=float)
+        def ramp(self, value):
+            print("Ramping up...")
+
+    if __name__ == "__main__":
+        server_run((PowerSupply,))
+
+*Pretty cool, uh?*
+
+.. note::
+    the ``__metaclass__`` statement is mandatory due to a limitation in the
+    *boost-python* library used by PyTango.
+    
+    If you are using python 3 you can write instead::
+        
+        class PowerSupply(Device, metaclass=DeviceMeta)
+            pass
+
+.. _logging:
+
+Server logging
+--------------
+
+This chapter instructs you on how to use the tango logging API (log4tango) to
+create tango log messages on your device server.
+
+The logging system explained here is the Tango Logging Service (TLS). For
+detailed information on how this logging system works please check:
+
+    * `3.5 The tango logging service <http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node4.html#sec:The-Tango-Logging>`_
+    * `9.3 The tango logging service <http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node9.html#SECTION00930000000000000000>`_
+
+The easiest way to start seeing log messages on your device server console is
+by starting it with the verbose option. Example::
+
+    python PyDsExp.py PyDs1 -v4
+
+This activates the console tango logging target and filters messages with 
+importance level DEBUG or more.
+The links above provided detailed information on how to configure log levels 
+and log targets. In this document we will focus on how to write log messages on
+your device server.
+
+Basic logging
+~~~~~~~~~~~~~
+
+The most basic way to write a log message on your device is to use the
+:class:`~PyTango.server.Device` logging related methods:
+
+    * :meth:`~PyTango.server.Device.debug_stream`
+    * :meth:`~PyTango.server.Device.info_stream`
+    * :meth:`~PyTango.server.Device.warn_stream`
+    * :meth:`~PyTango.server.Device.error_stream`
+    * :meth:`~PyTango.server.Device.fatal_stream`
+
+Example::
+
+    def read_voltage(self):
+        self.info_stream("read voltage attribute")
+	# ... 
+	return voltage_value
+
+This will print a message like::
+
+    1282206864 [-1215867200] INFO test/power_supply/1 read voltage attribute
+
+every time a client asks to read the *voltage* attribute value.
+
+The logging methods support argument list feature (since PyTango 8.1). Example::
+
+    def read_voltage(self):
+        self.info_stream("read_voltage(%s, %d)", self.host, self.port)
+	# ...
+	return voltage_value
+
+
+Logging with print statement
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*This feature is only possible since PyTango 7.1.3*
+
+It is possible to use the print statement to log messages into the tango logging
+system. This is achieved by using the python's print extend form sometimes
+refered to as *print chevron*.
+
+Same example as above, but now using *print chevron*::
+
+    def read_voltage(self, the_att):
+        print >>self.log_info, "read voltage attribute"
+	# ...
+	return voltage_value
+
+Or using the python 3k print function::
+
+    def read_Long_attr(self, the_att):
+        print("read voltage attribute", file=self.log_info)
+	# ...
+	return voltage_value
+
+
+Logging with decorators
+~~~~~~~~~~~~~~~~~~~~~~~
+
+*This feature is only possible since PyTango 7.1.3*
+
+PyTango provides a set of decorators that place automatic log messages when
+you enter and when you leave a python method. For example::
+
+    @PyTango.DebugIt()
+    def read_Long_attr(self, the_att):
+        the_att.set_value(self.attr_long)
+
+will generate a pair of log messages each time a client asks for the 'Long_attr'
+value. Your output would look something like::
+
+    1282208997 [-1215965504] DEBUG test/pydsexp/1 -> read_Long_attr()
+    1282208997 [-1215965504] DEBUG test/pydsexp/1 <- read_Long_attr()
+
+Decorators exist for all tango log levels:
+    * :class:`PyTango.DebugIt`
+    * :class:`PyTango.InfoIt`
+    * :class:`PyTango.WarnIt`
+    * :class:`PyTango.ErrorIt`
+    * :class:`PyTango.FatalIt`
+
+The decorators receive three optional arguments:
+    * show_args - shows method arguments in log message (defaults to False)
+    * show_kwargs shows keyword method arguments in log message (defaults to False)
+    * show_ret - shows return value in log message (defaults to False)
+
+Example::
+    
+    @PyTango.DebugIt(show_args=True, show_ret=True)
+    def IOLong(self, in_data):
+        return in_data * 2
+
+will output something like::
+
+    1282221947 [-1261438096] DEBUG test/pydsexp/1 -> IOLong(23)
+    1282221947 [-1261438096] DEBUG test/pydsexp/1 46 <- IOLong()
+
+
+Mix multiple device classes in a server
+---------------------------------------
+
+.. todo::
+   write this how to
+
+
+Create attributes dynamically
+-----------------------------
+
+It is also possible to create dynamic attributes within a Python device server. 
+There are several ways to create dynamic attributes. One of the way, is to 
+create all the devices within a loop, then to create the dynamic attributes and
+finally to make all the devices available for the external world. In C++ device
+server, this is typically done within the <Device>Class::device_factory() method.
+In Python device server, this method is generic and the user does not have one.
+Nevertheless, this generic device_factory method calls a method named dyn_attr()
+allowing the user to create his dynamic attributes. It is simply necessary to
+re-define this method within your <Device>Class and to create the dynamic 
+attribute within this method:
+
+    ``dyn_attr(self, dev_list)``
+    
+    where dev_list is a list containing all the devices created by the 
+    generic device_factory() method.
+
+There is another point to be noted regarding dynamic attribute within Python 
+device server. The Tango Python device server core checks that for each 
+attribute it exists methods named <attribute_name>_read and/or
+<attribute_name>_write and/or is_<attribute_name>_allowed. Using dynamic
+attribute, it is not possible to define these methods because attributes name
+and number are known only at run-time.
+To address this issue, the Device_3Impl::add_attribute() method has a diferent
+signature for Python device server which is:
+
+    ``add_attribute(self, attr, r_meth = None, w_meth = None, is_allo_meth = None)``
+    
+attr is an instance of the Attr class, r_meth is the method which has to be 
+executed with the attribute is read, w_meth is the method to be executed 
+when the attribute is written and is_allo_meth is the method to be executed
+to implement the attribute state machine. The method passed here as argument
+as to be class method and not object method. Which argument you have to use 
+depends on the type of the attribute (A WRITE attribute does not need a 
+read method). Note, that depending on the number of argument you pass to this
+method, you may have to use Python keyword argument. The necessary methods 
+required by the Tango Python device server core will be created automatically
+as a forward to the methods given as arguments.
+
+Here is an example of a device which has a TANGO command called 
+*createFloatAttribute*. When called, this command creates a new scalar floating
+point attribute with the specified name::
+
+ 
+    from PyTango import Util, Attr
+    from PyTango.server import DeviceMeta, Device, command
+
+    class MyDevice(Device):
+    	__metaclass__ = DeviceMeta
+
+	@command(dtype_in=str)
+        def CreateFloatAttribute(self, attr_name):
+	    attr = Attr(attr_name, PyTango.DevDouble) 
+	    self.add_attribute(attr, self.read_General, self.write_General)
+
+	def read_General(self, attr):
+	    self.info_stream("Reading attribute %s", attr.get_name())
+	    attr.set_value(99.99)
+
+	def write_General(self, attr):
+	    self.info_stream("Writting attribute %s", attr.get_name())
+
+
+Create/Delete devices dynamically
+---------------------------------
+
+*This feature is only possible since PyTango 7.1.2*
+
+Starting from PyTango 7.1.2 it is possible to create devices in a device server
+"en caliente". This means that you can create a command in your "management device"
+of a device server that creates devices of (possibly) several other tango classes.
+There are two ways to create a new device which are described below.
+
+Dynamic device from a known tango class name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you know the tango class name but you don't have access to the :class:`PyTango.DeviceClass`
+(or you are too lazy to search how to get it ;-) the way to do it is call 
+:meth:`~PyTango.Util.create_device` / :meth:`~PyTango.Util.delete_device`.
+Here is an example of implementing a tango command on one of your devices that 
+creates a device of some arbitrary class (the example assumes the tango commands
+'CreateDevice' and 'DeleteDevice' receive a parameter of type DevVarStringArray
+with two strings. No error processing was done on the code for simplicity sake)::
+
+    from PyTango import Util
+    from PyTango.server import DeviceMeta, Device, command
+
+    class MyDevice(Device):
+    	__metaclass__ = DeviceMeta
+
+	@command(dtype_in=[str])
+        def CreateDevice(self, pars):
+            klass_name, dev_name = pars
+            util = Util.instance()
+            util.create_device(klass_name, dev_name, alias=None, cb=None)
+        
+	@command(dtype_in=[str])
+        def DeleteDevice(self, pars):
+            klass_name, dev_name = pars
+            util = Util.instance()
+            util.delete_device(klass_name, dev_name)
+
+An optional callback can be registered that will be executed after the device is
+registed in the tango database but before the actual device object is created
+and its init_device method is called. It can be used, for example, to initialize
+some device properties.
+
+Dynamic device from a known tango class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you already have access to the :class:`~PyTango.DeviceClass` object that
+corresponds to the tango class of the device to be created you can call directly
+the :meth:`~PyTango.DeviceClass.create_device` / :meth:`~PyTango.DeviceClass.delete_device`.
+For example, if you wish to create a clone of your device, you can create a 
+tango command called *Clone*::
+
+    class MyDevice(PyTango.Device_4Impl):
+        
+        def fill_new_device_properties(self, dev_name):
+            prop_names = db.get_device_property_list(self.get_name(), "*")
+            prop_values = db.get_device_property(self.get_name(), prop_names.value_string)
+            db.put_device_property(dev_name, prop_values)
+            
+            # do the same for attributes...
+            ... 
+        
+        def Clone(self, dev_name):
+            klass = self.get_device_class()
+            klass.create_device(dev_name, alias=None, cb=self.fill_new_device_properties)
+            
+        def DeleteSibling(self, dev_name):
+            klass = self.get_device_class()
+            klass.delete_device(dev_name)
+            
+Note that the cb parameter is optional. In the example it is given for
+demonstration purposes only.
+
+.. _server:
+
+Write a server (original API)
+-----------------------------
+
+This chapter describes how to develop a PyTango device server using the
+original PyTango server API. This API mimics the C++ API and is considered
+low level.
+You should write a server using this API if you are using code generated by 
+`Pogo tool <http://www.esrf.eu/computing/cs/tango/tango_doc/tools_doc/pogo_doc/index.html>`_
+or if for some reason the high level API helper doesn't provide a feature
+you need (in that case think of writing a mail to tango mailing list explaining
+what you cannot do).
 
 The main part of a Python device server
----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The rule of this part of a Tango device server is to:
 
@@ -68,7 +470,7 @@ The following is a typical code for this main function::
     Run the device server loop
 
 The PyDsExpClass class in Python
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The rule of this class is to :
 
@@ -122,7 +524,7 @@ constructor. An example of such a contructor is ::
 The device type is set at line 3.
 
 Defining commands
------------------
+~~~~~~~~~~~~~~~~~
 
 As shown in the previous example, commands have to be defined in a :class:`dict`
 called *cmd_list* as a data member of the xxxClass class of the Tango class.
@@ -152,7 +554,7 @@ this :class:`dict` are summarized in the following array:
     +-------------------+----------------------+------------------------------------------+
 
 Defining attributes
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 As shown in the previous example, attributes have to be defined in a :class:`dict`
 called **attr_list** as a data
@@ -217,7 +619,7 @@ array:
     +-------------------+-----------------------------------+------------------------------------------+
 
 The PyDsExp class in Python
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The rule of this class is to implement methods executed by commands and attributes.
 In our example, the code of this class looks like::
@@ -480,284 +882,4 @@ write the Short_attr_rw attribute::
     store the value written in the device object. Our attribute is a scalar 
     short attribute so the return value is an int
 
-.. _logging:
 
-Logging
-#######
-
-This chapter instructs you on how to use the tango logging API (log4tango) to
-create tango log messages on your device server.
-
-The logging system explained here is the Tango Logging Service (TLS). For
-detailed information on how this logging system works please check:
-
-    * `3.5 The tango logging service <http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node4.html#sec:The-Tango-Logging>`_
-    * `9.3 The tango logging service <http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node9.html#SECTION00930000000000000000>`_
-
-The easiest way to start seeing log messages on your device server console is
-by starting it with the verbose option. Example::
-
-    python PyDsExp.py PyDs1 -v4
-
-This activates the console tango logging target and filters messages with 
-importance level DEBUG or more.
-The links above provided detailed information on how to configure log levels 
-and log targets. In this document we will focus on how to write log messages on
-your device server.
-
-Basic logging
-~~~~~~~~~~~~~
-
-The most basic way to write a log message on your device is to use the
-:class:`PyTango.DeviceImpl` logging related methods:
-
-    * :meth:`PyTango.DeviceImpl.debug_stream`
-    * :meth:`PyTango.DeviceImpl.info_stream`
-    * :meth:`PyTango.DeviceImpl.warn_stream`
-    * :meth:`PyTango.DeviceImpl.error_stream`
-    * :meth:`PyTango.DeviceImpl.fatal_stream`
-
-Example::
-
-    def read_Long_attr(self, the_att):
-        self.info_stream("read attribute name Long_attr")
-        the_att.set_value(self.attr_long)
-
-This will print a message like::
-
-    1282206864 [-1215867200] INFO test/pydsexp/1 read attribute name Long_attr
-
-every time a client asks to read the 'Long_attr' attribute value.
-
-Logging with print statement
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-*This feature is only possible since PyTango 7.1.3*
-
-It is possible to use the print statement to log messages into the tango logging
-system. This is achieved by using the python's print extend form sometimes
-refered to as *print chevron*.
-
-Same example as above, but now using *print chevron*::
-
-    def read_Long_attr(self, the_att):
-        print >>self.log_info, "read attribute name Long_attr"
-        the_att.set_value(self.attr_long)
-
-Or using the python 3k print function::
-
-    def read_Long_attr(self, the_att):
-        print("read attribute name Long_attr", file=self.log_info)
-        the_att.set_value(self.attr_long)
-
-Logging with decorators
-~~~~~~~~~~~~~~~~~~~~~~~
-
-*This feature is only possible since PyTango 7.1.3*
-
-PyTango provides a set of decorators that place automatic log messages when
-you enter and when you leave a python method. For example::
-
-    @PyTango.DebugIt()
-    def read_Long_attr(self, the_att):
-        the_att.set_value(self.attr_long)
-
-will generate a pair of log messages each time a client asks for the 'Long_attr'
-value. Your output would look something like::
-
-    1282208997 [-1215965504] DEBUG test/pydsexp/1 -> read_Long_attr()
-    1282208997 [-1215965504] DEBUG test/pydsexp/1 <- read_Long_attr()
-
-Decorators exist for all tango log levels:
-    * :class:`PyTango.DebugIt`
-    * :class:`PyTango.InfoIt`
-    * :class:`PyTango.WarnIt`
-    * :class:`PyTango.ErrorIt`
-    * :class:`PyTango.FatalIt`
-
-The decorators receive three optional arguments:
-    * show_args - shows method arguments in log message (defaults to False)
-    * show_kwargs shows keyword method arguments in log message (defaults to False)
-    * show_ret - shows return value in log message (defaults to False)
-
-Example::
-    
-    @PyTango.DebugIt(show_args=True, show_ret=True)
-    def IOLong(self, in_data):
-        return in_data * 2
-
-will output something like::
-
-    1282221947 [-1261438096] DEBUG test/pydsexp/1 -> IOLong(23)
-    1282221947 [-1261438096] DEBUG test/pydsexp/1 46 <- IOLong()
-
-Dynamic devices
-###############
-
-*This feature is only possible since PyTango 7.1.2*
-
-Starting from PyTango 7.1.2 it is possible to create devices in a device server
-"en caliente". This means that you can create a command in your "management device"
-of a device server that creates devices of (possibly) several other tango classes.
-There are two ways to create a new device which are described below.
-
-Dynamic device from a known tango class name
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you know the tango class name but you don't have access to the :class:`PyTango.DeviceClass`
-(or you are too lazy to search how to get it ;-) the way to do it is call 
-:meth:`PyTango.Util.create_device` / :meth:`PyTango.Util.delete_device`.
-Here is an example of implementing a tango command on one of your devices that 
-creates a device of some arbitrary class (the example assumes the tango commands
-'CreateDevice' and 'DeleteDevice' receive a parameter of type DevVarStringArray
-with two strings. No error processing was done on the code for simplicity sake)::
-
-    class MyDevice(PyTango.Device_4Impl):
-        
-        def CreateDevice(self, pars):
-            klass_name, dev_name = pars
-            util = PyTango.Util.instance()
-            util.create_device(klass_name, dev_name, alias=None, cb=None)
-        
-        def DeleteDevice(self, pars):
-            klass_name, dev_name = pars
-            util = PyTango.Util.instance()
-            util.delete_device(klass_name, dev_name)
-
-An optional callback can be registered that will be executed after the device is
-registed in the tango database but before the actual device object is created and its
-init_device method is called. You can, for example, initialize some device properties
-here.
-
-Dynamic device from a known tango class
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you already have access to the :class:`PyTango.DeviceClass` object that
-corresponds to the tango class of the device to be created you can call directly
-the :meth:`PyTango.DeviceClass.create_device` / :meth:`PyTango.DeviceClass.delete_device`.
-For example, if you wish to create a clone of your device, you can create a 
-tango command called Clone::
-
-    class MyDevice(PyTango.Device_4Impl):
-        
-        def fill_new_device_properties(self, dev_name):
-            prop_names = db.get_device_property_list(self.get_name(), "*")
-            prop_values = db.get_device_property(self.get_name(), prop_names.value_string)
-            db.put_device_property(dev_name, prop_values)
-            
-            # do the same for attributes...
-            ... 
-        
-        def Clone(self, dev_name):
-            klass = self.get_device_class()
-            klass.create_device(dev_name, alias=None, cb=self.fill_new_device_properties)
-            
-        def DeleteSibling(self, dev_name):
-            klass = self.get_device_class()
-            klass.delete_device(dev_name)
-            
-Note that the cb parameter is optional. In the example it is given for
-demonstration purposes only.
-
-Dynamic attributes
-##################
-
-It is also possible to create dynamic attributes within a Python device server. 
-There are several ways to create dynamic attributes. One of the way, is to 
-create all the devices within a loop, then to create the dynamic attributes and
-finally to make all the devices available for the external world. In C++ device
-server, this is typically done within the <Device>Class::device_factory() method.
-In Python device server, this method is generic and the user does not have one.
-Nevertheless, this generic device_factory method calls a method named dyn_attr()
-allowing the user to create his dynamic attributes. It is simply necessary to
-re-define this method within your <Device>Class and to create the dynamic 
-attribute within this method:
-
-    ``dyn_attr(self, dev_list)``
-    
-    where dev_list is a list containing all the devices created by the 
-    generic device_factory() method.
-
-There is another point to be noted regarding dynamic attribute within Python 
-device server. The Tango Python device server core checks that for each 
-attribute it exists methods named <attribute_name>_read and/or
-<attribute_name>_write and/or is_<attribute_name>_allowed. Using dynamic
-attribute, it is not possible to define these methods because attributes name
-and number are known only at run-time.
-To address this issue, the Device_3Impl::add_attribute() method has a diferent
-signature for Python device server which is:
-
-    ``add_attribute(self, attr, r_meth = None, w_meth = None, is_allo_meth = None)``
-    
-    attr is an instance of the Attr class, r_meth is the method which has to be 
-    executed with the attribute is read, w_meth is the method to be executed 
-    when the attribute is written and is_allo_meth is the method to be executed
-    to implement the attribute state machine. The method passed here as argument
-    as to be class method and not object method. Which argument you have to use 
-    depends on the type of the attribute (A WRITE attribute does not need a 
-    read method). Note, that depending on the number of argument you pass to this
-    method, you may have to use Python keyword argument. The necessary methods 
-    required by the Tango Python device server core will be created automatically
-    as a forward to the methods given as arguments.
-
-Mixing Tango classes (Python and C++) in a Python Tango device server
----------------------------------------------------------------------
-
-Within the same python interpreter, it is possible to mix several Tango classes. 
-Here is an example of the main function of a device server with two Tango classes
-called IRMiror and PLC::
-
-    import PyTango
-    import sys
-
-    if __name__ == '__main__':
-        util = PyTango.Util(sys.argv)
-        util.add_class(PLCClass, PLC, 'PLC')
-        util.add_class(IRMirrorClass, IRMirror, 'IRMirror')
-        
-        U = PyTango.Util.instance()
-        U.server_init()
-        U.server_run()
-
-:Line 6: The Tango class PLC is registered in the device server
-:Line 7: The Tango class IRMirror is registered in the device server
-
-It is also possible to add C++ Tango class in a Python device server as soon as:
-    1. The Tango class is in a shared library
-    2. It exist a C function to create the Tango class
-
-For a Tango class called MyTgClass, the shared library has to be called 
-MyTgClass.so and has to be in a directory listed in the LD_LIBRARY_PATH 
-environment variable. The C function creating the Tango class has to be called 
-_create_MyTgClass_class() and has to take one parameter of type "char \*" which 
-is the Tango class name. Here is an example of the main function of the same 
-device server than before but with one C++ Tango class called SerialLine::
-
-    import PyTango
-    import sys
-    
-    if __name__ == '__main__':
-        py = PyTango.Util(sys.argv)
-        util.add_class('SerialLine', 'SerialLine', language="c++")
-        util.add_class(PLCClass, PLC, 'PLC')
-        util.add_class(IRMirrorClass, IRMirror, 'IRMirror')
-        
-        U = PyTango.Util.instance()
-        U.server_init()
-        U.server_run()
-
-:Line 6: The C++ class is registered in the device server
-:Line 7 and 8: The two Python classes are registered in the device server
-
-Server API
-----------
-
-.. toctree::
-    :maxdepth: 2
-    
-    server
-    device
-    device_class
-    logging
-    attribute
-    util

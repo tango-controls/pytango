@@ -1,5 +1,7 @@
 .. currentmodule:: PyTango
 
+.. _pytango-faq:
+
 FAQ
 ===
 
@@ -7,8 +9,7 @@ Answers to general Tango questions can be found at http://www.tango-controls.org
 
 Please also check http://www.tango-controls.org/howtos for a list of Tango howtos
 
-Where are the usual bjam files?
--------------------------------
+**Where are the usual bjam files?**
 
 Starting from PyTango 7.0.0 the prefered way to build PyTango is using the standard
 python distutils package. This means that:
@@ -19,8 +20,7 @@ python distutils package. This means that:
 
 Please check the compilation chapter for details on how to build PyTango.
 
-I got a libbost_python error when I try to import PyTango module
-----------------------------------------------------------------
+**I got a libbost_python error when I try to import PyTango module**
 
 doing:
     >>> import PyTango
@@ -48,8 +48,7 @@ To see which boost python file PyTango needs type::
     /lib64/ld-linux-x86-64.so.2 (0x00007f3940a4c000)
 
 
-My python code uses PyTango 3.0.4 API. How do I change to 7.0.0 API?
---------------------------------------------------------------------
+**My python code uses PyTango 3.0.4 API. How do I change to 7.0.0 API?**
 
 To ease migration effort, PyTango 7 provides an alternative module called
 PyTango3.
@@ -69,8 +68,7 @@ since the PyTango team cannot assure the maintainability of the PyTango3 module.
 
 Please find below a basic set of rules to migrate from PyTango 3.0.x to 7:
 
-General rule of thumb for data types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*General rule of thumb for data types*
 
 The first important thing to be aware of when migrating from PyTango <= 3.0.4 to
 PyTango >= 7 is that the data type mapping from tango to python and vice versa is
@@ -162,8 +160,8 @@ reference, the proper code would be::
     if not da.data_format is PyTango.AttrDataFormat.SCALAR:
         print "array_attr is NOT a scalar attribute"
     
-Server
-~~~~~~
+*Server*
+
 
 #. replace `PyTango.PyUtil` with :class:`Util`
 
@@ -176,8 +174,7 @@ Server
     in PyTango 7 the methods have been renamed to **dev_state()** and **dev_status()** in
     order to match the C++ API.
 
-General
-~~~~~~~
+*General*
 
 #. AttributeValue does **NOT** exist anymore.
     - the result of a read_attribute call on a :class:`DeviceProxy` / :class:`Group`
@@ -224,118 +221,15 @@ General
             print e.args[0].reason
 
 
-Optional
-~~~~~~~~
+*Optional*
 
 The following is a list of API improvements. Some where added for performance 
 reasons, others to allow for a more pythonic interface, others still to reflect 
 more adequately the C++ interface. They are not mandatory since the original 
 interface will still be available.
 
-Server side V3 to V4 upgrade
-############################
+**Why is there a "-Wstrict-prototypes" warning when I compile PyTango?**
 
-If you want your server to support the V4 interface provided by Tango 7
-instead of the V3 provided by Tango 6:
-
-- replace the inheritance of your device class from :class:`Device_3Impl` to :class:`Device_4Impl`
-- in the `init_device` method replace the call::
-     
-     Device_3Impl.init_device(self)
-
-  with::
-  
-     Device_4Impl.init_device(self)
-
-  or better yet, if your device class only inherits from :class:`Device_4Impl`::
-  
-     super(<your class>, self).init_device()
-
-Improved server side image attribute read API
-#############################################
-
-In PyTango <= 3.0.4, to set the value of an image attribute you needed it
-as a flat list. Consider you want to set as value the following image::
-
-    # Image:
-    #  | 1  2 |
-    #  | 3  4 |
-    
-In order to tell tango the dimensions of the image you had to specify them as::
-
-    image = [ 1, 2, 3, 4]
-    dim_x = 2
-    dim_y = 2
-    attr.set_value(image, dim_x, dim_y)
-
-In PyTango 8 it is still supported, but the preferred way is to use a
-sequence of sequences (instead of a flat sequence), so the dimensions
-are inherent and not needed anymore::
-
-    image = [ [1, 2], [3, 4]]
-    attr.set_value(image)
-
-If you use a numpy array as the sequence of sequences you can get better
-performance::
-
-    image = numpy.array([ [1, 2], [3, 4]], dtype=numpy.int32)
-    attr.set_value(image)
-
-Likewise, calls to::
-
-    PyTango.set_attribute_value_date_quality(attr, value, date, quality, dim_x, dim_y)
-
-can be replaced with::
-
-    attr.set_value_date_quality(value, date, quality)
-
-Improved server side attribute write API
-########################################
-
-Imagine the following value is written to our IMAGE attribute::
-
-    # Image:
-    #  | 1  2 |
-    #  | 3  4 |
-
-This is what you would do with PyTango <= 3.0.4::
-
-    flatList = []
-    attr.get_write_value(flatList)
-    print "flatList =", flatList
-    # flatList = [ 1, 2, 3, 4 ]
-
-You can still do it with PyTango 8. However I recommend::
-
-    image = attr.get_write_value()
-    print "image =", image
-    # image = numpy.array([[1, 2], [3, 4]])
-
-If PyTango 8 is compiled without numpy support, you will get a sequence
-of sequences, which makes more sense than a flat list.
-
-If PyTango 8 is compiled with numpy support it does not only makes more sense
-but it is also considerably **faster and memory friendlier**.
-
-If PyTango is compiled with numpy support but you prefer a list of lists for
-some attribute, you can do::
-
-    image = attr.get_write_value(PyTango.ExtractAs.List)
-    print "image =", image
-    # image = [[1, 2], [3, 4]]
-
-Also the SCALAR attribute case is much **cleaner** now. Instead of::
-
-    data = []
-    attr.get_write_value(data)
-    actualData = data[0]
-
-You can just write::
-
-    actualData = attr.get_write_value()
-
-Why is there a "-Wstrict-prototypes" warning when I compile PyTango?
---------------------------------------------------------------------
 
 The PyTango prefered build system (distutils) uses the same flags used to compile
 Python to compile PyTango. It happens that Python is compiled as a pure C library
@@ -349,8 +243,8 @@ For reference here is the complete error message you may have:
 Do not worry about this warning since the compiler is ignoring the presence of this flag
 in the compilation.
 
-Why are there so many warnings when generating the documentation?
------------------------------------------------------------------
+**Why are there so many warnings when generating the documentation?**
+
 PyTango uses boost python for the binding between C++ and Python and sphinx for
 document generation.
 When sphinx generates the PyTango API documentation it uses introspection to search

@@ -1,9 +1,51 @@
 {% extends "layout.html" %}
 {% set title = 'PyTango documentation' %}
 
-{% set script_files = script_files + ["_static/slideshow.js"] %}
+{% set script_files = script_files + ["_static/jquery-1.9.1.min.js", "_static/jssor.slider.mini.js"] %}
 
 {% block body %}
+
+<script>
+    jQuery(document).ready(function ($) {
+
+        var _SlideshowTransitions = [
+            //Fade
+            { $Duration: 1200, $Opacity: 2 }
+        ];
+
+        var options = {
+            $AutoPlay: true,
+            $AutoPlaySteps: 1,
+            $AutoPlayInterval: 3000, 
+            $PauseOnHover: 1,
+            $ArrowKeyNavigation: true,
+            $SlideDuration: 500,
+            $MinDragOffsetToSlide: 20,
+            $SlideSpacing: 0,
+            $DisplayPieces: 1,
+            $ParkingPosition: 0,
+            $UISearchMode: 1,
+            $PlayOrientation: 1, 
+            $DragOrientation: 3,
+
+            $SlideshowOptions: {
+                $Class: $JssorSlideshowRunner$,
+                $Transitions: _SlideshowTransitions,
+                $TransitionsOrder: 1,
+                $ShowLink: false
+            },     
+
+            $ArrowNavigatorOptions: {
+                $Class: $JssorArrowNavigator$,
+                $ChanceToShow: 1,
+                $AutoCenter: 0,
+                $Steps: 1
+            }
+        };
+
+        var jssor_gallery = new $JssorSlider$("gallery", options);
+    });
+</script>
 
 <h1>Welcome to PyTango documentation!</h1>
 
@@ -15,29 +57,32 @@
   of this in pure python.
 </p>
 
-<div id="gallery" style="width:610px; height:415px; margin:auto;">
+<div id="gallery" style="position:relative; top:0px; left:0px; width:610px; height:415px; margin:auto;">
 
-  <img src="_static/banner1.png" />
+  <div u="slides" style="cursor: move; position:absolute; top:0px; left:0px; width: 610px; height: 415px; overflow: hidden;">
 
-  <iframe src="_static/ipython_tango.html" style="width:600px; height:411px;border: 0; "></iframe>
+    <div style="background:white;"><img src="_static/banner1.png"/></div>
 
-  <iframe src="_static/ipython_db.html" style="width:600px; height:411px;border: 0; "></iframe>
+    <div style="background:white;"><iframe src="_static/ipython_tango.html" style="width:600px; height:411px;border: 0;"></iframe></div>
 
-  <iframe src="_static/ipython_motor.html" style="width:600px; height:411px;border: 0; "></iframe>
+    <div style="background:white;"><iframe src="_static/ipython_db.html" style="width:600px; height:411px;border:0;"></iframe></div>
 
-  <iframe src="_static/ipython_serial.html" style="width:600px; height:411px;border: 0; "></iframe>
+    <div style="background:white;"><iframe src="_static/ipython_motor.html" style="width:600px; height:411px;border:0;"></iframe></div>
 
-  <table style="width:100%;"><tr>
-  <td>
+    <div style="background:white;"><iframe src="_static/ipython_serial.html" style="width:600px; height:411px;border:0;"></iframe></div>
 
-
+    <!-- 6th item -->
+    <div style="background: white;">
+      <table style="width:100%;"><tr><td>
 <div class="highlight-python"><div class="highlight"><pre style="font-size: 10px;">
 <span class="c"># ----------------- server ------------------</span>
+
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">from</span> <span class="nn">PyTango.server</span> <span class="kn">import</span> <span class="n">server_run</span>
 <span class="kn">from</span> <span class="nn">PyTango.server</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">DeviceMeta</span>
 <span class="kn">from</span> <span class="nn">PyTango.server</span> <span class="kn">import</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">command</span>
+
 
 <span class="k">class</span> <span class="nc">Clock</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">DeviceMeta</span>
@@ -53,6 +98,7 @@
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
     <span class="n">server_run</span><span class="p">((</span><span class="n">Clock</span><span class="p">,))</span>
+
 </pre></div>
 </div>
 
@@ -74,20 +120,24 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">clock</span><span class="o">.</span><span class="n">read_attribute</span><span class="p">(</span><span class="s">"time"</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
 <span class="go">1384447252.037578</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">clock</span><span class="o">.</span><span class="n">command_inout</span><span class="p">(</span><span class="s">"strftime"</span><span class="p">,</span>
-<span class="gp">... </span>                    <span class="s">"%H:%M:%S"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clock</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">"%H:%M:%S"</span><span class="p">)</span>
 <span class="go">'17:41:50'</span>
 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clock</span><span class="o">.</span><span class="n">command_inout</span><span class="p">(</span><span class="s">"strftime"</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="s">"%H:%M:%S"</span><span class="p">)</span>
+<span class="go">'17:43:12'</span>
+
 <span class="gp">&gt;&gt;&gt; </span><span class="n">clock</span><span class="o">.</span><span class="n">status</span><span class="p">()</span>
-<span class="go">The device is in UNKNOWN state.</span>
+<span class="go">'The device is in UNKNOWN state.'</span>
 
-</pre></div>
-</div>
+</pre></div></div>
+    </td></tr></table>
+  </div>
 
-  </td>
-  </tr></table>
+  <!-- 7th item -->
+  <div>
 
-  <table style="width:100%;"><tr>
+  <table style="width:100%;  background: white;"><tr>
   <td>
 
 <div class="highlight-python"><div class="highlight"><pre style="font-size: 10px;">
@@ -163,6 +213,44 @@
 
   </td>
   </tr></table>
+
+  </div>
+
+  </div> <!-- end of slide items -->
+
+  <!-- Arrow Navigator Skin Begin -->
+  <style>
+        /* jssor slider arrow navigator skin 03 css */
+        /*
+        .jssora03l              (normal)
+        .jssora03r              (normal)
+        .jssora03l:hover        (normal mouseover)
+        .jssora03r:hover        (normal mouseover)
+        .jssora03ldn            (mousedown)
+        .jssora03rdn            (mousedown)
+        */
+        .jssora03l, .jssora03r, .jssora03ldn, .jssora03rdn
+        {
+        	position: absolute;
+        	cursor: pointer;
+        	display: block;
+            background: url(_static/arrow03.png) no-repeat;
+            overflow:hidden;
+        }
+        .jssora03l { background-position: -3px -33px; }
+        .jssora03r { background-position: -63px -33px; }
+        .jssora03l:hover { background-position: -123px -33px; }
+        .jssora03r:hover { background-position: -183px -33px; }
+        .jssora03ldn { background-position: -243px -33px; }
+        .jssora03rdn { background-position: -303px -33px; }
+
+  </style>
+  <!-- Arrow Left -->
+  <span u="arrowleft" class="jssora03l" style="width: 55px; height: 55px; top: 123px; left: 8px;">
+  </span>
+  <!-- Arrow Right -->
+  <span u="arrowright" class="jssora03r" style="width: 55px; height: 55px; top: 123px; right: 8px">
+  </span>
 
 </div>
 

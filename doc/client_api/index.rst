@@ -7,5 +7,6 @@ Client API
     device_proxy
     attribute_proxy
     group
+    green
     miscellaneous
     other

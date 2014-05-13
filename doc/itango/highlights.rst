@@ -40,7 +40,7 @@ These include:
             ITango [4]: Att<tab>
             Attribute       AttributeError  AttributeProxy
             
-    - The tango :class:`PyTango.Database` object to which the itango session is 
+    - The Tango :class:`Database` object to which the itango session is 
       currently connected
       
       .. sourcecode:: itango
@@ -153,7 +153,7 @@ and attributes if the device is currently running)
     Result [3]: 56.433
 
 Tango classes as :class:`DeviceProxy`
----------------------------------------------
+------------------------------------------------
 
 ITango exports all known tango classes as python alias to :class:`DeviceProxy`. 
 This way, if you want to create a device of class which you already know 

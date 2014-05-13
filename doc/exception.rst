@@ -3,8 +3,8 @@
 .. highlight:: python
    :linenothreshold: 4
 
-Exception Handling
-==================
+Exception API
+=============
 
 Exception definition
 --------------------
@@ -42,21 +42,15 @@ all of which containing the following kind of key-value pairs:
 
 ::
 
-    #  Protect the script from Exceptions raised by the Tango or python itself
-    try:
-        # Get proxy on the tangotest1 device
-        print "Getting DeviceProxy "
-        tangotest = DeviceProxy("tango/tangotest/1")
+    import PyTango
 
-    #Catch Tango and Systems  Exceptions
-    except DevFailed:
-        exctype , value = sys.exc_info()[:2]
-        print "Failed with exception ! " , exctype
-        for err in value:
-            print " reason" , err.reason
-            print " description" , err.desc
-            print " origin" , err.origin
-            print " severity" , err.severity
+    #  How to protect the script from exceptions raised by the Tango
+    try:
+        # Get proxy on a non existing device should throw an exception
+        device = DeviceProxy("non/existing/device")
+    except DevFailed as df:
+        print("Failed to create proxy to non/existing/device:\n%s" % df)
+
 
 Throwing exception in a device server
 -------------------------------------

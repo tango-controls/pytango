@@ -29,6 +29,7 @@ extensions = ['sphinx.ext.pngmath',
               'sphinx.ext.autodoc',
               'sphinx.ext.doctest',
               'sphinx.ext.intersphinx',
+              'sphinx.ext.todo',
               'ipython_console_highlighting',
               'tango_console_highlighting']
 
@@ -252,6 +253,9 @@ intersphinx_mapping = {
     'http://pycassa.github.com/pycassa/' : None,
     'http://docs.sqlalchemy.org/en/rel_0_7/' : None,
 }
+
+todo_include_todos = True
+
 
 def copy_spaces(origin):
     r = ''

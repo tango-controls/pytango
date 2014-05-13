@@ -1,7 +1,7 @@
 
 .. currentmodule:: PyTango
 
-.. _api:
+.. _pytango-api:
 
 ===========
 PyTango API
@@ -10,12 +10,12 @@ PyTango API
 .. automodule:: PyTango
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     data_types
-    client/index
+    client_api/index
+    server_api/index
     database
-    server/index
     encoded
     utilities
     exception

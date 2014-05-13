@@ -6,8 +6,11 @@
 Getting started
 ===============
 
-Quick installation: Linux
--------------------------
+Installing
+----------
+
+Linux
+~~~~~
 
 PyTango is available on linux as an official debian/ubuntu package::
 
@@ -23,8 +26,8 @@ RPM packages are also available for RHEL & CentOS:
    * `RHEL 6/CentOS 6 32bits <ftp://ftp.maxlab.lu.se/pub/maxlab/packages/el6/i386/repoview/index.html>`_
    * `RHEL 6/CentOS 6 64bits <ftp://ftp.maxlab.lu.se/pub/maxlab/packages/el6/x86_64/repoview/index.html>`_
 
-From PyPi
-~~~~~~~~~
+PyPi
+~~~~
 
 You can also install the latest version from `PyPi`_.
 
@@ -43,8 +46,8 @@ or easy_install::
 
     $ easy_install -U PyTango
 
-Quick installation: Windows
----------------------------
+Windows
+~~~~~~~
 
 First, make sure `Python`_ and `numpy`_ are installed.
 
@@ -55,9 +58,8 @@ Windows XP/Vista/7/8. The complete list of binaries can be downloaded from
 Select the proper windows package, download it and finally execute the 
 installion wizard.
 
-
-Compiling & installing
-----------------------
+Compiling
+---------
 
 Linux
 ~~~~~
@@ -95,8 +97,8 @@ Since it is rarely needed and the instructions are so complicated, I have
 choosen to place the how-to in a separate text file. You can find it in the
 source package under :file:`doc/windows_notes.txt`.
 
-Testing your installation
--------------------------
+Testing
+-------
 
 If you have IPython_ installed, the best way to test your PyTango installation
 is by starting the new PyTango CLI called :ref:`itango` by typing on the command
@@ -121,3 +123,4 @@ python console and type:
     >>> PyTango.Release.version
     '8.0.2'
 
+Next steps: Check out the :ref:`pytango-quick-tour`.

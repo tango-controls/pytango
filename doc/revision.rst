@@ -1,15 +1,17 @@
-.. _revision:
+.. _pytango-history-changes:
 
-Revision
---------
+==================
+History of changes
+==================
 
 :Contributers: T\. Coutinho
 
 :Last Update: |today|
 
-.. _history-modifications:
+.. _pytango-revisions:
 
-History of modifications:
+Document revisions
+-------------------
 
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | Date     | Revision                                                                         | Description                                         | Author                |
@@ -78,7 +80,7 @@ History of modifications:
 | __/02/14 | `8.19 <http://www.tango-controls.org/static/PyTango/v812/doc/html/index.html>`_  | Update to PyTango 8.1.2                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
-.. _version-history:
+.. _pytango-version-history:
 
 Version history
 ---------------
