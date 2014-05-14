@@ -130,7 +130,9 @@ def __Connection__command_inout_raw(self, cmd_name, cmd_param = None):
 
 def __Connection__command_inout_asynch(self, cmd_name, *args):
     """
-    command_inout_asynch(self, cmd_name, cmd_param=None, forget=False) -> id
+    command_inout_asynch(self, cmd_name) -> id
+    command_inout_asynch(self, cmd_name, cmd_param) -> id    
+    command_inout_asynch(self, cmd_name, cmd_param, forget) -> id
     
             Execute asynchronously (polling model) a command on a device
             
@@ -139,11 +141,11 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
                 - cmd_param : (any) It should be a value of the type expected by the
                               command or a DeviceData object with this value inserted.
                               It can be ommited if the command should not get any argument.
-                              If the command sould get no argument and you want
+                              If the command should get no argument and you want
                               to set the 'forget' param, use None for cmd_param.
                 - forget    : (bool) If this flag is set to true, this means that the client
                               does not care at all about the server answer and will even
-                              not try to get it. A false default value is provided. Please,
+                              not try to get it. Default value is False. Please,
                               note that device re-connection will not take place (in case
                               it is needed) if the fire and forget mode is used. Therefore,
                               an application using only fire and forget requests is not able

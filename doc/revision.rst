@@ -99,6 +99,8 @@ Version history
 |          | - `649: write_attribute of spectrum/image fails in PyTango without numpy <https://sourceforge.net/p/tango-cs/bugs/649/>`_                                         |
 |          | - `650: [pytango] 8.1.1 not compatible with ipyton 1.2.0-rc1 <https://sourceforge.net/p/tango-cs/bugs/650/>`_                                                     |
 |          | - `651: PyTango segmentation fault when run a DS that use attr_data.py <https://sourceforge.net/p/tango-cs/bugs/651/>`_                                           |
+|          | - `660: command_inout_asynch (polling mode) fails <https://sourceforge.net/p/tango-cs/bugs/660/>`_                                                                |
+|          | - `666: PyTango shutdown sometimes blocks. <https://sourceforge.net/p/tango-cs/bugs/666/>`_                                                                       |
 +----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.1    | Features:                                                                                                                                                         |
 |          | - Implemented tango C++ 8.1 API                                                                                                                                   |
