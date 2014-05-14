@@ -9,172 +9,7 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-"""High Level API for writing Tango device servers.
-
-.. _pytango-hlapi-datatypes:
-
-.. rubric:: Data types
-
-When declaring attributes, properties or commands, one of the most important
-information is the data type. It is given by the keyword argument *dtype*.
-In order to provide a more *pythonic* interface, this argument is not restricted
-to the :obj:`~PyTango.CmdArgType` options.
-
-For example, to define a *SCALAR* :obj:`~PyTango.CmdArgType.DevLong`
-attribute you have several possibilities:
-
-#. :obj:`int`
-#. 'int'
-#. 'int32'
-#. 'integer' 
-#. :obj:`PyTango.CmdArgType.DevLong`
-#. 'DevLong' 
-#. :obj:`numpy.int32`
-
-To define a *SPECTRUM* attribute simply wrap the scalar data type in any
-python sequence:
-
-* using a *tuple*: ``(:obj:`int`,)`` or
-* using a *list*: ``[:obj:`int`]`` or
-* any other sequence type
-
-To define an *IMAGE* attribute simply wrap the scalar data type in any
-python sequence of sequences:
-
-* using a *tuple*: ``((:obj:`int`,),)`` or
-* using a *list*: ``[[:obj:`int`]]`` or
-* any other sequence type
-
-Below is the complete table of equivalences.
-
-========================================  ========================================
- type                                      tango type                             
-========================================  ========================================
- ``None``                                  ``DevVoid``
- ``'None'``                                ``DevVoid``
- ``DevVoid``                               ``DevVoid``
- ``'DevVoid'``                             ``DevVoid``
-
- ``DevState``                              ``DevState``                           
- ``'DevState'``                            ``DevState``                           
-
- :py:obj:`bool`                            ``DevBoolean``
- ``'bool'``                                ``DevBoolean``
- ``'boolean'``                             ``DevBoolean``
- ``DevBoolean``                            ``DevBoolean``
- ``'DevBoolean'``                          ``DevBoolean``
- :py:obj:`numpy.bool_`                     ``DevBoolean``
-
- ``'char'``                                ``DevUChar``
- ``'chr'``                                 ``DevUChar``
- ``'byte'``                                ``DevUChar``
- ``chr``                                   ``DevUChar``
- ``DevUChar``                              ``DevUChar``
- ``'DevUChar'``                            ``DevUChar``
- :py:obj:`numpy.uint8`                     ``DevUChar``
-
- ``'int16'``                               ``DevShort``
- ``DevShort``                              ``DevShort``
- ``'DevShort'``                            ``DevShort``
- :py:obj:`numpy.int16`                     ``DevShort``
-
- ``'uint16'``                              ``DevUShort``
- ``DevUShort``                             ``DevUShort``
- ``'DevUShort'``                           ``DevUShort``
- :py:obj:`numpy.uint16`                    ``DevUShort``
-
- :py:obj:`int`                             ``DevLong``
- ``'int'``                                 ``DevLong``
- ``'int32'``                               ``DevLong``
- ``DevLong``                               ``DevLong``
- ``'DevLong'``                             ``DevLong``
- :py:obj:`numpy.int32`                     ``DevLong``
-
- ``'uint'``                                ``DevULong``
- ``'uint32'``                              ``DevULong``
- ``DevULong``                              ``DevULong``
- ``'DevULong'``                            ``DevULong``
- :py:obj:`numpy.uint32`                    ``DevULong``
-
- ``'int64'``                               ``DevLong64``
- ``DevLong64``                             ``DevLong64``
- ``'DevLong64'``                           ``DevLong64``
- :py:obj:`numpy.int64`                     ``DevLong64``
- 
- ``'uint64'``                              ``DevULong64``
- ``DevULong64``                            ``DevULong64``
- ``'DevULong64'``                          ``DevULong64``
- :py:obj:`numpy.uint64`                    ``DevULong64``
-
- ``DevInt``                                ``DevInt``                             
- ``'DevInt'``                              ``DevInt``                             
- 
- ``'float32'``                             ``DevFloat``
- ``DevFloat``                              ``DevFloat``
- ``'DevFloat'``                            ``DevFloat``
- :py:obj:`numpy.float32`                   ``DevFloat``
- 
- :py:obj:`float`                           ``DevDouble``
- ``'double'``                              ``DevDouble``
- ``'float'``                               ``DevDouble``
- ``'float64'``                             ``DevDouble``
- ``DevDouble``                             ``DevDouble``
- ``'DevDouble'``                           ``DevDouble``
- :py:obj:`numpy.float64`                   ``DevDouble``
- 
- :py:obj:`str`                             ``DevString``
- ``'str'``                                 ``DevString``
- ``'string'``                              ``DevString``
- ``'text'``                                ``DevString``
- ``DevString``                             ``DevString``
- ``'DevString'``                           ``DevString``
- 
- :py:obj:`bytearray`                       ``DevEncoded``
- ``'bytearray'``                           ``DevEncoded``
- ``'bytes'``                               ``DevEncoded``
- ``DevEncoded``                            ``DevEncoded``
- ``'DevEncoded'``                          ``DevEncoded``
-
- ``DevVarBooleanArray``                    ``DevVarBooleanArray``
- ``'DevVarBooleanArray'``                  ``DevVarBooleanArray``
- 
- ``DevVarCharArray``                       ``DevVarCharArray``
- ``'DevVarCharArray'``                     ``DevVarCharArray``
- 
- ``DevVarShortArray``                      ``DevVarShortArray``
- ``'DevVarShortArray'``                    ``DevVarShortArray``
- 
- ``DevVarLongArray``                       ``DevVarLongArray``
- ``'DevVarLongArray'``                     ``DevVarLongArray``
- 
- ``DevVarLong64Array``                     ``DevVarLong64Array``
- ``'DevVarLong64Array'``                   ``DevVarLong64Array``
- 
- ``DevVarULong64Array``                    ``DevVarULong64Array``
- ``'DevVarULong64Array'``                  ``DevVarULong64Array``
- 
- ``DevVarFloatArray``                      ``DevVarFloatArray``
- ``'DevVarFloatArray'``                    ``DevVarFloatArray``
- 
- ``DevVarDoubleArray``                     ``DevVarDoubleArray``
- ``'DevVarDoubleArray'``                   ``DevVarDoubleArray``
- 
- ``DevVarUShortArray``                     ``DevVarUShortArray``
- ``'DevVarUShortArray'``                   ``DevVarUShortArray``
- 
- ``DevVarULongArray``                      ``DevVarULongArray``
- ``'DevVarULongArray'``                    ``DevVarULongArray``
- 
- ``DevVarStringArray``                     ``DevVarStringArray``
- ``'DevVarStringArray'``                   ``DevVarStringArray``
- 
- ``DevVarLongStringArray``                 ``DevVarLongStringArray``
- ``'DevVarLongStringArray'``               ``DevVarLongStringArray``
- 
- ``DevVarDoubleStringArray``               ``DevVarDoubleStringArray``
- ``'DevVarDoubleStringArray'``             ``DevVarDoubleStringArray``
-========================================  ========================================
-"""
+"""Server helper classes for writing Tango device servers."""
 
 from __future__ import with_statement
 from __future__ import print_function
@@ -595,23 +430,31 @@ def _attribute(**kwargs):
 
 def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
             dtype_out=None, dformat_out=None, doc_out="",):
-    """declares a new tango command in a :class:`Device`.
+    """
+    Declares a new tango command in a :class:`Device`.
     To be used like a decorator in the methods you want to declare as tango
-    commands. For example, to declare a *ramp* command that receives a
-    `PyTango.DevDouble` parameter called *current*, do::
+    commands. The following example declares commands:
+
+        * `void TurnOn(void)`
+        * `void Ramp(DevDouble current)`
+        * `DevBool Pressurize(DevDouble pressure)`
+    
+    ::
 
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
-            
+
+            @command
+            def TurnOn(self):
+                self.info_stream("Turning on the power supply")
+    
             @command(dtype_in=float)
-            def ramp(self, current):
+            def Ramp(self, current):
                 self.info_stream("Ramping on %f..." % current)
 
-            # Another more elaborate command
-            
             @command(dtype_in=float, doc_in="the pressure to be set",
                      dtype_out=bool, doc_out="True if it worked, False otherwise")
-            def pressurize(self, pressure):
+            def Pressurize(self, pressure):
                 self.info_stream("Pressurizing to %f..." % pressure)
 
     .. note::
@@ -706,9 +549,10 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
                  event_loop=None, post_init_callback=None):
     import PyTango
     if msg_stream is None:
-        import io
-        msg_stream = io.BytesIO()
-
+        write = lambda msg: None
+    else:
+        write = msg_stream.write
+        
     if args is None:
         args = sys.argv
 
@@ -742,98 +586,100 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
         u_instance.server_set_event_loop(event_loop)
     u_instance.server_init()
     post_init_callback()
-    msg_stream.write("Ready to accept request\n")
+    write("Ready to accept request\n")
     u_instance.server_run()
     return util
 
 
-def server_run(classes, args=None, msg_stream=sys.stdout,
-               verbose=False, util=None, event_loop=None,
-               post_init_callback=None):
-    """Provides a simple way to run a tango server. It handles exceptions
-       by writting a message to the msg_stream.
+def run(classes, args=None, msg_stream=sys.stdout,
+        verbose=False, util=None, event_loop=None,
+        post_init_callback=None):
+    """
+    Provides a simple way to run a tango server. It handles exceptions
+    by writting a message to the msg_stream.
 
-       The `classes` parameter can be either a sequence of :class:`~PyTango.server.Device`
-       classes or a dictionary where:
+    The `classes` parameter can be either a sequence of :class:`~PyTango.server.Device`
+    classes or a dictionary where:
 
-       The optional `post_init_callback` can be a callable (without arguments)
-       or a tuple where the first element is the callable, the second is a list
-       of arguments(optional) and the third is a dictionary of keyword arguments
-       (also optional). Examples::
-       
-       * key is the tango class name
-       * value is either:
-           #. a :class:`~PyTango.server.Device` class or
-           #. a a sequence of two elements :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`
+    * key is the tango class name
+    * value is either:
+        * a :class:`~PyTango.server.Device` class or
+        * a sequence of two elements :class:`~PyTango.DeviceClass` , :class:`~PyTango.DeviceImpl`
 
-       Example 1: registering and running a PowerSupply inheriting from :class:`~PyTango.server.Device`::
-       
-           from PyTango import server_run
-           from PyTango.server import Device, DeviceMeta
-       
-           class PowerSupply(Device):
-               __metaclass__ = DeviceMeta
-               
-           server_run((PowerSupply,))
+    The optional `post_init_callback` can be a callable (without arguments)
+    or a tuple where the first element is the callable, the second is a list
+    of arguments(optional) and the third is a dictionary of keyword arguments
+    (also optional).
            
-       Example 2: registering and running a MyServer defined by tango classes 
-       `MyServerClass` and `MyServer`::
+    Example 1: registering and running a PowerSupply inheriting from :class:`~PyTango.server.Device`::
        
-           import PyTango
-
-           class MyServer(PyTango.Device_4Impl):
-               pass
+        from PyTango.server import Device, DeviceMeta, run
+       
+        class PowerSupply(Device):
+            __metaclass__ = DeviceMeta
                
-           class MyServerClass(PyTango.DeviceClass):
-               pass
+        run((PowerSupply,))
+           
+    Example 2: registering and running a MyServer defined by tango classes 
+    `MyServerClass` and `MyServer`::
        
-           PyTango.server_run({"MyServer": (MyServerClass, MyServer)})
+        import PyTango
+        from PyTango.server import run
+    
+        class MyServer(PyTango.Device_4Impl):
+            pass
+               
+        class MyServerClass(PyTango.DeviceClass):
+            pass
        
-       :param classes:
-           a sequence of :class:`~PyTango.server.Device` classes or
-           a dictionary where keyword is the tango class name and value is a 
-           sequence of Tango Device Class python class, and Tango Device python class
-       :type classes: sequence or dict
+        run({"MyServer": (MyServerClass, MyServer)})
        
-       :param args:
-           list of command line arguments [default: None, meaning use sys.argv]
-       :type args: list
+    :param classes:
+        a sequence of :class:`~PyTango.server.Device` classes or
+        a dictionary where keyword is the tango class name and value is a 
+        sequence of Tango Device Class python class, and Tango Device python class
+    :type classes: sequence or dict
        
-       :param msg_stream:
-           stream where to put messages [default: sys.stdout]
+    :param args:
+        list of command line arguments [default: None, meaning use sys.argv]
+    :type args: list
        
-       :param util:
-           PyTango Util object [default: None meaning create a Util instance]
-       :type util: :class:`~PyTango.Util`
+    :param msg_stream:
+        stream where to put messages [default: sys.stdout]
+       
+    :param util:
+        PyTango Util object [default: None meaning create a Util instance]
+    :type util: :class:`~PyTango.Util`
 
-       :param event_loop: event_loop callable
-       :type event_loop: callable
+    :param event_loop: event_loop callable
+    :type event_loop: callable
        
-       :param post_init_callback: an optional callback that is executed between
-                                  the calls Util.server_init and Util.server_run
-       :type post_init_callback: callable or tuple (see description above)
+    :param post_init_callback:
+        an optional callback that is executed between the calls Util.server_init
+        and Util.server_run
+    :type post_init_callback: callable or tuple (see description above)
 
-       :return: The Util singleton object
-       :rtype: :class:`~PyTango.Util`
+    :return: The Util singleton object
+    :rtype: :class:`~PyTango.Util`
        
-       .. versionadded:: 8.0.0
+    .. versionadded:: 8.0.0
        
-       .. versionchanged:: 8.0.3
-           Added `util` keyword parameter.
-           Returns util object
+    .. versionchanged:: 8.0.3
+        Added `util` keyword parameter.
+        Returns util object
 
-       .. versionchanged:: 8.1.1
-           Changed default msg_stream from *stderr* to *stdout*
-           Added `event_loop` keyword parameter.
-           Returns util object
+    .. versionchanged:: 8.1.1
+        Changed default msg_stream from *stderr* to *stdout*
+        Added `event_loop` keyword parameter.
+        Returns util object
 
-       .. versionchanged:: 8.1.2
-           Added `post_init_callback` keyword parameter
+    .. versionchanged:: 8.1.2
+        Added `post_init_callback` keyword parameter
     """
     if msg_stream is None:
-        import io
-        msg_stream = io.BytesIO()
-    write = msg_stream.write
+        write = lambda msg : None
+    else:
+        write = msg_stream.write
     try:
         return __server_run(classes, args=args, msg_stream=msg_stream,
                             util=util, event_loop=event_loop,
@@ -850,14 +696,14 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
             write(traceback.format_exc())
     write("\nExited\n")
 
-def run(classes, args=None, msg_stream=sys.stdout,
+def server_run(classes, args=None, msg_stream=sys.stdout,
         verbose=False, util=None, event_loop=None,
         post_init_callback=None):
-    """Just an alias to :func:`~PyTango.server.server_run`
     """
-    return server_run(classes, args=args, msg_stream=msg_stream,
-                      verbose=verbose, util=util, event_loop=event_loop,
-                      post_init_callback=post_init_callback)
-
-run.__doc__ += server_run.__doc__
+    Just an alias to :func:`~PyTango.server.run`.
+    Use :func:`~PyTango.server.run` instead.
+    """
+    return run(classes, args=args, msg_stream=msg_stream,
+               verbose=verbose, util=util, event_loop=event_loop,
+               post_init_callback=post_init_callback)
 

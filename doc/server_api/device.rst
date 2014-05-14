@@ -1,5 +1,5 @@
-Device classes
-==============
+Device
+======
 
 .. currentmodule:: PyTango
 

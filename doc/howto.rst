@@ -3,6 +3,8 @@
 .. highlight:: python
    :linenothreshold: 3
 
+.. _pytango-howto:
+
 ======
 How to
 ======
@@ -10,8 +12,16 @@ How to
 Check the default TANGO host
 ----------------------------
 
-.. todo::
-   write this how to
+The default TANGO host can be defined using the environment variable 
+:envvar:`TANGO_HOST` or in a `tangorc` file.
+(see `Tango environment variables <http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node11.html#SECTION0011123000000000000000>`_
+for complete information)
+To check what is the current value that TANGO uses for the default configuration
+simple do::
+ 
+    >>> import PyTango
+    >>> PyTango.ApiUtil.get_env_var("TANGO_HOST")
+    'homer.simpson.com:10000'
 
 
 Work with Groups
@@ -29,14 +39,35 @@ Handle errors
 Check TANGO version
 -------------------
 
-.. todo:: 
-   write this how to
+There are two library versions you might be interested in checking:
+The PyTango version::
+
+    >>> import PyTango
+    >>> PyTango.__version__
+    '8.1.1'
+
+    >>> PyTango.__version_info__
+    (8, 1, 1, 'final', 0)
+
+... and the Tango C++ library version that PyTango was compiled with::
+
+    >>> import PyTango
+    >>> PyTango.constants.TgLibVers
+    '8.1.2'
+
 
 Report a bug
 ------------
 
-.. todo:: 
-   write this how to
+Bugs can be reported `TANGO Source forge tickets <https://sourceforge.net/p/tango-cs/bugs/>`_.
+
+When making a bug report don't forget to select *PyTango* in **Category**.
+
+It is also helpfull if you can put in the ticket description the PyTango information.
+It can be a dump of::
+
+   $ python -c "from PyTango.utils import info; print(info())"
+
 
 Write a server
 --------------
@@ -273,12 +304,54 @@ will output something like::
     1282221947 [-1261438096] DEBUG test/pydsexp/1 46 <- IOLong()
 
 
-Mix multiple device classes in a server
----------------------------------------
+Mix multiple device classes (Python and C++) in a server
+--------------------------------------------------------
 
-.. todo::
-   write this how to
+Within the same python interpreter, it is possible to mix several Tango classes.
+Here is an example of the main function of a device server with two Tango classes
+called IRMiror and PLC::
 
+    import PyTango
+    import sys
+
+    if __name__ == '__main__':
+        util = PyTango.Util(sys.argv)
+        util.add_class(PLCClass, PLC, 'PLC')
+        util.add_class(IRMirrorClass, IRMirror, 'IRMirror')
+        
+        U = PyTango.Util.instance()
+        U.server_init()
+        U.server_run()
+
+:Line 6: The Tango class PLC is registered in the device server
+:Line 7: The Tango class IRMirror is registered in the device server
+
+It is also possible to add C++ Tango class in a Python device server as soon as:
+    1. The Tango class is in a shared library
+    2. It exist a C function to create the Tango class
+
+For a Tango class called MyTgClass, the shared library has to be called 
+MyTgClass.so and has to be in a directory listed in the LD_LIBRARY_PATH 
+environment variable. The C function creating the Tango class has to be called 
+_create_MyTgClass_class() and has to take one parameter of type "char \*" which 
+is the Tango class name. Here is an example of the main function of the same 
+device server than before but with one C++ Tango class called SerialLine::
+
+    import PyTango
+    import sys
+    
+    if __name__ == '__main__':
+        py = PyTango.Util(sys.argv)
+        util.add_class('SerialLine', 'SerialLine', language="c++")
+        util.add_class(PLCClass, PLC, 'PLC')
+        util.add_class(IRMirrorClass, IRMirror, 'IRMirror')
+        
+        U = PyTango.Util.instance()
+        U.server_init()
+        U.server_run()
+
+:Line 6: The C++ class is registered in the device server
+:Line 7 and 8: The two Python classes are registered in the device server
 
 Create attributes dynamically
 -----------------------------

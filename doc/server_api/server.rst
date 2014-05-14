@@ -3,8 +3,18 @@
 
 .. _pytango-hlapi:
 
-High Level API
-==============
+High level server API
+=====================
+
+.. hlist::
+
+   * :class:`~PyTango.server.Device`
+   * :class:`~PyTango.server.attribute`
+   * :class:`~PyTango.server.command`
+   * :class:`~PyTango.server.device_property`
+   * :class:`~PyTango.server.class_property`
+   * :func:`~PyTango.server.run`
+   * :func:`~PyTango.server.server_run`
 
 This module provides a high level device server API. It implements
 :ref:`TEP1 <pytango-TEP1>`. It exposes an easier API for developing a Tango
@@ -109,31 +119,183 @@ using the high level API. The example contains:
         class PowerSupply(Device, metaclass=DeviceMeta)
             pass
 
-API
----
+.. _pytango-hlapi-datatypes:
 
-.. hlist::
+.. rubric:: Data types
 
-   * :class:`~PyTango.server.Device`
-   * :class:`~PyTango.server.attribute`
-   * :class:`~PyTango.server.command`
-   * :class:`~PyTango.server.device_property`
-   * :class:`~PyTango.server.class_property`
-   * :func:`~PyTango.server.server_run`
+When declaring attributes, properties or commands, one of the most important
+information is the data type. It is given by the keyword argument *dtype*.
+In order to provide a more *pythonic* interface, this argument is not restricted
+to the :obj:`~PyTango.CmdArgType` options.
 
-.. automodule:: PyTango.server
+For example, to define a *SCALAR* :obj:`~PyTango.CmdArgType.DevLong`
+attribute you have several possibilities:
 
-   .. autoclass:: Device
-      :show-inheritance:
-      :inherited-members:
-      :members:
+#. :obj:`int`
+#. 'int'
+#. 'int32'
+#. 'integer' 
+#. :obj:`PyTango.CmdArgType.DevLong`
+#. 'DevLong' 
+#. :obj:`numpy.int32`
 
-   .. autoclass:: attribute
+To define a *SPECTRUM* attribute simply wrap the scalar data type in any
+python sequence:
 
-   .. autofunction:: command
+* using a *tuple*: ``(:obj:`int`,)`` or
+* using a *list*: ``[:obj:`int`]`` or
+* any other sequence type
 
-   .. autoclass:: device_property
+To define an *IMAGE* attribute simply wrap the scalar data type in any
+python sequence of sequences:
 
-   .. autoclass:: class_property
+* using a *tuple*: ``((:obj:`int`,),)`` or
+* using a *list*: ``[[:obj:`int`]]`` or
+* any other sequence type
 
-   .. autofunction:: server_run
+Below is the complete table of equivalences.
+
+========================================  ========================================
+dtype argument                            converts to tango type                             
+========================================  ========================================
+ ``None``                                  ``DevVoid``
+ ``'None'``                                ``DevVoid``
+ ``DevVoid``                               ``DevVoid``
+ ``'DevVoid'``                             ``DevVoid``
+
+ ``DevState``                              ``DevState``                           
+ ``'DevState'``                            ``DevState``                           
+
+ :py:obj:`bool`                            ``DevBoolean``
+ ``'bool'``                                ``DevBoolean``
+ ``'boolean'``                             ``DevBoolean``
+ ``DevBoolean``                            ``DevBoolean``
+ ``'DevBoolean'``                          ``DevBoolean``
+ :py:obj:`numpy.bool_`                     ``DevBoolean``
+
+ ``'char'``                                ``DevUChar``
+ ``'chr'``                                 ``DevUChar``
+ ``'byte'``                                ``DevUChar``
+ ``chr``                                   ``DevUChar``
+ ``DevUChar``                              ``DevUChar``
+ ``'DevUChar'``                            ``DevUChar``
+ :py:obj:`numpy.uint8`                     ``DevUChar``
+
+ ``'int16'``                               ``DevShort``
+ ``DevShort``                              ``DevShort``
+ ``'DevShort'``                            ``DevShort``
+ :py:obj:`numpy.int16`                     ``DevShort``
+
+ ``'uint16'``                              ``DevUShort``
+ ``DevUShort``                             ``DevUShort``
+ ``'DevUShort'``                           ``DevUShort``
+ :py:obj:`numpy.uint16`                    ``DevUShort``
+
+ :py:obj:`int`                             ``DevLong``
+ ``'int'``                                 ``DevLong``
+ ``'int32'``                               ``DevLong``
+ ``DevLong``                               ``DevLong``
+ ``'DevLong'``                             ``DevLong``
+ :py:obj:`numpy.int32`                     ``DevLong``
+
+ ``'uint'``                                ``DevULong``
+ ``'uint32'``                              ``DevULong``
+ ``DevULong``                              ``DevULong``
+ ``'DevULong'``                            ``DevULong``
+ :py:obj:`numpy.uint32`                    ``DevULong``
+
+ ``'int64'``                               ``DevLong64``
+ ``DevLong64``                             ``DevLong64``
+ ``'DevLong64'``                           ``DevLong64``
+ :py:obj:`numpy.int64`                     ``DevLong64``
+ 
+ ``'uint64'``                              ``DevULong64``
+ ``DevULong64``                            ``DevULong64``
+ ``'DevULong64'``                          ``DevULong64``
+ :py:obj:`numpy.uint64`                    ``DevULong64``
+
+ ``DevInt``                                ``DevInt``                             
+ ``'DevInt'``                              ``DevInt``                             
+ 
+ ``'float32'``                             ``DevFloat``
+ ``DevFloat``                              ``DevFloat``
+ ``'DevFloat'``                            ``DevFloat``
+ :py:obj:`numpy.float32`                   ``DevFloat``
+ 
+ :py:obj:`float`                           ``DevDouble``
+ ``'double'``                              ``DevDouble``
+ ``'float'``                               ``DevDouble``
+ ``'float64'``                             ``DevDouble``
+ ``DevDouble``                             ``DevDouble``
+ ``'DevDouble'``                           ``DevDouble``
+ :py:obj:`numpy.float64`                   ``DevDouble``
+ 
+ :py:obj:`str`                             ``DevString``
+ ``'str'``                                 ``DevString``
+ ``'string'``                              ``DevString``
+ ``'text'``                                ``DevString``
+ ``DevString``                             ``DevString``
+ ``'DevString'``                           ``DevString``
+ 
+ :py:obj:`bytearray`                       ``DevEncoded``
+ ``'bytearray'``                           ``DevEncoded``
+ ``'bytes'``                               ``DevEncoded``
+ ``DevEncoded``                            ``DevEncoded``
+ ``'DevEncoded'``                          ``DevEncoded``
+
+ ``DevVarBooleanArray``                    ``DevVarBooleanArray``
+ ``'DevVarBooleanArray'``                  ``DevVarBooleanArray``
+ 
+ ``DevVarCharArray``                       ``DevVarCharArray``
+ ``'DevVarCharArray'``                     ``DevVarCharArray``
+ 
+ ``DevVarShortArray``                      ``DevVarShortArray``
+ ``'DevVarShortArray'``                    ``DevVarShortArray``
+ 
+ ``DevVarLongArray``                       ``DevVarLongArray``
+ ``'DevVarLongArray'``                     ``DevVarLongArray``
+ 
+ ``DevVarLong64Array``                     ``DevVarLong64Array``
+ ``'DevVarLong64Array'``                   ``DevVarLong64Array``
+ 
+ ``DevVarULong64Array``                    ``DevVarULong64Array``
+ ``'DevVarULong64Array'``                  ``DevVarULong64Array``
+ 
+ ``DevVarFloatArray``                      ``DevVarFloatArray``
+ ``'DevVarFloatArray'``                    ``DevVarFloatArray``
+ 
+ ``DevVarDoubleArray``                     ``DevVarDoubleArray``
+ ``'DevVarDoubleArray'``                   ``DevVarDoubleArray``
+ 
+ ``DevVarUShortArray``                     ``DevVarUShortArray``
+ ``'DevVarUShortArray'``                   ``DevVarUShortArray``
+ 
+ ``DevVarULongArray``                      ``DevVarULongArray``
+ ``'DevVarULongArray'``                    ``DevVarULongArray``
+ 
+ ``DevVarStringArray``                     ``DevVarStringArray``
+ ``'DevVarStringArray'``                   ``DevVarStringArray``
+ 
+ ``DevVarLongStringArray``                 ``DevVarLongStringArray``
+ ``'DevVarLongStringArray'``               ``DevVarLongStringArray``
+ 
+ ``DevVarDoubleStringArray``               ``DevVarDoubleStringArray``
+ ``'DevVarDoubleStringArray'``             ``DevVarDoubleStringArray``
+========================================  ========================================
+
+.. autoclass:: Device
+   :show-inheritance:
+   :inherited-members:
+   :members:
+
+.. autoclass:: attribute
+
+.. autofunction:: command
+
+.. autoclass:: device_property
+
+.. autoclass:: class_property
+
+.. autofunction:: run
+
+.. autofunction:: server_run
