@@ -184,9 +184,11 @@ namespace PyUtil
     
     boost::python::str get_dserver_ior(Tango::Util& self, Tango::DServer* dserver)
     {
-        const char *ior = self.get_orb()->object_to_string(dserver->_this());
-        boost::python::str ret = ior;
-        delete [] ior;
+        Tango::Device_var d = dserver->_this();
+	dserver->set_d_var(Tango::Device::_duplicate(d));
+        const char *dserver_ior = self.get_orb()->object_to_string(d);
+        boost::python::str ret = dserver_ior;
+        delete [] dserver_ior;
         return ret;
     }
 
