@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-import database
-
-def main():
-    database.main(embedded=True)
+from database import main
     
 if __name__ == '__main__':
     main()

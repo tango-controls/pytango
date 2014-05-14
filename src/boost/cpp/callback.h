@@ -65,7 +65,8 @@ public:
 class PyCallBackPushEvent : public Tango::CallBack , public boost::python::wrapper<Tango::CallBack>
 {
 public:
-    PyCallBackPushEvent() : m_weak_device(0), m_extract_as(PyTango::ExtractAsNumpy) {}
+    PyCallBackPushEvent() : m_weak_device(0), m_extract_as(PyTango::ExtractAsNumpy)
+    {}
     virtual ~PyCallBackPushEvent();
 
     //! The object that will call this callback (DeviceProxy), so we can
@@ -78,8 +79,7 @@ public:
     void set_extract_as(PyTango::ExtractAs extract_as)
     {   this->m_extract_as = extract_as; }
 
-    boost::python::object get_override(const char* name)
-    { return boost::python::wrapper<Tango::CallBack>::get_override(name); }
+    boost::python::object get_override(const char* name);
     
 //     virtual void cmd_ended(Tango::CmdDoneEvent * ev);
 //     virtual void attr_read(Tango::AttrReadEvent *ev);

@@ -254,6 +254,11 @@ namespace {
 }
 
 
+boost::python::object PyCallBackPushEvent::get_override(const char* name)
+{ 
+    return boost::python::wrapper<Tango::CallBack>::get_override(name); 
+}
+
 
 void PyCallBackPushEvent::fill_py_event(Tango::EventData* ev, object & py_ev, object py_device, PyTango::ExtractAs extract_as)
 {

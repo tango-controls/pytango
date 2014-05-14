@@ -40,6 +40,18 @@ import time
 
 import logging
 
+try:
+    import argparse
+except ImportError:
+    argparse = None
+    from optparse import OptionParser
+
+from PyTango.globals import get_class, get_class_by_class, \
+    get_constructed_class_by_class
+
+#Argument Options
+global options
+
 class DbInter(PyTango.Interceptors):
 
     def create_thread(self):
@@ -63,11 +75,6 @@ import db_access
 th_exc = PyTango.Except.throw_exception
 
 from db_errors import *
-
-DB_FRONTED = {
-    "sqlite3" : "db2",
-    "pyodbc" : "pyodbc"
-}
 
 def check_device_name(dev_name):
     if '*' in dev_name:
@@ -182,12 +189,12 @@ class DataBase (PyTango.Device_4Impl):
         self.attr_Timing_info_read = ['']
         self.init_timing_stats()
         #----- PROTECTED REGION ID(DataBase.init_device) ENABLED START -----#
-
-        self.db = db_access.Tango_sqlite3()
+        m = __import__('db_access.%s' % (options.db_access),None,None,
+                       'db_access.%s' % (options.db_access))
+        self.db = m.get_db()
 
         self.set_state(PyTango.DevState.ON)
 
-        logging.info("Finished init_device")
         #----- PROTECTED REGION END -----#	//	DataBase.init_device
 
 #------------------------------------------------------------------
@@ -948,7 +955,7 @@ class DataBase (PyTango.Device_4Impl):
         #----- PROTECTED REGION ID(DataBase.DbGetClassForDevice) ENABLED START -----#
 
         argout = self.db.get_class_for_device(argin)
-
+        print argout
         #----- PROTECTED REGION END -----#	//	DataBase.DbGetClassForDevice
         return argout
 
@@ -2843,36 +2850,94 @@ class DataBaseClass(PyTango.DeviceClass):
     def __init__(self, name):
         PyTango.DeviceClass.__init__(self, name)
         self.set_type(name);
-        print "In DataBase Class  constructor"
 
     def device_factory(self, names):
         names = [get_db_name()]
         return PyTango.DeviceClass.device_factory(self, names)
 
+    def device_factory(self, device_list):
+        """for internal usage only"""
+
+        dev_name = get_db_name()
+        
+        klass = self.__class__
+        klass_name = klass.__name__
+        info, klass = get_class_by_class(klass), get_constructed_class_by_class(klass)
+        
+        if info is None:
+            raise RuntimeError("Device class '%s' is not registered" % klass_name)
+
+        if klass is None:
+            raise RuntimeError("Device class '%s' as not been constructed" % klass_name)
+        
+        deviceClassClass, deviceImplClass, deviceImplName = info
+        deviceImplClass._device_class_instance = klass
+
+        device = deviceImplClass(klass, dev_name)
+        self._add_device(device)
+        tmp_dev_list = [device]
+
+        self.dyn_attr(tmp_dev_list)
+
+        self.export_device(device, "database")
+        self.py_dev_list += tmp_dev_list
+        
 #==================================================================
 #
 #    DataBase class main method
 #
 #==================================================================
+def main():
+    #Parameters management
+    global options
+    if argparse:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--db_access",dest="db_access",default="sqlite3",
+                            help="database type")
+        parser.add_argument("-e", "--embedded",dest="embedded",default=False,
+                            action="store_true")
+        parser.add_argument('argv',nargs=argparse.REMAINDER)
+        options = parser.parse_args()
+        options.argv = ["DataBaseds"] + options.argv
+    else:
+        parser = OptionParser()
+        parser.add_option("--db_access",dest="db_access",default="sqlite3",
+                          help="database type")
+        parser.add_option("-e","--embedded",dest="embedded",default=False,
+                          action="store_true")
+        (options,args) = parser.parse_args()
+        options.argv = ["DataBaseds"] + args
 
-def __run():
-    """Runs the Database DS as a standalone database"""
+    log_fmt = '%(threadName)-14s %(levelname)-8s %(asctime)s %(name)s: %(message)s'
+    logging.basicConfig(format=log_fmt, stream=sys.stdout, level=logging.INFO)
+    try:
+        db_name = "sys/database/" + options.argv[1]
+        set_db_name(db_name)
+        if options.embedded:
+            __run_embedded(db_name, options.argv)
+        else:
+            __run(db_name, options.argv)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
 
-    db_name = "sys/database/" + sys.argv[1]
-    set_db_name(db_name)
-
+def __run(db_name,argv):
+    """
+    Runs the Database DS as a standalone database. Run it with::
+    
+        ./DataBaseds pydb-test -ORBendPoint giop:tcp::11000
+    """
     PyTango.Util.set_use_db(False)
-    py_util = PyTango.Util(sys.argv)
+    py_util = PyTango.Util(argv)
     py_util.add_class(DataBaseClass, DataBase, 'DataBase')
 
     util = PyTango.Util.instance()
     dbi = DbInter()
     util.set_interceptors(dbi)
-    util.set_serial_model(PyTango.SerialModel.NO_SYNC)
+    #util.set_serial_model(PyTango.SerialModel.NO_SYNC)
     util.server_init()
 
     dserver = util.get_dserver_device()
-    dserver.duplicate_d_var()
     dserver_name = dserver.get_name()
     dserver_ior = util.get_dserver_ior(dserver)
 
@@ -2889,42 +2954,19 @@ def __run():
 
     print("Ready to accept request")
     util.orb_run()
+#    util.server_run()
 
-
-def __run_embedded():
+def __run_embedded(db_name,argv):
     """Runs the Database device server embeded in another TANGO Database
     (just like any other TANGO device server)"""
 
-    db_name = "sys/database/" + sys.argv[1]
-    set_db_name(db_name)
-
-    py_util = PyTango.Util(sys.argv)
+    py_util = PyTango.Util(argv)
     py_util.add_class(DataBaseClass, DataBase, 'DataBase')
 
     util = PyTango.Util.instance()
     util.server_init()
     print("Ready to accept request")
     util.server_run()
-
-
-def main(embedded=False):
-    log_fmt = '%(threadName)s %(levelname)-8s %(asctime)s %(name)s: %(message)s'
-    logging.basicConfig(format=log_fmt, stream=sys.stdout, level=logging.INFO)
-    
-    f = __run
-    if embedded:
-        f = __run_embedded
-    try:
-        return f()
-    except PyTango.DevFailed as df:
-        print '-------> Received a DevFailed exception:', df
-        import traceback;
-        traceback.print_exc()
-    except Exception as e:
-        print '-------> An unforeseen exception occured....', e
-        import traceback;
-        traceback.print_exc()
-
     
 if __name__ == '__main__':
-    run_embeded()
+    main()

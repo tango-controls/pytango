@@ -20,9 +20,11 @@ INSERT INTO object_history_id VALUES (0);
 
 INSERT INTO device VALUES ('sys/database/2',NULL,'sys','database','2','nada','nada','nada','DataBaseds/2','nada','DataBase','nada','nada','nada','nada');
 INSERT INTO device VALUES ('dserver/DataBaseds/2',NULL,'dserver','DataBaseds','2','nada','nada','nada','DataBaseds/2','nada','DServer','nada','nada','nada','nada');
+INSERT INTO server VALUES ('databaseds/2','',0,0);
 
 INSERT INTO device VALUES ('sys/database/pydb-test',NULL,'sys','database','pydb-test','nada','nada','nada','DataBaseds/pydb-test','nada','DataBase','nada','nada','nada','nada');
-INSERT INTO device VALUES ('dserver/DataBaseds/pydb-test',NULL,'dserver','DataBaseds','2','nada','nada','nada','DataBaseds/pydb-test','nada','DServer','nada','nada','nada','nada');
+INSERT INTO device VALUES ('dserver/DataBaseds/pydb-test',NULL,'dserver','DataBaseds','pydb-test','nada','nada','nada','DataBaseds/pydb-test','nada','DServer','nada','nada','nada','nada');
+INSERT INTO server VALUES ('databaseds/pydb-test','',0,0);
 
 #
 # Create entry for test device server in device table
@@ -30,6 +32,7 @@ INSERT INTO device VALUES ('dserver/DataBaseds/pydb-test',NULL,'dserver','DataBa
 
 INSERT INTO device VALUES ('sys/tg_test/1',NULL,'sys','tg_test','1','nada','nada','nada','TangoTest/test','nada','TangoTest','nada','nada','nada','nada');
 INSERT INTO device VALUES ('dserver/TangoTest/test',NULL,'dserver','TangoTest','test','nada','nada','nada','TangoTest/test','nada','DServer','nada','nada','nada','nada');
+INSERT INTO server VALUES ('tangotest/test','',0,0);
 
 #
 # Create entry for Tango Control Access in device table
