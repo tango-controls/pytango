@@ -1,4 +1,4 @@
-.. currentmodule:: PyTang
+.. currentmodule:: PyTango
 
 .. _pytango-data-types:
 
