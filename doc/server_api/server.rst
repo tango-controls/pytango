@@ -6,6 +6,8 @@
 High level server API
 =====================
 
+.. automodule:: PyTango.server
+
 .. hlist::
 
    * :class:`~PyTango.server.Device`

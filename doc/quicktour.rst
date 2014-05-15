@@ -201,7 +201,9 @@ Here is the code for the :file:`PowerSupplyDS.py`
 .. literalinclude:: _static/PowerSupplyDS.py
     :linenos:
 
-The server API :ref:`pytango-hlapi`.
+Check the :ref:`high level server API <pytango-hlapi>` for the complete
+reference API. The :ref:`write a server how to <pytango-howto-server>` can help
+as well.
 
 Before running this brand new server we need to register it in the Tango system.
 You can do it with Jive (`Jive->Edit->Create server`):

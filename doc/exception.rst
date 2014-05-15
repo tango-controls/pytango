@@ -3,6 +3,8 @@
 .. highlight:: python
    :linenothreshold: 4
 
+.. _pytango-exception-api:
+
 Exception API
 =============
 
@@ -55,21 +57,21 @@ all of which containing the following kind of key-value pairs:
 Throwing exception in a device server
 -------------------------------------
 
-The C++ Tango::Except class with its most important methods have been wrapped to Python.
-Therefore, in a Python device server, you have the following methods to throw, re-throw or
-print a Tango::DevFailed exception :
+The C++ :class:`~PyTango::Except` class with its most important methods have 
+been wrapped to Python. Therefore, in a Python device server, you have the 
+following methods to throw, re-throw or print a Tango::DevFailed exception :
 
-- *throw_exception()* which is a static method
-- *re_throw_exception()* which is also a static method
-- *print_exception()* which is also a static method
+- :meth:`~PyTango.Except.throw_exception` which is a static method
+- :meth:`~PyTango.Except.re_throw_exception` which is also a static method
+- :meth:`~PyTango.Except.print_exception` which is also a static method
 
-The following code is an example of a command method requesting a command on a sub-device and re-throwing
-the exception in case of::
+The following code is an example of a command method requesting a command on a
+sub-device and re-throwing the exception in case of::
 
     try:
         dev.command_inout("SubDevCommand")
-    except PyTango.DevFailed, e:
-        PyTango.Except.re_throw_exception(e,
+    except PyTango.DevFailed as df:
+        PyTango.Except.re_throw_exception(df,
             "MyClass_CommandFailed",
             "Sub device command SubdevCommand failed",
             "Command()")

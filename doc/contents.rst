@@ -9,10 +9,11 @@ Contents
 
 .. toctree::
     :maxdepth: 2
+    :titlesonly:
 
     start
     quicktour
-    itango/index
+    ITango <itango>
     green
     API <api>
     How to <howto>

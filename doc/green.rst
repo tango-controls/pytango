@@ -1,7 +1,7 @@
 .. currentmodule:: PyTango
 
-Green 
------
+Green mode
+----------
 
 PyTango supports cooperative green Tango objects. Since version 8.1 two *green*
 modes have been added: :obj:`~PyTango.GreenMode.Futures` and
@@ -13,8 +13,8 @@ The :obj:`~PyTango.GreenMode.Gevent` mode uses the well known gevent_ library.
 
 Currently, in version 8.1, only :class:`DeviceProxy` has been modified to work
 in a green cooperative way. If the work is found to be useful, the same can
-be implemented in the future for :class:`AttributeProxy` and even 
-to :class:`Database`.
+be implemented in the future for :class:`AttributeProxy`, :class:`Database`, 
+:class:`Group` or even in the server side.
 
 You can set the PyTango green mode at a global level. Set the environment
 variable :envvar:`PYTANGO_GREEN_MODE` to either *futures* or *gevent*

@@ -9,6 +9,10 @@
 How to
 ======
 
+This is a small list of how-tos specific to PyTango. A more general Tango how-to
+list can be found `here <http://www.tango-controls.org/howtos>`_.
+
+
 Check the default TANGO host
 ----------------------------
 
@@ -59,7 +63,7 @@ The PyTango version::
 Report a bug
 ------------
 
-Bugs can be reported `TANGO Source forge tickets <https://sourceforge.net/p/tango-cs/bugs/>`_.
+Bugs can be reported as tickets in `TANGO Source forge <https://sourceforge.net/p/tango-cs/bugs/>`_.
 
 When making a bug report don't forget to select *PyTango* in **Category**.
 
@@ -68,6 +72,7 @@ It can be a dump of::
 
    $ python -c "from PyTango.utils import info; print(info())"
 
+.. _pytango-howto-server:
 
 Write a server
 --------------
@@ -82,7 +87,10 @@ development of a Tango device server. This helper is provided through the
 :mod:`PyTango.server` module.
 
 Here is a simple example on how to write a *Clock* device server using the
-high level API::
+high level API
+
+.. code-block:: python
+   :linenos:
     
     import time
     from PyTango.server import run
@@ -104,10 +112,43 @@ high level API::
 
 
     if __name__ == "__main__":
-        run((Clock,))
+        run([Clock])
 
 
-Here is a more complete  example on how to write a *PowerSupply* device server
+**line 2-4**
+    import the necessary symbols
+
+**line 7**
+    tango device class definition. A Tango device must inherit from 
+    :class:`PyTango.server.Device`
+
+**line 8**
+    mandatory *magic* line. A Tango device must define the metaclass as
+    :class:`PyTango.server.DeviceClass`. This has to be done due to a limitation
+    on boost-python
+
+**line 10**
+    definition of the *time* attribute. By default, attributes are double, scalar, 
+    read-only. Check the :class:`~PyTango.server.attribute` for the complete
+    list of attribute options
+
+**line 12-13**
+    the method that is called when a client reads the *time* attribute from this
+    device. By default, Tango expects a method called ``read_<attribute name>``
+    to exist for every attribute
+
+**line 15-17**
+    the method *strftime* is exported as a Tango command. In receives a string
+    as argument and it returns a string. If a method is to be exported as a
+    Tango command, it must be decorated as such with the
+    :func:`~PyTango.server.command` decorator
+
+**line 21**
+    start the Tango run loop. The mandatory argument is a list of python classes
+    that are to be exported as Tango classes. Check :func:`~PyTango.server.run`
+    for the complete list of options
+
+Here is a more complete example on how to write a *PowerSupply* device server
 using the high level API. The example contains:
 
 #. a read-only double scalar attribute called *voltage*
@@ -123,9 +164,10 @@ using the high level API. The example contains:
     from time import time
     from numpy.random import random_sample
 
-    from PyTango import AttrQuality, AttrWriteType, DispLevel, server_run
+    from PyTango import AttrQuality, AttrWriteType, DispLevel, run
     from PyTango.server import Device, DeviceMeta, attribute, command
     from PyTango.server import class_property, device_property
+
 
     class PowerSupply(Device):
         __metaclass__ = DeviceMeta
@@ -166,10 +208,10 @@ using the high level API. The example contains:
         def ramp(self, value):
             print("Ramping up...")
 
-    if __name__ == "__main__":
-        server_run((PowerSupply,))
 
-*Pretty cool, uh?*
+    if __name__ == "__main__":
+        run([PowerSupply])
+
 
 .. note::
     the ``__metaclass__`` statement is mandatory due to a limitation in the
@@ -304,27 +346,50 @@ will output something like::
     1282221947 [-1261438096] DEBUG test/pydsexp/1 46 <- IOLong()
 
 
-Mix multiple device classes (Python and C++) in a server
---------------------------------------------------------
+Multiple device classes (Python and C++) in a server
+----------------------------------------------------
 
 Within the same python interpreter, it is possible to mix several Tango classes.
-Here is an example of the main function of a device server with two Tango classes
-called IRMiror and PLC::
+Let's say two of your colleagues programmed two separate Tango classes in two
+separated python files: A :class:`PLC` class in a :file:`PLC.py`::
 
-    import PyTango
-    import sys
+    # PLC.py
 
-    if __name__ == '__main__':
-        util = PyTango.Util(sys.argv)
-        util.add_class(PLCClass, PLC, 'PLC')
-        util.add_class(IRMirrorClass, IRMirror, 'IRMirror')
-        
-        U = PyTango.Util.instance()
-        U.server_init()
-        U.server_run()
+    from PyTango.server import Device, DeviceMeta, run
+    
+    class PLC(Device):
+        __metaclass__ = DeviceMeta
 
-:Line 6: The Tango class PLC is registered in the device server
-:Line 7: The Tango class IRMirror is registered in the device server
+        # bla, bla my PLC code
+
+    if __name__ == "__main__":
+        run([PLC])
+
+... and a :class:`IRMirror` in a :file:`IRMirror.py`::
+
+    # IRMirror.py
+
+    from PyTango.server import Device, DeviceMeta, run
+    
+    class IRMirror(Device):
+        __metaclass__ = DeviceMeta
+
+        # bla, bla my IRMirror code
+
+    if __name__ == "__main__":
+        run([IRMirror])
+
+You want to create a Tango server called `PLCMirror` that is able to contain
+devices from both PLC and IRMirror classes. All you have to do is write
+a :file:`PLCMirror.py` containing the code::
+
+    # PLCMirror.py
+
+    from PyTango.server import run
+    from PLC import PLC
+    from IRMirror import IRMirror
+
+    run([PLC, IRMirror])
 
 It is also possible to add C++ Tango class in a Python device server as soon as:
     1. The Tango class is in a shared library
@@ -427,6 +492,13 @@ Starting from PyTango 7.1.2 it is possible to create devices in a device server
 "en caliente". This means that you can create a command in your "management device"
 of a device server that creates devices of (possibly) several other tango classes.
 There are two ways to create a new device which are described below.
+
+Tango imposes a limitation: the tango class(es) of the device(s) that is(are)
+to be created must have been registered before the server starts.
+If you use the high level API, the tango class(es) must be listed in the call
+to :func:`~PyTango.server.run`. If you use the lower level server API, it must
+be done using individual calls to :meth:`~PyTango.Util.add_class`.
+
 
 Dynamic device from a known tango class name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
