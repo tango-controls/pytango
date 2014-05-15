@@ -101,12 +101,11 @@ high level API
     class Clock(Device):
         __metaclass__ = DeviceMeta
 
-        time = attribute()
-
-        def read_time(self):
+        @attribute
+        def time(self):
             return time.time()
 
-        @command(din_type=str, dout_type=str)
+        @command(dtype_in=str, dtype_out=str)
         def strftime(self, format):
             return time.strftime(format)
 
@@ -130,7 +129,7 @@ high level API
 **line 10**
     definition of the *time* attribute. By default, attributes are double, scalar, 
     read-only. Check the :class:`~PyTango.server.attribute` for the complete
-    list of attribute options
+    list of attribute options.
 
 **line 12-13**
     the method that is called when a client reads the *time* attribute from this
