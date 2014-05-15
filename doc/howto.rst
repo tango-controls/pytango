@@ -17,28 +17,16 @@ Check the default TANGO host
 ----------------------------
 
 The default TANGO host can be defined using the environment variable 
-:envvar:`TANGO_HOST` or in a `tangorc` file.
+:envvar:`TANGO_HOST` or in a `tangorc` file
 (see `Tango environment variables <http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node11.html#SECTION0011123000000000000000>`_
 for complete information)
+
 To check what is the current value that TANGO uses for the default configuration
 simple do::
  
     >>> import PyTango
     >>> PyTango.ApiUtil.get_env_var("TANGO_HOST")
     'homer.simpson.com:10000'
-
-
-Work with Groups
-----------------
-
-.. todo:: 
-   write this how to
-
-Handle errors
--------------
-
-.. todo:: 
-   write this how to
 
 Check TANGO version
 -------------------
@@ -71,6 +59,19 @@ It is also helpfull if you can put in the ticket description the PyTango informa
 It can be a dump of::
 
    $ python -c "from PyTango.utils import info; print(info())"
+
+
+Work with Groups
+----------------
+
+.. todo:: 
+   write this how to
+
+Handle errors
+-------------
+
+.. todo:: 
+   write this how to
 
 .. _pytango-howto-server:
 
@@ -126,23 +127,18 @@ high level API
     :class:`PyTango.server.DeviceClass`. This has to be done due to a limitation
     on boost-python
 
-**line 10**
+**line 10-12**
     definition of the *time* attribute. By default, attributes are double, scalar, 
     read-only. Check the :class:`~PyTango.server.attribute` for the complete
     list of attribute options.
 
-**line 12-13**
-    the method that is called when a client reads the *time* attribute from this
-    device. By default, Tango expects a method called ``read_<attribute name>``
-    to exist for every attribute
-
-**line 15-17**
+**line 14-16**
     the method *strftime* is exported as a Tango command. In receives a string
     as argument and it returns a string. If a method is to be exported as a
     Tango command, it must be decorated as such with the
     :func:`~PyTango.server.command` decorator
 
-**line 21**
+**line 20**
     start the Tango run loop. The mandatory argument is a list of python classes
     that are to be exported as Tango classes. Check :func:`~PyTango.server.run`
     for the complete list of options
@@ -171,8 +167,6 @@ using the high level API. The example contains:
     class PowerSupply(Device):
         __metaclass__ = DeviceMeta
 
-        voltage = attribute()
-
         current = attribute(label="Current", dtype=float,
                             display_level=DispLevel.EXPERT,
                             access=AttrWriteType.READ_WRITE,
@@ -190,7 +184,8 @@ using the high level API. The example contains:
         host = device_property(dtype=str)
         port = class_property(dtype=int, default_value=9788)
 
-        def read_voltage(self):
+	@attribute
+        def voltage(self):
             self.info_stream("get voltage(%s, %d)" % (self.host, self.port))
             return 10.0
 
