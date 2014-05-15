@@ -152,7 +152,7 @@ def set_complex_value(attr, value):
             attr.set_value(value)
 
 
-def check_tango_device_klass_attribute_read_method(tango_device_klass, method_name):
+def check_tango_device_klass_attribute_read_method(tango_device_klass, attribute):
     """Checks if method given by it's name for the given DeviceImpl class has
     the correct signature. If a read/write method doesn't have a parameter
     (the traditional Attribute), then the method is wrapped into another method
@@ -160,9 +160,15 @@ def check_tango_device_klass_attribute_read_method(tango_device_klass, method_na
     
     :param tango_device_klass: a DeviceImpl class
     :type tango_device_klass: class
-    :param method_name: method to be cheched
-    :type attr_data: str"""
-    read_method = getattr(tango_device_klass, method_name)
+    :param attribute: the attribute data information
+    :type attribute: AttrData"""    
+    read_method = getattr(attribute, "fget", None)
+    if read_method:
+        method_name = "__read_{0}__".format(attribute.attr_name)
+        attribute.read_method_name = method_name
+    else:
+        method_name = attribute.read_method_name
+        read_method = getattr(tango_device_klass, method_name)
 
     @functools.wraps(read_method)
     def read_attr(self, attr):
@@ -173,7 +179,7 @@ def check_tango_device_klass_attribute_read_method(tango_device_klass, method_na
     setattr(tango_device_klass, method_name, read_attr)
 
 
-def check_tango_device_klass_attribute_write_method(tango_device_klass, method_name):
+def check_tango_device_klass_attribute_write_method(tango_device_klass, attribute):
     """Checks if method given by it's name for the given DeviceImpl class has
     the correct signature. If a read/write method doesn't have a parameter
     (the traditional Attribute), then the method is wrapped into another method
@@ -181,9 +187,15 @@ def check_tango_device_klass_attribute_write_method(tango_device_klass, method_n
     
     :param tango_device_klass: a DeviceImpl class
     :type tango_device_klass: class
-    :param method_name: method to be cheched
-    :type attr_data: str"""
-    write_method = getattr(tango_device_klass, method_name)
+    :param attribute: the attribute data information
+    :type attribute: AttrData"""
+    write_method = getattr(attribute, "fset", None)
+    if write_method:
+        method_name = "__write_{0}__".format(attribute.attr_name)
+        attribute.write_method_name = method_name
+    else:
+        method_name = attribute.write_method_name
+        write_method = getattr(tango_device_klass, method_name)
 
     @functools.wraps(write_method)
     def write_attr(self, attr):
@@ -192,19 +204,21 @@ def check_tango_device_klass_attribute_write_method(tango_device_klass, method_n
     setattr(tango_device_klass, method_name, write_attr)
 
 
-def check_tango_device_klass_attribute_methods(tango_device_klass, attr_data):
+def check_tango_device_klass_attribute_methods(tango_device_klass, attribute):
     """Checks if the read and write methods have the correct signature. If a 
     read/write method doesn't have a parameter (the traditional Attribute),
     then the method is wrapped into another method to make this work
     
     :param tango_device_klass: a DeviceImpl class
     :type tango_device_klass: class
-    :param attr_data: the attribute data information
-    :type attr_data: AttrData"""
-    if attr_data.attr_write in (AttrWriteType.READ, AttrWriteType.READ_WRITE):
-        check_tango_device_klass_attribute_read_method(tango_device_klass, attr_data.read_method_name)
-    if attr_data.attr_write in (AttrWriteType.WRITE, AttrWriteType.READ_WRITE):
-        check_tango_device_klass_attribute_write_method(tango_device_klass, attr_data.write_method_name)
+    :param attribute: the attribute data information
+    :type attribute: AttrData"""
+    if attribute.attr_write in (AttrWriteType.READ, AttrWriteType.READ_WRITE):
+        check_tango_device_klass_attribute_read_method(tango_device_klass,
+                                                       attribute)
+    if attribute.attr_write in (AttrWriteType.WRITE, AttrWriteType.READ_WRITE):
+        check_tango_device_klass_attribute_write_method(tango_device_klass,
+                                                        attribute)
 
 
 class _DeviceClass(DeviceClass):
@@ -248,13 +262,18 @@ def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
 
     for attr_name, attr_obj in attrs.items():
         if isinstance(attr_obj, attribute):
-            attr_obj._set_name(attr_name)
+            if attr_obj.attr_name is None:
+                attr_obj._set_name(attr_name)
+            else:
+                attr_name = attr_obj.attr_name
             attr_list[attr_name] = attr_obj
             check_tango_device_klass_attribute_methods(tango_device_klass, attr_obj)
         elif isinstance(attr_obj, device_property):
-            device_property_list[attr_name] = [attr_obj.dtype, attr_obj.doc, attr_obj.default_value]
+            device_property_list[attr_name] = [attr_obj.dtype, attr_obj.doc,
+                                               attr_obj.default_value]
         elif isinstance(attr_obj, class_property):
-            class_property_list[attr_name] = [attr_obj.dtype, attr_obj.doc, attr_obj.default_value]
+            class_property_list[attr_name] = [attr_obj.dtype, attr_obj.doc,
+                                              attr_obj.default_value]
         elif inspect.isroutine(attr_obj):
             if hasattr(attr_obj, "__tango_command__"):
                 cmd_name, cmd_info = attr_obj.__tango_command__
@@ -335,68 +354,129 @@ class Device(LatestDeviceImpl):
 
 
 class attribute(AttrData):
-    """declares a new tango attribute in a :class:`Device`. To be used like
-the python native :obj:`property` function. For example, to declare a
-scalar, `PyTango.DevDouble`, read-only attribute called *voltage* in a
-*PowerSupply* :class:`Device` do::
+    '''
+    declares a new tango attribute in a :class:`Device`. To be used like
+    the python native :obj:`property` function. For example, to declare a
+    scalar, `PyTango.DevDouble`, read-only attribute called *voltage* in a
+    *PowerSupply* :class:`Device` do::
 
-    class PowerSupply(Device):
-        __metaclass__ = DeviceMeta
+        class PowerSupply(Device):
+            __metaclass__ = DeviceMeta
         
-        voltage = attribute()
+            voltage = attribute()
+         
+            def read_voltage(self):
+                return 999.999
+
+    The same can be achieved with::
+
+        class PowerSupply(Device):
+            __metaclass__ = DeviceMeta
+
+            @attribute
+            def voltage(self):
+                return 999.999
+
         
-        def read_voltage(self):
-            self.voltage = 1.0
+    It receives multiple keyword arguments.
 
-It receives multiple keyword arguments.
+    ===================== ================================ ======================================= =======================================================================================
+    parameter              type                                       default value                                 description
+    ===================== ================================ ======================================= =======================================================================================
+    name                   :obj:`str`                       class member name                       alternative attribute name
+    dtype                  :obj:`object`                    :obj:`~PyTango.CmdArgType.DevDouble`    data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
+    dformat                :obj:`~PyTango.AttrDataFormat`   :obj:`~PyTango.AttrDataFormat.SCALAR`   data format
+    max_dim_x              :obj:`int`                       1                                       maximum size for x dimension (ignored for SCALAR format) 
+    max_dim_y              :obj:`int`                       0                                       maximum size for y dimension (ignored for SCALAR and SPECTRUM formats) 
+    display_level          :obj:`~PyTango.DispLevel`        :obj:`~PyTango.DisLevel.OPERATOR`       display level
+    polling_period         :obj:`int`                       -1                                      polling period
+    memorized              :obj:`bool`                      False                                   attribute should or not be memorized
+    hw_memorized           :obj:`bool`                      False                                   write method should be called at startup when restoring memorize value (dangerous!)
+    access                 :obj:`~PyTango.AttrWriteType`    :obj:`~PyTango.AttrWriteType.READ`      read only/ read write / write only access
+    fget (or fread)        :obj:`str` or :obj:`callable`    'read_<attr_name>'                      read method name or method object
+    fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<attr_name>'                     write method name or method object
+    is_allowed             :obj:`str` or :obj:`callable`    'is_<attr_name>_allowed'                is allowed method name or method object
+    label                  :obj:`str`                       '<attr_name>'                           attribute label
+    doc (or description)   :obj:`str`                       ''                                      attribute description
+    unit                   :obj:`str`                       ''                                      physical units the attribute value is in
+    standard_unit          :obj:`str`                       ''                                      physical standard unit
+    display_unit           :obj:`str`                       ''                                      physical display unit (hint for clients)
+    format                 :obj:`str`                       '6.2f'                                  attribute representation format
+    min_value              :obj:`str`                       None                                    minimum allowed value
+    max_value              :obj:`str`                       None                                    maximum allowed value
+    min_alarm              :obj:`str`                       None                                    minimum value to trigger attribute alarm
+    max_alarm              :obj:`str`                       None                                    maximum value to trigger attribute alarm
+    min_warning            :obj:`str`                       None                                    minimum value to trigger attribute warning
+    max_warning            :obj:`str`                       None                                    maximum value to trigger attribute warning
+    delta_val              :obj:`str`                       None
+    delta_t                :obj:`str`                       None
+    abs_change             :obj:`str`                       None                                    minimum value change between events that causes event filter to send the event
+    rel_change             :obj:`str`                       None                                    minimum relative change between events that causes event filter to send the event (%)
+    period                 :obj:`str`                       None
+    archive_abs_change     :obj:`str`                       None
+    archive_rel_change     :obj:`str`                       None
+    archive_period         :obj:`str`                       None
+    ===================== ================================ ======================================= =======================================================================================
 
-===================== ================================ ======================================= =======================================================================================
-parameter              type                                       default value                                 description
-===================== ================================ ======================================= =======================================================================================
-name                   :obj:`str`                       class member name                       alternative attribute name
-dtype                  :obj:`object`                    :obj:`~PyTango.CmdArgType.DevDouble`    data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
-dformat                :obj:`~PyTango.AttrDataFormat`   :obj:`~PyTango.AttrDataFormat.SCALAR`   data format
-max_dim_x              :obj:`int`                       1                                       maximum size for x dimension (ignored for SCALAR format) 
-max_dim_y              :obj:`int`                       0                                       maximum size for y dimension (ignored for SCALAR and SPECTRUM formats) 
-display_level          :obj:`~PyTango.DispLevel`        :obj:`~PyTango.DisLevel.OPERATOR`       display level
-polling_period         :obj:`int`                       -1                                      polling period
-memorized              :obj:`bool`                      False                                   attribute should or not be memorized
-hw_memorized           :obj:`bool`                      False                                   write method should be called at startup when restoring memorize value (dangerous!)
-access                 :obj:`~PyTango.AttrWriteType`    :obj:`~PyTango.AttrWriteType.READ`      read only/ read write / write only access
-fget (or fread)        :obj:`str` or :obj:`callable`    'read_<attr_name>'                      read method name or method object
-fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<attr_name>'                     write method name or method object
-is_allowed             :obj:`str` or :obj:`callable`    'is_<attr_name>_allowed'                is allowed method name or method object
-label                  :obj:`str`                       '<attr_name>'                           attribute label
-doc (or description)   :obj:`str`                       ''                                      attribute description
-unit                   :obj:`str`                       ''                                      physical units the attribute value is in
-standard_unit          :obj:`str`                       ''                                      physical standard unit
-display_unit           :obj:`str`                       ''                                      physical display unit (hint for clients)
-format                 :obj:`str`                       '6.2f'                                  attribute representation format
-min_value              :obj:`str`                       None                                    minimum allowed value
-max_value              :obj:`str`                       None                                    maximum allowed value
-min_alarm              :obj:`str`                       None                                    minimum value to trigger attribute alarm
-max_alarm              :obj:`str`                       None                                    maximum value to trigger attribute alarm
-min_warning            :obj:`str`                       None                                    minimum value to trigger attribute warning
-max_warning            :obj:`str`                       None                                    maximum value to trigger attribute warning
-delta_val              :obj:`str`                       None
-delta_t                :obj:`str`                       None
-abs_change             :obj:`str`                       None                                    minimum value change between events that causes event filter to send the event
-rel_change             :obj:`str`                       None                                    minimum relative change between events that causes event filter to send the event (%)
-period                 :obj:`str`                       None
-archive_abs_change     :obj:`str`                       None
-archive_rel_change     :obj:`str`                       None
-archive_period         :obj:`str`                       None
-===================== ================================ ======================================= =======================================================================================
+    .. note::
+        avoid using *dformat* parameter. If you need a SPECTRUM attribute of say,
+        boolean type, use instead ``dtype=(bool,)``.
 
-.. note::
-    avoid using *dformat* parameter. If you need a SPECTRUM attribute of say,
-    boolean type, use instead ``dtype=(bool,)``.
+    Example of a integer writable attribute with a customized label, unit and
+    description::
 
-"""
+        class PowerSupply(Device):
+            __metaclass__ = DeviceMeta
+        
+            current = attribute(label="Current", unit="mA", dtype=int,
+                                access=AttrWriteType.READ_WRITE,
+                                doc="the power supply current")
 
-    def __init__(self, **kwargs):
+            def init_device(self):
+                Device.init_device(self)
+                self._current = -1
+    
+            def read_current(self):
+                return self._current
+
+            def write_current(self, current):
+                self._current = current
+
+    The same, but using attribute as a decorator::
+
+        class PowerSupply(Device):
+            __metaclass__ = DeviceMeta
+
+            def init_device(self):
+                Device.init_device(self)
+                self._current = -1
+    
+            @attribute(label="Current", unit="mA", dtype=int)
+            def current(self):
+                """the power supply current"""
+                return 999.999
+
+            @current.write
+            def current(self, current):
+                self._current = current
+
+    In this second format, defining the `write` implies setting the attribute
+    access to READ_WRITE.
+    '''
+
+    def __init__(self, fget=None, **kwargs):
+        self._kwargs = dict(kwargs)
         name = kwargs.pop("name", None)
         class_name = kwargs.pop("class_name", None)
+
+        if fget:
+            if inspect.isroutine(fget):
+                self.fget = fget
+                if 'doc' not in kwargs and 'description' not in kwargs:
+                    kwargs['doc'] = fget.__doc__
+            else:
+                kwargs['fget'] = fget
+        
         super(attribute, self).__init__(name, class_name)
         if 'dtype' in kwargs:
             kwargs['dtype'], kwargs['dformat'] = \
@@ -420,12 +500,24 @@ archive_period         :obj:`str`                       None
     def __delete__(self, obj):
         obj.remove_attribute(self.attr_name)
 
+    def setter(self, fset):
+        """To be used as a decorator. Will define the decorated method as a
+        write attribute method to be called when client writes the attribute"""
+        self.fset = fset
+        if self.attr_write == AttrWriteType.READ:
+            if getattr(self, 'fget', None):
+                self.attr_write = AttrWriteType.READ_WRITE
+            else:
+                self.attr_write = AttrWriteType.WRITE
+        return self
 
-def _attribute(**kwargs):
-    if 'dtype' in kwargs:
-        kwargs['dtype'], kwargs['dformat'] = \
-          get_tango_type_format(kwargs['dtype'], kwargs.get('dformat'))
-    return attribute.from_dict(kwargs)
+    def write(self, fset):
+        """To be used as a decorator. Will define the decorated method as a
+        write attribute method to be called when client writes the attribute"""
+        return self.setter(fset)        
+    
+    def __call__(self, fget):
+        return type(self)(fget=fget, **self._kwargs)
 
 
 def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
@@ -513,10 +605,45 @@ class _property(object):
 
 
 class device_property(_property):
+    """
+    Declares a new tango device property in a :class:`Device`. To be used like
+    the python native :obj:`property` function. For example, to declare a
+    scalar, `PyTango.DevString`, device property called *host* in a
+    *PowerSupply* :class:`Device` do::
+
+        from PyTango.server import Device, DeviceMeta
+        from PyTango.server import device_property    
+    
+        class PowerSupply(Device):
+            __metaclass__ = DeviceMeta
+        
+            host = device_property(dtype=str)
+
+    :param dtype: Data type (see :ref:`pytango-data-types`)
+    :param doc: property documentation (optional)
+    :param default_value: default value for the property (optional)
+    """
     pass
 
-
 class class_property(_property):
+    """
+    Declares a new tango class property in a :class:`Device`. To be used like
+    the python native :obj:`property` function. For example, to declare a
+    scalar, `PyTango.DevString`, class property called *port* in a *PowerSupply*
+    :class:`Device` do::
+
+        from PyTango.server import Device, DeviceMeta
+        from PyTango.server import class_property    
+    
+        class PowerSupply(Device):
+            __metaclass__ = DeviceMeta
+        
+            port = class_property(dtype=int, default_value=9788)
+
+    :param dtype: Data type (see :ref:`pytango-data-types`)
+    :param doc: property documentation (optional)
+    :param default_value: default value for the property (optional)
+    """    
     pass
 
 
