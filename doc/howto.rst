@@ -60,6 +60,134 @@ It can be a dump of::
 
    $ python -c "from PyTango.utils import info; print(info())"
 
+Test the connection to the Device and get it's current state
+------------------------------------------------------------
+
+One of the most basic examples is to get a reference to a device and
+determine if it is running or not::
+
+    from PyTango import DeviceProxy
+
+    # Get proxy on the tango_test1 device
+    print("Creating proxy to TangoTest device...")
+    tango_test = DeviceProxy("sys/tg_test/1")
+
+    # ping it
+    print(tango_test.ping())
+            
+    # get the state
+    print(tango_test.state())
+
+Reading and writing attributes
+------------------------------
+
+Basic read/write attribute operations::
+
+    from PyTango import DeviceProxy
+
+    # Get proxy on the tango_test1 device
+    print("Creating proxy to TangoTest device...")
+    tango_test = DeviceProxy("sys/tg_test/1")
+
+    # Read a scalar attribute. This will return a PyTango.DeviceAttribute
+    # Member 'value' contains the attribute value
+    scalar = tango_test.read_attribute("long_scalar")
+    print("Long_scalar value = {0}".format(scalar.value))
+
+    # PyTango provides a shorter way: 
+    scalar = tango_test.long_scalar.value
+    print("Long_scalar value = {0}".format(scalar))
+
+    # Read a spectrum attribute
+    spectrum = tango_test.read_attribute("double_spectrum")
+    # ... or, the shorter version:
+    spectrum = tango_test.double_spectrum
+
+    # Write a scalar attribute
+    scalar_value = 18
+    tango_test.write_attribute("long_scalar", scalar_value)
+
+    #  PyTango provides a shorter way: 
+    tango_test.long_scalar = scalar_value
+
+    # Write a spectrum attribute
+    spectrum_value = [1.2, 3.2, 12.3]
+    tango_test.write_attribute("double_spectrum", spectrum_value)
+    # ... or, the shorter version:
+    tango_test.double_spectrum = spectrum_value
+
+    # Write an image attribute
+    image_value = [ [1, 2], [3, 4] ]
+    tango_test.write_attribute("long_image", image_value)
+    # ... or, the shorter version:
+    tango_test.long_image = image_value
+
+Note that if PyTango is compiled with numpy support the values got when reading
+a spectrum or an image will be numpy arrays. This results in a faster and
+more memory efficient PyTango. You can also use numpy to specify the values when
+writing attributes, especially if you know the exact attribute type::
+
+    import numpy
+    from PyTango import DeviceProxy
+
+    # Get proxy on the tango_test1 device
+    print("Creating proxy to TangoTest device...")
+    tango_test = DeviceProxy("sys/tg_test/1")
+
+    data_1d_long = numpy.arange(0, 100, dtype=numpy.int32)
+
+    tango_test.long_spectrum = data_1d_long
+
+    data_2d_float = numpy.zeros((10,20), dtype=numpy.float64)
+
+    tango_test.double_image = data_2d_float
+
+
+Execute commands
+----------------
+
+As you can see in the following example, when scalar types are used, the Tango
+binding automagically manages the data types, and writing scripts is quite easy::            
+
+    from PyTango import DeviceProxy
+
+    # Get proxy on the tango_test1 device
+    print("Creating proxy to TangoTest device...")
+    tango_test = DeviceProxy("sys/tg_test/1")
+
+    # First use the classical command_inout way to execute the DevString command
+    # (DevString in this case is a command of the Tango_Test device)
+
+    result = tango_test.command_inout("DevString", "First hello to device")
+    print("Result of execution of DevString command = {0}".format(result))
+
+    # the same can be achieved with a helper method
+    result = tango_test.DevString("Second Hello to device")
+    print("Result of execution of DevString command = {0}".format(result))
+
+    # Please note that argin argument type is automatically managed by python
+    result = tango_test.DevULong(12456)
+    print("Result of execution of DevULong command = {0}".format(result))
+
+
+Execute commands with more complex types
+----------------------------------------
+
+In this case you have to use put your arguments data in the correct python
+structures::
+
+    from PyTango import DeviceProxy
+
+    # Get proxy on the tango_test1 device
+    print("Creating proxy to TangoTest device...")
+    tango_test = DeviceProxy("sys/tg_test/1")
+
+    # The input argument is a DevVarLongStringArray so create the argin 
+    # variable containing an array of longs and an array of strings
+    argin = ([1,2,3], ["Hello", "TangoTest device"])
+
+    result = tango_test.DevVarLongArray(argin)
+    print("Result of execution of DevVarLongArray command = {0}".format(result))
 
 Work with Groups
 ----------------
@@ -74,6 +202,88 @@ Handle errors
    write this how to
 
 .. _pytango-howto-server:
+
+For now check :ref:`pytango-exception-api`.
+
+Registering devices
+-------------------
+
+Defining devices in the Tango DataBase::
+
+    from PyTango import Database, DbDevInfo
+
+    #  A reference on the DataBase
+    db = Database()
+
+    # The 3 devices name we want to create
+    # Note: these 3 devices will be served by the same DServer
+    new_device_name1 = "px1/tdl/mouse1"
+    new_device_name2 = "px1/tdl/mouse2"
+    new_device_name3 = "px1/tdl/mouse3"
+
+    # Define the Tango Class served by this  DServer
+    new_device_info_mouse = DbDevInfo()
+    new_device_info_mouse._class = "Mouse"
+    new_device_info_mouse.server = "ds_Mouse/server_mouse"
+
+    # add the first device
+    print("Creating device: %s" % new_device_name1)
+    new_device_info_mouse.name = new_device_name1
+    db.add_device(new_device_info_mouse)
+
+    # add the next device
+    print("Creating device: %s" % new_device_name2)
+    new_device_info_mouse.name = new_device_name2
+    db.add_device(new_device_info_mouse)
+
+    # add the third device
+    print("Creating device: %s" % new_device_name3)
+    new_device_info_mouse.name = new_device_name3
+    db.add_device(new_device_info_mouse)
+
+Setting up Device properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A more complex example using python subtilities.
+The following python script example (containing some functions and instructions
+manipulating a Galil motor axis device server) gives an idea of how the Tango
+API should be accessed from Python::
+
+    from PyTango import DeviceProxy
+
+    # connecting to the motor axis device
+    axis1 = DeviceProxy("microxas/motorisation/galilbox")
+
+    # Getting Device Properties
+    property_names = ["AxisBoxAttachement",
+                      "AxisEncoderType",
+                      "AxisNumber",
+                      "CurrentAcceleration",
+                      "CurrentAccuracy",
+                      "CurrentBacklash",
+                      "CurrentDeceleration",
+                      "CurrentDirection",
+                      "CurrentMotionAccuracy",
+                      "CurrentOvershoot",
+                      "CurrentRetry",
+                      "CurrentScale",
+                      "CurrentSpeed",
+                      "CurrentVelocity",
+                      "EncoderMotorRatio",
+                      "logging_level",
+                      "logging_target",
+                      "UserEncoderRatio",
+                      "UserOffset"]
+
+    axis_properties = axis1.get_property(property_names)
+    for prop in axis_properties.keys():
+        print("%s: %s" % (prop, axis_properties[prop][0]))
+
+    # Changing Properties
+    axis_properties["AxisBoxAttachement"] = ["microxas/motorisation/galilbox"]
+    axis_properties["AxisEncoderType"] = ["1"]
+    axis_properties["AxisNumber"] = ["6"]
+    axis1.put_property(axis_properties)
 
 Write a server
 --------------
