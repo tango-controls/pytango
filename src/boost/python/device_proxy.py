@@ -19,6 +19,7 @@ __all__ = ["device_proxy_init", "get_device_proxy"]
 
 __docformat__ = "restructuredtext"
 
+import time
 import threading
 import collections
 
@@ -33,6 +34,7 @@ from .utils import seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
 from .green import result, submit, green, get_green_mode
 
+_UNSUBSCRIBE_LIFETIME = 60
 
 def get_device_proxy(*args, **kwargs):
     """get_device_proxy(self, dev_name, green_mode=None, wait=True, timeout=True) -> DeviceProxy
@@ -121,6 +123,7 @@ def __check_read_attribute(dev_attr):
 def __DeviceProxy__init__(self, *args, **kwargs):
     self.__dict__['_green_mode'] = kwargs.pop('green_mode', None)
     self.__dict__['_executors'] = executors = {}
+    self.__dict__['_pending_unsubscribe'] = {}
     executors[GreenMode.Futures] = kwargs.pop('executor', None)
     executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
     return DeviceProxy.__init_orig__(self, *args, **kwargs)
@@ -863,11 +866,25 @@ def __DeviceProxy__unsubscribe_event(self, event_id):
 
         Throws     : EventSystemFailed
     """
+    events_del = set()
+    timestamp = time.time()
+    se = self.__get_event_map()
+
     with self.__get_event_map_lock():
-        se = self.__get_event_map()
-        if event_id not in se:
-            raise IndexError("This device proxy does not own this subscription " + str(event_id))
+        # first delete event callbacks that have expire
+        for evt_id, (_, expire_time) in self._pending_unsubscribe.items():
+            if expire_time <= timestamp:
+                events_del.add(evt_id)
+        for evt_id in events_del:
+            del self._pending_unsubscribe[evt_id]
+            
+        # unsubscribe and put the callback in the pending unsubscribe callbacks
+        try:
+            evt_info = se[event_id]
+        except KeyError:
+            raise KeyError("This device proxy does not own this subscription " + str(event_id))
         del se[event_id]
+        self._pending_unsubscribe[event_id] = evt_info[0], timestamp + _UNSUBSCRIBE_LIFETIME
     self.__unsubscribe_event(event_id)
 
 def __DeviceProxy__unsubscribe_event_all(self):
