@@ -71,6 +71,7 @@ def __build_to_tango_type():
         'chr'       : CmdArgType.DevUChar,
         'char'      : CmdArgType.DevUChar,
         'None'      : CmdArgType.DevVoid,
+        'state'     : CmdArgType.DevState,
     }
 
     for key in dir(CmdArgType):
@@ -170,12 +171,20 @@ def check_tango_device_klass_attribute_read_method(tango_device_klass, attribute
         method_name = attribute.read_method_name
         read_method = getattr(tango_device_klass, method_name)
 
-    @functools.wraps(read_method)
-    def read_attr(self, attr):
-        ret = read_method(self)
-        if not attr.get_value_flag() and ret is not None:
-            set_complex_value(attr, ret)
-        return ret
+    read_args = inspect.getargspec(read_method)
+
+    if len(read_args.args) < 2:
+        @functools.wraps(read_method)
+        def read_attr(self, attr):
+            ret = read_method(self)
+            if not attr.get_value_flag() and ret is not None:
+                set_complex_value(attr, ret)
+            return ret
+        method_name = "__read_{0}_wrapper__".format(attribute.attr_name)
+        attribute.read_method_name = method_name
+    else:
+        read_attr = read_method
+
     setattr(tango_device_klass, method_name, read_attr)
 
 
@@ -789,19 +798,8 @@ def run(classes, args=None, msg_stream=sys.stdout,
     :return: The Util singleton object
     :rtype: :class:`~PyTango.Util`
        
-    .. versionadded:: 8.0.0
-       
-    .. versionchanged:: 8.0.3
-        Added `util` keyword parameter.
-        Returns util object
+    .. versionadded:: 8.1.2
 
-    .. versionchanged:: 8.1.1
-        Changed default msg_stream from *stderr* to *stdout*
-        Added `event_loop` keyword parameter.
-        Returns util object
-
-    .. versionchanged:: 8.1.2
-        Added `post_init_callback` keyword parameter
     """
     if msg_stream is None:
         write = lambda msg : None
@@ -827,8 +825,93 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
         verbose=False, util=None, event_loop=None,
         post_init_callback=None):
     """
-    Just an alias to :func:`~PyTango.server.run`.
-    Use :func:`~PyTango.server.run` instead.
+    Since PyTango 8.1.2 it is just an alias to
+    :func:`~PyTango.server.run`. Use :func:`~PyTango.server.run` instead.
+
+    Provides a simple way to run a tango server. It handles exceptions
+    by writting a message to the msg_stream.
+
+    The `classes` parameter can be either a sequence of :class:`~PyTango.server.Device`
+    classes or a dictionary where:
+
+    * key is the tango class name
+    * value is either:
+        * a :class:`~PyTango.server.Device` class or
+        * a sequence of two elements :class:`~PyTango.DeviceClass` , :class:`~PyTango.DeviceImpl`
+
+    The optional `post_init_callback` can be a callable (without arguments)
+    or a tuple where the first element is the callable, the second is a list
+    of arguments(optional) and the third is a dictionary of keyword arguments
+    (also optional).
+           
+    Example 1: registering and running a PowerSupply inheriting from :class:`~PyTango.server.Device`::
+       
+        from PyTango.server import Device, DeviceMeta, run
+       
+        class PowerSupply(Device):
+            __metaclass__ = DeviceMeta
+               
+        run((PowerSupply,))
+           
+    Example 2: registering and running a MyServer defined by tango classes 
+    `MyServerClass` and `MyServer`::
+       
+        import PyTango
+        from PyTango.server import run
+    
+        class MyServer(PyTango.Device_4Impl):
+            pass
+               
+        class MyServerClass(PyTango.DeviceClass):
+            pass
+       
+        run({"MyServer": (MyServerClass, MyServer)})
+       
+    :param classes:
+        a sequence of :class:`~PyTango.server.Device` classes or
+        a dictionary where keyword is the tango class name and value is a 
+        sequence of Tango Device Class python class, and Tango Device python class
+    :type classes: sequence or dict
+       
+    :param args:
+        list of command line arguments [default: None, meaning use sys.argv]
+    :type args: list
+       
+    :param msg_stream:
+        stream where to put messages [default: sys.stdout]
+       
+    :param util:
+        PyTango Util object [default: None meaning create a Util instance]
+    :type util: :class:`~PyTango.Util`
+
+    :param event_loop: event_loop callable
+    :type event_loop: callable
+       
+    :param post_init_callback:
+        an optional callback that is executed between the calls Util.server_init
+        and Util.server_run
+    :type post_init_callback: callable or tuple (see description above)
+
+    :return: The Util singleton object
+    :rtype: :class:`~PyTango.Util`
+       
+    .. versionadded:: 8.0.0
+       
+    .. versionchanged:: 8.0.3
+        Added `util` keyword parameter.
+        Returns util object
+
+    .. versionchanged:: 8.1.1
+        Changed default msg_stream from *stderr* to *stdout*
+        Added `event_loop` keyword parameter.
+        Returns util object
+
+    .. versionchanged:: 8.1.2
+        Added `post_init_callback` keyword parameter
+
+    .. deprecated:: 8.1.2
+        Use :func:`~PyTango.server.run` instead.
+        
     """
     return run(classes, args=args, msg_stream=msg_stream,
                verbose=verbose, util=util, event_loop=event_loop,

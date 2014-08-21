@@ -95,6 +95,7 @@ Version history
 |          | Bug fixes:                                                                                                                                                            |
 |          |                                                                                                                                                                       |
 |          |     - `659: segmentation fault when unsubscribing from events <https://sourceforge.net/p/tango-cs/bugs/659/>`_                                                        |
+|          |     - `680: Cannot import PyTango.server.run <https://sourceforge.net/p/tango-cs/bugs/680/>`_                                                                         |
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.2    | Features:                                                                                                                                                             |
 |          |                                                                                                                                                                       |
