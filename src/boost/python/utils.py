@@ -165,6 +165,8 @@ def requires_pytango(min_version=None, conflicts=(),
     :type software_name: str
 
     :raises Exception: if the required PyTango version is not met
+
+    New in PyTango 8.1.4
     """
     return __requires("PyTango", min_version=min_version,
                       conflicts=conflicts, software_name=software_name)
@@ -198,6 +200,8 @@ def requires_tango(min_version=None, conflicts=(),
     :type software_name: str
 
     :raises Exception: if the required Tango version is not met
+
+    New in PyTango 8.1.4
     """
     return __requires("Tango", min_version=min_version,
                       conflicts=conflicts, software_name=software_name)    
