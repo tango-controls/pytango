@@ -184,7 +184,8 @@ from .globals import get_class, get_classes, get_cpp_class, get_cpp_classes, \
     delete_class_list, class_list, cpp_class_list, constructed_class
 from .utils import is_scalar_type, is_array_type, is_numerical_type, \
     is_int_type, is_float_type, is_bool_type, is_str_type, \
-    obj_2_str, str_2_obj, seqStr_2_obj
+    obj_2_str, str_2_obj, seqStr_2_obj, \
+    requires_pytango, requires_tango
 from .green import set_green_mode, get_green_mode
 from .device_proxy import get_device_proxy
 from .tango_numpy import NumpyType, numpy_type, numpy_spectrum, numpy_image

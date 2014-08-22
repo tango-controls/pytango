@@ -92,6 +92,8 @@ Version history
 +==========+=======================================================================================================================================================================+
 | 8.1.3    | Features:                                                                                                                                                             |
 |          |                                                                                                                                                                       |
+|          |     - `107: Nice to check Tango/PyTango version at runtime <https://sourceforge.net/p/tango-cs/feature-requests/107>`_                                                |
+|          |                                                                                                                                                                       |
 |          | Bug fixes:                                                                                                                                                            |
 |          |                                                                                                                                                                       |
 |          |     - `659: segmentation fault when unsubscribing from events <https://sourceforge.net/p/tango-cs/bugs/659/>`_                                                        |

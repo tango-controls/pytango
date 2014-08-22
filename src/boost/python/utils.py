@@ -16,15 +16,17 @@ This is an internal PyTango module.
 from __future__ import with_statement
 from __future__ import print_function
 
-__all__ = [ "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
-            "is_number", "is_scalar_type", "is_array_type", "is_numerical_type",
-            "is_int_type", "is_float_type", "is_bool_type", "is_bin_type",
-            "is_str_type", "obj_2_str", "seqStr_2_obj",
-            "scalar_to_array_type",
-            "document_method", "document_static_method", "document_enum",
-            "CaselessList", "CaselessDict", "EventCallBack", "get_home",
-            "from_version_str_to_hex_str", "from_version_str_to_int",
-            "seq_2_StdStringVector", "StdStringVector_2_seq" ]
+__all__ = [
+    "requires_pytango", "requires_tango",
+    "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
+    "is_number", "is_scalar_type", "is_array_type", "is_numerical_type",
+    "is_int_type", "is_float_type", "is_bool_type", "is_bin_type",
+    "is_str_type", "obj_2_str", "seqStr_2_obj",
+    "scalar_to_array_type",
+    "document_method", "document_static_method", "document_enum",
+    "CaselessList", "CaselessDict", "EventCallBack", "get_home",
+    "from_version_str_to_hex_str", "from_version_str_to_int",
+    "seq_2_StdStringVector", "StdStringVector_2_seq" ]
 
 __docformat__ = "restructuredtext"
 
@@ -37,7 +39,8 @@ from ._PyTango import StdStringVector, StdDoubleVector, \
     DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
     EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
     GreenMode
-from .constants import AlrmValueNotSpec, StatusNotSet
+from .constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
+from .release import Release
 
 _scalar_int_types = (CmdArgType.DevShort, CmdArgType.DevUShort,
     CmdArgType.DevInt, CmdArgType.DevLong, CmdArgType.DevULong,
@@ -93,6 +96,111 @@ __NO_STR_VALUE = AlrmValueNotSpec, StatusNotSet
 __device_classes = None
 
 bool_ = lambda value_str : value_str.lower() == "true"
+
+
+def __import(name):
+    __import__(name)
+    return sys.modules[name]
+    
+def __requires(package_name, min_version=None, conflicts=(),
+               software_name="Software"):
+    from distutils.version import LooseVersion
+    package_name_l = package_name.lower()
+    if package_name_l == 'pytango':
+        curr_version = LooseVersion(Release.version)
+    elif package_name_l == 'tango':
+        curr_version = LooseVersion(TgLibVers)
+    else:
+        try:
+            package = __import(package_name)
+            curr_version = LooseVersion(package.__version__)
+        except ImportError:
+            msg = "Could not find package {0} required by {1}".format(
+                package_name, software_name)
+            raise Exception(msg)
+        except:
+            msg = "Error importing package {0} required by {1}".format(
+                package_name, software_name)
+            raise Exception(msg)
+        
+    if min_version is not None:
+        min_version = LooseVersion(min_version)
+        if min_version > curr_version:        
+            msg = "{0} requires {1} {2} but {3} installed".format(
+                software_name, package_name, min_version, curr_version)
+            raise Exception(msg)
+
+    conflicts = map(LooseVersion, conflicts)
+    if curr_version in conflicts:
+        msg = "{0} cannot run with {1} {2}".format(
+            software_name, package_name, curr_version)
+        raise Exception(msg)        
+    return True
+
+def requires_pytango(min_version=None, conflicts=(),
+                     software_name="Software"):
+    """
+    Determines if the required PyTango version for the running
+    software is present. If not an exception is thrown.
+    Example usage::
+
+        from PyTango import requires_pytango
+
+        requires_pytango('7.1', conflicts=['8.1.1'], software='MyDS')
+
+    :param min_version:
+        minimum PyTango version [default: None, meaning no minimum
+        required]. If a string is given, it must be in the valid
+        version number format
+        (see: :class:`~distutils.version.LooseVersion`)
+    :type min_version:
+        None, str, :class:`~distutils.version.LooseVersion`
+    :param conflics:
+        a sequence of PyTango versions which conflict with the
+        software using it
+    :type conflics:
+        seq<str|LooseVersion>
+    :param software_name:
+        software name using PyTango. Used in the exception message
+    :type software_name: str
+
+    :raises Exception: if the required PyTango version is not met
+    """
+    return __requires("PyTango", min_version=min_version,
+                      conflicts=conflicts, software_name=software_name)
+
+
+def requires_tango(min_version=None, conflicts=(),
+                     software_name="Software"):
+    """
+    Determines if the required Tango version for the running
+    software is present. If not an exception is thrown.
+    Example usage::
+
+        from Tango import requires_tango
+
+        requires_tango('7.1', conflicts=['8.1.1'], software='MyDS')
+
+    :param min_version:
+        minimum Tango version [default: None, meaning no minimum
+        required]. If a string is given, it must be in the valid
+        version number format
+        (see: :class:`~distutils.version.LooseVersion`)
+    :type min_version:
+        None, str, :class:`~distutils.version.LooseVersion`
+    :param conflics:
+        a sequence of Tango versions which conflict with the
+        software using it
+    :type conflics:
+        seq<str|LooseVersion>
+    :param software_name:
+        software name using Tango. Used in the exception message
+    :type software_name: str
+
+    :raises Exception: if the required Tango version is not met
+    """
+    return __requires("Tango", min_version=min_version,
+                      conflicts=conflicts, software_name=software_name)    
 
 
 def get_tango_device_classes():
