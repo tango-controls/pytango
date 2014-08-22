@@ -305,6 +305,54 @@ namespace PyWAttribute
     }
 
     template<>
+    inline void __set_write_value_array<Tango::DEV_STRING>(Tango::WAttribute &att,
+							   boost::python::object &seq,
+							   long x_dim, long y_dim)
+    {
+        PyObject *seq_ptr = seq.ptr();
+        long len = (long) PySequence_Size(seq_ptr);
+        twod2oned(len, x_dim, y_dim);
+
+	Tango::DevString* tg_ptr = Tango::DevVarStringArray::allocbuf(len);
+
+        for (long idx = 0; idx < len; ++idx)
+        {
+            PyObject *elt_ptr = PySequence_GetItem(seq_ptr, idx);
+
+            // The boost extract could be used:
+            // TangoScalarType val = boost::python::extract<TangoScalarType>(elt_ptr);
+            // instead of the code below.
+            // the problem is that extract is considerably slower than our
+            // convert function which only has to deal with the specific tango
+            // data types
+            try
+            {
+		Tango::DevString tg_scalar;
+                from_py<Tango::DEV_STRING>::convert(elt_ptr, tg_scalar);
+                tg_ptr[idx] = Tango::string_dup(tg_scalar);
+                Py_DECREF(elt_ptr);
+            }
+            catch(...)
+            {
+                Py_DECREF(elt_ptr);
+                delete [] tg_ptr;
+                throw;
+            }
+        }
+
+        try
+        {
+            att.set_write_value(tg_ptr, x_dim, y_dim);
+//            delete [] tg_ptr;
+        }
+        catch(...)
+        {
+            delete [] tg_ptr;
+            throw;
+        }
+    }
+
+    template<>
     inline void __set_write_value_array<Tango::DEV_ENCODED>(Tango::WAttribute &att,
                                                             boost::python::object &seq,
                                                             long x_dim, long y_dim)
@@ -452,14 +500,16 @@ namespace PyWAttribute
     void __get_write_value_pytango3<Tango::DEV_STRING>(Tango::WAttribute &att,
                                               boost::python::list &seq)
     {
-        const Tango::ConstDevString *ptr;
-
-        long length = att.get_write_value_length();
+        const Tango::ConstDevString *ptr = NULL;
 
         att.get_write_value(ptr);
 
-        for (long l = 0; l < length; ++l)
-        {
+	if (ptr == NULL) {
+	    return;
+	}
+
+        long length = att.get_write_value_length();
+        for (long l = 0; l < length; ++l) {
             seq.append(ptr[l]);
         }
     }
@@ -484,9 +534,15 @@ namespace PyWAttribute
     template<>
     void __get_write_value_scalar<Tango::DEV_STRING>(Tango::WAttribute &att, boost::python::object* obj)
     {
-        const Tango::ConstDevString *v = NULL;
+        Tango::DevString v = NULL;
         att.get_write_value(v);
-        *obj = boost::python::object(v[0]);
+
+	if(v == NULL) {
+	    *obj = boost::python::object();
+	}
+	else {
+	    *obj = boost::python::object((const char*)v);
+	}
     }
 
     template<long tangoTypeConst>
@@ -494,25 +550,39 @@ namespace PyWAttribute
     {
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
 
-        const TangoScalarType * buffer;
+        const TangoScalarType *buffer = NULL;
         att.get_write_value(buffer);
+
+	if (buffer == NULL) {
+	    *obj = boost::python::object();
+	    return;
+	}
+
         size_t length = att.get_write_value_length();
         
         boost::python::list o;
-        for (size_t n = 0; n < length; ++n)
+        for (size_t n = 0; n < length; ++n) {
             o.append(buffer[n]);
+	}
         *obj = o;
     }
 
     template<>
     void __get_write_value_array_pytango3<Tango::DEV_STRING>(Tango::WAttribute &att, boost::python::object* obj)
     {
-        const Tango::ConstDevString *ptr;
+        const Tango::ConstDevString *ptr = NULL;
+
+	if (ptr == NULL) {
+	    *obj = boost::python::object();
+	    return;
+	}
+
         long length = att.get_write_value_length();
         att.get_write_value(ptr);
         boost::python::list o;
-        for (long l = 0; l < length; ++l)
+        for (long l = 0; l < length; ++l) {
             o.append(ptr[l]);
+	}
     }
 
     template<long tangoTypeConst>
@@ -520,8 +590,14 @@ namespace PyWAttribute
     {
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
 
-        const TangoScalarType *buffer;
+        const TangoScalarType *buffer = NULL;
         att.get_write_value(buffer);
+
+	if (buffer == NULL) {
+	    *obj = boost::python::object();
+	    return;
+	}	
+
         size_t dim_x = att.get_w_dim_x();
         size_t dim_y = att.get_w_dim_y();
         
@@ -546,8 +622,14 @@ namespace PyWAttribute
     template<>
     void __get_write_value_array_lists<Tango::DEV_STRING>(Tango::WAttribute &att, boost::python::object* obj)
     {
-        const Tango::ConstDevString* buffer;
+        const Tango::ConstDevString* buffer= NULL;
         att.get_write_value(buffer);
+
+	if (buffer == NULL) {
+	    *obj = boost::python::object();
+	    return;
+	}
+
         size_t dim_x = att.get_w_dim_x();
         size_t dim_y = att.get_w_dim_y();
         
