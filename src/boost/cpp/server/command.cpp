@@ -118,15 +118,24 @@ void insert_scalar<Tango::DEV_ENCODED>(boost::python::object &o, CORBA::Any &any
     bopy::object p1 = o[1];
 
     const char* encoded_format = bopy::extract<const char *> (p0.ptr());
-    const char* encoded_data = bopy::extract<const char *> (p1.ptr());
     
-    CORBA::ULong nb = static_cast<CORBA::ULong>(bopy::len(p1));
-    Tango::DevVarCharArray arr(nb, nb, (CORBA::Octet*)encoded_data, false);
+    PyObject* data_ptr = p1.ptr();
+    Py_buffer view;
+    
+    if (PyObject_GetBuffer(data_ptr, &view, PyBUF_FULL_RO) < 0)
+    {
+        throw_bad_type(Tango::CmdArgTypeName[Tango::DEV_ENCODED]);
+    }
+    
+    CORBA::ULong nb = static_cast<CORBA::ULong>(view.len);
+    Tango::DevVarCharArray arr(nb, nb, (CORBA::Octet*)view.buf, false);
     Tango::DevEncoded *data = new Tango::DevEncoded;
     data->encoded_format = CORBA::string_dup(encoded_format);
-    data->encoded_data = arr;
-
+    data->encoded_data = arr;    
+    
     any <<= data;
+
+    PyBuffer_Release(&view);
 }
 
 template<long tangoArrayTypeConst>
