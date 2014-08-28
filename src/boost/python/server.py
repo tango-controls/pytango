@@ -716,7 +716,7 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
             util.add_class(klass_klass, klass, klass_name)
     else:
         for klass_name, klass_info in classes.items():
-            if is_seq(klass_info)
+            if is_seq(klass_info):
                 if len(klass_info) == 2:
                     klass_klass, klass = klass_info
                 else:
