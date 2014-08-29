@@ -222,7 +222,12 @@ def get_tango_device_classes():
                 break
     return __device_classes
 
-__str_klasses = str,
+try:
+    __str_klasses = basestring,
+except NameError:
+    __str_klasses = str,
+
+
 __int_klasses = int,
 __number_klasses = numbers.Number,
 __seq_klasses = collections.Sequence, bytearray
@@ -232,7 +237,7 @@ try:
     unicode
     __use_unicode = True
     __str_klasses = tuple(list(__str_klasses) + [unicode])
-except:
+except NameError:
     pass
 
 __use_long = False
@@ -240,7 +245,7 @@ try:
     long
     __use_long = True
     __int_klasses = tuple(list(__int_klasses) + [long])
-except:
+except NameError:
     pass
 
 if constants.NUMPY_SUPPORT:
@@ -256,22 +261,87 @@ __seq_klasses = tuple(__seq_klasses)
 
 
 def is_pure_str(obj):
+    """
+    Tells if the given object is a python string.
+
+    In python 2.x this means any subclass of basestring.
+    In python 3.x this means any subclass of str.
+
+    :param obj: the object to be inspected
+    :type obj: :py:obj:`object`
+
+    :return: True is the given obj is a string or False otherwise
+    :rtype: :py:obj:`bool`
+    """
     return isinstance(obj , __str_klasses)
 
 
 def is_seq(obj):
+    """
+    Tells if the given object is a python sequence.
+
+    It will return True for any collections.Sequence (list, tuple,
+    str, bytes, unicode), bytearray and (if numpy is enabled)
+    numpy.ndarray
+
+    :param obj: the object to be inspected
+    :type obj: :py:obj:`object`
+
+    :return: True is the given obj is a sequence or False otherwise
+    :rtype: :py:obj:`bool`
+    """
     return isinstance(obj, __seq_klasses)
 
 
 def is_non_str_seq(obj):
+    """
+    Tells if the given object is a python sequence (excluding string
+    sequences).
+
+    It will return True for any collections.Sequence (list, tuple (and
+    bytes in python3)), bytearray and (if numpy is enabled)
+    numpy.ndarray
+
+    :param obj: the object to be inspected
+    :type obj: :py:obj:`object`
+
+    :return: True is the given obj is a sequence or False otherwise
+    :rtype: :py:obj:`bool`
+    """    
     return is_seq(obj) and not is_pure_str(obj)
 
 
 def is_integer(obj):
+    """
+    Tells if the given object is a python integer.
+
+    It will return True for any int, long (in python 2) and
+    (if numpy is enabled) numpy.integer
+
+    :param obj: the object to be inspected
+    :type obj: :py:obj:`object`
+
+    :return:
+        True is the given obj is a python integer or False otherwise
+    :rtype: :py:obj:`bool`
+    """
     return isinstance(obj, __int_klasses)
 
 
 def is_number(obj):
+    """
+    Tells if the given object is a python number.
+
+    It will return True for any numbers.Number and (if numpy is
+    enabled) numpy.number
+
+    :param obj: the object to be inspected
+    :type obj: :py:obj:`object`
+
+    :return:
+        True is the given obj is a python number or False otherwise
+    :rtype: :py:obj:`bool`
+    """
     return isinstance(obj, __number_klasses)
 
 
@@ -676,8 +746,23 @@ def _seqStr_2_obj_from_type_format(seq, tg_type, tg_format):
     return _seqStr_2_obj_from_type(tg_type, seq)
 
 
-def scalar_to_array_type(dtype):
-    return _scalar_to_array_type[dtype]
+def scalar_to_array_type(tg_type):
+    """
+    Gives the array tango type corresponding to the given tango
+    scalar type. Example: giving DevLong will return DevVarLongArray.
+    
+    :param tg_type: tango type
+    :type tg_type: :class:`PyTango.CmdArgType`
+
+    :return: the array tango type for the given scalar tango type
+    :rtype: :class:`PyTango.CmdArgType`
+    
+    :raises ValueError: in case the given dtype is not a tango scalar type
+    """
+    try:
+        return _scalar_to_array_type[tg_type]
+    except KeyError:
+        raise ValueError("Invalid tango scalar type: {0}".format(tg_type))
 
 
 def str_2_obj(obj_str, tg_type=None):

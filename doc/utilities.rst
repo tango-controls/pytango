@@ -9,6 +9,8 @@ The Utilities API
     :members:
     :undoc-members:
 
+.. autofunction:: PyTango.utils.is_pure_str
+
 .. autofunction:: PyTango.utils.is_seq
 
 .. autofunction:: PyTango.utils.is_non_str_seq
@@ -16,6 +18,8 @@ The Utilities API
 .. autofunction:: PyTango.utils.is_integer
 
 .. autofunction:: PyTango.utils.is_number
+
+.. autofunction:: PyTango.utils.is_bool
 
 .. autofunction:: PyTango.utils.is_scalar_type
     
