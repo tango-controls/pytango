@@ -78,8 +78,8 @@ determine if it is running or not::
     # get the state
     print(tango_test.state())
 
-Reading and writing attributes
-------------------------------
+Read and write attributes
+-------------------------
 
 Basic read/write attribute operations::
 
@@ -208,7 +208,7 @@ For now check :ref:`pytango-exception-api`.
 Registering devices
 -------------------
 
-Defining devices in the Tango DataBase::
+Here is how to define devices in the Tango DataBase::
 
     from PyTango import Database, DbDevInfo
 
@@ -241,7 +241,8 @@ Defining devices in the Tango DataBase::
     new_device_info_mouse.name = new_device_name3
     db.add_device(new_device_info_mouse)
 
-Setting up Device properties
+
+Setting up device properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A more complex example using python subtilities.
