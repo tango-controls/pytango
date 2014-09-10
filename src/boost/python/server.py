@@ -14,10 +14,9 @@
 from __future__ import with_statement
 from __future__ import print_function
 
-__all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute", "command",
-           "device_property", "class_property", "server_run"]
-
-import __builtin__
+__all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
+           "command", "device_property", "class_property",
+           "run", "server_run"]
 
 import sys
 import inspect
@@ -25,9 +24,8 @@ import operator
 import functools
 import traceback
 
-from ._PyTango import DeviceImpl, Attribute, WAttribute, CmdArgType
-from ._PyTango import AttrDataFormat, AttrWriteType, DispLevel, constants
-from ._PyTango import DevFailed
+from ._PyTango import CmdArgType, AttrDataFormat, AttrWriteType
+from ._PyTango import DevFailed, constants
 from .attr_data import AttrData
 from .device_class import DeviceClass
 from .utils import get_tango_device_classes, is_seq, is_non_str_seq
@@ -129,7 +127,9 @@ def set_complex_value(attr, value):
         if is_tuple and len(value) == 4:
             attr.set_value_date_quality(*value)
         elif is_tuple and len(value) == 3 and is_non_str_seq(value[0]):
-            attr.set_value_date_quality(value[0][0], value[0][1], *value[1:])
+            attr.set_value_date_quality(value[0][0],
+                                        value[0][1],
+                                        *value[1:])
         else:
             attr.set_value(*value)
     else:
@@ -153,16 +153,20 @@ def set_complex_value(attr, value):
             attr.set_value(value)
 
 
-def check_tango_device_klass_attribute_read_method(tango_device_klass, attribute):
-    """Checks if method given by it's name for the given DeviceImpl class has
-    the correct signature. If a read/write method doesn't have a parameter
-    (the traditional Attribute), then the method is wrapped into another method
-    which has correct parameter definition to make it work.
-    
+def check_dev_klass_attr_read_method(tango_device_klass,
+                                                   attribute):
+    """
+    Checks if method given by it's name for the given DeviceImpl
+    class has the correct signature. If a read/write method doesn't
+    have a parameter (the traditional Attribute), then the method is
+    wrapped into another method which has correct parameter definition
+    to make it work.
+
     :param tango_device_klass: a DeviceImpl class
     :type tango_device_klass: class
     :param attribute: the attribute data information
-    :type attribute: AttrData"""    
+    :type attribute: AttrData
+    """
     read_method = getattr(attribute, "fget", None)
     if read_method:
         method_name = "__read_{0}__".format(attribute.attr_name)
@@ -180,7 +184,8 @@ def check_tango_device_klass_attribute_read_method(tango_device_klass, attribute
             if not attr.get_value_flag() and ret is not None:
                 set_complex_value(attr, ret)
             return ret
-        method_name = "__read_{0}_wrapper__".format(attribute.attr_name)
+        method_name = "__read_{0}_wrapper__".format(
+            attribute.attr_name)
         attribute.read_method_name = method_name
     else:
         read_attr = read_method
@@ -188,16 +193,19 @@ def check_tango_device_klass_attribute_read_method(tango_device_klass, attribute
     setattr(tango_device_klass, method_name, read_attr)
 
 
-def check_tango_device_klass_attribute_write_method(tango_device_klass, attribute):
-    """Checks if method given by it's name for the given DeviceImpl class has
-    the correct signature. If a read/write method doesn't have a parameter
-    (the traditional Attribute), then the method is wrapped into another method
-    which has correct parameter definition to make it work.
-    
+def check_dev_klass_attr_write_method(tango_device_klass, attribute):
+    """
+    Checks if method given by it's name for the given DeviceImpl
+    class has the correct signature. If a read/write method doesn't
+    have a parameter (the traditional Attribute), then the method is
+    wrapped into another method which has correct parameter definition
+    to make it work.
+
     :param tango_device_klass: a DeviceImpl class
     :type tango_device_klass: class
     :param attribute: the attribute data information
-    :type attribute: AttrData"""
+    :type attribute: AttrData
+    """
     write_method = getattr(attribute, "fset", None)
     if write_method:
         method_name = "__write_{0}__".format(attribute.attr_name)
@@ -213,21 +221,26 @@ def check_tango_device_klass_attribute_write_method(tango_device_klass, attribut
     setattr(tango_device_klass, method_name, write_attr)
 
 
-def check_tango_device_klass_attribute_methods(tango_device_klass, attribute):
-    """Checks if the read and write methods have the correct signature. If a 
-    read/write method doesn't have a parameter (the traditional Attribute),
-    then the method is wrapped into another method to make this work
-    
+def check_dev_klass_attr_methods(tango_device_klass, attribute):
+    """
+    Checks if the read and write methods have the correct signature.
+    If a read/write method doesn't have a parameter (the traditional
+    Attribute), then the method is wrapped into another method to make
+    this work.
+
     :param tango_device_klass: a DeviceImpl class
     :type tango_device_klass: class
     :param attribute: the attribute data information
-    :type attribute: AttrData"""
-    if attribute.attr_write in (AttrWriteType.READ, AttrWriteType.READ_WRITE):
-        check_tango_device_klass_attribute_read_method(tango_device_klass,
-                                                       attribute)
-    if attribute.attr_write in (AttrWriteType.WRITE, AttrWriteType.READ_WRITE):
-        check_tango_device_klass_attribute_write_method(tango_device_klass,
-                                                        attribute)
+    :type attribute: AttrData
+    """
+    if attribute.attr_write in (AttrWriteType.READ,
+                                AttrWriteType.READ_WRITE):
+        check_dev_klass_attr_read_method(tango_device_klass,
+                                         attribute)
+    if attribute.attr_write in (AttrWriteType.WRITE,
+                                AttrWriteType.READ_WRITE):
+        check_dev_klass_attr_write_method(tango_device_klass,
+                                          attribute)
 
 
 class _DeviceClass(DeviceClass):
@@ -240,25 +253,29 @@ class _DeviceClass(DeviceClass):
         """Invoked to create dynamic attributes for the given devices.
         Default implementation calls
         :meth:`TT.initialize_dynamic_attributes` for each device
-    
+
         :param dev_list: list of devices
         :type dev_list: :class:`PyTango.DeviceImpl`"""
 
         for dev in dev_list:
-            init_dyn_attrs = getattr(dev, "initialize_dynamic_attributes", None)
+            init_dyn_attrs = getattr(dev,
+                                     "initialize_dynamic_attributes",
+                                     None)
             if init_dyn_attrs and callable(init_dyn_attrs):
                 try:
                     init_dyn_attrs()
                 except Exception:
-                    import traceback
-                    dev.warn_stream("Failed to initialize dynamic attributes")
-                    dev.debug_stream("Details: " + traceback.format_exc())
+                    dev.warn_stream("Failed to initialize dynamic " \
+                                    "attributes")
+                    dev.debug_stream("Details: " + \
+                                     traceback.format_exc())
 
 
 def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     klass_name = tango_device_klass.__name__
     if not issubclass(tango_device_klass, (Device)):
-        msg = "{0} device must inherit from PyTango.server.Device".format(klass_name)
+        msg = "{0} device must inherit from " \
+              "PyTango.server.Device".format(klass_name)
         raise Exception(msg)
 
     if attrs is None:
@@ -276,12 +293,14 @@ def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
             else:
                 attr_name = attr_obj.attr_name
             attr_list[attr_name] = attr_obj
-            check_tango_device_klass_attribute_methods(tango_device_klass, attr_obj)
+            check_dev_klass_attr_methods(tango_device_klass, attr_obj)
         elif isinstance(attr_obj, device_property):
-            device_property_list[attr_name] = [attr_obj.dtype, attr_obj.doc,
+            device_property_list[attr_name] = [attr_obj.dtype,
+                                               attr_obj.doc,
                                                attr_obj.default_value]
         elif isinstance(attr_obj, class_property):
-            class_property_list[attr_name] = [attr_obj.dtype, attr_obj.doc,
+            class_property_list[attr_name] = [attr_obj.dtype,
+                                              attr_obj.doc,
                                               attr_obj.default_value]
         elif inspect.isroutine(attr_obj):
             if hasattr(attr_obj, "__tango_command__"):
@@ -296,10 +315,11 @@ def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     return type(devclass_name, (_DeviceClass,), devclass_attrs)
 
 
-def init_tango_device_klass(tango_device_klass, attrs=None, tango_class_name=None):
+def init_tango_device_klass(tango_device_klass, attrs=None,
+                            tango_class_name=None):
     klass_name = tango_device_klass.__name__
-    tango_deviceclass_klass = create_tango_deviceclass_klass(tango_device_klass,
-                                                             attrs=attrs)
+    tango_deviceclass_klass = create_tango_deviceclass_klass(
+        tango_device_klass, attrs=attrs)
     if tango_class_name is None:
         if hasattr(tango_device_klass, "TangoClassName"):
             tango_class_name = tango_device_klass.TangoClassName
@@ -321,19 +341,21 @@ def create_tango_device_klass(name, bases, attrs):
 
 
 def DeviceMeta(name, bases, attrs):
-    """The :py:data:`metaclass` callable for :class:`Device`. Every subclass of
-    :class:`Device` must have associated this metaclass to itself in order to
-    work properly (boost-python internal limitation).
-    
+    """
+    The :py:data:`metaclass` callable for :class:`Device`.Every
+    sub-class of :class:`Device` must have associated this metaclass
+    to itself in order to work properly (boost-python internal
+    limitation).
+
     Example (python 2.x)::
-    
+
         from PyTango.server import Device, DeviceMeta
 
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
 
     Example (python 3.x)::
-    
+
         from PyTango.server import Device, DeviceMeta
 
         class PowerSupply(Device, metaclass=DeviceMeta):
@@ -343,40 +365,48 @@ def DeviceMeta(name, bases, attrs):
 
 
 class Device(LatestDeviceImpl):
-    """High level DeviceImpl API. All Device specific classes should inherit
-    from this class."""
+    """
+    High level DeviceImpl API. All Device specific classes should
+    inherit from this class."""
 
     def __init__(self, cl, name):
         LatestDeviceImpl.__init__(self, cl, name)
         self.init_device()
 
     def init_device(self):
-        """Tango init_device method. Default implementation calls
+        """
+        Tango init_device method. Default implementation calls
         :meth:`get_device_properties`"""
         self.get_device_properties()
 
     def always_executed_hook(self):
-        """Tango always_executed_hook. Default implementation does nothing"""
+        """
+        Tango always_executed_hook. Default implementation does
+        nothing
+        """
         pass
 
     def initialize_dynamic_attributes(self):
-        """Method executed at initializion phase to create dynamic attributes.
-        Default implementation does nothing. Overwrite when necessary."""
+        """
+        Method executed at initializion phase to create dynamic
+        attributes. Default implementation does nothing. Overwrite
+        when necessary.
+        """
         pass
 
 
 class attribute(AttrData):
     '''
-    declares a new tango attribute in a :class:`Device`. To be used like
-    the python native :obj:`property` function. For example, to declare a
-    scalar, `PyTango.DevDouble`, read-only attribute called *voltage* in a
-    *PowerSupply* :class:`Device` do::
+    Declares a new tango attribute in a :class:`Device`. To be used
+    like the python native :obj:`property` function. For example, to
+    declare a scalar, `PyTango.DevDouble`, read-only attribute called
+    *voltage* in a *PowerSupply* :class:`Device` do::
 
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
-        
+
             voltage = attribute()
-         
+
             def read_voltage(self):
                 return 999.999
 
@@ -389,7 +419,7 @@ class attribute(AttrData):
             def voltage(self):
                 return 999.999
 
-        
+
     It receives multiple keyword arguments.
 
     ===================== ================================ ======================================= =======================================================================================
@@ -398,8 +428,8 @@ class attribute(AttrData):
     name                   :obj:`str`                       class member name                       alternative attribute name
     dtype                  :obj:`object`                    :obj:`~PyTango.CmdArgType.DevDouble`    data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
     dformat                :obj:`~PyTango.AttrDataFormat`   :obj:`~PyTango.AttrDataFormat.SCALAR`   data format
-    max_dim_x              :obj:`int`                       1                                       maximum size for x dimension (ignored for SCALAR format) 
-    max_dim_y              :obj:`int`                       0                                       maximum size for y dimension (ignored for SCALAR and SPECTRUM formats) 
+    max_dim_x              :obj:`int`                       1                                       maximum size for x dimension (ignored for SCALAR format)
+    max_dim_y              :obj:`int`                       0                                       maximum size for y dimension (ignored for SCALAR and SPECTRUM formats)
     display_level          :obj:`~PyTango.DispLevel`        :obj:`~PyTango.DisLevel.OPERATOR`       display level
     polling_period         :obj:`int`                       -1                                      polling period
     memorized              :obj:`bool`                      False                                   attribute should or not be memorized
@@ -431,15 +461,15 @@ class attribute(AttrData):
     ===================== ================================ ======================================= =======================================================================================
 
     .. note::
-        avoid using *dformat* parameter. If you need a SPECTRUM attribute of say,
-        boolean type, use instead ``dtype=(bool,)``.
+        avoid using *dformat* parameter. If you need a SPECTRUM
+        attribute of say, boolean type, use instead ``dtype=(bool,)``.
 
-    Example of a integer writable attribute with a customized label, unit and
-    description::
+    Example of a integer writable attribute with a customized label,
+    unit and description::
 
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
-        
+
             current = attribute(label="Current", unit="mA", dtype=int,
                                 access=AttrWriteType.READ_WRITE,
                                 doc="the power supply current")
@@ -447,7 +477,7 @@ class attribute(AttrData):
             def init_device(self):
                 Device.init_device(self)
                 self._current = -1
-    
+
             def read_current(self):
                 return self._current
 
@@ -462,7 +492,7 @@ class attribute(AttrData):
             def init_device(self):
                 Device.init_device(self)
                 self._current = -1
-    
+
             @attribute(label="Current", unit="mA", dtype=int)
             def current(self):
                 """the power supply current"""
@@ -472,8 +502,8 @@ class attribute(AttrData):
             def current(self, current):
                 self._current = current
 
-    In this second format, defining the `write` implies setting the attribute
-    access to READ_WRITE.
+    In this second format, defining the `write` implies setting the
+    attribute access to READ_WRITE.
     '''
 
     def __init__(self, fget=None, **kwargs):
@@ -488,11 +518,12 @@ class attribute(AttrData):
                     kwargs['doc'] = fget.__doc__
             else:
                 kwargs['fget'] = fget
-        
+
         super(attribute, self).__init__(name, class_name)
         if 'dtype' in kwargs:
             kwargs['dtype'], kwargs['dformat'] = \
-                get_tango_type_format(kwargs['dtype'], kwargs.get('dformat'))
+                get_tango_type_format(kwargs['dtype'],
+                                      kwargs.get('dformat'))
         self.build_from_dict(kwargs)
 
     def get_attribute(self, obj):
@@ -513,8 +544,11 @@ class attribute(AttrData):
         obj.remove_attribute(self.attr_name)
 
     def setter(self, fset):
-        """To be used as a decorator. Will define the decorated method as a
-        write attribute method to be called when client writes the attribute"""
+        """
+        To be used as a decorator. Will define the decorated method
+        as a write attribute method to be called when client writes
+        the attribute
+        """
         self.fset = fset
         if self.attr_write == AttrWriteType.READ:
             if getattr(self, 'fget', None):
@@ -524,10 +558,13 @@ class attribute(AttrData):
         return self
 
     def write(self, fset):
-        """To be used as a decorator. Will define the decorated method as a
-        write attribute method to be called when client writes the attribute"""
-        return self.setter(fset)        
-    
+        """
+        To be used as a decorator. Will define the decorated method
+        as a write attribute method to be called when client writes
+        the attribute
+        """
+        return self.setter(fset)
+
     def __call__(self, fget):
         return type(self)(fget=fget, **self._kwargs)
 
@@ -536,13 +573,13 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
             dtype_out=None, dformat_out=None, doc_out="",):
     """
     Declares a new tango command in a :class:`Device`.
-    To be used like a decorator in the methods you want to declare as tango
-    commands. The following example declares commands:
+    To be used like a decorator in the methods you want to declare as
+    tango commands. The following example declares commands:
 
         * `void TurnOn(void)`
         * `void Ramp(DevDouble current)`
         * `DevBool Pressurize(DevDouble pressure)`
-    
+
     ::
 
         class PowerSupply(Device):
@@ -550,46 +587,47 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
 
             @command
             def TurnOn(self):
-                self.info_stream("Turning on the power supply")
-    
+                self.info_stream('Turning on the power supply')
+
             @command(dtype_in=float)
             def Ramp(self, current):
-                self.info_stream("Ramping on %f..." % current)
+                self.info_stream('Ramping on %f...' % current)
 
-            @command(dtype_in=float, doc_in="the pressure to be set",
-                     dtype_out=bool, doc_out="True if it worked, False otherwise")
+            @command(dtype_in=float, doc_in='the pressure to be set',
+                     dtype_out=bool, doc_out='True if it worked, False otherwise')
             def Pressurize(self, pressure):
-                self.info_stream("Pressurizing to %f..." % pressure)
+                self.info_stream('Pressurizing to %f...' % pressure)
 
     .. note::
-        avoid using *dformat* parameter. If you need a SPECTRUM attribute of
-        say, boolean type, use instead ``dtype=(bool,)``.
-                    
-    :param dtype_in: a :ref:`data type <pytango-hlapi-datatypes>`
-                     describing the type of parameter. Default is None meaning
-                     no parameter.
+        avoid using *dformat* parameter. If you need a SPECTRUM
+        attribute of say, boolean type, use instead ``dtype=(bool,)``.
+
+    :param dtype_in:
+        a :ref:`data type <pytango-hlapi-datatypes>` describing the
+        type of parameter. Default is None meaning no parameter.
     :param dformat_in: parameter data format. Default is None.
     :type dformat_in: AttrDataFormat
     :param doc_in: parameter documentation
     :type doc_in: str
 
-    :param dtype_out: a :ref:`data type <pytango-hlapi-datatypes>`
-                      describing the type of return value. Default is None
-                      meaning no return value.
+    :param dtype_out:
+        a :ref:`data type <pytango-hlapi-datatypes>` describing the
+        type of return value. Default is None meaning no return value.
     :param dformat_out: return value data format. Default is None.
     :type dformat_out: AttrDataFormat
     :param doc_out: return value documentation
     :type doc_out: str
-
     """
     if f is None:
         return functools.partial(command,
             dtype_in=dtype_in, dformat_in=dformat_in, doc_in=doc_in,
-            dtype_out=dtype_out, dformat_out=dformat_out, doc_out=doc_out)
+            dtype_out=dtype_out, dformat_out=dformat_out,
+            doc_out=doc_out)
     name = f.__name__
 
     dtype_in, dformat_in = get_tango_type_format(dtype_in, dformat_in)
-    dtype_out, dformat_out = get_tango_type_format(dtype_out, dformat_out)
+    dtype_out, dformat_out = get_tango_type_format(dtype_out,
+                                                   dformat_out)
 
     din = [from_typeformat_to_type(dtype_in, dformat_in), doc_in]
     dout = [from_typeformat_to_type(dtype_out, dformat_out), doc_out]
@@ -618,17 +656,17 @@ class _property(object):
 
 class device_property(_property):
     """
-    Declares a new tango device property in a :class:`Device`. To be used like
-    the python native :obj:`property` function. For example, to declare a
-    scalar, `PyTango.DevString`, device property called *host* in a
-    *PowerSupply* :class:`Device` do::
+    Declares a new tango device property in a :class:`Device`. To be
+    used like the python native :obj:`property` function. For example,
+    to declare a scalar, `PyTango.DevString`, device property called
+    *host* in a *PowerSupply* :class:`Device` do::
 
         from PyTango.server import Device, DeviceMeta
-        from PyTango.server import device_property    
-    
+        from PyTango.server import device_property
+
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
-        
+
             host = device_property(dtype=str)
 
     :param dtype: Data type (see :ref:`pytango-data-types`)
@@ -639,23 +677,23 @@ class device_property(_property):
 
 class class_property(_property):
     """
-    Declares a new tango class property in a :class:`Device`. To be used like
-    the python native :obj:`property` function. For example, to declare a
-    scalar, `PyTango.DevString`, class property called *port* in a *PowerSupply*
-    :class:`Device` do::
+    Declares a new tango class property in a :class:`Device`. To be
+    used like the python native :obj:`property` function. For example,
+    to declare a scalar, `PyTango.DevString`, class property called
+    *port* in a *PowerSupply* :class:`Device` do::
 
         from PyTango.server import Device, DeviceMeta
-        from PyTango.server import class_property    
-    
+        from PyTango.server import class_property
+
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
-        
+
             port = class_property(dtype=int, default_value=9788)
 
     :param dtype: Data type (see :ref:`pytango-data-types`)
     :param doc: property documentation (optional)
     :param default_value: default value for the property (optional)
-    """    
+    """
     pass
 
 
@@ -682,7 +720,7 @@ def __to_cb(post_init_callback):
         return functools.partial(cb, *args, **kwargs)
 
     raise TypeError(err_msg)
-    
+
 
 def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
                  event_loop=None, post_init_callback=None):
@@ -691,7 +729,7 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
         write = lambda msg: None
     else:
         write = msg_stream.write
-        
+
     if args is None:
         args = sys.argv
 
@@ -706,10 +744,12 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
                 if len(klass_info) == 2:
                     klass_klass, klass = klass_info
                 else:
-                    klass_klass, klass, klass_name = klass_info                
+                    klass_klass, klass, klass_name = klass_info
             else:
                 if not hasattr(klass_info, '_api') or klass_info._api < 2:
-                    raise Exception("When giving a single class, it must implement HLAPI (see PyTango.server)")
+                    raise Exception(
+                        "When giving a single class, it must " \
+                        "implement HLAPI (see PyTango.server)")
                 klass_klass = klass_info.TangoClassClass
                 klass_name = klass_info.TangoClassName
                 klass = klass_info
@@ -723,7 +763,9 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
                     klass_klass, klass, klass_name = klass_info
             else:
                 if not hasattr(klass_info, '_api') or klass_info._api < 2:
-                    raise Exception("When giving a single class, it must implement HLAPI (see PyTango.server)")
+                    raise Exception(
+                        "When giving a single class, it must " \
+                        "implement HLAPI (see PyTango.server)")
                 klass_klass = klass_info.TangoClassClass
                 klass_name = klass_info.TangoClassName
                 klass = klass_info
@@ -749,103 +791,115 @@ def run(classes, args=None, msg_stream=sys.stdout,
     The `classes` parameter can be either a sequence of:
 
     * :class:`~PyTango.server.Device` or
-    * a sequence of two elements :class:`~PyTango.DeviceClass` , :class:`~PyTango.DeviceImpl` or
-    * a sequence of three elements :class:`~PyTango.DeviceClass` , :class:`~PyTango.DeviceImpl`, tango class name (str)
-    
+    * a sequence of two elements
+      :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl` or
+    * a sequence of three elements
+      :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`,
+      tango class name (str)
+
     or a dictionary where:
 
     * key is the tango class name
     * value is either:
         * a :class:`~PyTango.server.Device` class or
-        * a sequence of two elements :class:`~PyTango.DeviceClass` , :class:`~PyTango.DeviceImpl` or
-        * a sequence of three elements :class:`~PyTango.DeviceClass` , :class:`~PyTango.DeviceImpl`, tango class name (str)        
+        * a sequence of two elements
+          :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`
+          or
+        * a sequence of three elements
+          :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`,
+          tango class name (str)
 
-    The optional `post_init_callback` can be a callable (without arguments)
-    or a tuple where the first element is the callable, the second is a list
-    of arguments(optional) and the third is a dictionary of keyword arguments
-    (also optional).
+    The optional `post_init_callback` can be a callable (without
+    arguments) or a tuple where the first element is the callable,
+    the second is a list of arguments (optional) and the third is a
+    dictionary of keyword arguments (also optional).
 
     .. note::
        the order of registration of tango classes defines the order
        tango uses to initialize the corresponding devices.
        if using a dictionary as argument for classes be aware that the
-       order of registration becomes arbitrary. If you need a predefined
-       order use a sequence or an OrderedDict.
-           
-    Example 1: registering and running a PowerSupply inheriting from :class:`~PyTango.server.Device`::
-       
+       order of registration becomes arbitrary. If you need a
+       predefined order use a sequence or an OrderedDict.
+
+    Example 1: registering and running a PowerSupply inheriting from
+    :class:`~PyTango.server.Device`::
+
         from PyTango.server import Device, DeviceMeta, run
-       
+
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
-               
+
         run((PowerSupply,))
-           
-    Example 2: registering and running a MyServer defined by tango classes 
-    `MyServerClass` and `MyServer`::
-       
+
+    Example 2: registering and running a MyServer defined by tango
+    classes `MyServerClass` and `MyServer`::
+
         from PyTango import Device_4Impl, DeviceClass
         from PyTango.server import run
-    
+
         class MyServer(Device_4Impl):
             pass
-               
+
         class MyServerClass(DeviceClass):
             pass
-       
+
         run({'MyServer': (MyServerClass, MyServer)})
 
-    Example 3: registering and running a MyServer defined by tango classes 
-    `MyServerClass` and `MyServer`::
-       
-        from PyTango import Device_4Impl, DeviceClass        
+    Example 3: registering and running a MyServer defined by tango
+    classes `MyServerClass` and `MyServer`::
+
+        from PyTango import Device_4Impl, DeviceClass
         from PyTango.server import Device, DeviceMeta, run
-       
+
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
-               
+
         class MyServer(Device_4Impl):
             pass
-               
+
         class MyServerClass(DeviceClass):
             pass
 
         run([PowerSupply, [MyServerClass, MyServer]])
         # or: run({'MyServer': (MyServerClass, MyServer)})
-       
+
     :param classes:
         a sequence of :class:`~PyTango.server.Device` classes or
-        a dictionary where keyword is the tango class name and value is a 
-        sequence of Tango Device Class python class, and Tango Device python class
+        a dictionary where keyword is the tango class name and value
+        is a sequence of Tango Device Class python class, and Tango
+        Device python class
     :type classes: sequence or dict
-       
+
     :param args:
-        list of command line arguments [default: None, meaning use sys.argv]
+        list of command line arguments [default: None, meaning use
+        sys.argv]
     :type args: list
-       
+
     :param msg_stream:
         stream where to put messages [default: sys.stdout]
-       
+
     :param util:
-        PyTango Util object [default: None meaning create a Util instance]
+        PyTango Util object [default: None meaning create a Util
+        instance]
     :type util: :class:`~PyTango.Util`
 
     :param event_loop: event_loop callable
     :type event_loop: callable
-       
+
     :param post_init_callback:
-        an optional callback that is executed between the calls Util.server_init
-        and Util.server_run
-    :type post_init_callback: callable or tuple (see description above)
+        an optional callback that is executed between the calls
+        Util.server_init and Util.server_run
+    :type post_init_callback:
+        callable or tuple (see description above)
 
     :return: The Util singleton object
     :rtype: :class:`~PyTango.Util`
-       
+
     .. versionadded:: 8.1.2
 
     .. versionchanged:: 8.1.4
         when classes argument is a sequence, the items can also be
-        a sequence of <TangoClass, TangoClassClass>[, tango class name]
+        a sequence <TangoClass, TangoClassClass>[, tango class name]
     """
     if msg_stream is None:
         write = lambda msg : None
@@ -858,11 +912,13 @@ def run(classes, args=None, msg_stream=sys.stdout,
     except KeyboardInterrupt:
         write("Exiting: Keyboard interrupt\n")
     except DevFailed as df:
-        write("Exiting: Server exited with PyTango.DevFailed:\n" + str(df) + "\n")
+        write("Exiting: Server exited with PyTango.DevFailed:\n" + \
+              str(df) + "\n")
         if verbose:
             write(traceback.format_exc())
     except Exception as e:
-        write("Exiting: Server exited with unforseen exception:\n" + str(e) + "\n")
+        write("Exiting: Server exited with unforseen exception:\n" + \
+              str(e) + "\n")
         if verbose:
             write(traceback.format_exc())
     write("\nExited\n")
@@ -872,10 +928,11 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
         post_init_callback=None):
     """
     Since PyTango 8.1.2 it is just an alias to
-    :func:`~PyTango.server.run`. Use :func:`~PyTango.server.run` instead.
-       
+    :func:`~PyTango.server.run`. Use :func:`~PyTango.server.run`
+    instead.
+
     .. versionadded:: 8.0.0
-       
+
     .. versionchanged:: 8.0.3
         Added `util` keyword parameter.
         Returns util object
@@ -890,7 +947,7 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
 
     .. deprecated:: 8.1.2
         Use :func:`~PyTango.server.run` instead.
-        
+
     """
     return run(classes, args=args, msg_stream=msg_stream,
                verbose=verbose, util=util, event_loop=event_loop,
