@@ -1,5 +1,5 @@
 
-.. currentmodule:: PyTango.hlapi
+.. currentmodule:: PyTango.server
 
 .. _pytango-TEP1:
 
@@ -11,8 +11,8 @@ TEP 1 - Device Server High Level API
  TEP:               1   
 ================== ====================================================
  Title:             Device Server High Level API
- Version:           2.1.0
- Last-Modified:     13-Nov-2013
+ Version:           2.2.0
+ Last-Modified:     10-Sep-2014
  Author:            Tiago Coutinho <tcoutinho@cells.es>
  Status:            Active
  Type:              Standards Track
@@ -125,10 +125,10 @@ In order to keep the code up to date with tango, every time a new Tango IDL
 is released, the code of **every** device server needs to be manually
 updated to ihnerit from the newest tango version.
 
-By inheriting from a new high-level :class:`~PyTango.hlapi.Device` (which
+By inheriting from a new high-level :class:`~PyTango.server.Device` (which
 itself automatically *decides* from which DeviceImpl version it should
 inherit), the device servers are always up to date with the latest tango
-release without need for manual intervention (see :mod:`PyTango.hlapi`).
+release without need for manual intervention (see :mod:`PyTango.server`).
 
 Low-level way::
 
@@ -137,17 +137,17 @@ Low-level way::
     
 High-level way::
 
-    class Motor(PyTango.hlapi.Device):
+    class Motor(PyTango.server.Device):
         pass
     
-Default implementation of :class:`~PyTango.hlapi.Device` constructor
+Default implementation of :class:`~PyTango.server.Device` constructor
 --------------------------------------------------------------------------------
 
 99% of the different device classes which inherit from low level
 :class:`~PyTango.DeviceImpl` only implement `__init__` to call their
-`init_device` (see :mod:`PyTango.hlapi`).
+`init_device` (see :mod:`PyTango.server`).
 
-:class:`~PyTango.hlapi.Device` already calls init_device.
+:class:`~PyTango.server.Device` already calls init_device.
 
 Low-level way::
 
@@ -159,21 +159,21 @@ Low-level way::
     
 High-level way::
 
-    class Motor(PyTango.hlapi.Device):
+    class Motor(PyTango.server.Device):
 
         # Nothing to be done!
         
         pass
 
-Default implementation of :meth:`~PyTango.hlapi.Device.init_device`
+Default implementation of :meth:`~PyTango.server.Device.init_device`
 --------------------------------------------------------------------------------
 
 99% of different device classes which inherit from low level
 :class:`~PyTango.DeviceImpl` have an implementation of `init_device` which
 *at least* calls :meth:`~PyTango.DeviceImpl.get_device_properties`
-(see :mod:`PyTango.hlapi`).
+(see :mod:`PyTango.server`).
 
-:meth:`~PyTango.hlapi.Device.init_device` already calls :meth:`~PyTango.hlapi.Device.get_device_properties`.
+:meth:`~PyTango.server.Device.init_device` already calls :meth:`~PyTango.server.Device.get_device_properties`.
 
 Low-level way::
 
@@ -184,7 +184,7 @@ Low-level way::
     
 High-level way::
 
-    class Motor(PyTango.hlapi.Device):
+    class Motor(PyTango.server.Device):
         # Nothing to be done!
         pass
 
@@ -199,8 +199,8 @@ device and class properties by using the corresponding
 
 With the high-level API we completely remove the need to code the
 :class:`~PyTango.DeviceClass` by registering attribute, commands,
-device and class properties in the :class:`~PyTango.hlapi.Device` with a more
-pythonic API (see :mod:`PyTango.hlapi`)
+device and class properties in the :class:`~PyTango.server.Device` with a more
+pythonic API (see :mod:`PyTango.server`)
 
 
 #. Hide `<Device>Class` class completely
@@ -232,9 +232,9 @@ Low-level way::
 
 High-level way::
 
-    class Motor(PyTango.hlapi.Device):
+    class Motor(PyTango.server.Device):
         
-        position = PyTango.hlapi.attribute(dtype=float, )
+        position = PyTango.server.attribute(dtype=float, )
 
         def read_position(self):
             pass
@@ -574,7 +574,7 @@ And the equivalent HLAPI version of the code would be::
     #!/usr/bin/env python
 
     from PyTango import DebugIt, server_run
-    from PyTango.hlapi import Device, DeviceMeta, attribute
+    from PyTango.server import Device, DeviceMeta, attribute
 
 
     class Motor(Device):
@@ -595,10 +595,15 @@ And the equivalent HLAPI version of the code would be::
 References
 ==========
 
-:mod:`PyTango.hlapi`
+:mod:`PyTango.server`
 
 Changes
 =======
+
+from 2.1.0 to 2.2.0
+-------------------
+
+Changed module name from *hlapi* to *server*
 
 from 2.0.0 to 2.1.0
 -------------------
