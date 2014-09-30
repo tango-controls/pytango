@@ -326,10 +326,12 @@ def create_tango_deviceclass_klass(tango_device_klass, attrs=None):
             attr_list[attr_name] = attr_obj
             check_dev_klass_attr_methods(tango_device_klass, attr_obj)
         elif isinstance(attr_obj, device_property):
+            attr_obj.name = attr_name
             device_property_list[attr_name] = [attr_obj.dtype,
                                                attr_obj.doc,
                                                attr_obj.default_value]
         elif isinstance(attr_obj, class_property):
+            attr_obj.name = attr_name
             class_property_list[attr_name] = [attr_obj.dtype,
                                               attr_obj.doc,
                                               attr_obj.default_value]
@@ -401,6 +403,7 @@ class Device(LatestDeviceImpl):
     inherit from this class."""
 
     def __init__(self, cl, name):
+        self._tango_properties = {}
         LatestDeviceImpl.__init__(self, cl, name)
         self.init_device()
 
@@ -678,6 +681,7 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
 class _property(object):
 
     def __init__(self, dtype, doc='', default_value=None):
+        self.name = None
         self.__value = None
         dtype = from_typeformat_to_type(*_get_tango_type_format(dtype))
         self.dtype = dtype
@@ -685,13 +689,13 @@ class _property(object):
         self.default_value = default_value
 
     def __get__(self, obj, objtype):
-        return self.__value
+        return obj._tango_properties.get(self.name)
 
     def __set__(self, obj, value):
-        self.__value = value
+        obj._tango_properties[self.name] = value
 
     def __delete__(self, obj):
-        del self.__value
+        del obj._tango_properties[self.name]
 
 
 class device_property(_property):

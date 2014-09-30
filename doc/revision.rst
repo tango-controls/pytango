@@ -97,8 +97,10 @@ Version history
 |          | Bug fixes:                                                                                                                                                            |
 |          |                                                                                                                                                                       |
 |          |     - `659: segmentation fault when unsubscribing from events <https://sourceforge.net/p/tango-cs/bugs/659/>`_                                                        |
+|          |     - `678: [pytango] 8.1.2 unexpected files in the source package  <https://sourceforge.net/p/tango-cs/bugs/678/>`_                                                  |
 |          |     - `679: PyTango.server tries to import missing __builtin__ module on Python 3 <https://sourceforge.net/p/tango-cs/bugs/679/>`_                                    |
 |          |     - `680: Cannot import PyTango.server.run <https://sourceforge.net/p/tango-cs/bugs/680/>`_                                                                         |
+|          |     - `686: Device property substitution for a multi-device server <https://sourceforge.net/p/tango-cs/bugs/686/>`_                                                   |
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.3    | *SKIPPED*                                                                                                                                                             |
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
