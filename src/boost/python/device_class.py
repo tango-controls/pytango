@@ -21,7 +21,7 @@ __docformat__ = "restructuredtext"
 
 import collections
 
-from ._PyTango import Except, DevFailed, _DeviceClass, CmdArgType, \
+from ._PyTango import Except, DevFailed, DeviceClass, CmdArgType, \
     DispLevel, UserDefaultAttrProp
 from .pyutil import Util
 
@@ -261,393 +261,401 @@ class PropUtil:
         return obj_2_str(argin, argout_type)
 
 
-class DeviceClass(_DeviceClass):
-    """Base class for all TANGO device-class class.
-       A TANGO device-class class is a class where is stored all
-       data/method common to all devices of a TANGO device class"""
+def __DeviceClass__init__(self, name):
+    DeviceClass.__init_orig__(self, name)
+    self.dyn_att_added_methods = []
+    try:
+        pu = self.prop_util = PropUtil()
+        self.py_dev_list = []
+        pu.set_default_property_values(self, self.class_property_list,
+                                       self.device_property_list)
+        pu.get_class_properties(self, self.class_property_list)
+        for prop_name in self.class_property_list:
+            if not hasattr(self, prop_name):
+                setattr(self, prop_name, pu.get_property_values(prop_name,
+                        self.class_property_list))
+    except DevFailed as df:
+        print("PyDS: %s: A Tango error occured in the constructor:" % name)
+        Except.print_exception(df)
+    except Exception as e:
+        print("PyDS: %s: An error occured in the constructor:" % name)
+        print(str(e))
 
-    class_property_list = {}
-    device_property_list = {}
-    cmd_list = {}
-    attr_list = {}
+def __DeviceClass__str__(self):
+    return '%s(%s)' % (self.__class__.__name__, self.get_name())
 
-    def __init__(self, name):
-        _DeviceClass.__init__(self, name)
-        self.dyn_att_added_methods = []
-        try:
-            pu = self.prop_util = PropUtil()
-            self.py_dev_list = []
-            pu.set_default_property_values(self, self.class_property_list,
-                                           self.device_property_list)
-            pu.get_class_properties(self, self.class_property_list)
-            for prop_name in self.class_property_list:
-                if not hasattr(self, prop_name):
-                    setattr(self, prop_name, pu.get_property_values(prop_name,
-                            self.class_property_list))
-        except DevFailed as df:
-            print("PyDS: %s: A Tango error occured in the constructor:" % name)
-            Except.print_exception(df)
-        except Exception as e:
-            print("PyDS: %s: An error occured in the constructor:" % name)
-            print(str(e))
-            
-    def __str__(self):
-        return '%s(%s)' % (self.__class__.__name__, self.get_name())
-    
-    def __repr__(self):
-        return '%s(%s)' % (self.__class__.__name__, self.get_name())    
-    
-    def __throw_create_attribute_exception(self, msg):
-        """Helper method to throw DevFailed exception when inside create_attribute"""
-        Except.throw_exception("PyDs_WrongAttributeDefinition", msg, "create_attribute()")
+def __DeviceClass__repr__(self):
+    return '%s(%s)' % (self.__class__.__name__, self.get_name())    
 
-    def __throw_create_command_exception(self, msg):
-        """Helper method to throw DevFailed exception when inside create_command"""
-        Except.throw_exception("PyDs_WrongCommandDefinition", msg, "create_command()")
+def __throw_create_attribute_exception(msg):
+    """
+    Helper method to throw DevFailed exception when inside
+    create_attribute
+    """
+    Except.throw_exception("PyDs_WrongAttributeDefinition", msg,
+                           "create_attribute()")
 
-    def __attribute_factory(self, attr_list):
-        """for internal usage only"""
+def __throw_create_command_exception(msg):
+    """
+    Helper method to throw DevFailed exception when inside
+    create_command
+    """
+    Except.throw_exception("PyDs_WrongCommandDefinition", msg,
+                           "create_command()")
 
-        for attr_name, attr_info in self.attr_list.items():
-            if isinstance(attr_info, AttrData):
-                attr_data = attr_info
-            else:
-                attr_data = AttrData(attr_name, self.get_name(), attr_info)
-            self.__create_attribute(attr_list, attr_data)
-
-    def __create_attribute(self, attr_list, attr_data):
-        """for internal usage only"""
+def __DeviceClass__attribute_factory(self, attr_list):
+    """for internal usage only"""
+    for attr_name, attr_info in self.attr_list.items():
+        if isinstance(attr_info, AttrData):
+            attr_data = attr_info
+        else:
+            attr_data = AttrData(attr_name, self.get_name(), attr_info)
         self._create_attribute(attr_list, attr_data.attr_name,
-                               attr_data.attr_type, attr_data.attr_format,
-                               attr_data.attr_write, attr_data.dim_x,
-                               attr_data.dim_y, attr_data.display_level,
-                               attr_data.polling_period, attr_data.memorized,
+                               attr_data.attr_type,
+                               attr_data.attr_format,
+                               attr_data.attr_write,
+                               attr_data.dim_x, attr_data.dim_y,
+                               attr_data.display_level,
+                               attr_data.polling_period,
+                               attr_data.memorized,
                                attr_data.hw_memorized,
                                attr_data.read_method_name,
                                attr_data.write_method_name,
-                               attr_data.is_allowed_name, attr_data.att_prop)
+                               attr_data.is_allowed_name,
+                               attr_data.att_prop)
 
-    def __create_user_default_attr_prop(self, attr_name, extra_info):
-        """for internal usage only"""
-        p = UserDefaultAttrProp()
-        for k, v in extra_info.items():
-            k_lower = k.lower()
-            method_name = "set_%s" % k_lower.replace(' ','_')
-            if hasattr(p, method_name):
-                method = getattr(p, method_name)
-                method(str(v))
-            elif k == 'delta_time':
-                p.set_delta_t(str(v))
-            elif not k_lower in ('display level', 'polling period', 'memorized'):
-                name = self.get_name()
-                msg = "Wrong definition of attribute %s in " \
-                      "class %s\nThe object extra information '%s' " \
-                      "is not recognized!" % (attr_name, name, k)
-                self.__throw_create_attribute_exception(msg)
-        return p
+def __DeviceClass__command_factory(self):
+    """for internal usage only"""
+    name = self.get_name()
+    class_info = get_class(name)
+    deviceimpl_class = class_info[1]
 
-    def __command_factory(self):
-        """for internal usage only"""
-        name = self.get_name()
-        class_info = get_class(name)
-        deviceimpl_class = class_info[1]
+    if not hasattr(deviceimpl_class, "init_device"):
+        msg = "Wrong definition of class %s\n" \
+              "The init_device() method does not exist!" % name
+        Except.throw_exception("PyDs_WrongCommandDefinition", msg, "command_factory()")
 
-        if not hasattr(deviceimpl_class, "init_device"):
-            msg = "Wrong definition of class %s\n" \
-                  "The init_device() method does not exist!" % name
-            Except.throw_exception("PyDs_WrongCommandDefinition", msg, "command_factory()")
+    for cmd_name, cmd_info in self.cmd_list.items():
+        __create_command(self, deviceimpl_class, cmd_name, cmd_info)
 
-        for cmd_name, cmd_info in self.cmd_list.items():
-            self.__create_command(deviceimpl_class, cmd_name, cmd_info)
+def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
+    """for internal usage only"""
+    name = self.get_name()
 
-    def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
-        """for internal usage only"""
-        name = self.get_name()
+    # check for well defined command info
 
-        # check for well defined command info
+    # check parameter
+    if not isinstance(cmd_info, collections.Sequence):
+        msg = "Wrong data type for value for describing command %s in " \
+              "class %s\nMust be a sequence with 2 or 3 elements" % (cmd_name, name)
+        __throw_create_command_exception(msg)
 
-        # check parameter
-        if not isinstance(cmd_info, collections.Sequence):
-            msg = "Wrong data type for value for describing command %s in " \
-                  "class %s\nMust be a sequence with 2 or 3 elements" % (cmd_name, name)
-            self.__throw_create_command_exception(msg)
+    if len(cmd_info) < 2 or len(cmd_info) > 3:
+        msg = "Wrong number of argument for describing command %s in " \
+              "class %s\nMust be a sequence with 2 or 3 elements" % (cmd_name, name)
+        __throw_create_command_exception(msg)
 
-        if len(cmd_info) < 2 or len(cmd_info) > 3:
-            msg = "Wrong number of argument for describing command %s in " \
-                  "class %s\nMust be a sequence with 2 or 3 elements" % (cmd_name, name)
-            self.__throw_create_command_exception(msg)
+    param_info, result_info = cmd_info[0], cmd_info[1]
 
-        param_info, result_info = cmd_info[0], cmd_info[1]
+    if not isinstance(param_info, collections.Sequence):
+        msg = "Wrong data type in command argument for command %s in " \
+              "class %s\nCommand parameter (first element) must be a sequence" % (cmd_name, name)
+        __throw_create_command_exception(msg)
 
-        if not isinstance(param_info, collections.Sequence):
-            msg = "Wrong data type in command argument for command %s in " \
-                  "class %s\nCommand parameter (first element) must be a sequence" % (cmd_name, name)
-            self.__throw_create_command_exception(msg)
+    if len(param_info) < 1 or len(param_info) > 2:
+        msg = "Wrong data type in command argument for command %s in " \
+              "class %s\nSequence describing command parameters must contain " \
+              "1 or 2 elements"
+        __throw_create_command_exception(msg)
 
-        if len(param_info) < 1 or len(param_info) > 2:
-            msg = "Wrong data type in command argument for command %s in " \
-                  "class %s\nSequence describing command parameters must contain " \
-                  "1 or 2 elements"
-            self.__throw_create_command_exception(msg)
+    param_type = CmdArgType.DevVoid
+    try:
+        param_type = CmdArgType(param_info[0])
+    except:
+        msg = "Wrong data type in command argument for command %s in " \
+              "class %s\nCommand parameter type (first element in first " \
+              "sequence) must be a PyTango.CmdArgType"
+        __throw_create_command_exception(msg)
 
-        param_type = CmdArgType.DevVoid
-        try:
-            param_type = CmdArgType(param_info[0])
-        except:
-            msg = "Wrong data type in command argument for command %s in " \
-                  "class %s\nCommand parameter type (first element in first " \
-                  "sequence) must be a PyTango.CmdArgType"
-            self.__throw_create_command_exception(msg)
+    param_desc = ""
+    if len(param_info) > 1:
+        param_desc = param_info[1]
+        if not is_pure_str(param_desc):
+            msg = "Wrong data type in command parameter for command %s in " \
+                  "class %s\nCommand parameter description (second element " \
+                  "in first sequence), when given, must be a string"
+            __throw_create_command_exception(msg)
 
-        param_desc = ""
-        if len(param_info) > 1:
-            param_desc = param_info[1]
-            if not is_pure_str(param_desc):
-                msg = "Wrong data type in command parameter for command %s in " \
-                      "class %s\nCommand parameter description (second element " \
-                      "in first sequence), when given, must be a string"
-                self.__throw_create_command_exception(msg)
+    # Check result
+    if not isinstance(result_info, collections.Sequence):
+        msg = "Wrong data type in command result for command %s in " \
+              "class %s\nCommand result (second element) must be a sequence" % (cmd_name, name)
+        __throw_create_command_exception(msg)
 
-        # Check result
-        if not isinstance(result_info, collections.Sequence):
+    if len(result_info) < 1 or len(result_info) > 2:
+        msg = "Wrong data type in command result for command %s in " \
+              "class %s\nSequence describing command result must contain " \
+              "1 or 2 elements" % (cmd_name, name)
+        __throw_create_command_exception(msg)
+
+    result_type = CmdArgType.DevVoid
+    try:
+        result_type = CmdArgType(result_info[0])
+    except:
+        msg = "Wrong data type in command result for command %s in " \
+              "class %s\nCommand result type (first element in second " \
+              "sequence) must be a PyTango.CmdArgType" % (cmd_name, name)
+        __throw_create_command_exception(msg)
+
+    result_desc = ""
+    if len(result_info) > 1:
+        result_desc = result_info[1]
+        if not is_pure_str(result_desc):
             msg = "Wrong data type in command result for command %s in " \
-                  "class %s\nCommand result (second element) must be a sequence" % (cmd_name, name)
-            self.__throw_create_command_exception(msg)
+                  "class %s\nCommand parameter description (second element " \
+                  "in second sequence), when given, must be a string" % (cmd_name, name)
+            __throw_create_command_exception(msg)
 
-        if len(result_info) < 1 or len(result_info) > 2:
-            msg = "Wrong data type in command result for command %s in " \
-                  "class %s\nSequence describing command result must contain " \
-                  "1 or 2 elements" % (cmd_name, name)
-            self.__throw_create_command_exception(msg)
+    # If it is defined, get addictional dictionnary used for optional parameters
+    display_level, default_command, polling_period = DispLevel.OPERATOR, False, -1
 
-        result_type = CmdArgType.DevVoid
-        try:
-            result_type = CmdArgType(result_info[0])
-        except:
-            msg = "Wrong data type in command result for command %s in " \
-                  "class %s\nCommand result type (first element in second " \
-                  "sequence) must be a PyTango.CmdArgType" % (cmd_name, name)
-            self.__throw_create_command_exception(msg)
+    if len(cmd_info) == 3:
+        extra_info = cmd_info[2]
+        if not isinstance(extra_info, collections.Mapping):
+            msg = "Wrong data type in command information for command %s in " \
+                  "class %s\nCommand information (third element in sequence), " \
+                  "when given, must be a dictionary" % (cmd_name, name)
+            __throw_create_command_exception(msg)
 
-        result_desc = ""
-        if len(result_info) > 1:
-            result_desc = result_info[1]
-            if not is_pure_str(result_desc):
-                msg = "Wrong data type in command result for command %s in " \
-                      "class %s\nCommand parameter description (second element " \
-                      "in second sequence), when given, must be a string" % (cmd_name, name)
-                self.__throw_create_command_exception(msg)
+        if len(extra_info) > 3:
+            msg = "Wrong data type in command information for command %s in " \
+                  "class %s\nThe optional dictionary can not have more than " \
+                  "three elements" % (cmd_name, name)
+            __throw_create_command_exception(msg)
 
-        # If it is defined, get addictional dictionnary used for optional parameters
-        display_level, default_command, polling_period = DispLevel.OPERATOR, False, -1
-
-        if len(cmd_info) == 3:
-            extra_info = cmd_info[2]
-            if not isinstance(extra_info, collections.Mapping):
-                msg = "Wrong data type in command information for command %s in " \
-                      "class %s\nCommand information (third element in sequence), " \
-                      "when given, must be a dictionary" % (cmd_name, name)
-                self.__throw_create_command_exception(msg)
-
-            if len(extra_info) > 3:
-                msg = "Wrong data type in command information for command %s in " \
-                      "class %s\nThe optional dictionary can not have more than " \
-                      "three elements" % (cmd_name, name)
-                self.__throw_create_command_exception(msg)
-
-            for info_name, info_value in extra_info.items():
-                info_name_lower = info_name.lower()
-                if info_name_lower == "display level":
-                    try:
-                        display_level = DispLevel(info_value)
-                    except:
-                        msg = "Wrong data type in command information for command %s in " \
-                              "class %s\nCommand information for display level is not a " \
-                              "PyTango.DispLevel" % (cmd_name, name)
-                        self.__throw_create_command_exception(msg)
-                elif info_name_lower == "default command":
-                    if not is_pure_str(info_value):
-                        msg = "Wrong data type in command information for command %s in " \
-                              "class %s\nCommand information for default command is not a " \
-                              "string" % (cmd_name, name)
-                        self.__throw_create_command_exception(msg)
-                    v = info_value.lower()
-                    default_command = v == 'true'
-                elif info_name_lower == "polling period":
-                    try:
-                        polling_period = int(info_value)
-                    except:
-                        msg = "Wrong data type in command information for command %s in " \
-                              "class %s\nCommand information for polling period is not an " \
-                              "integer" % (cmd_name, name)
-                        self.__throw_create_command_exception(msg)
-                else:
+        for info_name, info_value in extra_info.items():
+            info_name_lower = info_name.lower()
+            if info_name_lower == "display level":
+                try:
+                    display_level = DispLevel(info_value)
+                except:
                     msg = "Wrong data type in command information for command %s in " \
-                          "class %s\nCommand information has unknown key " \
-                          "%s" % (cmd_name, name, info_name)
-                    self.__throw_create_command_exception(msg)
-
-        # check that the method to be executed exists
-        try:
-            cmd = getattr(deviceimpl_class, cmd_name)
-            if not isinstance(cmd, collections.Callable):
-                msg = "Wrong definition of command %s in " \
-                      "class %s\nThe object exists in class but is not " \
-                      "a method!" % (cmd_name, name)
-                self.__throw_create_command_exception(msg)
-        except AttributeError:
-            msg = "Wrong definition of command %s in " \
-                  "class %s\nThe command method does not exist!" % (cmd_name, name)
-            self.__throw_create_command_exception(msg)
-
-        is_allowed_name = "is_%s_allowed" % cmd_name
-        try:
-            is_allowed = getattr(deviceimpl_class, is_allowed_name)
-            if not isinstance(is_allowed, collections.Callable):
-                msg = "Wrong definition of command %s in " \
-                      "class %s\nThe object '%s' exists in class but is " \
-                      "not a method!" % (cmd_name, name, is_allowed_name)
-                self.__throw_create_command_exception(msg)
-        except:
-            is_allowed_name = ""
-
-        self._create_command(cmd_name, param_type, result_type,
-                             param_desc, result_desc,
-                             display_level, default_command,
-                             polling_period, is_allowed_name)
-
-    def device_factory(self, device_list):
-        """for internal usage only"""
-       
-        klass = self.__class__
-        klass_name = klass.__name__
-        info, klass = get_class_by_class(klass), get_constructed_class_by_class(klass)
-        
-        if info is None:
-            raise RuntimeError("Device class '%s' is not registered" % klass_name)
-
-        if klass is None:
-            raise RuntimeError("Device class '%s' as not been constructed" % klass_name)
-        
-        deviceClassClass, deviceImplClass, deviceImplName = info
-        deviceImplClass._device_class_instance = klass
-
-        tmp_dev_list = []
-        for dev_name in device_list:
-            device = deviceImplClass(klass, dev_name)
-            self._add_device(device)
-            tmp_dev_list.append(device)
-
-        self.dyn_attr(tmp_dev_list)
-
-        for dev in tmp_dev_list:
-            if Util._UseDb and not Util._FileDb:
-                self.export_device(dev)
+                          "class %s\nCommand information for display level is not a " \
+                          "PyTango.DispLevel" % (cmd_name, name)
+                    __throw_create_command_exception(msg)
+            elif info_name_lower == "default command":
+                if not is_pure_str(info_value):
+                    msg = "Wrong data type in command information for command %s in " \
+                          "class %s\nCommand information for default command is not a " \
+                          "string" % (cmd_name, name)
+                    __throw_create_command_exception(msg)
+                v = info_value.lower()
+                default_command = v == 'true'
+            elif info_name_lower == "polling period":
+                try:
+                    polling_period = int(info_value)
+                except:
+                    msg = "Wrong data type in command information for command %s in " \
+                          "class %s\nCommand information for polling period is not an " \
+                          "integer" % (cmd_name, name)
+                    __throw_create_command_exception(msg)
             else:
-                self.export_device(dev, dev.get_name())
-        self.py_dev_list += tmp_dev_list
+                msg = "Wrong data type in command information for command %s in " \
+                      "class %s\nCommand information has unknown key " \
+                      "%s" % (cmd_name, name, info_name)
+                __throw_create_command_exception(msg)
 
-    def create_device(self, device_name, alias=None, cb=None):
-        """
-            create_device(self, device_name, alias=None, cb=None) -> None
-            
-                Creates a new device of the given class in the database, creates a new
-                DeviceImpl for it and calls init_device (just like it is done for
-                existing devices when the DS starts up)
-        
-                An optional parameter callback is called AFTER the device is 
-                registered in the database and BEFORE the init_device for the
-                newly created device is called
-                
+    # check that the method to be executed exists
+    try:
+        cmd = getattr(deviceimpl_class, cmd_name)
+        if not isinstance(cmd, collections.Callable):
+            msg = "Wrong definition of command %s in " \
+                  "class %s\nThe object exists in class but is not " \
+                  "a method!" % (cmd_name, name)
+            __throw_create_command_exception(msg)
+    except AttributeError:
+        msg = "Wrong definition of command %s in " \
+              "class %s\nThe command method does not exist!" % (cmd_name, name)
+        __throw_create_command_exception(msg)
+
+    is_allowed_name = "is_%s_allowed" % cmd_name
+    try:
+        is_allowed = getattr(deviceimpl_class, is_allowed_name)
+        if not isinstance(is_allowed, collections.Callable):
+            msg = "Wrong definition of command %s in " \
+                  "class %s\nThe object '%s' exists in class but is " \
+                  "not a method!" % (cmd_name, name, is_allowed_name)
+            __throw_create_command_exception(msg)
+    except:
+        is_allowed_name = ""
+
+    self._create_command(cmd_name, param_type, result_type,
+                         param_desc, result_desc,
+                         display_level, default_command,
+                         polling_period, is_allowed_name)
+
+def __DeviceClass__new_device(self, klass, dev_class, dev_name):
+    return klass(dev_class, dev_name)
+
+def __DeviceClass__device_factory(self, device_list):
+    """for internal usage only"""
+
+    klass = self.__class__
+    klass_name = klass.__name__
+    info, klass = get_class_by_class(klass), get_constructed_class_by_class(klass)
+
+    if info is None:
+        raise RuntimeError("Device class '%s' is not registered" % klass_name)
+
+    if klass is None:
+        raise RuntimeError("Device class '%s' as not been constructed" % klass_name)
+
+    deviceClassClass, deviceImplClass, deviceImplName = info
+    deviceImplClass._device_class_instance = klass
+
+    tmp_dev_list = []
+    for dev_name in device_list:
+        device = self._new_device(deviceImplClass, klass, dev_name)
+        self._add_device(device)
+        tmp_dev_list.append(device)
+
+    self.dyn_attr(tmp_dev_list)
+
+    for dev in tmp_dev_list:
+        if Util._UseDb and not Util._FileDb:
+            self.export_device(dev)
+        else:
+            self.export_device(dev, dev.get_name())
+    self.py_dev_list += tmp_dev_list
+
+def __DeviceClass__create_device(self, device_name, alias=None, cb=None):
+    """
+        create_device(self, device_name, alias=None, cb=None) -> None
+
+            Creates a new device of the given class in the database, creates a new
+            DeviceImpl for it and calls init_device (just like it is done for
+            existing devices when the DS starts up)
+
+            An optional parameter callback is called AFTER the device is 
+            registered in the database and BEFORE the init_device for the
+            newly created device is called
+
+        Throws PyTango.DevFailed:
+            - the device name exists already or
+            - the given class is not registered for this DS.
+            - the cb is not a callable
+
+        New in PyTango 7.1.2
+
+        Parameters :
+            - device_name : (str) the device name
+            - alias : (str) optional alias. Default value is None meaning do not create device alias
+            - cb : (callable) a callback that is called AFTER the device is registered
+                   in the database and BEFORE the init_device for the newly created
+                   device is called. Typically you may want to put device and/or attribute
+                   properties in the database here. The callback must receive a parameter:
+                   device name (str). Default value is None meaning no callback
+
+        Return     : None"""
+    util = Util.instance()
+    util.create_device(self.get_name(), device_name, alias=alias, cb=cb)
+
+def __DeviceClass__delete_device(self, device_name):
+    """
+        delete_device(self, klass_name, device_name) -> None
+
+            Deletes an existing device from the database and from this running
+            server
+
             Throws PyTango.DevFailed:
-                - the device name exists already or
-                - the given class is not registered for this DS.
-                - the cb is not a callable
-                
-            New in PyTango 7.1.2
-            
-            Parameters :
-                - device_name : (str) the device name
-                - alias : (str) optional alias. Default value is None meaning do not create device alias
-                - cb : (callable) a callback that is called AFTER the device is registered
-                       in the database and BEFORE the init_device for the newly created
-                       device is called. Typically you may want to put device and/or attribute
-                       properties in the database here. The callback must receive a parameter:
-                       device name (str). Default value is None meaning no callback
-            
-            Return     : None"""
-        util = Util.instance()
-        util.create_device(self.get_name(), device_name, alias=alias, cb=cb)
+                - the device name doesn't exist in the database
+                - the device name doesn't exist in this DS.
 
-    def delete_device(self, device_name):
-        """
-            delete_device(self, klass_name, device_name) -> None
-            
-                Deletes an existing device from the database and from this running
-                server
-        
-                Throws PyTango.DevFailed:
-                    - the device name doesn't exist in the database
-                    - the device name doesn't exist in this DS.
-            
-            New in PyTango 7.1.2
-            
-            Parameters :
-                - klass_name : (str) the device class name
-                - device_name : (str) the device name
-            
-            Return     : None"""
-        util = Util.instance()
-        util.delete_device(self.get_name(), device_name)
-        
-    def dyn_attr(self,device_list):
-        """
-            dyn_attr(self,device_list) -> None
+        New in PyTango 7.1.2
 
-                Default implementation does not do anything
-                Overwrite in order to provide dynamic attributes
+        Parameters :
+            - klass_name : (str) the device class name
+            - device_name : (str) the device name
 
-            Parameters :
-                - device_list : (seq<DeviceImpl>) sequence of devices of this class
+        Return     : None"""
+    util = Util.instance()
+    util.delete_device(self.get_name(), device_name)
 
-            Return     : None"""
-        pass
+def __DeviceClass__dyn_attr(self,device_list):
+    """
+        dyn_attr(self,device_list) -> None
 
-    def device_destroyer(self,name):
-        """for internal usage only"""
-        name = name.lower()
-        for d in self.py_dev_list:
-            dname = d.get_name().lower()
-            if dname == name:
-                dev_cl = d.get_device_class()
-                # the internal C++ device_destroyer isn't case sensitive so we
-                # use the internal DeviceImpl name to make sure the DeviceClass
-                # finds it
-                dev_cl._device_destroyer(d.get_name())
-                self.py_dev_list.remove(d)
-                return
-        err_mess = "Device " + name + " not in Tango class device list!"
-        Except.throw_exception("PyAPI_CantDestroyDevice",err_mess,"DeviceClass.device_destroyer")
-    
-    def device_name_factory(self, dev_name_list):
-        """
-            device_name_factory(self, dev_name_list) ->  None
-                
-                Create device(s) name list (for no database device server).
-                This method can be re-defined in DeviceClass sub-class for
-                device server started without database. Its rule is to
-                initialise class device name. The default method does nothing.
-            
-            Parameters :
-                - dev_name_list : (seq<str>) sequence of devices to be filled
+            Default implementation does not do anything
+            Overwrite in order to provide dynamic attributes
 
-            Return     : None"""
-        pass
-    
-def __init_DeviceClass():
+        Parameters :
+            - device_list : (seq<DeviceImpl>) sequence of devices of this class
+
+        Return     : None"""
     pass
 
+def __DeviceClass__device_destroyer(self,name):
+    """for internal usage only"""
+    name = name.lower()
+    for d in self.py_dev_list:
+        dname = d.get_name().lower()
+        if dname == name:
+            dev_cl = d.get_device_class()
+            # the internal C++ device_destroyer isn't case sensitive so we
+            # use the internal DeviceImpl name to make sure the DeviceClass
+            # finds it
+            dev_cl._device_destroyer(d.get_name())
+            self.py_dev_list.remove(d)
+            return
+    err_mess = "Device " + name + " not in Tango class device list!"
+    Except.throw_exception("PyAPI_CantDestroyDevice",err_mess,"DeviceClass.device_destroyer")
+
+
+def __DeviceClass__device_name_factory(self, dev_name_list):
+    """
+        device_name_factory(self, dev_name_list) ->  None
+
+            Create device(s) name list (for no database device server).
+            This method can be re-defined in DeviceClass sub-class for
+            device server started without database. Its rule is to
+            initialise class device name. The default method does nothing.
+
+        Parameters :
+            - dev_name_list : (seq<str>) sequence of devices to be filled
+
+        Return     : None"""
+    pass
+
+    
+def __init_DeviceClass():
+    DeviceClass.class_property_list = {}
+    DeviceClass.device_property_list = {}
+    DeviceClass.cmd_list = {}
+    DeviceClass.attr_list = {}
+    DeviceClass.__init_orig__ = DeviceClass.__init__
+    DeviceClass.__init__ = __DeviceClass__init__
+    DeviceClass.__str__ = __DeviceClass__str__
+    DeviceClass.__repr__ = __DeviceClass__repr__
+    DeviceClass._attribute_factory = __DeviceClass__attribute_factory
+    DeviceClass._command_factory = __DeviceClass__command_factory
+    DeviceClass._new_device = __DeviceClass__new_device
+    
+    DeviceClass.device_factory = __DeviceClass__device_factory
+    DeviceClass.create_device = __DeviceClass__create_device
+    DeviceClass.delete_device = __DeviceClass__delete_device
+    DeviceClass.dyn_attr = __DeviceClass__dyn_attr
+    DeviceClass.device_destroyer = __DeviceClass__device_destroyer
+    DeviceClass.device_name_factory = __DeviceClass__device_name_factory
+
+
 def __doc_DeviceClass():
+
+    DeviceClass.__doc__ = """
+    Base class for all TANGO device-class class.
+    A TANGO device-class class is a class where is stored all
+    data/method common to all devices of a TANGO device class
+    """
+    
     def document_method(method_name, desc, append=True):
         return __document_method(DeviceClass, method_name, desc, append)
 

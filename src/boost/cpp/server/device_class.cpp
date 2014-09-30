@@ -70,18 +70,18 @@ void CppDeviceClass::create_command(const std::string &cmd_name,
 }
 
 void CppDeviceClass::create_attribute(vector<Tango::Attr *> &att_list,
-                                    const std::string &attr_name,
-                                    Tango::CmdArgType attr_type,
-                                    Tango::AttrDataFormat attr_format,
-                                    Tango::AttrWriteType attr_write,
-                                    long dim_x, long dim_y,
-                                    Tango::DispLevel display_level,
-                                    long polling_period,
-                                    bool memorized, bool hw_memorized,
-                                    const std::string &read_method_name,
-                                    const std::string &write_method_name,
-                                    const std::string &is_allowed_name,
-                                    Tango::UserDefaultAttrProp *att_prop)
+				      const std::string &attr_name,
+				      Tango::CmdArgType attr_type,
+				      Tango::AttrDataFormat attr_format,
+				      Tango::AttrWriteType attr_write,
+				      long dim_x, long dim_y,
+				      Tango::DispLevel display_level,
+				      long polling_period,
+				      bool memorized, bool hw_memorized,
+				      const std::string &read_method_name,
+				      const std::string &write_method_name,
+				      const std::string &is_allowed_name,
+				      Tango::UserDefaultAttrProp *att_prop)
 {
     //
     // Create the attribute objet according to attribute format
@@ -102,13 +102,15 @@ void CppDeviceClass::create_attribute(vector<Tango::Attr *> &att_list,
             break;
 
         case Tango::SPECTRUM:
-            spec_attr_ptr = new PySpecAttr(attr_name.c_str(), attr_type, attr_write, dim_x);
+            spec_attr_ptr = new PySpecAttr(attr_name.c_str(), attr_type,
+					   attr_write, dim_x);
             py_attr_ptr = spec_attr_ptr;
             attr_ptr = spec_attr_ptr;
             break;
 
         case Tango::IMAGE:
-            ima_attr_ptr = new PyImaAttr(attr_name.c_str(), attr_type, attr_write, dim_x, dim_y);
+            ima_attr_ptr = new PyImaAttr(attr_name.c_str(), attr_type, 
+					 attr_write, dim_x, dim_y);
             py_attr_ptr = ima_attr_ptr;
             attr_ptr = ima_attr_ptr;
             break;
@@ -178,7 +180,7 @@ void CppDeviceClassWrap::attribute_factory(std::vector<Tango::Attr *> &att_list)
 
     try
     {
-        boost::python::call_method<void>(m_self, "_DeviceClass__attribute_factory",
+        boost::python::call_method<void>(m_self, "_attribute_factory",
                                          py_att_list);
     }
     catch(boost::python::error_already_set &eas)
@@ -189,7 +191,7 @@ void CppDeviceClassWrap::attribute_factory(std::vector<Tango::Attr *> &att_list)
 
 void CppDeviceClassWrap::command_factory()
 {
-    CALL_DEVCLASS_METHOD(_DeviceClass__command_factory)
+    CALL_DEVCLASS_METHOD(_command_factory)
 }
 
 void CppDeviceClassWrap::device_name_factory(std::vector<std::string> &dev_list)
@@ -281,7 +283,8 @@ namespace PyDeviceClass
     {
         boost::python::list py_cmd_list;
         vector<Tango::Command *> cmd_list = self.get_command_list();
-        for(vector<Tango::Command *>::iterator it = cmd_list.begin(); it != cmd_list.end(); ++it)
+        for(vector<Tango::Command *>::iterator it = cmd_list.begin(); 
+	    it != cmd_list.end(); ++it)
         {
             object py_value = object(
                         handle<>(
@@ -292,36 +295,24 @@ namespace PyDeviceClass
         }
         return py_cmd_list;
     }
-        
-    /*
-    void add_device(CppDeviceClass &self, auto_ptr<Tango::DeviceImpl> dev)
+   
+    void register_signal(CppDeviceClass &self, long signo)
     {
-        self.add_device(dev.get());
-        dev.release();
+	self.register_signal(signo);
     }
 
-    void add_device(CppDeviceClass &self, auto_ptr<Tango::Device_4Impl> dev)
-    {
-        self.add_device(dev.get());
-        dev.release();
-    }
-
-    void (*add_device1)(CppDeviceClass &, auto_ptr<Tango::DeviceImpl>) = &add_device;
-    void (*add_device2)(CppDeviceClass &, auto_ptr<Tango::Device_4Impl>) = &add_device;
-    */
+#if (defined __linux)
     
+    void register_signal(CppDeviceClass &self, long signo, bool own_handler)
+    {
+	self.register_signal(signo, own_handler);
+    }
+
+#endif
 }
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS (export_device_overload,
                                         CppDeviceClass::export_device, 1, 2)
-
-#if !(defined __linux)
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS (register_signal_overload,
-                                        Tango::DeviceClass::register_signal, 1, 1)
-#else
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS (register_signal_overload,
-                                        Tango::DeviceClass::register_signal, 1, 2)
-#endif
 
 
 void export_device_class()
@@ -335,18 +326,20 @@ void export_device_class()
     void (Tango::DeviceClass::*add_wiz_class_prop__)(string &,string &,string &) =
         &Tango::DeviceClass::add_wiz_class_prop;
 
-    class_<CppDeviceClass, auto_ptr<CppDeviceClassWrap>, boost::noncopyable>("_DeviceClass",
+    class_<CppDeviceClass, auto_ptr<CppDeviceClassWrap>, boost::noncopyable>("DeviceClass",
         init<const std::string &>())
 
         .def("device_factory", &CppDeviceClassWrap::device_factory)
         .def("device_name_factory", &CppDeviceClassWrap::device_name_factory)
         .def("export_device", &CppDeviceClass::export_device,
             export_device_overload())
-        //.def("_add_device", PyDeviceClass::add_device1)
-        //.def("_add_device", PyDeviceClass::add_device2)
         .def("_add_device", &CppDeviceClass::add_device)
-        .def("register_signal",&Tango::DeviceClass::register_signal,
-            register_signal_overload())
+        .def("register_signal", 
+	     (void (*) (CppDeviceClass &, long)) &PyDeviceClass::register_signal)
+#if defined __linux
+        .def("register_signal", 
+	     (void (*) (CppDeviceClass &, long, bool)) &PyDeviceClass::register_signal)
+#endif
         .def("unregister_signal", &Tango::DeviceClass::unregister_signal)
         .def("signal_handler", &Tango::DeviceClass::signal_handler,
             &CppDeviceClassWrap::default_signal_handler)
