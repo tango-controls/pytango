@@ -680,6 +680,10 @@ def __doc_DeviceClass():
             is sent to to the device server process.
             The second version of the method is available only under Linux.
 
+        Throws PyTango.DevFailed:
+            - if the signal number is out of range
+            - if the operating system failed to register a signal for the process.
+
         Parameters :
             - signo : (int) signal identifier
             - own_handler : (bool) true if you want the device signal handler
@@ -688,10 +692,6 @@ def __doc_DeviceClass():
                             is set to true, care should be taken on how the
                             handler is written. A default false value is provided
         
-        Throws PyTango.DevFailed:
-            - if the signal number is out of range
-            - if the operating system failed to register a signal for the process.
-
         Return     : None
     """ )
 
