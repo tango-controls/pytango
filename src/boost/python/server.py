@@ -667,12 +667,12 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
     dout = [from_typeformat_to_type(dtype_out, dformat_out), doc_out]
 
     @functools.wraps(f)
-    def cmd(self, value):
+    def cmd(self, *args, **kwargs):
         runner = _get_runner()
         if runner:
-            ret = runner.execute(f, self, value)
+            ret = runner.execute(f, self, *args, **kargs)
         else:
-            ret = f(self, value)
+            ret = f(self, *args, **kwargs)
         return ret
     cmd.__tango_command__ = name, [din, dout]
     return cmd

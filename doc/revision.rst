@@ -79,7 +79,9 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 16/05/14 | `8.19 <http://www.tango-controls.org/static/PyTango/v812/doc/html/index.html>`_  | Update to PyTango 8.1.2                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| 10/09/14 | `8.20 <http://www.tango-controls.org/static/PyTango/v813/doc/html/index.html>`_  | Update to PyTango 8.1.4                             | T\. Coutinho          |
+| 30/09/14 | `8.20 <http://www.tango-controls.org/static/PyTango/v814/doc/html/index.html>`_  | Update to PyTango 8.1.4                             | T\. Coutinho          |
++----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
+| 01/10/14 | `8.21 <http://www.tango-controls.org/static/PyTango/v815/doc/html/index.html>`_  | Update to PyTango 8.1.5                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _pytango-version-history:
@@ -90,6 +92,11 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
+| 8.1.5    | Bug fixes:                                                                                                                                                            |
+|          |                                                                                                                                                                       |
+|          |     - `687: [pytango] 8.1.4 unexpected files in the source package <https://sourceforge.net/p/tango-cs/bugs/687/>`_                                                   |
+|          |     - `688: PyTango 8.1.4 new style server commands don't work <https://sourceforge.net/p/tango-cs/bugs/688/>`_                                                       |
++----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.4    | Features:                                                                                                                                                             |
 |          |                                                                                                                                                                       |
 |          |     - `107: Nice to check Tango/PyTango version at runtime <https://sourceforge.net/p/tango-cs/feature-requests/107>`_                                                |
@@ -97,6 +104,7 @@ Version history
 |          | Bug fixes:                                                                                                                                                            |
 |          |                                                                                                                                                                       |
 |          |     - `659: segmentation fault when unsubscribing from events <https://sourceforge.net/p/tango-cs/bugs/659/>`_                                                        |
+|          |     - `664: problem while installing PyTango 8.1.1 with pip (using pip 1.4.1) <https://sourceforge.net/p/tango-cs/bugs/664/>`_                                        |
 |          |     - `678: [pytango] 8.1.2 unexpected files in the source package  <https://sourceforge.net/p/tango-cs/bugs/678/>`_                                                  |
 |          |     - `679: PyTango.server tries to import missing __builtin__ module on Python 3 <https://sourceforge.net/p/tango-cs/bugs/679/>`_                                    |
 |          |     - `680: Cannot import PyTango.server.run <https://sourceforge.net/p/tango-cs/bugs/680/>`_                                                                         |
