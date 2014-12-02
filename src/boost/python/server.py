@@ -670,7 +670,7 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
     def cmd(self, *args, **kwargs):
         runner = _get_runner()
         if runner:
-            ret = runner.execute(f, self, *args, **kargs)
+            ret = runner.execute(f, self, *args, **kwargs)
         else:
             ret = f(self, *args, **kwargs)
         return ret
@@ -776,6 +776,7 @@ def _to_classes(classes):
             if is_seq(klass_info):
                 if len(klass_info) == 2:
                     klass_klass, klass = klass_info
+                    klass_name = klass.__name__
                 else:
                     klass_klass, klass, klass_name = klass_info
             else:
