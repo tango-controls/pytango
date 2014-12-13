@@ -1162,7 +1162,7 @@ def __to_tango_type_fmt(value):
     return dtype, dfmt, max_dim_x, max_dim_y
 
 
-def create_tango_class(obj, tango_class_name=None):
+def create_tango_class(obj, tango_class_name=None, member_filter=None):
 
     obj_klass = obj.__class__
     obj_klass_name = obj_klass.__name__
@@ -1199,7 +1199,8 @@ def create_tango_class(obj, tango_class_name=None):
             logging.debug("Details:", exc_info=1)
         if inspect.isclass(member) or inspect.ismodule(member):
             continue
-
+        if member_filter and not member_filter(member):
+            continue
         if inspect.isroutine(member):
             func = member
             func_name = name
@@ -1423,7 +1424,8 @@ class _Server:
                                "while server is running")
         self.__tango_classes.append(klass)
 
-    def register_object(self, obj, name, tango_class_name=None):
+    def register_object(self, obj, name, tango_class_name=None,
+                        member_filter=None):
         slash_count = name.count("/")
         if slash_count == 0:
             alias = name
@@ -1438,7 +1440,8 @@ class _Server:
         tango_class_name = tango_object.tango_class_name
         tango_class = self.get_tango_class(tango_class_name)
         if tango_class is None:
-            tango_class = create_tango_class(obj, tango_class_name)
+            tango_class = create_tango_class(obj, tango_class_name,
+                                             member_filter=member_filter)
             self.register_tango_class(tango_class)
         self.__objects[full_name.lower()] = tango_object
         return tango_object
