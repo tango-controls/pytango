@@ -45,7 +45,7 @@ LatestDeviceImpl = get_tango_device_classes()[-1]
 def __build_to_tango_type():
     ret = \
     {
-        int         : CmdArgType.DevLong,
+        int         : CmdArgType.DevLong64,
         str         : CmdArgType.DevString,
         bool        : CmdArgType.DevBoolean,
         bytearray   : CmdArgType.DevEncoded,
@@ -78,6 +78,12 @@ def __build_to_tango_type():
         'None'      : CmdArgType.DevVoid,
         'state'     : CmdArgType.DevState,
     }
+
+    try:
+        ret[long] = ret[int]
+    except NameError:
+        pass
+
 
     for key in dir(CmdArgType):
         if key.startswith("Dev"):
