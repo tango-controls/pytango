@@ -1199,7 +1199,8 @@ def create_tango_class(obj, tango_class_name=None, member_filter=None):
             logging.debug("Details:", exc_info=1)
         if inspect.isclass(member) or inspect.ismodule(member):
             continue
-        if member_filter and not member_filter(member):
+        if member_filter and not member_filter(obj, tango_class_name,
+                                               name, member):
             continue
         if inspect.isroutine(member):
             func = member
@@ -1426,6 +1427,10 @@ class _Server:
 
     def register_object(self, obj, name, tango_class_name=None,
                         member_filter=None):
+        """
+        :param member_filter:
+            callable(obj, tango_class_name, member_name, member) -> bool
+        """
         slash_count = name.count("/")
         if slash_count == 0:
             alias = name
