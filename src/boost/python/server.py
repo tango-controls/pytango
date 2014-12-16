@@ -1331,13 +1331,14 @@ class _Server:
             return self.__obj()
 
     def __init__(self, server_name, server_type=None, port=None,
-                 event_loop_callback=None, post_init_callback=None,
-                 auto_clean=True, green_mode=None, tango_classes=None,
-                 protocol="pickle"):
+                 event_loop_callback=None, pre_init_callback=None,
+                 post_init_callback=None, auto_clean=False, green_mode=None,
+                 tango_classes=None, protocol="pickle"):
         self.__server_name = server_name
         self.__server_type = server_type
         self.__port = port
         self.__event_loop_callback = event_loop_callback
+        self.__pre_init_callback = pre_init_callback
         self.__post_init_callback = post_init_callback
         self.__util = None
         self.__objects = {}
@@ -1459,14 +1460,19 @@ class _Server:
         self.__objects[full_name.lower()] = tango_object
         return tango_object
 
-    def _post_init_callback(self):
-        cb = self.__post_init_callback
+    def __exec_cb(self, cb):
         if not cb:
             return
         if self.gevent_mode:
             self.__runner.execute(cb)
         else:
             cb()
+
+    def _pre_init_callback(self):
+        self.__exec_cb(elf.__pre_init_callback)
+
+    def _post_init_callback(self):
+        self.__exec_cb(elf.__post_init_callback)
 
     def __clean_up(self):
         self.log.debug("clean up")
@@ -1523,6 +1529,8 @@ class _Server:
 
         util = self.tango_util
         u_instance = util.instance()
+
+        self._pre_init_callback()
 
         if gevent_mode:
             if event_loop:
