@@ -1201,7 +1201,7 @@ def create_tango_class(obj, tango_class_name=None, member_filter=None):
         try:
             member = getattr(obj, name)
         except:
-            log.warning("failed to inspect member '%s.%s'",
+            log.info("failed to inspect member '%s.%s'",
                         obj_klass_name, name)
             log.debug("Details:", exc_info=1)
         if inspect.isclass(member) or inspect.ismodule(member):
@@ -1481,8 +1481,8 @@ class _Server:
                     dserver.ping()
                     raise Exception("Server already running")
                 except:
-                    self.log.warning("Last time server was not properly "
-                                     "shutdown!")
+                    self.log.info("Last time server was not properly "
+                                  "shutdown!")
             devices = db.get_device_class_list(server_instance)[::2]
             for device in devices:
                 db.delete_device(device)
