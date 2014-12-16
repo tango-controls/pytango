@@ -1361,6 +1361,30 @@ class _Server:
                          "giop:tcp::{0}".format(self.__port)])
         return args
 
+    def __get_devices(self):
+        """
+        Helper that retuns a dict of devices for this server.
+
+        :return:
+            Returns a tuple of two elements:
+              - dict<tango class name : list of device names>
+              - dict<device names : tango class name>
+        :rtype: tuple<dict, dict>
+        """
+        import PyTango
+        db = PyTango.Database()
+        server = self.server_instance
+        dev_list = db.get_device_class_list(server)
+        class_map, dev_map  = {}, {}
+        for class_name, dev_name in zip(dev_list[1::2], dev_list[::2]):
+            dev_names = class_map.get(class_name)
+            if dev_names is None:
+                class_map[class_name] = dev_names = []
+            dev_name = dev_name.lower()
+            dev_names.append(dev_name)
+            dev_map[dev_name] = class_name
+        return class_map, dev_map
+
     @property
     def server_type(self):
         server_type = self.__server_type
@@ -1469,16 +1493,22 @@ class _Server:
             cb()
 
     def _pre_init_callback(self):
-        self.__exec_cb(elf.__pre_init_callback)
+        self.__exec_cb(self.__pre_init_callback)
 
     def _post_init_callback(self):
-        self.__exec_cb(elf.__post_init_callback)
+        self.__exec_cb(self.__post_init_callback)
 
-    def __clean_up(self):
-        self.log.debug("clean up")
+    def __prepare(self):
+        """Update database with existing devices"""
+        self.log.debug("prepare")
+
         server_instance = self.server_instance
         db = Database()
-        if server_instance in db.get_server_list():
+
+        # get list of server devices if server was already registered
+        server_registered = server_instance in db.get_server_list()
+
+        if server_registered:
             dserver_name = "dserver/{0}".format(server_instance)
             if db.import_device(dserver_name).exported:
                 import PyTango
@@ -1489,13 +1519,57 @@ class _Server:
                 except:
                     self.log.info("Last time server was not properly "
                                   "shutdown!")
-            devices = db.get_device_class_list(server_instance)[::2]
-            for device in devices:
-                db.delete_device(device)
-                try:
-                    db.delete_device_alias(db.get_alias(device))
-                except:
-                    pass
+            db_class_map, db_device_map = self.__get_devices()
+        else:
+            db_class_map, db_device_map = {}, {}
+
+        db_devices_add = {}
+
+        # all devices that are registered in database that are not registered
+        # as tango objects or for which the tango class changed will be removed
+        db_devices_remove = set(db_device_map) - set(self.__objects)
+
+        for local_name, local_object in self.__objects.items():
+            local_class_name = local_object.tango_class_name
+            db_class_name = db_device_map.get(local_name)
+            if db_class_name:
+                if local_class_name != db_class_name:
+                    db_devices_remove.add(local_name)
+                    db_devices_add[local_name] = local_object
+            else:
+                db_devices_add[local_name] = local_object
+
+        for device in db_devices_remove:
+            db.delete_device(device)
+            try:
+                db.delete_device_alias(db.get_alias(device))
+            except:
+                pass
+
+        # register devices in database
+
+        # add DServer
+        db_dev_info = DbDevInfo()
+        db_dev_info.server = server_instance
+        db_dev_info._class = "DServer"
+        db_dev_info.name = "dserver/" + server_instance
+
+        db_dev_infos = [db_dev_info]
+        aliases = []
+        for obj_name, obj in db_devices_add.items():
+            db_dev_info = DbDevInfo()
+            db_dev_info.server = server_instance
+            db_dev_info._class = obj.tango_class_name
+            db_dev_info.name = obj.full_name
+            db_dev_infos.append(db_dev_info)
+            if obj.alias:
+                aliases.append((obj.full_name, obj.alias))
+
+        db.add_server(server_instance, db_dev_infos)
+
+        # add aliases
+        for alias_info in aliases:
+            db.put_device_alias(*alias_info)
 
     def __clean_up_process(self):
         if not self.__auto_clean:
@@ -1505,22 +1579,6 @@ class _Server:
         res = subprocess.call([sys.executable, "-c", clean_up])
         if res:
             self.log.error("Failed to cleanup")
-
-    def __prepare(self):
-        self.log.debug("prepare")
-        self.__clean_up()
-        server_instance = self.server_instance
-        db = Database()
-        db_dev_infos = []
-        for obj_name, obj in self.__objects.items():
-            db_dev_info = DbDevInfo()
-            db_dev_info.server = server_instance
-            db_dev_info._class = obj.tango_class_name
-            db_dev_info.name = obj.full_name
-            db_dev_infos.append(db_dev_info)
-            db.add_device(db_dev_info)
-            if obj.alias:
-                db.put_device_alias(obj.full_name, obj.alias)
 
     def __initialize(self):
         self.log.debug("initialize")
@@ -1581,7 +1639,7 @@ class _Server:
 __SERVER = None
 def Server(server_name=None, server_type=None, port=None,
            event_loop_callback=None, post_init_callback=None,
-           auto_clean=True, green_mode=None):
+           auto_clean=False, green_mode=None):
     """Experimental server class. Not part of the official API"""
 
     global __SERVER
