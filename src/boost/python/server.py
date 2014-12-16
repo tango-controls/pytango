@@ -1168,7 +1168,7 @@ def __to_tango_type_fmt(value):
     return dtype, dfmt, max_dim_x, max_dim_y
 
 
-def create_tango_class(obj, tango_class_name=None, member_filter=None):
+def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
     log = logging.getLogger("PyTango.Server")
 
     obj_klass = obj.__class__
@@ -1184,7 +1184,7 @@ def create_tango_class(obj, tango_class_name=None, member_filter=None):
 
         def __init__(self, tango_class_obj, name):
             Device.__init__(self, tango_class_obj, name)
-            self.__tango_obj = Server().get_tango_object(self.get_name())
+            self.__tango_obj = server.get_tango_object(self.get_name())
             self.__tango_obj.device = self
 
         def init_device(self):
@@ -1214,7 +1214,7 @@ def create_tango_class(obj, tango_class_name=None, member_filter=None):
             func = member
             func_name = name
             def _command(obj, func_name, param):
-                server = Server()
+                #server = Server()
                 runner = server.runner
                 args, kwargs = loads(*param)
                 f = getattr(obj, func_name)
@@ -1248,11 +1248,9 @@ def create_tango_class(obj, tango_class_name=None, member_filter=None):
                 dtype = CmdArgType.DevEncoded
                 fmt = AttrDataFormat.SCALAR
                 def read(dev, attr):
-                    server = Server()
-                    runner = server.runner
                     name = attr.get_name()
-                    if runner:
-                        value = runner.execute(getattr, obj, name)
+                    if server.runner:
+                        value = server.runner.execute(getattr, obj, name)
                     else:
                         value = getattr(obj, name)
                     attr.set_value(*server.dumps(value))
@@ -1260,29 +1258,23 @@ def create_tango_class(obj, tango_class_name=None, member_filter=None):
                     name = attr.get_name()
                     value = attr.get_write_value()
                     value = loads(*value)
-                    server = Server()
-                    runner = server.runner
-                    if runner:
-                        runner.execute(setattr, obj, name, value)
+                    if server.runner:
+                        server.runner.execute(setattr, obj, name, value)
                     else:
                         setattr(obj, name, value)
             else:
                 def read(dev, attr):
-                    server = Server()
-                    runner = server.runner
                     name = attr.get_name()
-                    if runner:
-                        value = runner.execute(getattr, obj, name)
+                    if server.runner:
+                        value = server.runner.execute(getattr, obj, name)
                     else:
                         value = getattr(obj, name)
                     attr.set_value(value)
                 def write(dev, attr):
-                    server = Server()
-                    runner = server.runner
                     name = attr.get_name()
                     value = attr.get_write_value()
-                    if runner:
-                        runner.execute(setattr, obj, name, value)
+                    if server.runner:
+                        server.runner.execute(setattr, obj, name, value)
                     else:
                         setattr(obj, name, value)
             read.__name__ = "_read_" + name
@@ -1293,7 +1285,7 @@ def create_tango_class(obj, tango_class_name=None, member_filter=None):
             if read_only:
                 write = None
             else:
-                write.__name__ = "_write" + name
+                write.__name__ = "_write_" + name
                 pars['fset'] = write
                 setattr(DeviceDispatcher, write.__name__, write)
             attr_data = AttrData.from_dict(pars)
@@ -1301,7 +1293,14 @@ def create_tango_class(obj, tango_class_name=None, member_filter=None):
     return DeviceDispatcher
 
 
-class _Server:
+class Server:
+    """
+    Server helper
+    """
+
+    Phase0, Phase1, Phase2 = range(3)
+    PreInitPhase = Phase1
+    PostInitPhase = Phase2
 
     class TangoObject:
 
@@ -1331,15 +1330,18 @@ class _Server:
             return self.__obj()
 
     def __init__(self, server_name, server_type=None, port=None,
-                 event_loop_callback=None, pre_init_callback=None,
-                 post_init_callback=None, auto_clean=False, green_mode=None,
-                 tango_classes=None, protocol="pickle"):
+                 event_loop_callback=None, init_callbacks=None,
+                 auto_clean=False, green_mode=None, tango_classes=None,
+                 protocol="pickle"):
+        if server_name is None:
+            raise ValueError("Must give a valid server name")
         self.__server_name = server_name
         self.__server_type = server_type
         self.__port = port
         self.__event_loop_callback = event_loop_callback
-        self.__pre_init_callback = pre_init_callback
-        self.__post_init_callback = post_init_callback
+        if init_callbacks is None:
+            init_callbacks = {}
+        self.__init_callbacks = init_callbacks
         self.__util = None
         self.__objects = {}
         self.__running = False
@@ -1353,6 +1355,7 @@ class _Server:
         else:
             self.__runner = None
         self.log = logging.getLogger("PyTango.Server")
+        self.__phase = Server.Phase0
 
     def __build_args(self):
         args = [self.server_type, self.__server_name]
@@ -1360,129 +1363,6 @@ class _Server:
             args.extend(["-ORBendPoint",
                          "giop:tcp::{0}".format(self.__port)])
         return args
-
-    def __get_devices(self):
-        """
-        Helper that retuns a dict of devices for this server.
-
-        :return:
-            Returns a tuple of two elements:
-              - dict<tango class name : list of device names>
-              - dict<device names : tango class name>
-        :rtype: tuple<dict, dict>
-        """
-        import PyTango
-        db = PyTango.Database()
-        server = self.server_instance
-        dev_list = db.get_device_class_list(server)
-        class_map, dev_map  = {}, {}
-        for class_name, dev_name in zip(dev_list[1::2], dev_list[::2]):
-            dev_names = class_map.get(class_name)
-            if dev_names is None:
-                class_map[class_name] = dev_names = []
-            dev_name = dev_name.lower()
-            dev_names.append(dev_name)
-            dev_map[dev_name] = class_name
-        return class_map, dev_map
-
-    @property
-    def server_type(self):
-        server_type = self.__server_type
-        if server_type is None:
-            server_file = os.path.basename(sys.argv[0])
-            server_type = os.path.splitext(server_file)[0]
-        return server_type
-
-    @property
-    def server_instance(self):
-        return "{0}/{1}".format(self.server_type, self.__server_name)
-
-    @property
-    def tango_util(self):
-        if self.__util is None:
-            import PyTango
-            self.__util = PyTango.Util(self.__build_args())
-        return self.__util
-
-    @property
-    def green_mode(self):
-        gm = self.__green_mode
-        if gm is None:
-            from PyTango import get_green_mode
-            gm = get_green_mode()
-        return gm
-
-    @green_mode.setter
-    def green_mode(self, gm):
-        if gm == self.__green_mode:
-            return
-        if self.__running:
-            raise RuntimeError("Cannot change green mode while "
-                               "server is running")
-        self.__green_mode = gm
-
-    @property
-    def gevent_mode(self):
-        return self.green_mode == GreenMode.Gevent
-
-    @property
-    def runner(self):
-        return self.__runner
-
-    def dumps(self, obj):
-        return dumps(self.__protocol, obj)
-
-    def get_tango_object(self, name):
-        return self.__objects.get(name.lower())
-
-    def get_tango_class(self, tango_class_name):
-        for klass in self.__tango_classes:
-            if klass.TangoClassName == tango_class_name:
-                return klass
-
-    def __find_tango_class(self, key):
-        pass
-
-    def register_tango_device(self, klass, name):
-        if inspect.isclass(klass):
-            if isinstance(klass, Device):
-                kk, k, kname = Device.TangoClassClass, Device, Device.TangoClassName
-            else:
-                raise ValueError
-        else:
-            raise NotImplementedError
-
-    def register_tango_class(self, klass):
-        if self.__running:
-            raise RuntimeError("Cannot create new Tango class while "
-                               "while server is running")
-        self.__tango_classes.append(klass)
-
-    def register_object(self, obj, name, tango_class_name=None,
-                        member_filter=None):
-        """
-        :param member_filter:
-            callable(obj, tango_class_name, member_name, member) -> bool
-        """
-        slash_count = name.count("/")
-        if slash_count == 0:
-            alias = name
-            full_name = "{0}/{1}".format(self.server_instance, name)
-        elif slash_count == 2:
-            alias = None
-            full_name = name
-        else:
-            raise
-        tango_object = self.TangoObject(obj, full_name, alias,
-                                        tango_class_name=tango_class_name)
-        tango_class_name = tango_object.tango_class_name
-        tango_class = self.get_tango_class(tango_class_name)
-        if tango_class is None:
-            tango_class = create_tango_class(obj, tango_class_name,
-                                             member_filter=member_filter)
-            self.register_tango_class(tango_class)
-        self.__objects[full_name.lower()] = tango_object
-        return tango_object
 
     def __exec_cb(self, cb):
         if not cb:
@@ -1492,15 +1372,15 @@ class _Server:
         else:
             cb()
 
-    def _pre_init_callback(self):
-        self.__exec_cb(self.__pre_init_callback)
-
-    def _post_init_callback(self):
-        self.__exec_cb(self.__post_init_callback)
+    def __find_tango_class(self, key):
+        pass
 
     def __prepare(self):
         """Update database with existing devices"""
         self.log.debug("prepare")
+
+        if self.__phase > 0:
+            raise RuntimeError("Internal error: Can only prepare in phase 0")
 
         server_instance = self.server_instance
         db = Database()
@@ -1519,7 +1399,7 @@ class _Server:
                 except:
                     self.log.info("Last time server was not properly "
                                   "shutdown!")
-            db_class_map, db_device_map = self.__get_devices()
+            db_class_map, db_device_map = self.get_devices()
         else:
             db_class_map, db_device_map = {}, {}
 
@@ -1588,8 +1468,6 @@ class _Server:
         util = self.tango_util
         u_instance = util.instance()
 
-        self._pre_init_callback()
-
         if gevent_mode:
             if event_loop:
                 event_loop = functools.partial(self.__runner.execute,
@@ -1614,7 +1492,7 @@ class _Server:
         self.__running = True
         u_instance = self.tango_util.instance()
         u_instance.server_init()
-        self._post_init_callback()
+        self.__phase = Server.Phase2
         self.log.info("Ready to accept request")
         u_instance.server_run()
         if self.gevent_mode:
@@ -1622,6 +1500,143 @@ class _Server:
         if self.__auto_clean:
             self.__clean_up_process()
         self.log.debug("Tango loop exit")
+
+    @property
+    def _phase(self):
+        return self.__phase
+
+    @_phase.setter
+    def _phase(self, phase):
+        self.__phase = phase
+        cb = self.__init_callbacks.get(phase)
+        self.__exec_cb(cb)
+
+    @property
+    def server_type(self):
+        server_type = self.__server_type
+        if server_type is None:
+            server_file = os.path.basename(sys.argv[0])
+            server_type = os.path.splitext(server_file)[0]
+        return server_type
+
+    @property
+    def server_instance(self):
+        return "{0}/{1}".format(self.server_type, self.__server_name)
+
+    @property
+    def tango_util(self):
+        if self.__util is None:
+            import PyTango
+            self.__util = PyTango.Util(self.__build_args())
+            self._phase = Server.Phase1
+        return self.__util
+
+    @property
+    def green_mode(self):
+        gm = self.__green_mode
+        if gm is None:
+            from PyTango import get_green_mode
+            gm = get_green_mode()
+        return gm
+
+    @green_mode.setter
+    def green_mode(self, gm):
+        if gm == self.__green_mode:
+            return
+        if self.__running:
+            raise RuntimeError("Cannot change green mode while "
+                               "server is running")
+        self.__green_mode = gm
+
+    @property
+    def gevent_mode(self):
+        return self.green_mode == GreenMode.Gevent
+
+    @property
+    def runner(self):
+        return self.__runner
+
+    def dumps(self, obj):
+        return dumps(self.__protocol, obj)
+
+    def get_devices(self):
+        """
+        Helper that retuns a dict of devices for this server.
+
+        :return:
+            Returns a tuple of two elements:
+              - dict<tango class name : list of device names>
+              - dict<device names : tango class name>
+        :rtype: tuple<dict, dict>
+        """
+        import PyTango
+        db = PyTango.Database()
+        server = self.server_instance
+        dev_list = db.get_device_class_list(server)
+        class_map, dev_map  = {}, {}
+        for class_name, dev_name in zip(dev_list[1::2], dev_list[::2]):
+            dev_names = class_map.get(class_name)
+            if dev_names is None:
+                class_map[class_name] = dev_names = []
+            dev_name = dev_name.lower()
+            dev_names.append(dev_name)
+            dev_map[dev_name] = class_name
+        return class_map, dev_map
+
+    def get_tango_object(self, name):
+        return self.__objects.get(name.lower())
+
+    def get_tango_class(self, tango_class_name):
+        for klass in self.__tango_classes:
+            if klass.TangoClassName == tango_class_name:
+                return klass
+
+    def register_tango_device(self, klass, name):
+        if inspect.isclass(klass):
+            if isinstance(klass, Device):
+                kk, k, kname = Device.TangoClassClass, Device, Device.TangoClassName
+            else:
+                raise ValueError
+        else:
+            raise NotImplementedError
+
+    def register_tango_class(self, klass):
+        if self._phase > Server.Phase1:
+            raise RuntimeError("Cannot add new class after phase 1 "
+                               "(i.e. after server_init)")
+        self.__tango_classes.append(klass)
+
+    def register_object(self, obj, name, tango_class_name=None,
+                        member_filter=None):
+        """
+        :param member_filter:
+            callable(obj, tango_class_name, member_name, member) -> bool
+        """
+        slash_count = name.count("/")
+        if slash_count == 0:
+            alias = name
+            full_name = "{0}/{1}".format(self.server_instance, name)
+        elif slash_count == 2:
+            alias = None
+            full_name = name
+        else:
+            raise ValueError("Invalid name")
+
+        tango_class_name = tango_class_name or obj.__class__.__name__
+        tango_class = self.get_tango_class(tango_class_name)
+
+        if tango_class is None:
+            tango_class = create_tango_class(self, obj, tango_class_name,
+                                             member_filter=member_filter)
+            self.register_tango_class(tango_class)
+
+        tango_object = self.TangoObject(obj, full_name, alias,
+                                        tango_class_name=tango_class_name)
+        self.__objects[full_name.lower()] = tango_object
+        if self._phase > Server.Phase1:
+            util = self.tango_util
+            util.create_device(tango_class_name, name)
+        return tango_object
 
     def run(self, timeout=None):
         self.log.debug("run")
@@ -1634,22 +1649,3 @@ class _Server:
             if not gevent_mode:
                 raise RuntimeError("Server is already running")
         self.__run(timeout=timeout)
-
-
-__SERVER = None
-def Server(server_name=None, server_type=None, port=None,
-           event_loop_callback=None, post_init_callback=None,
-           auto_clean=False, green_mode=None):
-    """Experimental server class. Not part of the official API"""
-
-    global __SERVER
-    if __SERVER is None:
-        if server_name is None:
-            raise ValueError("Must give a valid server name")
-        __SERVER = _Server(server_name,
-                           server_type=server_type, port=port,
-                           event_loop_callback=event_loop_callback,
-                           post_init_callback=post_init_callback,
-                           auto_clean=auto_clean,
-                           green_mode=green_mode)
-    return __SERVER
