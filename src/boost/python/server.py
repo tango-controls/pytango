@@ -1621,7 +1621,8 @@ class Server:
     def unregister_object(self, name):
         del self.__objects[name.lower()]
         if self._phase > Server.Phase1:
-            util.delete_device(name)
+            import PyTango
+            PyTango.Util.instance().delete_device(name)
 
     def register_object(self, obj, name, tango_class_name=None,
                         member_filter=None):
@@ -1651,7 +1652,8 @@ class Server:
                                                tango_class_name=class_name)
         self.__objects[full_name.lower()] = tango_object
         if self._phase > Server.Phase1:
-            util = self.tango_util
+            import PyTango
+            util = PyTango.Util.instance()
             util.create_device(class_name, name)
         return tango_object
 
