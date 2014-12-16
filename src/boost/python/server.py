@@ -1504,7 +1504,7 @@ class Server:
         self.__running = True
         u_instance = self.tango_util.instance()
         u_instance.server_init()
-        self.__phase = Server.Phase2
+        self._phase = Server.Phase2
         self.log.info("Ready to accept request")
         u_instance.server_run()
         if self.gevent_mode:
