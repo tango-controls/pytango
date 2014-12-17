@@ -1619,10 +1619,12 @@ class Server:
         self.__tango_classes.append(klass)
 
     def unregister_object(self, name):
-        del self.__objects[name.lower()]
+        tango_object = self.__objects.pop(name.lower())
         if self._phase > Server.Phase1:
             import PyTango
-            PyTango.Util.instance().delete_device(name)
+            util = PyTango.Util.instance()
+            if not util.is_svr_shutting_down():
+                util.delete_device(tango_object.tango_class_name, name)
 
     def register_object(self, obj, name, tango_class_name=None,
                         member_filter=None):
