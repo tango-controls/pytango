@@ -67,7 +67,7 @@ namespace PyUtil
         AutoPythonAllowThreads guard;
         instance.server_run();
     }
-    
+
     inline Tango::Util* init(boost::python::object &obj)
     {
         PyObject *obj_ptr = obj.ptr();
@@ -87,12 +87,18 @@ namespace PyUtil
                 str item = str(handle<>(item_ptr));
                 argv[i] = extract<char *>(item);
             }
-            res = Tango::Util::init(argc, argv);
+	    res = Tango::Util::init(argc, argv);
         } catch (...) {
             delete [] argv;
             throw;
         }
         delete [] argv;
+
+	if (PyEval_ThreadsInitialized() == 0)
+	{
+	    PyEval_InitThreads();
+	}
+
         return res;
     }
 
@@ -117,7 +123,7 @@ namespace PyUtil
                             to_python_indirect<
                                 Tango::DeviceImpl*,
                                 detail::make_reference_holder>()(*it)));
-            
+
             py_dev_list.append(py_value);
         }
         return py_dev_list;
@@ -134,7 +140,7 @@ namespace PyUtil
 
         return py_value;
     }
-    
+
     inline object get_device_list(Tango::Util &self, const string &name)
     {
         boost::python::list py_dev_list;
@@ -150,7 +156,7 @@ namespace PyUtil
         }
         return py_dev_list;
     }
-    
+
     inline bool event_loop()
     {
         AutoPythonGIL guard;
@@ -160,7 +166,7 @@ namespace PyUtil
         bool ret = boost::python::extract<bool>(py_ret);
         return ret;
     }
-    
+
     inline void server_set_event_loop(Tango::Util& self,
                                       boost::python::object& py_event_loop)
     {
@@ -176,12 +182,12 @@ namespace PyUtil
             self.server_set_event_loop(event_loop);
         }
     }
-    
+
     void set_use_db(bool use_db)
     {
         Tango::Util::_UseDb = use_db;
     }
-    
+
     boost::python::str get_dserver_ior(Tango::Util& self, Tango::DServer* dserver)
     {
         Tango::Device_var d = dserver->_this();
@@ -199,7 +205,7 @@ namespace PyUtil
         delete [] ior;
         return ret;
     }
-    
+
     void orb_run(Tango::Util& self)
     {
         AutoPythonAllowThreads guard;
@@ -217,15 +223,15 @@ namespace PyUtil
         boost::python::str ret = self.get_version_str().c_str();
         return ret;
     }
-}
 
-void init_python()
-{
-    if (PyEval_ThreadsInitialized() == 0)
+    static boost::shared_ptr<Tango::Util>
+    makeUtil(boost::python::object& args)
     {
-        PyEval_InitThreads();
+        Tango::Util* util = PyUtil::init(args);
+        return boost::shared_ptr<Tango::Util>(util);
     }
 }
+
 
 BOOST_PYTHON_FUNCTION_OVERLOADS (server_init_overload, PyUtil::server_init, 1, 2)
 
@@ -235,8 +241,9 @@ void export_util()
         .def("create_thread", &Tango::Interceptors::create_thread)
         .def("delete_thread", &Tango::Interceptors::delete_thread)
     ;
-    
-    class_<Tango::Util, boost::noncopyable>("_Util", no_init)
+
+    class_<Tango::Util, boost::noncopyable>("Util", no_init)
+        .def("__init__", boost::python::make_constructor(PyUtil::makeUtil))
         .def("init", PyUtil::init,
             return_value_policy<reference_existing_object>())
         .staticmethod("init")
@@ -279,13 +286,13 @@ void export_util()
         .def("set_polling_threads_pool_size", &Tango::Util::set_polling_threads_pool_size)
         .def("get_polling_threads_pool_size", &Tango::Util::get_polling_threads_pool_size)
         .def("is_svr_starting", &Tango::Util::is_svr_starting)
-        .def("is_svr_shutting_down", &Tango::Util::is_svr_shutting_down)        
-        .def("is_device_restarting", &Tango::Util::is_device_restarting)        
+        .def("is_svr_shutting_down", &Tango::Util::is_svr_shutting_down)
+        .def("is_device_restarting", &Tango::Util::is_device_restarting)
         .def("get_sub_dev_diag", &Tango::Util::get_sub_dev_diag,
             return_internal_reference<>())
         .def("connect_db", &Tango::Util::connect_db)
         .def("reset_filedatabase", &Tango::Util::reset_filedatabase)
-        .def("get_database", &Tango::Util::get_database, 
+        .def("get_database", &Tango::Util::get_database,
             return_internal_reference<>())
         .def("unregister_server", &Tango::Util::unregister_server)
         .def("get_device_list_by_class", &PyUtil::get_device_list_by_class)
@@ -295,8 +302,6 @@ void export_util()
         .def("set_interceptors", &Tango::Util::set_interceptors)
         .def_readonly("_UseDb", &Tango::Util::_UseDb)
         .def_readonly("_FileDb", &Tango::Util::_FileDb)
-        .def("init_python", init_python)
-        .staticmethod("init_python")
         .def("set_use_db", &PyUtil::set_use_db)
         .staticmethod("set_use_db")
         .def("get_dserver_ior", &PyUtil::get_dserver_ior)
