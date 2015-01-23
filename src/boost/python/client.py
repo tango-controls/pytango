@@ -15,6 +15,7 @@ High Level API for writting Tango clients
 This is an experimental module. Not part of the official API.
 """
 
+import weakref
 import functools
 
 import PyTango
@@ -46,6 +47,16 @@ class _DeviceHelper(object):
     def __init__(self, dev_name, *args, **kwargs):
         self.dev_name = dev_name
         self.device = Device(dev_name, *args, **kwargs)
+        self.slots = weakref.WeakKeyDictionary()
+
+    def connect(self, signal, slot, event_type=PyTango.EventType.CHANGE_EVENT):
+        i = self.device.subscribe_event(signal, event_type, slot)
+        self.slots[slot] = i
+        return i
+
+    def disconnect(self, signal, slot):
+        i = self.slots.pop(slot)
+        self.device.unsubscribe_event(i)
 
     def get_attr_cache(self, refresh=False):
         try:
@@ -100,7 +111,7 @@ class _DeviceHelper(object):
             except PyTango.DevFailed:
                 pass
             self.__cmd_cache = cache
-        return cache        
+        return cache
 
     def get_cmd_info(self, name):
         cache = self.get_cmd_cache()
@@ -143,7 +154,7 @@ class _DeviceHelper(object):
             self.device.write_attribute(name, dumps(value))
         else:
             self.device.write_attribute(name, value)
-        
+
     def get_info(self):
         try:
             return self.__info
@@ -155,7 +166,7 @@ class _DeviceHelper(object):
             return info
         except PyTango.DevFailed:
             return None
-    
+
     def __str__(self):
         return self.dstr()
 
@@ -169,13 +180,14 @@ class _DeviceHelper(object):
             klass = info.dev_class
         return "{0}({1})".format(klass, self.dev_name)
 
-class _Device(object):
+
+class Object(object):
     """Tango object"""
-    
+
     def __init__(self, dev_name, *args, **kwargs):
         helper = _DeviceHelper(dev_name, *args, **kwargs)
         self.__dict__["_helper"] = helper
-    
+
     def __getattr__(self, name):
         r = self._helper.get(name)
         if isinstance(r, PyTango.CommandInfo):
@@ -199,33 +211,28 @@ class _Device(object):
         return self._helper.members()
 
 
-def Object(*args, **kwargs):
-    """Experimental class. Not part of the official API"""
-    return _Device(*args, **kwargs)
-
-
 def get_object_proxy(obj):
-    """Experimental function. Not part of the official API"""    
+    """Experimental function. Not part of the official API"""
     return obj._helper.device
 
 
 def get_object_db(obj):
-    """Experimental function. Not part of the official API"""    
+    """Experimental function. Not part of the official API"""
     return get_object_proxy(obj).get_device_db()
 
 
 def get_object_name(obj):
-    """Experimental function. Not part of the official API"""    
+    """Experimental function. Not part of the official API"""
     return get_object_proxy(obj).get_name()
 
 
 def get_object_info(obj):
-    """Experimental function. Not part of the official API"""    
+    """Experimental function. Not part of the official API"""
     return get_object_proxy(obj).info()
 
 
 def get_attributes_config(obj, refresh=False):
-    """Experimental function. Not part of the official API"""    
+    """Experimental function. Not part of the official API"""
     return obj._helper.get_attr_cache(refresh=refresh)
 
 
@@ -234,7 +241,12 @@ def get_commands_config(obj, refresh=False):
     return obj._helper.get_cmd_cache(refresh=refresh)
 
 
-def connect(obj, signal, slot, event_type=None):
-    """Experimental function. Not part of the official API"""    
-    raise NotImplementedError
-    
+def connect(obj, signal, slot, event_type=PyTango.EventType.CHANGE_EVENT):
+    """Experimental function. Not part of the official API"""
+    return obj._helper.connect(signal, slot, event_type=event_type)
+
+
+def disconnect(obj, signal, slot):
+    """Experimental function. Not part of the official API"""
+    return obj._helper.disconnect(signal, slot)
+
