@@ -1185,9 +1185,9 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
         TangoClassName = tango_class_name
 
         def __init__(self, tango_class_obj, name):
-            Device.__init__(self, tango_class_obj, name)
-            tango_object = server.get_tango_object(self.get_name())
+            tango_object = server.get_tango_object(name)
             self.__tango_object = weakref.ref(tango_object)
+            Device.__init__(self, tango_class_obj, name)
 
         def init_device(self):
             Device.init_device(self)
@@ -1221,15 +1221,35 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
             log.debug("filtered out %s from %s", name, tango_class_name)
             continue
         if inspect.isroutine(member):
-            def _command(dev, param, func_name=None):
-                obj = dev._object
-                args, kwargs = loads(*param)
-                f = getattr(obj, func_name)
-                if server.runner:
-                    result = server.runner.execute(f, *args, **kwargs)
-                else:
-                    result = f(*args, **kwargs)
-                return server.dumps(result)
+            # try to find out if there are any parameters
+            in_type = CmdArgType.DevEncoded
+            out_type = CmdArgType.DevEncoded
+            try:
+                arg_spec = inspect.getargspec(member)
+                if not arg_spec.args:
+                    in_type = CmdArgType.DevVoid
+            except TypeError:
+                pass
+
+            if in_type == CmdArgType.DevVoid:
+                def _command(dev, func_name=None):
+                    obj = dev._object
+                    f = getattr(obj, func_name)
+                    if server.runner:
+                        result = server.runner.execute(f)
+                    else:
+                        result = f()
+                    return server.dumps(result)
+            else:
+                def _command(dev, param, func_name=None):
+                    obj = dev._object
+                    args, kwargs = loads(*param)
+                    f = getattr(obj, func_name)
+                    if server.runner:
+                        result = server.runner.execute(f, *args, **kwargs)
+                    else:
+                        result = f(*args, **kwargs)
+                    return server.dumps(result)
             cmd = functools.partial(_command, func_name=name)
             cmd.__name__ = name
             doc = member.__doc__
@@ -1239,8 +1259,7 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
             cmd = types.MethodType(cmd, None, DeviceDispatcher)
             setattr(DeviceDispatcher, name, cmd)
             DeviceDispatcherClass.cmd_list[name] = \
-                [[CmdArgType.DevEncoded, doc],
-                 [CmdArgType.DevEncoded, ""]]
+                [[in_type, doc], [out_type, ""]]
         else:
             read_only = False
             if hasattr(obj_klass, name):
