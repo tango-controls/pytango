@@ -55,9 +55,8 @@ def install():
     
     
 def remove():
-    print "Removing..."
-    print "DONE!"
-    pass
+    print ("Removing...")
+    print ("DONE!")
     
     
 def main():
