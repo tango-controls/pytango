@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="UserMacros">
     <PyTangoBaseFile>_PyTango</PyTangoBaseFile>
@@ -8,7 +8,7 @@
     <TangoVer>$(TangoMajorVer).$(TangoMinorVer).$(TangoPatchVer)</TangoVer>
     <PyTangoMajorVer>8</PyTangoMajorVer>
     <PyTangoMinorVer>1</PyTangoMinorVer>
-    <PyTangoPatchVer>2</PyTangoPatchVer>
+    <PyTangoPatchVer>6</PyTangoPatchVer>
     <PyTangoVer>$(PyTangoMajorVer).$(PyTangoMinorVer).$(PyTangoPatchVer)</PyTangoVer>
 
     <BoostMajorVer>1</BoostMajorVer>
