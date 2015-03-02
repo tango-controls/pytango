@@ -222,7 +222,7 @@ command.h \
 device_class.h \
 device_impl.h
 
-LINKER=$(LN) $(LNFLAGS) $(OBJS) $(LN_VER)
+LINKER=$(LN) $(OBJS) $(LN_VER)
 
 LINK_TASK=link
 ifdef optimize
@@ -271,7 +271,7 @@ $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
 
 link: prepare $(OBJS)
 	@echo -n "Linking shared $(LIB_NAME)... "
-	@$(LINKER) -o $(OBJS_DIR)/$(LIB_NAME)
+	@$(LINKER) -o $(OBJS_DIR)/$(LIB_NAME) $(LNFLAGS)
 	@echo $(OK)
 
 link-opt: link
