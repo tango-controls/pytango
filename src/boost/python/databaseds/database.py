@@ -2928,10 +2928,9 @@ def __run(db_name,argv):
         ./DataBaseds pydb-test -ORBendPoint giop:tcp::11000
     """
     PyTango.Util.set_use_db(False)
-    py_util = PyTango.Util(argv)
-    py_util.add_class(DataBaseClass, DataBase, 'DataBase')
+    util = PyTango.Util(argv)
+    util.add_class(DataBaseClass, DataBase, 'DataBase')
 
-    util = PyTango.Util.instance()
     dbi = DbInter()
     util.set_interceptors(dbi)
     #util.set_serial_model(PyTango.SerialModel.NO_SYNC)
@@ -2944,7 +2943,7 @@ def __run(db_name,argv):
     dbase = util.get_device_by_name(db_name)
     dbase_name = dbase.get_name()
     dbase_ior = util.get_device_ior(dbase)
-        
+
     host = util.get_host_name()
     pid = util.get_pid_str()
     version = util.get_version_str()
