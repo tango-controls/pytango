@@ -51,7 +51,8 @@ from PyTango.globals import get_class, get_class_by_class, \
 
 #Argument Options
 global options
-
+global WILDCARD_REPLACEMENT
+WILDCARD_REPLACEMENT = True
 class DbInter(PyTango.Interceptors):
 
     def create_thread(self):
@@ -97,6 +98,8 @@ def check_device_name(dev_name):
     return True, dev_name, dfm
 
 def replace_wildcard(text):
+    if not WILDCARD_REPLACEMENT:
+        return text
     # escape '%' with '\'
     text = text.replace("%", "\\%")
     # escape '_' with '\'
@@ -192,7 +195,11 @@ class DataBase (PyTango.Device_4Impl):
         m = __import__('db_access.%s' % (options.db_access),None,None,
                        'db_access.%s' % (options.db_access))
         self.db = m.get_db()
-
+        try:
+            global WILDCARD_REPLACEMENT
+            WILDCARD_REPLACEMENT = m.get_wildcard_replacement()
+        except AttributeError:
+            pass
         self.set_state(PyTango.DevState.ON)
 
         #----- PROTECTED REGION END -----#	//	DataBase.init_device
