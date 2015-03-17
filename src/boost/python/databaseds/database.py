@@ -194,7 +194,7 @@ class DataBase (PyTango.Device_4Impl):
         #----- PROTECTED REGION ID(DataBase.init_device) ENABLED START -----#
         m = __import__('db_access.%s' % (options.db_access),None,None,
                        'db_access.%s' % (options.db_access))
-        self.db = m.get_db()
+        self.db = m.get_db(personal_name = options.argv[1])
         try:
             global WILDCARD_REPLACEMENT
             WILDCARD_REPLACEMENT = m.get_wildcard_replacement()

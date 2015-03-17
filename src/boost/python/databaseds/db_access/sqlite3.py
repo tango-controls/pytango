@@ -1568,7 +1568,7 @@ def main():
     db.add_device("MyServer/my1", ("a/b/c", ("a", "b", "c")), "MyClass")
     db.close_db()
 
-def get_db():
+def get_db(**keys):
     return Executor.submit(sqlite3).result()
 
 if __name__ == "__main__":
