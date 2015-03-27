@@ -1170,7 +1170,10 @@ def _create_gevent_worker():
             self.__watcher.send()
             event.wait()
             if task.exception:
-                Except.throw_python_exception(*task.exception)
+                if issubclass(task.exception[0], DevFailed):
+                    raise task.exception[1]
+                else:
+                    Except.throw_python_exception(*task.exception)
             return task.value
 
         def stop(self):
