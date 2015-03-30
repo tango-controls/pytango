@@ -882,27 +882,25 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
 
     if util is None:
         util = PyTango.Util(args)
-    u_instance = PyTango.Util.instance()
 
     if gevent_mode and event_loop:
         gevent_worker = _create_gevent_worker()
         event_loop = functools.partial(gevent_worker.execute, event_loop)
 
     if event_loop is not None:
-        u_instance.server_set_event_loop(event_loop)
+        util.server_set_event_loop(event_loop)
 
     log = logging.getLogger("PyTango")
 
+    log.debug("Tango init")
+    _add_classes(util, classes)
+    util.server_init()
+    post_init_callback()
+
     def tango_loop(worker=None):
         log.debug("Tango loop started")
-        _add_classes(util, classes)
-        u_instance.server_init()
-        if worker:
-            worker.execute(post_init_callback)
-        else:
-            post_init_callback()
         write("Ready to accept request\n")
-        u_instance.server_run()
+        util.server_run()
         if worker:
             worker.stop()
         log.debug("Tango loop exit")
@@ -1172,7 +1170,10 @@ def _create_gevent_worker():
             self.__watcher.send()
             event.wait()
             if task.exception:
-                Except.throw_python_exception(*task.exception)
+                if issubclass(task.exception[0], DevFailed):
+                    raise task.exception[1]
+                else:
+                    Except.throw_python_exception(*task.exception)
             return task.value
 
         def stop(self):
