@@ -1742,7 +1742,7 @@ def DbExportDevice(self, argin):
     self.db.export_device(dev_name, IOR, host, pid, version)
 
 
-def main():
+def main(argv = None):
     #Parameters management
     global options
     if argparse:
@@ -1754,7 +1754,7 @@ def main():
         parser.add_argument("--logging_level","-l",dest="logging_level",type=int,
                             default=0,help="logging_level 0:WARNING,1:INFO,2:DEBUG")
         parser.add_argument('argv',nargs=argparse.REMAINDER)
-        options = parser.parse_args()
+        options = parser.parse_args(argv)
         options.argv = ["DataBaseds"] + options.argv
     else:
         parser = OptionParser()
@@ -1764,7 +1764,7 @@ def main():
                           help="logging_level 0:WARNING,1:INFO,2:DEBUG")
         parser.add_option("-e","--embedded",dest="embedded",default=False,
                           action="store_true")
-        (options,args) = parser.parse_args()
+        (options,args) = parser.parse_args(argv)
         options.argv = ["DataBaseds"] + args
 
     log_fmt = '%(threadName)-14s %(levelname)-8s %(asctime)s %(name)s: %(message)s'
