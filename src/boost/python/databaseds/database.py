@@ -161,8 +161,8 @@ class DataBase(Device):
         self.attr_Timing_index_read = ['']
         self.attr_Timing_info_read = ['']
         self.init_timing_stats()
-        m = __import__('db_access.%s' % (options.db_access),None,None,
-                       'db_access.%s' % (options.db_access))
+        m = __import__('%s.%s' % (db_access.__package__,options.db_access),None,None,
+                       '%s.%s' % (db_access.__package__,options.db_access))
         self.db = m.get_db(personal_name = options.argv[1])
         try:
             global WILDCARD_REPLACEMENT
