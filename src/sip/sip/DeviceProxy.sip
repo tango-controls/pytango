@@ -76,21 +76,22 @@ public:
     virtual std::vector<std::string> *get_attribute_list();
 
     virtual AttributeInfoList *get_attribute_config(std::vector<std::string>&);
-    /*
     virtual AttributeInfoListEx *get_attribute_config_ex(std::vector<std::string>&);
+
     virtual AttributeInfoEx get_attribute_config(const std::string &);
 
-    virtual AttributeInfoEx attribute_query(std::string name) {return get_attribute_config(name);}
+    virtual AttributeInfoEx attribute_query(std::string name);
+
     virtual AttributeInfoList *attribute_list_query();
     virtual AttributeInfoListEx *attribute_list_query_ex();
 
     virtual void set_attribute_config(AttributeInfoList &);
     virtual void set_attribute_config(AttributeInfoListEx &);
-
+/*
     virtual DeviceAttribute read_attribute(std::string&);
-    virtual DeviceAttribute read_attribute(const char *at) {std::string str(at);return read_attribute(str);}
+    virtual DeviceAttribute read_attribute(const char *at);
     void read_attribute(const char *,DeviceAttribute &);
-    void read_attribute(std::string &at,DeviceAttribute &da) {read_attribute(at.c_str(),da);}
+    void read_attribute(std::string &at,DeviceAttribute &da);
     virtual std::vector<DeviceAttribute> *read_attributes(std::vector<std::string>&);
 
     virtual void write_attribute(DeviceAttribute&);

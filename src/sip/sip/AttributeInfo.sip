@@ -87,7 +87,9 @@ using namespace Tango;
         AttributeInfo *aAttributeInfo = new AttributeInfo(*j);
         PyObject *wobj;
 
-        if (!(wobj = sipConvertFromNewType(aAttributeInfo, sipType_AttributeInfo, sipTransferObj)))
+        if (!(wobj = sipConvertFromNewType(aAttributeInfo, 
+                                           sipType_AttributeInfo,
+                                           sipTransferObj)))
         {
             // There was an error so garbage collect the Python list.
             Py_DECREF(l);

@@ -6,22 +6,28 @@ import sipconfig
 # system.
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
-out_dir = os.path.join(this_dir, 'out')
+sip_dir = os.path.join(this_dir, 'sip')
+build_dir = os.path.join(this_dir, 'build')
+install_dir = os.path.join(this_dir, os.path.pardir, 'Tango')
+
+try:
+    os.makedirs(build_dir)
+except OSError:
+    pass
 
 name = "Tango"
 sip_file = os.path.join(this_dir, name + ".sip")
-build_file = os.path.join(out_dir , name + ".sbf")
+build_file = os.path.join(build_dir , name + ".sbf")
 
 # Get the SIP configuration information.
 config = sipconfig.Configuration()
-
 
 # Run SIP to generate the code.
 cmd = " ".join([config.sip_bin,
                 "-e" ,  # Enable support for exceptions.
                 "-g",  # Always release and reaquire the GIL.
                 "-w",  # Enable warning messages
-                "-c", out_dir,
+                "-c", build_dir,
                 "-b", build_file,
                 sip_file])
 print cmd
@@ -32,20 +38,18 @@ if ret:
     sys.exit(ret)
 
 # Create the Makefile.
-makefile = sipconfig.SIPModuleMakefile(config, build_file,
-                                       dir=out_dir,
-                                       install_dir=this_dir)
+makefile = sipconfig.SIPModuleMakefile(config, build_file, dir=this_dir,
+                                       install_dir=install_dir)
 
 python_lib = "python{v[0]}.{v[1]}".format(v=sys.version_info)
 
 # Add the library we are wrapping.  The name doesn't include any platform
 # specific prefixes or extensions (e.g. the "lib" prefix on UNIX, or the
 # ".dll" extension on Windows).
-makefile.extra_libs = ["tango", "log4tango", "zmq",
-                       "omniORB4", "omniDynamic4", "omnithread", "COS4",
-                       python_lib]
-makefile.extra_lib_dirs = []  #["/home/tcoutinho/.local/lib"]
-makefile.extra_include_dirs = []  #["/home/tcoutinho/.local/include", "/home/tcoutinho/.local/include/tango"]
+makefile.extra_libs = ["tango", "log4tango", python_lib]
+makefile.extra_libs += ["zmq", "omniORB4", "omniDynamic4", "omnithread", "COS4"]
+#makefile.extra_lib_dirs = ["/home/tcoutinho/.local/lib"]
+#makefile.extra_include_dirs = ["/home/tcoutinho/.local/include", "/home/tcoutinho/.local/include/tango"]
 makefile.extra_cxxflags = ["-std=c++0x"]
 
 # see all undefined references
@@ -53,4 +57,3 @@ makefile.extra_lflags = ['-z defs']
 
 # Generate the Makefile itself.
 makefile.generate()
-

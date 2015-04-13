@@ -21,13 +21,16 @@
 %Include DeviceInfo.sip
 %Include DeviceAttributeConfig.sip
 %Include AttributeInfo.sip
+%Include AttributeInfoEx.sip
 %Include DbDatum.sip
 %Include DbDevInfo.sip
 %Include DbDevImportInfo.sip
 %Include connection.sip
+%Include DeviceAttribute.sip
 %Include DeviceProxy.sip
 %Include Database.sip
 
+/*
 %PostInitialisationCode
 
     PyObject* init_tango = PyImport_ImportModule("__init_tango");
@@ -40,8 +43,10 @@
         return;
     }
     PyObject* init_name = PyString_FromString("init");
-    PyObject* ret = PyObject_CallMethodObjArgs(init_tango, init_name, sipModule, sipModuleDict, NULL);
+    PyObject* ret = PyObject_CallMethodObjArgs(init_tango, init_name, sipModule,
+                                               sipModuleDict, NULL);
     Py_DECREF(init_name);
     Py_DECREF(ret);
     Py_DECREF(init_tango);
 %End
+*/

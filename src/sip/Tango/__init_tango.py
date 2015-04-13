@@ -9,9 +9,8 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-import collections
-
 def __inc_param(obj, name):
+    import collections
     ret = not name.startswith('_')
     ret &= not name in ('except_flags',)
     ret &= not isinstance(getattr(obj, name), collections.Callable)
@@ -28,7 +27,7 @@ def __struct_params_s(obj, separator=', ', f=repr, fmt='%s = %s'):
 
 def __struct_params_repr(obj):
     """method wrapper for representing all elements of a struct"""
-    return __struct_params_s(obj)
+    return __struct_params_s(obj, fmt='%s=%s')
 
 def __struct_params_str(obj, fmt, f=repr):
     """method wrapper for printing all elements of a struct."""
@@ -41,16 +40,20 @@ def __repr__Struct(self):
 def __str__Struct_Helper(self, f=repr):
     """str method for struct"""
     attrs = [ n for n in dir(self) if __inc_param(self, n)]
-    fmt = attrs and '%%%ds=%%s' % max(map(len, attrs)) or "%s = %s"
+    fmt = attrs and '%%%ds = %%s' % max(map(len, attrs)) or "%s = %s"
     return '%s(\n%s)\n' % (self.__class__.__name__, __struct_params_str(self, fmt, f))
 
 def __str__Struct(self):
-    return __str__Struct_Helper(self, f=repr)
+    return __str__Struct_Helper(self)
 
 def __registerStructStr(Tango):
     """helper method to register str and repr methods for structures"""
     structs = (Tango.DeviceInfo, Tango.DbDevImportInfo, Tango.DbDatum,
-        Tango.AttributeInfo)
+               Tango.AttributeInfo, Tango.AttributeInfoEx,
+               Tango.ChangeEventInfo, Tango.PeriodicEventInfo,
+               Tango.ArchiveEventInfo, Tango.AttributeAlarmInfo,
+               Tango.AttributeEventInfo,
+               Tango.AttributeInfo, Tango.CommandInfo)
 
     for struct in structs:
         struct.__str__ = __str__Struct
@@ -58,7 +61,6 @@ def __registerStructStr(Tango):
 
 def __pprint_init(Tango):
     __registerStructStr(Tango)
-
 
 def init(Tango, Tangodict):
     __pprint_init(Tango)

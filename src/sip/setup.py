@@ -10,15 +10,15 @@
 # ------------------------------------------------------------------------------
 
 import os
-import sys
 import imp
+import sys
 import struct
 import platform
 import subprocess
 
 from distutils.core import setup, Extension
-from distutils.unixccompiler import UnixCCompiler
 from distutils.version import StrictVersion as V
+from distutils.unixccompiler import UnixCCompiler
 
 import sipdistutils
 
@@ -31,8 +31,12 @@ def abspath(*path):
 
 
 def get_release_info():
-    import release
-    return release.Release
+    try:
+        sys.path.insert(0, abspath("python"))
+        import release
+        return release.Release
+    finally:
+        sys.path.pop(0)
 
 
 def uniquify(seq):
@@ -198,10 +202,6 @@ def main():
         extra_link_args += []
 
         macros += [
-            #('_WINDOWS', None),
-            #('_USRDLL', None),
-            #('_TANGO_LIB', None),
-            #('JPG_USE_ASM', None),
             ('LOG4TANGO_HAS_DLL', None),
             ('TANGO_HAS_DLL', None),
             ('WIN32', None),
@@ -255,14 +255,15 @@ def main():
     include_dirs = uniquify(include_dirs)
     library_dirs = uniquify(library_dirs)
     src_dir = abspath('.')
-    _cppfiles = [ os.path.join(src_dir, fname) for fname in os.listdir(src_dir) if fname.endswith('.cpp') ]
+    _cppfiles = [os.path.join(src_dir, fname) for fname in os.listdir(src_dir)
+                 if fname.endswith('.cpp') ]
     _cppfiles.sort()
-    sources = ["Tango.sip"] + _cppfiles
+    sources = [abspath("sip", "Tango.sip")] + _cppfiles
 
     cmdclass = {'build_ext': build_ext}
 
     _tango = Extension(
-        name='Tango',
+        name='Tango.Tango',
         sources=sources,
         include_dirs=include_dirs,
         library_dirs=library_dirs,
@@ -285,7 +286,7 @@ def main():
         platforms=Release.platform,
         license=Release.license,
         packages=packages,
-        package_dir={ 'Tango' : abspath(".") },
+        package_dir={ 'Tango' : abspath("Tango") },
         classifiers=classifiers,
         provides=provides,
         keywords=Release.keywords,

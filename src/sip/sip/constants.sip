@@ -148,17 +148,71 @@ enum ChannelType
 
 // IDL
 
-enum AttrQuality { ATTR_VALID, ATTR_INVALID, ATTR_ALARM, ATTR_CHANGING, ATTR_WARNING /*, __max_AttrQuality=0xffffffff */ };
+enum AttrQuality {
+     ATTR_VALID,
+     ATTR_INVALID,
+     ATTR_ALARM,
+     ATTR_CHANGING,
+     ATTR_WARNING
+     /*, __max_AttrQuality=0xffffffff */
+};
 
-enum AttrWriteType { READ, READ_WITH_WRITE, WRITE, READ_WRITE /*, __max_AttrWriteType=0xffffffff */ };
+enum AttrWriteType
+{
+    READ,
+    READ_WITH_WRITE,
+    WRITE,
+    READ_WRITE
+    /*, __max_AttrWriteType=0xffffffff */
+};
 
-enum AttrDataFormat { SCALAR, SPECTRUM, IMAGE, FMT_UNKNOWN /*, __max_AttrDataFormat=0xffffffff */ };
+enum AttrDataFormat
+{
+    SCALAR,
+    SPECTRUM,
+    IMAGE,
+    FMT_UNKNOWN
+    /*, __max_AttrDataFormat=0xffffffff */
+};
 
-enum DevSource { DEV, CACHE, CACHE_DEV /*, __max_DevSource=0xffffffff */ };
+enum DevSource
+{
+    DEV,
+    CACHE,
+    CACHE_DEV
+    /*, __max_DevSource=0xffffffff */
+};
 
-enum ErrSeverity { WARN, ERR, PANIC /*, __max_ErrSeverity=0xffffffff */ };
+enum ErrSeverity
+{
+    WARN,
+    ERR,
+    PANIC
+    /*, __max_ErrSeverity=0xffffffff */
+};
 
-enum DevState { ON, OFF, CLOSE, OPEN, INSERT, EXTRACT, MOVING, STANDBY, FAULT, INIT, RUNNING, ALARM, DISABLE, UNKNOWN /*, __max_DevState=0xffffffff */ };
+enum DevState
+{
+    ON,
+    OFF,
+    CLOSE,
+    OPEN,
+    INSERT,
+    EXTRACT,
+    MOVING,
+    STANDBY,
+    FAULT,
+    INIT,
+    RUNNING,
+    ALARM,
+    DISABLE,
+    UNKNOWN
+    /*, __max_DevState=0xffffffff */
+};
 
-enum DispLevel { OPERATOR, EXPERT /*, __max_DispLevel=0xffffffff */ };
-
+enum DispLevel
+{
+    OPERATOR,
+    EXPERT
+    /*, __max_DispLevel=0xffffffff */
+};
