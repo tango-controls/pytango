@@ -163,7 +163,10 @@ def __DeviceProxy__refresh_cmd_cache(self):
     cmd_cache = {}
     for cmd in cmd_list:
         n = cmd.cmd_name.lower()
-        cmd_cache[n] = cmd, None
+        doc = "%s(%s) -> %s\n\n" % (cmd.cmd_name, cmd.in_type, cmd.out_type)
+        doc += " -  in (%s): %s\n" % (cmd.in_type, cmd.in_type_desc)
+        doc += " - out (%s): %s\n" % (cmd.out_type, cmd.out_type_desc)
+        cmd_cache[n] = cmd, doc
     self.__dict__['__cmd_cache'] = cmd_cache
 
 def __DeviceProxy__refresh_attr_cache(self):
@@ -190,14 +193,10 @@ def __DeviceProxy__getattr(self, name):
         pass
 
     if cmd_info is not None:
-        d, f = cmd_info
-        if f is None:
-            doc = "%s(%s) -> %s\n\n" % (d.cmd_name, d.in_type, d.out_type)
-            doc += " -  in (%s): %s\n" % (d.in_type, d.in_type_desc)
-            doc += " - out (%s): %s\n" % (d.out_type, d.out_type_desc)
-            def f(*args, **kwds): return self.command_inout(name, *args, **kwds)
-            f.__doc__ = doc
-            self.__cmd_cache[name_l] = d, f
+        _, doc = cmd_info
+        def f(*args, **kwds):
+            return self.command_inout(name, *args, **kwds)
+        f.__doc__ = doc
         return f
 
     find_attr = True
