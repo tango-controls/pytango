@@ -892,13 +892,13 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
 
     log = logging.getLogger("PyTango")
 
-    log.debug("Tango init")
-    _add_classes(util, classes)
-    util.server_init()
-    post_init_callback()
-
     def tango_loop(worker=None):
         log.debug("Tango loop started")
+        _add_classes(util, classes)
+        log.debug("Tango init")
+        util.server_init()
+        if worker:
+            worker.execute(post_init_callback)
         write("Ready to accept request\n")
         util.server_run()
         if worker:
