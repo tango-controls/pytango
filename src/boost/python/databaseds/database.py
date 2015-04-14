@@ -1753,6 +1753,8 @@ def main(argv = None):
                             action="store_true")
         parser.add_argument("--logging_level","-l",dest="logging_level",type=int,
                             default=0,help="logging_level 0:WARNING,1:INFO,2:DEBUG")
+        parser.add_argument("--port",dest="port",default=None, type=int,
+                            help="database port")
         parser.add_argument('argv',nargs=argparse.REMAINDER)
         options = parser.parse_args(argv)
         options.argv = ["DataBaseds"] + options.argv
@@ -1764,8 +1766,19 @@ def main(argv = None):
                           help="logging_level 0:WARNING,1:INFO,2:DEBUG")
         parser.add_option("-e","--embedded",dest="embedded",default=False,
                           action="store_true")
+        parser.add_option("--port",dest="port",default=10000, type=int,
+                          help="database port")
         (options,args) = parser.parse_args(argv)
         options.argv = ["DataBaseds"] + args
+
+    port = options.port
+    if port is None:
+        try:
+            _, port = PyTango.ApiUtil.get_env_var("TANGO_HOST").split(":")
+        except:
+            port = 10000
+
+    options.argv += ["-ORBendPoint", "giop:tcp::{0}".format(port)]
 
     log_fmt = '%(threadName)-14s %(levelname)-8s %(asctime)s %(name)s: %(message)s'
     if options.logging_level == 1:
