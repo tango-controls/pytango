@@ -1811,7 +1811,7 @@ def __monkey_patch_database_class():
         deviceClassClass, deviceImplClass, deviceImplName = info
         deviceImplClass._device_class_instance = klass
 
-        device = deviceImplClass(klass, dev_name)
+        device = self._new_device(deviceImplClass, klass, dev_name)
         self._add_device(device)
         tmp_dev_list = [device]
 
