@@ -866,6 +866,7 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
         util = PyTango.Util(args)
 
     if gevent_mode:
+        util.set_serial_model(PyTango.SerialModel.NO_SYNC)
         worker = _create_gevent_worker()
         set_worker(worker)
 
