@@ -582,8 +582,7 @@ class attribute(AttrData):
                 self.fget = fget
                 if 'doc' not in kwargs and 'description' not in kwargs:
                     kwargs['doc'] = fget.__doc__
-            else:
-                kwargs['fget'] = fget
+            kwargs['fget'] = fget
 
         super(attribute, self).__init__(name, class_name)
         if 'dtype' in kwargs:
