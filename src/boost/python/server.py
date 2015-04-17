@@ -1651,8 +1651,11 @@ class Server:
               - dict<device names : tango class name>
         :rtype: tuple<dict, dict>
         """
-        import PyTango
-        db = PyTango.Database()
+        if self.__util is None:
+            import PyTango
+            db = PyTango.Database()
+        else:
+            db = self.__util.get_database()
         server = self.server_instance
         dev_list = db.get_device_class_list(server)
         class_map, dev_map  = {}, {}
