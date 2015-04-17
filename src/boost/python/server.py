@@ -711,19 +711,24 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
 
 class _BaseProperty(object):
 
-    def __init__(self, dtype, doc='', default_value=None):
+    def __init__(self, dtype, doc='', default_value=None, update_db=False):
         self.name = None
         self.__value = None
         dtype = from_typeformat_to_type(*_get_tango_type_format(dtype))
         self.dtype = dtype
         self.doc = doc
         self.default_value = default_value
+        self.update_db = update_db
 
     def __get__(self, obj, objtype):
         return obj._tango_properties.get(self.name)
 
     def __set__(self, obj, value):
         obj._tango_properties[self.name] = value
+        if self.update_db:
+            import PyTango
+            db = PyTango.Util.instance().get_database()
+            db.put_device_property(obj.get_name(), {self.name: value})
 
     def __delete__(self, obj):
         del obj._tango_properties[self.name]
@@ -747,6 +752,12 @@ class device_property(_BaseProperty):
     :param dtype: Data type (see :ref:`pytango-data-types`)
     :param doc: property documentation (optional)
     :param default_value: default value for the property (optional)
+    :param update_db: tells if set value should write the value to database.
+                     [default: False]
+    :type update_db: bool
+
+    .. versionadded:: 8.1.7
+        added update_db option
     """
     pass
 
@@ -769,6 +780,12 @@ class class_property(_BaseProperty):
     :param dtype: Data type (see :ref:`pytango-data-types`)
     :param doc: property documentation (optional)
     :param default_value: default value for the property (optional)
+    :param update_db: tells if set value should write the value to database.
+                     [default: False]
+    :type update_db: bool
+
+    .. versionadded:: 8.1.7
+        added update_db option
     """
     pass
 

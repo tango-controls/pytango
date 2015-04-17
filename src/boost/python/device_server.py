@@ -292,10 +292,18 @@ def __DeviceImpl__get_device_properties(self, ds_class = None):
         self.device_property_list = copy.deepcopy(ds_class.device_property_list)
         class_prop = ds_class.class_property_list
         pu.get_device_properties(self, class_prop, self.device_property_list)
-        for prop_name in class_prop:
-            setattr(self, prop_name, pu.get_property_values(prop_name, class_prop))
-        for prop_name in self.device_property_list:
-            setattr(self, prop_name, self.prop_util.get_property_values(prop_name, self.device_property_list))
+        if hasattr(self, "_tango_properties"):
+            for prop_name in class_prop:
+                value = pu.get_property_values(prop_name, class_prop)
+                self._tango_properties[prop_name] = value
+            for prop_name in self.device_property_list:
+                value = self.prop_util.get_property_values(prop_name, self.device_property_list)
+                self._tango_properties[prop_name] = value
+        else:
+            for prop_name in class_prop:
+                setattr(self, prop_name, pu.get_property_values(prop_name, class_prop))
+            for prop_name in self.device_property_list:
+                setattr(self, prop_name, self.prop_util.get_property_values(prop_name, self.device_property_list))
     except DevFailed as df:
         print(80*"-")
         print(df)
