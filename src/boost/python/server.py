@@ -564,6 +564,9 @@ class attribute(AttrData):
 
     In this second format, defining the `write` implies setting the
     attribute access to READ_WRITE.
+
+    .. versionadded:: 8.1.7
+        added green_mode, read_green_mode and write_green_mode options
     '''
 
     def __init__(self, fget=None, **kwargs):
@@ -684,6 +687,9 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
         set green mode on this specific command. Default value is None meaning
         use the server green mode. Set it to GreenMode.Synchronous to force
         a non green command in a green server.
+
+    .. versionadded:: 8.1.7
+        added green_mode option
     """
     if f is None:
         return functools.partial(command,
