@@ -21,6 +21,7 @@ __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
 
 import os
 import sys
+import copy
 import types
 import inspect
 import logging
@@ -435,6 +436,35 @@ class Device(LatestDeviceImpl):
         Tango init_device method. Default implementation calls
         :meth:`get_device_properties`"""
         self.get_device_properties()
+
+    def delete_device(self):
+        pass
+    delete_device.__doc__ == LatestDeviceImpl.delete_device.__doc__
+
+    def get_device_properties(self, ds_class = None):
+        if ds_class is None:
+            try:
+                # Call this method in a try/except in case this is called during 
+                # the DS shutdown sequence
+                ds_class = self.get_device_class()
+            except:
+                return
+        try:
+            pu = self.prop_util = ds_class.prop_util
+            self.device_property_list = copy.deepcopy(ds_class.device_property_list)
+            class_prop = ds_class.class_property_list
+            pu.get_device_properties(self, class_prop, self.device_property_list)
+            for prop_name in class_prop:
+                value = pu.get_property_values(prop_name, class_prop)
+                self._tango_properties[prop_name] = value
+            for prop_name in self.device_property_list:
+                value = self.prop_util.get_property_values(prop_name, 
+                                                           self.device_property_list)
+                self._tango_properties[prop_name] = value
+        except DevFailed as df:
+            print(80*"-")
+            print(df)
+            raise df
 
     def always_executed_hook(self):
         """
