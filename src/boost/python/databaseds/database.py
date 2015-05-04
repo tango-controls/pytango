@@ -136,30 +136,24 @@ class DataBase(Device):
 
     # --- attributes ---------------------------------------
 
-    Timing_maximum = attribute(dtype=('float64',), access=READ_ONLY)
+    Timing_maximum = attribute(dtype=('float64',),max_dim_x=128, access=READ_ONLY)
 
-    Timing_average = attribute(dtype=('float64',), access=READ_ONLY)
+    Timing_average = attribute(dtype=('float64',),max_dim_x=128, access=READ_ONLY)
 
-    Timing_index = attribute(dtype=('str',), access=READ_ONLY)
+    Timing_index = attribute(dtype=('str',),max_dim_x=128, access=READ_ONLY)
 
-    Timing_calls = attribute(dtype=('float64',), access=READ_ONLY)
+    Timing_calls = attribute(dtype=('float64',),max_dim_x=128, access=READ_ONLY)
 
-    Timing_info = attribute(dtype=('str',), access=READ_ONLY)
+    Timing_info = attribute(dtype=('str',),max_dim_x=128, access=READ_ONLY)
 
     StoredProcedureRelease = attribute(dtype='str', access=READ_ONLY)
 
-    Timing_minimum = attribute(dtype=('float64',), access=READ_ONLY)
+    Timing_minimum = attribute(dtype=('float64',),max_dim_x=128, access=READ_ONLY)
 
     def init_device(self):
         self._log = log = logging.getLogger(self.get_name())
         self._log.debug("In init_device()")
         self.attr_StoredProcedureRelease_read = ''
-        self.attr_Timing_average_read = [0.0]
-        self.attr_Timing_minimum_read = [0.0]
-        self.attr_Timing_maximum_read = [0.0]
-        self.attr_Timing_calls_read = [0.0]
-        self.attr_Timing_index_read = ['']
-        self.attr_Timing_info_read = ['']
         self.init_timing_stats()
         m = __import__('%s.%s' % (db_access.__package__,options.db_access),None,None,
                        '%s.%s' % (db_access.__package__,options.db_access))
@@ -182,45 +176,33 @@ class DataBase(Device):
 
     def read_Timing_maximum(self):
         self._log.debug("In read_Timing_maximum()")
-        self.attr_Timing_maximum_read[:] = []
-        for tmp_name in cmd_list:
-            self.attr_Timing_maximum_read.append(self.timing_maps[tmp_name].maximum)
-
-        return self.attr_Timing_maximum_read
+        return [x.maximum for x in self.timing_maps.values()]
 
     def read_Timing_average(self):
         self._log.debug("In read_Timing_average()")
-
-        self.attr_Timing_average_read[:] = []
-        for tmp_name in cmd_list:
-            self.attr_Timing_average_read.append(self.timing_maps[tmp_name].average)
-        return self.attr_Timing_average_read
+        
+        return [x.average for x in self.timing_maps.values()]
 
     def read_Timing_index(self):
         self._log.debug("In read_Timing_index()")
-        for tmp_name in cmd_list:
-            self.attr_Timing_index_read.append(self.timing_maps[tmp_name].index)
-        return self.attr_Timing_index_read
+        return [x.index for x in self.timing_maps.values()]
 
     def read_Timing_calls(self):
         self._log.debug("In read_Timing_calls()")
-        self.attr_Timing_calls_read[:] = []
-        for tmp_name in cmd_list:
-            self.attr_Timing_calls_read.append(self.timing_maps[tmp_name].calls)
-        return self.attr_Timing_calls_read
+        return [x.calls for x in self.timing_maps.values()]
 
     def read_Timing_info(self):
         self._log.debug("In read_Timing_info()")
-        self.attr_Timing_info_read[:] = []
         util = PyTango.Util.instance()
-        self.attr_Timing_info_read.append("TANGO Database Timing info on host " + util.get_host_name())
-        self.attr_Timing_info_read.append(" ")
-        self.attr_Timing_info_read.append("command	average	minimum	maximum	calls")
-        self.attr_Timing_info_read.append(" ")
-        for tmp_name in cmd_list:
+        attr_Timing_info_read = []
+        attr_Timing_info_read.append("TANGO Database Timing info on host " + util.get_host_name())
+        attr_Timing_info_read.append(" ")
+        attr_Timing_info_read.append("command	average	minimum	maximum	calls")
+        attr_Timing_info_read.append(" ")
+        for tmp_name in sorted(self.timing_maps.keys()):
             tmp_info = "%41s\t%6.3f\t%6.3f\t%6.3f\t%.0f"%(tmp_name, self.timing_maps[tmp_name].average, self.timing_maps[tmp_name].minimum, self.timing_maps[tmp_name].maximum, self.timing_maps[tmp_name].calls)
-            self.attr_Timing_info_read.append(tmp_info)
-        return self.attr_Timing_info_read
+            attr_Timing_info_read.append(tmp_info)
+        return attr_Timing_info_read
 
     def read_StoredProcedureRelease(self):
         self._log.debug("In read_StoredProcedureRelease()")
@@ -229,10 +211,7 @@ class DataBase(Device):
 
     def read_Timing_minimum(self):
         self._log.debug("In read_Timing_minimum()")
-        self.attr_Timing_minimum_read[:] = []
-        for tmp_name in cmd_list:
-            self.attr_Timing_minimum_read.append(self.timing_maps[tmp_name].minimum)
-        return self.attr_Timing_minimum_read
+        return [x.minimum for x in self.timing_maps.values()]
 
     # --- commands -----------------------------------------
 
@@ -1028,7 +1007,7 @@ class DataBase(Device):
         :return:
         :rtype: PyTango.DevVoid """
         self._log.debug("In ResetTimingValues()")
-        for tmp_timing in timing_maps.itervalues():
+        for tmp_timing in self.timing_maps.itervalues():
             tmp_timing.average = 0.
             tmp_timing.minimum = 0.
             tmp_timing.maximum = 0.
