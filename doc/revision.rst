@@ -103,6 +103,7 @@ Version history
 |          | Bug fixes:                                                                                                                                                            |
 |          |                                                                                                                                                                       |
 |          |     - `690: Description attribute property <https://sourceforge.net/p/tango-cs/bugs/690/>`_                                                                           |
+|          |     - `700: [pytango] useless files in the source distribution <https://sourceforge.net/p/tango-cs/bugs/700/>`_                                                       |
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.6    | Bug fixes:                                                                                                                                                            |
 |          |                                                                                                                                                                       |
