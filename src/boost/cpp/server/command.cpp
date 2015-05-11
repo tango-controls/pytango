@@ -206,7 +206,7 @@ void extract_scalar<Tango::DEV_ENCODED>(const CORBA::Any &any, boost::python::ob
          template<long type>
          static void dev_var_x_array_deleter__(void * ptr_)
          {
-             TANGO_DO_ON_ATTRIBUTE_DATA_TYPE_ID(type,
+             TANGO_DO_ON_DEVICE_ARRAY_DATA_TYPE_ID(type,
                  delete static_cast<TANGO_const2type(tangoTypeConst)*>(ptr_);
              );
          }
@@ -215,7 +215,7 @@ void extract_scalar<Tango::DEV_ENCODED>(const CORBA::Any &any, boost::python::ob
          static void dev_var_x_array_deleter__(PyObject* obj)
          {
              void * ptr_ = PyCapsule_GetPointer(obj, NULL);
-             TANGO_DO_ON_ATTRIBUTE_DATA_TYPE_ID(type,
+             TANGO_DO_ON_DEVICE_ARRAY_DATA_TYPE_ID(type,
                  delete static_cast<TANGO_const2type(tangoTypeConst)*>(ptr_);
              );
          }
