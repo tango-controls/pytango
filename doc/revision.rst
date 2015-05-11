@@ -106,6 +106,7 @@ Version history
 |          |     - `700: [pytango] useless files in the source distribution <https://sourceforge.net/p/tango-cs/bugs/700/>`_                                                       |
 |          |     - `701: Memory leak in command with list argument <https://sourceforge.net/p/tango-cs/bugs/701/>`_                                                                |
 |          |     - `704: Assertion failure when calling command with string array input type <https://sourceforge.net/p/tango-cs/bugs/704/>`_                                      |
+|          |     - `705: Support boost_python lib name on Gentoo  <https://sourceforge.net/p/tango-cs/bugs/705/>`_                                                                 |
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.6    | Bug fixes:                                                                                                                                                            |
 |          |                                                                                                                                                                       |

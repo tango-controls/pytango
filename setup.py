@@ -355,12 +355,15 @@ def setup_args():
             dist_name = platform.linux_distribution()[0].lower()
             debian_based = 'debian' in dist_name or 'ubuntu' in dist_name or \
                            'mint' in dist_name
+            py_ver = platform.python_version_tuple()
             if debian_based:
                 # when building with multiple version of python on debian we need
                 # to link against boost_python-py25/-py26 etc...
                 pyver = "-py"
-                pyver += "".join(map(str, platform.python_version_tuple()[:2]))
+                pyver += "".join(map(str, py_ver[:2]))
                 boost_library_name += pyver
+            elif 'gentoo' in dist_name:
+                boost_library_name += "-" + ".".join(map(str, py_ver[:2]))
     else:
         inc_dir = os.path.join(BOOST_ROOT, 'include')
         lib_dirs = [os.path.join(BOOST_ROOT, 'lib')]
