@@ -95,15 +95,16 @@ struct from_py<tangoTypeConst> \
                 PyErr_SetString(PyExc_TypeError, "Expecting a numeric type, it is not."); \
                 boost::python::throw_error_already_set();  \
             } \
-            if (cpy_value > TangoScalarTypeLimits::max()) { \
-                PyErr_SetString(PyExc_OverflowError, "Value is too large."); \
-                boost::python::throw_error_already_set(); \
+            if (TangoScalarTypeLimits::is_integer) { \
+                if (cpy_value > TangoScalarTypeLimits::max()) {	\
+                    PyErr_SetString(PyExc_OverflowError, "Value is too large."); \
+                    boost::python::throw_error_already_set(); \
+                } \
+                if (cpy_value < TangoScalarTypeLimits::min()) {	\
+                    PyErr_SetString(PyExc_OverflowError, "Value is too small."); \
+                    boost::python::throw_error_already_set(); \
+                } \
             } \
-            if (cpy_value < TangoScalarTypeLimits::min()) { \
-                PyErr_SetString(PyExc_OverflowError, "Value is too small."); \
-                boost::python::throw_error_already_set(); \
-            } \
-            \
             tg = static_cast<TangoScalarType>(cpy_value);  \
         } \
     };
