@@ -562,8 +562,8 @@ class attribute(AttrData):
             def current(self, current):
                 self._current = current
 
-    In this second format, defining the `write` implies setting the
-    attribute access to READ_WRITE.
+    In this second format, defining the `write` implicitly sets the attribute
+    access to READ_WRITE.
 
     .. versionadded:: 8.1.7
         added green_mode, read_green_mode and write_green_mode options
@@ -581,7 +581,8 @@ class attribute(AttrData):
             if inspect.isroutine(fget):
                 self.fget = fget
                 if 'doc' not in kwargs and 'description' not in kwargs:
-                    kwargs['doc'] = fget.__doc__
+                    if fget.__doc__ is not None:
+                        kwargs['doc'] = fget.__doc__
             kwargs['fget'] = fget
 
         super(attribute, self).__init__(name, class_name)

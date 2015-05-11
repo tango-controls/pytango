@@ -141,7 +141,7 @@ class AttrData(object):
         p = UserDefaultAttrProp()
 
         doc = extra_info.pop('doc', None)
-        if 'doc' is not None:
+        if doc is not None:
             extra_info['description'] = doc
         
         for k, v in extra_info.items():

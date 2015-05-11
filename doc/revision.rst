@@ -85,7 +85,7 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 05/02/15 | `8.22 <http://www.tango-controls.org/static/PyTango/v816/doc/html/index.html>`_  | Update to PyTango 8.1.6                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| --/04/15 | `8.23 <http://www.tango-controls.org/static/PyTango/v817/doc/html/index.html>`_  | Update to PyTango 8.1.6                             | T\. Coutinho          |
+| --/05/15 | `8.23 <http://www.tango-controls.org/static/PyTango/v817/doc/html/index.html>`_  | Update to PyTango 8.1.7                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _pytango-version-history:
@@ -99,6 +99,10 @@ Version history
 | 8.1.7    | Features:                                                                                                                                                             |
 |          |                                                                                                                                                                       |
 |          |     - `110:  device property with auto update in database <https://sourceforge.net/p/tango-cs/feature-requests/110>`_                                                 |
+|          |                                                                                                                                                                       |
+|          | Bug fixes:                                                                                                                                                            |
+|          |                                                                                                                                                                       |
+|          |     - `690: Description attribute property <https://sourceforge.net/p/tango-cs/bugs/690/>`_                                                                           |
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.6    | Bug fixes:                                                                                                                                                            |
 |          |                                                                                                                                                                       |
