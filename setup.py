@@ -353,7 +353,8 @@ def setup_args():
     if BOOST_ROOT is None:
         if 'linux' in sys.platform:
             dist_name = platform.linux_distribution()[0].lower()
-            debian_based = 'debian' in dist_name or 'ubuntu' in dist_name
+            debian_based = 'debian' in dist_name or 'ubuntu' in dist_name or \
+                           'mint' in dist_name
             if debian_based:
                 # when building with multiple version of python on debian we need
                 # to link against boost_python-py25/-py26 etc...
