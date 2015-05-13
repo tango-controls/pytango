@@ -96,7 +96,11 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
-| 8.1.7    | Features:                                                                                                                                                             |
+| 8.1.7    | Bug fixes:                                                                                                                                                            |
+|          |                                                                                                                                                                       |
+|          |     - `714: Memory leak in PyTango for direct server command calls <https://sourceforge.net/p/tango-cs/bugs/714>`_                                                    |
+|          |                                                                                                                                                                       |
+|          | Features:                                                                                                                                                             |
 |          |                                                                                                                                                                       |
 |          |     - `110:  device property with auto update in database <https://sourceforge.net/p/tango-cs/feature-requests/110>`_                                                 |
 |          |                                                                                                                                                                       |

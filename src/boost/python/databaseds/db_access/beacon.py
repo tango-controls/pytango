@@ -18,17 +18,20 @@ from ..db_errors import *
 from beacon import static,settings
 import itertools
 
-
-def _info(funct) :
-    def f(self,*args,**kwargs) :
-        self._info("%s: %s %s", funct.__name__,args,kwargs)
-        returnVal = funct(self,*args,**kwargs)
-        if returnVal is not None:
-            self._info("return %s : %s",funct.__name__,returnVal)
-        else:
-            self._info("return %s",funct.__name__)
-        return returnVal
-    return f
+if logging.getLogger().isEnabledFor(logging.INFO):
+    def _info(funct) :
+        def f(self,*args,**kwargs) :
+            self._info("%s: %s %s", funct.__name__,args,kwargs)
+            returnVal = funct(self,*args,**kwargs)
+            if returnVal is not None:
+                self._info("return %s : %s",funct.__name__,returnVal)
+            else:
+                self._info("return %s",funct.__name__)
+            return returnVal
+        return f
+else:
+    def _info(funct):
+        return funct
 
 def _filter(wildcard,l) :
     wildcard = wildcard.replace('*','.*')
@@ -41,7 +44,7 @@ class beacon(object):
     TANGO_ATTR_ALIAS = 'tango.attr.alias'
 
     def __init__(self, personal_name = "",**keys):
-        self._config = static.get_config()
+        self._config = static.Config('',3.)
         self._logger = logging.getLogger(self.__class__.__name__)
         self._debug = self._logger.debug
         self._info = self._logger.info
@@ -78,7 +81,7 @@ class beacon(object):
                 self._parse_list(values,indexing_flag)
             elif isinstance(values,dict):
                 self._parse_dict(values,indexing_flag)
-
+                self._index_tango(values)
 
     def _parse_list(self,l,indexing_flag) :
         for v in l:
@@ -164,7 +167,6 @@ class beacon(object):
         attr_alias = settings.HashObjSetting(self.TANGO_ATTR_ALIAS)
         del attr_alias[alias]
     
-    @_info
     def _get_class_attribute(self,klass_name, attr_name) :
         self._info("_get_class_attribute(klass_name=%s,attr_name=%s)",
                    klass_name, attr_name)
@@ -181,7 +183,6 @@ class beacon(object):
         class_attribute = self._get_class_attribute(klass_name,attr_name)
         del class_attribute[prop_name]
 
-    @_info
     def _get_class_properties(self,klass_name,prop_name):
         key_name = 'tango.class.properties.%s.%s' % (klass_name,prop_name)
         return settings.QueueSetting(key_name)
@@ -191,7 +192,6 @@ class beacon(object):
         class_property = self._get_class_properties(klass_name,prop_name)
         class_property.clear()
 
-    @_info
     def _get_property_attr_device(self,dev_name) :
         key_name = 'tango.%s' % dev_name.lower().replace('/','.')
         return settings.HashObjSetting(key_name)
@@ -268,7 +268,6 @@ class beacon(object):
     def delete_server_info(self, server_instance):
         self._warn("Not implemented delete_server_info(server_instance=%s)", (server_instance))
 
-    @_info
     def _get_export_device_info(self,dev_name):
         key_name = 'tango.info.%s' % dev_name
         return settings.HashSetting(key_name)
@@ -442,21 +441,21 @@ class beacon(object):
                               [str(x) for p in prop_attr.iteritems() for x in p])
         return result  
 
-    @_info
     def get_device_attribute_property2(self, dev_name, attributes):
-        prop_attr_device = self._get_property_attr_device(dev_name)
+        prop_attr_device_handler = self._get_property_attr_device(dev_name)
         result = [dev_name, str(len(attributes))]
+        prop_attr_device = prop_attr_device_handler.get_all()
         for attr_name in attributes:
             prop_attr = prop_attr_device.get(attr_name)
             if prop_attr is None:
-                result.extend([attr_name,'0'])
+                result.extend((attr_name,'0'))
             else:
-                result.extend([attr_name,str(len(prop_attr))])
+                result.extend((attr_name,str(len(prop_attr))))
                 for name,values in prop_attr:
                     if isinstance(values,list):
                         result.extend([name,len(values)] + [str(x) for x in values])
                     else:
-                        result.extend([name,'1',str(values)])
+                        result.extend((name,'1',str(values)))
         return result
 
     @_info
@@ -495,7 +494,6 @@ class beacon(object):
                                  [n.get('tango_name') for n in self._tango_name_2_node.values()])
         return list(set([x.split('/')[1] for x in  filtered_names]))
     
-    @_info
     def get_device_info(self, dev_name):
         dev_name = dev_name.lower()
         device_info = self._get_export_device_info(dev_name)
@@ -509,13 +507,13 @@ class beacon(object):
                 server_node = device_node
             else:
                 server_node = device_node.parent
-            result_str.extend([dev_name,
+            result_str.extend((dev_name,
                                info.get('IOR',''),
                                str(info.get('version','0')),
                                server_node.get('server','') + '/' + server_node.get('personal_name',''),
                                info.get('host','?'),info.get('start-time','?'),'?',
-                               device_node.get('class','DServer')])
-            result_long.extend([info and 1 or 0,info.get('pid',-1)])
+                               device_node.get('class','DServer')))
+            result_long.extend((info and 1 or 0,info.get('pid',-1)))
         return (result_long,result_str)
 
     @_info
@@ -706,18 +704,19 @@ class beacon(object):
     @_info
     def get_server_class_list(self,wildcard):
         server_names = _filter(wildcard,self._personal_2_node.keys())
-        result = []
+        result = set()
         for ser_name in server_names:
             server_node = self._personal_2_node.get(ser_name)
             for device_node in server_node.get('device',[]) :
                 class_name = device_node.get('class')
                 if class_name is not None:
-                    result.append(class_name)
+                    result.add(class_name)
 
-        result.append('DServer')
+        result.add('DServer')
+        result = list(result)
         result.sort()
         return result
-    @_info
+
     def import_device(self, dev_name):
         dev_node = self._tango_name_2_node.get(dev_name)
         if dev_node is not None:
@@ -726,7 +725,6 @@ class beacon(object):
             th_exc(DB_DeviceNotDefined,
                    "device " + dev_name + " not defined in the database !",
                    "DataBase::ImportDevice()")
-
     @_info
     def import_event(self, event_name):
         th_exc(DB_DeviceNotDefined,
@@ -879,7 +877,6 @@ class beacon(object):
         #Not use in our case
         pass
 
-    @_info
     def unexport_device(self, dev_name):
         device_info = self._get_export_device_info(dev_name)
         device_info.clear()
