@@ -85,7 +85,7 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 05/02/15 | `8.22 <http://www.tango-controls.org/static/PyTango/v816/doc/html/index.html>`_  | Update to PyTango 8.1.6                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| --/05/15 | `8.23 <http://www.tango-controls.org/static/PyTango/v817/doc/html/index.html>`_  | Update to PyTango 8.1.7                             | T\. Coutinho          |
+| --/06/15 | `8.23 <http://www.tango-controls.org/static/PyTango/v817/doc/html/index.html>`_  | Update to PyTango 8.1.7                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _pytango-version-history:
@@ -96,11 +96,7 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
-| 8.1.7    | Bug fixes:                                                                                                                                                            |
-|          |                                                                                                                                                                       |
-|          |     - `714: Memory leak in PyTango for direct server command calls <https://sourceforge.net/p/tango-cs/bugs/714>`_                                                    |
-|          |                                                                                                                                                                       |
-|          | Features:                                                                                                                                                             |
+| 8.1.7    | Features:                                                                                                                                                            |
 |          |                                                                                                                                                                       |
 |          |     - `110:  device property with auto update in database <https://sourceforge.net/p/tango-cs/feature-requests/110>`_                                                 |
 |          |                                                                                                                                                                       |
@@ -111,6 +107,7 @@ Version history
 |          |     - `701: Memory leak in command with list argument <https://sourceforge.net/p/tango-cs/bugs/701/>`_                                                                |
 |          |     - `704: Assertion failure when calling command with string array input type <https://sourceforge.net/p/tango-cs/bugs/704/>`_                                      |
 |          |     - `705: Support boost_python lib name on Gentoo  <https://sourceforge.net/p/tango-cs/bugs/705/>`_                                                                 |
+|          |     - `714: Memory leak in PyTango for direct server command calls <https://sourceforge.net/p/tango-cs/bugs/714>`_                                                    |
 |          |     - `718: OverflowErrors with float types in 8.1.6 <https://sourceforge.net/p/tango-cs/bugs/718/>`_                                                                 |
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.6    | Bug fixes:                                                                                                                                                            |
