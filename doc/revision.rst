@@ -109,6 +109,7 @@ Version history
 |          |     - `705: Support boost_python lib name on Gentoo  <https://sourceforge.net/p/tango-cs/bugs/705/>`_                                                                 |
 |          |     - `714: Memory leak in PyTango for direct server command calls <https://sourceforge.net/p/tango-cs/bugs/714>`_                                                    |
 |          |     - `718: OverflowErrors with float types in 8.1.6 <https://sourceforge.net/p/tango-cs/bugs/718/>`_                                                                 |
+|          |     - `724: PyTango DeviceProxy.command_inout(<str>) memory leaks <https://sourceforge.net/p/tango-cs/bugs/724/>`_                                                    |
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.6    | Bug fixes:                                                                                                                                                            |
 |          |                                                                                                                                                                       |

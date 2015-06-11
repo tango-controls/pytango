@@ -37,6 +37,25 @@ namespace PyDeviceData {
 	    from_py<tangoTypeConst>::convert(py_value.ptr(), value);
             self << value;
         }
+
+        template <>
+        void insert_scalar<Tango::DEV_STRING>(Tango::DeviceData &self, object py_value)
+        {
+	    PyObject* py_value_ptr = py_value.ptr();
+	    if(PyUnicode_Check(py_value_ptr))
+	    {
+		PyObject* obj_bytes_ptr = PyUnicode_AsLatin1String(py_value_ptr);
+		Tango::DevString value = PyBytes_AsString(obj_bytes_ptr);
+		self << value;
+		Py_DECREF(obj_bytes_ptr);
+	    }
+	    else
+	    {
+		Tango::DevString value = PyBytes_AsString(py_value_ptr);
+		self << value;
+	    }
+	}
+
         template <>
         void insert_scalar<Tango::DEV_ENCODED>(Tango::DeviceData &self, object py_value)
         {
