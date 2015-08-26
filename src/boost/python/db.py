@@ -1483,12 +1483,11 @@ def __doc_Database():
     get_server_list(self, wildcard) -> DbDatum
 
             Return the list of all servers registered in the database.
-            If wildcard parameter is given, then the the list of servers registred on the
-            specified host (we refer 'host' in the context of tango device, i.e. following
-            the tango naming convention 'host/family/member') is returned
+            If wildcard parameter is given, then the the list matching servers
+            will be returned (ex: Serial/\*)
 
         Parameters :
-            - wildcard : (str) host wildcard
+            - wildcard : (str) host wildcard (ex: Serial/\*)
         Return     : DbDatum containing list of registered servers
     """ )
 
