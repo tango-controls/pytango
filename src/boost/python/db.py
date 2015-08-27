@@ -66,15 +66,53 @@ def __init_DbDatum():
 # Database extension
 #-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
-def __Database__add_server(self, servname, dev_info):
+def __Database__add_server(self, servname, dev_info, with_dserver=False):
     """
-        add_server( self, servname, dev_info) -> None
+        add_server( self, servname, dev_info, with_dserver=False) -> None
 
-                Add a (group of) devices to the database.
+                Add a (group of) devices to the database. This is considered as a
+                low level call because it may render the database inconsistent
+                if it is not used properly.
+
+                If *with_dserver* parameter is set to False (default), this
+                call will only register the given dev_info(s). You should include
+                in the list of dev_info an entry to the usually hidden **DServer**
+                device.
+
+                If *with_dserver* parameter is set to True, the call will add an
+                additional **DServer** device if it is not included in the
+                *dev_info* parameter.
+
+            Example using *with_dserver=True*::
+
+                dev_info1 = DbDevInfo()
+                dev_info1.name = 'my/own/device'
+                dev_info1._class = 'MyDevice'
+                dev_info1.server = 'MyServer/test'
+                db.add_server(dev_info1.server, dev_info, with_dserver=True)
+
+            Same example using *with_dserver=False*::
+
+                dev_info1 = DbDevInfo()
+                dev_info1.name = 'my/own/device'
+                dev_info1._class = 'MyDevice'
+                dev_info1.server = 'MyServer/test'
+
+                dev_info2 = DbDevInfo()
+                dev_info1.name = 'dserver/' + dev_info1.server
+                dev_info1._class = 'DServer
+                dev_info1.server = dev_info1.server
+
+                dev_info = dev_info1, dev_info2
+                db.add_server(dev_info1.server, dev_info)
+
+            .. versionadded:: 8.1.7
+                added *with_dserver* parameter
 
             Parameters :
                 - servname : (str) server name
                 - dev_info : (sequence<DbDevInfo> | DbDevInfos | DbDevInfo) containing the server device(s) information
+                - with_dserver: (bool) whether or not to auto create **DServer** device in server
             Return     : None
 
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
@@ -91,6 +129,18 @@ def __Database__add_server(self, servname, dev_info):
         dev_info = seq_2_DbDevInfos((dev_info,))
     else:
         dev_info = seq_2_DbDevInfos(dev_info)
+    if with_dserver:
+        has_dserver = False
+        for i in dev_info:
+            if i._class == "DServer":
+                has_dserver = True
+                break
+        if not has_dserver:
+            dserver_info = DbDevInfo()
+            dserver_info.name = 'dserver/' + dev_info[0].server
+            dserver_info._class = 'DServer'
+            dserver_info.server = dev_info[0].server
+            dev_info.append(dserver_info)
     self._add_server(servname, dev_info)
 
 def __Database__export_server(self, dev_info):
