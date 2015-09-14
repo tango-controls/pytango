@@ -259,7 +259,7 @@ todo_include_todos = True
 
 def copy_spaces(origin):
     r = ''
-    for x in xrange(len(origin)):
+    for x in range(len(origin)):
         if origin[x] in (' ', '\t'):
             r += origin[x]
         else:
@@ -362,7 +362,7 @@ def search_ONLY_signature(name, text):
 
     signatureLine = None
 
-    for ln in xrange(len(lines)):
+    for ln in range(len(lines)):
         line = lines[ln]
 
         if len(line.strip()) and line[0] != ' ':
@@ -405,7 +405,7 @@ _with_only_one_signature_methods = {}
 def __reformat_lines(app, what, name, obj, options, lines):
     global _with_only_one_signature_methods
     if what != 'method':
-        for ln in xrange(len(lines)):
+        for ln in range(len(lines)):
             lines[ln] = parse_bullet_with_type(lines[ln])
         return
 
@@ -415,7 +415,7 @@ def __reformat_lines(app, what, name, obj, options, lines):
 
     toinsert.append((0, ""))
     
-    for ln in xrange(len(lines)):
+    for ln in range(len(lines)):
         line = lines[ln]
 
         if len(line) and line[0] != ' ':
@@ -487,7 +487,7 @@ def __reformat_lines(app, what, name, obj, options, lines):
         else:
             lines[ln] = spaces + ":" + control_word + ": " + spl[1]
 
-    for x in xrange(len(toinsert)-1, -1, -1):
+    for x in range(len(toinsert)-1, -1, -1):
         pos, txt = toinsert[x]
         lines.insert(pos, txt)
 

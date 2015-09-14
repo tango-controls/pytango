@@ -96,7 +96,7 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
-| 8.1.7    | Features:                                                                                                                                                            |
+| 8.1.7    | Features:                                                                                                                                                             |
 |          |                                                                                                                                                                       |
 |          |     - `110:  device property with auto update in database <https://sourceforge.net/p/tango-cs/feature-requests/110>`_                                                 |
 |          |                                                                                                                                                                       |
@@ -110,6 +110,7 @@ Version history
 |          |     - `714: Memory leak in PyTango for direct server command calls <https://sourceforge.net/p/tango-cs/bugs/714>`_                                                    |
 |          |     - `718: OverflowErrors with float types in 8.1.6 <https://sourceforge.net/p/tango-cs/bugs/718/>`_                                                                 |
 |          |     - `724: PyTango DeviceProxy.command_inout(<str>) memory leaks <https://sourceforge.net/p/tango-cs/bugs/724/>`_                                                    |
+|          |     - `736: pytango FTBFS with python 3.4 <https://sourceforge.net/p/tango-cs/bugs/736/>`_                                                                            |
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.6    | Bug fixes:                                                                                                                                                            |
 |          |                                                                                                                                                                       |
