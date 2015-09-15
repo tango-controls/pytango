@@ -272,7 +272,7 @@ def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None, extract_as=
 
     read_attributes_asynch( self, attr_names, callback, extract_as=Numpy) -> None
 
-            Read asynchronously (callback model) an attribute list.
+            Read asynchronously (push model) an attribute list.
 
         Parameters :
                 - attr_names : (sequence<str>) A list of attributes to read. See read_attributes.
@@ -285,6 +285,12 @@ def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None, extract_as=
         Throws     : ConnectionFailed
 
         New in PyTango 7.0.0
+
+    .. important::
+        by default, TANGO is initialized with the **polling** model. If you want
+        to use the **push** model (the one with the callback parameter), you
+        need to change the global TANGO model to PUSH_CALLBACK.
+        You can do this with the :meth:`PyTango.ApiUtil.set_asynch_cb_sub_model`
     """
     if cb is None:
         return self.__read_attributes_asynch(attr_names)
@@ -347,6 +353,12 @@ def __DeviceProxy__write_attributes_asynch(self, attr_values, cb=None):
         Throws     : ConnectionFailed
 
         New in PyTango 7.0.0
+
+    .. important::
+        by default, TANGO is initialized with the **polling** model. If you want
+        to use the **push** model (the one with the callback parameter), you
+        need to change the global TANGO model to PUSH_CALLBACK.
+        You can do this with the :meth:`PyTango.ApiUtil.set_asynch_cb_sub_model`
     """
     if cb is None:
         return self.__write_attributes_asynch(attr_values)

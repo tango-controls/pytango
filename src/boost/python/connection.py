@@ -170,6 +170,12 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
         Return     : None
 
         Throws     : ConnectionFailed, TypeError, anything thrown by command_query
+
+    .. important::
+        by default, TANGO is initialized with the **polling** model. If you want
+        to use the **push** model (the one with the callback parameter), you
+        need to change the global TANGO model to PUSH_CALLBACK.
+        You can do this with the :meth:`PyTango.ApiUtil.set_asynch_cb_sub_model`
     """
     if len(args) == 0: # command_inout_asynch()
         argin = DeviceData()
