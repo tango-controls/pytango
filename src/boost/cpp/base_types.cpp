@@ -1,4 +1,4 @@
-g/******************************************************************************
+/******************************************************************************
   This file is part of PyTango (http://www.tinyurl.com/PyTango)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
