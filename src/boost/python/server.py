@@ -1250,7 +1250,7 @@ def _create_asyncio_worker():
     def connect_async(coro, future, loop=None):
         """Connect a coroutine to a future."""
         loop = loop or asyncio.get_event_loop()
-        fut = asyncio.ensure_future(coro, loop=loop)
+        fut = asyncio.async(coro, loop=loop)
         connect_futures(fut, future)
 
     class LoopExecutor(concurrent.futures.Executor):
