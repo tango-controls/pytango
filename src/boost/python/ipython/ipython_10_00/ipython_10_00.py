@@ -272,7 +272,7 @@ def lsdev(self, parameter_s=''):
         return
     data = db._db_cache.devices
 
-    s = io.BytesIO()
+    s = io.StringIO()
     lengths = 40, 25, 25, 20
     title = "Device", "Alias", "Server", "Class"
     templ = "{0:{l[0]}} {1:{l[1]}} {2:{l[2]}} {3:{l[3]}}"
@@ -306,7 +306,6 @@ def lsdevclass(self, parameter_s=''):
         return
     data = db._db_cache.klasses
 
-    s = io.BytesIO()
     data = [ "%-030s" % klass for klass in data.keys() if not reg_exp or reg_exp.match(klass) ]
     s = textwrap.fill(" ".join(data), 80)
     page(s)
@@ -331,7 +330,6 @@ def lsserv(self, parameter_s=''):
         return
     data = db._db_cache.servers
 
-    s = io.BytesIO()
     data = [ "%-030s" % server for server in data.keys() if not reg_exp or reg_exp.match(server) ]
     s = textwrap.fill(" ".join(data), 80)
     page(s)

@@ -238,7 +238,7 @@ def magic_lsdev(self, parameter_s=''):
         return
     data = db._db_cache.devices
 
-    s = io.BytesIO()
+    s = io.StringIO()
     cols = 40, 25, 25, 20
     l = "%{0}s %{1}s %{2}s %{3}s".format(*cols)
     print(l % ("Device", "Alias", "Server", "Class"), file=s)
@@ -269,7 +269,6 @@ def magic_lsdevclass(self, parameter_s=''):
         return
     data = db._db_cache.klasses
 
-    s = io.BytesIO()
     data = [ "%-030s" % klass for klass in data.keys() if not reg_exp or reg_exp.match(klass) ]
     s = textwrap.fill(" ".join(data), 80)
     IPython.genutils.page(s)
@@ -294,7 +293,6 @@ def magic_lsserv(self, parameter_s=''):
         return
     data = db._db_cache.servers
 
-    s = io.BytesIO()
     data = [ "%-030s" % server for server in data.keys() if not reg_exp or reg_exp.match(server) ]
     s = textwrap.fill(" ".join(data), 80)
     IPython.genutils.page(s)
@@ -676,7 +674,7 @@ def __store(ip, var):
     # we hide the standard output 
     stdout = sys.stdout
     try:
-        sys.stdout = io.BytesIO()
+        sys.stdout = io.StringIO()
         ip.magic("store %s" % var)
     finally:
         sys.stdout = stdout
