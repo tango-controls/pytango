@@ -10,12 +10,12 @@
 # -----------------------------------------------------------------------------
 
 __all__ = ["get_green_mode", "set_green_mode",
-           "get_executor", "submit", "spawn",
+           "get_executor", "submit", "spawn", "result", "wait",
            "get_synch_executor", "synch_submit", "synch_wait",
            "get_gevent_executor", "gevent_submit", "gevent_wait",
            "get_futures_executor", "futures_submit", "futures_wait",
            "get_asyncio_executor", "asyncio_submit", "asyncio_wait",
-           "wait", "get_submitters", "green"]
+           "get_submitters", "green", "get_wait_default_value"]
 
 __docformat__ = "restructuredtext"
 
@@ -147,6 +147,10 @@ def get_waiter(mode):
     return __wait_map[mode]
 
 
+def get_wait_default_value(mode):
+    return mode not in (GreenMode.Asyncio,)
+
+
 # Generic submitter/spawner and waiter
 
 def submit(mode, fn, *args, **kwargs):
@@ -155,9 +159,17 @@ def submit(mode, fn, *args, **kwargs):
 spawn = submit
 
 
-def wait(ret, green_mode=None, timeout=None):
+def wait_result(ret, green_mode=None, timeout=None):
     green_mode = green_mode or get_green_mode()
     return get_waiter(green_mode)(ret, timeout=timeout)
+
+wait = wait_result
+
+
+def result(ret, green_mode=None, wait=True, timeout=None):
+    if not wait:
+        return ret
+    return wait_result(ret, green_mode=green_mode, timeout=timeout)
 
 
 # Get callables for corresponding object and green mode
@@ -214,7 +226,7 @@ def green(fn):
     def greener(self, *args, **kwargs):
         # first take out all green parameters
         green_mode = kwargs.pop('green_mode', None)
-        wait = kwargs.pop('wait', True)
+        wait = kwargs.pop('wait', get_wait_default_value(green_mode))
         timeout = kwargs.pop('timeout', None)
 
         # get the proper submitable for the given green_mode
