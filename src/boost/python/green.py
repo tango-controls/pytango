@@ -14,7 +14,7 @@ __all__ = ["get_green_mode", "set_green_mode",
            "get_synch_executor", "synch_submit",
            "get_gevent_executor", "gevent_submit",
            "get_futures_executor", "futures_submit",
-           "result", "submitable", "green"] 
+           "result", "submitable", "green"]
 
 __docformat__ = "restructuredtext"
 
@@ -40,7 +40,7 @@ def set_green_mode(green_mode=None):
     """Sets the global default PyTango green mode.
 
     Advice: Use only in your final application. Don't use this in a python library
-    in order not to interfere with the beavior of other libraries and/or 
+    in order not to interfere with the beavior of other libraries and/or
     application where your library is being.
 
     :param green_mode: the new global default PyTango green mode
@@ -55,7 +55,7 @@ def set_green_mode(green_mode=None):
     elif green_mode == GreenMode.Futures:
         # check if we can change to futures mode
         import PyTango.futures
-        
+
     __current_green_mode = green_mode
 
 
@@ -128,10 +128,10 @@ def submitable(obj, green_mode=None):
             green_mode = obj.get_green_mode()
         else:
             green_mode = get_green_mode()
-    
+
     if green_mode == GreenMode.Synchronous:
         return green_mode, synch_submit
-    
+
     has_executors = hasattr(obj, "_executors")
     s_func = __submit_map[green_mode]
     if green_mode == GreenMode.Futures:
@@ -163,8 +163,7 @@ def green(fn):
 
         # submit the method
         ret = submit(fn, self, *args, **kwargs)
-        
-        # return the proper result        
-        return result(ret, green_mode, wait=wait, timeout=timeout)
-    return greener     
 
+        # return the proper result
+        return result(ret, green_mode, wait=wait, timeout=timeout)
+    return greener
