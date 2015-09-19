@@ -11,7 +11,8 @@
 
 from __future__ import absolute_import
 
-__all__ = ["get_global_threadpool", "get_global_executor", "submit", "spawn"]
+__all__ = ["get_global_threadpool", "get_global_executor",
+           "submit", "spawn", "wait"]
 
 
 def get_global_threadpool():
@@ -26,3 +27,7 @@ def spawn(fn, *args, **kwargs):
 get_global_executor = get_global_threadpool
 
 submit = spawn
+
+
+def wait(greenlet, timeout=None):
+    return greenlet.get(timeout=timeout)
