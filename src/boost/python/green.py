@@ -15,7 +15,8 @@ __all__ = ["get_green_mode", "set_green_mode",
            "get_gevent_executor", "gevent_submit", "gevent_wait",
            "get_futures_executor", "futures_submit", "futures_wait",
            "get_asyncio_executor", "asyncio_submit", "asyncio_wait",
-           "get_submitters", "green", "get_wait_default_value"]
+           "get_object_submitter", "get_object_waiter",
+           "get_object_green_mode", "green", "get_wait_default_value"]
 
 __docformat__ = "restructuredtext"
 
@@ -148,6 +149,8 @@ def get_waiter(mode):
 
 
 def get_wait_default_value(mode):
+    if mode is None:
+        mode = get_green_mode()
     return mode not in (GreenMode.Asyncio,)
 
 
@@ -172,49 +175,54 @@ def result(ret, green_mode=None, wait=True, timeout=None):
     return wait_result(ret, green_mode=green_mode, timeout=timeout)
 
 
-# Get callables for corresponding object and green mode
+# Get object submitter, waiter and green_mode
 
-def get_submitters(obj, green_mode=None):
-    """Returns proper submit and wait callables for the given object.
+def get_object_green_mode(obj):
+    if hasattr(obj, "get_green_mode"):
+        return obj.get_green_mode()
+    return get_green_mode()
+
+
+def get_object_submitter(obj, green_mode=None):
+    """Returns the proper submit callable for the given object.
 
     If the object has *_executors* and *_green_mode* members it returns
-    the callables for the executor corresponding to the green_mode.
-    Otherwise it returns the global callables for the given green_mode.
+    the submit callable for the executor corresponding to the green_mode.
+    Otherwise it returns the global submit callable for the given green_mode.
 
-    :returns: submit callable, wait_callable"""
-    # determine the efective green_mode
+    :returns: submit callable"""
+    # Get green mode
     if green_mode is None:
-        if hasattr(obj, "get_green_mode"):
-            green_mode = obj.get_green_mode()
-        else:
-            green_mode = get_green_mode()
+        green_mode = get_object_green_mode(obj)
+    # Get executor
+    executors = getattr(obj, "_executors", {})
+    executor = executors.get(green_mode, get_executor(green_mode))
+    # Get submitter
+    if green_mode == GreenMode.Gevent:
+        return executor.spawn
+    return executor.submit
 
-    if green_mode == GreenMode.Synchronous:
-        return synch_submit, synch_wait
 
-    has_executors = hasattr(obj, "_executors")
-    s_func = __submit_map[green_mode]
-    w_func = __submit_map[green_mode]
-    if green_mode == GreenMode.Futures:
-        if has_executors:
-            executor = obj._executors.get(GreenMode.Futures)
-            if executor:
-                s_func = executor.submit
-    elif green_mode == GreenMode.Gevent:
-        if has_executors:
-            executor = obj._executors.get(GreenMode.Gevent)
-            if executor:
-                s_func = executor.spawn
-    elif green_mode == GreenMode.Asyncio:
-        if has_executors:
-            executor = obj._executors.get(GreenMode.Asyncio)
-            if executor:
-                s_func = executor.submit
-                w_func = partial(w_func, loop=executor.loop)
-    else:
-        msg = "Undefined green_mode '%s' for %s"
-        raise TypeError(msg % (str(green_mode)), str(obj))
-    return s_func, w_func
+def get_object_waiter(obj, green_mode=None):
+    """Returns the proper wait callable for the given object.
+
+    If the object has *_executors* and *_green_mode* members it returns
+    the wait callable for the executor corresponding to the green_mode.
+    Otherwise it returns the global wait callable for the given green_mode.
+
+    :returns: wait callable"""
+    # Get green mode
+    if green_mode is None:
+        green_mode = get_object_green_mode(obj)
+    # Get waiter
+    waiter = get_waiter(green_mode)
+    # Asyncio corner case
+    if green_mode == GreenMode.Asyncio:
+        executors = getattr(obj, "_executors", {})
+        executor = executors.get(GreenMode.Asyncio)
+        return partial(waiter, loop=executor.loop) if executor else waiter
+    # Return waiter
+    return waiter
 
 
 # Green decorator
@@ -225,17 +233,18 @@ def green(fn):
     @wraps(fn)
     def greener(self, *args, **kwargs):
         # first take out all green parameters
-        green_mode = kwargs.pop('green_mode', None)
+        green_mode = kwargs.pop('green_mode', get_object_green_mode(self))
         wait = kwargs.pop('wait', get_wait_default_value(green_mode))
         timeout = kwargs.pop('timeout', None)
 
         # get the proper submitable for the given green_mode
-        submit_func, wait_func = get_submitters(self, green_mode)
+        submitter = get_object_submitter(self, green_mode)
+        waiter = get_object_waiter(self, green_mode)
 
         # submit the method
-        ret = submit_func(fn, self, *args, **kwargs)
+        ret = submitter(fn, self, *args, **kwargs)
 
         # return the proper result
-        return wait_func(ret, timeout=timeout) if wait else ret
+        return waiter(ret, timeout=timeout) if wait else ret
 
     return greener
