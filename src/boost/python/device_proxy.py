@@ -32,7 +32,8 @@ from .utils import is_pure_str, is_non_str_seq, is_integer
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
 from .utils import seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
-from .green import result, submit, green, get_green_mode
+from .green import result, submit, green
+from .green import get_green_mode, get_wait_default_value
 
 _UNSUBSCRIBE_LIFETIME = 60
 
@@ -93,7 +94,7 @@ def get_device_proxy(*args, **kwargs):
     # we cannot use the green wrapper because it consumes the green_mode and we
     # want to forward it to the DeviceProxy constructor
     green_mode = kwargs.get('green_mode', get_green_mode())
-    wait = kwargs.pop('wait', True)
+    wait = kwargs.pop('wait', get_wait_default_value(green_mode))
     timeout = kwargs.pop('timeout', None)
 
     d = submit(green_mode, DeviceProxy, *args, **kwargs)
@@ -126,6 +127,7 @@ def __DeviceProxy__init__(self, *args, **kwargs):
     self.__dict__['_pending_unsubscribe'] = {}
     executors[GreenMode.Futures] = kwargs.pop('executor', None)
     executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
+    executors[GreenMode.Asyncio] = kwargs.pop('asyncio_executor', None)
     return DeviceProxy.__init_orig__(self, *args, **kwargs)
 
 def __DeviceProxy__get_green_mode(self):
