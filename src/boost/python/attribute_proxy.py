@@ -83,7 +83,7 @@ def get_attribute_proxy(*args, **kwargs):
     # we cannot use the green wrapper because it consumes the green_mode and we
     # want to forward it to the DeviceProxy constructor
     green_mode = kwargs.get('green_mode', get_green_mode())
-    wait = kwargs.pop('wait', get_wait_default_value())
+    wait = kwargs.pop('wait', get_wait_default_value(green_mode))
     timeout = kwargs.pop('timeout', None)
 
     d = submit(green_mode, AttributeProxy, *args, **kwargs)
