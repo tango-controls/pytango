@@ -91,7 +91,7 @@ DeviceProxy.__doc__ = """
 
 AttributeProxy = partial(get_attribute_proxy,
                          green_mode=GreenMode.Futures,
-                         wait=True)
+                         wait=False)
 AttributeProxy.__doc__ = """
     AttributeProxy(self, full_attr_name, wait=False, timeout=False)
         -> AttributeProxy
