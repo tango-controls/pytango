@@ -163,7 +163,8 @@ spawn = submit
 
 
 def wait_result(ret, green_mode=None, timeout=None):
-    green_mode = green_mode or get_green_mode()
+    if green_mode is None:
+        green_mode = get_green_mode()
     return get_waiter(green_mode)(ret, timeout=timeout)
 
 wait = wait_result
