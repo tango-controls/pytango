@@ -9,6 +9,8 @@
 # See LICENSE.txt for more info.
 # -----------------------------------------------------------------------------
 
+from __future__ import absolute_import
+
 __all__ = ["get_global_executor", "submit", "spawn", "wait"]
 
 __global_executor = None
