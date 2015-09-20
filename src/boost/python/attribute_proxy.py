@@ -27,7 +27,7 @@ from ._PyTango import StdStringVector, DbData, DbDatum, DeviceProxy
 from ._PyTango import __AttributeProxy as _AttributeProxy
 from .utils import seq_2_StdStringVector, seq_2_DbData, DbData_2_dict
 from .utils import is_pure_str, is_non_str_seq
-from .green import result, submit, get_green_mode, get_default_wait_value
+from .green import result, submit, get_green_mode, get_wait_default_value
 
 
 def get_attribute_proxy(*args, **kwargs):
@@ -83,7 +83,7 @@ def get_attribute_proxy(*args, **kwargs):
     # we cannot use the green wrapper because it consumes the green_mode and we
     # want to forward it to the DeviceProxy constructor
     green_mode = kwargs.get('green_mode', get_green_mode())
-    wait = kwargs.pop('wait', get_default_wait_value())
+    wait = kwargs.pop('wait', get_wait_default_value())
     timeout = kwargs.pop('timeout', None)
 
     d = submit(green_mode, AttributeProxy, *args, **kwargs)
