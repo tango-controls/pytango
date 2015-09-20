@@ -1238,7 +1238,10 @@ def _create_gevent_worker():
 
 
 def _create_asyncio_worker():
-    import asyncio
+    try:
+        import asyncio
+    except ImportError:
+        import trollius as asyncio
     import functools
     import concurrent.futures
 
