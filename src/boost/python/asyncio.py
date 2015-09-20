@@ -43,7 +43,7 @@ def check_requirements():
 check_requirements()
 
 DeviceProxy = partial(get_device_proxy,
-                      green_mode=GreenMode.Futures,
+                      green_mode=GreenMode.Asyncio,
                       wait=False)
 DeviceProxy.__doc__ = """
     DeviceProxy(self, dev_name, wait=False, timeout=None)
@@ -90,7 +90,7 @@ DeviceProxy.__doc__ = """
 """
 
 AttributeProxy = partial(get_attribute_proxy,
-                         green_mode=GreenMode.Futures,
+                         green_mode=GreenMode.Asyncio,
                          wait=False)
 AttributeProxy.__doc__ = """
     AttributeProxy(self, full_attr_name, wait=False, timeout=False)

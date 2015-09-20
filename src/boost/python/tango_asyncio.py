@@ -26,7 +26,7 @@ def __get_executor_class():
         import trollius as asyncio
 
     # Asyncio executor
-    class AsyncioExecutor(concurrent.futures.Futures):
+    class AsyncioExecutor(concurrent.futures.Executor):
         """Executor to submit task to a subexecutor through an asyncio loop.
         Warning: This class has nothing to do with the AsyncioExecutor class
         implemented for the server.
