@@ -1245,16 +1245,20 @@ def _create_asyncio_worker():
     import functools
     import concurrent.futures
 
-    def connect_futures(fut1, fut2):
-        """Connect result of future 1 with future 2."""
-        callback = lambda fut: fut2.set_result(fut.result())
-        fut1.add_done_callback(callback)
+    def connect_futures(aiofut, confut):
+        """Connect an asyncio future to a concurrent future."""
+        def _check_cancel_other(future):
+            if future.cancelled():
+                aiofut._loop.call_soon_threadsafe(aiofut.cancel)
+        _copy_state = asyncio.Future._copy_state.__get__(confut)
+        confut.add_done_callback(_check_cancel_other)
+        aiofut.add_done_callback(_copy_state)
 
     def connect_async(coro, future, loop=None):
         """Connect a coroutine to a future."""
         loop = loop or asyncio.get_event_loop()
-        fut = asyncio.async(coro, loop=loop)
-        connect_futures(fut, future)
+        aiofut = asyncio.async(coro, loop=loop)
+        connect_futures(aiofut, future)
 
     class LoopExecutor(concurrent.futures.Executor):
         """An Executor subclass that uses an event loop
