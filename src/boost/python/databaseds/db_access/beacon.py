@@ -55,11 +55,11 @@ class beacon(object):
         self._index()
         
         #Trick to start
-        self._beacon_dserver_node = static.Config.Node(self._config)
+        self._beacon_dserver_node = static.Node(self._config)
         self._beacon_dserver_node['server'] = 'DataBaseds'
         self._beacon_dserver_node['personal_name'] = personal_name
         tango_name =  'sys/database/%s' % personal_name
-        databse_device_node = static.Config.Node(self._config,self._beacon_dserver_node)
+        databse_device_node = static.Node(self._config,self._beacon_dserver_node)
         databse_device_node['class'] = 'DataBase'
         databse_device_node['tango_name'] = tango_name
         self._beacon_dserver_node['device'] = [databse_device_node]
@@ -148,7 +148,7 @@ class beacon(object):
             server_node['server'],server_node['personal_name'] = server_name.split('/')
             self._personal_2_node[server_name] = server_node
 
-        device_node = static.Config.Node(self._config,parent=server_node)
+        device_node = static.Node(self._config,parent=server_node)
         device_node['tango_name'] = tango_name
         device_node['class'] = klass_name
         if alias is not None:
@@ -851,7 +851,7 @@ class beacon(object):
                         break
                 old_properties = property_node
         if old_properties is None:
-            properties = static.Config.Node(self._config,parent=device_node)
+            properties = static.Node(self._config,parent=device_node)
             device_node['properties'] = properties
         else:
             properties = old_properties
