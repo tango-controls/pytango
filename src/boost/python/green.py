@@ -96,10 +96,7 @@ def get_executor(mode):
     return __executor_map[mode]()
 
 def get_submitter(mode):
-    executor = get_executor(mode)
-    if mode == GreenMode.Gevent:
-        return executor.spawn
-    return executor.submit
+    return __submit_map[mode]
 
 def submit(mode, fn, *args, **kwargs):
     return get_submitter(mode)(fn, *args, **kwargs)

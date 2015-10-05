@@ -10,18 +10,59 @@
 # ------------------------------------------------------------------------------
 
 from __future__ import absolute_import
+import sys
+import types
 
 __all__ = ["get_global_threadpool", "get_global_executor", "submit", "spawn"]
-
 
 def get_global_threadpool():
     import gevent
     return gevent.get_hub().threadpool
 
+class ExceptionWrapper:
+    def __init__(self, exception, error_string, tb):
+        self.exception = exception
+        self.error_string = error_string
+        self.tb = tb
+
+class wrap_errors(object):
+    def __init__(self, func):
+        """Make a new function from `func', such that it catches all exceptions
+        and return it as a specific object
+        """
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        func = self.func
+        try:
+            return func(*args, **kwargs)
+        except:
+            return ExceptionWrapper(*sys.exc_info())
+
+    def __str__(self):
+        return str(self.func)
+
+    def __repr__(self):
+        return repr(self.func)
+
+    def __getattr__(self, item):
+        return getattr(self.func, item)
+
+def get_with_exception(g, block=True, timeout=None):
+    result = g._get(block, timeout)
+    if isinstance(result, ExceptionWrapper):
+        # raise the exception using the caller context
+        raise result.error_string, None, result.tb
+    else:
+        return result
 
 def spawn(fn, *args, **kwargs):
-    return get_global_threadpool().spawn(fn, *args, **kwargs)
-
+    # the gevent threadpool do not raise exception with asyncresults, we have to wrap it
+    fn = wrap_errors(fn)
+    g = get_global_threadpool().spawn(fn, *args, **kwargs)
+    g._get = g.get
+    g.get = types.MethodType(get_with_exception, g)
+    return g
 
 get_global_executor = get_global_threadpool
 
