@@ -419,7 +419,10 @@ def inheritance_patch(attrs):
 
 def DeviceMeta(name, bases, attrs):
     """
-    The :py:data:`metaclass` callable for :class:`Device`.
+    The :py:data:`metaclass` callable for :class:`Device`.Every
+    sub-class of :class:`Device` must have associated this metaclass
+    to itself in order to work properly (boost-python internal
+    limitation).
 
     Example (python 2.x)::
 
