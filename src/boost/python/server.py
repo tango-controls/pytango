@@ -535,6 +535,26 @@ class Device(LatestDeviceImpl):
         """
         pass
 
+    @classmethod
+    def run_server(cls, args=None, **kwargs):
+        """Run the class as a device server.
+        It is based on the PyTango.server.run method.
+
+        The difference is that the device class
+        and server name are automatically given.
+
+        Args:
+            args (iterable): args as given in the PyTango.server.run method
+                             without the server name. If None, the sys.argv
+                             list is used
+            kwargs: the other keywords argument are as given
+                    in the PyTango.server.run method.
+        """
+        if args is None:
+            args = sys.argv[1:]
+        args = [cls.__name__] + list(args)
+        return run((cls,), args, **kwargs)
+
 
 class attribute(AttrData):
     '''
