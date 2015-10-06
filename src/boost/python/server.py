@@ -585,7 +585,7 @@ class Device(LatestDeviceImpl):
     def get_device_properties(self, ds_class = None):
         if ds_class is None:
             try:
-                # Call this method in a try/except in case this is called during 
+                # Call this method in a try/except in case this is called during
                 # the DS shutdown sequence
                 ds_class = self.get_device_class()
             except:
@@ -599,7 +599,7 @@ class Device(LatestDeviceImpl):
                 value = pu.get_property_values(prop_name, class_prop)
                 self._tango_properties[prop_name] = value
             for prop_name in self.device_property_list:
-                value = self.prop_util.get_property_values(prop_name, 
+                value = self.prop_util.get_property_values(prop_name,
                                                            self.device_property_list)
                 self._tango_properties[prop_name] = value
         except DevFailed as df:
@@ -621,6 +621,26 @@ class Device(LatestDeviceImpl):
         when necessary.
         """
         pass
+
+    @classmethod
+    def run_server(cls, args=None, **kwargs):
+        """Run the class as a device server.
+        It is based on the PyTango.server.run method.
+
+        The difference is that the device class
+        and server name are automatically given.
+
+        Args:
+            args (iterable): args as given in the PyTango.server.run method
+                             without the server name. If None, the sys.argv
+                             list is used
+            kwargs: the other keywords argument are as given
+                    in the PyTango.server.run method.
+        """
+        if args is None:
+            args = sys.argv[1:]
+        args = [cls.__name__] + list(args)
+        return run((cls,), args, **kwargs)
 
 
 class attribute(AttrData):
