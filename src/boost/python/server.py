@@ -535,6 +535,29 @@ def __init_tango_device_klass(tango_device_klass, attrs=None,
     return tango_device_klass
 
 
+def is_tango_object(arg):
+    """Return tango data if the argument is a tango object,
+    False otherwise.
+    """
+    classes = attribute, device_property
+    if isinstance(arg, classes):
+        return arg
+    try:
+        return arg.__tango_command__
+    except AttributeError:
+        return False
+
+
+def inheritance_patch(attrs):
+    """Patch tango objects before they are processed by the metaclass."""
+    for key, obj in attrs.items():
+        if isinstance(obj, attribute):
+            if getattr(obj, 'attr_write', None) == AttrWriteType.READ_WRITE:
+                if not getattr(obj, 'fset', None):
+                    method_name = obj.write_method_name or "write_" + key
+                    obj.fset = attrs.get(method_name)
+
+
 def DeviceMeta(name, bases, attrs):
     """
     The :py:data:`metaclass` callable for :class:`Device`.Every
@@ -555,11 +578,34 @@ def DeviceMeta(name, bases, attrs):
 
         class PowerSupply(Device, metaclass=DeviceMeta):
             pass
+
+    This implementation of DeviceMeta makes device inheritance possible.
     """
+    # Get metaclass
     LatestDeviceImplMeta = type(LatestDeviceImpl)
-    klass = LatestDeviceImplMeta(name, bases, attrs)
-    __init_tango_device_klass(klass, attrs)
-    return klass
+    # Attribute dictionary
+    dct = {}
+    # Filter object from bases
+    bases = tuple(base for base in bases if base != object)
+    # Add device to bases
+    if Device not in bases:
+        bases += (Device,)
+    # Set tango objects as attributes
+    for base in reversed(bases):
+        for key, value in base.__dict__.items():
+            if is_tango_object(value):
+                dct[key] = value
+    # Inheritance patch
+    inheritance_patch(attrs)
+    # Update attribute dictionary
+    dct.update(attrs)
+    # Create device class
+    cls = LatestDeviceImplMeta(name, bases, dct)
+    # Initialize device class
+    __init_tango_device_klass(cls, dct)
+    cls.TangoClassName = name
+    # Return device class
+    return cls
 
 
 class Device(LatestDeviceImpl):
@@ -1610,7 +1656,9 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
         def _object(self):
             return self._tango_object._object
 
+
     DeviceDispatcher.__name__ = tango_class_name
+    DeviceDispatcher.TangoClassName = tango_class_name
     DeviceDispatcherClass = DeviceDispatcher.TangoClassClass
 
     for name in dir(obj):
