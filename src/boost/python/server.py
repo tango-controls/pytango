@@ -394,12 +394,32 @@ def __init_tango_device_klass(tango_device_klass, attrs=None,
     return tango_device_klass
 
 
+def is_tango_object(arg):
+    """Return tango data if the argument is a tango object,
+    False otherwise.
+    """
+    classes = attribute, device_property
+    if isinstance(arg, classes):
+        return arg
+    try:
+        return arg.__tango_command__
+    except AttributeError:
+        return False
+
+
+def inheritance_patch(attrs):
+    """Patch tango objects before they are processed by the metaclass."""
+    for key, obj in attrs.items():
+        if isinstance(obj, attribute):
+            if getattr(obj, 'attr_write', None) == AttrWriteType.READ_WRITE:
+                if not getattr(obj, 'fset', None):
+                    method_name = obj.write_method_name or "write_" + key
+                    obj.fset = attrs.get(method_name)
+
+
 def DeviceMeta(name, bases, attrs):
     """
-    The :py:data:`metaclass` callable for :class:`Device`.Every
-    sub-class of :class:`Device` must have associated this metaclass
-    to itself in order to work properly (boost-python internal
-    limitation).
+    The :py:data:`metaclass` callable for :class:`Device`.
 
     Example (python 2.x)::
 
@@ -414,11 +434,34 @@ def DeviceMeta(name, bases, attrs):
 
         class PowerSupply(Device, metaclass=DeviceMeta):
             pass
+
+    This implementation of DeviceMeta makes device inheritance possible.
     """
+    # Get metaclass
     LatestDeviceImplMeta = type(LatestDeviceImpl)
-    klass = LatestDeviceImplMeta(name, bases, attrs)
-    __init_tango_device_klass(klass, attrs)
-    return klass
+    # Attribute dictionary
+    dct = {}
+    # Filter object from bases
+    bases = tuple(base for base in bases if base != object)
+    # Add device to bases
+    if Device not in bases:
+        bases += (Device,)
+    # Set tango objects as attributes
+    for base in reversed(bases):
+        for key, value in base.__dict__.items():
+            if is_tango_object(value):
+                dct[key] = value
+    # Inheritance patch
+    inheritance_patch(attrs)
+    # Update attribute dictionary
+    dct.update(attrs)
+    # Create device class
+    cls = LatestDeviceImplMeta(name, bases, dct)
+    # Initialize device class
+    __init_tango_device_klass(cls, dct)
+    cls.TangoClassName = name
+    # Return device class
+    return cls
 
 
 class Device(LatestDeviceImpl):
@@ -444,7 +487,7 @@ class Device(LatestDeviceImpl):
     def get_device_properties(self, ds_class = None):
         if ds_class is None:
             try:
-                # Call this method in a try/except in case this is called during 
+                # Call this method in a try/except in case this is called during
                 # the DS shutdown sequence
                 ds_class = self.get_device_class()
             except:
@@ -458,7 +501,7 @@ class Device(LatestDeviceImpl):
                 value = pu.get_property_values(prop_name, class_prop)
                 self._tango_properties[prop_name] = value
             for prop_name in self.device_property_list:
-                value = self.prop_util.get_property_values(prop_name, 
+                value = self.prop_util.get_property_values(prop_name,
                                                            self.device_property_list)
                 self._tango_properties[prop_name] = value
         except DevFailed as df:
