@@ -13,7 +13,8 @@ from __future__ import absolute_import
 import sys
 import types
 
-__all__ = ["get_global_threadpool", "get_global_executor", "submit", "spawn"]
+__all__ = ["get_global_threadpool", "get_global_executor",
+           "get_event_loop", "submit", "spawn"]
 
 def get_global_threadpool():
     import gevent
@@ -67,3 +68,28 @@ def spawn(fn, *args, **kwargs):
 get_global_executor = get_global_threadpool
 
 submit = spawn
+
+__event_loop = None
+
+def get_event_loop():
+    global __event_loop
+    if __event_loop is None:
+        import gevent
+        import gevent.queue
+
+        def loop(queue):
+            while True:
+                event = queue.get()
+                f, args, kwargs = event
+                try:
+                    f(*args, **kwargs)
+                except Exception as e:
+                    sys.excepthook(*sys.exc_info())
+
+        def submit(fn, *args, **kwargs):
+            queue.put((fn, args, kwargs))
+
+        queue = gevent.queue.Queue()
+        __event_loop = gevent.spawn(loop, queue)
+        __event_loop.submit = submit
+    return __event_loop

@@ -32,7 +32,7 @@ from .utils import is_pure_str, is_non_str_seq, is_integer
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
 from .utils import seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
-from .green import result, submit, green, get_green_mode
+from .green import result, submit, green, green_cb, get_green_mode, get_event_loop
 
 _UNSUBSCRIBE_LIFETIME = 60
 
@@ -95,6 +95,9 @@ def get_device_proxy(*args, **kwargs):
     green_mode = kwargs.get('green_mode', get_green_mode())
     wait = kwargs.pop('wait', True)
     timeout = kwargs.pop('timeout', None)
+
+    # make sure the event loop is initialized
+    get_event_loop(green_mode)
 
     d = submit(green_mode, DeviceProxy, *args, **kwargs)
     return result(d, green_mode, wait=wait, timeout=timeout)
@@ -837,10 +840,10 @@ def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize
 
     if isinstance(cb_or_queuesize, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = cb_or_queuesize
+        cb.push_event = green_cb(cb_or_queuesize, self.get_green_mode())
     elif hasattr(cb_or_queuesize, "push_event") and isinstance(cb_or_queuesize.push_event, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = cb_or_queuesize.push_event
+        cb.push_event = green_cb(cb_or_queuesize.push_event, self.get_green_mode())
     elif is_integer(cb_or_queuesize):
         cb = cb_or_queuesize  # queuesize
     else:

@@ -14,7 +14,8 @@ __all__ = ["get_green_mode", "set_green_mode",
            "get_synch_executor", "synch_submit",
            "get_gevent_executor", "gevent_submit",
            "get_futures_executor", "futures_submit",
-           "result", "submitable", "green"] 
+           "get_event_loop", "get_gevent_event_loop",
+           "result", "submitable", "green", "green_cb"]
 
 __docformat__ = "restructuredtext"
 
@@ -24,6 +25,7 @@ from functools import wraps
 from ._PyTango import GreenMode
 from .tango_gevent import get_global_executor as get_gevent_executor
 from .tango_gevent import submit as gevent_submit
+from .tango_gevent import get_event_loop as get_gevent_event_loop
 from .tango_futures import get_global_executor as get_futures_executor
 from .tango_futures import submit as futures_submit
 
@@ -92,6 +94,10 @@ __submit_map = {
     GreenMode.Gevent:      gevent_submit,
 }
 
+__event_loop_map = {
+    GreenMode.Gevent:      get_gevent_event_loop,
+}
+
 def get_executor(mode):
     return __executor_map[mode]()
 
@@ -102,6 +108,11 @@ def submit(mode, fn, *args, **kwargs):
     return get_submitter(mode)(fn, *args, **kwargs)
 
 spawn = submit
+
+def get_event_loop(mode):
+    f = __event_loop_map.get(mode)
+    if f:
+        return f()
 
 def result(value, green_mode, wait=True, timeout=None):
     if wait and not green_mode is GreenMode.Synchronous:
@@ -164,4 +175,17 @@ def green(fn):
         # return the proper result        
         return result(ret, green_mode, wait=wait, timeout=timeout)
     return greener     
+
+def green_cb(fn, green_mode=None):
+    """return a green verion of the given callback."""
+
+    @wraps(fn)
+    def greener(*args, **kwargs):
+        event_loop = get_event_loop(green_mode)
+        if event_loop is None:
+            fn(*args, **kwargs)
+        else:
+            event_loop.submit(fn, *args, **kwargs)
+
+    return greener
 
