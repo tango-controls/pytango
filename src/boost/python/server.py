@@ -167,33 +167,13 @@ def set_complex_value(attr, value):
         else:
             attr.set_value(value)
 
-
-def __patch_read_method(tango_device_klass, attribute):
-    """
-    Checks if method given by it's name for the given DeviceImpl
-    class has the correct signature. If a read/write method doesn't
-    have a parameter (the traditional Attribute), then the method is
-    wrapped into another method which has correct parameter definition
-    to make it work.
-
-    :param tango_device_klass: a DeviceImpl class
-    :type tango_device_klass: class
-    :param attribute: the attribute data information
-    :type attribute: AttrData
-    """
-    read_method = getattr(attribute, "fget", None)
-    if read_method:
-        method_name = "__read_{0}__".format(attribute.attr_name)
-        attribute.read_method_name = method_name
-    else:
-        method_name = attribute.read_method_name
-        read_method = getattr(tango_device_klass, method_name)
-
+def _get_wrapped_read_method(attribute, read_method):
     read_args = inspect.getargspec(read_method)
+    nb_args = len(read_args.args)
 
     green_mode = attribute.read_green_mode
 
-    if len(read_args.args) < 2:
+    if nb_args < 2:
         if green_mode == GreenMode.Synchronous:
             @functools.wraps(read_method)
             def read_attr(self, attr):
@@ -217,11 +197,51 @@ def __patch_read_method(tango_device_klass, attribute):
             def read_attr(self, attr):
                 return get_worker().execute(read_method, self, attr)
 
+    return read_attr
 
+
+def __patch_read_method(tango_device_klass, attribute):
+    """
+    Checks if method given by it's name for the given DeviceImpl
+    class has the correct signature. If a read/write method doesn't
+    have a parameter (the traditional Attribute), then the method is
+    wrapped into another method which has correct parameter definition
+    to make it work.
+
+    :param tango_device_klass: a DeviceImpl class
+    :type tango_device_klass: class
+    :param attribute: the attribute data information
+    :type attribute: AttrData
+    """
+    read_method = getattr(attribute, "fget", None)
+    if read_method:
+        method_name = "__read_{0}__".format(attribute.attr_name)
+        attribute.read_method_name = method_name
+    else:
+        method_name = attribute.read_method_name
+        read_method = getattr(tango_device_klass, method_name)
+
+    read_attr = _get_wrapped_read_method(attribute, read_method)
     method_name = "__read_{0}_wrapper__".format(attribute.attr_name)
     attribute.read_method_name = method_name
 
     setattr(tango_device_klass, method_name, read_attr)
+
+
+def _get_wrapped_write_method(attribute, write_method):
+    green_mode = attribute.write_green_mode
+
+    if green_mode == GreenMode.Synchronous:
+        @functools.wraps(write_method)
+        def write_attr(self, attr):
+            value = attr.get_write_value()
+            return write_method(self, value)
+    else:
+        @functools.wraps(write_method)
+        def write_attr(self, attr):
+            value = attr.get_write_value()
+            return get_worker().execute(write_method, self, value)
+    return write_attr
 
 
 def __patch_write_method(tango_device_klass, attribute):
@@ -245,19 +265,7 @@ def __patch_write_method(tango_device_klass, attribute):
         method_name = attribute.write_method_name
         write_method = getattr(tango_device_klass, method_name)
 
-    green_mode = attribute.write_green_mode
-
-    if green_mode == GreenMode.Synchronous:
-        @functools.wraps(write_method)
-        def write_attr(self, attr):
-            value = attr.get_write_value()
-            return write_method(self, value)
-    else:
-        @functools.wraps(write_method)
-        def write_attr(self, attr):
-            value = attr.get_write_value()
-            return get_worker().execute(write_method, self, value)
-
+    write_attr = _get_wrapped_write_method(attribute, write_method)
     setattr(tango_device_klass, method_name, write_attr)
 
 
