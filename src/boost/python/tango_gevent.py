@@ -79,15 +79,17 @@ def get_event_loop():
 
         def loop(queue):
             while True:
-                event = queue.get()
-                f, args, kwargs = event
+                item = queue.get()
                 try:
-                    f(*args, **kwargs)
+                    f, args, kwargs = item
+                    gevent.spawn(f, *args, **kwargs)
                 except Exception as e:
                     sys.excepthook(*sys.exc_info())
 
         def submit(fn, *args, **kwargs):
+            l_async = queue.hub.loop.async()
             queue.put((fn, args, kwargs))
+            l_async.send()
 
         queue = gevent.queue.Queue()
         __event_loop = gevent.spawn(loop, queue)
