@@ -272,7 +272,8 @@ void PyCallBackPushEvent::fill_py_event(Tango::EventData* ev, object & py_ev, ob
     // attr_value pointer but its own copy, so my efforts are useless.
     if (ev->attr_value)
     {
-        Tango::DeviceAttribute *attr = new Tango::DeviceAttribute(*ev->attr_value);
+        Tango::DeviceAttribute *attr = new Tango::DeviceAttribute;
+	(*attr) = std::move(*ev->attr_value);
         py_ev.attr("attr_value") = PyDeviceAttribute::convert_to_python(attr, *ev->device, extract_as);
     }
     // ev->attr_value = 0; // Do not delete, python will.
