@@ -18,17 +18,13 @@ void export_multi_class_attribute()
 {
     Tango::Attr& (Tango::MultiClassAttribute::*get_attr_)(std::string &) =
         &Tango::MultiClassAttribute::get_attr;
-    void (Tango::MultiClassAttribute::*remove_attr_)(std::string &, const std::string &) =
-        &Tango::MultiClassAttribute::remove_attr;
 
     class_<Tango::MultiClassAttribute, boost::noncopyable>("MultiClassAttribute", no_init)
         .def("get_attr",
             (Tango::Attr& (Tango::MultiClassAttribute::*) (const std::string &))
             get_attr_,
             return_value_policy<reference_existing_object>())
-        .def("remove_attr",
-            (void (Tango::MultiClassAttribute::*) (const std::string &, const std::string &))
-            remove_attr_)
+	.def("remove_attr", &Tango::MultiClassAttribute::remove_attr)
         .def("get_attr_list", &Tango::MultiClassAttribute::get_attr_list,
             return_value_policy<reference_existing_object>())
     ;

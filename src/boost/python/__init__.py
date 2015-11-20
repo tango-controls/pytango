@@ -195,8 +195,11 @@ __init()
 
 
 def __leave():
-    _PyTango._leavefunc()
+    try:
+        _PyTango._leavefunc()
+    except:
+        pass
 
-import atexit
-atexit.register(__leave)
+#import atexit
+#atexit.register(__leave)
 
