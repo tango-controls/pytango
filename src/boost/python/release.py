@@ -40,10 +40,10 @@ class Release:
             - keywords : (seq<str>) list of keywords
             - license : (str) the license"""
     name = 'PyTango'
-    version_info = (8, 1, 9, 'dev', 0)
+    version_info = (9, 2, 0, 'dev', 0)
     version = '.'.join(map(str, version_info[:3]))
     version_long = version + ''.join(map(str, version_info[3:]))
-    version_description = 'This version implements the C++ Tango 8.1 API.'
+    version_description = 'This version implements the C++ Tango 9.2 API.'
     version_number = int(version.replace('.',''))
     description = 'A python binding for the Tango control system'
     long_description = 'This module implements the Python Tango Device API ' \

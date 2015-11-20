@@ -14,8 +14,11 @@
 #include <cassert>
 #include <tango.h>
 
-#ifndef TgLibVersNb
-#   define TgLibVersNb 80005
+#ifndef TANGO_VERSION_NB
+#define TANGO_VERSION_NB \
+    TANGO_VERSION_MAJOR*10000 +	\
+    TANGO_VERSION_MINOR*100   + \
+    TANGO_VERSION_MINOR
 #endif
 
 namespace Tango

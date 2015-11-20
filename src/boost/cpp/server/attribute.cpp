@@ -393,6 +393,9 @@ namespace PyAttribute
                                        long x, long y)
     { __set_value("set_value_date_quality", att, value, &x, &y, t, &quality); }
     
+    /* According to tango attribute.h these "methods not usable for
+       the external world (outside the lib)" */
+    /*
     inline bopy::object get_properties(Tango::Attribute &att,
                                                 bopy::object &attr_cfg)
     {
@@ -405,7 +408,7 @@ namespace PyAttribute
                                                   bopy::object &attr_cfg)
     {
         Tango::AttributeConfig_2 tg_attr_cfg;
-        att.get_properties_2(tg_attr_cfg);
+        att.get_properties(tg_attr_cfg);
         return to_py(tg_attr_cfg, attr_cfg);
     }
 
@@ -413,9 +416,10 @@ namespace PyAttribute
                                                   bopy::object &attr_cfg)
     {
         Tango::AttributeConfig_3 tg_attr_cfg;
-        att.get_properties_3(tg_attr_cfg);
+        att.get_properties(tg_attr_cfg);
         return to_py(tg_attr_cfg, attr_cfg);
     }
+    */
 
     template<typename TangoScalarType>
     inline void _get_properties_multi_attr_prop(Tango::Attribute &att, bopy::object &multi_attr_prop)
@@ -426,46 +430,8 @@ namespace PyAttribute
     	to_py(tg_multi_attr_prop,multi_attr_prop);
     }
 
-#if TgLibVersNb < 80100 // _get_properties_multi_attr_prop<Tango::DevString>
-
-    // This is a hook dealing with a bug in Tango 8.0.5 related to AttrProp<Tango::DevString> specialisation
-    template<>
-    inline void _get_properties_multi_attr_prop<Tango::DevString>(Tango::Attribute &att, bopy::object &multi_attr_prop)
-    {
-        Tango::AttributeConfig_3 tg_attr_cfg;
-        att.get_properties_3(tg_attr_cfg);
-
-        if(multi_attr_prop.ptr() == Py_None)
-        {
-            PYTANGO_MOD
-            multi_attr_prop = pytango.attr("MultiAttrProp")();
-        }
-
-        multi_attr_prop.attr("label") = tg_attr_cfg.label;
-        multi_attr_prop.attr("description") = tg_attr_cfg.description;
-        multi_attr_prop.attr("unit") = tg_attr_cfg.unit;
-        multi_attr_prop.attr("standard_unit") = tg_attr_cfg.standard_unit;
-        multi_attr_prop.attr("display_unit") = tg_attr_cfg.display_unit;
-        multi_attr_prop.attr("format") = tg_attr_cfg.format;
-        multi_attr_prop.attr("min_value") = tg_attr_cfg.min_value;
-        multi_attr_prop.attr("max_value") = tg_attr_cfg.max_value;
-        multi_attr_prop.attr("min_alarm") = tg_attr_cfg.att_alarm.min_alarm;
-        multi_attr_prop.attr("max_alarm") = tg_attr_cfg.att_alarm.max_alarm;
-        multi_attr_prop.attr("min_warning") = tg_attr_cfg.att_alarm.min_warning;
-        multi_attr_prop.attr("max_warning") = tg_attr_cfg.att_alarm.max_warning;
-        multi_attr_prop.attr("delta_t") = tg_attr_cfg.att_alarm.delta_t;
-        multi_attr_prop.attr("delta_val") = tg_attr_cfg.att_alarm.delta_val;
-        multi_attr_prop.attr("event_period") = tg_attr_cfg.event_prop.per_event.period;
-        multi_attr_prop.attr("archive_period") = tg_attr_cfg.event_prop.arch_event.period;
-        multi_attr_prop.attr("rel_change") = tg_attr_cfg.event_prop.ch_event.rel_change;
-        multi_attr_prop.attr("abs_change") = tg_attr_cfg.event_prop.ch_event.abs_change;
-        multi_attr_prop.attr("archive_rel_change") = tg_attr_cfg.event_prop.arch_event.rel_change;
-        multi_attr_prop.attr("archive_abs_change") = tg_attr_cfg.event_prop.arch_event.abs_change;
-    }
-    
-#endif // _get_properties_multi_attr_prop<Tango::DevString>
-
-    inline bopy::object get_properties_multi_attr_prop(Tango::Attribute &att,
+    inline bopy::object
+    get_properties_multi_attr_prop(Tango::Attribute &att,
                                                 bopy::object &multi_attr_prop)
     {
     	long tangoTypeConst = att.get_data_type();
@@ -473,6 +439,7 @@ namespace PyAttribute
 		return multi_attr_prop;
     }
 
+    /*
     void set_properties(Tango::Attribute &att, bopy::object &attr_cfg,
                         bopy::object &dev)
     {
@@ -490,6 +457,7 @@ namespace PyAttribute
         Tango::DeviceImpl *dev_ptr = extract<Tango::DeviceImpl*>(dev);
         att.set_properties(tg_attr_cfg, dev_ptr);
     }
+    */
 
     template<typename TangoScalarType>
     inline void _set_properties_multi_attr_prop(Tango::Attribute &att, bopy::object &multi_attr_prop)
@@ -558,7 +526,7 @@ namespace PyAttribute
 		self.set_min_alarm(c_value);
     }
 
-#if TgLibVersNb < 80100 // set_min_alarm
+#if TANGO_VERSION_NB < 80100 // set_min_alarm
 
     template<>
     inline void _set_min_alarm<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
@@ -601,7 +569,7 @@ namespace PyAttribute
 		self.set_max_alarm(c_value);
     }
 
-#if TgLibVersNb < 80100 // set_max_alarm
+#if TANGO_VERSION_NB < 80100 // set_max_alarm
 
     template<>
     inline void _set_max_alarm<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
@@ -644,7 +612,7 @@ namespace PyAttribute
 		self.set_min_warning(c_value);
     }
 
-#if TgLibVersNb < 80100 // set_min_warning
+#if TANGO_VERSION_NB < 80100 // set_min_warning
 
     template<>
     inline void _set_min_warning<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
@@ -687,7 +655,7 @@ namespace PyAttribute
 		self.set_max_warning(c_value);
     }
 
-#if TgLibVersNb < 80100 // set_max_warning
+#if TANGO_VERSION_NB < 80100 // set_max_warning
 
     template<>
     inline void _set_max_warning<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
@@ -953,14 +921,20 @@ void export_attribute()
         .def("is_data_ready_event", &Tango::Attribute::is_data_ready_event)
         .def("remove_configuration", &Tango::Attribute::remove_configuration)
         
+	/*
         .def("_get_properties", &PyAttribute::get_properties)
         .def("_get_properties_2", &PyAttribute::get_properties_2)
         .def("_get_properties_3", &PyAttribute::get_properties_3)
-        .def("_get_properties_multi_attr_prop", &PyAttribute::get_properties_multi_attr_prop)
+	*/
+        .def("_get_properties_multi_attr_prop", 
+	     &PyAttribute::get_properties_multi_attr_prop)
         
+	/*
         .def("_set_properties", &PyAttribute::set_properties)
         .def("_set_properties_3", &PyAttribute::set_properties_3)
-        .def("_set_properties_multi_attr_prop", &PyAttribute::set_properties_multi_attr_prop)
+	*/
+        .def("_set_properties_multi_attr_prop", 
+	     &PyAttribute::set_properties_multi_attr_prop)
         
         .def("set_upd_properties",
 			(void (*) (Tango::Attribute &, bopy::object &))

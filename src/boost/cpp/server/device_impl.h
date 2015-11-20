@@ -49,7 +49,7 @@ public:
     DeviceImplWrap(PyObject *self, CppDeviceClass *cl, const char *name,
                    const char *desc = "A Tango device",
                    Tango::DevState sta = Tango::UNKNOWN,
-                   const char *status = StatusNotSet);
+                   const char *status = Tango::StatusNotSet);
 
     /**
      * Destructor
@@ -104,7 +104,7 @@ public:
     Device_2ImplWrap(PyObject *self, CppDeviceClass *cl, const char *name,
                      const char *desc = "A Tango device",
                      Tango::DevState sta = Tango::UNKNOWN,
-                     const char *status = StatusNotSet);
+                     const char *status = Tango::StatusNotSet);
 
     /**
      * Destructor
@@ -161,7 +161,7 @@ public:
     Device_3ImplWrap(PyObject *self, CppDeviceClass *cl, const char *name,
                      const char *desc = "A Tango device",
                      Tango::DevState sta = Tango::UNKNOWN,
-                     const char *status = StatusNotSet);
+                     const char *status = Tango::StatusNotSet);
 
     /**
      * Destructor
@@ -288,7 +288,7 @@ public:
     Device_4ImplWrap(PyObject *self, CppDeviceClass *cl, const char *name,
                      const char *desc = "A Tango device",
                      Tango::DevState sta = Tango::UNKNOWN,
-                     const char *status = StatusNotSet);
+                     const char *status = Tango::StatusNotSet);
 
     /**
      * Destructor
