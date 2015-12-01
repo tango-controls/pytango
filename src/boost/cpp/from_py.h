@@ -276,6 +276,7 @@ void from_py_object(bopy::object &, Tango::EventProperties &);
 void from_py_object(bopy::object &, Tango::AttributeConfig &);
 void from_py_object(bopy::object &, Tango::AttributeConfig_2 &);
 void from_py_object(bopy::object &, Tango::AttributeConfig_3 &);
+void from_py_object(bopy::object &, Tango::AttributeConfig_5 &);
 
 template<typename T>
 void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_prop)
@@ -699,3 +700,4 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 void from_py_object(bopy::object &, Tango::AttributeConfigList &);
 void from_py_object(bopy::object &, Tango::AttributeConfigList_2 &);
 void from_py_object(bopy::object &, Tango::AttributeConfigList_3 &);
+void from_py_object(bopy::object &, Tango::AttributeConfigList_5 &);

@@ -36,7 +36,8 @@ from ._PyTango import (StdStringVector, StdLongVector, CommandInfoList,
 
 from .device_server import AttributeAlarm, EventProperties
 from .device_server import ChangeEventProp, PeriodicEventProp, ArchiveEventProp
-from .device_server import AttributeConfig, AttributeConfig_2, AttributeConfig_3
+from .device_server import AttributeConfig, AttributeConfig_2
+from .device_server import AttributeConfig_3, AttributeConfig_5
 import collections
 
 def __inc_param(obj, name):
@@ -123,6 +124,7 @@ def __registerStructStr():
         GroupReply, GroupAttrReply, GroupCmdReply,
         DevError, EventData, AttrConfEventData, DataReadyEventData,
         AttributeConfig, AttributeConfig_2, AttributeConfig_3,
+        AttributeConfig_5,
         ChangeEventProp, PeriodicEventProp, ArchiveEventProp,
         AttributeAlarm, EventProperties)
 
