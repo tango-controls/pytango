@@ -778,58 +778,6 @@ def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
         return self._get_command_config(v)
 
     raise TypeError('value must be a string or a sequence<string>')
-
-def __DeviceProxy__get_pipe_config(self, value=None):
-    """
-    get_pipe_config( self) -> PipeInfoList
-
-            Return the pipe configuration for all pipes.
-
-        Return     : (PipeInfoList) Object containing the pipes
-                     information
-
-        Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
-
-    get_pipe_config( self, name) -> PipeInfo
-
-            Return the pipe configuration for a single pipe.
-
-        Parameters :
-                - name : (str) pipe name
-
-        Return     : (PipeInfo) Object containing the pipe
-                     information
-
-        Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
-
-    get_pipe_config( self, names) -> PipeInfoList
-
-            Return the pipe configuration for the list of specified pipes. To get all the
-            pipes pass a sequence containing the constant PyTango.constants.AllPipe
-
-        Parameters :
-                - names : (sequence<str>) pipe names
-
-        Return     : (PipeInfoList) Object containing the pipes
-                     information
-
-        Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
-
-        New in PyTango 9.2.0
-    """
-    if value is None:
-        value = [constants.AllPipe]
-    if isinstance(value, StdStringVector) or is_pure_str(value):
-        return self._get_pipe_config(value)
-    elif isinstance(value, collections.Sequence):
-        v = seq_2_StdStringVector(value)
-        return self._get_pipe_config(v)
-
-    raise TypeError('value must be a string or a sequence<string>')
-
 def __DeviceProxy__set_attribute_config(self, value):
     """
     set_attribute_config( self, attr_info) -> None
@@ -1314,10 +1262,6 @@ def __init_DeviceProxy():
     DeviceProxy.set_attribute_config = __DeviceProxy__set_attribute_config
 
     DeviceProxy.get_command_config = __DeviceProxy__get_command_config
-
-    DeviceProxy.get_pipe_config = __DeviceProxy__get_pipe_config
-    DeviceProxy.set_pipe_config = __DeviceProxy__set_pipe_config
-
     DeviceProxy.__get_event_map = __DeviceProxy__get_event_map
     DeviceProxy.__get_event_map_lock = __DeviceProxy__get_event_map_lock
     DeviceProxy.subscribe_event = green(__DeviceProxy__subscribe_event)
