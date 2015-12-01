@@ -701,6 +701,3 @@ void from_py_object(bopy::object &, Tango::AttributeConfigList &);
 void from_py_object(bopy::object &, Tango::AttributeConfigList_2 &);
 void from_py_object(bopy::object &, Tango::AttributeConfigList_3 &);
 void from_py_object(bopy::object &, Tango::AttributeConfigList_5 &);
-
-void from_py_object(bopy::object &, Tango::PipeConfig &);
-void from_py_object(bopy::object &, Tango::PipeConfigList &);

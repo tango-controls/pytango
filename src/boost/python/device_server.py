@@ -18,18 +18,19 @@ from __future__ import print_function
 __all__ = [ "ChangeEventProp", "PeriodicEventProp",
             "ArchiveEventProp","AttributeAlarm", "EventProperties",
             "AttributeConfig", "AttributeConfig_2",
-            "AttributeConfig_3", "AttributeConfig_5",
-            "MultiAttrProp", "device_server_init"]
+            "AttributeConfig_3", "AttributeConfig_5", "PipeConfig",
+            "MultiAttrProp",
+            "device_server_init"]
 
 __docformat__ = "restructuredtext"
 
 import copy
 
-from ._PyTango import DeviceImpl, Device_3Impl, Device_4Impl, Device_5Impl, \
+from ._PyTango import DeviceImpl, Device_3Impl, Device_4Impl, \
     DevFailed, Attribute, WAttribute, \
     MultiAttribute, MultiClassAttribute, \
-    Attr, Logger, AttrWriteType, AttrDataFormat, CmdArgType, \
-    DispLevel, UserDefaultAttrProp, StdStringVector
+    Attr, Logger, AttrWriteType, PipeWriteType, AttrDataFormat, \
+    DispLevel, UserDefaultAttrProp
 
 from .utils import document_method as __document_method
 from .utils import copy_doc
@@ -175,8 +176,6 @@ class AttributeConfig_5(object):
         self.att_alarm = AttributeAlarm()
         self.event_prop = EventProperties()
         self.sys_extensions = []
-
-
 
 def __Attribute__get_properties(self, attr_cfg = None):
     """get_properties(self, attr_cfg = None) -> AttributeConfig
