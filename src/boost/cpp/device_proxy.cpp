@@ -145,14 +145,41 @@ namespace PyDeviceProxy
         // Do the actual write_read_attribute thing...
         {
             AutoPythonAllowThreads guard;
-            r_dev_attr.reset(new Tango::DeviceAttribute(self.write_read_attribute(w_dev_attr)));
+            Tango::DeviceAttribute da = self.write_read_attribute(w_dev_attr);
+            r_dev_attr.reset(new Tango::DeviceAttribute(da));
         }
 
         // Convert the result back to python
         return PyDeviceAttribute::convert_to_python(r_dev_attr.release(), self, extract_as);
     }
 
-    static inline bopy::object
+    static bopy::object
+    write_read_attributes(Tango::DeviceProxy& self,
+                          bopy::object py_name_val_list,
+                          bopy::object py_attr_names,
+                          PyTango::ExtractAs extract_as)
+    {
+        // Convert write
+        std::vector<Tango::DeviceAttribute> dev_attrs;
+        pylist_to_devattrs(self, py_name_val_list, dev_attrs);
+
+        // Convert read
+        CSequenceFromPython<StdStringVector> attr_names(py_attr_names);
+        PyDeviceAttribute::AutoDevAttrVector dev_attr_vec;
+
+        // Do the actual write_read_attributes thing...
+        {
+            AutoPythonAllowThreads guard;
+            dev_attr_vec.reset(self.write_read_attributes(dev_attrs,
+                                                          *attr_names));
+        }
+
+        // Convert the result back to python
+        return PyDeviceAttribute::convert_to_python(dev_attr_vec, self,
+                                                    extract_as);
+    }
+
+    static bopy::object
     command_history(Tango::DeviceProxy& self, const std::string& cmd_name, int depth)
     {
         std::vector<Tango::DeviceDataHistory>* device_data_hist = NULL;
@@ -573,7 +600,12 @@ void export_device_proxy()
 
         .def("_write_read_attribute",
             &PyDeviceProxy::write_read_attribute,
-            ( arg_("self"), arg_("attr_name"), arg_("value"), arg_("extract_as")=PyTango::ExtractAsNumpy ) )
+	     ( arg_("self"), arg_("attr_name"), arg_("value"), arg_("extract_as")=PyTango::ExtractAsNumpy ) )
+
+        .def("_write_read_attributes",
+	     &PyDeviceProxy::write_read_attributes,
+	     ( arg_("self"), arg_("attr_in"), arg_("attr_read_names"),
+	       arg_("extract_as")=PyTango::ExtractAsNumpy ) )
 
         //
         // history methods

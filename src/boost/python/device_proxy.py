@@ -384,8 +384,16 @@ def __DeviceProxy__write_attribute_asynch(self, attr_name, value, cb=None):
     """
     return self.write_attributes_asynch([(attr_name, value)], cb)
 
-def __DeviceProxy__write_read_attribute(self, attr_name, value, extract_as=ExtractAs.Numpy):
-    return __check_read_attribute(self._write_read_attribute(attr_name, value, extract_as))
+def __DeviceProxy__write_read_attribute(self, attr_name, value,
+                                        extract_as=ExtractAs.Numpy):
+    result = self._write_read_attribute(attr_name, value, extract_as)
+    return __check_read_attribute(result)
+
+def __DeviceProxy__write_read_attributes(self, name_val,
+                                         attr_read_names,
+                                         extract_as=ExtractAs.Numpy):
+    return self._write_read_attributes(name_val, attr_read_names,
+                                       extract_as)
 
 def __DeviceProxy__get_property(self, propname, value=None):
     """
@@ -1091,6 +1099,7 @@ def __init_DeviceProxy():
     DeviceProxy.write_attribute = green(__DeviceProxy__write_attribute)
     DeviceProxy.write_attributes = green(__DeviceProxy__write_attributes)
     DeviceProxy.write_read_attribute = green(__DeviceProxy__write_read_attribute)
+    DeviceProxy.write_read_attributes = green(__DeviceProxy__write_read_attributes)
 
     DeviceProxy.read_attributes_asynch = __DeviceProxy__read_attributes_asynch
     DeviceProxy.read_attribute_asynch = __DeviceProxy__read_attribute_asynch
@@ -1565,6 +1574,41 @@ def __doc_DeviceProxy():
         *green_mode* parameter.
         *wait* parameter.
         *timeout* parameter.
+    """)
+
+    document_method("write_read_attributes", """
+    write_read_attributes(self, name_val, attr_names, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
+
+            Write then read attribute(s) in a single network call. By
+            default (serialisation by device), the execution of this
+            call in the server can't be interrupted by other clients.
+            On the server side, attribute(s) are first written and
+            if no exception has been thrown during the write phase,
+            attributes will be read.
+
+        Parameters :
+                - name_val: A list of pairs (attr_name, value). See write_attribute
+                - attr_names : (sequence<str>) A list of attributes to read.
+                - extract_as : (ExtractAs) Defaults to numpy.
+                - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
+                               (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
+                               :meth:`~PyTango.DeviceProxy.set_green_mode`).
+                - wait       : (bool) whether or not to wait for result. If green_mode
+                               is *Synchronous*, this parameter is ignored as it always
+                               waits for the result.
+                               Ignored when green_mode is Synchronous (always waits).
+                - timeout    : (float) The number of seconds to wait for the result.
+                               If None, then there is no limit on the wait time.
+                               Ignored when green_mode is Synchronous or wait is False.
+
+        Return     : (sequence<DeviceAttribute>)
+
+        Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked,
+                     DevFailed from device, WrongData
+                     TimeoutError (green_mode == Futures) If the future didn't finish executing before the given timeout.
+                     Timeout (green_mode == Gevent) If the async result didn't finish executing before the given timeout.
+
+        New in PyTango 9.0.0
     """)
 
 #-------------------------------------
