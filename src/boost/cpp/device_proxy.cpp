@@ -33,7 +33,7 @@ namespace PyDeviceProxy
             return bopy::make_tuple(ret);
         }
     };
-    
+
     static inline Tango::DevState state(Tango::DeviceProxy& self)
     {
         AutoPythonAllowThreads guard;
@@ -453,7 +453,7 @@ void export_device_proxy()
         // general methods
         //
         .def("dev_name", &Tango::DeviceProxy::dev_name)
-        
+
         .def("info", &Tango::DeviceProxy::info,
             ( arg_("self") ),
             bopy::return_internal_reference<1>() )
@@ -480,19 +480,33 @@ void export_device_proxy()
             ( arg_("self") ) )
 
         .def("get_tango_lib_version", &Tango::DeviceProxy::get_tango_lib_version,
-            ( arg_("self") ) )        
+            ( arg_("self") ) )
 
         .def("_ping", &PyDeviceProxy::ping,
             ( arg_("self") ) )
-            
+
 
         .def("black_box", &Tango::DeviceProxy::black_box,
             ( arg_("self"), arg_("n") ),
             bopy::return_value_policy<bopy::manage_new_object>() )
 
         //
-        // device methods
+        // command methods
         //
+        .def("get_command_list", &Tango::DeviceProxy::get_command_list,
+	     ( arg_("self") ),
+            bopy::return_value_policy<bopy::manage_new_object>() )
+
+        .def("_get_command_config",
+	     (Tango::CommandInfoList* (Tango::DeviceProxy::*)(StdStringVector &))
+	     &Tango::DeviceProxy::get_command_config,
+	     ( arg_("self"), arg_("attr_names") ),
+	     bopy::return_value_policy<bopy::manage_new_object>() )
+
+        .def("_get_command_config",
+	     (Tango::CommandInfo (Tango::DeviceProxy::*)(const std::string&))
+	     &Tango::DeviceProxy::get_command_config,
+	     ( arg_("self"), arg_("attr_name") ) )
 
         .def("command_query", &Tango::DeviceProxy::command_query,
             ( arg_("self"), arg_("command") ) )
@@ -716,7 +730,7 @@ void export_device_proxy()
             (void (*) (bopy::object, bopy::object, bopy::object))
             &PyDeviceProxy::write_attributes_asynch,
             ( arg_("self"), arg_("values"), arg_("callback") ) )
-        
+
         //
         // Logging administration methods
         //
