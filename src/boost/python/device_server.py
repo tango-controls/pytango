@@ -15,9 +15,10 @@ This is an internal PyTango module.
 
 from __future__ import print_function
 
-__all__ = [ "ChangeEventProp", "PeriodicEventProp", "ArchiveEventProp",
-            "AttributeAlarm", "EventProperties",
-            "AttributeConfig", "AttributeConfig_2", "AttributeConfig_3",
+__all__ = [ "ChangeEventProp", "PeriodicEventProp",
+            "ArchiveEventProp","AttributeAlarm", "EventProperties",
+            "AttributeConfig", "AttributeConfig_2",
+            "AttributeConfig_3", "AttributeConfig_5", "PipeConfig",
             "MultiAttrProp",
             "device_server_init"]
 
@@ -25,9 +26,11 @@ __docformat__ = "restructuredtext"
 
 import copy
 
-from ._PyTango import DevFailed, DeviceImpl, Device_3Impl, Device_4Impl, \
-    Attribute, WAttribute, MultiAttribute, MultiClassAttribute, \
-    Attr, Logger, AttrWriteType, AttrDataFormat, DispLevel, UserDefaultAttrProp
+from ._PyTango import DeviceImpl, Device_3Impl, Device_4Impl, \
+    DevFailed, Attribute, WAttribute, \
+    MultiAttribute, MultiClassAttribute, \
+    Attr, Logger, AttrWriteType, PipeWriteType, AttrDataFormat, \
+    DispLevel, UserDefaultAttrProp
 
 from .utils import document_method as __document_method
 from .utils import copy_doc
@@ -159,16 +162,34 @@ class AttributeConfig_3(object):
         self.event_prop = EventProperties()
         self.sys_extensions = []
 
+class AttributeConfig_5(object):
+    """This class represents the python interface for the Tango IDL object
+    AttributeConfig_5."""
+
+    def __init__(self):
+        _init_attr_config(self)
+        self.memorized = False
+        self.mem_init = False
+        self.level = -1
+        self.root_attr_name = ''
+        self.enum_labels = []
+        self.att_alarm = AttributeAlarm()
+        self.event_prop = EventProperties()
+        self.sys_extensions = []
+
 def __Attribute__get_properties(self, attr_cfg = None):
     """get_properties(self, attr_cfg = None) -> AttributeConfig
 
                 Get attribute properties.
 
             Parameters :
-                - conf : (AttributeConfig) the config object to be filled with 
+                - conf : the config object to be filled with
                          the attribute configuration. Default is None meaning the
-                         method will create internally a new AttributeConfig
-                         and return it
+                         method will create internally a new AttributeConfig_5
+                         and return it.
+                         Can be AttributeConfig, AttributeConfig_2,
+                         AttributeConfig_3, AttributeConfig_5 or
+                         MultiAttrProp
 
             Return     : (AttributeConfig) the config object filled with
                          attribute configuration information
@@ -176,54 +197,11 @@ def __Attribute__get_properties(self, attr_cfg = None):
             New in PyTango 7.1.4
     """
 
-    if isinstance(attr_cfg,MultiAttrProp):
-        return self._get_properties_multi_attr_prop(attr_cfg)
-    else:
-        if attr_cfg is None:
-            attr_cfg = AttributeConfig()
-        return self._get_properties(attr_cfg)
-
-def __Attribute__get_properties_2(self, attr_cfg = None):
-    """get_properties_2(self, attr_cfg = None) -> AttributeConfig_2
-
-                Get attribute properties.
-
-            Parameters :
-                - conf : (AttributeConfig_2) the config object to be filled with 
-                         the attribute configuration. Default is None meaning the
-                         method will create internally a new AttributeConfig
-                         and return it
-
-            Return     : (AttributeConfig_2) the config object filled with
-                         attribute configuration information
-
-            New in PyTango 7.1.4
-    """
-
     if attr_cfg is None:
-        attr_cfg = AttributeConfig_2()
-    return self._get_properties_2(attr_cfg)
-
-def __Attribute__get_properties_3(self, attr_cfg = None):
-    """get_properties_3(self, attr_cfg = None) -> AttributeConfig_3
-
-                Get attribute properties.
-
-            Parameters :
-                - conf : (AttributeConfig_3) the config object to be filled with 
-                         the attribute configuration. Default is None meaning the
-                         method will create internally a new AttributeConfig
-                         and return it
-
-            Return     : (AttributeConfig_3) the config object filled with
-                         attribute configuration information
-
-            New in PyTango 7.1.4
-    """
-
-    if attr_cfg is None:
-        attr_cfg = AttributeConfig_3()
-    return self._get_properties_3(attr_cfg)
+        attr_cfg = MultiAttrProp()
+    if not isinstance(attr_cfg, MultiAttrProp):
+        raise TypeError("attr_cfg must be an instance of MultiAttrProp")
+    return self._get_properties_multi_attr_prop(attr_cfg)
 
 def __Attribute__set_properties(self, attr_cfg, dev = None):
     """set_properties(self, attr_cfg, dev) -> None
@@ -234,20 +212,17 @@ def __Attribute__set_properties(self, attr_cfg, dev = None):
                 of the fileds in the AttributeConfig/ AttributeConfig_3 object
 
             Parameters :
-                - conf : (AttributeConfig or AttributeConfig_3) the config 
+                - conf : (AttributeConfig or AttributeConfig_3) the config
                          object.
-                - dev : (DeviceImpl) the device
+                - dev : (DeviceImpl) the device (not used, maintained
+                        for backward compatibility)
 
             New in PyTango 7.1.4
     """
-    
-    if isinstance(attr_cfg,MultiAttrProp):
-        return self._set_properties_multi_attr_prop(attr_cfg)
-    else:
-        if isinstance(attr_cfg, AttributeConfig_3):
-            self._set_properties_3(attr_cfg, dev)
-        else:
-            self._set_properties(attr_cfg, dev)
+
+    if not isinstance(attr_cfg, MultiAttrProp):
+        raise TypeError("attr_cfg must be an instance of MultiAttrProp")
+    return self._set_properties_multi_attr_prop(attr_cfg)
 
 def __Attribute__str(self):
     return '%s(%s)' % (self.__class__.__name__, self.get_name())
@@ -256,8 +231,6 @@ def __init_Attribute():
     Attribute.__str__ = __Attribute__str
     Attribute.__repr__ = __Attribute__str
     Attribute.get_properties = __Attribute__get_properties
-    Attribute.get_properties_2 = __Attribute__get_properties_2
-    Attribute.get_properties_3 = __Attribute__get_properties_3
     Attribute.set_properties = __Attribute__set_properties
     
 def __DeviceImpl__get_device_class(self):

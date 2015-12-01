@@ -307,6 +307,38 @@ void from_py_object(object &py_obj, Tango::AttributeConfig_3 &attr_conf)
     convert2array(py_obj.attr("sys_extensions"), attr_conf.sys_extensions);
 }
 
+void from_py_object(object &py_obj, Tango::AttributeConfig_5 &attr_conf)
+{
+    attr_conf.name = obj_to_new_char(py_obj.attr("name"));
+    attr_conf.writable = extract<Tango::AttrWriteType>(py_obj.attr("writable"));
+    attr_conf.data_format = extract<Tango::AttrDataFormat>(py_obj.attr("data_format"));
+    attr_conf.data_type = extract<CORBA::Long>(py_obj.attr("data_type"));
+    attr_conf.memorized = extract<CORBA::Boolean>(py_obj.attr("memorized"));
+    attr_conf.mem_init = extract<CORBA::Boolean>(py_obj.attr("mem_init"));
+    attr_conf.max_dim_x = extract<CORBA::Long>(py_obj.attr("max_dim_x"));
+    attr_conf.max_dim_y = extract<CORBA::Long>(py_obj.attr("max_dim_y"));
+    attr_conf.description = obj_to_new_char(py_obj.attr("description"));
+    attr_conf.label = obj_to_new_char(py_obj.attr("label"));
+    attr_conf.unit = obj_to_new_char(py_obj.attr("unit"));
+    attr_conf.standard_unit = obj_to_new_char(py_obj.attr("standard_unit"));
+    attr_conf.display_unit = obj_to_new_char(py_obj.attr("display_unit"));
+    attr_conf.format = obj_to_new_char(py_obj.attr("format"));
+    attr_conf.min_value = obj_to_new_char(py_obj.attr("min_value"));
+    attr_conf.max_value = obj_to_new_char(py_obj.attr("max_value"));
+    attr_conf.writable_attr_name = obj_to_new_char(py_obj.attr("writable_attr_name"));
+    attr_conf.level = extract<Tango::DispLevel>(py_obj.attr("level"));
+    attr_conf.root_attr_name = obj_to_new_char(py_obj.attr("root_attr_name"));
+
+    convert2array(py_obj.attr("enum_labels"), attr_conf.enum_labels);
+
+    object py_att_alarm = py_obj.attr("att_alarm");
+    object py_event_prop = py_obj.attr("event_prop");
+
+    from_py_object(py_att_alarm, attr_conf.att_alarm);
+    from_py_object(py_event_prop, attr_conf.event_prop);
+    convert2array(py_obj.attr("extensions"), attr_conf.extensions);
+    convert2array(py_obj.attr("sys_extensions"), attr_conf.sys_extensions);
+}
 
 void from_py_object(object &py_obj, Tango::AttributeConfigList &attr_conf_list)
 {
@@ -349,7 +381,26 @@ void from_py_object(object &py_obj, Tango::AttributeConfigList_2 &attr_conf_list
 void from_py_object(object &py_obj, Tango::AttributeConfigList_3 &attr_conf_list)
 {
     PyObject* py_obj_ptr = py_obj.ptr();
-    
+
+    if (!PySequence_Check(py_obj_ptr))
+    {
+        attr_conf_list.length(1);
+        from_py_object(py_obj, attr_conf_list[0]);
+        return;
+    }
+
+    CORBA::ULong size = static_cast<CORBA::ULong>(boost::python::len(py_obj));
+    attr_conf_list.length(size);
+    for (CORBA::ULong i=0; i < size; ++i) {
+        object tmp = py_obj[i];
+        from_py_object(tmp, attr_conf_list[i]);
+    }
+}
+
+void from_py_object(object &py_obj, Tango::AttributeConfigList_5 &attr_conf_list)
+{
+    PyObject* py_obj_ptr = py_obj.ptr();
+
     if (!PySequence_Check(py_obj_ptr))
     {
         attr_conf_list.length(1);

@@ -176,6 +176,40 @@ object to_py(const Tango::AttributeConfig_3 &attr_conf, object py_attr_conf)
     return py_attr_conf;
 }
 
+object to_py(const Tango::AttributeConfig_5 &attr_conf, object py_attr_conf)
+{
+    if(py_attr_conf.ptr() == Py_None)
+    {
+        PYTANGO_MOD
+        py_attr_conf = pytango.attr("AttributeConfig_5")();
+    }
+
+    py_attr_conf.attr("name") = str(attr_conf.name.in());
+    py_attr_conf.attr("writable") = attr_conf.writable;
+    py_attr_conf.attr("data_format") = attr_conf.data_format;
+    py_attr_conf.attr("data_type") = attr_conf.data_type;
+    py_attr_conf.attr("memorized") = attr_conf.memorized;
+    py_attr_conf.attr("mem_init") = attr_conf.mem_init;
+    py_attr_conf.attr("max_dim_x") = attr_conf.max_dim_x;
+    py_attr_conf.attr("max_dim_y") = attr_conf.max_dim_y;
+    py_attr_conf.attr("description") = str(attr_conf.description.in());
+    py_attr_conf.attr("label") = str(attr_conf.label.in());
+    py_attr_conf.attr("unit") = str(attr_conf.unit.in());
+    py_attr_conf.attr("standard_unit") = str(attr_conf.standard_unit.in());
+    py_attr_conf.attr("display_unit") = str(attr_conf.display_unit.in());
+    py_attr_conf.attr("format") = str(attr_conf.format.in());
+    py_attr_conf.attr("min_value") = str(attr_conf.min_value.in());
+    py_attr_conf.attr("max_value") = str(attr_conf.max_value.in());
+    py_attr_conf.attr("writable_attr_name") = str(attr_conf.writable_attr_name.in());
+    py_attr_conf.attr("level") = attr_conf.level;
+    py_attr_conf.attr("root_attr_name") = str(attr_conf.root_attr_name.in());
+    py_attr_conf.attr("enum_labels") = CORBA_sequence_to_list<Tango::DevVarStringArray>::to_list(attr_conf.enum_labels);
+    py_attr_conf.attr("att_alarm") = to_py(attr_conf.att_alarm);
+    py_attr_conf.attr("event_prop") = to_py(attr_conf.event_prop);
+    py_attr_conf.attr("extensions") = CORBA_sequence_to_list<Tango::DevVarStringArray>::to_list(attr_conf.extensions);
+    py_attr_conf.attr("sys_extensions") = CORBA_sequence_to_list<Tango::DevVarStringArray>::to_list(attr_conf.sys_extensions);
+    return py_attr_conf;
+}
 boost::python::list to_py(const Tango::AttributeConfigList &attr_conf_list)
 {
     boost::python::list py_attr_conf_list;
@@ -207,6 +241,18 @@ boost::python::list to_py(const Tango::AttributeConfigList_3 &attr_conf_list)
     for(unsigned long index = 0; index < attr_conf_list.length(); ++index)
     {
         const Tango::AttributeConfig_3 &attr_conf = attr_conf_list[index];
+        py_attr_conf_list.append(to_py(attr_conf, none));
+    }
+    return py_attr_conf_list;
+}
+
+boost::python::list to_py(const Tango::AttributeConfigList_5 &attr_conf_list)
+{
+    boost::python::list py_attr_conf_list;
+    boost::python::object none;
+    for(unsigned long index = 0; index < attr_conf_list.length(); ++index)
+    {
+        const Tango::AttributeConfig_5 &attr_conf = attr_conf_list[index];
         py_attr_conf_list.append(to_py(attr_conf, none));
     }
     return py_attr_conf_list;

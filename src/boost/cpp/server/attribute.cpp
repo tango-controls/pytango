@@ -393,34 +393,6 @@ namespace PyAttribute
                                        long x, long y)
     { __set_value("set_value_date_quality", att, value, &x, &y, t, &quality); }
     
-    /* According to tango attribute.h these "methods not usable for
-       the external world (outside the lib)" */
-    /*
-    inline bopy::object get_properties(Tango::Attribute &att,
-                                                bopy::object &attr_cfg)
-    {
-        Tango::AttributeConfig tg_attr_cfg;
-        att.get_properties(tg_attr_cfg);
-        return to_py(tg_attr_cfg, attr_cfg);
-    }
-    
-    inline bopy::object get_properties_2(Tango::Attribute &att,
-                                                  bopy::object &attr_cfg)
-    {
-        Tango::AttributeConfig_2 tg_attr_cfg;
-        att.get_properties(tg_attr_cfg);
-        return to_py(tg_attr_cfg, attr_cfg);
-    }
-
-    inline bopy::object get_properties_3(Tango::Attribute &att,
-                                                  bopy::object &attr_cfg)
-    {
-        Tango::AttributeConfig_3 tg_attr_cfg;
-        att.get_properties(tg_attr_cfg);
-        return to_py(tg_attr_cfg, attr_cfg);
-    }
-    */
-
     template<typename TangoScalarType>
     inline void _get_properties_multi_attr_prop(Tango::Attribute &att, bopy::object &multi_attr_prop)
     {
@@ -438,26 +410,6 @@ namespace PyAttribute
 		TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _get_properties_multi_attr_prop, att, multi_attr_prop);
 		return multi_attr_prop;
     }
-
-    /*
-    void set_properties(Tango::Attribute &att, bopy::object &attr_cfg,
-                        bopy::object &dev)
-    {
-        Tango::AttributeConfig tg_attr_cfg;
-        from_py_object(attr_cfg, tg_attr_cfg);
-        Tango::DeviceImpl *dev_ptr = extract<Tango::DeviceImpl*>(dev);
-        att.set_properties(tg_attr_cfg, dev_ptr);
-    }
-
-    void set_properties_3(Tango::Attribute &att, bopy::object &attr_cfg,
-                          bopy::object &dev)
-    {
-        Tango::AttributeConfig_3 tg_attr_cfg;
-        from_py_object(attr_cfg, tg_attr_cfg);
-        Tango::DeviceImpl *dev_ptr = extract<Tango::DeviceImpl*>(dev);
-        att.set_properties(tg_attr_cfg, dev_ptr);
-    }
-    */
 
     template<typename TangoScalarType>
     inline void _set_properties_multi_attr_prop(Tango::Attribute &att, bopy::object &multi_attr_prop)

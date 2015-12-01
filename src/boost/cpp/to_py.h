@@ -353,10 +353,13 @@ boost::python::object to_py(const Tango::AttributeConfig_2 &,
                             boost::python::object py_attr_conf);
 boost::python::object to_py(const Tango::AttributeConfig_3 &,
                             boost::python::object py_attr_conf);
+boost::python::object to_py(const Tango::AttributeConfig_5 &,
+                            boost::python::object py_attr_conf);
 
 boost::python::list to_py(const Tango::AttributeConfigList &);
 boost::python::list to_py(const Tango::AttributeConfigList_2 &);
 boost::python::list to_py(const Tango::AttributeConfigList_3 &);
+boost::python::list to_py(const Tango::AttributeConfigList_5 &);
 
 template<class T>
 inline boost::python::object to_py_list(const T *seq)

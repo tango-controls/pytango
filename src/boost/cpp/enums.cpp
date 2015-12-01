@@ -50,7 +50,10 @@ void export_enums()
         .value(Tango::CmdArgTypeName[Tango::DEVVAR_LONG64ARRAY], Tango::DEVVAR_LONG64ARRAY)
         .value(Tango::CmdArgTypeName[Tango::DEVVAR_ULONG64ARRAY], Tango::DEVVAR_ULONG64ARRAY)
         .value(Tango::CmdArgTypeName[Tango::DEV_INT], Tango::DEV_INT)
-        .value("DevEncoded", Tango::DEV_ENCODED)
+        .value(Tango::CmdArgTypeName[Tango::DEV_ENCODED], Tango::DEV_ENCODED)
+        .value(Tango::CmdArgTypeName[Tango::DEV_ENUM], Tango::DEV_ENUM)
+        .value(Tango::CmdArgTypeName[Tango::DEV_PIPE_BLOB], Tango::DEV_PIPE_BLOB)
+        .value(Tango::CmdArgTypeName[Tango::DEVVAR_STATEARRAY], Tango::DEVVAR_STATEARRAY)
         .export_values()
     ;
 
@@ -170,6 +173,7 @@ void export_enums()
         .value("READ_WITH_WRITE", Tango::READ_WITH_WRITE)
         .value("WRITE", Tango::WRITE)
         .value("READ_WRITE", Tango::READ_WRITE)
+        .value("WT_UNKNOWN", Tango::READ_WRITE)
         .export_values()
     ;
 
@@ -213,6 +217,19 @@ void export_enums()
     enum_<Tango::DispLevel>("DispLevel")
         .value("OPERATOR", Tango::OPERATOR)
         .value("EXPERT", Tango::EXPERT)
+        .value("DL_UNKNOWN", Tango::DL_UNKNOWN)
     ;
 
+    enum_<Tango::PipeWriteType>("PipeWriteType")
+        .value("PIPE_READ", Tango::PIPE_READ)
+        .value("PIPE_READ_WRITE", Tango::PIPE_READ_WRITE)
+        .value("PIPE_WT_UNKNOWN", Tango::PIPE_WT_UNKNOWN)
+    ;
+
+    enum_<Tango::AttrMemorizedType>("AttrMemorizedType")
+        .value("NOT_KNOWN", Tango::NOT_KNOWN)
+        .value("NONE", Tango::NONE)
+        .value("MEMORIZED", Tango::MEMORIZED)
+        .value("MEMORIZED_WRITE_INIT", Tango::MEMORIZED_WRITE_INIT)
+    ;
 }
