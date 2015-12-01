@@ -692,6 +692,49 @@ def __DeviceProxy__get_attribute_config_ex(self, value):
 
     raise TypeError('value must be a string or a sequence<string>')
 
+def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
+    """
+    get_command_config( self) -> CommandInfoList
+
+            Return the command configuration for all commands.
+
+        Return     : (CommandInfoList) Object containing the commands
+                     information
+
+        Throws     : ConnectionFailed, CommunicationFailed,
+                     DevFailed from device
+
+    get_command_config( self, name) -> CommandInfo
+
+            Return the command configuration for a single command.
+
+        Parameters :
+                - name : (str) command name
+        Return     : (CommandInfo) Object containing the command
+                     information
+
+        Throws     : ConnectionFailed, CommunicationFailed,
+                     DevFailed from device
+
+    get_command_config( self, names) -> CommandInfoList
+
+            Return the command configuration for the list of specified commands.
+
+        Parameters :
+                - names : (sequence<str>) command names
+        Return     : (CommandInfoList) Object containing the commands
+                     information
+
+        Throws     : ConnectionFailed, CommunicationFailed,
+                     DevFailed from device
+    """
+    if isinstance(value, StdStringVector) or is_pure_str(value):
+        return self._get_command_config(value)
+    elif isinstance(value, collections.Sequence):
+        v = seq_2_StdStringVector(value)
+        return self._get_command_config(v)
+
+    raise TypeError('value must be a string or a sequence<string>')
 def __DeviceProxy__set_attribute_config(self, value):
     """
     set_attribute_config( self, attr_info) -> None
@@ -1119,6 +1162,7 @@ def __init_DeviceProxy():
     DeviceProxy.get_attribute_config_ex = __DeviceProxy__get_attribute_config_ex
     DeviceProxy.set_attribute_config = __DeviceProxy__set_attribute_config
 
+    DeviceProxy.get_command_config = __DeviceProxy__get_command_config
     DeviceProxy.__get_event_map = __DeviceProxy__get_event_map
     DeviceProxy.__get_event_map_lock = __DeviceProxy__get_event_map_lock
     DeviceProxy.subscribe_event = green(__DeviceProxy__subscribe_event)
@@ -1299,6 +1343,18 @@ def __doc_DeviceProxy():
 #-------------------------------------
 #   Device methods
 #-------------------------------------
+
+    document_method("get_command_list", """
+    get_command_list(self) -> sequence<str>
+
+            Return the names of all commands implemented for this device.
+
+        Parameters : None
+        Return     : sequence<str>
+
+        Throws     : ConnectionFailed, CommunicationFailed,
+                     DevFailed from device
+    """)
 
     document_method("command_query", """
     command_query(self, command) -> CommandInfo
