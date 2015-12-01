@@ -303,6 +303,25 @@ def __throw_create_command_exception(msg):
     Except.throw_exception("PyDs_WrongCommandDefinition", msg,
                            "create_command()")
 
+def __DeviceClass__create_user_default_attr_prop(self, attr_name, extra_info):
+    """for internal usage only"""
+    p = UserDefaultAttrProp()
+    for k, v in extra_info.items():
+        k_lower = k.lower()
+        method_name = "set_%s" % k_lower.replace(' ','_')
+        if hasattr(p, method_name):
+            method = getattr(p, method_name)
+            method(str(v))
+        elif k == 'delta_time':
+            p.set_delta_t(str(v))
+        elif not k_lower in ('display level', 'polling period', 'memorized'):
+            name = self.get_name()
+            msg = "Wrong definition of attribute %s in " \
+                  "class %s\nThe object extra information '%s' " \
+                  "is not recognized!" % (attr_name, name, k)
+            self.__throw_create_attribute_exception(msg)
+    return p
+
 def __DeviceClass__attribute_factory(self, attr_list):
     """for internal usage only"""
     for attr_name, attr_info in self.attr_list.items():
@@ -636,6 +655,7 @@ def __init_DeviceClass():
     DeviceClass.__init__ = __DeviceClass__init__
     DeviceClass.__str__ = __DeviceClass__str__
     DeviceClass.__repr__ = __DeviceClass__repr__
+    DeviceClass._create_user_default_attr_prop = __DeviceClass__create_user_default_attr_prop
     DeviceClass._attribute_factory = __DeviceClass__attribute_factory
     DeviceClass._command_factory = __DeviceClass__command_factory
     DeviceClass._new_device = __DeviceClass__new_device
