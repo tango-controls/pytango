@@ -1822,50 +1822,8 @@ def __doc_DeviceProxy():
                      TimeoutError (green_mode == Futures) If the future didn't finish executing before the given timeout.
                      Timeout (green_mode == Gevent) If the async result didn't finish executing before the given timeout.
 
-        New in PyTango 9.2.0
+        New in PyTango 9.0.0
     """)
-
-#-------------------------------------
-#   Pipe methods
-#-------------------------------------
-
-    document_method("read_pipe", """
-    read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> tuple
-
-            Read a single pipe. The result is a *blob*: a tuple with two elements: blob name (string) and blob
-            data (sequence). The blob data consists of a sequence where each element is a dictionary with the
-            following keys:
-
-            - name: blob element name
-            - dtype: tango data type
-            - value: blob element data (str for DevString, etc)
-
-        In case dtype is ``DevPipeBlob``, value is again a *blob*.
-
-        Parameters :
-            - pipe_name  : (str) The name of the pipe to read.
-            - extract_as : (ExtractAs) Defaults to numpy.
-            - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
-                           (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
-                           :meth:`~PyTango.DeviceProxy.set_green_mode`).
-            - wait       : (bool) whether or not to wait for result. If green_mode
-                           is *Synchronous*, this parameter is ignored as it always
-                           waits for the result.
-                           Ignored when green_mode is Synchronous (always waits).
-            - timeout    : (float) The number of seconds to wait for the result.
-                           If None, then there is no limit on the wait time.
-                           Ignored when green_mode is Synchronous or wait is False.
-
-        Return     : tuple<str, sequence>
-
-        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device
-                     TimeoutError (green_mode == Futures) If the future didn't finish executing before the given timeout.
-                     Timeout (green_mode == Gevent) If the async result didn't finish executing before the given timeout.
-
-        New in PyTango 9.2.0
-    """)
-
-    document_method("write_pipe", """TODO""")
 
 #-------------------------------------
 #   History methods
