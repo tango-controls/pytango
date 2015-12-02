@@ -257,3 +257,32 @@ boost::python::list to_py(const Tango::AttributeConfigList_5 &attr_conf_list)
     }
     return py_attr_conf_list;
 }
+
+object to_py(const Tango::PipeConfig &pipe_conf, object py_pipe_conf)
+{
+    if(py_pipe_conf.ptr() == Py_None)
+    {
+        PYTANGO_MOD
+        py_pipe_conf = pytango.attr("PipeConfig")();
+    }
+
+    py_pipe_conf.attr("name") = str(pipe_conf.name.in());
+    py_pipe_conf.attr("description") = str(pipe_conf.description.in());
+    py_pipe_conf.attr("label") = str(pipe_conf.label.in());
+    py_pipe_conf.attr("level") = pipe_conf.level;
+    py_pipe_conf.attr("writable") = pipe_conf.writable;
+    py_pipe_conf.attr("extensions") = CORBA_sequence_to_list<Tango::DevVarStringArray>::to_list(pipe_conf.extensions);
+    return py_pipe_conf;
+}
+
+boost::python::list to_py(const Tango::PipeConfigList &pipe_conf_list)
+{
+    boost::python::list py_pipe_conf_list;
+    boost::python::object none;
+    for(unsigned long index = 0; index < pipe_conf_list.length(); ++index)
+    {
+        const Tango::PipeConfig &pipe_conf = pipe_conf_list[index];
+        py_pipe_conf_list.append(to_py(pipe_conf, none));
+    }
+    return py_pipe_conf_list;
+}

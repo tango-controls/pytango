@@ -39,6 +39,7 @@ void export_device_data();
 void export_device_attribute();
 void export_device_data_history();
 void export_device_attribute_history();
+void export_pipe_info();
 
 void export_dev_error();
 void export_time_val();
@@ -120,6 +121,15 @@ inline bool operator==(const Tango::DeviceDataHistory& ddh1_, const Tango::Devic
            //ddh1.errors() == ddh2.errors();
 }
 
+inline bool operator==(const Tango::PipeInfo& pi1, const Tango::PipeInfo& pi2)
+{
+    return pi1.name == pi2.name &&
+	pi1.description == pi2.description &&
+	pi1.label == pi2.label &&
+	pi1.disp_level == pi2.disp_level &&
+	pi1.writable == pi2.writable &&
+	pi1.extensions == pi2.extensions;
+}
 }
 
 /**
@@ -290,6 +300,8 @@ void export_base_types()
 
     class_<Tango::AttributeInfoListEx>("AttributeInfoListEx")
         .def(vector_indexing_suite<Tango::AttributeInfoListEx, false>());
+    class_<Tango::PipeInfoList>("PipeInfoList")
+        .def(vector_indexing_suite<Tango::PipeInfoList, false>());
 
     class_<std::vector<Tango::Attr *> >("AttrList")
         .def(vector_indexing_suite<std::vector<Tango::Attr *>, true>());
@@ -404,6 +416,7 @@ void export_base_types()
     export_device_attribute();
     export_device_data_history();
     export_device_attribute_history();
+    export_pipe_info();
 
     export_dev_error();
     export_time_val();

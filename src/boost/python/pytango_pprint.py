@@ -20,11 +20,11 @@ __docformat__ = "restructuredtext"
 import operator
 
 from ._PyTango import (StdStringVector, StdLongVector, CommandInfoList,
-    AttributeInfoList, AttributeInfoListEx,
+    AttributeInfoList, AttributeInfoListEx, PipeInfoList,
     DeviceDataHistoryList,
     GroupReplyList, GroupAttrReplyList, GroupCmdReplyList,
     DbData, DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList,
-    LockerInfo, DevCommandInfo, AttributeDimension, CommandInfo,
+    LockerInfo, DevCommandInfo, AttributeDimension, CommandInfo, PipeInfo,
     DeviceInfo, DeviceAttributeConfig, AttributeInfo, AttributeAlarmInfo,
     ChangeEventInfo, PeriodicEventInfo, ArchiveEventInfo,
     AttributeEventInfo, AttributeInfoEx,
@@ -87,7 +87,7 @@ def __registerSeqStr():
     _SeqRepr = lambda self: (self and "[%s]" % (", ".join(map(repr,self)))) or "[]"
 
     seqs = (StdStringVector, StdLongVector, CommandInfoList,
-            AttributeInfoList, AttributeInfoListEx,
+            AttributeInfoList, AttributeInfoListEx, PipeInfoList,
             DeviceDataHistoryList,
             GroupReplyList, GroupAttrReplyList, GroupCmdReplyList,
             DbData, DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList)
@@ -118,7 +118,7 @@ def __registerStructStr():
     structs = (LockerInfo, DevCommandInfo, AttributeDimension, CommandInfo,
         DeviceInfo, DeviceAttributeConfig, AttributeInfo, AttributeAlarmInfo,
         ChangeEventInfo, PeriodicEventInfo, ArchiveEventInfo,
-        AttributeEventInfo, AttributeInfoEx,
+        AttributeEventInfo, AttributeInfoEx, PipeInfo,
         DeviceAttribute, DeviceAttributeHistory, DeviceData, DeviceDataHistory,
         DbDatum, DbDevInfo, DbDevImportInfo, DbDevExportInfo, DbServerInfo,
         GroupReply, GroupAttrReply, GroupCmdReply,
