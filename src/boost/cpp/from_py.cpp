@@ -415,3 +415,32 @@ void from_py_object(object &py_obj, Tango::AttributeConfigList_5 &attr_conf_list
         from_py_object(tmp, attr_conf_list[i]);
     }
 }
+
+void from_py_object(object &py_obj, Tango::PipeConfig &pipe_conf)
+{
+    pipe_conf.name = obj_to_new_char(py_obj.attr("name"));
+    pipe_conf.description = obj_to_new_char(py_obj.attr("description"));
+    pipe_conf.label = obj_to_new_char(py_obj.attr("label"));
+    pipe_conf.level = extract<Tango::DispLevel>(py_obj.attr("level"));
+    pipe_conf.writable = extract<Tango::PipeWriteType>(py_obj.attr("writable"));
+    convert2array(py_obj.attr("extensions"), pipe_conf.extensions);
+}
+
+void from_py_object(object &py_obj, Tango::PipeConfigList &pipe_conf_list)
+{
+    PyObject* py_obj_ptr = py_obj.ptr();
+
+    if (!PySequence_Check(py_obj_ptr))
+    {
+        pipe_conf_list.length(1);
+        from_py_object(py_obj, pipe_conf_list[0]);
+        return;
+    }
+
+    CORBA::ULong size = static_cast<CORBA::ULong>(boost::python::len(py_obj));
+    pipe_conf_list.length(size);
+    for (CORBA::ULong i=0; i < size; ++i) {
+        object tmp = py_obj[i];
+        from_py_object(tmp, pipe_conf_list[i]);
+    }
+}
