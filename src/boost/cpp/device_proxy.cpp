@@ -586,9 +586,6 @@ void export_device_proxy()
 	     &Tango::DeviceProxy::set_pipe_config,
 	     ( arg_("self"), arg_("seq") ) )
 
-	.def("__read_pipe", &PyDeviceProxy::read_pipe,
-	     ( arg_("self"), arg_("pipe_name") ) )
-
         //
         // attribute methods
         //
