@@ -555,6 +555,30 @@ void export_device_proxy()
             ( arg_("self"), arg_("filter"), arg_("array") ) )
 
         //
+        // pipe methods
+        //
+
+        .def("get_pipe_list", &Tango::DeviceProxy::get_pipe_list,
+	     ( arg_("self") ),
+	     bopy::return_value_policy<bopy::manage_new_object>() )
+
+        .def("_get_pipe_config",
+	     (Tango::PipeInfoList* (Tango::DeviceProxy::*)(StdStringVector &))
+	     &Tango::DeviceProxy::get_pipe_config,
+	     ( arg_("self"), arg_("pipe_names") ),
+	     bopy::return_value_policy<bopy::manage_new_object>() )
+
+        .def("_get_pipe_config",
+	     (Tango::PipeInfo (Tango::DeviceProxy::*)(const std::string&))
+	     &Tango::DeviceProxy::get_pipe_config,
+	     ( arg_("self"), arg_("pipe_name") ) )
+
+        .def("_set_pipe_config",
+	     (void (Tango::DeviceProxy::*)(Tango::PipeInfoList &))
+	     &Tango::DeviceProxy::set_pipe_config,
+	     ( arg_("self"), arg_("seq") ) )
+
+        //
         // attribute methods
         //
 

@@ -177,6 +177,18 @@ class AttributeConfig_5(object):
         self.event_prop = EventProperties()
         self.sys_extensions = []
 
+class PipeConfig(object):
+    """
+    This class represents the python interface for the Tango IDL
+    object PipeConfig."""
+
+    def __init__(self):
+        self.name = ''
+        self.description = ''
+        self.label = ''
+        self.level = PipeWriteType.PIPE_READ
+        self.extensions = []
+
 def __Attribute__get_properties(self, attr_cfg = None):
     """get_properties(self, attr_cfg = None) -> AttributeConfig
 
