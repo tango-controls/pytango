@@ -71,11 +71,19 @@ namespace PyDeviceData {
             val.encoded_data = arr;
             self << val;
         }
+
         template <>
         void insert_scalar<Tango::DEV_VOID>(Tango::DeviceData &self, object py_value)
         {
             raise_(PyExc_TypeError, "Trying to insert a value in a DEV_VOID DeviceData!");
         }
+
+        template <>
+        void insert_scalar<Tango::DEV_PIPE_BLOB>(Tango::DeviceData &self, object py_value)
+        {
+            assert(false);
+        }
+
     /// @}
     // ~Scalar Insertion
     // -----------------------------------------------------------------------
@@ -127,6 +135,14 @@ namespace PyDeviceData {
             self >> val;
             return boost::python::object(val);
         }
+
+        template <>
+        object extract_scalar<Tango::DEV_PIPE_BLOB>(Tango::DeviceData &self)
+        {
+            assert(false);
+	    return bopy::object();
+        }
+
     /// @}
     // ~Scalar Extraction
     // -----------------------------------------------------------------------
@@ -161,6 +177,13 @@ namespace PyDeviceData {
                 case PyTango::ExtractAsNothing:
                     return object();
             }
+        }
+
+        template <>
+        object extract_array<Tango::DEVVAR_STATEARRAY>(Tango::DeviceData &self, object &py_self, PyTango::ExtractAs extract_as)
+        {
+            assert(False);
+            return object();
         }
     /// @}
     // ~Array Extraction

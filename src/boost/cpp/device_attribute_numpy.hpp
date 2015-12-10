@@ -40,6 +40,12 @@ namespace PyDeviceAttribute {
             delete static_cast<TANGO_const2arraytype(tangoTypeConst)*>(ptr_);
         );
     }
+    template<> inline void 
+    _dev_var_x_array_deleter<Tango::DEV_PIPE_BLOB>(PyObject* obj)
+    {
+	// Unsupported
+        assert(false);
+    }
 #endif
 
     template<long tangoTypeConst>

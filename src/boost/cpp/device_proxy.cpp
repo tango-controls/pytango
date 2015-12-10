@@ -11,6 +11,7 @@
 
 #include "precompiled_header.hpp"
 #include "device_attribute.h"
+#include "device_pipe.h"
 #include "callback.h"
 #include "defs.h"
 #include "pytgutils.h"
@@ -81,7 +82,23 @@ namespace PyDeviceProxy
         }
     }
 
-    static inline bopy::object read_attribute(Tango::DeviceProxy& self, const string & attr_name, PyTango::ExtractAs extract_as)
+    static bopy::object
+    read_pipe(Tango::DeviceProxy& self, const std::string & pipe_name,
+              PyTango::ExtractAs extract_as)
+    {
+        Tango::DevicePipe* dev_pipe_result;
+        {
+            AutoPythonAllowThreads guard;
+            Tango::DevicePipe dev_pipe_read = self.read_pipe(pipe_name);
+            dev_pipe_result = new Tango::DevicePipe;
+            (*dev_pipe_result) = std::move(dev_pipe_read);
+
+        }
+
+        return PyTango::DevicePipe::convert_to_python(dev_pipe_result, extract_as);
+    }
+
+    static bopy::object read_attribute(Tango::DeviceProxy& self, const std::string & attr_name, PyTango::ExtractAs extract_as)
     {
         // Even if there's an exception in convert_to_python, the
         // DeviceAttribute will be deleted there, so we don't need to worry.
@@ -577,6 +594,10 @@ void export_device_proxy()
 	     (void (Tango::DeviceProxy::*)(Tango::PipeInfoList &))
 	     &Tango::DeviceProxy::set_pipe_config,
 	     ( arg_("self"), arg_("seq") ) )
+
+	.def("_read_pipe", &PyDeviceProxy::read_pipe,
+	     ( arg_("self"), arg_("pipe_name"),
+	       arg_("extract_as")=PyTango::ExtractAsNumpy ) )
 
         //
         // attribute methods

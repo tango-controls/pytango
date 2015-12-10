@@ -56,6 +56,12 @@ inline boost::python::object to_py_numpy<Tango::DEVVAR_STRINGARRAY>(const Tango:
 }
 
 template <>
+inline boost::python::object to_py_numpy<Tango::DEVVAR_STATEARRAY>(const Tango::DevVarStateArray* tg_array, boost::python::object parent)
+{
+    return to_py_list(tg_array);
+}
+
+template <>
 inline boost::python::object to_py_numpy<Tango::DEVVAR_LONGSTRINGARRAY>(const Tango::DevVarLongStringArray* tg_array, boost::python::object parent)
 {
     boost::python::list result;
