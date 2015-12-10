@@ -1451,6 +1451,8 @@ void export_device_impl()
         .def("get_attr_min_poll_period", 
             &Tango::DeviceImpl::get_attr_min_poll_period,
             return_internal_reference<>())
+	.def("is_there_subscriber",
+	     &Tango::DeviceImpl::is_there_subscriber)
     ;
     implicitly_convertible<auto_ptr<DeviceImplWrap>, auto_ptr<Tango::DeviceImpl> >();
     
