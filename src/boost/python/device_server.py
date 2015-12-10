@@ -1185,6 +1185,25 @@ def __doc_DeviceImpl():
         
         New in PyTango 7.2.1
     """ )
+
+    document_method("is_there_subscriber", """
+    is_there_subscriber(self, att_name, event_type) -> bool
+
+            Check if there is subscriber(s) listening for the event.
+
+            This method returns a boolean set to true if there are some
+            subscriber(s) listening on the event specified by the two method
+            arguments. Be aware that there is some delay (up to 600 sec)
+            between this method returning false and the last subscriber
+            unsubscription or crash...
+
+            The device interface change event is not supported by this method.
+
+        Parameters :
+            - att_name: (str) the attribute name
+            - event_type (EventType): the event type
+        Return     : True if there is at least one listener or False otherwise
+    """ )
     
 def __doc_extra_DeviceImpl(cls):
     def document_method(method_name, desc, append=True):
