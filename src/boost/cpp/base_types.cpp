@@ -39,6 +39,7 @@ void export_device_data();
 void export_device_attribute();
 void export_device_data_history();
 void export_device_attribute_history();
+void export_device_pipe();
 void export_pipe_info();
 
 void export_dev_error();
@@ -421,6 +422,7 @@ void export_base_types()
     export_device_attribute();
     export_device_data_history();
     export_device_attribute_history();
+    export_device_pipe();
     export_pipe_info();
 
     export_dev_error();

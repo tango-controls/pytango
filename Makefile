@@ -154,6 +154,7 @@ $(OBJS_DIR)/attribute_dimension.o \
 $(OBJS_DIR)/attribute_event_info.o \
 $(OBJS_DIR)/attribute_info.o \
 $(OBJS_DIR)/attribute_info_ex.o \
+$(OBJS_DIR)/device_pipe.o \
 $(OBJS_DIR)/pipe_info.o \
 $(OBJS_DIR)/attribute_proxy.o \
 $(OBJS_DIR)/base_types.o \

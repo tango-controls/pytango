@@ -195,6 +195,14 @@ namespace PyDeviceAttribute
         }
     }
 
+    template<> inline void
+    _update_value_as_bin<Tango::DEV_PIPE_BLOB>(Tango::DeviceAttribute &self,
+					       bopy::object py_value,
+					       bool read_only)
+    {
+	assert(false);
+    }
+
     template<long tangoTypeConst> static inline void
     _update_value_as_string(Tango::DeviceAttribute &self,
                             bopy::object py_value)
@@ -271,6 +279,13 @@ namespace PyDeviceAttribute
         }
     }
 
+    template<> inline void
+    _update_value_as_string<Tango::DEV_PIPE_BLOB>(Tango::DeviceAttribute &self,
+						  bopy::object py_value)
+    {
+	assert(false);
+    }
+
     template<long tangoTypeConst> static inline void
     _update_scalar_values(Tango::DeviceAttribute &self, bopy::object py_value)
     {
@@ -323,6 +338,13 @@ namespace PyDeviceAttribute
             py_value.attr(value_attr_name) = object(rvalue);
             py_value.attr(w_value_attr_name) = object();
         }
+    }
+
+    template<> inline void 
+    _update_scalar_values<Tango::DEV_PIPE_BLOB>(Tango::DeviceAttribute &self,
+						bopy::object py_value)
+    {
+	assert(false);
     }
 
     template<long tangoTypeConst> static inline void
@@ -386,6 +408,14 @@ namespace PyDeviceAttribute
             }
             py_value.attr(it? value_attr_name : w_value_attr_name) = result;
         }
+    }
+
+    template<> inline void
+    _update_array_values_as_lists<Tango::DEV_PIPE_BLOB>(Tango::DeviceAttribute &self,
+							bool isImage,
+							bopy::object py_value)
+    {
+	assert(false);
     }
 
     template<long tangoTypeConst> static void
@@ -470,6 +500,14 @@ namespace PyDeviceAttribute
             }
             py_value.attr(it? value_attr_name : w_value_attr_name) = result_guard;
         }
+    }
+
+    template<> inline void
+    _update_array_values_as_tuples<Tango::DEV_PIPE_BLOB>(Tango::DeviceAttribute &self,
+                                                         bool isImage,
+                                                         bopy::object py_value)
+    {
+	assert(false);
     }
 
     void
