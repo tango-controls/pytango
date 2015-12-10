@@ -138,6 +138,12 @@ void insert_scalar<Tango::DEV_ENCODED>(boost::python::object &o, CORBA::Any &any
     PyBuffer_Release(&view);
 }
 
+template<>
+void insert_scalar<Tango::DEV_PIPE_BLOB>(boost::python::object &o, CORBA::Any &any)
+{
+    assert(false);
+}
+
 template<long tangoArrayTypeConst>
 void insert_array(boost::python::object &o, CORBA::Any &any)
 {   
@@ -149,6 +155,12 @@ void insert_array(boost::python::object &o, CORBA::Any &any)
     // By giving a pointer to <<= we are giving ownership of the data 
     // buffer to CORBA
     any <<= data;
+}
+
+template<>
+void insert_array<Tango::DEV_PIPE_BLOB>(boost::python::object &o, CORBA::Any &any)
+{
+    assert(false);
 }
 
 template<long tangoTypeConst>
@@ -178,6 +190,12 @@ void extract_scalar<Tango::DEV_STRING>(const CORBA::Any &any, boost::python::obj
 template<>
 void extract_scalar<Tango::DEV_VOID>(const CORBA::Any &any, boost::python::object &o)
 {}
+
+template<>
+void extract_scalar<Tango::DEV_PIPE_BLOB>(const CORBA::Any &any, boost::python::object &o)
+{
+    assert(false);
+}
 
 template<>
 void extract_scalar<Tango::DEV_ENCODED>(const CORBA::Any &any, boost::python::object &o)
@@ -259,6 +277,13 @@ void extract_array(const CORBA::Any &any, boost::python::object &py_result)
 #else
       py_result = to_py_list(tmp_ptr);
 #endif
+}
+
+template<>
+void extract_array<Tango::DEV_PIPE_BLOB>(const CORBA::Any &any,
+					 boost::python::object &py_result)
+{
+    assert(false);
 }
 
 CORBA::Any *PyCmd::execute(Tango::DeviceImpl *dev, const CORBA::Any &param_any)

@@ -125,6 +125,11 @@ def __check_read_attribute(dev_attr):
         raise DevFailed(*dev_attr.get_err_stack())
     return dev_attr
 
+def __check_read_pipe(dev_pipe):
+    if dev_pipe.has_failed:
+        raise DevFailed(*dev_pipe.get_err_stack())
+    return dev_pipe
+
 def __DeviceProxy__init__(self, *args, **kwargs):
     self.__dict__['_green_mode'] = kwargs.pop('green_mode', None)
     self.__dict__['_executors'] = executors = {}
@@ -1139,6 +1144,9 @@ def __DeviceProxy__str(self):
     info = self._get_info_()
     return "%s(%s)" % (info.dev_class, self.dev_name())
 
+def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
+    return self._read_pipe(pipe_name, extract_as)
+
 def __DeviceProxy__read_attributes(self, *args, **kwargs):
     return self._read_attributes(*args, **kwargs)
 
@@ -1250,6 +1258,8 @@ def __init_DeviceProxy():
     DeviceProxy.write_attributes_asynch = __DeviceProxy__write_attributes_asynch
     DeviceProxy.write_attribute_asynch = __DeviceProxy__write_attribute_asynch
     DeviceProxy.write_attribute_reply = __DeviceProxy__write_attribute_reply
+
+    DeviceProxy.read_pipe = __DeviceProxy__read_pipe
 
     DeviceProxy.get_property = __DeviceProxy__get_property
     DeviceProxy.put_property = __DeviceProxy__put_property
