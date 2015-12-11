@@ -59,6 +59,7 @@
     //Unassigned: Tango::DEV_ENCODED
     DEF_TANGO2NUMPY(Tango::DEV_LONG64, NPY_INT64 );
     DEF_TANGO2NUMPY(Tango::DEV_ULONG64, NPY_UINT64 );
+    DEF_TANGO2NUMPY(Tango::DEV_ENUM, NPY_INT16 );
 
 /// @name Conversion from a Tango array type name to the scalar numpy name
 /// For types like DEVVAR_DOUBLEARRAY. This is ended with ARRAY, except

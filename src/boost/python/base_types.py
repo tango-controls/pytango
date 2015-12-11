@@ -357,6 +357,7 @@ def __doc_base_types():
         - DevVarULong64Array
         - DevInt
         - DevEncoded
+        - DevEnum
     """ )
 
     document_enum("LockerLanguage", """
