@@ -115,6 +115,11 @@ TSD_SIMPLE__( DEV_STATE,                Tango::DevState  ,  Tango::DevVarStateAr
 TSD_SIMPLE__( DEV_ENCODED,              Tango::DevEncoded,  Tango::DevVarEncodedArray     );
 TSD_SIMPLE__( DEV_PIPE_BLOB,            Tango::DevPipeBlob, void  );
 
+// since enum type is implemented as a short we cannot use tango_type2name because
+// it will conflict with the DevShort template declaration
+DEF_TANGO_NAME2TYPE__( DEV_ENUM,        Tango::DevEnum);
+DEF_TANGO_NAME2ARRAY( DEV_ENUM, Tango::DevVarShortArray, Tango::DevEnum);
+
 TSD_SIMPLE__( DEV_VOID,                 void             , void);
 
 TSD_ARRAY__(  DEVVAR_CHARARRAY,         _CORBA_Octet     ,  Tango::DevVarCharArray);
@@ -259,6 +264,7 @@ DEF_TANGO_SCALAR_ARRAY_NAMES( DEV_STATE,   DEVVAR_STATEARRAY );
 /*        __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_INT, DOIT_SIMPLE) */\
         __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_ENCODED, DOIT_SIMPLE) \
         __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_PIPE_BLOB, DOIT_SIMPLE) \
+        __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_ENUM, DOIT_SIMPLE) \
         default: \
             assert(false); \
     } } else (void)0
@@ -316,6 +322,7 @@ DEF_TANGO_SCALAR_ARRAY_NAMES( DEV_STATE,   DEVVAR_STATEARRAY );
 /*        __TANGO_DEPEND_ON_TYPE_AUX_NAME(DEV_INT, DOIT_SIMPLE) */\
         __TANGO_DEPEND_ON_TYPE_AUX_NAME(DEV_ENCODED, DOIT_SIMPLE) \
         __TANGO_DEPEND_ON_TYPE_AUX_NAME(DEV_PIPE_BLOB, DOIT_SIMPLE) \
+        __TANGO_DEPEND_ON_TYPE_AUX_NAME(DEV_ENUM, DOIT_SIMPLE) \
         default: \
             assert(false); \
     } } else (void)0
