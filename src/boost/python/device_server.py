@@ -26,11 +26,11 @@ __docformat__ = "restructuredtext"
 
 import copy
 
-from ._PyTango import DeviceImpl, Device_3Impl, Device_4Impl, \
+from ._PyTango import DeviceImpl, Device_3Impl, Device_4Impl, Device_5Impl, \
     DevFailed, Attribute, WAttribute, \
     MultiAttribute, MultiClassAttribute, \
     Attr, Logger, AttrWriteType, PipeWriteType, AttrDataFormat, \
-    DispLevel, UserDefaultAttrProp
+    DispLevel, UserDefaultAttrProp, StdStringVector
 
 from .utils import document_method as __document_method
 from .utils import copy_doc
@@ -637,7 +637,7 @@ def __UserDefaultAttrProp_set_enum_labels(self, enum_labels):
         Parameters :
             - enum_labels : (seq<str>) list of enumeration labels
 
-        New in PyTango 9.2.0
+        New in PyTango 9.1.0
     """
     elbls = StdStringVector()
     for enu in enum_labels:
