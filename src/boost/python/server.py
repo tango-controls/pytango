@@ -79,6 +79,7 @@ def __build_to_tango_type():
         'char'      : CmdArgType.DevUChar,
         'None'      : CmdArgType.DevVoid,
         'state'     : CmdArgType.DevState,
+        'enum'      : CmdArgType.DevEnum,
     }
 
     try:
@@ -534,6 +535,7 @@ class attribute(AttrData):
     fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<attr_name>'                     write method name or method object
     is_allowed             :obj:`str` or :obj:`callable`    'is_<attr_name>_allowed'                is allowed method name or method object
     label                  :obj:`str`                       '<attr_name>'                           attribute label
+    enum_labels            sequence                         None                                    the list of enumeration labels (enum data type)
     doc (or description)   :obj:`str`                       ''                                      attribute description
     unit                   :obj:`str`                       ''                                      physical units the attribute value is in
     standard_unit          :obj:`str`                       ''                                      physical standard unit

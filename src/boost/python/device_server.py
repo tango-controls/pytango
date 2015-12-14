@@ -26,11 +26,11 @@ __docformat__ = "restructuredtext"
 
 import copy
 
-from ._PyTango import DeviceImpl, Device_3Impl, Device_4Impl, \
+from ._PyTango import DeviceImpl, Device_3Impl, Device_4Impl, Device_5Impl, \
     DevFailed, Attribute, WAttribute, \
     MultiAttribute, MultiClassAttribute, \
     Attr, Logger, AttrWriteType, PipeWriteType, AttrDataFormat, \
-    DispLevel, UserDefaultAttrProp
+    DispLevel, UserDefaultAttrProp, StdStringVector
 
 from .utils import document_method as __document_method
 from .utils import copy_doc
@@ -628,12 +628,31 @@ def __Logger__fatal(self, msg, *args):
     """
     self.__fatal(msg % args)
 
+def __UserDefaultAttrProp_set_enum_labels(self, enum_labels):
+    """
+    set_enum_labels(self, enum_labels) -> None
+
+            Set default enumeration labels.
+
+        Parameters :
+            - enum_labels : (seq<str>) list of enumeration labels
+
+        New in PyTango 9.1.0
+    """
+    elbls = StdStringVector()
+    for enu in enum_labels:
+        elbls.append(enu)
+    return self._set_enum_labels(elbls)
+
 def __Attr__str(self):
     return '%s(%s)' % (self.__class__.__name__, self.get_name())
 
 def __init_Attr():
     Attr.__str__ = __Attr__str
     Attr.__repr__ = __Attr__str
+
+def __init_UserDefaultAttrProp():
+    UserDefaultAttrProp.set_enum_labels = __UserDefaultAttrProp_set_enum_labels
 
 def __init_Logger():
     Logger.log = __Logger__log
@@ -2614,6 +2633,7 @@ def device_server_init(doc=True):
     __init_DeviceImpl()
     __init_Attribute()
     __init_Attr()
+    __init_UserDefaultAttrProp()
     __init_Logger()
     if doc:
         __doc_DeviceImpl()
