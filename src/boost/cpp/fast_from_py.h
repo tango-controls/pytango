@@ -184,7 +184,7 @@ DEFINE_FAST_TANGO_FROMPY_NUM(Tango::DEV_DOUBLE, double, PyFloat_AsDouble)
 
 // DEFINE_FAST_TANGO_FROMPY(Tango::DEV_STRING, PyString_AsString)
 DEFINE_FAST_TANGO_FROMPY(Tango::DEV_STRING, PyString_AsCorbaString)
-
+DEFINE_FAST_TANGO_FROMPY(Tango::DEV_ENUM, PyLong_AsUnsignedLong)
 
 template<long tangoArrayTypeConst>
 struct array_element_from_py : public from_py<TANGO_const2scalarconst(tangoArrayTypeConst)>

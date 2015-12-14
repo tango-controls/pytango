@@ -149,7 +149,10 @@ class AttrData(object):
             method_name = "set_%s" % k_lower.replace(' ','_')
             if hasattr(p, method_name):
                 method = getattr(p, method_name)
-                method(str(v))
+                if method_name == 'set_enum_labels':
+                    method(v)
+                else:
+                    method(str(v))
             elif k == 'delta_time':
                 p.set_delta_t(str(v))
             elif not k_lower in ('display level', 'polling period', 'memorized'):
@@ -289,6 +292,12 @@ class AttrData(object):
         else:
             self.memorized = False
         
+        if self.attr_type == CmdArgType.DevEnum:
+            if not 'enum_labels' in extra_info:
+                throw_ex("Missing 'enum_labels' key in attr_list definition "\
+                         "for enum attribute %s in class %s" % (attr_name, name))
+            self.enum_labels = extra_info["enum_labels"]
+
         self.attr_class = extra_info.get("klass", self.DftAttrClassMap[self.attr_format])
         self.attr_args.extend((self.attr_name, self.attr_type, self.attr_write))
         if not self.attr_format == AttrDataFormat.SCALAR:
