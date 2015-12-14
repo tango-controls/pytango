@@ -44,7 +44,8 @@ void export_user_default_attr_prop()
         .def("set_archive_event_abs_change", &Tango::UserDefaultAttrProp::set_archive_event_abs_change)
         .def("set_archive_event_rel_change", &Tango::UserDefaultAttrProp::set_archive_event_rel_change)
         .def("set_archive_event_period", &Tango::UserDefaultAttrProp::set_archive_event_period)
-        
+        .def("_set_enum_labels", &Tango::UserDefaultAttrProp::set_enum_labels)
+
         .def_readwrite("label", &Tango::UserDefaultAttrProp::label)
         .def_readwrite("description", &Tango::UserDefaultAttrProp::description)
         .def_readwrite("unit", &Tango::UserDefaultAttrProp::unit)
@@ -65,6 +66,7 @@ void export_user_default_attr_prop()
         .def_readwrite("archive_abs_change", &Tango::UserDefaultAttrProp::archive_abs_change)
         .def_readwrite("archive_rel_change", &Tango::UserDefaultAttrProp::archive_rel_change)
         .def_readwrite("archive_period", &Tango::UserDefaultAttrProp::archive_period)
+        .def_readwrite("enum_labels", &Tango::UserDefaultAttrProp::enum_labels)
     ;
 
 }
