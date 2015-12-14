@@ -385,4 +385,130 @@ protected:
     void _init();
 };
 
+/**
+ * Device_5ImplWrap is the class used to represent a Python Tango device.
+ */
+class Device_5ImplWrap : public Tango::Device_5Impl,
+                         public PyDeviceImplBase,
+                         public boost::python::wrapper<Tango::Device_5Impl>
+{
+public:
+    /**
+     * Constructor
+     *
+     * @param[in] self
+     * @param[in] cl
+     * @param[in] st
+     */
+    Device_5ImplWrap(PyObject *self, CppDeviceClass *cl, std::string &st);
+
+    /**
+     * Constructor
+     *
+     * @param[in] self
+     * @param[in] cl
+     * @param[in] name
+     * @param[in] desc
+     * @param[in] sta
+     * @param[in] status
+     */
+    Device_5ImplWrap(PyObject *self, CppDeviceClass *cl, const char *name,
+                     const char *desc = "A Tango device",
+                     Tango::DevState sta = Tango::UNKNOWN,
+                     const char *status = Tango::StatusNotSet);
+
+    /**
+     * Destructor
+     */
+    virtual ~Device_5ImplWrap();
+
+    /**
+     * Necessary init_device implementation to call python
+     */
+    virtual void init_device();
+
+    /**
+     * Necessary delete_device implementation to call python
+     */
+    virtual void delete_device();
+
+    /**
+     * Executes default delete_device implementation
+     */
+    void default_delete_device();
+
+    /**
+     * called to ask Python to delete a device by decrementing the Python
+     * reference count
+     */
+    virtual void delete_dev();
+
+    /**
+     * Necessary always_executed_hook implementation to call python
+     */
+    virtual void always_executed_hook();
+
+    /**
+     * Executes default always_executed_hook implementation
+     */
+    void default_always_executed_hook();
+
+    /**
+     * Necessary read_attr_hardware implementation to call python
+     */
+    virtual void read_attr_hardware(vector<long> &attr_list);
+
+    /**
+     * Executes default read_attr_hardware implementation
+     */
+    void default_read_attr_hardware(vector<long> &attr_list);
+
+    /**
+     * Necessary write_attr_hardware implementation to call python
+     */
+    virtual void write_attr_hardware(vector<long> &attr_list);
+
+    /**
+     * Executes default write_attr_hardware implementation
+     */
+    void default_write_attr_hardware(vector<long> &attr_list);
+
+    /**
+     * Necessary dev_state implementation to call python
+     */
+    virtual Tango::DevState dev_state();
+
+    /**
+     * Executes default dev_state implementation
+     */
+    Tango::DevState default_dev_state();
+
+    /**
+     * Necessary dev_status implementation to call python
+     */
+    virtual Tango::ConstDevString dev_status();
+
+    /**
+     * Executes default dev_status implementation
+     */
+    Tango::ConstDevString default_dev_status();
+
+    /**
+     * Necessary signal_handler implementation to call python
+     */
+    virtual void signal_handler(long signo);
+
+    /**
+     * Executes default signal_handler implementation
+     */
+    void default_signal_handler(long signo);
+
+    virtual void py_delete_dev();
+
+protected:
+    /**
+     * internal method used to initialize the class. Called by the constructors
+     */
+    void _init();
+};
 #endif // _DEVICE_IMPL_H
