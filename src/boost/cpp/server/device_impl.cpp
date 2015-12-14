@@ -1187,6 +1187,162 @@ void Device_4ImplWrap::default_signal_handler(long signo)
     this->Tango::Device_4Impl::signal_handler(signo);
 }
 
+
+Device_5ImplWrap::Device_5ImplWrap(PyObject *self, CppDeviceClass *cl,
+                                   std::string &st)
+    :Tango::Device_5Impl(cl,st),
+    PyDeviceImplBase(self)
+{
+    _init();
+}
+
+Device_5ImplWrap::Device_5ImplWrap(PyObject *self, CppDeviceClass *cl,
+                                   const char *name,
+                                   const char *desc /* = "A Tango device" */,
+                                   Tango::DevState sta /* = Tango::UNKNOWN */,
+                                   const char *status /* = StatusNotSet */)
+    :Tango::Device_5Impl(cl, name, desc, sta, status),
+    PyDeviceImplBase(self)
+{
+    _init();
+}
+
+Device_5ImplWrap::~Device_5ImplWrap()
+{ delete_device(); }
+
+void Device_5ImplWrap::_init()
+{
+    // Make sure the wrapper contains a valid pointer to the self
+    // I found out this is needed by inspecting the boost wrapper_base.hpp code
+    initialize_wrapper(the_self, this);
+}
+
+void Device_5ImplWrap::init_device()
+{
+    AutoPythonGIL __py_lock;
+    try
+    {
+        this->get_override("init_device")();
+    }
+    catch(boost::python::error_already_set &eas)
+    {
+        handle_python_exception(eas);
+    }
+}
+
+void Device_5ImplWrap::delete_device()
+{
+    CALL_DEVICE_METHOD(Device_5Impl, delete_device)
+}
+
+void Device_5ImplWrap::default_delete_device()
+{
+    this->Tango::Device_5Impl::delete_device();
+}
+
+void Device_5ImplWrap::delete_dev()
+{
+    // Call here the delete_device method. It is defined in Device_5ImplWrap
+    // class which is already destroyed when the Tango kernel call the
+    // delete_device method
+    try
+    {
+        delete_device();
+    }
+    catch (Tango::DevFailed &e)
+    {
+        Tango::Except::print_exception(e);
+    }
+}
+
+void Device_5ImplWrap::py_delete_dev()
+{
+    Device_5ImplWrap::delete_dev();
+    PyDeviceImplBase::py_delete_dev();
+}
+
+void Device_5ImplWrap::always_executed_hook()
+{
+    CALL_DEVICE_METHOD(Device_5Impl, always_executed_hook)
+}
+
+void Device_5ImplWrap::default_always_executed_hook()
+{
+    this->Tango::Device_5Impl::always_executed_hook();
+}
+
+void Device_5ImplWrap::read_attr_hardware(vector<long> &attr_list)
+{
+    CALL_DEVICE_METHOD_VARGS(Device_5Impl, read_attr_hardware, attr_list)
+}
+
+void Device_5ImplWrap::default_read_attr_hardware(vector<long> &attr_list)
+{
+    this->Tango::Device_5Impl::read_attr_hardware(attr_list);
+}
+
+void Device_5ImplWrap::write_attr_hardware(vector<long> &attr_list)
+{
+    CALL_DEVICE_METHOD_VARGS(Device_5Impl, write_attr_hardware, attr_list)
+}
+
+void Device_5ImplWrap::default_write_attr_hardware(vector<long> &attr_list)
+{
+    this->Tango::Device_5Impl::write_attr_hardware(attr_list);
+}
+
+Tango::DevState Device_5ImplWrap::dev_state()
+{
+    CALL_DEVICE_METHOD_RET(Device_5Impl, dev_state)
+    // Keep the compiler quiet
+    return Tango::UNKNOWN;
+}
+
+Tango::DevState Device_5ImplWrap::default_dev_state()
+{
+    return this->Tango::Device_5Impl::dev_state();
+}
+
+Tango::ConstDevString Device_5ImplWrap::dev_status()
+{
+    CALL_DEVICE_METHOD_RET(Device_5Impl, dev_status)
+    // Keep the compiler quiet
+    return "Impossible state";
+}
+
+Tango::ConstDevString Device_5ImplWrap::default_dev_status()
+{
+    return this->Tango::Device_5Impl::dev_status();
+}
+
+void Device_5ImplWrap::signal_handler(long signo)
+{
+    try
+    {
+        CALL_DEVICE_METHOD_VARGS(Device_5Impl, signal_handler, signo)
+    }
+    catch(Tango::DevFailed &df)
+    {
+        long nb_err = df.errors.length();
+        df.errors.length(nb_err + 1);
+        
+        df.errors[nb_err].reason = CORBA::string_dup(
+            "PyDs_UnmanagedSignalHandlerException");
+        df.errors[nb_err].desc = CORBA::string_dup(
+            "An unmanaged Tango::DevFailed exception occurred in signal_handler");
+        df.errors[nb_err].origin = CORBA::string_dup("Device_5Impl.signal_handler");
+        df.errors[nb_err].severity = Tango::ERR;
+
+        Tango::Except::print_exception(df);
+    }
+}
+
+void Device_5ImplWrap::default_signal_handler(long signo)
+{
+    this->Tango::Device_5Impl::signal_handler(signo);
+}
+
+
 #if ((defined sun) || (defined WIN32))
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(register_signal_overload,
                                        Tango::DeviceImpl::register_signal, 1, 1)
@@ -1514,4 +1670,29 @@ void export_device_impl()
             &Device_4ImplWrap::default_signal_handler)
     ;
     implicitly_convertible<auto_ptr<Device_4ImplWrap>, auto_ptr<Tango::Device_4Impl> >();
+
+    class_<Tango::Device_5Impl, auto_ptr<Device_5ImplWrap>,
+           bases<Tango::Device_4Impl>,
+           boost::noncopyable>
+           ("Device_5Impl",
+            init<CppDeviceClass *, const char *,
+                 optional<const char *, Tango::DevState, const char *> >())
+        .def("init_device", pure_virtual(&Tango::Device_5Impl::init_device))
+        .def("delete_device", &Tango::Device_5Impl::delete_device,
+            &Device_5ImplWrap::default_delete_device)
+        .def("always_executed_hook", &Tango::Device_5Impl::always_executed_hook,
+            &Device_5ImplWrap::default_always_executed_hook)
+        .def("read_attr_hardware", &Tango::Device_5Impl::read_attr_hardware,
+            &Device_5ImplWrap::default_read_attr_hardware)
+        .def("write_attr_hardware", &Tango::Device_5Impl::write_attr_hardware,
+            &Device_5ImplWrap::default_write_attr_hardware)
+        .def("dev_state", &Tango::Device_5Impl::dev_state,
+            &Device_5ImplWrap::default_dev_state)
+        .def("dev_status", &Tango::Device_5Impl::dev_status,
+            &Device_5ImplWrap::default_dev_status)
+        .def("signal_handler", &Tango::Device_5Impl::signal_handler,
+            &Device_5ImplWrap::default_signal_handler)
+    ;
+    implicitly_convertible<auto_ptr<Device_5ImplWrap>, auto_ptr<Tango::Device_5Impl> >();
+
 }
