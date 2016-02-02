@@ -38,7 +38,7 @@ import collections
 from ._PyTango import StdStringVector, StdDoubleVector, \
     DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
     EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
-    GreenMode
+    GreenMode, DevState
 from .constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
 from .release import Release
 
@@ -75,6 +75,78 @@ _array_types = _array_numerical_types + _array_bool_types + _array_str_types + \
 
 _binary_types = (CmdArgType.DevEncoded, CmdArgType.DevVarCharArray)
 
+def __build_to_tango_type():
+    ret = \
+    {
+        int         : CmdArgType.DevLong64,
+        str         : CmdArgType.DevString,
+        bool        : CmdArgType.DevBoolean,
+        bytearray   : CmdArgType.DevEncoded,
+        float       : CmdArgType.DevDouble,
+        chr         : CmdArgType.DevUChar,
+        None        : CmdArgType.DevVoid,
+
+        'int'       : CmdArgType.DevLong,
+        'int16'     : CmdArgType.DevShort,
+        'int32'     : CmdArgType.DevLong,
+        'int64'     : CmdArgType.DevLong64,
+        'uint'      : CmdArgType.DevULong,
+        'uint16'    : CmdArgType.DevUShort,
+        'uint32'    : CmdArgType.DevULong,
+        'uint64'    : CmdArgType.DevULong64,
+        'str'       : CmdArgType.DevString,
+        'string'    : CmdArgType.DevString,
+        'text'      : CmdArgType.DevString,
+        'bool'      : CmdArgType.DevBoolean,
+        'boolean'   : CmdArgType.DevBoolean,
+        'bytes'     : CmdArgType.DevEncoded,
+        'bytearray' : CmdArgType.DevEncoded,
+        'float'     : CmdArgType.DevDouble,
+        'float32'   : CmdArgType.DevFloat,
+        'float64'   : CmdArgType.DevDouble,
+        'double'    : CmdArgType.DevDouble,
+        'byte'      : CmdArgType.DevUChar,
+        'chr'       : CmdArgType.DevUChar,
+        'char'      : CmdArgType.DevUChar,
+        'None'      : CmdArgType.DevVoid,
+        'state'     : CmdArgType.DevState,
+        'enum'      : CmdArgType.DevEnum,
+        'blob'      : CmdArgType.DevPipeBlob,
+    }
+
+    try:
+        ret[long] = ret[int]
+    except NameError:
+        pass
+
+
+    for key in dir(CmdArgType):
+        if key.startswith("Dev"):
+            value = getattr(CmdArgType, key)
+            ret[key] = ret[value] = value
+
+    if constants.NUMPY_SUPPORT:
+        import numpy
+        FROM_TANGO_TO_NUMPY_TYPE = { \
+                   CmdArgType.DevBoolean : numpy.bool8,
+                     CmdArgType.DevUChar : numpy.ubyte,
+                     CmdArgType.DevShort : numpy.short,
+                    CmdArgType.DevUShort : numpy.ushort,
+                      CmdArgType.DevLong : numpy.int32,
+                     CmdArgType.DevULong : numpy.uint32,
+                    CmdArgType.DevLong64 : numpy.int64,
+                   CmdArgType.DevULong64 : numpy.uint64,
+                    CmdArgType.DevString : numpy.str,
+                    CmdArgType.DevDouble : numpy.float64,
+                     CmdArgType.DevFloat : numpy.float32,
+        }
+
+        for key, value in FROM_TANGO_TO_NUMPY_TYPE.items():
+            ret[value] = key
+    return ret
+
+TO_TANGO_TYPE = __build_to_tango_type()
+
 _scalar_to_array_type = {
     CmdArgType.DevBoolean : CmdArgType.DevVarBooleanArray,
     CmdArgType.DevUChar : CmdArgType.DevVarCharArray,
@@ -91,6 +163,12 @@ _scalar_to_array_type = {
     CmdArgType.ConstDevString : CmdArgType.DevVarStringArray,
 }
 
+# add derived scalar types to scalar to array map
+for k, v in TO_TANGO_TYPE.items():
+    if v in _scalar_to_array_type:
+        _scalar_to_array_type[k] = _scalar_to_array_type[v]
+
+
 __NO_STR_VALUE = AlrmValueNotSpec, StatusNotSet
 
 __device_classes = None
@@ -101,7 +179,7 @@ bool_ = lambda value_str : value_str.lower() == "true"
 def __import(name):
     __import__(name)
     return sys.modules[name]
-    
+
 def __requires(package_name, min_version=None, conflicts=(),
                software_name="Software"):
     from distutils.version import LooseVersion
@@ -222,6 +300,11 @@ def get_tango_device_classes():
                 break
     return __device_classes
 
+
+def get_latest_device_class():
+    return get_tango_device_classes()[-1]
+
+
 try:
     __str_klasses = basestring,
 except NameError:
@@ -258,6 +341,43 @@ __str_klasses = tuple(__str_klasses)
 __int_klasses = tuple(__int_klasses)
 __number_klasses = tuple(__number_klasses)
 __seq_klasses = tuple(__seq_klasses)
+
+
+def __get_tango_type(obj):
+    from .device_server import DataElement
+    if is_non_str_seq(obj):
+        tg_type, tg_format = get_tango_type(obj[0])
+        tg_format = AttrDataFormat(int(tg_format)+1)
+        return tg_type, tg_format
+    elif is_pure_str(obj):
+        r = CmdArgType.DevString
+    elif isinstance(obj, DevState):
+        r = CmdArgType.DevState
+    elif isinstance(obj, bool):
+        r = CmdArgType.DevBoolean
+    elif isinstance(obj, __int_klasses):
+        r = CmdArgType.DevLong64
+    elif isinstance(obj, __number_klasses):
+        r = CmdArgType.DevDouble
+    return r, AttrDataFormat.SCALAR
+
+
+def __get_tango_type_numpy_support(obj):
+    import numpy
+    try:
+        ndim, dtype = obj.ndim, str(obj.dtype)
+        if ndim > 2:
+            raise TypeError('cannot translate numpy array with {0} '
+                            'dimensions to tango type'.format(obj.ndim))
+        return TO_TANGO_TYPE[dtype], AttrDataFormat(ndim)
+    except AttributeError:
+        return __get_tango_type(obj)
+
+
+def get_tango_type(obj):
+    if constants.NUMPY_SUPPORT:
+        return __get_tango_type_numpy_support(obj)
+    return __get_tango_type(obj)
 
 
 def is_pure_str(obj):

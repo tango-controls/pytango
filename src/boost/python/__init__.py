@@ -27,6 +27,7 @@ __all__ = [ 'AccessControlType', 'ApiUtil', 'ArchiveEventInfo',
 'AttributeConfig_3', 'AttributeDimension', 'AttributeEventInfo',
 'AttributeInfo', 'AttributeInfoEx', 'AttributeInfoList', 'AttributeInfoListEx',
 'AttributeList', 'AttributeProxy', 'ChangeEventInfo', 'ChangeEventProp',
+'Pipe', 'PipeConfig', 'PipeWriteType',
 'CmdArgType', 'CmdDoneEvent', 'CommandInfo', 'CommandInfoList',
 'CommunicationFailed', 'Connection', 'ConnectionFailed',
 'ConstDevString', 'DServer', 'DataReadyEventData', 'Database', 'DbData',
@@ -60,8 +61,8 @@ __all__ = [ 'AccessControlType', 'ApiUtil', 'ArchiveEventInfo',
 'SPECTRUM', 'SerialModel', 'SpectrumAttr', 'StdDoubleVector',
 'StdGroupAttrReplyVector', 'StdGroupCmdReplyVector', 'StdGroupReplyVector',
 'StdLongVector', 'StdNamedDevFailedVector', 'StdStringVector', 'SubDevDiag',
-'TangoStream', 'TimeVal', 'UserDefaultAttrProp', 'Util', 'WAttribute',
-'WRITE', 'WarnIt', 'WrongData', 'WrongNameSyntax', '__version__',
+'TangoStream', 'TimeVal', 'UserDefaultAttrProp', 'UserDefaultPipeProp', 'Util',
+'WAttribute', 'WRITE', 'WarnIt', 'WrongData', 'WrongNameSyntax', '__version__',
 '__version_description__', '__version_info__', '__version_long__',
 '__version_number__', 'alarm_flags', 'asyn_req_type', 'cb_sub_model',
 'class_factory', 'class_list', 'constants', 'constructed_class',
@@ -125,7 +126,7 @@ from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     AttrSerialModel, AttrWriteType, AttrWrittenEvent, Attribute,
     AttributeAlarmInfo, AttributeDimension, AttributeEventInfo, AttributeInfo,
     AttributeInfoEx, AttributeInfoList, AttributeInfoListEx, AttributeList,
-    ChangeEventInfo, CmdArgType,
+    ChangeEventInfo, CmdArgType, Pipe, PipeWriteType,
     CmdDoneEvent, CommandInfo, CommandInfoList, CommunicationFailed,
     Connection, ConnectionFailed, ConstDevString, DServer, DataReadyEventData,
     Database, DbData, DbDatum, DbDevExportInfo, DbDevExportInfos,
@@ -153,8 +154,8 @@ from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     SpectrumAttr, StdDoubleVector, StdGroupAttrReplyVector,
     StdGroupCmdReplyVector, StdGroupReplyVector, StdLongVector,
     StdNamedDevFailedVector, StdStringVector, SubDevDiag, TimeVal,
-    UserDefaultAttrProp, WAttribute, WRITE, WrongData, WrongNameSyntax,
-    alarm_flags, asyn_req_type, cb_sub_model, constants,
+    UserDefaultAttrProp, UserDefaultPipeProp, WAttribute, WRITE, WrongData,
+    WrongNameSyntax, alarm_flags, asyn_req_type, cb_sub_model, constants,
     raise_asynch_exception, Interceptors)
 
 ArgType = CmdArgType
@@ -175,6 +176,7 @@ from .log4tango import TangoStream, LogIt, DebugIt, InfoIt, WarnIt, \
 from .device_server import ChangeEventProp, PeriodicEventProp, \
     ArchiveEventProp, AttributeAlarm, EventProperties, AttributeConfig, \
     AttributeConfig_2, AttributeConfig_3, MultiAttrProp
+from .pipe import PipeConfig
 from .attribute_proxy import AttributeProxy, get_attribute_proxy
 from .group import Group
 from .pyutil import Util

@@ -14,6 +14,87 @@
 
 using namespace boost::python;
 
+#define __AUX_DECL_CALL_ATTR_METHOD \
+    PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev); \
+    AutoPythonGIL __py_lock;
+
+#define __AUX_CATCH_PY_EXCEPTION \
+    catch(boost::python::error_already_set &eas) \
+    { handle_python_exception(eas); }
+
+#define CALL_ATTR_METHOD(dev, name) \
+    __AUX_DECL_CALL_ATTR_METHOD \
+    try { boost::python::call_method<void>(__dev_ptr->the_self, name); } \
+    __AUX_CATCH_PY_EXCEPTION
+
+#define CALL_ATTR_METHOD_VARGS(dev, name, ...) \
+    __AUX_DECL_CALL_ATTR_METHOD \
+    try { boost::python::call_method<void>(__dev_ptr->the_self, name, __VA_ARGS__); } \
+    __AUX_CATCH_PY_EXCEPTION
+
+#define CALL_ATTR_METHOD_RET(retType, ret, dev, name) \
+    __AUX_DECL_CALL_ATTR_METHOD \
+    try { ret = boost::python::call_method<retType>(__dev_ptr->the_self, name); } \
+    __AUX_CATCH_PY_EXCEPTION
+
+#define CALL_ATTR_METHOD_VARGS_RET(retType, ret, dev, name, ...) \
+    __AUX_DECL_CALL_ATTR_METHOD \
+    try { ret = boost::python::call_method<retType>(__dev_ptr->the_self, name, __VA_ARGS__); } \
+    __AUX_CATCH_PY_EXCEPTION
+
+#define RET_CALL_ATTR_METHOD(retType, dev, name) \
+    __AUX_DECL_CALL_ATTR_METHOD \
+    try { return boost::python::call_method<retType>(__dev_ptr->the_self, name); } \
+    __AUX_CATCH_PY_EXCEPTION
+
+#define RET_CALL_ATTR_METHOD_VARGS(retType, dev, name, ...) \
+    __AUX_DECL_CALL_ATTR_METHOD \
+    try { return boost::python::call_method<retType>(__dev_ptr->the_self, name, __VA_ARGS__); } \
+    __AUX_CATCH_PY_EXCEPTION
+
+
+void PyAttr::read(Tango::DeviceImpl *dev, Tango::Attribute &att)
+{
+    if (!_is_method(dev, read_name))
+    {
+        TangoSys_OMemStream o;
+        o << read_name << " method not found for " << att.get_name();
+        Tango::Except::throw_exception("PyTango_ReadAttributeMethodNotFound",
+            o.str(), "PyTango::Attr::read");
+    }
+    CALL_ATTR_METHOD_VARGS(dev, read_name.c_str(), boost::ref(att))
+}
+
+void PyAttr::write(Tango::DeviceImpl *dev, Tango::WAttribute &att)
+{
+    if (!_is_method(dev, write_name))
+    {
+        TangoSys_OMemStream o;
+        o << write_name << " method not found for " << att.get_name();
+        Tango::Except::throw_exception("PyTango_WriteAttributeMethodNotFound",
+            o.str(), "PyTango::Attr::write");
+    }
+    CALL_ATTR_METHOD_VARGS(dev, write_name.c_str(), boost::ref(att))
+}
+
+bool PyAttr::is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType ty)
+{
+    if (_is_method(dev, py_allowed_name))
+    {
+        RET_CALL_ATTR_METHOD_VARGS(bool, dev, py_allowed_name.c_str(), ty)
+    }
+    // keep compiler quiet
+    return true;
+}
+
+bool PyAttr::_is_method(Tango::DeviceImpl *dev, const std::string &name)
+{
+    AutoPythonGIL __py_lock;
+    PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev);
+    PyObject *__dev_py = __dev_ptr->the_self;
+    return is_method_defined(__dev_py, name);
+}
+
 void PyAttr::set_user_prop(vector<Tango::AttrProperty> &user_prop,
                            Tango::UserDefaultAttrProp &def_prop)
 {

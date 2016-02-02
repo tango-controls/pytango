@@ -18,9 +18,8 @@ from __future__ import print_function
 __all__ = [ "ChangeEventProp", "PeriodicEventProp",
             "ArchiveEventProp","AttributeAlarm", "EventProperties",
             "AttributeConfig", "AttributeConfig_2",
-            "AttributeConfig_3", "AttributeConfig_5", "PipeConfig",
-            "MultiAttrProp",
-            "device_server_init"]
+            "AttributeConfig_3", "AttributeConfig_5",
+            "MultiAttrProp", "device_server_init"]
 
 __docformat__ = "restructuredtext"
 
@@ -29,7 +28,7 @@ import copy
 from ._PyTango import DeviceImpl, Device_3Impl, Device_4Impl, Device_5Impl, \
     DevFailed, Attribute, WAttribute, \
     MultiAttribute, MultiClassAttribute, \
-    Attr, Logger, AttrWriteType, PipeWriteType, AttrDataFormat, \
+    Attr, Logger, AttrWriteType, AttrDataFormat, CmdArgType, \
     DispLevel, UserDefaultAttrProp, StdStringVector
 
 from .utils import document_method as __document_method
@@ -177,17 +176,7 @@ class AttributeConfig_5(object):
         self.event_prop = EventProperties()
         self.sys_extensions = []
 
-class PipeConfig(object):
-    """
-    This class represents the python interface for the Tango IDL
-    object PipeConfig."""
 
-    def __init__(self):
-        self.name = ''
-        self.description = ''
-        self.label = ''
-        self.level = PipeWriteType.PIPE_READ
-        self.extensions = []
 
 def __Attribute__get_properties(self, attr_cfg = None):
     """get_properties(self, attr_cfg = None) -> AttributeConfig
@@ -2628,6 +2617,7 @@ def __doc_UserDefaultAttrProp():
         
         New in PyTango 8.0
     """ )
+
     
 def device_server_init(doc=True):
     __init_DeviceImpl()

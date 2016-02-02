@@ -261,3 +261,5 @@ void is_method_defined(boost::python::object &obj, const std::string &method_nam
 #define CALL_METHOD(retType, self, name, ...) \
     boost::python::call_method<retType>(self, name , __VA_ARGS__);
     
+
+bool hasattr(boost::python::object &, const std::string &);

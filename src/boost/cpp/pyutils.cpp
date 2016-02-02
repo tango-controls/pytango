@@ -181,3 +181,8 @@ EXIT:
 }
 
 #endif
+
+bool hasattr(boost::python::object& obj, const std::string& name)
+{
+    return PyObject_HasAttrString(obj.ptr(), name.c_str());
+}
