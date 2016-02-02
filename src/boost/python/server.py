@@ -878,14 +878,9 @@ class attribute(AttrData):
 class pipe(PipeData):
     '''
     Declares a new tango pipe in a :class:`Device`. To be used
-    like the python native :obj:`property` function.
-
-    Checkout the :ref:`pipe data types <pytango-pipe-data-types>`
-    to see what you should return on a pipe read request and what
-    to expect as argument on a pipe write request.
-
-    For example, to declare a read-only pipe called *ROI*
-    (for Region Of Interest), in a *Detector* :class:`Device` do::
+    like the python native :obj:`property` function. For example, to
+    declare a read-only pipe called *ROI* (for Region Of Interest), in a 
+    *Detector* :class:`Device` do::
 
         class Detector(Device):
             __metaclass__ = DeviceMeta
@@ -893,20 +888,16 @@ class pipe(PipeData):
             ROI = pipe()
 
             def read_ROI(self):
-                return ('ROI', ({'name': 'x', 'value': 0},
-                                {'name': 'y', 'value': 10},
-                                {'name': 'width', 'value': 100},
-                                {'name': 'height', 'value': 200}))
+                return dict(x=0, y=10, width=100, height=200)
 
-    The same can be achieved with (also showing that a dict can be used
-    to pass blob data)::
+    The same can be achieved with::
 
         class Detector(Device):
             __metaclass__ = DeviceMeta
 
             @pipe
             def ROI(self):
-                return 'ROI', dict(x=0, y=10, width=100, height=200)
+                return dict(x=0, y=10, width=100, height=200)
 
 
     It receives multiple keyword arguments.
@@ -927,7 +918,7 @@ class pipe(PipeData):
     write_green_mode       :obj:`~PyTango.GreenMode`        None                                    green mode for write. None means use server green mode.
     ===================== ================================ ======================================= =======================================================================================
 
-    The same example with a read-write ROI, a customized label and description::
+    The same example with a read-write ROI, a customized label and description and::
 
         class Detector(Device):
             __metaclass__ = DeviceMeta
@@ -937,13 +928,13 @@ class pipe(PipeData):
 
             def init_device(self):
                 Device.init_device(self)
-                self.__roi = 'ROI', dict(x=0, y=10, width=100, height=200)
+                self.__roi = dict(x=0, y=10, width=100, height=200)
 
             def read_ROI(self):
                 return self.__roi
 
             def write_ROI(self, roi):
-                self.__roi = roi
+                self.__roi = dict(roi)
 
 
     The same, but using pipe as a decorator::
@@ -953,7 +944,7 @@ class pipe(PipeData):
 
             def init_device(self):
                 Device.init_device(self)
-                self.__roi = 'ROI', dict(x=0, y=10, width=100, height=200)
+                self.__roi = dict(x=0, y=10, width=100, height=200)
 
             @pipe(label="Region Of Interest")
             def ROI(self):
@@ -962,12 +953,12 @@ class pipe(PipeData):
 
             @ROI.write
             def ROI(self, roi):
-                self.__roi = roi
+                self.__roi = dict(roi)
 
     In this second format, defining the `write` / `setter` implicitly sets 
     the pipe access to READ_WRITE.
 
-    .. versionadded:: 9.2.0
+    .. versionadded:: 9.1.0
     '''
 
     def __init__(self, fget=None, **kwargs):
@@ -988,8 +979,6 @@ class pipe(PipeData):
 
         super(pipe, self).__init__(name, class_name)
         self.build_from_dict(kwargs)
-        if self.pipe_write == PipeWriteType.PIPE_READ_WRITE:
-            raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
 
     def get_pipe(self, obj):
         dclass = obj.get_device_class()
@@ -1011,9 +1000,12 @@ class pipe(PipeData):
         To be used as a decorator. Will define the decorated method
         as a write pipe method to be called when client writes to the pipe
         """
-        raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
         self.fset = fset
-        self.pipe_write = PipeWriteType.PIPE_READ_WRITE
+        if self.attr_write == AttrWriteType.READ:
+            if getattr(self, 'fget', None):
+                self.attr_write = AttrWriteType.READ_WRITE
+            else:
+                self.attr_write = AttrWriteType.WRITE
         return self
 
     def write(self, fset):

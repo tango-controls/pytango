@@ -426,7 +426,7 @@ void export_device_class()
         .def("get_cvs_location",&Tango::DeviceClass::get_cvs_location,
             return_value_policy<copy_non_const_reference>())
         .def("get_device_list",&PyDeviceClass::get_device_list)
-        .def("get_command_list",&PyDeviceClass::get_command_list)
+        .def("get_command_list",&PyDeviceClass::get_device_list)
         .def("get_pipe_list",&PyDeviceClass::get_pipe_list)
         .def("get_cmd_by_name",&Tango::DeviceClass::get_cmd_by_name,
             return_internal_reference<>())
