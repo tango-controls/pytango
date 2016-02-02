@@ -82,20 +82,11 @@ namespace PyDeviceProxy
         }
     }
 
-    static bopy::object
-    read_pipe(Tango::DeviceProxy& self, const std::string & pipe_name,
-              PyTango::ExtractAs extract_as)
+    Tango::DevicePipe
+    read_pipe(Tango::DeviceProxy& self, const std::string & pipe_name)
     {
-        Tango::DevicePipe* dev_pipe_result;
-        {
-            AutoPythonAllowThreads guard;
-            Tango::DevicePipe dev_pipe_read = self.read_pipe(pipe_name);
-            dev_pipe_result = new Tango::DevicePipe;
-            (*dev_pipe_result) = std::move(dev_pipe_read);
-
-        }
-
-        return PyTango::DevicePipe::convert_to_python(dev_pipe_result, extract_as);
+        AutoPythonAllowThreads guard;
+	return self.read_pipe(pipe_name);
     }
 
     static bopy::object read_attribute(Tango::DeviceProxy& self, const std::string & attr_name, PyTango::ExtractAs extract_as)
@@ -595,9 +586,8 @@ void export_device_proxy()
 	     &Tango::DeviceProxy::set_pipe_config,
 	     ( arg_("self"), arg_("seq") ) )
 
-	.def("_read_pipe", &PyDeviceProxy::read_pipe,
-	     ( arg_("self"), arg_("pipe_name"),
-	       arg_("extract_as")=PyTango::ExtractAsNumpy ) )
+	.def("__read_pipe", &PyDeviceProxy::read_pipe,
+	     ( arg_("self"), arg_("pipe_name") ) )
 
         //
         // attribute methods

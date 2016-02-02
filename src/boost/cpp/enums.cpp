@@ -226,6 +226,14 @@ void export_enums()
         .value("PIPE_WT_UNKNOWN", Tango::PIPE_WT_UNKNOWN)
     ;
 
+    enum_<Tango::PipeSerialModel>("PipeSerialModel")
+        .value("PIPE_NO_SYNC", Tango::PIPE_NO_SYNC)
+        .value("PIPE_BY_KERNEL", Tango::PIPE_BY_KERNEL)
+        .value("PIPE_BY_USER", Tango::PIPE_BY_USER)
+    ;
+  
+    scope().attr("PipeReqType") = scope().attr("AttReqType");
+
     enum_<Tango::AttrMemorizedType>("AttrMemorizedType")
         .value("NOT_KNOWN", Tango::NOT_KNOWN)
         .value("NONE", Tango::NONE)

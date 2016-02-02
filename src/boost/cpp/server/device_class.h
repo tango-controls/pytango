@@ -79,6 +79,20 @@ public:
                           Tango::UserDefaultAttrProp *att_prop);
 
     /**
+     * Creates an pipe and adds it to the att_list.
+     * This method is intended to be called by python to register a new
+     * pipe.
+     */
+    void create_pipe(vector<Tango::Pipe *> &pipe_list,
+		     const std::string &name,
+		     Tango::PipeWriteType access,
+		     Tango::DispLevel display_level,
+		     const std::string &read_method_name,
+		     const std::string &write_method_name,
+		     const std::string &is_allowed_name,
+		     Tango::UserDefaultPipeProp *prop);
+
+    /**
      * Creates a command.
      * This method is intended to be called by python to register a new
      * command.
@@ -131,6 +145,14 @@ public:
      * @param[in] att_list attribute list
      */
     virtual void attribute_factory(std::vector<Tango::Attr *> &att_list);
+
+    /**
+     * This method forward a C++ call to the pipe_factory method to the
+     * Python method
+     *
+     * @param[in] pipe_list pipe list
+     */
+    virtual void pipe_factory();
 
     /**
      * This method forward a C++ call to the command_factory method to the

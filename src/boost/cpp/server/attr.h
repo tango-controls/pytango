@@ -19,44 +19,6 @@
 #include "pytgutils.h"
 #include "server/device_impl.h"
 
-#define __AUX_DECL_CALL_ATTR_METHOD \
-    PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev); \
-    AutoPythonGIL __py_lock;
-
-#define __AUX_CATCH_PY_EXCEPTION \
-    catch(boost::python::error_already_set &eas) \
-    { handle_python_exception(eas); }
-
-#define CALL_ATTR_METHOD(dev, name) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { boost::python::call_method<void>(__dev_ptr->the_self, name); } \
-    __AUX_CATCH_PY_EXCEPTION
-
-#define CALL_ATTR_METHOD_VARGS(dev, name, ...) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { boost::python::call_method<void>(__dev_ptr->the_self, name, __VA_ARGS__); } \
-    __AUX_CATCH_PY_EXCEPTION
-
-#define CALL_ATTR_METHOD_RET(retType, ret, dev, name) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { ret = boost::python::call_method<retType>(__dev_ptr->the_self, name); } \
-    __AUX_CATCH_PY_EXCEPTION
-
-#define CALL_ATTR_METHOD_VARGS_RET(retType, ret, dev, name, ...) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { ret = boost::python::call_method<retType>(__dev_ptr->the_self, name, __VA_ARGS__); } \
-    __AUX_CATCH_PY_EXCEPTION
-
-#define RET_CALL_ATTR_METHOD(retType, dev, name) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { return boost::python::call_method<retType>(__dev_ptr->the_self, name); } \
-    __AUX_CATCH_PY_EXCEPTION
-
-#define RET_CALL_ATTR_METHOD_VARGS(retType, dev, name, ...) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { return boost::python::call_method<retType>(__dev_ptr->the_self, name, __VA_ARGS__); } \
-    __AUX_CATCH_PY_EXCEPTION
-
 class PyAttr
 {
 public:
@@ -78,18 +40,7 @@ public:
      * @param[in] dev The device on which the attribute has to be read
      * @param[in, out] att the attribute
      */
-    inline void read(Tango::DeviceImpl *dev,Tango::Attribute &att)
-    {
-        if (!_is_method(dev, read_name))
-        {
-            TangoSys_OMemStream o;
-            o << read_name << " method not found for " << att.get_name();
-            Tango::Except::throw_exception("PyTango_ReadAttributeMethodNotFound",
-                o.str(), "PyTango::Attr::read");
-        }
-        
-        CALL_ATTR_METHOD_VARGS(dev, read_name.c_str(), boost::ref(att))
-    }
+    void read(Tango::DeviceImpl *dev,Tango::Attribute &att);
 
     /**
      * Write one attribute. This method forward the action to the python method.
@@ -97,17 +48,7 @@ public:
      * @param[in] dev The device on which the attribute has to be written
      * @param[in, out] att the attribute
      */
-    inline void write(Tango::DeviceImpl *dev,Tango::WAttribute &att)
-    {
-        if (!_is_method(dev, write_name))
-        {
-            TangoSys_OMemStream o;
-            o << write_name << " method not found for " << att.get_name();
-            Tango::Except::throw_exception("PyTango_WriteAttributeMethodNotFound",
-                o.str(), "PyTango::Attr::write");
-        }
-        CALL_ATTR_METHOD_VARGS(dev, write_name.c_str(), boost::ref(att))
-    }
+    void write(Tango::DeviceImpl *dev,Tango::WAttribute &att);
 
     /**
      * Decide if it is allowed to read/write the attribute
@@ -118,15 +59,7 @@ public:
      * @return a boolean set to true if it is allowed to execute
      *         the command. Otherwise, returns false
      */
-    inline bool is_allowed(Tango::DeviceImpl *dev,Tango::AttReqType ty)
-    {
-        if (_is_method(dev, py_allowed_name))
-        {
-            RET_CALL_ATTR_METHOD_VARGS(bool, dev, py_allowed_name.c_str(), ty)
-        }
-        // keep compiler quiet
-        return true;
-    }
+    bool is_allowed(Tango::DeviceImpl *dev,Tango::AttReqType ty);
 
     /**
      * Sets the is_allowed method name for this attribute
@@ -168,13 +101,7 @@ public:
     void set_user_prop(std::vector<Tango::AttrProperty> &user_prop,
                        Tango::UserDefaultAttrProp &def_prop);
 
-    inline bool _is_method(Tango::DeviceImpl *dev, const std::string &name)
-    {   
-        AutoPythonGIL __py_lock;
-        PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev);
-        PyObject *__dev_py = __dev_ptr->the_self;
-        return is_method_defined(__dev_py, name);
-    }
+    bool _is_method(Tango::DeviceImpl *dev, const std::string &name);
     
 private:
 

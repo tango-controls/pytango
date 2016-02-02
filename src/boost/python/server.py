@@ -16,7 +16,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
-           "command", "device_property", "class_property",
+           "command", "pipe", "device_property", "class_property",
            "run", "server_run", "Server", "get_worker", "get_async_worker"]
 
 import os
@@ -33,16 +33,17 @@ import traceback
 from ._PyTango import (CmdArgType, AttrDataFormat, AttrWriteType,
                        DevFailed, Except, GreenMode, constants,
                        Database, DbDevInfo, DevState, CmdArgType,
-                       Attr)
+                       Attr, PipeWriteType)
 from .attr_data import AttrData
+from .pipe_data import PipeData
 from .device_class import DeviceClass
-from .utils import (get_tango_device_classes, is_seq, is_non_str_seq,
+from .utils import (get_latest_device_class, is_seq, is_non_str_seq,
                     scalar_to_array_type)
 from .codec import loads, dumps
 
 API_VERSION = 2
 
-LatestDeviceImpl = get_tango_device_classes()[-1]
+LatestDeviceImpl = get_latest_device_class()
 
 def __build_to_tango_type():
     ret = \
@@ -290,6 +291,128 @@ def __patch_attr_methods(tango_device_klass, attribute):
         __patch_write_method(tango_device_klass, attribute)
 
 
+def _get_wrapped_pipe_read_method(pipe, read_method):
+    read_args = inspect.getargspec(read_method)
+    nb_args = len(read_args.args)
+
+    green_mode = pipe.read_green_mode
+
+    if nb_args < 2:
+        if green_mode == GreenMode.Synchronous:
+            @functools.wraps(read_method)
+            def read_pipe(self, pipe):
+                ret = read_method(self)
+                if not pipe.get_value_flag() and ret is not None:
+                    pipe.set_value(pipe, ret)
+                return ret
+        else:
+            @functools.wraps(read_method)
+            def read_pipe(self, pipe):
+                worker = get_worker()
+                ret = worker.execute(read_method, self)
+                if ret is not None:
+                    pipe.set_value(ret)
+                return ret
+    else:
+        if green_mode == GreenMode.Synchronous:
+            read_pipe = read_method
+        else:
+            @functools.wraps(read_method)
+            def read_pipe(self, pipe):
+                return get_worker().execute(read_method, self, pipe)
+
+    return read_pipe
+
+
+def __patch_pipe_read_method(tango_device_klass, pipe):
+    """
+    Checks if method given by it's name for the given DeviceImpl
+    class has the correct signature. If a read/write method doesn't
+    have a parameter (the traditional Pipe), then the method is
+    wrapped into another method which has correct parameter definition
+    to make it work.
+
+    :param tango_device_klass: a DeviceImpl class
+    :type tango_device_klass: class
+    :param pipe: the pipe data information
+    :type pipe: PipeData
+    """
+    read_method = getattr(pipe, "fget", None)
+    if read_method:
+        method_name = "__read_{0}__".format(pipe.pipe_name)
+        pipe.read_method_name = method_name
+    else:
+        method_name = pipe.read_method_name
+        read_method = getattr(tango_device_klass, method_name)
+
+    read_pipe = _get_wrapped_pipe_read_method(pipe, read_method)
+    method_name = "__read_{0}_wrapper__".format(pipe.pipe_name)
+    pipe.read_method_name = method_name
+
+    setattr(tango_device_klass, method_name, read_pipe)
+
+
+def _get_wrapped_pipe_write_method(pipe, write_method):
+    green_mode = pipe.write_green_mode
+
+    if green_mode == GreenMode.Synchronous:
+        @functools.wraps(write_method)
+        def write_pipe(self, pipe):
+            # TODO
+            raise NotImplementedError
+            #value = pipe.get_write_value()
+            return write_method(self, value)
+    else:
+        @functools.wraps(write_method)
+        def write_pipe(self, pipe):
+            raise NotImplementedError
+            #value = pipe.get_write_value()
+            return get_worker().execute(write_method, self, value)
+    return write_pipe
+
+
+def __patch_pipe_write_method(tango_device_klass, pipe):
+    """
+    Checks if method given by it's name for the given DeviceImpl
+    class has the correct signature. If a read/write method doesn't
+    have a parameter (the traditional Pipe), then the method is
+    wrapped into another method which has correct parameter definition
+    to make it work.
+
+    :param tango_device_klass: a DeviceImpl class
+    :type tango_device_klass: class
+    :param pipe: the pipe data information
+    :type pipe: PipeData
+    """
+    write_method = getattr(pipe, "fset", None)
+    if write_method:
+        method_name = "__write_{0}__".format(pipe.pipe_name)
+        pipe.write_method_name = method_name
+    else:
+        method_name = pipe.write_method_name
+        write_method = getattr(tango_device_klass, method_name)
+
+    write_pipe = _get_wrapped_pipe_write_method(pipe, write_method)
+    setattr(tango_device_klass, method_name, write_pipe)
+
+
+def __patch_pipe_methods(tango_device_klass, pipe):
+    """
+    Checks if the read and write methods have the correct signature.
+    If a read/write method doesn't have a parameter (the traditional
+    Pipe), then the method is wrapped into another method to make
+    this work.
+
+    :param tango_device_klass: a DeviceImpl class
+    :type tango_device_klass: class
+    :param pipe: the pipe data information
+    :type pipe: PipeData
+    """
+    __patch_pipe_read_method(tango_device_klass, pipe)
+    if pipe.pipe_write == PipeWriteType.PIPE_READ_WRITE:
+        __patch_pipe_write_method(tango_device_klass, pipe)
+
+
 def __patch_init_delete_device(klass):
     # TODO allow to force non green mode
     green_mode = True
@@ -350,6 +473,7 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
         attrs = tango_device_klass.__dict__
 
     attr_list = {}
+    pipe_list = {}
     class_property_list = {}
     device_property_list = {}
     cmd_list = {}
@@ -362,6 +486,13 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
                 attr_name = attr_obj.attr_name
             attr_list[attr_name] = attr_obj
             __patch_attr_methods(tango_device_klass, attr_obj)
+        elif isinstance(attr_obj, pipe):
+            if attr_obj.pipe_name is None:
+                attr_obj._set_name(attr_name)
+            else:
+                attr_name = attr_obj.pipe_name
+            pipe_list[attr_name] = attr_obj
+            __patch_pipe_methods(tango_device_klass, attr_obj)            
         elif isinstance(attr_obj, device_property):
             attr_obj.name = attr_name
             device_property_list[attr_name] = [attr_obj.dtype,
@@ -383,7 +514,8 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
 
     devclass_attrs = dict(class_property_list=class_property_list,
                           device_property_list=device_property_list,
-                          cmd_list=cmd_list, attr_list=attr_list)
+                          cmd_list=cmd_list, attr_list=attr_list,
+                          pipe_list=pipe_list)
     return type(devclass_name, (_DeviceClass,), devclass_attrs)
 
 
@@ -736,6 +868,150 @@ class attribute(AttrData):
         To be used as a decorator. Will define the decorated method
         as a write attribute method to be called when client writes
         the attribute
+        """
+        return self.setter(fset)
+
+    def __call__(self, fget):
+        return type(self)(fget=fget, **self._kwargs)
+
+
+class pipe(PipeData):
+    '''
+    Declares a new tango pipe in a :class:`Device`. To be used
+    like the python native :obj:`property` function. For example, to
+    declare a read-only pipe called *ROI* (for Region Of Interest), in a 
+    *Detector* :class:`Device` do::
+
+        class Detector(Device):
+            __metaclass__ = DeviceMeta
+
+            ROI = pipe()
+
+            def read_ROI(self):
+                return dict(x=0, y=10, width=100, height=200)
+
+    The same can be achieved with::
+
+        class Detector(Device):
+            __metaclass__ = DeviceMeta
+
+            @pipe
+            def ROI(self):
+                return dict(x=0, y=10, width=100, height=200)
+
+
+    It receives multiple keyword arguments.
+
+    ===================== ================================ ======================================= =======================================================================================
+    parameter              type                                       default value                                 description
+    ===================== ================================ ======================================= =======================================================================================
+    name                   :obj:`str`                       class member name                       alternative pipe name
+    display_level          :obj:`~PyTango.DispLevel`        :obj:`~PyTango.DisLevel.OPERATOR`       display level
+    access                 :obj:`~PyTango.PipeWriteType`    :obj:`~PyTango.PipeWriteType.READ`      read only/ read write access
+    fget (or fread)        :obj:`str` or :obj:`callable`    'read_<pipe_name>'                      read method name or method object
+    fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<pipe_name>'                     write method name or method object
+    is_allowed             :obj:`str` or :obj:`callable`    'is_<pipe_name>_allowed'                is allowed method name or method object
+    label                  :obj:`str`                       '<pipe_name>'                           pipe label
+    doc (or description)   :obj:`str`                       ''                                      pipe description
+    green_mode             :obj:`~PyTango.GreenMode`        None                                    green mode for read and write. None means use server green mode.
+    read_green_mode        :obj:`~PyTango.GreenMode`        None                                    green mode for read. None means use server green mode.
+    write_green_mode       :obj:`~PyTango.GreenMode`        None                                    green mode for write. None means use server green mode.
+    ===================== ================================ ======================================= =======================================================================================
+
+    The same example with a read-write ROI, a customized label and description and::
+
+        class Detector(Device):
+            __metaclass__ = DeviceMeta
+
+            ROI = pipe(label='Region Of Interest', doc='The active region of interest',
+                       access=PipeWriteType.PIPE_READ_WRITE)
+
+            def init_device(self):
+                Device.init_device(self)
+                self.__roi = dict(x=0, y=10, width=100, height=200)
+
+            def read_ROI(self):
+                return self.__roi
+
+            def write_ROI(self, roi):
+                self.__roi = dict(roi)
+
+
+    The same, but using pipe as a decorator::
+
+        class Detector(Device):
+            __metaclass__ = DeviceMeta
+
+            def init_device(self):
+                Device.init_device(self)
+                self.__roi = dict(x=0, y=10, width=100, height=200)
+
+            @pipe(label="Region Of Interest")
+            def ROI(self):
+                """The active region of interest"""
+                return self.__roi
+
+            @ROI.write
+            def ROI(self, roi):
+                self.__roi = dict(roi)
+
+    In this second format, defining the `write` / `setter` implicitly sets 
+    the pipe access to READ_WRITE.
+
+    .. versionadded:: 9.1.0
+    '''
+
+    def __init__(self, fget=None, **kwargs):
+        self._kwargs = dict(kwargs)
+        name = kwargs.pop("name", None)
+        class_name = kwargs.pop("class_name", None)
+        green_mode = kwargs.pop("green_mode", True)
+        self.read_green_mode = kwargs.pop("read_green_mode", green_mode)
+        self.write_green_mode = kwargs.pop("write_green_mode", green_mode)
+
+        if fget:
+            if inspect.isroutine(fget):
+                self.fget = fget
+                if 'doc' not in kwargs and 'description' not in kwargs:
+                    if fget.__doc__ is not None:
+                        kwargs['doc'] = fget.__doc__
+            kwargs['fget'] = fget
+
+        super(pipe, self).__init__(name, class_name)
+        self.build_from_dict(kwargs)
+
+    def get_pipe(self, obj):
+        dclass = obj.get_device_class()
+        return dclass.get_pipe_by_name(self.pipe_name)
+
+    # --------------------
+    # descriptor interface
+    # --------------------
+
+    def __get__(self, obj, objtype):
+        return self.get_attribute(obj)
+
+    def __set__(self, obj, value):
+        attr = self.get_attribute(obj)
+        set_complex_value(attr, value)
+
+    def setter(self, fset):
+        """
+        To be used as a decorator. Will define the decorated method
+        as a write pipe method to be called when client writes to the pipe
+        """
+        self.fset = fset
+        if self.attr_write == AttrWriteType.READ:
+            if getattr(self, 'fget', None):
+                self.attr_write = AttrWriteType.READ_WRITE
+            else:
+                self.attr_write = AttrWriteType.WRITE
+        return self
+
+    def write(self, fset):
+        """
+        To be used as a decorator. Will define the decorated method
+        as a write pipe method to be called when client writes to the pipe
         """
         return self.setter(fset)
 

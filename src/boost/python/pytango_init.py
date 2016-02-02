@@ -36,7 +36,7 @@ from .group_reply_list import group_reply_list_init
 from .pytango_pprint import pytango_pprint_init
 from .pyutil import pyutil_init
 from .time_val import time_val_init
-from .auto_monitor import auto_monitor_init
+from .pipe import pipe_init
 from ._PyTango import constants
 from ._PyTango import _get_tango_lib_release
 
@@ -112,7 +112,7 @@ def init():
     pytango_pprint_init(doc=doc)
     pyutil_init(doc=doc)
     time_val_init(doc=doc)
-    auto_monitor_init(doc=doc)
+    pipe_init(doc=doc)
 
     # must come last: depends on device_proxy.init()
     attribute_proxy_init(doc=doc)
