@@ -86,3 +86,68 @@ inline boost::python::object to_py_numpy<Tango::DEVVAR_DOUBLESTRINGARRAY>(const 
 // ~Array Extraction
 // -----------------------------------------------------------------------
 
+template <long tangoArrayTypeConst>
+inline boost::python::object to_py_numpy(typename TANGO_const2type(tangoArrayTypeConst)* tg_array, int orphan)
+{
+    static const int typenum = TANGO_const2scalarnumpy(tangoArrayTypeConst);
+
+    if (tg_array == 0) {
+        // Empty
+        PyObject* value = PyArray_SimpleNew(0, 0, typenum);
+        if (!value)
+            boost::python::throw_error_already_set();
+        return boost::python::object(boost::python::handle<>(value));
+    }
+
+    // Create a new numpy.ndarray() object. It uses ch_ptr as the data,
+    // so no costy memory copies when handling big images.
+    int nd = 1;
+    npy_intp dims[1];
+    dims[0]= tg_array->length();
+    void *ch_ptr = (void *)(tg_array->get_buffer(orphan));
+    PyObject* py_array = PyArray_New(&PyArray_Type, nd, dims, typenum, NULL,
+				     ch_ptr, -1, 0, NULL);
+    if (!py_array) {
+        boost::python::throw_error_already_set();
+    }
+
+    return boost::python::object(boost::python::handle<>(py_array));
+}
+
+template <>
+inline boost::python::object to_py_numpy<Tango::DEVVAR_STRINGARRAY>(Tango::DevVarStringArray* tg_array,
+								    int orphan)
+{
+    return to_py_list(tg_array);
+}
+
+template <>
+inline boost::python::object to_py_numpy<Tango::DEVVAR_STATEARRAY>(Tango::DevVarStateArray* tg_array,
+								   int orphan)
+{
+    return to_py_list(tg_array);
+}
+
+template <>
+inline boost::python::object to_py_numpy<Tango::DEVVAR_LONGSTRINGARRAY>(Tango::DevVarLongStringArray* tg_array,
+									int orphan)
+{
+    boost::python::list result;
+
+    result.append(to_py_numpy<Tango::DEVVAR_LONGARRAY>(&tg_array->lvalue, orphan));
+    result.append(to_py_numpy<Tango::DEVVAR_STRINGARRAY>(&tg_array->svalue, orphan));
+
+    return result;
+}
+
+template <>
+inline boost::python::object to_py_numpy<Tango::DEVVAR_DOUBLESTRINGARRAY>(Tango::DevVarDoubleStringArray* tg_array,
+									  int orphan)
+{
+    boost::python::list result;
+
+    result.append(to_py_numpy<Tango::DEVVAR_DOUBLEARRAY>(&tg_array->dvalue, orphan));
+    result.append(to_py_numpy<Tango::DEVVAR_STRINGARRAY>(&tg_array->svalue, orphan));
+
+    return result;
+}

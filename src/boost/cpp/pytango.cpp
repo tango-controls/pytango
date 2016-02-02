@@ -39,6 +39,7 @@ void export_attribute_proxy();
 void export_db();
 void export_callback(); /// @todo not sure were to put it...
 void export_util();
+void export_pipe();
 void export_attr();
 void export_attribute();
 void export_encoded_attribute();
@@ -46,6 +47,7 @@ void export_wattribute();
 void export_multi_attribute();
 void export_multi_class_attribute();
 void export_user_default_attr_prop();
+void export_user_default_pipe_prop();
 void export_sub_dev_diag();
 void export_dserver();
 void export_device_class();
@@ -98,6 +100,7 @@ BOOST_PYTHON_MODULE(_PyTango)
     export_attribute_proxy();
     export_db();
     export_util();
+    export_pipe();
     export_attr();
     export_attribute();
     export_encoded_attribute();
@@ -105,6 +108,7 @@ BOOST_PYTHON_MODULE(_PyTango)
     export_multi_attribute();
     export_multi_class_attribute();
     export_user_default_attr_prop();
+    export_user_default_pipe_prop();
     export_sub_dev_diag();
     export_device_class();
     export_device_impl();

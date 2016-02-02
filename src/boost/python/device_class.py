@@ -32,6 +32,7 @@ from .utils import document_method as __document_method
 from .globals import get_class, get_class_by_class, \
     get_constructed_class_by_class
 from .attr_data import AttrData
+from .pipe_data import PipeData
 
 
 class PropUtil:
@@ -342,6 +343,21 @@ def __DeviceClass__attribute_factory(self, attr_list):
                                attr_data.write_method_name,
                                attr_data.is_allowed_name,
                                attr_data.att_prop)
+
+def __DeviceClass__pipe_factory(self, pipe_list):
+    """for internal usage only"""
+    for pipe_name, pipe_info in self.pipe_list.items():
+        if isinstance(pipe_info, PipeData):
+            pipe_data = pipe_info
+        else:
+            pipe_data = PipeData(pipe_name, self.get_name(), pipe_info)
+        self._create_pipe(pipe_list, pipe_data.pipe_name,
+                          pipe_data.pipe_write,
+                          pipe_data.display_level,
+                          pipe_data.read_method_name,
+                          pipe_data.write_method_name,
+                          pipe_data.is_allowed_name,
+                          pipe_data.pipe_prop)
 
 def __DeviceClass__command_factory(self):
     """for internal usage only"""
@@ -657,6 +673,7 @@ def __init_DeviceClass():
     DeviceClass.__repr__ = __DeviceClass__repr__
     DeviceClass._create_user_default_attr_prop = __DeviceClass__create_user_default_attr_prop
     DeviceClass._attribute_factory = __DeviceClass__attribute_factory
+    DeviceClass._pipe_factory = __DeviceClass__pipe_factory
     DeviceClass._command_factory = __DeviceClass__command_factory
     DeviceClass._new_device = __DeviceClass__new_device
     

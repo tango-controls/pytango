@@ -15,6 +15,7 @@
 #include "server/device_class.h"
 #include "server/attr.h"
 #include "server/command.h"
+#include "server/pipe.h"
 
 using namespace boost::python;
 
@@ -146,6 +147,36 @@ void CppDeviceClass::create_attribute(vector<Tango::Attr *> &att_list,
 
     att_list.push_back(attr_ptr);
 }
+void CppDeviceClass::create_pipe(vector<Tango::Pipe *> &pipe_list,
+				 const std::string &name,
+				 Tango::PipeWriteType access,
+				 Tango::DispLevel display_level,
+				 const std::string &read_method_name,
+				 const std::string &write_method_name,
+				 const std::string &is_allowed_name,
+				 Tango::UserDefaultPipeProp *prop)
+{
+    Tango::Pipe *pipe_ptr = NULL;
+    if(access == Tango::PIPE_READ)
+    {
+	PyTango::Pipe::PyPipe* py_pipe_ptr = new PyTango::Pipe::PyPipe(name, display_level, access);
+	py_pipe_ptr->set_read_name(read_method_name);
+	py_pipe_ptr->set_allowed_name(is_allowed_name);
+	pipe_ptr = py_pipe_ptr;
+    }
+    else
+    {
+	PyTango::Pipe::PyWPipe* py_pipe_ptr = new PyTango::Pipe::PyWPipe(name, display_level);
+	py_pipe_ptr->set_read_name(read_method_name);
+	py_pipe_ptr->set_allowed_name(is_allowed_name);
+	py_pipe_ptr->set_write_name(write_method_name);
+	pipe_ptr = py_pipe_ptr;
+    }
+
+    if (prop)
+	pipe_ptr->set_default_properties(*prop);
+    pipe_list.push_back(pipe_ptr);
+}
 
 CppDeviceClassWrap::CppDeviceClassWrap(PyObject *self, const std::string &name)
     : CppDeviceClass(name), m_self(self)
@@ -182,6 +213,30 @@ void CppDeviceClassWrap::attribute_factory(std::vector<Tango::Attr *> &att_list)
     {
         boost::python::call_method<void>(m_self, "_attribute_factory",
                                          py_att_list);
+    }
+    catch(boost::python::error_already_set &eas)
+    {
+        handle_python_exception(eas);
+    }
+}
+
+void CppDeviceClassWrap::pipe_factory()
+{
+    //
+    // make sure we pass the same vector object to the python method
+    //
+    AutoPythonGIL python_guard;
+
+    object py_pipe_list(
+                handle<>(
+                    to_python_indirect<
+                        std::vector<Tango::Pipe *>,
+                        detail::make_reference_holder>()(pipe_list)));
+
+    try
+    {
+        boost::python::call_method<void>(m_self, "_pipe_factory",
+                                         py_pipe_list);
     }
     catch(boost::python::error_already_set &eas)
     {
@@ -296,6 +351,23 @@ namespace PyDeviceClass
         return py_cmd_list;
     }
    
+    object get_pipe_list(CppDeviceClass &self, const std::string& dev_name)
+    {
+        boost::python::list py_pipe_list;
+        vector<Tango::Pipe *> pipe_list = self.get_pipe_list(dev_name);
+        for(vector<Tango::Pipe *>::iterator it = pipe_list.begin();
+	    it != pipe_list.end(); ++it)
+        {
+            object py_value = object(
+                        handle<>(
+                            to_python_indirect<
+                                Tango::Pipe*,
+                                detail::make_reference_holder>()(*it)));
+            py_pipe_list.append(py_value);
+        }
+        return py_pipe_list;
+    }
+
     void register_signal(CppDeviceClass &self, long signo)
     {
 	self.register_signal(signo);
@@ -355,7 +427,10 @@ void export_device_class()
             return_value_policy<copy_non_const_reference>())
         .def("get_device_list",&PyDeviceClass::get_device_list)
         .def("get_command_list",&PyDeviceClass::get_device_list)
+        .def("get_pipe_list",&PyDeviceClass::get_pipe_list)
         .def("get_cmd_by_name",&Tango::DeviceClass::get_cmd_by_name,
+            return_internal_reference<>())
+        .def("get_pipe_by_name",&Tango::DeviceClass::get_pipe_by_name,
             return_internal_reference<>())
         .def("set_type",
             (void (Tango::DeviceClass::*) (const char *))
@@ -376,6 +451,7 @@ void export_device_class()
             (void (Tango::DeviceClass::*) (const char *))
             &Tango::DeviceClass::device_destroyer)
         .def("_create_attribute", &CppDeviceClass::create_attribute)
+        .def("_create_pipe", &CppDeviceClass::create_pipe)
         .def("_create_command", &CppDeviceClass::create_command)
         .def("get_class_attr", &Tango::DeviceClass::get_class_attr,
             return_value_policy<reference_existing_object>())

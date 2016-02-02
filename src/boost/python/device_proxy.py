@@ -1142,7 +1142,8 @@ def __DeviceProxy__str(self):
     return "%s(%s)" % (info.dev_class, self.dev_name())
 
 def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
-    return self._read_pipe(pipe_name, extract_as)
+    r = self.__read_pipe(pipe_name)
+    return r.extract(extract_as)
 
 def __DeviceProxy__read_attributes(self, *args, **kwargs):
     return self._read_attributes(*args, **kwargs)
