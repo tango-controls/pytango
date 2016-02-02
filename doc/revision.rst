@@ -85,7 +85,7 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 05/02/15 | `8.22 <http://www.tango-controls.org/static/PyTango/v816/doc/html/index.html>`_  | Update to PyTango 8.1.6                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| --/06/15 | `8.23 <http://www.tango-controls.org/static/PyTango/v817/doc/html/index.html>`_  | Update to PyTango 8.1.7                             | T\. Coutinho          |
+| 02/02/15 | `8.23 <http://www.tango-controls.org/static/PyTango/v817/doc/html/index.html>`_  | Update to PyTango 8.1.8                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _pytango-version-history:
@@ -96,7 +96,7 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
-| 8.1.7    | Features:                                                                                                                                                             |
+| 8.1.8    | Features:                                                                                                                                                             |
 |          |                                                                                                                                                                       |
 |          |     - `110:  device property with auto update in database <https://sourceforge.net/p/tango-cs/feature-requests/110>`_                                                 |
 |          |                                                                                                                                                                       |
@@ -111,6 +111,7 @@ Version history
 |          |     - `718: OverflowErrors with float types in 8.1.6 <https://sourceforge.net/p/tango-cs/bugs/718/>`_                                                                 |
 |          |     - `724: PyTango DeviceProxy.command_inout(<str>) memory leaks <https://sourceforge.net/p/tango-cs/bugs/724/>`_                                                    |
 |          |     - `736: pytango FTBFS with python 3.4 <https://sourceforge.net/p/tango-cs/bugs/736/>`_                                                                            |
+|          |     - `747: PyTango event callback in gevent mode gets called in non main thread <https://sourceforge.net/p/tango-cs/bugs/736/>`_                                     |
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.6    | Bug fixes:                                                                                                                                                            |
 |          |                                                                                                                                                                       |
