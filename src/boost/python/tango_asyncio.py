@@ -11,7 +11,7 @@
 
 from __future__ import absolute_import
 
-__all__ = ["get_global_executor", "submit", "spawn", "wait"]
+__all__ = ["get_global_executor", "submit", "spawn", "wait", "get_event_loop"]
 
 __global_executor = None
 
@@ -64,6 +64,8 @@ def get_global_executor():
 def submit(fn, *args, **kwargs):
     return get_global_executor().submit(fn, *args, **kwargs)
 
+spawn = submit
+
 
 def wait(fut, timeout=None, loop=None):
     # Imports
@@ -77,4 +79,19 @@ def wait(fut, timeout=None, loop=None):
     return loop.run_until_complete(coro)
 
 
-spawn = submit
+def get_event_loop():
+    # Imports
+    try:
+        import asyncio
+    except ImportError:
+        import trollius as asyncio
+    # Get loop
+    loop = asyncio.get_event_loop()
+
+    def submit(fn, *args, **kwargs):
+        callback = lambda: fn(*args, **kwargs)
+        return loop.call_soon_threadsafe(callback)
+
+    # Patch loop
+    loop.submit = submit
+    return loop

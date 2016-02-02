@@ -45,6 +45,7 @@ from .tango_futures import wait as futures_wait
 from .tango_asyncio import get_global_executor as get_asyncio_executor
 from .tango_asyncio import submit as asyncio_submit
 from .tango_asyncio import wait as asyncio_wait
+from .tango_asyncio import get_event_loop as get_asyncio_event_loop
 
 
 # Handle current green mode
@@ -138,7 +139,10 @@ __wait_map = {
 
 
 __event_loop_map = {
+    GreenMode.Synchronous: (lambda: None),
+    GreenMode.Futures:     (lambda: None),
     GreenMode.Gevent:      get_gevent_event_loop,
+    GreenMode.Asyncio:     get_asyncio_event_loop,
 }
 
 
@@ -185,9 +189,7 @@ def result(ret, green_mode=None, wait=True, timeout=None):
 
 
 def get_event_loop(mode):
-    f = __event_loop_map.get(mode)
-    if f:
-        return f()
+    return __event_loop_map[mode]()
 
 
 # Get object submitter, waiter and green_mode
