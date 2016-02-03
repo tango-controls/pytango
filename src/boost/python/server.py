@@ -553,6 +553,8 @@ class Device(LatestDeviceImpl):
         if args is None:
             args = sys.argv[1:]
         args = [cls.__name__] + list(args)
+        green_mode = getattr(cls, 'green_mode', None)
+        kwargs.setdefault("green_mode", green_mode)
         return run((cls,), args, **kwargs)
 
 
@@ -1368,7 +1370,12 @@ def _create_asyncio_worker():
             """Execute the callable fn as fn(*args **kwargs)."""
             return self.submit(fn, *args, **kwargs).result()
 
-    return LoopExecutor()
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    return LoopExecutor(loop=loop)
 
 
 _CLEAN_UP_TEMPLATE = """
