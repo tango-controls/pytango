@@ -1314,27 +1314,17 @@ def _create_gevent_worker():
 
 
 def _create_asyncio_worker():
+    import concurrent.futures
+
     try:
         import asyncio
     except ImportError:
         import trollius as asyncio
-    import functools
-    import concurrent.futures
 
-    def connect_futures(aiofut, confut):
-        """Connect an asyncio future to a concurrent future."""
-        def _check_cancel_other(future):
-            if future.cancelled():
-                aiofut._loop.call_soon_threadsafe(aiofut.cancel)
-        _copy_state = asyncio.Future._copy_state.__get__(confut)
-        confut.add_done_callback(_check_cancel_other)
-        aiofut.add_done_callback(_copy_state)
-
-    def connect_async(coro, future, loop=None):
-        """Connect a coroutine to a future."""
-        loop = loop or asyncio.get_event_loop()
-        aiofut = asyncio.async(coro, loop=loop)
-        connect_futures(aiofut, future)
+    try:
+        from asyncio import run_coroutine_threadsafe
+    except ImportError:
+        from .asyncio_tools import run_coroutine_threadsafe
 
     class LoopExecutor(concurrent.futures.Executor):
         """An Executor subclass that uses an event loop
@@ -1347,16 +1337,17 @@ def _create_asyncio_worker():
         def submit(self, fn, *args, **kwargs):
             """Schedule the callable fn, to be executed as fn(*args **kwargs).
             Return a Future representing the execution of the callable."""
-            future = concurrent.futures.Future()
-            corofn = asyncio.coroutine(functools.partial(fn, *args, **kwargs))
-            self.loop.call_soon_threadsafe(connect_async, corofn(), future)
-            return future
+            corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
+            return run_coroutine_threadsafe(corofn(), loop)
 
         def run_in_thread(self, func, *args, **kwargs):
             """Schedule a blocking callback."""
             callback = lambda: func(*args, **kwargs)
             coro = self.loop.run_in_executor(None, callback)
-            self.loop.call_soon_threadsafe(asyncio.async, coro)
+            # That is not actually necessary since coro is actually
+            # a future. But it is an implementation detail and it
+            # might be changed later on.
+            asyncio.async(coro)
 
         def run(self, timeout=None):
             """Run the asyncio event loop."""
