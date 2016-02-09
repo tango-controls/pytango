@@ -213,7 +213,9 @@ def get_object_submitter(obj, green_mode=None):
         green_mode = get_object_green_mode(obj)
     # Get executor
     executors = getattr(obj, "_executors", {})
-    executor = executors.get(green_mode, get_executor(green_mode))
+    executor = executors.get(green_mode, None)
+    if executor is None:
+        executor = get_executor(green_mode)
     # Get submitter
     if green_mode == GreenMode.Gevent:
         return executor.spawn
@@ -237,7 +239,9 @@ def get_object_waiter(obj, green_mode=None):
     if green_mode == GreenMode.Asyncio:
         executors = getattr(obj, "_executors", {})
         executor = executors.get(GreenMode.Asyncio)
-        return partial(waiter, loop=executor.loop) if executor else waiter
+        if executor is None:
+            return waiter
+        return partial(waiter, loop=executor.loop)
     # Return waiter
     return waiter
 
@@ -269,13 +273,12 @@ def green(fn):
 
 def green_cb(fn, green_mode=None):
     """return a green verion of the given callback."""
+    event_loop = get_event_loop(green_mode)
+    if event_loop is None:
+        return fn
 
     @wraps(fn)
     def greener(*args, **kwargs):
-        event_loop = get_event_loop(green_mode)
-        if event_loop is None:
-            fn(*args, **kwargs)
-        else:
-            event_loop.submit(fn, *args, **kwargs)
+        event_loop.submit(fn, *args, **kwargs)
 
     return greener
