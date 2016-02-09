@@ -86,7 +86,15 @@ def get_event_loop():
     except ImportError:
         import trollius as asyncio
     # Get loop
-    loop = asyncio.get_event_loop()
+    global __event_loop
+    if __event_loop is not None:
+        return __event_loop
+    # Create loop
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
     def submit(fn, *args, **kwargs):
         callback = lambda: fn(*args, **kwargs)
@@ -94,4 +102,8 @@ def get_event_loop():
 
     # Patch loop
     loop.submit = submit
+    __event_loop = loop
     return loop
+
+
+__event_loop = None
