@@ -55,9 +55,10 @@ def get_global_executor():
     except ImportError:
         get_futures_executor = lambda: None
     # Set global
+    loop = get_event_loop()
     klass = __get_executor_class()
     subexecutor = get_futures_executor()
-    __global_executor = klass(subexecutor=subexecutor)
+    __global_executor = klass(loop, subexecutor)
     return __global_executor
 
 
