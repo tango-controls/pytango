@@ -1378,7 +1378,9 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
         def _object(self):
             return self._tango_object._object
 
+
     DeviceDispatcher.__name__ = tango_class_name
+    DeviceDispatcher.TangoClassName = tango_class_name
     DeviceDispatcherClass = DeviceDispatcher.TangoClassClass
 
     for name in dir(obj):
