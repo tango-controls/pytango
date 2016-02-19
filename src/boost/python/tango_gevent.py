@@ -53,7 +53,7 @@ def get_with_exception(g, block=True, timeout=None):
     result = g._get(block, timeout)
     if isinstance(result, ExceptionWrapper):
         # raise the exception using the caller context
-        raise result.error_string, None, result.tb
+        raise result.error_string(None, result.tb)
     else:
         return result
 
