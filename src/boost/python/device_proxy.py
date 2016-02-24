@@ -1186,6 +1186,9 @@ def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
     r = self.__read_pipe(pipe_name)
     return r.extract(extract_as)
 
+def __DeviceProxy__write_pipe(*args, **kwargs):
+    raise NotImplementedError
+
 def __DeviceProxy__read_attributes(self, *args, **kwargs):
     return self._read_attributes(*args, **kwargs)
 
@@ -1300,6 +1303,7 @@ def __init_DeviceProxy():
     DeviceProxy.write_attribute_reply = __DeviceProxy__write_attribute_reply
 
     DeviceProxy.read_pipe = green(__DeviceProxy__read_pipe)
+    DeviceProxy.write_pipe = green(__DeviceProxy__write_pipe)
 
     DeviceProxy.get_property = __DeviceProxy__get_property
     DeviceProxy.put_property = __DeviceProxy__put_property
