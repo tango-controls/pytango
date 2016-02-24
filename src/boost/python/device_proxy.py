@@ -1257,7 +1257,7 @@ def __init_DeviceProxy():
     DeviceProxy.write_attribute_asynch = __DeviceProxy__write_attribute_asynch
     DeviceProxy.write_attribute_reply = __DeviceProxy__write_attribute_reply
 
-    DeviceProxy.read_pipe = __DeviceProxy__read_pipe
+    DeviceProxy.read_pipe = green(__DeviceProxy__read_pipe)
 
     DeviceProxy.get_property = __DeviceProxy__get_property
     DeviceProxy.put_property = __DeviceProxy__put_property
