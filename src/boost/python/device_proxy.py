@@ -134,6 +134,9 @@ def __DeviceProxy__init__(self, *args, **kwargs):
     self.__dict__['_green_mode'] = kwargs.pop('green_mode', None)
     self.__dict__['_executors'] = executors = {}
     self.__dict__['_pending_unsubscribe'] = {}
+    self.__dict__['__cmd_cache'] = {}
+    self.__dict__['__attr_cache'] = ()
+    self.__dict__['__pipe_cache'] = ()
     executors[GreenMode.Futures] = kwargs.pop('executor', None)
     executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
     executors[GreenMode.Asyncio] = kwargs.pop('asyncio_executor', None)
@@ -184,6 +187,17 @@ def __DeviceProxy__refresh_attr_cache(self):
     attr_cache = [attr_name.lower() for attr_name in self.get_attribute_list()]
     self.__dict__['__attr_cache'] = attr_cache
 
+def __DeviceProxy__refresh_pipe_cache(self):
+    pipe_cache = [pipe_name.lower() for pipe_name in self.get_pipe_list()]
+    self.__dict__['__pipe_cache'] = pipe_cache
+
+def __get_command_func(dp, cmd_info, name):
+    _, doc = cmd_info
+    def f(*args, **kwds):
+        return dp.command_inout(name, *args, **kwds)
+    f.__doc__ = doc
+    return f
+
 def __DeviceProxy__getattr(self, name):
     # trait_names is a feature of IPython. Hopefully they will solve
     # ticket http://ipython.scipy.org/ipython/ipython/ticket/229 someday
@@ -192,35 +206,43 @@ def __DeviceProxy__getattr(self, name):
         raise AttributeError(name)
 
     name_l = name.lower()
-    cmd_info = None
-    if not hasattr(self, '__cmd_cache'):
-        try:
-            self.__refresh_cmd_cache()
-        except:
-            pass
+
+    cmd_info = self.__cmd_cache.get(name_l)
+    if cmd_info:
+        return __get_command_func(self, cmd_info, name)
+
+    if name_l in self.__attr_cache:
+        return self.read_attribute(name).value
+
+    if name_l in self.__pipe_cache:
+        return self.read_pipe(name)
+
     try:
-        cmd_info = self.__cmd_cache[name_l]
+        self.__refresh_cmd_cache()
     except:
         pass
 
-    if cmd_info is not None:
-        _, doc = cmd_info
-        def f(*args, **kwds):
-            return self.command_inout(name, *args, **kwds)
-        f.__doc__ = doc
-        return f
+    cmd_info = self.__cmd_cache.get(name_l)
+    if cmd_info:
+        return __get_command_func(self, cmd_info, name)
 
-    find_attr = True
-    if not hasattr(self, '__attr_cache') or name_l not in self.__attr_cache:
-        try:
-            self.__refresh_attr_cache()
-        except:
-            find_attr = False
+    try:
+        self.__refresh_attr_cache()
+    except:
+        pass
 
-    if not find_attr or name_l not in self.__attr_cache:
-        raise AttributeError(name)
+    if name_l in self.__attr_cache:
+        return self.read_attribute(name).value
 
-    return self.read_attribute(name).value
+    try:
+        self.__refresh_pipe_cache()
+    except Exception as e:
+        pass
+
+    if name_l in self.__pipe_cache:
+        return self.read_pipe(name)
+
+    raise AttributeError(name)
 
 def __DeviceProxy__setattr(self, name, value):
     try:
@@ -240,6 +262,7 @@ def __DeviceProxy__getAttributeNames(self):
     try:
         lst = [cmd.cmd_name for cmd in self.command_list_query()]
         lst += self.get_attribute_list()
+        lst += self.get_pipe_list()
         lst += list(map(str.lower, lst))
         lst.sort()
         return lst
@@ -1148,6 +1171,9 @@ def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
     r = self.__read_pipe(pipe_name)
     return r.extract(extract_as)
 
+def __DeviceProxy__write_pipe(*args, **kwargs):
+    raise NotImplementedError
+
 def __DeviceProxy__read_attributes(self, *args, **kwargs):
     return self._read_attributes(*args, **kwargs)
 
@@ -1241,6 +1267,7 @@ def __init_DeviceProxy():
 
     DeviceProxy.__refresh_cmd_cache = __DeviceProxy__refresh_cmd_cache
     DeviceProxy.__refresh_attr_cache = __DeviceProxy__refresh_attr_cache
+    DeviceProxy.__refresh_pipe_cache = __DeviceProxy__refresh_pipe_cache
 
     DeviceProxy.ping = green(__DeviceProxy__ping)
     DeviceProxy.state = green(__DeviceProxy__state)
@@ -1261,6 +1288,7 @@ def __init_DeviceProxy():
     DeviceProxy.write_attribute_reply = __DeviceProxy__write_attribute_reply
 
     DeviceProxy.read_pipe = green(__DeviceProxy__read_pipe)
+    DeviceProxy.write_pipe = green(__DeviceProxy__write_pipe)
 
     DeviceProxy.get_property = __DeviceProxy__get_property
     DeviceProxy.put_property = __DeviceProxy__put_property
