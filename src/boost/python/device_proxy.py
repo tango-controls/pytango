@@ -245,16 +245,31 @@ def __DeviceProxy__getattr(self, name):
     raise AttributeError(name)
 
 def __DeviceProxy__setattr(self, name, value):
-    try:
-        if not hasattr(self, '__attr_cache') or name.lower() not in self.__attr_cache:
-            self.__refresh_attr_cache()
-    except:
-        return super(DeviceProxy, self).__setattr__(name, value)
+    name_l = name.lower()
 
-    if name.lower() in self.__attr_cache:
-        self.write_attribute(name, value)
-    else:
-        return super(DeviceProxy, self).__setattr__(name, value)
+    if name_l in self.__attr_cache:
+        return self.write_attribute(name, value)
+
+    if name_l in self.__pipe_cache:
+        return self.write_pipe(name, value)
+
+    try:
+        self.__refresh_attr_cache()
+    except:
+        pass
+
+    if name_l in self.__attr_cache:
+        return self.write_attribute(name, value)
+
+    try:
+        self.__refresh_pipe_cache()
+    except:
+        pass
+
+    if name_l in self.__pipe_cache:
+        return self.write_pipe(name, value)
+
+    return super(DeviceProxy, self).__setattr__(name, value)
 
 
 def __DeviceProxy__getAttributeNames(self):
@@ -1172,7 +1187,7 @@ def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
     return r.extract(extract_as)
 
 def __DeviceProxy__write_pipe(*args, **kwargs):
-    raise NotImplementedError
+    raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
 
 def __DeviceProxy__read_attributes(self, *args, **kwargs):
     return self._read_attributes(*args, **kwargs)
