@@ -10,7 +10,7 @@ How to
 ======
 
 This is a small list of how-tos specific to PyTango. A more general Tango how-to
-list can be found `here <http://www.tango-controls.org/howtos>`_.
+list can be found `here <http://www.tango-controls.org/resources/howto>`_.
 
 
 Check the default TANGO host
@@ -292,7 +292,7 @@ Write a server
 Before reading this chapter you should be aware of the TANGO basic concepts.
 This chapter does not explain what a Tango device or a device server is.
 This is explained in details in the
-`Tango control system manual <http://www.tango-controls.org/TangoKernel>`_
+`Tango control system manual <http://www.tango-controls.org/resources/documentation/kernel/>`_
 
 Since version 8.1, PyTango provides a helper module which simplifies the 
 development of a Tango device server. This helper is provided through the
@@ -307,7 +307,7 @@ high level API
     import time
     from PyTango.server import run
     from PyTango.server import Device, DeviceMeta
-    from PyTango.server import attribute, command   
+    from PyTango.server import attribute, command, pipe
 
 
     class Clock(Device):
@@ -320,6 +320,13 @@ high level API
         @command(dtype_in=str, dtype_out=str)
         def strftime(self, format):
             return time.strftime(format)
+
+	@pipe
+	def info(self):
+            return ('Information',
+                    dict(manufacturer='Tango',
+	                 model='PS2000',
+                         version_number=123))
 
 
     if __name__ == "__main__":
@@ -349,7 +356,11 @@ high level API
     Tango command, it must be decorated as such with the
     :func:`~PyTango.server.command` decorator
 
-**line 20**
+**line 18-23**
+    definition of the *info* pipe. Check the :class:`~PyTango.server.pipe`
+    for the complete list of pipe options.
+
+**line 28**
     start the Tango run loop. The mandatory argument is a list of python classes
     that are to be exported as Tango classes. Check :func:`~PyTango.server.run`
     for the complete list of options

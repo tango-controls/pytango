@@ -626,7 +626,7 @@ def __UserDefaultAttrProp_set_enum_labels(self, enum_labels):
         Parameters :
             - enum_labels : (seq<str>) list of enumeration labels
 
-        New in PyTango 9.1.0
+        New in PyTango 9.2.0
     """
     elbls = StdStringVector()
     for enu in enum_labels:

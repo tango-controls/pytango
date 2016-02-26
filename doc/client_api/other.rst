@@ -42,6 +42,8 @@ Enumerations
 
 .. autoclass:: PyTango.AttrDataFormat
 
+.. autoclass:: PyTango.PipeWriteType
+
 .. autoclass:: PyTango.DevSource
 
 .. autoclass:: PyTango.ErrSeverity
