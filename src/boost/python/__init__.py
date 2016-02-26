@@ -193,11 +193,3 @@ from .tango_numpy import NumpyType, numpy_type, numpy_spectrum, numpy_image
 
 from .pytango_init import init as __init
 __init()
-
-
-def __leave():
-    _PyTango._leavefunc()
-
-import atexit
-atexit.register(__leave)
-
