@@ -977,6 +977,8 @@ class pipe(PipeData):
 
         super(pipe, self).__init__(name, class_name)
         self.build_from_dict(kwargs)
+        if self.pipe_write == PipeWriteType.PIPE_READ_WRITE:
+            raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
 
     def get_pipe(self, obj):
         dclass = obj.get_device_class()
@@ -998,12 +1000,9 @@ class pipe(PipeData):
         To be used as a decorator. Will define the decorated method
         as a write pipe method to be called when client writes to the pipe
         """
+        raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
         self.fset = fset
-        if self.attr_write == AttrWriteType.READ:
-            if getattr(self, 'fget', None):
-                self.attr_write = AttrWriteType.READ_WRITE
-            else:
-                self.attr_write = AttrWriteType.WRITE
+        self.pipe_write = PipeWriteType.PIPE_READ_WRITE
         return self
 
     def write(self, fset):
