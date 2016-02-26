@@ -197,12 +197,3 @@ from .pytango_init import init as __init
 __init()
 
 
-def __leave():
-    try:
-        _PyTango._leavefunc()
-    except:
-        pass
-
-#import atexit
-#atexit.register(__leave)
-
