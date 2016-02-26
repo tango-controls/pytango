@@ -234,12 +234,6 @@ int raise_asynch_exception(long thread_id, boost::python::object exp_klass)
     return PyThreadState_SetAsyncExc(thread_id, exp_klass.ptr());
 }
 
-void leave()
-{
-    AutoPythonAllowThreads guard;
-    Tango::leavefunc();
-}
-
 void export_base_types()
 {
     enum_<PyTango::ExtractAs>("ExtractAs")
@@ -434,6 +428,4 @@ void export_base_types()
     def("raise_asynch_exception", &raise_asynch_exception);
 
     def("_get_tango_lib_release", &Tango::_convert_tango_lib_release);
-
-    def("_leavefunc", &leave);
 }
