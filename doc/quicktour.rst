@@ -10,16 +10,20 @@ Fundamental TANGO concepts
 
 Before you begin there are some fundamental TANGO concepts you should be aware of.
 
-Tango consists basically of a set of **devices** running somewhere on the network.
+Tango consists basically of a set of *devices* running somewhere on the network.
 
 A device is identified by a unique case insensitive name in the format 
 *<domain>/<family>/<member>*. Examples: `LAB-01/PowerSupply/01`, 
 `ID21/OpticsHutch/energy`. 
 
-Each device has a series of *attributes*, *properties* and *commands*. 
+Each device has a series of *attributes*, *pipes*, *properties* and *commands*.
 
 An attribute is identified by a name in a device. It has a value that can 
-be read. Some attributes can also be changed (read-write attributes).
+be read. Some attributes can also be changed (read-write attributes). Each
+attribute has a well known, fixed data type.
+
+A pipe is a kind of attribute. Unlike attributes, the pipe data type is strucured
+(in the sence of C struct) and it is dynamic.
 
 A property is identified by a name in a device. Usually, devices properties are
 used to provide a way to configure a device. 
@@ -58,7 +62,7 @@ for you. You need to ask your facility/institute tango contact for the
 :envvar:`TANGO_HOST` variable where Tango system is running. 
 
 If you are working in an isolate machine you first need to make sure the Tango
-system is installed and running (`Tango howtos <http://www.tango-controls.org/howtos>`_).
+system is installed and running (see `tango how to <http://www.tango-controls.org/resources/howto>`_).
 
 Most examples here connect to a device called *sys/tg_test/1* that runs in a 
 TANGO server called *TangoTest* with the instance name *test*.
@@ -184,6 +188,10 @@ which will have attributes:
 * *voltage* (scalar, read-only, numeric)
 * *current* (scalar, read_write, numeric, expert mode) 
 * *noise* (2D, read-only, numeric)
+
+pipes:
+
+* *info* (read-only)
 
 commands:
 

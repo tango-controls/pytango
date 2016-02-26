@@ -13,6 +13,7 @@ High level server API
    * :class:`~PyTango.server.Device`
    * :class:`~PyTango.server.attribute`
    * :class:`~PyTango.server.command`
+   * :class:`~PyTango.server.pipe`
    * :class:`~PyTango.server.device_property`
    * :class:`~PyTango.server.class_property`
    * :func:`~PyTango.server.run`
@@ -283,6 +284,9 @@ dtype argument                            converts to tango type
  
  ``DevVarDoubleStringArray``               ``DevVarDoubleStringArray``
  ``'DevVarDoubleStringArray'``             ``DevVarDoubleStringArray``
+
+ ``DevPipeBlob``                           ``DevPipeBlob``
+ ``'DevPipeBlob'``                         ``DevPipeBlob``
 ========================================  ========================================
 
 .. autoclass:: Device
@@ -293,6 +297,8 @@ dtype argument                            converts to tango type
 .. autoclass:: attribute
 
 .. autofunction:: command
+
+.. autoclass:: pipe
 
 .. autoclass:: device_property
 

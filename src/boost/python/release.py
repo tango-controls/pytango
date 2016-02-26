@@ -40,7 +40,7 @@ class Release:
             - keywords : (seq<str>) list of keywords
             - license : (str) the license"""
     name = 'PyTango'
-    version_info = (9, 2, 0, 'dev', 0)
+    version_info = (9, 2, 0, 'a', 1)
     version = '.'.join(map(str, version_info[:3]))
     version_long = version + ''.join(map(str, version_info[3:]))
     version_description = 'This version implements the C++ Tango 9.2 API.'
@@ -51,7 +51,7 @@ class Release:
     license = 'LGPL'
     authors = { 'Coutinho' : ('Tiago Coutinho' , 'coutinho@esrf.fr') }
     author_lines = "\n".join([ "%s <%s>" % x for x in authors.values()])
-    url = 'http://www.tinyurl.com/PyTango/'
+    url = 'http://www.esrf.fr/computing/cs/tango/pytango/'
     download_url = 'http://pypi.python.org/pypi/PyTango'
     platform = ['Linux', 'Windows XP/Vista/7/8']
     keywords = ['Tango', 'CORBA', 'binding']

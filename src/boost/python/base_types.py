@@ -358,6 +358,7 @@ def __doc_base_types():
         - DevInt
         - DevEncoded
         - DevEnum
+        - DevPipeBlob
     """ )
 
     document_enum("LockerLanguage", """
@@ -541,7 +542,14 @@ def __doc_base_types():
         - IMAGE
         - FMT_UNKNOWN
     """ )
+
+    document_enum("PipeWriteType", """
+    An enumeration representing the pipe type
     
+        - PIPE_READ
+        - PIPE_READ_WRITE
+    """ )
+
     document_enum("DevSource", """
     An enumeration representing the device source for data
     
