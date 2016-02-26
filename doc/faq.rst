@@ -5,9 +5,10 @@
 FAQ
 ===
 
-Answers to general Tango questions can be found at http://www.tango-controls.org/tutorials
+Answers to general Tango questions can be found in the
+`general tango tutorial <http://www.tango-controls.org/resources/tutorials>`_.
 
-Please also check http://www.tango-controls.org/howtos for a list of Tango howtos
+Please also check the `general tango how to <http://www.tango-controls.org/resources/howto>`_.
 
 **Where are the usual bjam files?**
 

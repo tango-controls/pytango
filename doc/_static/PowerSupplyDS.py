@@ -7,7 +7,7 @@ import time
 import numpy
 
 from PyTango import AttrQuality, AttrWriteType, DispLevel, DevState, DebugIt
-from PyTango.server import Device, DeviceMeta, attribute, command, run
+from PyTango.server import Device, DeviceMeta, attribute, command, pipe, run
 from PyTango.server import device_property
 
 
@@ -35,6 +35,8 @@ class PowerSupply(Device):
                       dtype=((int,),),
                       max_dim_x=1024, max_dim_y=1024)
 
+    info = pipe(label='Info')
+
     host = device_property(dtype=str)
     port = device_property(dtype=int, default_value=9788)
     
@@ -53,6 +55,11 @@ class PowerSupply(Device):
     def set_current(self, current):
         # should set the power supply current
         self.__current = current
+
+    def read_info(self):
+        return 'Information', dict(manufacturer='Tango',
+                                   model='PS2000',
+                                   version_number=123)
 
     @DebugIt()
     def read_noise(self):

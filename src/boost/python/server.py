@@ -876,9 +876,14 @@ class attribute(AttrData):
 class pipe(PipeData):
     '''
     Declares a new tango pipe in a :class:`Device`. To be used
-    like the python native :obj:`property` function. For example, to
-    declare a read-only pipe called *ROI* (for Region Of Interest), in a 
-    *Detector* :class:`Device` do::
+    like the python native :obj:`property` function.
+
+    Checkout the :ref:`pipe data types <pytango-pipe-data-types>`
+    to see what you should return on a pipe read request and what
+    to expect as argument on a pipe write request.
+
+    For example, to declare a read-only pipe called *ROI*
+    (for Region Of Interest), in a *Detector* :class:`Device` do::
 
         class Detector(Device):
             __metaclass__ = DeviceMeta
@@ -886,16 +891,20 @@ class pipe(PipeData):
             ROI = pipe()
 
             def read_ROI(self):
-                return dict(x=0, y=10, width=100, height=200)
+                return ('ROI', ({'name': 'x', 'value': 0},
+                                {'name': 'y', 'value': 10},
+                                {'name': 'width', 'value': 100},
+                                {'name': 'height', 'value': 200}))
 
-    The same can be achieved with::
+    The same can be achieved with (also showing that a dict can be used
+    to pass blob data)::
 
         class Detector(Device):
             __metaclass__ = DeviceMeta
 
             @pipe
             def ROI(self):
-                return dict(x=0, y=10, width=100, height=200)
+                return 'ROI', dict(x=0, y=10, width=100, height=200)
 
 
     It receives multiple keyword arguments.
@@ -916,7 +925,7 @@ class pipe(PipeData):
     write_green_mode       :obj:`~PyTango.GreenMode`        None                                    green mode for write. None means use server green mode.
     ===================== ================================ ======================================= =======================================================================================
 
-    The same example with a read-write ROI, a customized label and description and::
+    The same example with a read-write ROI, a customized label and description::
 
         class Detector(Device):
             __metaclass__ = DeviceMeta
@@ -926,13 +935,13 @@ class pipe(PipeData):
 
             def init_device(self):
                 Device.init_device(self)
-                self.__roi = dict(x=0, y=10, width=100, height=200)
+                self.__roi = 'ROI', dict(x=0, y=10, width=100, height=200)
 
             def read_ROI(self):
                 return self.__roi
 
             def write_ROI(self, roi):
-                self.__roi = dict(roi)
+                self.__roi = roi
 
 
     The same, but using pipe as a decorator::
@@ -942,7 +951,7 @@ class pipe(PipeData):
 
             def init_device(self):
                 Device.init_device(self)
-                self.__roi = dict(x=0, y=10, width=100, height=200)
+                self.__roi = 'ROI', dict(x=0, y=10, width=100, height=200)
 
             @pipe(label="Region Of Interest")
             def ROI(self):
@@ -951,12 +960,12 @@ class pipe(PipeData):
 
             @ROI.write
             def ROI(self, roi):
-                self.__roi = dict(roi)
+                self.__roi = roi
 
     In this second format, defining the `write` / `setter` implicitly sets 
     the pipe access to READ_WRITE.
 
-    .. versionadded:: 9.1.0
+    .. versionadded:: 9.2.0
     '''
 
     def __init__(self, fget=None, **kwargs):
