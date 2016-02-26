@@ -1187,7 +1187,7 @@ def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
     return r.extract(extract_as)
 
 def __DeviceProxy__write_pipe(*args, **kwargs):
-    raise NotImplementedError
+    raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
 
 def __DeviceProxy__read_attributes(self, *args, **kwargs):
     return self._read_attributes(*args, **kwargs)
