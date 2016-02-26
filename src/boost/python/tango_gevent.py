@@ -13,6 +13,8 @@ from __future__ import absolute_import
 import sys
 import types
 
+from . import six
+
 __all__ = ["get_global_threadpool", "get_global_executor",
            "get_event_loop", "submit", "spawn"]
 
@@ -53,7 +55,7 @@ def get_with_exception(g, block=True, timeout=None):
     result = g._get(block, timeout)
     if isinstance(result, ExceptionWrapper):
         # raise the exception using the caller context
-        raise result.error_string(None, result.tb)
+        six.reraise(result.exception, result.error_string,result.tb)
     else:
         return result
 
