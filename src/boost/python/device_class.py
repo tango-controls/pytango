@@ -667,6 +667,7 @@ def __init_DeviceClass():
     DeviceClass.device_property_list = {}
     DeviceClass.cmd_list = {}
     DeviceClass.attr_list = {}
+    DeviceClass.pipe_list = {}
     DeviceClass.__init_orig__ = DeviceClass.__init__
     DeviceClass.__init__ = __DeviceClass__init__
     DeviceClass.__str__ = __DeviceClass__str__
