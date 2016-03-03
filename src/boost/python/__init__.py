@@ -70,7 +70,7 @@ __all__ = [ 'AccessControlType', 'ApiUtil', 'ArchiveEventInfo',
 'get_cpp_classes', 'is_array_type', 'is_float_type',
 'is_int_type', 'is_numerical_type', 'is_scalar_type', 'numpy_image',
 'numpy_spectrum', 'numpy_type', 'obj_2_str', 'raise_asynch_exception',
-'seqStr_2_obj']
+'seqStr_2_obj', 'AutoTangoMonitor', 'AutoTangoAllowThreads']
 
 __docformat__ = "restructuredtext"
 
@@ -155,7 +155,8 @@ from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     StdNamedDevFailedVector, StdStringVector, SubDevDiag, TimeVal,
     UserDefaultAttrProp, WAttribute, WRITE, WrongData, WrongNameSyntax,
     alarm_flags, asyn_req_type, cb_sub_model, constants,
-    raise_asynch_exception, Interceptors)
+    raise_asynch_exception, Interceptors, 
+    AutoTangoMonitor, AutoTangoAllowThreads)
 
 ArgType = CmdArgType
 

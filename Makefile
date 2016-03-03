@@ -203,7 +203,8 @@ $(OBJS_DIR)/multi_class_attribute.o \
 $(OBJS_DIR)/subdev.o \
 $(OBJS_DIR)/tango_util.o \
 $(OBJS_DIR)/user_default_attr_prop.o \
-$(OBJS_DIR)/wattribute.o
+$(OBJS_DIR)/wattribute.o \
+$(OBJS_DIR)/auto_monitor.o
 
 INC := callback.h \
 defs.h \
