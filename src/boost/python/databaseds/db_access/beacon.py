@@ -15,7 +15,7 @@ th_exc = PyTango.Except.throw_exception
 
 from ..db_errors import *
 
-from beacon import static,settings
+from bliss.config import static,settings
 import itertools
 
 if logging.getLogger().isEnabledFor(logging.INFO):
