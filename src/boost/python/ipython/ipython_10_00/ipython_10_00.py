@@ -27,7 +27,10 @@ from IPython.core.error import UsageError
 from IPython.utils.ipstruct import Struct
 from IPython.core.page import page
 from IPython.core.interactiveshell import InteractiveShell
-from IPython.config.application import Application
+try:  # IPython 4.x
+    from traitlets.config.application import Application
+except: # IPython < 4.x
+    from IPython.config.application import Application
 from IPython.terminal.ipapp import launch_new_instance
 
 import PyTango
