@@ -343,6 +343,9 @@ def setup_args():
                 boost_library_name += pyver
             elif 'gentoo' in dist_name:
                 boost_library_name += "-" + ".".join(map(str, py_ver[:2]))
+            elif 'fedora' in dist_name or 'centos' in dist_name:
+                if int(py_ver[0]) == 3:
+                    boost_library_name += '3'
     else:
         inc_dir = os.path.join(BOOST_ROOT, 'include')
         lib_dirs = [os.path.join(BOOST_ROOT, 'lib')]
