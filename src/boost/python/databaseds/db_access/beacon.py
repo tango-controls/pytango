@@ -148,8 +148,7 @@ class beacon(object):
             
         server_node = self._personal_2_node.get(server_name)
         if server_node is None:
-            root = self._config.root
-            server_node = root.add_node('tango',filename = server_name.replace('/','-'))
+            server_node = static.Node(self._config,filename = 'tango/%s.yml' % server_name.replace('/','_'))
             server_node['server'],server_node['personal_name'] = server_name.split('/')
             self._personal_2_node[server_name] = server_node
 
@@ -533,8 +532,9 @@ class beacon(object):
 
     @_info
     def get_device_list(self,server_name, class_name ):
-        result = []
         server_node = self._personal_2_node.get(server_name)
+        if server_node is None:
+            return []
         device_list = server_node.get('device')
         m = re.compile(class_name.replace('*','.*'))
         if isinstance(device_list,list) :
