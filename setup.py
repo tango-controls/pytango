@@ -121,31 +121,10 @@ def has_numpy(with_src=True):
 
 
 def get_script_files():
-
-    FILTER_OUT = []  # "winpostinstall.py",
-
-    if os.name != "nt":
-        FILTER_OUT.append("pytango_winpostinstall.py")
-
-    scripts_dir = abspath("scripts")
-    scripts = []
-    items = os.listdir(scripts_dir)
-    for item in items:
-        # avoid hidden files
-        if item.startswith("."):
-            continue
-        abs_item = os.path.join(scripts_dir, item)
-        # avoid non files
-        if not os.path.isfile(abs_item):
-            continue
-        if item.endswith('c') and item[:-1] in items:
-            continue
-        # avoid any core dump... of course there isn't any :-) but just in case
-        if item.startswith('core'):
-            continue
-        if item in FILTER_OUT:
-            continue
-        scripts.append('scripts/' + item)
+    major = platform.python_version_tuple()[0]
+    scripts = ['scripts/itango3' if major == 3 else 'scripts/itango']
+    if os.name == "nt":
+        scripts.append("scripts/pytango_winpostinstall.py")
     return scripts
 
 
@@ -171,7 +150,7 @@ def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None)
             if os.path.isdir(lib64_dir):
                 lib_dirs.insert(0, lib64_dir)
         dirs['library_dirs'].extend(lib_dirs)
-        
+
         if lib_name.startswith('lib'):
             lib_name = lib_name[3:]
         dirs['libraries'].append(lib_name)
