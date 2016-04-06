@@ -121,7 +121,7 @@ def has_numpy(with_src=True):
 
 
 def get_script_files():
-    major = platform.python_version_tuple()[0]
+    major = int(platform.python_version_tuple()[0])
     scripts = ['scripts/itango3' if major == 3 else 'scripts/itango']
     if os.name == "nt":
         scripts.append("scripts/pytango_winpostinstall.py")
