@@ -23,14 +23,14 @@ class AutoTangoMonitor
   Tango::DeviceClass                *klass;
 
 public:
-  AutoTangoMonitor(Tango::DeviceImpl *dev)
+  AutoTangoMonitor(Tango::DeviceImpl *di)
   {
-    this.dev = dev;
+    dev = di;
   }
 
-  AutoTangoMonitor(Tango::DeviceClass *klass)
+  AutoTangoMonitor(Tango::DeviceClass *dc)
   {
-    this.klass = klass;
+    klass = dc;
   }
 
   void acquire()
@@ -55,6 +55,7 @@ public:
     if (mon != NULL)
     {
       delete mon;
+      mon = NULL;
     }
   }
 

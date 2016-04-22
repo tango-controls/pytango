@@ -21,7 +21,7 @@ from ._PyTango import AutoTangoMonitor, AutoTangoAllowThreads
 
 
 def __AutoTangoMonitor__enter__(self):
-    self._acquire
+    self._acquire()
     return self
 
 
