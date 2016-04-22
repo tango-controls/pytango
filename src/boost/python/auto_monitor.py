@@ -17,13 +17,13 @@ __all__ = ["auto_monitor_init"]
 
 __docformat__ = "restructuredtext"
 
-import copy
-
-from .utils import document_method as __document_method
 from ._PyTango import AutoTangoMonitor, AutoTangoAllowThreads
 
+
 def __AutoTangoMonitor__enter__(self):
+    self._acquire
     return self
+
 
 def __AutoTangoMonitor__exit__(self, *args, **kwargs):
     self._release()
@@ -33,9 +33,10 @@ def __init_AutoTangoMonitor():
     AutoTangoMonitor.__enter__ = __AutoTangoMonitor__enter__
     AutoTangoMonitor.__exit__ = __AutoTangoMonitor__exit__
 
+
 def __doc_AutoTangoMonitor():
     AutoTangoMonitor.__doc__ = """\
-    
+
     In a tango server, guard the tango monitor within a python context::
 
         with AutoTangoMonitor(dev):
@@ -43,8 +44,10 @@ def __doc_AutoTangoMonitor():
             do something
     """
 
+
 def __AutoTangoAllowThreads__enter__(self):
     return self
+
 
 def __AutoTangoAllowThreads__exit__(self, *args, **kwargs):
     self._acquire()
@@ -54,15 +57,17 @@ def __init_AutoTangoAllowThreads():
     AutoTangoAllowThreads.__enter__ = __AutoTangoAllowThreads__enter__
     AutoTangoAllowThreads.__exit__ = __AutoTangoAllowThreads__exit__
 
+
 def __doc_AutoTangoAllowThreads():
     AutoTangoAllowThreads.__doc__ = """\
-    
+
     In a tango server, free the tango monitor within a context:
 
         with AutoTangoAllowThreads(dev):
             # code here is not under the tango device monitor
             do something
     """
+
 
 def auto_monitor_init(doc=True):
     __init_AutoTangoMonitor()

@@ -18,21 +18,50 @@ namespace PyTango
 
 class AutoTangoMonitor
 {
-  Tango::AutoTangoMonitor           *mon;  
+  Tango::AutoTangoMonitor           *mon;
+  Tango::DeviceImpl                 *dev;
+  Tango::DeviceClass                *klass;
 
 public:
   AutoTangoMonitor(Tango::DeviceImpl *dev)
-  { mon = new Tango::AutoTangoMonitor(dev); }
+  {
+    this.dev = dev;
+  }
 
   AutoTangoMonitor(Tango::DeviceClass *klass)
-  { mon = new Tango::AutoTangoMonitor(klass); }
+  {
+    this.klass = klass;
+  }
+
+  void acquire()
+  {
+    if (mon == NULL)
+    {
+      if (dev != NULL)
+      {
+	AutoPythonAllowThreads no_gil;
+        mon = new Tango::AutoTangoMonitor(dev);
+      }
+      else if (klass != NULL)
+      {
+	AutoPythonAllowThreads no_gil;
+        mon = new Tango::AutoTangoMonitor(klass);
+      }
+    }
+  }
 
   void release()
   {
-    delete mon;
+    if (mon != NULL)
+    {
+      delete mon;
+    }
   }
 
-  ~AutoTangoMonitor() { release(); }
+  ~AutoTangoMonitor()
+  {
+    release();
+  }
 
 };
 
@@ -109,13 +138,12 @@ void export_auto_tango_monitor()
   bopy::class_<PyTango::AutoTangoMonitor, boost::noncopyable>(
     "AutoTangoMonitor", bopy::init<Tango::DeviceImpl*>())
     .def(bopy::init<Tango::DeviceClass*>())
+    .def("_acquire", &PyTango::AutoTangoMonitor::acquire)
     .def("_release", &PyTango::AutoTangoMonitor::release)
   ;
 
   bopy::class_<PyTango::AutoTangoAllowThreads, boost::noncopyable>(
     "AutoTangoAllowThreads", bopy::init<Tango::DeviceImpl*>())
-    
     .def("_acquire", &PyTango::AutoTangoAllowThreads::acquire);
   ;
 }
-
