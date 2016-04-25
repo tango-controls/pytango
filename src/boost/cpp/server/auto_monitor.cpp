@@ -23,30 +23,31 @@ class AutoTangoMonitor
   Tango::DeviceClass                *klass;
 
 public:
-  AutoTangoMonitor(Tango::DeviceImpl *di)
+  AutoTangoMonitor(Tango::DeviceImpl *dev_arg) : mon(), dev(), klass()
   {
-    dev = di;
+    dev = dev_arg;
   }
 
-  AutoTangoMonitor(Tango::DeviceClass *dc)
+  AutoTangoMonitor(Tango::DeviceClass *klass_arg) : mon(), dev(), klass()
   {
-    klass = dc;
+    klass = klass_arg;
   }
 
   void acquire()
   {
-    if (mon == NULL)
+    if (mon != NULL)
     {
-      if (dev != NULL)
-      {
-	AutoPythonAllowThreads no_gil;
-        mon = new Tango::AutoTangoMonitor(dev);
-      }
-      else if (klass != NULL)
-      {
-	AutoPythonAllowThreads no_gil;
-        mon = new Tango::AutoTangoMonitor(klass);
-      }
+      return;
+    }
+    if (dev != NULL)
+    {
+      AutoPythonAllowThreads no_gil;
+      mon = new Tango::AutoTangoMonitor(dev);
+    }
+    else if (klass != NULL)
+    {
+      AutoPythonAllowThreads no_gil;
+      mon = new Tango::AutoTangoMonitor(klass);
     }
   }
 
