@@ -128,13 +128,34 @@ def __check_read_pipe(dev_pipe):
         raise DevFailed(*dev_pipe.get_err_stack())
     return dev_pipe
 
+def __DeviceProxy__get_cmd_cache(self):
+    try:
+        ret = self.__dict__['__cmd_cache']
+    except KeyError:
+        self.__dict__['__cmd_cache'] = ret = {}
+    return ret
+
+def __DeviceProxy__get_attr_cache(self):
+    try:
+        ret = self.__dict__['__attr_cache']
+    except KeyError:
+        self.__dict__['__attr_cache'] = ret = ()
+    return ret
+
+def __DeviceProxy__get_pipe_cache(self):
+    try:
+        ret = self.__dict__['__pipe_cache']
+    except KeyError:
+        self.__dict__['__pipe_cache'] = ret = ()
+    return ret
+
 def __DeviceProxy__init__(self, *args, **kwargs):
     self.__dict__['_green_mode'] = kwargs.pop('green_mode', None)
     self.__dict__['_executors'] = executors = {}
     self.__dict__['_pending_unsubscribe'] = {}
-    self.__dict__['__cmd_cache'] = {}
-    self.__dict__['__attr_cache'] = ()
-    self.__dict__['__pipe_cache'] = ()
+#    self.__dict__['__cmd_cache'] = {}
+#    self.__dict__['__attr_cache'] = ()
+#    self.__dict__['__pipe_cache'] = ()
     executors[GreenMode.Futures] = kwargs.pop('executor', None)
     executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
     return DeviceProxy.__init_orig__(self, *args, **kwargs)
@@ -204,14 +225,14 @@ def __DeviceProxy__getattr(self, name):
 
     name_l = name.lower()
 
-    cmd_info = self.__cmd_cache.get(name_l)
+    cmd_info = self.__get_cmd_cache().get(name_l)
     if cmd_info:
         return __get_command_func(self, cmd_info, name)
 
-    if name_l in self.__attr_cache:
+    if name_l in self.__get_attr_cache():
         return self.read_attribute(name).value
 
-    if name_l in self.__pipe_cache:
+    if name_l in self.__get_pipe_cache():
         return self.read_pipe(name)
 
     try:
@@ -219,7 +240,7 @@ def __DeviceProxy__getattr(self, name):
     except:
         pass
 
-    cmd_info = self.__cmd_cache.get(name_l)
+    cmd_info = self.__get_cmd_cache().get(name_l)
     if cmd_info:
         return __get_command_func(self, cmd_info, name)
 
@@ -228,7 +249,7 @@ def __DeviceProxy__getattr(self, name):
     except:
         pass
 
-    if name_l in self.__attr_cache:
+    if name_l in self.__get_attr_cache():
         return self.read_attribute(name).value
 
     try:
@@ -236,7 +257,7 @@ def __DeviceProxy__getattr(self, name):
     except Exception as e:
         pass
 
-    if name_l in self.__pipe_cache:
+    if name_l in self.__get_pipe_cache():
         return self.read_pipe(name)
 
     raise AttributeError(name)
@@ -244,10 +265,10 @@ def __DeviceProxy__getattr(self, name):
 def __DeviceProxy__setattr(self, name, value):
     name_l = name.lower()
 
-    if name_l in self.__attr_cache:
+    if name_l in self.__get_attr_cache():
         return self.write_attribute(name, value)
 
-    if name_l in self.__pipe_cache:
+    if name_l in self.__get_pipe_cache():
         return self.write_pipe(name, value)
 
     try:
@@ -255,7 +276,7 @@ def __DeviceProxy__setattr(self, name, value):
     except:
         pass
 
-    if name_l in self.__attr_cache:
+    if name_l in self.__get_attr_cache():
         return self.write_attribute(name, value)
 
     try:
@@ -263,7 +284,7 @@ def __DeviceProxy__setattr(self, name, value):
     except:
         pass
 
-    if name_l in self.__pipe_cache:
+    if name_l in self.__get_pipe_cache():
         return self.write_pipe(name, value)
 
     return super(DeviceProxy, self).__setattr__(name, value)
@@ -1277,6 +1298,9 @@ def __init_DeviceProxy():
 
     DeviceProxy._getAttributeNames = __DeviceProxy__getAttributeNames
 
+    DeviceProxy.__get_cmd_cache = __DeviceProxy__get_cmd_cache
+    DeviceProxy.__get_attr_cache = __DeviceProxy__get_attr_cache
+    DeviceProxy.__get_pipe_cache = __DeviceProxy__get_pipe_cache
     DeviceProxy.__refresh_cmd_cache = __DeviceProxy__refresh_cmd_cache
     DeviceProxy.__refresh_attr_cache = __DeviceProxy__refresh_attr_cache
     DeviceProxy.__refresh_pipe_cache = __DeviceProxy__refresh_pipe_cache
