@@ -18,6 +18,8 @@ This is an experimental module. Not part of the official API.
 import weakref
 import functools
 
+import six
+
 import PyTango
 from PyTango import DeviceProxy as Device
 from PyTango import CmdArgType
@@ -189,7 +191,10 @@ class Object(object):
         self.__dict__["_helper"] = helper
 
     def __getattr__(self, name):
-        r = self._helper.get(name)
+        try:
+            r = self._helper.get(name)
+        except KeyError as ke:
+            six.raise_from(AttributeError('Unknown {0}'.format(name)), ke)
         if isinstance(r, PyTango.CommandInfo):
             self.__dict__[name] = r.func
             return r.func
@@ -198,8 +203,8 @@ class Object(object):
     def __setattr__(self, name, value):
         try:
             return self._helper.set(name, value)
-        except KeyError:
-            object.__setattr__(self, name, value)
+        except KeyError as ke:
+            six.raise_from(AttributeError('Unknown {0}'.format(name)), ke)
 
     def __str__(self):
         return str(self._helper)
