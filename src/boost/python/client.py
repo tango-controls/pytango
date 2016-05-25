@@ -169,6 +169,16 @@ class _DeviceHelper(object):
         except PyTango.DevFailed:
             return None
 
+    def __getitem__(self, name):
+        if self.get_attr_info(name) is None:
+            raise KeyError("Unknown attribute %s" % name)
+        return self.device[name]
+
+    def __setitem__(self, name, value):
+        if self.get_attr_info(name) is None:
+            raise KeyError("Unknown attribute %s" % name)
+        self.device[name] = value
+
     def __str__(self):
         return self.dstr()
 
@@ -205,6 +215,12 @@ class Object(object):
             return self._helper.set(name, value)
         except KeyError as ke:
             six.raise_from(AttributeError('Unknown {0}'.format(name)), ke)
+
+    def __getitem__(self, name):
+        return self._helper[name]
+
+    def __setitem__(self, name, value):
+        self._helper[name] = value
 
     def __str__(self):
         return str(self._helper)
