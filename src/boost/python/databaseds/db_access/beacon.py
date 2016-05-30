@@ -74,6 +74,7 @@ class beacon(object):
         #Tango indexing
         self._personal_2_node = weakref.WeakValueDictionary()
         self._tango_name_2_node = weakref.WeakValueDictionary()
+        self._class_name_2_node = weakref.WeakValueDictionary()
 
         for key,values in self._config.root.iteritems():
             indexing_flag = key == 'tango'
@@ -104,6 +105,10 @@ class beacon(object):
                 self._parse_list(v,indexing_flag)
 
     def _index_tango(self,v) :
+        klass = v.get('class')
+        if klass is not None:
+            self._class_name_2_node[klass] = v
+
         personal_name = v.get('personal_name')
         if personal_name is not None :
             server = v.get('server')
@@ -184,13 +189,15 @@ class beacon(object):
         del class_attribute[prop_name]
 
     def _get_class_properties(self,klass_name,prop_name):
-        key_name = 'tango.class.properties.%s.%s' % (klass_name,prop_name)
-        return settings.QueueSetting(key_name)
+        #key_name = 'tango.class.properties.%s.%s' % (klass_name,prop_name)
+        #return settings.QueueSetting(key_name)
+        return self._class_name_2_node.get(klass_name,dict()).get('properties',dict()).get(prop_name,'')
 
     @_info
     def delete_class_property(self, klass_name, prop_name):
-        class_property = self._get_class_properties(klass_name,prop_name)
-        class_property.clear()
+        #class_property = self._get_class_properties(klass_name,prop_name)
+        #class_property.clear()
+        pass
 
     def _get_property_attr_device(self,dev_name) :
         key_name = 'tango.%s' % dev_name.lower().replace('/','.')
@@ -390,8 +397,14 @@ class beacon(object):
     def get_class_property(self, class_name, properties):
         result = [class_name,str(len(properties))]
         for prop_name in properties:
-            class_properties = list(self._get_class_properties(class_name,prop_name))
-            result.extend([prop_name,str(len(class_properties))] + class_properties)
+            properties_array = []
+            values = self._get_class_properties(class_name,prop_name)
+            if isinstance(values,list):
+                values = [str(x) for x in values]
+                properties_array.extend([prop_name,str(len(values))] + values)
+            else:
+                properties_array.extend([prop_name,'1',str(values)])
+            result.extend(properties_array)
         return result
         
     @_info
@@ -400,8 +413,10 @@ class beacon(object):
         
     @_info
     def get_class_property_list(self, class_name):
-        cache = settings.get_cache()
-        return cache.keys('tango.class.properties.%s*' % class_name)
+        properties = self._class_name_2_node.get(class_name).get("properties", dict())
+        return [k for k,v in properties.iteritems() if not isinstance(v,dict)]
+        #cache = settings.get_cache()
+        #return cache.keys('tango.class.properties.%s*' % class_name)
 
     @_info
     def get_device_alias(self, dev_name):
