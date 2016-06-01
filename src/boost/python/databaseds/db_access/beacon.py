@@ -517,17 +517,21 @@ class beacon(object):
 
     @_info
     def get_device_list(self,server_name, class_name ):
-        server_node = self._personal_2_node.get(server_name)
-        if server_node is None:
-            return []
-        device_list = server_node.get('device')
-        m = re.compile(class_name.replace('*','.*'))
-        if isinstance(device_list,list) :
-            return [x.get('tango_name') for x in device_list if m.match(x.get('class',''))]
-        elif isinstance(device_list,dict) and m.match(device_list.get('class','')) :
-            return [device_list.get('tango_name')]
+        if server_name == '*':
+            server_nodes = self._personal_2_node.values()
         else:
+            server_nodes = filter(None,[self._personal_2_node.get(server_name)])
+        if not server_nodes:
             return []
+        ret = list()
+        for server_node in server_nodes:
+            device_list = server_node.get('device')
+            m = re.compile(class_name.replace('*','.*'))
+            if isinstance(device_list,list) :
+                ret.extend([x.get('tango_name') for x in device_list if m.match(x.get('class',''))])
+            elif isinstance(device_list,dict) and m.match(device_list.get('class','')) :
+                ret.append(device_list.get('tango_name'))
+        return ret
     
     @_info
     def get_device_wide_list(self, wildcard):
