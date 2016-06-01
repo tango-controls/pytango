@@ -455,6 +455,7 @@ class beacon(object):
                               [str(x) for p in prop_attr.iteritems() for x in p])
         return result  
 
+    @_info
     def get_device_attribute_property2(self, dev_name, attributes):
         prop_attr_device_handler = self._get_property_attr_device(dev_name)
         result = [dev_name, str(len(attributes))]
@@ -465,7 +466,7 @@ class beacon(object):
                 result.extend((attr_name,'0'))
             else:
                 result.extend((attr_name,str(len(prop_attr))))
-                for name,values in prop_attr:
+                for name,values in prop_attr.iteritems():
                     if isinstance(values,list):
                         result.extend([name,len(values)] + [str(x) for x in values])
                     else:
