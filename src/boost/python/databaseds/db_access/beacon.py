@@ -455,6 +455,7 @@ class beacon(object):
                               [str(x) for p in prop_attr.iteritems() for x in p])
         return result  
 
+    @_info
     def get_device_attribute_property2(self, dev_name, attributes):
         prop_attr_device_handler = self._get_property_attr_device(dev_name)
         result = [dev_name, str(len(attributes))]
@@ -465,7 +466,7 @@ class beacon(object):
                 result.extend((attr_name,'0'))
             else:
                 result.extend((attr_name,str(len(prop_attr))))
-                for name,values in prop_attr:
+                for name,values in prop_attr.iteritems():
                     if isinstance(values,list):
                         result.extend([name,len(values)] + [str(x) for x in values])
                     else:
@@ -532,17 +533,21 @@ class beacon(object):
 
     @_info
     def get_device_list(self,server_name, class_name ):
-        server_node = self._personal_2_node.get(server_name)
-        if server_node is None:
-            return []
-        device_list = server_node.get('device')
-        m = re.compile(class_name.replace('*','.*'))
-        if isinstance(device_list,list) :
-            return [x.get('tango_name') for x in device_list if m.match(x.get('class',''))]
-        elif isinstance(device_list,dict) and m.match(device_list.get('class','')) :
-            return [device_list.get('tango_name')]
+        if server_name == '*':
+            server_nodes = self._personal_2_node.values()
         else:
+            server_nodes = filter(None,[self._personal_2_node.get(server_name)])
+        if not server_nodes:
             return []
+        ret = list()
+        for server_node in server_nodes:
+            device_list = server_node.get('device')
+            m = re.compile(class_name.replace('*','.*'))
+            if isinstance(device_list,list) :
+                ret.extend([x.get('tango_name') for x in device_list if m.match(x.get('class',''))])
+            elif isinstance(device_list,dict) and m.match(device_list.get('class','')) :
+                ret.append(device_list.get('tango_name'))
+        return ret
     
     @_info
     def get_device_wide_list(self, wildcard):
