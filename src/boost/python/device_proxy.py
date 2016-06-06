@@ -265,11 +265,22 @@ def __DeviceProxy__getattr(self, name):
 def __DeviceProxy__setattr(self, name, value):
     name_l = name.lower()
 
+    if name_l in self.__get_cmd_cache():
+        raise TypeError('Cannot set the value of a command')
+
     if name_l in self.__get_attr_cache():
         return self.write_attribute(name, value)
 
     if name_l in self.__get_pipe_cache():
         return self.write_pipe(name, value)
+
+    try:
+        self.__refresh_cmd_cache()
+    except:
+        pass
+
+    if name_l in self.__get_cmd_cache():
+        raise TypeError('Cannot set the value of a command')
 
     try:
         self.__refresh_attr_cache()
