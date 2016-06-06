@@ -313,7 +313,7 @@ except NameError:
 
 __int_klasses = int,
 __number_klasses = numbers.Number,
-__seq_klasses = collections.Sequence, bytearray
+__seq_klasses = collections.Sequence, bytearray, StdStringVector
 
 __use_unicode = False
 try:
