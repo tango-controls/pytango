@@ -13,7 +13,7 @@ from __future__ import absolute_import
 import sys
 import types
 
-from . import six
+import six
 
 __all__ = ["get_global_threadpool", "get_global_executor",
            "get_event_loop", "submit", "spawn", "wait"]
