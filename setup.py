@@ -34,16 +34,17 @@ except ImportError:
 
 try:
     import IPython
-    _IPY_ROOT = os.path.dirname(os.path.abspath(IPython.__file__))
-    if V(IPython.__version__) > V('0.10'):
-        import IPython.utils.path
-        get_ipython_dir = IPython.utils.path.get_ipython_dir
-    else:
-        import IPython.genutils
-        get_ipython_dir = IPython.genutils.get_ipython_dir
-    _IPY_LOCAL = str(get_ipython_dir())
-except:
+except ImportError:
     IPython = None
+else:
+    try:
+        from IPython.paths import get_ipython_dir
+    except ImportError:
+        try:
+            from IPython.utils.path import get_ipython_dir
+        except ImportError:
+            from IPython.genutils import get_ipython_dir
+    _IPY_LOCAL = str(get_ipython_dir())
 
 try:
     import numpy
