@@ -16,11 +16,12 @@ import struct
 import platform
 import subprocess
 
-from distutils.core import setup, Extension
-from distutils.cmd import Command
+from setuptools import setup, Extension
+from setuptools import Command
+from setuptools.command.build_ext import build_ext as dftbuild_ext
+from setuptools.command.install import install as dftinstall
+
 from distutils.command.build import build as dftbuild
-from distutils.command.build_ext import build_ext as dftbuild_ext
-from distutils.command.install import install as dftinstall
 from distutils.unixccompiler import UnixCCompiler
 from distutils.version import StrictVersion as V
 
