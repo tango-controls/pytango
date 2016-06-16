@@ -123,11 +123,17 @@ def has_numpy(with_src=True):
 
 
 def get_script_files():
-    major = int(platform.python_version_tuple()[0])
-    scripts = ['scripts/itango3' if major == 3 else 'scripts/itango']
     if os.name == "nt":
-        scripts.append("scripts/pytango_winpostinstall.py")
-    return scripts
+        return ["scripts/pytango_winpostinstall.py"]
+    return []
+
+
+def get_entry_points():
+    major = int(platform.python_version_tuple()[0])
+    itango = 'itango3' if major == 3 else 'itango'
+    return {
+        "console_scripts": ["{0} = PyTango.ipython:run".format(itango)],
+        "gui_scripts": ["itango-qt = PyTango.ipython:run_qt"]}
 
 
 def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None):
@@ -408,6 +414,8 @@ def setup_args():
 
     scripts = get_script_files()
 
+    entry_points = get_entry_points()
+
     data_files = []
     if os.name == 'nt':
         data_files.append(('scripts', ['doc/_static/itango.ico']))
@@ -502,6 +510,7 @@ def setup_args():
         package_data=package_data,
         data_files=data_files,
         scripts=scripts,
+        entry_points=entry_points,
         provides=provides,
         keywords=Release.keywords,
         requires=requires,
