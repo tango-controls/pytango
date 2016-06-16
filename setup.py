@@ -405,7 +405,12 @@ def setup_args():
 
     requires = [
         'boost_python (>=1.33)',
-        'numpy (>=1.1)'
+        'numpy (>=1.1)',
+        'six',
+    ]
+
+    install_requires = [
+        'six',
     ]
 
     package_data = {
@@ -514,6 +519,7 @@ def setup_args():
         provides=provides,
         keywords=Release.keywords,
         requires=requires,
+        install_requires=install_requires,
         ext_package='PyTango',
         ext_modules=[_pytango],
         cmdclass=cmdclass)
