@@ -19,15 +19,22 @@ import sys
 import IPython
 from IPython.core.profiledir import ProfileDirError, ProfileDir
 from IPython.core.application import BaseIPythonApplication
-from IPython.utils.path import get_ipython_dir
 from IPython.utils.io import ask_yes_no
+
+try:
+    from IPython.paths import get_ipython_dir
+except ImportError:
+    try:
+        from IPython.utils.path import get_ipython_dir
+    except ImportError:
+        from IPython.genutils import get_ipython_dir
 
 import PyTango
 
 
 __PROFILE = """\
 #!/usr/bin/env ipython
-\"\"\"An automaticaly generated IPython profile designed to provide a user 
+\"\"\"An automaticaly generated IPython profile designed to provide a user
 friendly interface to Tango.
 Created with PyTango {pytangover} for IPython {ipyver}\"\"\"
 
@@ -58,7 +65,7 @@ def install(ipydir=None, verbose=True, profile='tango'):
             sys.stdout.flush()
     else:
         out = lambda x : None
-    
+
     ipython_dir = ipydir or get_ipython_dir()
     try:
         p_dir = ProfileDir.find_profile_dir_by_name(ipython_dir, profile)
@@ -69,7 +76,7 @@ def install(ipydir=None, verbose=True, profile='tango'):
     if os.path.isfile(abs_config_file_name):
         create_config = ask_yes_no("Tango configuration file already exists. "\
                                    "Do you wish to replace it?", default='y')
-    
+
     if not create_config:
         return
 
@@ -91,12 +98,12 @@ http://www.tango-controls.org/static/PyTango/latest/doc/html/
 Have fun with ITango!
 The PyTango team
 """)
-    
+
 def main():
     d = None
     if len(sys.argv) > 1:
         d = sys.argv[1]
     install(d)
-    
+
 if __name__ == "__main__":
     main()
