@@ -56,11 +56,11 @@ def __build_to_tango_type():
         chr         : CmdArgType.DevUChar,
         None        : CmdArgType.DevVoid,
 
-        'int'       : CmdArgType.DevLong,
+        'int'       : CmdArgType.DevLong64,
         'int16'     : CmdArgType.DevShort,
         'int32'     : CmdArgType.DevLong,
         'int64'     : CmdArgType.DevLong64,
-        'uint'      : CmdArgType.DevULong,
+        'uint'      : CmdArgType.DevULong64,
         'uint16'    : CmdArgType.DevUShort,
         'uint32'    : CmdArgType.DevULong,
         'uint64'    : CmdArgType.DevULong64,
@@ -492,7 +492,7 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
             else:
                 attr_name = attr_obj.pipe_name
             pipe_list[attr_name] = attr_obj
-            __patch_pipe_methods(tango_device_klass, attr_obj)            
+            __patch_pipe_methods(tango_device_klass, attr_obj)
         elif isinstance(attr_obj, device_property):
             attr_obj.name = attr_name
             device_property_list[attr_name] = [attr_obj.dtype,
@@ -964,7 +964,7 @@ class pipe(PipeData):
             def ROI(self, roi):
                 self.__roi = roi
 
-    In this second format, defining the `write` / `setter` implicitly sets 
+    In this second format, defining the `write` / `setter` implicitly sets
     the pipe access to READ_WRITE.
 
     .. versionadded:: 9.2.0
