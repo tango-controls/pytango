@@ -16,12 +16,12 @@ import io
 import operator
 
 class EventLogger(object):
-    
+
     def __init__(self, capacity=100000, pager=None):
         self._capacity = capacity
         self._pager = pager
         self._records = []
-        
+
     def push_event(self, evt):
         attr_name = evt.attr_name
         dev, sep, attr = attr_name.rpartition('/')
@@ -39,26 +39,32 @@ class EventLogger(object):
         over = len(self._records) - self._capacity
         if over > 0:
             self._records = self._records[over:]
-    
+
     def model(self):
         return self
-    
+
     def getEvents(self):
         return self._records
-    
+
     def show(self, dexpr=None, aexpr=None):
         if dexpr is not None:
             dexpr = re.compile(dexpr, re.IGNORECASE)
         if aexpr is not None:
             aexpr = re.compile(aexpr, re.IGNORECASE)
-            
-        s = io.BytesIO()
+
+        class StringIO(io.StringIO):
+            def write(self, value):
+                if isinstance(value, bytes):
+                    value = value.decode()
+                io.StringIO.write(self, value)
+
+        s = StringIO()
         lengths = 4, 30, 18, 20, 12, 16
         title = 'ID', 'Device', 'Attribute', 'Value', 'Quality', 'Time'
         templ = "{0:{l[0]}} {1:{l[1]}} {2:{l[2]}} {3:{l[3]}} {4:{l[4]}} {5:{l[5]}}"
         print(templ.format(*title, l=lengths), file=s)
         print(*map(operator.mul, lengths, len(lengths)*"-"), file=s)
-        
+
         for i,r in enumerate(self._records):
             if dexpr is not None and not dexpr.match(r.dev_name): continue
             if aexpr is not None and not aexpr.match(r.s_attr_name): continue
