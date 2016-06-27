@@ -139,13 +139,24 @@ def add_lib(name, dirs, sys_libs,
 
 class build(dftbuild):
 
-    user_options = dftbuild.user_options + \
-        [('strip-lib', None, "strips the shared library of debugging symbols (Unix like systems only)"),
-         ('no-doc', None, "do not build documentation") ]
+    user_options = list(dftbuild.user_options)
+
+    # Strip library option
+    user_options.append((
+        'strip-lib',
+        None,
+        "strips the shared library of debugging symbols"
+        " (Unix like systems only)"))
+
+    # No documentation option
+    user_options.append((
+        'no-doc',
+        None,
+        "do not build documentation"))
 
     boolean_options = dftbuild.boolean_options + ['strip-lib', 'no-doc']
 
-    def initialize_options (self):
+    def initialize_options(self):
         dftbuild.initialize_options(self)
         self.strip_lib = None
         self.no_doc = None
@@ -158,27 +169,30 @@ class build(dftbuild):
             self.warn('NOT using numpy: it is not available')
         elif get_c_numpy() is None:
             self.warn("NOT using numpy: numpy available but C source is not")
-
         dftbuild.run(self)
-
         if self.strip_lib:
-            if 'posix' in os.name:
-                has_objcopy = os.system("type objcopy") == 0
-                if has_objcopy:
-                    d = abspath(self.build_lib, "PyTango")
-                    orig_dir = os.path.abspath(os.curdir)
-                    so = "_PyTango.so"
-                    dbg = so + ".dbg"
-                    try:
-                        os.chdir(d)
-                        is_stripped = os.system('file %s | grep -q "not stripped" || exit 1' % so) != 0
-                        if not is_stripped:
-                            os.system("objcopy --only-keep-debug %s %s" % (so, dbg))
-                            os.system("objcopy --strip-debug --strip-unneeded %s" % (so,))
-                            os.system("objcopy --add-gnu-debuglink=%s %s" % (dbg, so))
-                            os.system("chmod -x %s" % (dbg,))
-                    finally:
-                        os.chdir(orig_dir)
+            self.strip_debug_symbols()
+
+    def strip_debug_symbols(self):
+        if 'posix' not in os.name:
+            return
+        if os.system("type objcopy") != 0:
+            return
+        d = abspath(self.build_lib, "PyTango")
+        orig_dir = os.path.abspath(os.curdir)
+        so = "_PyTango.so"
+        dbg = so + ".dbg"
+        try:
+            os.chdir(d)
+            stripped_cmd = 'file %s | grep -q "not stripped" || exit 1' % so
+            not_stripped = os.system(stripped_cmd) == 0
+            if not_stripped:
+                os.system("objcopy --only-keep-debug %s %s" % (so, dbg))
+                os.system("objcopy --strip-debug --strip-unneeded %s" % (so,))
+                os.system("objcopy --add-gnu-debuglink=%s %s" % (dbg, so))
+                os.system("chmod -x %s" % (dbg,))
+        finally:
+            os.chdir(orig_dir)
 
     def has_doc(self):
         if self.no_doc:
@@ -186,7 +200,9 @@ class build(dftbuild):
         if sphinx is None:
             return False
         if V(sphinx.__version__) <= V("0.6.5"):
-            print("Documentation will not be generated: sphinx version (%s) too low. Needs 0.6.6" % sphinx.__version__)
+            print("Documentation will not be generated:"
+                  " sphinx version (%s) too low."
+                  " Needs 0.6.6" % sphinx.__version__)
             return False
         setup_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.isdir(os.path.join(setup_dir, 'doc'))
@@ -202,11 +218,13 @@ class build_ext(dftbuild_ext):
             compiler_pars = self.compiler.compiler_so
             while '-Wstrict-prototypes' in compiler_pars:
                 del compiler_pars[compiler_pars.index('-Wstrict-prototypes')]
-            #self.compiler.compiler_so = " ".join(compiler_pars)
+            # self.compiler.compiler_so = " ".join(compiler_pars)
 
             # mimic tango check to activate C++0x extension
             compiler = self.compiler.compiler
-            proc = subprocess.Popen(compiler + ["-dumpversion"], stdout=subprocess.PIPE)
+            proc = subprocess.Popen(
+                compiler + ["-dumpversion"],
+                stdout=subprocess.PIPE)
             pipe = proc.stdout
             proc.wait()
             gcc_ver = pipe.readlines()[0].decode().strip()
@@ -217,7 +235,7 @@ class build_ext(dftbuild_ext):
     def build_extension(self, ext):
         if self.use_cpp_0x:
             ext.extra_compile_args += ['-std=c++0x']
-            ext.define_macros += [ ('PYTANGO_HAS_UNIQUE_PTR', '1') ]
+            ext.define_macros += [('PYTANGO_HAS_UNIQUE_PTR', '1')]
         dftbuild_ext.build_extension(self, ext)
 
 
@@ -237,15 +255,21 @@ if sphinx:
 
 class install_html(Command):
 
-    user_options = [
-        ('install-dir=', 'd', 'base directory for installing HTML documentation files')]
+    user_options = []
+
+    # Install directory option
+    user_options.append((
+        'install-dir=',
+        'd',
+        'base directory for installing HTML documentation files'))
 
     def initialize_options(self):
         self.install_dir = None
 
     def finalize_options(self):
-        self.set_undefined_options('install',
-                                   ('install_html', 'install_dir'))
+        self.set_undefined_options(
+            'install',
+            ('install_html', 'install_dir'))
 
     def run(self):
         build_doc_cmd = self.get_finalized_command('build_doc')
@@ -255,8 +279,13 @@ class install_html(Command):
 
 class install(dftinstall):
 
-    user_options = dftinstall.user_options + \
-        [('install-html=', None, "installation directory for HTML documentation"), ]
+    user_options = list(dftinstall.user_options)
+
+    # HTML directory option
+    user_options.append((
+        'install-html=',
+        None,
+        "installation directory for HTML documentation"))
 
     def initialize_options(self):
         dftinstall.initialize_options(self)
@@ -264,15 +293,16 @@ class install(dftinstall):
 
     def finalize_options(self):
         dftinstall.finalize_options(self)
-        # We do a hack here. We cannot trust the 'install_base' value because it
-        # is not always the final target. For example, in unix, the install_base
-        # is '/usr' and all other install_* are directly relative to it. However,
-        # in unix-local (like ubuntu) install_base is still '/usr' but, for
-        # example, install_data, is '$install_base/local' which breaks everything.
-        #
-        # The hack consists in using install_data instead of install_base since
-        # install_data seems to be, in practice, the proper install_base on all
-        # different systems.
+        # We do a hack here. We  cannot trust the 'install_base' value because
+        # it  is not  always  the final  target.  For  example,  in unix,  the
+        # install_base is '/usr' and all other install_* are directly relative
+        # to  it. However,in  unix-local (like  ubuntu) install_base  is still
+        # '/usr'  but,  for  example, install_data,  is  '$install_base/local'
+        # which breaks everything.
+
+        # The  hack consists  in  using install_data  instead of  install_base
+        # since install_data seems to be, in practice, the proper install_base
+        # on all different systems.
         if self.install_html is None:
             self.install_html = os.path.join(self.install_data,
                                              'share', 'doc', 'PyTango', 'html')
@@ -285,7 +315,6 @@ class install(dftinstall):
 
 
 def setup_args():
-    macros = []
 
     directories = {
         'include_dirs': [],
@@ -309,8 +338,8 @@ def setup_args():
                            'mint' in dist_name
             py_ver = platform.python_version_tuple()
             if debian_based:
-                # when building with multiple version of python on debian we need
-                # to link against boost_python-py25/-py26 etc...
+                # when building with  multiple version of python  on debian we
+                # need to link against boost_python-py25/-py26 etc...
                 pyver = "-py"
                 pyver += "".join(map(str, py_ver[:2]))
                 boost_library_name += pyver
@@ -338,10 +367,11 @@ def setup_args():
     if numpy_c_include is not None:
         directories['include_dirs'].append(numpy_c_include)
 
+    macros = []
     if not has_numpy():
         macros.append(('DISABLE_PYTANGO_NUMPY', None))
     else:
-        macros.append(('PYTANGO_NUMPY_VERSION', '"' + str(numpy.__version__) + '"'))
+        macros.append(('PYTANGO_NUMPY_VERSION', '"%s"' % numpy.__version__))
 
     if 'posix' in os.name:
         directories = pkg_config(*sys_libs, **directories)
@@ -384,7 +414,8 @@ def setup_args():
         'Development Status :: 5 - Production/Stable',
         'Environment :: Other Environment',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
+        'License :: OSI Approved ::'
+        ' GNU Library or Lesser General Public License (LGPL)',
         'Natural Language :: English',
         'Operating System :: Microsoft :: Windows',
         'Operating System :: POSIX',
@@ -403,7 +434,7 @@ def setup_args():
     # and then uncommenting this line. Someday maybe this will be
     # automated...
     extra_compile_args = [
-#        '-includesrc/precompiled_header.hpp',
+        # '-includesrc/precompiled_header.hpp',
     ]
 
     extra_link_args = [
@@ -413,28 +444,32 @@ def setup_args():
 
     if please_debug:
         extra_compile_args += ['-g', '-O0']
-        extra_link_args += ['-g' , '-O0']
+        extra_link_args += ['-g', '-O0']
 
     src_dir = abspath('src', 'boost', 'cpp')
     client_dir = src_dir
     server_dir = os.path.join(src_dir, 'server')
-    _clientfiles = [ os.path.join(client_dir, fname)
-                        for fname in os.listdir(client_dir)
-                            if fname.endswith('.cpp') ]
-    _clientfiles.sort()
-    _serverfiles = [ os.path.join(server_dir, fname)
-                         for fname in os.listdir(server_dir)
-                             if fname.endswith('.cpp') ]
-    _serverfiles.sort()
-    _cppfiles = _clientfiles + _serverfiles
 
-    include_dirs = uniquify(directories['include_dirs'] + [client_dir, server_dir])
+    clientfiles = sorted(
+        os.path.join(client_dir, fname)
+        for fname in os.listdir(client_dir)
+        if fname.endswith('.cpp'))
+
+    serverfiles = sorted(
+        os.path.join(server_dir, fname)
+        for fname in os.listdir(server_dir)
+        if fname.endswith('.cpp'))
+
+    cppfiles = clientfiles + serverfiles
+    directories['include_dirs'].extend([client_dir, server_dir])
+
+    include_dirs = uniquify(directories['include_dirs'])
     library_dirs = uniquify(directories['library_dirs'])
     libraries = uniquify(directories['libraries'])
 
-    _pytango = Extension(
+    pytango_ext = Extension(
         name='_PyTango',
-        sources=_cppfiles,
+        sources=cppfiles,
         include_dirs=include_dirs,
         library_dirs=library_dirs,
         libraries=libraries,
@@ -444,10 +479,11 @@ def setup_args():
         language='c++',
         depends=[])
 
-    cmdclass = {'build'        : build,
-                'build_ext'    : build_ext,
-                'install_html' : install_html,
-                'install'      : install }
+    cmdclass = {
+        'build': build,
+        'build_ext': build_ext,
+        'install_html': install_html,
+        'install': install}
 
     if sphinx:
         cmdclass['build_doc'] = build_doc
@@ -464,7 +500,7 @@ def setup_args():
         platforms=Release.platform,
         license=Release.license,
         packages=packages,
-        package_dir={ 'PyTango' : os.path.join('src', 'boost', 'python') },
+        package_dir={'PyTango': os.path.join('src', 'boost', 'python')},
         py_modules=py_modules,
         classifiers=classifiers,
         package_data=package_data,
@@ -474,10 +510,11 @@ def setup_args():
         requires=requires,
         install_requires=install_requires,
         ext_package='PyTango',
-        ext_modules=[_pytango],
+        ext_modules=[pytango_ext],
         cmdclass=cmdclass)
 
     return opts
+
 
 def main():
     return setup(**setup_args())
