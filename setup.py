@@ -28,24 +28,10 @@ from distutils.version import StrictVersion as V
 try:
     import sphinx
     import sphinx.util.console
-    sphinx.util.console.color_terminal = lambda : False
+    sphinx.util.console.color_terminal = lambda: False
     from sphinx.setup_command import BuildDoc
 except ImportError:
     sphinx = None
-
-try:
-    import IPython
-except ImportError:
-    IPython = None
-else:
-    try:
-        from IPython.paths import get_ipython_dir
-    except ImportError:
-        try:
-            from IPython.utils.path import get_ipython_dir
-        except ImportError:
-            from IPython.genutils import get_ipython_dir
-    _IPY_LOCAL = str(get_ipython_dir())
 
 try:
     import numpy
@@ -122,21 +108,8 @@ def has_numpy(with_src=True):
     return ret
 
 
-def get_script_files():
-    if os.name == "nt":
-        return ["scripts/pytango_winpostinstall.py"]
-    return []
-
-
-def get_entry_points():
-    major = int(platform.python_version_tuple()[0])
-    itango = 'itango3' if major == 3 else 'itango'
-    return {
-        "console_scripts": ["{0} = PyTango.ipython:run".format(itango)],
-        "gui_scripts": ["itango-qt = PyTango.ipython:run_qt"]}
-
-
-def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None):
+def add_lib(name, dirs, sys_libs,
+            env_name=None, lib_name=None, inc_suffix=None):
     if env_name is None:
         env_name = name.upper() + '_ROOT'
     ENV = os.environ.get(env_name)
@@ -167,15 +140,13 @@ def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None)
 class build(dftbuild):
 
     user_options = dftbuild.user_options + \
-        [('without-ipython', None, "Tango IPython extension"),
-         ('strip-lib', None, "strips the shared library of debugging symbols (Unix like systems only)"),
+        [('strip-lib', None, "strips the shared library of debugging symbols (Unix like systems only)"),
          ('no-doc', None, "do not build documentation") ]
 
-    boolean_options = dftbuild.boolean_options + ['without-ipython', 'strip-lib', 'no-doc']
+    boolean_options = dftbuild.boolean_options + ['strip-lib', 'no-doc']
 
     def initialize_options (self):
         dftbuild.initialize_options(self)
-        self.without_ipython = None
         self.strip_lib = None
         self.no_doc = None
 
@@ -187,12 +158,6 @@ class build(dftbuild):
             self.warn('NOT using numpy: it is not available')
         elif get_c_numpy() is None:
             self.warn("NOT using numpy: numpy available but C source is not")
-
-        if IPython and not self.without_ipython:
-            if V(IPython.__version__) > V('0.10'):
-                self.distribution.py_modules.append('IPython.config.profile.tango.ipython_config')
-            else:
-                self.distribution.py_modules.append('IPython.Extensions.ipy_profile_tango')
 
         dftbuild.run(self)
 
@@ -389,10 +354,6 @@ def setup_args():
 
     packages = [
         'PyTango',
-        'PyTango.ipython',
-        'PyTango.ipython.ipython_00_10',
-        'PyTango.ipython.ipython_00_11',
-        'PyTango.ipython.ipython_10_00',
         'PyTango.databaseds',
         'PyTango.databaseds.db_access',
     ]
@@ -414,16 +375,10 @@ def setup_args():
     ]
 
     package_data = {
-        'PyTango' : [],
+        'PyTango': [],
     }
 
-    scripts = get_script_files()
-
-    entry_points = get_entry_points()
-
     data_files = []
-    if os.name == 'nt':
-        data_files.append(('scripts', ['doc/_static/itango.ico']))
 
     classifiers = [
         'Development Status :: 5 - Production/Stable',
@@ -514,8 +469,6 @@ def setup_args():
         classifiers=classifiers,
         package_data=package_data,
         data_files=data_files,
-        scripts=scripts,
-        entry_points=entry_points,
         provides=provides,
         keywords=Release.keywords,
         requires=requires,
