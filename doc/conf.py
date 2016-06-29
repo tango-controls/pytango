@@ -20,7 +20,7 @@ print("Using PyTango from: {0}".format(os.path.dirname(PyTango.__file__)))
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.append(os.path.abspath('sphinxext'))
+#sys.path.append(os.path.abspath('sphinxext'))
 
 needs_sphinx = "1.0"
 
@@ -32,9 +32,7 @@ extensions = ['sphinx.ext.pngmath',
               'sphinx.ext.autodoc',
               'sphinx.ext.doctest',
               'sphinx.ext.intersphinx',
-              'sphinx.ext.todo',
-              'ipython_console_highlighting',
-              'tango_console_highlighting']
+              'sphinx.ext.todo']
 
 # disable until graphviz works in pyhon 3
 if sys.hexversion < 0x03000000:
@@ -111,7 +109,6 @@ exclude_trees = ['_build']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-pygments_style = 'tango_console_highlighting.TangoStyle'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []

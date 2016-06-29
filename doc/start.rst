@@ -12,7 +12,9 @@ Installing
 Linux
 ~~~~~
 
-PyTango is available on linux as an official debian/ubuntu package::
+PyTango is available on linux as an official debian/ubuntu package:
+
+.. sourcecode:: console
 
     $ sudo apt-get install python-pytango
 
@@ -38,11 +40,15 @@ are available from the major official distribution repositories):
 * `numpy`_ 
 * `IPython`_ (optional, highly recommended)
 
-Then install PyTango either from pip::
+Then install PyTango either from pip:
+
+.. sourcecode:: console
 
     $ pip install PyTango
 
-or easy_install::
+or easy_install:
+
+.. sourcecode:: console
 
     $ easy_install -U PyTango
 
@@ -71,7 +77,9 @@ Besides the binaries for the three dependencies mentioned above, you also need
 the development files for the respective libraries.
 
 You can get the latest ``.tar.gz`` from `PyPI`_ or directly
-the latest SVN checkout::
+the latest SVN checkout:
+
+.. sourcecode:: console
 
     $ svn co http://svn.code.sf.net/p/tango-cs/code/bindings/PyTango/trunk PyTango
     $ cd PyTango
@@ -81,9 +89,11 @@ the latest SVN checkout::
 This will install PyTango in the system python installation directory and, since
 version 8.0.0, it will also install :ref:`itango` as an IPython_ extension.
 
-If whish to install in a different directory, replace the last line with::
+If you whish to install in a different directory, replace the last line with:
+
+.. sourcecode:: console
     
-    $ # private installation to your user (usually ~/.local/lib/python<X>.<Y>/site-packages
+    $ # private installation to your user (usually ~/.local/lib/python<X>.<Y>/site-packages)
     $ python setup.py install --user
 
     $ # or specific installation directory
@@ -100,27 +110,11 @@ source package under :file:`doc/windows_notes.txt`.
 Testing
 -------
 
-If you have IPython_ installed, the best way to test your PyTango installation
-is by starting the new PyTango CLI called :ref:`itango` by typing on the command
-line::
+To test the installation, import ``PyTango`` and check ``PyTango.Release.version``:
 
-    $ itango
+.. sourcecode:: console
 
-then, in ITango type:
-
-.. sourcecode:: itango
-
-    ITango [1]: PyTango.Release.version
-    Result [1]: '8.0.2'
-
-(if you are wondering, :ref:`itango` automaticaly does ``import PyTango`` 
-for you!)
-
-If you don't have IPython_ installed, to test the installation start a
-python console and type:
-
-    >>> import PyTango
-    >>> PyTango.Release.version
-    '8.0.2'
+    $ python -c "import PyTango; print(PyTango.Release.version)"
+    9.2.0
 
 Next steps: Check out the :ref:`pytango-quick-tour`.
