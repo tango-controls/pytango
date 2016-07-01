@@ -319,9 +319,13 @@ def setup_args():
     directories = {
         'include_dirs': [],
         'library_dirs': [],
-        'libraries':    ['tango'],
+        'libraries':    [],
     }
     sys_libs = []
+
+    # Link specifically to libtango version 9
+    tangolib = ':libtango.so.9' if 'linux' in sys.platform else 'tango'
+    directories['libraries'].append(tangolib)
 
     add_lib('omni', directories, sys_libs, lib_name='omniORB4')
     add_lib('zmq', directories, sys_libs, lib_name='libzmq')
