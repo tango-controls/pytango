@@ -59,7 +59,7 @@ def main():
         cmd_line += 'bdist_wininst --skip-build --target-version=%s ' \
                     '--bdist-dir=%s ' \
                     '--dist-dir=%s ' \
-                    '--title="PyTango 8" ' \
+                    '--title="PyTango 9" ' \
                     '--bitmap="%s" ' \
                     '--plat-name=%s ' % (ver, bdist_dir, dist_dir, bitmap, plat_name)
         os.system(cmd_line)

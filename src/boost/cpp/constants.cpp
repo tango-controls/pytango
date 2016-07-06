@@ -24,7 +24,7 @@ void export_constants()
     scope consts_scope = consts_module;
 
     consts_scope.attr("__doc__") = "module containing several Tango constants.\n"
-        "\nNew in PyTango 7.0.0";
+        "\nNew in PyTango 9.2.0";
 
 #ifdef DISABLE_PYTANGO_NUMPY
     consts_scope.attr("NUMPY_SUPPORT") = false;

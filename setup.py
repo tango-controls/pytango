@@ -334,9 +334,9 @@ def setup_args():
     # special boost-python configuration
 
     BOOST_ROOT = os.environ.get('BOOST_ROOT')
-    boost_library_name = 'boost_python'
     if BOOST_ROOT is None:
         if 'linux' in sys.platform:
+            boost_library_name = 'boost_python'
             dist_name = platform.linux_distribution()[0].lower()
             debian_based = 'debian' in dist_name or 'ubuntu' in dist_name or \
                            'mint' in dist_name
@@ -353,8 +353,60 @@ def setup_args():
                 if int(py_ver[0]) == 3:
                     boost_library_name += '3'
     else:
-        inc_dir = os.path.join(BOOST_ROOT, 'include')
-        lib_dirs = [os.path.join(BOOST_ROOT, 'lib')]
+        # inc_dir = os.path.join(BOOST_ROOT, 'include')
+        lib_dirs = ''
+        inc_dir = BOOST_ROOT
+        if 'win' in sys.platform:
+            if sys.version_info.major == 2:
+                if sys.version_info.minor == 6:
+                    if platform.architecture()[0] in '32bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib32-msvc-9.0')]
+                    if platform.architecture()[0] in '64bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib64-msvc-9.0')]
+                    directories['libraries'].append('python26')
+                if sys.version_info.minor == 7:
+                    if platform.architecture()[0] in '32bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib32-msvc-9.0')]
+                    if platform.architecture()[0] in '64bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib64-msvc-9.0')]
+                    directories['libraries'].append('python27')
+            if sys.version_info.major == 3:
+                if sys.version_info.minor == 0:
+                    if platform.architecture()[0] in '32bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib32-msvc-9.0')]
+                    if platform.architecture()[0] in '64bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib64-msvc-9.0')]
+                    directories['libraries'].append('python30')
+                if sys.version_info.minor == 1:
+                    if platform.architecture()[0] in '32bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib32-msvc-9.0')]
+                    if platform.architecture()[0] in '64bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib64-msvc-9.0')]
+                    directories['libraries'].append('python31')
+                if sys.version_info.minor == 2:
+                    if platform.architecture()[0] in '32bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib32-msvc-9.0')]
+                    if platform.architecture()[0] in '64bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib64-msvc-9.0')]
+                    directories['libraries'].append('python32')
+                if sys.version_info.minor == 3:
+                    if platform.architecture()[0] in '32bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib32-msvc-10.0')]
+                    if platform.architecture()[0] in '64bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib64-msvc-10.0')]
+                    directories['libraries'].append('python33')
+                if sys.version_info.minor == 4:
+                    if platform.architecture()[0] in '32bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib32-msvc-10.0')]
+                    if platform.architecture()[0] in '64bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib64-msvc-10.0')]
+                    directories['libraries'].append('python34')
+                if sys.version_info.minor == 5:
+                    if platform.architecture()[0] in '32bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib32-msvc-14.0')]
+                    if platform.architecture()[0] in '64bits':
+                        lib_dirs = [os.path.join(BOOST_ROOT, 'lib64-msvc-14.0')]
+                    directories['libraries'].append('python35')
         if is64:
             lib64_dir = os.path.join(BOOST_ROOT, 'lib64')
             if os.path.isdir(lib64_dir):
@@ -363,7 +415,63 @@ def setup_args():
         directories['include_dirs'].append(inc_dir)
         directories['library_dirs'].extend(lib_dirs)
 
-    directories['libraries'].append(boost_library_name)
+    TANGO_ROOT = os.environ.get('TANGO_ROOT')
+    if 'win32' in sys.platform:
+        lib_dirs = ''
+        inc_dir = ''
+        if sys.version_info.major == 2:
+            if sys.version_info.minor in [6, 7]:
+                if platform.architecture()[0] in '32bits':
+                    inc_dir = os.path.join(TANGO_ROOT, 'win32\\include\\vc9')
+                    lib_dirs = os.path.join(TANGO_ROOT, 'win32\\lib\\vc9')
+                if platform.architecture()[0] in '64bits':
+                    inc_dir = os.path.join(TANGO_ROOT, 'win64\\include\\vc9')
+                    lib_dirs = os.path.join(TANGO_ROOT, 'win64\\lib\\vc9')
+        if sys.version_info.major == 3:
+            if sys.version_info.minor in [0, 1, 2]:
+                if platform.architecture()[0] in '32bits':
+                    inc_dir = os.path.join(TANGO_ROOT, 'win32\\include\\vc9')
+                    lib_dirs = os.path.join(TANGO_ROOT, 'win32\\lib\\vc9')
+                if platform.architecture()[0] in '64bits':
+                    inc_dir = os.path.join(TANGO_ROOT, 'win64\\include\\vc9')
+                    lib_dirs = os.path.join(TANGO_ROOT, 'win64\\lib\\vc9')
+            if sys.version_info.minor in [3, 4]:
+                if platform.architecture()[0] in '32bits':
+                    inc_dir = os.path.join(TANGO_ROOT, 'win32\\include\\vc10')
+                    lib_dirs = os.path.join(TANGO_ROOT, 'win32\\lib\\vc10')
+                if platform.architecture()[0] in '64bits':
+                    inc_dir = os.path.join(TANGO_ROOT, 'win64\\include\\vc10')
+                    lib_dirs = os.path.join(TANGO_ROOT, 'win64\\lib\\vc10')
+            if sys.version_info.minor == 5:
+                if platform.architecture()[0] in '32bits':
+                    inc_dir = os.path.join(TANGO_ROOT, 'win32\\include\\vc14')
+                    lib_dirs = os.path.join(TANGO_ROOT, 'win32\\lib\\vc14')
+                if platform.architecture()[0] in '64bits':
+                    inc_dir = os.path.join(TANGO_ROOT, 'win64\\include\\vc14')
+                    lib_dirs = os.path.join(TANGO_ROOT, 'win64\\lib\\vc14')
+        directories['include_dirs'].append(inc_dir)
+        directories['library_dirs'].append(lib_dirs)
+    if 'win' in sys.platform:
+        directories['libraries'].append('omniORB4')
+        directories['libraries'].append('omniDynamic4')
+        directories['libraries'].append('omnithread')
+        directories['libraries'].append('zmq')
+        directories['libraries'].append('COS4')
+        directories['libraries'].append('log4tango')
+        directories['libraries'].append('ws2_32')
+        directories['libraries'].append('Advapi32')
+        directories['libraries'].append('User32')
+        directories['libraries'].append('kernel32')
+        directories['libraries'].append('winspool')
+        directories['libraries'].append('advapi32')
+        directories['libraries'].append('shell32')
+        directories['libraries'].append('ole32')
+        directories['libraries'].append('oleaut32')
+        directories['libraries'].append('uuid')
+        directories['libraries'].append('gdi32')
+        directories['libraries'].append('comctl32')
+    else:
+        directories['libraries'].append(boost_library_name)
 
     # special numpy configuration
 
@@ -438,13 +546,35 @@ def setup_args():
     # and then uncommenting this line. Someday maybe this will be
     # automated...
     extra_compile_args = [
-        # '-includesrc/precompiled_header.hpp',
+#        '-includesrc/precompiled_header.hpp',
+        '/EHsc',
+        '/D "_WINSTATIC"',
+        '/D "WIN32"',
+        '/D "NDEBUG"',
+        '/FD',
+        '/GS-',
+        '/Fp',
+        '/TP',
+        '/D "BOOST_PYTHON_STATIC_LIB"',
+        '/D "_WINDLL"',
+        '/MT'
     ]
 
     extra_link_args = [
-        '-Wl,-h',
-        '-Wl,--strip-all',
+##        '-Wl,-h',
+##        '-Wl,--strip-all',
+        '/SUBSYSTEM:WINDOWS',
+        '/OPT:REF',
+        '/OPT:ICF',
+        '/LTCG',
+        '/DYNAMICBASE:NO',
+        '/ERRORREPORT:PROMPT',
     ]
+
+    if platform.architecture()[0] in '32bits':
+        extra_link_args.append('/MACHINE:X86')
+    if platform.architecture()[0] in '64bits':
+        extra_link_args.append('/MACHINE:X64')
 
     if please_debug:
         extra_compile_args += ['-g', '-O0']
