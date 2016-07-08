@@ -37,7 +37,7 @@ First, make sure you have the following packages already installed (all of them
 are available from the major official distribution repositories):
 
 * `boost-python`_ (including boost-python-dev)
-* `numpy`_ 
+* `numpy`_
 * `IPython`_ (optional, highly recommended)
 
 Then install PyTango either from pip:
@@ -61,7 +61,7 @@ PyTango team provides a limited set of binary PyTango distributables for
 Windows XP/Vista/7/8. The complete list of binaries can be downloaded from
 `PyPI`_.
 
-Select the proper windows package, download it and finally execute the 
+Select the proper windows package, download it and finally execute the
 installion wizard.
 
 Compiling
@@ -70,10 +70,10 @@ Compiling
 Linux
 ~~~~~
 
-Since PyTango 7 the build system used to compile PyTango is the standard python 
+Since PyTango 7 the build system used to compile PyTango is the standard python
 distutils.
 
-Besides the binaries for the three dependencies mentioned above, you also need 
+Besides the binaries for the three dependencies mentioned above, you also need
 the development files for the respective libraries.
 
 You can get the latest ``.tar.gz`` from `PyPI`_ or directly
@@ -92,7 +92,7 @@ version 8.0.0, it will also install :ref:`itango` as an IPython_ extension.
 If you whish to install in a different directory, replace the last line with:
 
 .. sourcecode:: console
-    
+
     $ # private installation to your user (usually ~/.local/lib/python<X>.<Y>/site-packages)
     $ python setup.py install --user
 
@@ -110,11 +110,11 @@ source package under :file:`doc/windows_notes.txt`.
 Testing
 -------
 
-To test the installation, import ``PyTango`` and check ``PyTango.Release.version``:
+To test the installation, import ``tango`` and check ``tango.Release.version``:
 
 .. sourcecode:: console
 
-    $ python -c "import PyTango; print(PyTango.Release.version)"
+    $ python -c "import tango; print(tango.Release.version)"
     9.2.0
 
 Next steps: Check out the :ref:`pytango-quick-tour`.
