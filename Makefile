@@ -31,7 +31,7 @@
 # - PY_VER: use a specific python version (default is empty) (ex: 3.2)
 
 # Build "in parallel":
-# make prepare && make -j5 
+# make prepare && make -j5
 #
 # Install "in parallel":
 # make prepare && make -j5 && make install prefix=<install dir>
@@ -141,8 +141,7 @@ MACROS := -DNDEBUG -DPYTANGO_HAS_UNIQUE_PTR -DPYTANGO_NUMPY_VERSION=$(PYTANGO_NU
 CFLAGS := -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC -g $(OPTIMIZE_CC) $(MACROS) $(TANGO_CFLAGS) $(INCLUDE_DIRS) $(QUOTE_INCLUDE_DIRS)
 LNFLAGS := $(LN_DIRS) $(LN_LIBS)
 
-LIB_NAME := _PyTango.so
-LIB_NAME_STATIC := _PyTangoStatic.so
+LIB_NAME := _tango.so
 LIB_SYMB_NAME := $(LIB_NAME).dbg
 
 OBJS := \
@@ -249,7 +248,7 @@ init:
 	@echo Using python $(PY_VER)
 	@echo CFLAGS  = $(CFLAGS)
 	@echo LNFLAGS = $(LNFLAGS)
-	@echo -n "Preparing build directories... " 
+	@echo -n "Preparing build directories... "
 	@mkdir -p $(OBJS_DIR)
 	@echo $(OK)
 
@@ -297,7 +296,7 @@ clean:
 	@rm -f $(OBJS_DIR)/*.o
 	@echo $(OK)
 
-clean-all: 
+clean-all:
 	@echo -n Cleaning all...
 	@rm -rf $(OBJS_DIR)
 	@echo $(OK)
