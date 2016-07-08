@@ -6,9 +6,9 @@
 import time
 import numpy
 
-from PyTango import AttrQuality, AttrWriteType, DispLevel, DevState, DebugIt
-from PyTango.server import Device, DeviceMeta, attribute, command, pipe, run
-from PyTango.server import device_property
+from tango import AttrQuality, AttrWriteType, DispLevel, DevState, DebugIt
+from tango.server import Device, DeviceMeta, attribute, command, pipe, run
+from tango.server import device_property
 
 
 class PowerSupply(Device):

@@ -27,9 +27,9 @@ Here is a simple example on how to write a *Clock* device server using the
 high level API::
     
     import time
-    from PyTango.server import run
-    from PyTango.server import Device, DeviceMeta
-    from PyTango.server import attribute, command   
+    from tango.server import run
+    from tango.server import Device, DeviceMeta
+    from tango.server import attribute, command   
 
 
     class Clock(Device):
@@ -65,9 +65,9 @@ using the high level API. The example contains:
     from time import time
     from numpy.random import random_sample
 
-    from PyTango import AttrQuality, AttrWriteType, DispLevel, server_run
-    from PyTango.server import Device, DeviceMeta, attribute, command
-    from PyTango.server import class_property, device_property
+    from tango import AttrQuality, AttrWriteType, DispLevel, server_run
+    from tango.server import Device, DeviceMeta, attribute, command
+    from tango.server import class_property, device_property
 
     class PowerSupply(Device):
         __metaclass__ = DeviceMeta
