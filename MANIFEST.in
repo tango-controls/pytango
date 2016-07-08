@@ -1,9 +1,5 @@
-recursive-include PyTango *.py
-recursive-include cPyTango *.py
-recursive-include IPython *.py
 include LICENSE.txt
 
-graft src
 graft doc
 graft tests
 

@@ -69,7 +69,7 @@ def abspath(*path):
 
 def get_release_info():
     name = "release"
-    release_dir = abspath('src', 'boost', 'python')
+    release_dir = abspath('tango')
     data = imp.find_module(name, [release_dir])
     release = imp.load_module(name, *data)
     return release.Release
@@ -178,9 +178,9 @@ class build(dftbuild):
             return
         if os.system("type objcopy") != 0:
             return
-        d = abspath(self.build_lib, "PyTango")
+        d = abspath(self.build_lib, "tango")
         orig_dir = os.path.abspath(os.curdir)
-        so = "_PyTango.so"
+        so = "_tango.so"
         dbg = so + ".dbg"
         try:
             os.chdir(d)
@@ -387,15 +387,18 @@ def setup_args():
     please_debug = False
 
     packages = [
-        'PyTango',
-        'PyTango.databaseds',
-        'PyTango.databaseds.db_access',
+        'tango',
+        'tango.databaseds',
+        'tango.databaseds.db_access',
     ]
 
-    py_modules = []
+    py_modules = [
+        'PyTango',  # Backward compatibilty
+    ]
 
     provides = [
-        'PyTango',
+        'tango',
+        'PyTango',  # Backward compatibilty
     ]
 
     requires = [
@@ -438,7 +441,7 @@ def setup_args():
     # and then uncommenting this line. Someday maybe this will be
     # automated...
     extra_compile_args = [
-        # '-includesrc/precompiled_header.hpp',
+        # '-include ext/precompiled_header.hpp',
     ]
 
     extra_link_args = [
@@ -450,7 +453,7 @@ def setup_args():
         extra_compile_args += ['-g', '-O0']
         extra_link_args += ['-g', '-O0']
 
-    src_dir = abspath('src', 'boost', 'cpp')
+    src_dir = abspath('ext')
     client_dir = src_dir
     server_dir = os.path.join(src_dir, 'server')
 
@@ -472,7 +475,7 @@ def setup_args():
     libraries = uniquify(directories['libraries'])
 
     pytango_ext = Extension(
-        name='_PyTango',
+        name='_tango',
         sources=cppfiles,
         include_dirs=include_dirs,
         library_dirs=library_dirs,
@@ -493,7 +496,7 @@ def setup_args():
         cmdclass['build_doc'] = build_doc
 
     opts = dict(
-        name='PyTango',
+        name='pytango',
         version=Release.version,
         description=Release.description,
         long_description=Release.long_description,
@@ -504,7 +507,6 @@ def setup_args():
         platforms=Release.platform,
         license=Release.license,
         packages=packages,
-        package_dir={'PyTango': os.path.join('src', 'boost', 'python')},
         py_modules=py_modules,
         classifiers=classifiers,
         package_data=package_data,
@@ -513,7 +515,7 @@ def setup_args():
         keywords=Release.keywords,
         requires=requires,
         install_requires=install_requires,
-        ext_package='PyTango',
+        ext_package='tango',
         ext_modules=[pytango_ext],
         cmdclass=cmdclass)
 
