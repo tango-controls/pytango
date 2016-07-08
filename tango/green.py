@@ -22,7 +22,7 @@ __docformat__ = "restructuredtext"
 import os
 from functools import wraps
 
-from ._PyTango import GreenMode
+from ._tango import GreenMode
 from .tango_gevent import get_global_executor as get_gevent_executor
 from .tango_gevent import submit as gevent_submit
 from .tango_gevent import get_event_loop as get_gevent_event_loop
@@ -53,10 +53,10 @@ def set_green_mode(green_mode=None):
         return
     if green_mode == GreenMode.Gevent:
         # check if we can change to gevent mode
-        import PyTango.gevent
+        import tango.gevent
     elif green_mode == GreenMode.Futures:
         # check if we can change to futures mode
-        import PyTango.futures
+        import tango.futures
         
     __current_green_mode = green_mode
 

@@ -20,7 +20,7 @@ __docformat__ = "restructuredtext"
 import os
 import copy
 
-from ._PyTango import Util, Except, DevFailed, DbDevInfo
+from ._tango import Util, Except, DevFailed, DbDevInfo
 from .utils import document_method as __document_method
 #from utils import document_static_method as __document_static_method
 from .globals import class_list, cpp_class_list, get_constructed_classes
@@ -61,7 +61,7 @@ def __Util__create_device(self, klass_name, device_name, alias=None, cb=None):
             registered in the database and BEFORE the init_device for the
             newly created device is called
 
-            Throws PyTango.DevFailed:
+            Throws tango.DevFailed:
                 - the device name exists already or
                 - the given class is not registered for this DS.
                 - the cb is not a callable
@@ -148,7 +148,7 @@ def __Util__delete_device(self, klass_name, device_name):
             Deletes an existing device from the database and from this running
             server
 
-            Throws PyTango.DevFailed:
+            Throws tango.DevFailed:
                 - the device name doesn't exist in the database
                 - the device name doesn't exist in this DS.
 
@@ -210,7 +210,7 @@ def __Util__add_TgClass(self, klass_device_class, klass_device,
            util.add_TgClass(MotorClass, Motor, 'Motor') # equivalent to previous line
 
        .. deprecated:: 7.1.2
-           Use :meth:`PyTango.Util.add_class` instead."""
+           Use :meth:`tango.Util.add_class` instead."""
     if device_class_name is None:
         device_class_name = klass_device.__name__
     class_list.append((klass_device_class, klass_device, device_class_name))
@@ -228,7 +228,7 @@ def __Util__add_Cpp_TgClass(self, device_class_name, tango_device_class_name):
                  library name.
 
        .. deprecated:: 7.1.2
-           Use :meth:`PyTango.Util.add_class` instead."""
+           Use :meth:`tango.Util.add_class` instead."""
     cpp_class_list.append((device_class_name, tango_device_class_name))
 
 def __Util__add_class(self, *args, **kwargs):
@@ -238,8 +238,8 @@ def __Util__add_class(self, *args, **kwargs):
             Register a new tango class ('python' or 'c++').
 
             If language is 'python' then args must be the same as
-            :meth:`PyTango.Util.add_TgClass`. Otherwise, args should be the ones
-            in :meth:`PyTango.Util.add_Cpp_TgClass`. Example::
+            :meth:`tango.Util.add_TgClass`. Otherwise, args should be the ones
+            in :meth:`tango.Util.add_Cpp_TgClass`. Example::
 
                 util.add_class(MotorClass, Motor)
                 util.add_class('CounterClass', 'Counter', language='c++')
@@ -271,7 +271,7 @@ def __doc_Util():
     Therefore a device server process can have only one instance of this
     class and its constructor is not public. Example::
 
-        util = PyTango.Util.instance()
+        util = tango.Util.instance()
             print(util.get_host_name())
     """
 
@@ -702,11 +702,11 @@ def __doc_Util():
                 return _LOOP_NB > 100
 
             def main():
-                py = PyTango.Util(sys.argv)
+                py = tango.Util(sys.argv)
 
                 # ...
 
-                U = PyTango.Util.instance()
+                U = tango.Util.instance()
                 U.server_set_event_loop(looping)
                 U.server_init()
                 U.server_run()

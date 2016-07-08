@@ -13,7 +13,7 @@ __all__ = ['PipeConfig']
 
 
 
-from ._PyTango import Pipe, PipeWriteType, UserDefaultPipeProp, \
+from ._tango import Pipe, PipeWriteType, UserDefaultPipeProp, \
     AttrDataFormat, CmdArgType, DevState, DispLevel, constants
 
 from .utils import scalar_to_array_type, TO_TANGO_TYPE, \

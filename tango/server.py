@@ -30,7 +30,7 @@ import operator
 import functools
 import traceback
 
-from ._PyTango import (CmdArgType, AttrDataFormat, AttrWriteType,
+from ._tango import (CmdArgType, AttrDataFormat, AttrWriteType,
                        DevFailed, Except, GreenMode, constants,
                        Database, DbDevInfo, DevState, CmdArgType,
                        Attr, PipeWriteType)
@@ -446,7 +446,7 @@ class _DeviceClass(DeviceClass):
         :meth:`TT.initialize_dynamic_attributes` for each device
 
         :param dev_list: list of devices
-        :type dev_list: :class:`PyTango.DeviceImpl`"""
+        :type dev_list: :class:`tango.DeviceImpl`"""
 
         for dev in dev_list:
             init_dyn_attrs = getattr(dev,
@@ -466,7 +466,7 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     klass_name = tango_device_klass.__name__
     if not issubclass(tango_device_klass, (Device)):
         msg = "{0} device must inherit from " \
-              "PyTango.server.Device".format(klass_name)
+              "tango.server.Device".format(klass_name)
         raise Exception(msg)
 
     if attrs is None:
@@ -567,14 +567,14 @@ def DeviceMeta(name, bases, attrs):
 
     Example (python 2.x)::
 
-        from PyTango.server import Device, DeviceMeta
+        from tango.server import Device, DeviceMeta
 
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
 
     Example (python 3.x)::
 
-        from PyTango.server import Device, DeviceMeta
+        from tango.server import Device, DeviceMeta
 
         class PowerSupply(Device, metaclass=DeviceMeta):
             pass
@@ -671,17 +671,17 @@ class Device(LatestDeviceImpl):
     @classmethod
     def run_server(cls, args=None, **kwargs):
         """Run the class as a device server.
-        It is based on the PyTango.server.run method.
+        It is based on the tango.server.run method.
 
         The difference is that the device class
         and server name are automatically given.
 
         Args:
-            args (iterable): args as given in the PyTango.server.run method
+            args (iterable): args as given in the tango.server.run method
                              without the server name. If None, the sys.argv
                              list is used
             kwargs: the other keywords argument are as given
-                    in the PyTango.server.run method.
+                    in the tango.server.run method.
         """
         if args is None:
             args = sys.argv[1:]
@@ -693,7 +693,7 @@ class attribute(AttrData):
     '''
     Declares a new tango attribute in a :class:`Device`. To be used
     like the python native :obj:`property` function. For example, to
-    declare a scalar, `PyTango.DevDouble`, read-only attribute called
+    declare a scalar, `tango.DevDouble`, read-only attribute called
     *voltage* in a *PowerSupply* :class:`Device` do::
 
         class PowerSupply(Device):
@@ -720,15 +720,15 @@ class attribute(AttrData):
     parameter              type                                       default value                                 description
     ===================== ================================ ======================================= =======================================================================================
     name                   :obj:`str`                       class member name                       alternative attribute name
-    dtype                  :obj:`object`                    :obj:`~PyTango.CmdArgType.DevDouble`    data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
-    dformat                :obj:`~PyTango.AttrDataFormat`   :obj:`~PyTango.AttrDataFormat.SCALAR`   data format
+    dtype                  :obj:`object`                    :obj:`~tango.CmdArgType.DevDouble`    data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
+    dformat                :obj:`~tango.AttrDataFormat`   :obj:`~tango.AttrDataFormat.SCALAR`   data format
     max_dim_x              :obj:`int`                       1                                       maximum size for x dimension (ignored for SCALAR format)
     max_dim_y              :obj:`int`                       0                                       maximum size for y dimension (ignored for SCALAR and SPECTRUM formats)
-    display_level          :obj:`~PyTango.DispLevel`        :obj:`~PyTango.DisLevel.OPERATOR`       display level
+    display_level          :obj:`~tango.DispLevel`        :obj:`~tango.DisLevel.OPERATOR`       display level
     polling_period         :obj:`int`                       -1                                      polling period
     memorized              :obj:`bool`                      False                                   attribute should or not be memorized
     hw_memorized           :obj:`bool`                      False                                   write method should be called at startup when restoring memorize value (dangerous!)
-    access                 :obj:`~PyTango.AttrWriteType`    :obj:`~PyTango.AttrWriteType.READ`      read only/ read write / write only access
+    access                 :obj:`~tango.AttrWriteType`    :obj:`~tango.AttrWriteType.READ`      read only/ read write / write only access
     fget (or fread)        :obj:`str` or :obj:`callable`    'read_<attr_name>'                      read method name or method object
     fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<attr_name>'                     write method name or method object
     is_allowed             :obj:`str` or :obj:`callable`    'is_<attr_name>_allowed'                is allowed method name or method object
@@ -753,9 +753,9 @@ class attribute(AttrData):
     archive_abs_change     :obj:`str`                       None
     archive_rel_change     :obj:`str`                       None
     archive_period         :obj:`str`                       None
-    green_mode             :obj:`~PyTango.GreenMode`        None                                    green mode for read and write. None means use server green mode.
-    read_green_mode        :obj:`~PyTango.GreenMode`        None                                    green mode for read. None means use server green mode.
-    write_green_mode       :obj:`~PyTango.GreenMode`        None                                    green mode for write. None means use server green mode.
+    green_mode             :obj:`~tango.GreenMode`        None                                    green mode for read and write. None means use server green mode.
+    read_green_mode        :obj:`~tango.GreenMode`        None                                    green mode for read. None means use server green mode.
+    write_green_mode       :obj:`~tango.GreenMode`        None                                    green mode for write. None means use server green mode.
     ===================== ================================ ======================================= =======================================================================================
 
     .. note::
@@ -913,16 +913,16 @@ class pipe(PipeData):
     parameter              type                                       default value                                 description
     ===================== ================================ ======================================= =======================================================================================
     name                   :obj:`str`                       class member name                       alternative pipe name
-    display_level          :obj:`~PyTango.DispLevel`        :obj:`~PyTango.DisLevel.OPERATOR`       display level
-    access                 :obj:`~PyTango.PipeWriteType`    :obj:`~PyTango.PipeWriteType.READ`      read only/ read write access
+    display_level          :obj:`~tango.DispLevel`        :obj:`~tango.DisLevel.OPERATOR`       display level
+    access                 :obj:`~tango.PipeWriteType`    :obj:`~tango.PipeWriteType.READ`      read only/ read write access
     fget (or fread)        :obj:`str` or :obj:`callable`    'read_<pipe_name>'                      read method name or method object
     fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<pipe_name>'                     write method name or method object
     is_allowed             :obj:`str` or :obj:`callable`    'is_<pipe_name>_allowed'                is allowed method name or method object
     label                  :obj:`str`                       '<pipe_name>'                           pipe label
     doc (or description)   :obj:`str`                       ''                                      pipe description
-    green_mode             :obj:`~PyTango.GreenMode`        None                                    green mode for read and write. None means use server green mode.
-    read_green_mode        :obj:`~PyTango.GreenMode`        None                                    green mode for read. None means use server green mode.
-    write_green_mode       :obj:`~PyTango.GreenMode`        None                                    green mode for write. None means use server green mode.
+    green_mode             :obj:`~tango.GreenMode`        None                                    green mode for read and write. None means use server green mode.
+    read_green_mode        :obj:`~tango.GreenMode`        None                                    green mode for read. None means use server green mode.
+    write_green_mode       :obj:`~tango.GreenMode`        None                                    green mode for write. None means use server green mode.
     ===================== ================================ ======================================= =======================================================================================
 
     The same example with a read-write ROI, a customized label and description::
@@ -1122,8 +1122,8 @@ class _BaseProperty(object):
     def __set__(self, obj, value):
         obj._tango_properties[self.name] = value
         if self.update_db:
-            import PyTango
-            db = PyTango.Util.instance().get_database()
+            import tango
+            db = tango.Util.instance().get_database()
             db.put_device_property(obj.get_name(), {self.name: value})
 
     def __delete__(self, obj):
@@ -1134,11 +1134,11 @@ class device_property(_BaseProperty):
     """
     Declares a new tango device property in a :class:`Device`. To be
     used like the python native :obj:`property` function. For example,
-    to declare a scalar, `PyTango.DevString`, device property called
+    to declare a scalar, `tango.DevString`, device property called
     *host* in a *PowerSupply* :class:`Device` do::
 
-        from PyTango.server import Device, DeviceMeta
-        from PyTango.server import device_property
+        from tango.server import Device, DeviceMeta
+        from tango.server import device_property
 
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
@@ -1162,11 +1162,11 @@ class class_property(_BaseProperty):
     """
     Declares a new tango class property in a :class:`Device`. To be
     used like the python native :obj:`property` function. For example,
-    to declare a scalar, `PyTango.DevString`, class property called
+    to declare a scalar, `tango.DevString`, class property called
     *port* in a *PowerSupply* :class:`Device` do::
 
-        from PyTango.server import Device, DeviceMeta
-        from PyTango.server import class_property
+        from tango.server import Device, DeviceMeta
+        from tango.server import class_property
 
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
@@ -1227,7 +1227,7 @@ def _to_classes(classes):
                 if not hasattr(klass_info, '_api') or klass_info._api < 2:
                     raise Exception(
                         "When giving a single class, it must " \
-                        "implement HLAPI (see PyTango.server)")
+                        "implement HLAPI (see tango.server)")
                 klass_klass = klass_info.TangoClassClass
                 klass_name = klass_info.TangoClassName
                 klass = klass_info
@@ -1243,7 +1243,7 @@ def _to_classes(classes):
                 if not hasattr(klass_info, '_api') or klass_info._api < 2:
                     raise Exception(
                         "When giving a single class, it must " \
-                        "implement HLAPI (see PyTango.server)")
+                        "implement HLAPI (see tango.server)")
                 klass_klass = klass_info.TangoClassClass
                 klass_name = klass_info.TangoClassName
                 klass = klass_info
@@ -1260,11 +1260,11 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
                  event_loop=None, post_init_callback=None,
                  green_mode=None):
     if green_mode is None:
-        from PyTango import get_green_mode
+        from tango import get_green_mode
         green_mode = get_green_mode()
     gevent_mode = green_mode == GreenMode.Gevent
 
-    import PyTango
+    import tango
     if msg_stream is None:
         write = lambda msg: None
     else:
@@ -1276,10 +1276,10 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
     post_init_callback = __to_cb(post_init_callback)
 
     if util is None:
-        util = PyTango.Util(args)
+        util = tango.Util(args)
 
     if gevent_mode:
-        util.set_serial_model(PyTango.SerialModel.NO_SYNC)
+        util.set_serial_model(tango.SerialModel.NO_SYNC)
         worker = _create_gevent_worker()
         set_worker(worker)
 
@@ -1290,7 +1290,7 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
             event_loop = functools.partial(worker.execute, event_loop)
         util.server_set_event_loop(event_loop)
 
-    log = logging.getLogger("PyTango")
+    log = logging.getLogger("tango")
 
     def tango_loop():
         log.debug("server loop started")
@@ -1321,23 +1321,23 @@ def run(classes, args=None, msg_stream=sys.stdout,
 
     The `classes` parameter can be either a sequence of:
 
-    * :class:`~PyTango.server.Device` or
+    * :class:`~tango.server.Device` or
     * a sequence of two elements
-      :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl` or
+      :class:`~tango.DeviceClass`, :class:`~tango.DeviceImpl` or
     * a sequence of three elements
-      :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`,
+      :class:`~tango.DeviceClass`, :class:`~tango.DeviceImpl`,
       tango class name (str)
 
     or a dictionary where:
 
     * key is the tango class name
     * value is either:
-        * a :class:`~PyTango.server.Device` class or
+        * a :class:`~tango.server.Device` class or
         * a sequence of two elements
-          :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`
+          :class:`~tango.DeviceClass`, :class:`~tango.DeviceImpl`
           or
         * a sequence of three elements
-          :class:`~PyTango.DeviceClass`, :class:`~PyTango.DeviceImpl`,
+          :class:`~tango.DeviceClass`, :class:`~tango.DeviceImpl`,
           tango class name (str)
 
     The optional `post_init_callback` can be a callable (without
@@ -1353,9 +1353,9 @@ def run(classes, args=None, msg_stream=sys.stdout,
        predefined order use a sequence or an OrderedDict.
 
     Example 1: registering and running a PowerSupply inheriting from
-    :class:`~PyTango.server.Device`::
+    :class:`~tango.server.Device`::
 
-        from PyTango.server import Device, DeviceMeta, run
+        from tango.server import Device, DeviceMeta, run
 
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
@@ -1365,8 +1365,8 @@ def run(classes, args=None, msg_stream=sys.stdout,
     Example 2: registering and running a MyServer defined by tango
     classes `MyServerClass` and `MyServer`::
 
-        from PyTango import Device_4Impl, DeviceClass
-        from PyTango.server import run
+        from tango import Device_4Impl, DeviceClass
+        from tango.server import run
 
         class MyServer(Device_4Impl):
             pass
@@ -1379,8 +1379,8 @@ def run(classes, args=None, msg_stream=sys.stdout,
     Example 3: registering and running a MyServer defined by tango
     classes `MyServerClass` and `MyServer`::
 
-        from PyTango import Device_4Impl, DeviceClass
-        from PyTango.server import Device, DeviceMeta, run
+        from tango import Device_4Impl, DeviceClass
+        from tango.server import Device, DeviceMeta, run
 
         class PowerSupply(Device):
             __metaclass__ = DeviceMeta
@@ -1395,7 +1395,7 @@ def run(classes, args=None, msg_stream=sys.stdout,
         # or: run({'MyServer': (MyServerClass, MyServer)})
 
     :param classes:
-        a sequence of :class:`~PyTango.server.Device` classes or
+        a sequence of :class:`~tango.server.Device` classes or
         a dictionary where keyword is the tango class name and value
         is a sequence of Tango Device Class python class, and Tango
         Device python class
@@ -1412,7 +1412,7 @@ def run(classes, args=None, msg_stream=sys.stdout,
     :param util:
         PyTango Util object [default: None meaning create a Util
         instance]
-    :type util: :class:`~PyTango.Util`
+    :type util: :class:`~tango.Util`
 
     :param event_loop: event_loop callable
     :type event_loop: callable
@@ -1424,7 +1424,7 @@ def run(classes, args=None, msg_stream=sys.stdout,
         callable or tuple (see description above)
 
     :return: The Util singleton object
-    :rtype: :class:`~PyTango.Util`
+    :rtype: :class:`~tango.Util`
 
     .. versionadded:: 8.1.2
 
@@ -1444,7 +1444,7 @@ def run(classes, args=None, msg_stream=sys.stdout,
     except KeyboardInterrupt:
         write("Exiting: Keyboard interrupt\n")
     except DevFailed as df:
-        write("Exiting: Server exited with PyTango.DevFailed:\n" + \
+        write("Exiting: Server exited with tango.DevFailed:\n" + \
               str(df) + "\n")
         if verbose:
             write(traceback.format_exc())
@@ -1460,7 +1460,7 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
         post_init_callback=None, green_mode=None):
     """
     Since PyTango 8.1.2 it is just an alias to
-    :func:`~PyTango.server.run`. Use :func:`~PyTango.server.run`
+    :func:`~tango.server.run`. Use :func:`~tango.server.run`
     instead.
 
     .. versionadded:: 8.0.0
@@ -1478,7 +1478,7 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
         Added `post_init_callback` keyword parameter
 
     .. deprecated:: 8.1.2
-        Use :func:`~PyTango.server.run` instead.
+        Use :func:`~tango.server.run` instead.
 
     """
     return run(classes, args=args, msg_stream=msg_stream,
@@ -1593,7 +1593,7 @@ def _create_gevent_worker():
 
 _CLEAN_UP_TEMPLATE = """
 import sys
-from PyTango import Database
+from tango import Database
 
 db = Database()
 server_instance = '{server_instance}'
@@ -1634,7 +1634,7 @@ def __to_tango_type_fmt(value):
 
 def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
     slog = server.server_instance.replace("/", ".")
-    log = logging.getLogger("PyTango.Server." + slog)
+    log = logging.getLogger("tango.Server." + slog)
 
     obj_klass = obj.__class__
     obj_klass_name = obj_klass.__name__
@@ -1833,7 +1833,7 @@ class Server:
         else:
             self.__worker = get_worker()
         set_worker(self.__worker)
-        self.log = logging.getLogger("PyTango.Server")
+        self.log = logging.getLogger("tango.Server")
         self.__phase = Server.Phase0
 
     def __build_args(self):
@@ -1867,8 +1867,8 @@ class Server:
         if server_registered:
             dserver_name = "dserver/{0}".format(server_instance)
             if db.import_device(dserver_name).exported:
-                import PyTango
-                dserver = PyTango.DeviceProxy(dserver_name)
+                import tango
+                dserver = tango.DeviceProxy(dserver_name)
                 try:
                     dserver.ping()
                     raise Exception("Server already running")
@@ -2000,8 +2000,8 @@ class Server:
     @property
     def tango_util(self):
         if self.__util is None:
-            import PyTango
-            self.__util = PyTango.Util(self.__build_args())
+            import tango
+            self.__util = tango.Util(self.__build_args())
             self._phase = Server.Phase1
         return self.__util
 
@@ -2009,7 +2009,7 @@ class Server:
     def green_mode(self):
         gm = self.__green_mode
         if gm is None:
-            from PyTango import get_green_mode
+            from tango import get_green_mode
             gm = get_green_mode()
         return gm
 
@@ -2044,8 +2044,8 @@ class Server:
         :rtype: tuple<dict, dict>
         """
         if self.__util is None:
-            import PyTango
-            db = PyTango.Database()
+            import tango
+            db = tango.Database()
         else:
             db = self.__util.get_database()
         server = self.server_instance
@@ -2086,8 +2086,8 @@ class Server:
     def unregister_object(self, name):
         tango_object = self.__objects.pop(name.lower())
         if self._phase > Server.Phase1:
-            import PyTango
-            util = PyTango.Util.instance()
+            import tango
+            util = tango.Util.instance()
             if not util.is_svr_shutting_down():
                 util.delete_device(tango_object.tango_class_name, name)
 
@@ -2119,8 +2119,8 @@ class Server:
                                                tango_class_name=class_name)
         self.__objects[full_name.lower()] = tango_object
         if self._phase > Server.Phase1:
-            import PyTango
-            util = PyTango.Util.instance()
+            import tango
+            util = tango.Util.instance()
             util.create_device(class_name, name)
         return tango_object
 

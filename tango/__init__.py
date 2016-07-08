@@ -87,7 +87,7 @@ def __prepare_nt():
     if tango_root is None:
         tango_root = os.path.join(os.environ["ProgramFiles"], "tango")
     tango_root = tango_root.lower()
-    
+
     if sys.hexversion < 0x03030000:
         vc = "vc9_dll"
     else:
@@ -103,7 +103,7 @@ def __prepare_nt():
        tango_dll_path not in PATH.lower():
             os.environ['PATH'] += ";" + tango_dll_path
     else:
-        # Tango C++ could not be found on the system... 
+        # Tango C++ could not be found on the system...
         # ... use PyTango's private Tango C++ library
         tango_dll_path = os.path.dirname(os.path.abspath(__file__))
         tango_dll_path = os.path.join(tango_dll_path, "_tango_dll_")
@@ -112,15 +112,15 @@ def __prepare_nt():
 
 if os.name == 'nt':
     try:
-        from . import _PyTango
+        from . import _tango
     except ImportError as ie:
         # in windows try to find the location for tango
         __prepare_nt()
-        from . import _PyTango
+        from . import _tango
 else:
-    from . import _PyTango
-        
-from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
+    from . import _tango
+
+from ._tango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     AsynCall, AsynReplyNotArrived, AttReqType, Attr, AttrConfEventData,
     AttrDataFormat, AttrList, AttrProperty, AttrQuality, AttrReadEvent,
     AttrSerialModel, AttrWriteType, AttrWrittenEvent, Attribute,
@@ -156,7 +156,7 @@ from ._PyTango import (AccessControlType, ApiUtil, ArchiveEventInfo,
     StdNamedDevFailedVector, StdStringVector, SubDevDiag, TimeVal,
     UserDefaultAttrProp, UserDefaultPipeProp, WAttribute, WRITE, WrongData,
     WrongNameSyntax, alarm_flags, asyn_req_type, cb_sub_model, constants,
-    raise_asynch_exception, Interceptors, 
+    raise_asynch_exception, Interceptors,
     AutoTangoMonitor, AutoTangoAllowThreads)
 
 ArgType = CmdArgType

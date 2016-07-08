@@ -17,7 +17,7 @@ __all__ = ["api_util_init"]
 
 __docformat__ = "restructuredtext"
 
-from ._PyTango import ApiUtil
+from ._tango import ApiUtil
 
 from .utils import document_method, document_static_method, _get_env_var
 
@@ -32,8 +32,8 @@ def __doc_api_util():
     It is designed as a singleton. To get a reference to the singleton object
     you must do::
     
-        import PyTango
-        apiutil = PyTango.ApiUtil.instance()
+        import tango
+        apiutil = tango.ApiUtil.instance()
         
     New in PyTango 7.1.3
     """

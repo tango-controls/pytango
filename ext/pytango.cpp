@@ -64,7 +64,7 @@ void* init_numpy(void) { import_array(); return NULL; }
 void init_numpy(void) { import_array(); return; }
 #endif
 
-BOOST_PYTHON_MODULE(_PyTango)
+BOOST_PYTHON_MODULE(_tango)
 {
 
 #ifndef DISABLE_BOOST_DOCSTRING_OPTIONS

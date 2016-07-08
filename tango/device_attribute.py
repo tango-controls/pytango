@@ -20,7 +20,7 @@ __docformat__ = "restructuredtext"
 import copy
 
 from .utils import document_method as __document_method
-from ._PyTango import DeviceAttribute, ExtractAs
+from ._tango import DeviceAttribute, ExtractAs
 
 def __DeviceAttribute__get_data(self):
     return self.get_data_raw().extract()

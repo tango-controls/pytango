@@ -25,7 +25,7 @@ __docformat__ = "restructuredtext"
 
 import copy
 
-from ._PyTango import DeviceImpl, Device_3Impl, Device_4Impl, Device_5Impl, \
+from ._tango import DeviceImpl, Device_3Impl, Device_4Impl, Device_5Impl, \
     DevFailed, Attribute, WAttribute, \
     MultiAttribute, MultiClassAttribute, \
     Attr, Logger, AttrWriteType, AttrDataFormat, CmdArgType, \
@@ -1843,7 +1843,7 @@ def __doc_MultiClassAttribute():
 
     MultiClassAttribute.__doc__ = """
     There is one instance of this class for each device class.
-    This class is mainly an aggregate of :class:`~PyTango.Attr` objects. 
+    This class is mainly an aggregate of :class:`~tango.Attr` objects. 
     It eases management of multiple attributes
     
     New in PyTango 7.2.1"""
@@ -1851,7 +1851,7 @@ def __doc_MultiClassAttribute():
     document_method("get_attr", """
     get_attr(self, attr_name) -> Attr
 
-            Get the :class:`~PyTango.Attr` object for the attribute with
+            Get the :class:`~tango.Attr` object for the attribute with
             name passed as parameter
 
         Parameters :
@@ -1866,7 +1866,7 @@ def __doc_MultiClassAttribute():
     document_method("remove_attr", """
     remove_attr(self, attr_name, cl_name) -> None
 
-            Remove the :class:`~PyTango.Attr` object for the attribute with
+            Remove the :class:`~tango.Attr` object for the attribute with
             name passed as parameter. Does nothing if the attribute does not
             exist.
 
@@ -1880,7 +1880,7 @@ def __doc_MultiClassAttribute():
     document_method("get_attr_list", """
     get_attr_list(self) -> seq<Attr>
 
-            Get the list of :class:`~PyTango.Attr` for this device class.
+            Get the list of :class:`~tango.Attr` for this device class.
 
         Return     : (seq<Attr>) the list of attribute objects
         
@@ -1893,15 +1893,15 @@ def __doc_MultiAttribute():
 
     MultiAttribute.__doc__ = """
     There is one instance of this class for each device.
-    This class is mainly an aggregate of :class:`~PyTango.Attribute` or
-    :class:`~PyTango.WAttribute` objects. It eases management of multiple
+    This class is mainly an aggregate of :class:`~tango.Attribute` or
+    :class:`~tango.WAttribute` objects. It eases management of multiple
     attributes"""
     
     document_method("get_attr_by_name", """
     get_attr_by_name(self, attr_name) -> Attribute
 
-            Get :class:`~PyTango.Attribute` object from its name.
-            This method returns an :class:`~PyTango.Attribute` object with a
+            Get :class:`~tango.Attribute` object from its name.
+            This method returns an :class:`~tango.Attribute` object with a
             name passed as parameter. The equality on attribute name is case
             independant.
 
@@ -1915,8 +1915,8 @@ def __doc_MultiAttribute():
     document_method("get_attr_by_ind", """
     get_attr_by_ind(self, ind) -> Attribute
 
-            Get :class:`~PyTango.Attribute` object from its index.
-            This method returns an :class:`~PyTango.Attribute` object from the
+            Get :class:`~tango.Attribute` object from its index.
+            This method returns an :class:`~tango.Attribute` object from the
             index in the main attribute vector.
 
         Parameters :
@@ -1928,7 +1928,7 @@ def __doc_MultiAttribute():
     get_w_attr_by_name(self, attr_name) -> WAttribute
 
             Get a writable attribute object from its name.
-            This method returns an :class:`~PyTango.WAttribute` object with a
+            This method returns an :class:`~tango.WAttribute` object with a
             name passed as parameter. The equality on attribute name is case
             independant.
 
@@ -1943,7 +1943,7 @@ def __doc_MultiAttribute():
     get_w_attr_by_ind(self, ind) -> WAttribute
 
             Get a writable attribute object from its index.
-            This method returns an :class:`~PyTango.WAttribute` object from the
+            This method returns an :class:`~tango.WAttribute` object from the
             index in the main attribute vector.
 
         Parameters :
@@ -1956,7 +1956,7 @@ def __doc_MultiAttribute():
 
             Get Attribute index into the main attribute vector from its name.
             This method returns the index in the Attribute vector (stored in the 
-            :class:`~PyTango.MultiAttribute` object) of an attribute with a
+            :class:`~tango.MultiAttribute` object) of an attribute with a
             given name. The name equality is case independant.
 
         Parameters :

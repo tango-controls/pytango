@@ -35,12 +35,15 @@ import sys
 import numbers
 import collections
 
-from ._PyTango import StdStringVector, StdDoubleVector, \
+from ._tango import StdStringVector, StdDoubleVector, \
     DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
     EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
-    GreenMode, DevState
+    DevState, CommunicationFailed
+
+from . import _tango
 from .constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
 from .release import Release
+
 
 _scalar_int_types = (CmdArgType.DevShort, CmdArgType.DevUShort,
     CmdArgType.DevInt, CmdArgType.DevLong, CmdArgType.DevULong,
@@ -200,10 +203,10 @@ def __requires(package_name, min_version=None, conflicts=(),
             msg = "Error importing package {0} required by {1}".format(
                 package_name, software_name)
             raise Exception(msg)
-        
+
     if min_version is not None:
         min_version = LooseVersion(min_version)
-        if min_version > curr_version:        
+        if min_version > curr_version:
             msg = "{0} requires {1} {2} but {3} installed".format(
                 software_name, package_name, min_version, curr_version)
             raise Exception(msg)
@@ -212,7 +215,7 @@ def __requires(package_name, min_version=None, conflicts=(),
     if curr_version in conflicts:
         msg = "{0} cannot run with {1} {2}".format(
             software_name, package_name, curr_version)
-        raise Exception(msg)        
+        raise Exception(msg)
     return True
 
 def requires_pytango(min_version=None, conflicts=(),
@@ -222,7 +225,7 @@ def requires_pytango(min_version=None, conflicts=(),
     software is present. If not an exception is thrown.
     Example usage::
 
-        from PyTango import requires_pytango
+        from tango import requires_pytango
 
         requires_pytango('7.1', conflicts=['8.1.1'], software='MyDS')
 
@@ -239,14 +242,14 @@ def requires_pytango(min_version=None, conflicts=(),
     :type conflics:
         seq<str|LooseVersion>
     :param software_name:
-        software name using PyTango. Used in the exception message
+        software name using tango. Used in the exception message
     :type software_name: str
 
     :raises Exception: if the required PyTango version is not met
 
     New in PyTango 8.1.4
     """
-    return __requires("PyTango", min_version=min_version,
+    return __requires("pytango", min_version=min_version,
                       conflicts=conflicts, software_name=software_name)
 
 
@@ -257,7 +260,7 @@ def requires_tango(min_version=None, conflicts=(),
     software is present. If not an exception is thrown.
     Example usage::
 
-        from Tango import requires_tango
+        from tango import requires_tango
 
         requires_tango('7.1', conflicts=['8.1.1'], software='MyDS')
 
@@ -282,19 +285,19 @@ def requires_tango(min_version=None, conflicts=(),
     New in PyTango 8.1.4
     """
     return __requires("Tango", min_version=min_version,
-                      conflicts=conflicts, software_name=software_name)    
+                      conflicts=conflicts, software_name=software_name)
 
 
 def get_tango_device_classes():
     global __device_classes
     if __device_classes is None:
-        import PyTango
-        __device_classes = [PyTango.DeviceImpl]
+
+        __device_classes = [_tango.DeviceImpl]
         i = 2
         while True:
             dc = "Device_{0}Impl".format(i)
             try:
-               __device_classes.append(getattr(PyTango, dc))
+               __device_classes.append(getattr(_tango, dc))
                i = i + 1
             except AttributeError:
                 break
@@ -427,7 +430,7 @@ def is_non_str_seq(obj):
 
     :return: True is the given obj is a sequence or False otherwise
     :rtype: :py:obj:`bool`
-    """    
+    """
     return is_seq(obj) and not is_pure_str(obj)
 
 
@@ -467,10 +470,10 @@ def is_number(obj):
 
 def is_scalar(tg_type):
     """Tells if the given tango type is a scalar
-    
+
     :param tg_type: tango type
-    :type tg_type: :class:`PyTango.CmdArgType`
-    
+    :type tg_type: :class:`tango.CmdArgType`
+
     :return: True if the given tango type is a scalar or False otherwise
     :rtype: :py:obj:`bool`
     """
@@ -482,10 +485,10 @@ is_scalar_type = is_scalar
 
 def is_array(tg_type):
     """Tells if the given tango type is an array type
-    
+
     :param tg_type: tango type
-    :type tg_type: :class:`PyTango.CmdArgType`
-    
+    :type tg_type: :class:`tango.CmdArgType`
+
     :return: True if the given tango type is an array type or False otherwise
     :rtype: :py:obj:`bool`
     """
@@ -497,13 +500,13 @@ is_array_type = is_array
 
 def is_numerical(tg_type, inc_array=False):
     """Tells if the given tango type is numerical
-    
+
     :param tg_type: tango type
-    :type tg_type: :class:`PyTango.CmdArgType`
-    :param inc_array: (optional, default is False) determines if include array 
+    :type tg_type: :class:`tango.CmdArgType`
+    :param inc_array: (optional, default is False) determines if include array
                       in the list of checked types
     :type inc_array: :py:obj:`bool`
-    
+
     :return: True if the given tango type is a numerical or False otherwise
     :rtype: :py:obj:`bool`
     """
@@ -519,13 +522,13 @@ is_numerical_type = is_numerical
 
 def is_int(tg_type, inc_array=False):
     """Tells if the given tango type is integer
-    
+
     :param tg_type: tango type
-    :type tg_type: :class:`PyTango.CmdArgType`
-    :param inc_array: (optional, default is False) determines if include array 
+    :type tg_type: :class:`tango.CmdArgType`
+    :param inc_array: (optional, default is False) determines if include array
                       in the list of checked types
     :type inc_array: :py:obj:`bool`
-    
+
     :return: True if the given tango type is integer or False otherwise
     :rtype: :py:obj:`bool`
     """
@@ -541,13 +544,13 @@ is_int_type = is_int
 
 def is_float(tg_type, inc_array=False):
     """Tells if the given tango type is float
-    
+
     :param tg_type: tango type
-    :type tg_type: :class:`PyTango.CmdArgType`
-    :param inc_array: (optional, default is False) determines if include array 
+    :type tg_type: :class:`tango.CmdArgType`
+    :param inc_array: (optional, default is False) determines if include array
                       in the list of checked types
     :type inc_array: :py:obj:`bool`
-    
+
     :return: True if the given tango type is float or False otherwise
     :rtype: :py:obj:`bool`
     """
@@ -563,13 +566,13 @@ is_float_type = is_float
 
 def is_bool(tg_type, inc_array=False):
     """Tells if the given tango type is boolean
-    
+
     :param tg_type: tango type
-    :type tg_type: :class:`PyTango.CmdArgType`
-    :param inc_array: (optional, default is False) determines if include array 
+    :type tg_type: :class:`tango.CmdArgType`
+    :param inc_array: (optional, default is False) determines if include array
                       in the list of checked types
     :type inc_array: :py:obj:`bool`
-    
+
     :return: True if the given tango type is boolean or False otherwise
     :rtype: :py:obj:`bool`
     """
@@ -584,13 +587,13 @@ is_bool_type = is_bool
 
 def is_str(tg_type, inc_array=False):
     """Tells if the given tango type is string
-    
+
     :param tg_type: tango type
-    :type tg_type: :class:`PyTango.CmdArgType`
-    :param inc_array: (optional, default is False) determines if include array 
+    :type tg_type: :class:`tango.CmdArgType`
+    :param inc_array: (optional, default is False) determines if include array
                       in the list of checked types
     :type inc_array: :py:obj:`bool`
-    
+
     :return: True if the given tango type is string or False otherwise
     :rtype: :py:obj:`bool`
     """
@@ -606,13 +609,13 @@ is_str_type = is_str
 
 def is_bin(tg_type, inc_array=False):
     """Tells if the given tango type is binary
-    
+
     :param tg_type: tango type
-    :type tg_type: :class:`PyTango.CmdArgType`
-    :param inc_array: (optional, default is False) determines if include array 
+    :type tg_type: :class:`tango.CmdArgType`
+    :param inc_array: (optional, default is False) determines if include array
                       in the list of checked types
     :type inc_array: :py:obj:`bool`
-    
+
     :return: True if the given tango type is binary or False otherwise
     :rtype: :py:obj:`bool`
     """
@@ -623,31 +626,31 @@ is_bin_type = is_bin
 
 
 def seq_2_StdStringVector(seq, vec=None):
-    """Converts a python sequence<str> object to a :class:`PyTango.StdStringVector`
-        
+    """Converts a python sequence<str> object to a :class:`tango.StdStringVector`
+
         :param seq: the sequence of strings
         :type seq: sequence<:py:obj:`str`>
-        :param vec: (optional, default is None) an :class:`PyTango.StdStringVector`
-                    to be filled. If None is given, a new :class:`PyTango.StdStringVector`
+        :param vec: (optional, default is None) an :class:`tango.StdStringVector`
+                    to be filled. If None is given, a new :class:`tango.StdStringVector`
                     is created
-        :return: a :class:`PyTango.StdStringVector` filled with the same contents as seq
-        :rtype: :class:`PyTango.StdStringVector`
+        :return: a :class:`tango.StdStringVector` filled with the same contents as seq
+        :rtype: :class:`tango.StdStringVector`
     """
     if vec is None:
         if isinstance(seq, StdStringVector): return seq
         vec = StdStringVector()
     if not isinstance(vec, StdStringVector):
-        raise TypeError('vec must be a PyTango.StdStringVector')
+        raise TypeError('vec must be a tango.StdStringVector')
     for e in seq:
         vec.append(str(e))
     return vec
 
 
 def StdStringVector_2_seq(vec, seq=None):
-    """Converts a :class:`PyTango.StdStringVector` to a python sequence<str>
-        
-        :param seq: the :class:`PyTango.StdStringVector`
-        :type seq: :class:`PyTango.StdStringVector`
+    """Converts a :class:`tango.StdStringVector` to a python sequence<str>
+
+        :param seq: the :class:`tango.StdStringVector`
+        :type seq: :class:`tango.StdStringVector`
         :param vec: (optional, default is None) a python sequence to be filled.
                      If None is given, a new list is created
         :return: a python sequence filled with the same contents as seq
@@ -655,38 +658,38 @@ def StdStringVector_2_seq(vec, seq=None):
     """
     if seq is None: seq = []
     if not isinstance(vec, StdStringVector):
-        raise TypeError('vec must be a PyTango.StdStringVector')
+        raise TypeError('vec must be a tango.StdStringVector')
     for e in vec:
         seq.append(str(e))
     return seq
 
 
 def seq_2_StdDoubleVector(seq, vec=None):
-    """Converts a python sequence<float> object to a :class:`PyTango.StdDoubleVector`
-        
+    """Converts a python sequence<float> object to a :class:`tango.StdDoubleVector`
+
         :param seq: the sequence of floats
         :type seq: sequence<:py:obj:`float`>
-        :param vec: (optional, default is None) an :class:`PyTango.StdDoubleVector`
-                    to be filled. If None is given, a new :class:`PyTango.StdDoubleVector`
+        :param vec: (optional, default is None) an :class:`tango.StdDoubleVector`
+                    to be filled. If None is given, a new :class:`tango.StdDoubleVector`
                     is created
-        :return: a :class:`PyTango.StdDoubleVector` filled with the same contents as seq
-        :rtype: :class:`PyTango.StdDoubleVector`
+        :return: a :class:`tango.StdDoubleVector` filled with the same contents as seq
+        :rtype: :class:`tango.StdDoubleVector`
     """
     if vec is None:
         if isinstance(seq, StdDoubleVector): return seq
         vec = StdDoubleVector()
     if not isinstance(vec, StdDoubleVector):
-        raise TypeError('vec must be a PyTango.StdDoubleVector')
+        raise TypeError('vec must be a tango.StdDoubleVector')
     for e in seq:
         vec.append(str(e))
     return vec
 
 
 def StdDoubleVector_2_seq(vec, seq=None):
-    """Converts a :class:`PyTango.StdDoubleVector` to a python sequence<float>
-        
-        :param seq: the :class:`PyTango.StdDoubleVector`
-        :type seq: :class:`PyTango.StdDoubleVector`
+    """Converts a :class:`tango.StdDoubleVector` to a python sequence<float>
+
+        :param seq: the :class:`tango.StdDoubleVector`
+        :type seq: :class:`tango.StdDoubleVector`
         :param vec: (optional, default is None) a python sequence to be filled.
                      If None is given, a new list is created
         :return: a python sequence filled with the same contents as seq
@@ -694,67 +697,67 @@ def StdDoubleVector_2_seq(vec, seq=None):
     """
     if seq is None: seq = []
     if not isinstance(vec, StdDoubleVector):
-        raise TypeError('vec must be a PyTango.StdDoubleVector')
+        raise TypeError('vec must be a tango.StdDoubleVector')
     for e in vec: seq.append(float(e))
     return seq
 
 
 def seq_2_DbDevInfos(seq, vec=None):
-    """Converts a python sequence<DbDevInfo> object to a :class:`PyTango.DbDevInfos`
-        
+    """Converts a python sequence<DbDevInfo> object to a :class:`tango.DbDevInfos`
+
         :param seq: the sequence of DbDevInfo
         :type seq: sequence<DbDevInfo>
-        :param vec: (optional, default is None) an :class:`PyTango.DbDevInfos`
-                    to be filled. If None is given, a new :class:`PyTango.DbDevInfos`
+        :param vec: (optional, default is None) an :class:`tango.DbDevInfos`
+                    to be filled. If None is given, a new :class:`tango.DbDevInfos`
                     is created
-        :return: a :class:`PyTango.DbDevInfos` filled with the same contents as seq
-        :rtype: :class:`PyTango.DbDevInfos`
+        :return: a :class:`tango.DbDevInfos` filled with the same contents as seq
+        :rtype: :class:`tango.DbDevInfos`
     """
     if vec is None:
         if isinstance(seq, DbDevInfos): return seq
         vec = DbDevInfos()
     if not isinstance(vec, DbDevInfos):
-        raise TypeError('vec must be a PyTango.DbDevInfos')
+        raise TypeError('vec must be a tango.DbDevInfos')
     for e in seq: vec.append(e)
     return vec
 
 
 def seq_2_DbDevExportInfos(seq, vec=None):
-    """Converts a python sequence<DbDevExportInfo> object to a :class:`PyTango.DbDevExportInfos`
-        
+    """Converts a python sequence<DbDevExportInfo> object to a :class:`tango.DbDevExportInfos`
+
         :param seq: the sequence of DbDevExportInfo
         :type seq: sequence<DbDevExportInfo>
-        :param vec: (optional, default is None) an :class:`PyTango.DbDevExportInfos`
-                    to be filled. If None is given, a new :class:`PyTango.DbDevExportInfos`
+        :param vec: (optional, default is None) an :class:`tango.DbDevExportInfos`
+                    to be filled. If None is given, a new :class:`tango.DbDevExportInfos`
                     is created
-        :return: a :class:`PyTango.DbDevExportInfos` filled with the same contents as seq
-        :rtype: :class:`PyTango.DbDevExportInfos`
+        :return: a :class:`tango.DbDevExportInfos` filled with the same contents as seq
+        :rtype: :class:`tango.DbDevExportInfos`
     """
     if vec is None:
         if isinstance(seq, DbDevExportInfos): return seq
         vec = DbDevExportInfos()
     if not isinstance(vec, DbDevExportInfos):
-        raise TypeError('vec must be a PyTango.DbDevExportInfos')
+        raise TypeError('vec must be a tango.DbDevExportInfos')
     for e in seq: vec.append(e)
     return vec
 
 
 def seq_2_DbData(seq, vec=None):
-    """Converts a python sequence<DbDatum> object to a :class:`PyTango.DbData`
-        
+    """Converts a python sequence<DbDatum> object to a :class:`tango.DbData`
+
         :param seq: the sequence of DbDatum
         :type seq: sequence<DbDatum>
-        :param vec: (optional, default is None) an :class:`PyTango.DbData`
-                    to be filled. If None is given, a new :class:`PyTango.DbData`
+        :param vec: (optional, default is None) an :class:`tango.DbData`
+                    to be filled. If None is given, a new :class:`tango.DbData`
                     is created
-        :return: a :class:`PyTango.DbData` filled with the same contents as seq
-        :rtype: :class:`PyTango.DbData`
+        :return: a :class:`tango.DbData` filled with the same contents as seq
+        :rtype: :class:`tango.DbData`
     """
     if vec is None:
         if isinstance(seq, DbData): return seq
         vec = DbData()
     if not isinstance(vec, DbData):
-        raise TypeError('vec must be a PyTango.DbData')
+        raise TypeError('vec must be a tango.DbData')
     for e in seq: vec.append(e)
     return vec
 
@@ -762,7 +765,7 @@ def seq_2_DbData(seq, vec=None):
 def DbData_2_dict(db_data, d=None):
     if d is None: d = {}
     if not isinstance(db_data, DbData):
-        raise TypeError('db_data must be a PyTango.DbData. A %s found instead' % type(db_data))
+        raise TypeError('db_data must be a tango.DbData. A %s found instead' % type(db_data))
     for db_datum in db_data:
         d[db_datum.name] = db_datum.value_string
     return d
@@ -770,14 +773,14 @@ def DbData_2_dict(db_data, d=None):
 
 def seqStr_2_obj(seq, tg_type, tg_format=None):
     """Translates a sequence<str> to a sequence of objects of give type and format
-    
+
         :param seq: the sequence
         :type seq: sequence<str>
         :param tg_type: tango type
-        :type tg_type: :class:`PyTango.CmdArgType`
+        :type tg_type: :class:`tango.CmdArgType`
         :param tg_format: (optional, default is None, meaning SCALAR) tango format
-        :type tg_format: :class:`PyTango.AttrDataFormat`
-        
+        :type tg_format: :class:`tango.AttrDataFormat`
+
         :return: a new sequence
     """
     if tg_format:
@@ -870,13 +873,13 @@ def scalar_to_array_type(tg_type):
     """
     Gives the array tango type corresponding to the given tango
     scalar type. Example: giving DevLong will return DevVarLongArray.
-    
+
     :param tg_type: tango type
-    :type tg_type: :class:`PyTango.CmdArgType`
+    :type tg_type: :class:`tango.CmdArgType`
 
     :return: the array tango type for the given scalar tango type
-    :rtype: :class:`PyTango.CmdArgType`
-    
+    :rtype: :class:`tango.CmdArgType`
+
     :raises ValueError: in case the given dtype is not a tango scalar type
     """
     try:
@@ -887,11 +890,11 @@ def scalar_to_array_type(tg_type):
 
 def str_2_obj(obj_str, tg_type=None):
     """Converts a string into an object according to the given tango type
-    
+
            :param obj_str: the string to be converted
            :type obj_str: :py:obj:`str`
            :param tg_type: tango type
-           :type tg_type: :class:`PyTango.CmdArgType`
+           :type tg_type: :class:`tango.CmdArgType`
            :return: an object calculated from the given string
            :rtype: :py:obj:`object`
     """
@@ -913,11 +916,11 @@ def str_2_obj(obj_str, tg_type=None):
 
 def obj_2_str(obj, tg_type=None):
     """Converts a python object into a string according to the given tango type
-    
+
            :param obj: the object to be converted
            :type obj: :py:obj:`object`
            :param tg_type: tango type
-           :type tg_type: :class:`PyTango.CmdArgType`
+           :type tg_type: :class:`tango.CmdArgType`
            :return: a string representation of the given object
            :rtype: :py:obj:`str`
     """
@@ -953,7 +956,7 @@ def copy_doc(klass, fnname):
     meth, func = __get_meth_func(klass, fnname)
     func.__doc__ = base_func.__doc__
 
-    
+
 def document_method(klass, method_name, d, add=True):
     meth, func = __get_meth_func(klass, method_name)
     if add:
@@ -969,7 +972,7 @@ def document_method(klass, method_name, d, add=True):
         except AttributeError:
             pass
 
-        
+
 def document_static_method(klass, method_name, d, add=True):
     meth, func = __get_meth_func(klass, method_name)
     if add:
@@ -979,7 +982,7 @@ def document_static_method(klass, method_name, d, add=True):
             return
     meth.__doc__ = d
 
-    
+
 def document_enum(klass, enum_name, desc, append=True):
     # derived = type(base)('derived', (base,), {'__doc__': 'desc'})
 
@@ -997,10 +1000,10 @@ def document_enum(klass, enum_name, desc, append=True):
     # Replace the original enum type with the new one
     setattr(klass, enum_name, derived)
 
-    
+
 class CaselessList(list):
-    """A case insensitive lists that has some caseless methods. Only allows 
-    strings as list members. Most methods that would normally return a list, 
+    """A case insensitive lists that has some caseless methods. Only allows
+    strings as list members. Most methods that would normally return a list,
     return a CaselessList. (Except list() and lowercopy())
     Sequence Methods implemented are :
     __contains__, remove, count, index, append, extend, insert,
@@ -1064,7 +1067,7 @@ class CaselessList(list):
         list.append(self, item)
 
     def extend(self, item):
-        """Extend the list with another list. Each member of the list must be 
+        """Extend the list with another list. Each member of the list must be
         a string."""
         if not isinstance(item, list):
             raise TypeError('You can only extend lists with lists. ' \
@@ -1086,7 +1089,7 @@ class CaselessList(list):
         return count
 
     def index(self, item, minindex=0, maxindex=None):
-        """Provide an index of first occurence of item in the list. (or raise 
+        """Provide an index of first occurence of item in the list. (or raise
         a ValueError if item not present)
         If item is not a string, will raise a TypeError.
         minindex and maxindex are also optional arguments
@@ -1115,10 +1118,10 @@ class CaselessList(list):
 
     def __setitem__(self, index, value):
         """For setting values in the list.
-        index must be an integer or (extended) slice object. (__setslice__ used 
+        index must be an integer or (extended) slice object. (__setslice__ used
         for simple slices)
         If index is an integer then value must be a string.
-        If index is a slice object then value must be a list of strings - with 
+        If index is a slice object then value must be a list of strings - with
         the same length as the slice object requires.
         """
         if isinstance(index, int):
@@ -1147,7 +1150,7 @@ class CaselessList(list):
 
     def __getslice__(self, i, j):
         """Called to implement evaluation of self[i:j].
-        Although the manual says this method is deprecated - if I don't define 
+        Although the manual says this method is deprecated - if I don't define
         it the list one is called.
         (Which returns a list - this returns a CaselessList)"""
         return CaselessList(list.__getslice__(self, i, j))
@@ -1259,17 +1262,18 @@ def _notifd2db_file_db(ior_string, files, out=sys.stdout):
     return
 
 def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
-    import PyTango
+    from . import Database
+
     print("going to export notification service event factory to " \
           "Tango database ...", file=out)
 
     num_retries = 3
     while num_retries > 0:
         try:
-            db = PyTango.Database()
+            db = Database()
             db.set_timeout_millis(10000)
             num_retries = 0
-        except PyTango.DevFailed as df:
+        except DevFailed as df:
             num_retries -= 1
             if num_retries == 0:
                 print("Can't create Tango database object", file=out)
@@ -1293,7 +1297,7 @@ def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
             print("Successfully exported notification service event " \
                   "factory for host", host_name, "to Tango database !", file=out)
             break
-        except PyTango.CommunicationFailed as cf:
+        except CommunicationFailed as cf:
             if len(cf.errors) >= 2:
                 if cf.errors[1].reason == "API_DeviceTimedOut":
                     if num_retries > 0:
@@ -1313,23 +1317,23 @@ def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
 class EventCallBack(object):
     """
     Useful event callback for test purposes
-    
+
     Usage::
-    
-        >>> dev = PyTango.DeviceProxy(dev_name)
-        >>> cb = PyTango.utils.EventCallBack()
-        >>> id = dev.subscribe_event("state", PyTango.EventType.CHANGE_EVENT, cb, [])
+
+        >>> dev = tango.DeviceProxy(dev_name)
+        >>> cb = tango.utils.EventCallBack()
+        >>> id = dev.subscribe_event("state", tango.EventType.CHANGE_EVENT, cb, [])
         2011-04-06 15:33:18.910474 sys/tg_test/1 STATE CHANGE [ATTR_VALID] ON
-        
+
     Allowed format keys are:
-        
+
         - date (event timestamp)
         - reception_date (event reception timestamp)
         - type (event type)
         - dev_name (device name)
         - name (attribute name)
         - value (event value)
-        
+
     New in PyTango 7.1.4
     """
 
@@ -1343,7 +1347,7 @@ class EventCallBack(object):
 
     def get_events(self):
         """Returns the list of events received by this callback
-           
+
            :return: the list of events received by this callback
            :rtype: sequence<obj>
         """
@@ -1412,14 +1416,14 @@ class EventCallBack(object):
         elif isinstance(evt, DataReadyEventData):
             return ""
 
-        
+
 def get_home():
     """
     Find user's home directory if possible. Otherwise raise error.
-    
+
     :return: user's home directory
     :rtype: :py:obj:`str`
-    
+
     New in PyTango 7.1.4
     """
     path = ''
@@ -1439,7 +1443,7 @@ def get_home():
     else:
         raise RuntimeError('please define environment variable $HOME')
 
-    
+
 def _get_env_var(env_var_name):
     """
     Returns the value for the given environment name
@@ -1449,12 +1453,12 @@ def _get_env_var(env_var_name):
         * a real environ var
         * HOME/.tangorc
         * /etc/tangorc
-        
+
     :param env_var_name: the environment variable name
     :type env_var_name: str
     :return: the value for the given environment name
     :rtype: str
-    
+
     New in PyTango 7.1.4
     """
 
@@ -1484,7 +1488,7 @@ def _get_env_var(env_var_name):
         if key == env_var_name:
             return val
 
-        
+
 def from_version_str_to_hex_str(version_str):
     v = map(int, version_str.split('.'));
     return "0x%02d%02d%02d00" % (v[0], v[1], v[2])
@@ -1495,13 +1499,10 @@ def from_version_str_to_int(version_str):
 
 
 def info():
-    import PyTango.constants
-
-    Compile = PyTango.constants.Compile
-    Runtime = PyTango.constants.Runtime
-
+    # Compile and Runtime are set by `tango.pytango_init.init`
+    from .constants import Compile, Runtime
     msg = """\
-PyTango {0.Release.version} {0.Release.version_info}
+PyTango {0.version} {0.version_info}
 PyTango compiled with:
     Python : {1.PY_VERSION}
     Numpy  : {1.NUMPY_VERSION}
@@ -1515,8 +1516,7 @@ PyTango runtime is:
     Boost  : {2.BOOST_VERSION}
 
 PyTango running on:
-{2.UNAME}   
+{2.UNAME}
 """
-    msg = msg.format(PyTango, Compile, Runtime)
+    msg = msg.format(Release, Compile, Runtime)
     return msg
-

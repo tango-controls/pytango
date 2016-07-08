@@ -19,7 +19,7 @@ __docformat__ = "restructuredtext"
 
 import collections
 
-from ._PyTango import StdStringVector, Database, DbDatum, DbData, \
+from ._tango import StdStringVector, Database, DbDatum, DbData, \
     DbDevInfo, DbDevInfos, DbDevImportInfo, DbDevExportInfo, DbDevExportInfos, \
     DbHistory, DbServerInfo, DbServerData
 
@@ -197,8 +197,8 @@ def __Database__generic_get_property(self, obj_name, value, f):
                 new_value.append(DbDatum(k))
         ret = value
     else:
-        raise TypeError('value must be a string, PyTango.DbDatum, '\
-                        'PyTango.DbData, a sequence or a dictionary')
+        raise TypeError('value must be a string, tango.DbDatum, '\
+                        'tango.DbData, a sequence or a dictionary')
 
     f(obj_name, new_value)
     if ret is None: ret = {}
@@ -228,7 +228,7 @@ def __Database__generic_put_property(self, obj_name, value, f):
             new_value.append(db_datum)
         value = new_value
     else:
-        raise TypeError('value must be a PyTango.DbDatum, PyTango.DbData,'\
+        raise TypeError('value must be a tango.DbDatum, tango.DbData,'\
                         'a sequence<DbDatum> or a dictionary')
     return f(obj_name, value)
 
@@ -257,8 +257,8 @@ def __Database__generic_delete_property(self, obj_name, value, f):
             else:
                 new_value.append(DbDatum(k))
     else:
-        raise TypeError('value must be a string, PyTango.DbDatum, '\
-                        'PyTango.DbData, a sequence or a dictionary')
+        raise TypeError('value must be a string, tango.DbDatum, '\
+                        'tango.DbData, a sequence or a dictionary')
 
     return f(obj_name, new_value)
 
@@ -497,8 +497,8 @@ def __Database__get_device_attribute_property(self, dev_name, value):
             else:
                 new_value.append(DbDatum(k))
     else:
-        raise TypeError('value must be a string, PyTango.DbDatum, '\
-                        'PyTango.DbData, a sequence or a dictionary')
+        raise TypeError('value must be a string, tango.DbDatum, '\
+                        'tango.DbData, a sequence or a dictionary')
 
     if ret is None: ret = {}
 
@@ -536,7 +536,7 @@ def __Database__put_device_attribute_property(self, dev_name, value):
                        associated with each key being:
                        
                        3.1 seq<str>
-                       3.2 PyTango.DbDatum
+                       3.2 tango.DbDatum
 
             Return     : None
 
@@ -565,7 +565,7 @@ def __Database__put_device_attribute_property(self, dev_name, value):
                 new_value.append(db_datum)
         value = new_value
     else:
-        raise TypeError('value must be a PyTango.DbData,'\
+        raise TypeError('value must be a tango.DbData,'\
                         'a sequence<DbDatum> or a dictionary')
     return self._put_device_attribute_property(dev_name, value)
 
@@ -600,8 +600,8 @@ def __Database__delete_device_attribute_property(self, dev_name, value):
             for k2 in v1:
                 new_value.append(DbDatum(k2))
     else:
-        raise TypeError('value must be a string, PyTango.DbDatum, '\
-                        'PyTango.DbData, a sequence or a dictionary')
+        raise TypeError('value must be a string, tango.DbDatum, '\
+                        'tango.DbData, a sequence or a dictionary')
 
     return self._delete_device_attribute_property(dev_name, new_value)
 
@@ -616,8 +616,8 @@ def __Database__get_class_property(self, class_name, value):
                 - value : can be one of the following:
                 
                     1. str [in] - single property data to be fetched
-                    2. PyTango.DbDatum [in] - single property data to be fetched
-                    3. PyTango.DbData [in,out] - several property data to be fetched
+                    2. tango.DbDatum [in] - single property data to be fetched
+                    3. tango.DbData [in,out] - several property data to be fetched
                        In this case (direct C++ API) the DbData will be filled with
                        the property values
                     4. sequence<str> [in] - several property data to be fetched
@@ -732,8 +732,8 @@ def __Database__get_class_attribute_property(self, class_name, value):
             else:
                 new_value.append(DbDatum(k))
     else:
-        raise TypeError('value must be a string, PyTango.DbDatum, '\
-                        'PyTango.DbData, a sequence or a dictionary')
+        raise TypeError('value must be a string, tango.DbDatum, '\
+                        'tango.DbData, a sequence or a dictionary')
 
     self._get_class_attribute_property(class_name, new_value)
 
@@ -764,14 +764,14 @@ def __Database__put_class_attribute_property(self, class_name, value):
                 - class_name : (str) class name
                 - propdata : can be one of the following:
                 
-                    1. PyTango.DbData - several property data to be inserted
+                    1. tango.DbData - several property data to be inserted
                     2. sequence<DbDatum> - several property data to be inserted
                     3. dict<str, dict<str, obj>> keys are attribute names and value
                        being another dictionary which keys are the attribute property
                        names and the value associated with each key being:
                        
                        3.1 seq<str>
-                       3.2 PyTango.DbDatum
+                       3.2 tango.DbDatum
 
             Return     : None
 
@@ -799,7 +799,7 @@ def __Database__put_class_attribute_property(self, class_name, value):
                 new_value.append(db_datum)
         value = new_value
     else:
-        raise TypeError('value must be a PyTango.DbData,'\
+        raise TypeError('value must be a tango.DbData,'\
                         'a sequence<DbDatum> or a dictionary')
     return self._put_class_attribute_property(class_name, value)
 
@@ -1255,7 +1255,7 @@ def __doc_Database():
         Return     : device name
 
         .. deprecated:: 8.1.0
-            Use :meth:`~PyTango.Database.get_device_from_alias` instead
+            Use :meth:`~tango.Database.get_device_from_alias` instead
     """ )
 
     document_method("get_alias", """
@@ -1270,7 +1270,7 @@ def __doc_Database():
         New in PyTango 3.0.4
         
         .. deprecated:: 8.1.0
-            Use :meth:`~PyTango.Database.get_alias_from_device` instead
+            Use :meth:`~tango.Database.get_alias_from_device` instead
     """ )
 
     document_method("get_device_from_alias", """
@@ -1794,7 +1794,7 @@ def __doc_Database():
             is an example of how to delete the unit property of the velocity attribute of
             the id11/motor/1 device using this method :
 
-            db_data = PyTango.DbData();
+            db_data = tango.DbData();
             db_data.append(DbDatum("velocity"));
             db_data.append(DbDatum("unit"));
             db.delete_device_attribute_property("id11/motor/1", db_data);
@@ -1994,7 +1994,7 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
         
         .. deprecated:: 8.1.0
-            Use :meth:`~PyTango.Database.get_attribute_from_alias` instead
+            Use :meth:`~tango.Database.get_attribute_from_alias` instead
     """ )
 
     document_method("get_attribute_from_alias", """

@@ -19,8 +19,8 @@ __docformat__ = "restructuredtext"
 
 import collections
 
-from ._PyTango import EncodedAttribute, ExtractAs, _ImageFormat
-from ._PyTango import constants
+from ._tango import EncodedAttribute, ExtractAs, _ImageFormat
+from ._tango import constants
 
 from .utils import is_pure_str, is_seq
 
@@ -65,7 +65,7 @@ def __EncodedAttribute_encode_jpeg_gray8(self, gray8, width=0, height=0, quality
        Example::
            
            def read_myattr(self, attr):
-               enc = PyTango.EncodedAttribute()
+               enc = tango.EncodedAttribute()
                data = numpy.arange(100, dtype=numpy.byte)
                data = numpy.array((data,data,data))
                enc.encode_jpeg_gray8(data)
@@ -100,7 +100,7 @@ def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
        Example::
            
            def read_myattr(self, attr):
-               enc = PyTango.EncodedAttribute()
+               enc = tango.EncodedAttribute()
                data = numpy.arange(100, dtype=numpy.byte)
                data = numpy.array((data,data,data))
                enc.encode_gray8(data)
@@ -180,7 +180,7 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
        Example::
            
            def read_myattr(self, attr):
-               enc = PyTango.EncodedAttribute()
+               enc = tango.EncodedAttribute()
                data = numpy.arange(100, dtype=numpy.int16)
                data = numpy.array((data,data,data))
                enc.encode_gray16(data)
@@ -259,7 +259,7 @@ def __EncodedAttribute_encode_jpeg_rgb24(self, rgb24, width=0, height=0, quality
        Example::
            
            def read_myattr(self, attr):
-               enc = PyTango.EncodedAttribute()
+               enc = tango.EncodedAttribute()
                # create an 'image' where each pixel is R=0x01, G=0x01, B=0x01
                arr = numpy.ones((10,10,3), dtype=numpy.uint8)
                enc.encode_jpeg_rgb24(data)
@@ -295,7 +295,7 @@ def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
        Example::
            
            def read_myattr(self, attr):
-               enc = PyTango.EncodedAttribute()
+               enc = tango.EncodedAttribute()
                # create an 'image' where each pixel is R=0x01, G=0x01, B=0x01
                arr = numpy.ones((10,10,3), dtype=numpy.uint8)
                enc.encode_rgb24(data)
@@ -375,7 +375,7 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
        Example::
            
            def read_myattr(self, attr):
-               enc = PyTango.EncodedAttribute()
+               enc = tango.EncodedAttribute()
                data = numpy.arange(100, dtype=numpy.int32)
                data = numpy.array((data,data,data))
                enc.encode_jpeg_rgb32(data)
@@ -447,9 +447,9 @@ def __EncodedAttribute_decode_gray8(self, da, extract_as=ExtractAs.Numpy):
            that the given :class:`DeviceAttribute` is obtained from a 
            call which **DOESN'T** extract the contents. Example::
                
-               dev = PyTango.DeviceProxy("a/b/c")
-               da = dev.read_attribute("my_attr", extract_as=PyTango.ExtractAs.Nothing)
-               enc = PyTango.EncodedAttribute()
+               dev = tango.DeviceProxy("a/b/c")
+               da = dev.read_attribute("my_attr", extract_as=tango.ExtractAs.Nothing)
+               enc = tango.EncodedAttribute()
                data = enc.decode_gray8(da)
     """
     if hasattr(da, 'value'):
@@ -482,9 +482,9 @@ def __EncodedAttribute_decode_gray16(self, da, extract_as=ExtractAs.Numpy):
            that the given :class:`DeviceAttribute` is obtained from a 
            call which **DOESN'T** extract the contents. Example::
                
-               dev = PyTango.DeviceProxy("a/b/c")
-               da = dev.read_attribute("my_attr", extract_as=PyTango.ExtractAs.Nothing)
-               enc = PyTango.EncodedAttribute()
+               dev = tango.DeviceProxy("a/b/c")
+               da = dev.read_attribute("my_attr", extract_as=tango.ExtractAs.Nothing)
+               enc = tango.EncodedAttribute()
                data = enc.decode_gray16(da)
     """
     if hasattr(da, 'value'):
@@ -517,9 +517,9 @@ def __EncodedAttribute_decode_rgb32(self, da, extract_as=ExtractAs.Numpy):
            that the given :class:`DeviceAttribute` is obtained from a 
            call which **DOESN'T** extract the contents. Example::
                
-               dev = PyTango.DeviceProxy("a/b/c")
-               da = dev.read_attribute("my_attr", extract_as=PyTango.ExtractAs.Nothing)
-               enc = PyTango.EncodedAttribute()
+               dev = tango.DeviceProxy("a/b/c")
+               da = dev.read_attribute("my_attr", extract_as=tango.ExtractAs.Nothing)
+               enc = tango.EncodedAttribute()
                data = enc.decode_rgb32(da)
     """
     if hasattr(da, 'value'):

@@ -56,7 +56,7 @@ inline PyObject *PyImport_ImportModule_(const std::string &name)
     #define PyBytes_Type PyString_Type
 
     #define PyBytes_Check PyString_Check
-    #define PyBytes_CheckExact PyString_CheckExact 
+    #define PyBytes_CheckExact PyString_CheckExact
     #define PyBytes_CHECK_INTERNED PyString_CHECK_INTERNED
     #define PyBytes_AS_STRING PyString_AS_STRING
     #define PyBytes_GET_SIZE PyString_GET_SIZE
@@ -154,7 +154,7 @@ void * PyCapsule_Import(const char *name, int no_block);
 
 #endif /* #if PY_VERSION_HEX < 0x02070000 */
 
-PyObject* from_char_to_str(const char* in, Py_ssize_t size=-1, 
+PyObject* from_char_to_str(const char* in, Py_ssize_t size=-1,
                            const char* encoding=NULL, /* defaults to latin-1 */
                            const char* errors="strict");
 
@@ -162,7 +162,7 @@ PyObject* from_char_to_str(const std::string& in,
                            const char* encoding=NULL, /* defaults to latin-1 */
                            const char* errors="strict");
 
-bopy::object from_char_to_str2(const char* in, Py_ssize_t size=-1, 
+bopy::object from_char_to_str2(const char* in, Py_ssize_t size=-1,
                                const char* encoding=NULL, /* defaults to latin-1 */
                                const char* errors="strict");
 
@@ -184,9 +184,9 @@ inline void raise_(PyObject *type, const char *message)
 class AutoPythonAllowThreads
 {
     PyThreadState *m_save;
-    
+
 public:
-    
+
     inline void giveup()
     {
         if (m_save)
@@ -195,12 +195,12 @@ public:
             m_save = 0;
         }
     }
-    
+
     inline AutoPythonAllowThreads()
     {
         m_save = PyEval_SaveThread();
     }
-    
+
     inline ~AutoPythonAllowThreads()
     {
         giveup();
@@ -256,10 +256,10 @@ void is_method_defined(boost::python::object &obj, const std::string &method_nam
                        bool &exists, bool &is_method);
 
 #define PYTANGO_MOD \
-    boost::python::object pytango((boost::python::handle<>(boost::python::borrowed(PyImport_AddModule("PyTango")))));
-    
+    boost::python::object pytango((boost::python::handle<>(boost::python::borrowed(PyImport_AddModule("tango")))));
+
 #define CALL_METHOD(retType, self, name, ...) \
     boost::python::call_method<retType>(self, name , __VA_ARGS__);
-    
+
 
 bool hasattr(boost::python::object &, const std::string &);

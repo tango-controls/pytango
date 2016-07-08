@@ -17,7 +17,7 @@ __all__ = ["group_reply_list_init"]
 
 __docformat__ = "restructuredtext"
 
-from ._PyTango import GroupReplyList, GroupCmdReplyList, GroupAttrReplyList
+from ._tango import GroupReplyList, GroupCmdReplyList, GroupAttrReplyList
 
 
 def __GroupReplyList__getitem(self, item):

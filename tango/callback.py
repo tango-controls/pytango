@@ -17,7 +17,7 @@ __all__ = ["callback_init"]
 
 __docformat__ = "restructuredtext"
 
-from ._PyTango import CmdDoneEvent, AttrReadEvent, AttrWrittenEvent
+from ._tango import CmdDoneEvent, AttrReadEvent, AttrWrittenEvent
 
 def __init_Callback():
     pass

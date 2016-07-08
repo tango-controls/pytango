@@ -6,9 +6,9 @@ import functools
 import threading
 import Queue
 
-import PyTango
+import tango
 
-th_exc = PyTango.Except.throw_exception
+th_exc = tango.Except.throw_exception
 
 from db_errors import *
 
@@ -182,7 +182,7 @@ class Tango_dbapi2(object):
             pos = name.find('.')
             if pos != -1:
                 name = name[0:pos]
-            dev = PyTango.DeviceProxy(name)
+            dev = tango.DeviceProxy(name)
             dev.UpdateServersInfo()
             
             
@@ -403,7 +403,7 @@ class Tango_dbapi2(object):
         if self.fire_to_starter:
             if dev_name[0:8] == "dserver/":
                 # Get database server name
-                tango_util = PyTango.Util.instance()
+                tango_util = tango.Util.instance()
                 db_serv = tango_util.get_ds_name()
                 adm_dev_name = "dserver/" + db_serv.lower()
                 if dev_name != adm_dev_name and dev_name[0:16] != "dserver/starter/":

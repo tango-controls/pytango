@@ -23,7 +23,7 @@ import time
 import threading
 import collections
 
-from ._PyTango import StdStringVector, DbData, DbDatum, AttributeInfo, \
+from ._tango import StdStringVector, DbData, DbDatum, AttributeInfo, \
     AttributeInfoEx, AttributeInfoList, AttributeInfoListEx, DeviceProxy, \
     __CallBackAutoDie, __CallBackPushEvent, EventType, DevFailed, Except, \
     ExtractAs, GreenMode, constants
@@ -40,9 +40,9 @@ def get_device_proxy(*args, **kwargs):
     """get_device_proxy(self, dev_name, green_mode=None, wait=True, timeout=True) -> DeviceProxy
     get_device_proxy(self, dev_name, need_check_acc, green_mode=None, wait=True, timeout=None) -> DeviceProxy
 
-    Returns a new :class:`~PyTango.DeviceProxy`.
+    Returns a new :class:`~tango.DeviceProxy`.
     There is no difference between using this function and the direct
-    :class:`~PyTango.DeviceProxy` constructor if you use the default kwargs.
+    :class:`~tango.DeviceProxy` constructor if you use the default kwargs.
 
     The added value of this function becomes evident when you choose a green_mode
     to be *Futures* or *Gevent*. The DeviceProxy constructor internally makes some
@@ -51,8 +51,8 @@ def get_device_proxy(*args, **kwargs):
 
     .. note::
         The timeout parameter has no relation with the tango device client side
-        timeout (gettable by :meth:`~PyTango.DeviceProxy.get_timeout_millis` and
-        settable through :meth:`~PyTango.DeviceProxy.set_timeout_millis`)
+        timeout (gettable by :meth:`~tango.DeviceProxy.get_timeout_millis` and
+        settable through :meth:`~tango.DeviceProxy.set_timeout_millis`)
 
     :param dev_name: the device name or alias
     :type dev_name: str
@@ -62,9 +62,9 @@ def get_device_proxy(*args, **kwargs):
     :type need_check_acc: bool
     :param green_mode: determines the mode of execution of the device (including
                       the way it is created). Defaults to the current global
-                      green_mode (check :func:`~PyTango.get_green_mode` and
-                      :func:`~PyTango.set_green_mode`)
-    :type green_mode: :obj:`~PyTango.GreenMode`
+                      green_mode (check :func:`~tango.get_green_mode` and
+                      :func:`~tango.set_green_mode`)
+    :type green_mode: :obj:`~tango.GreenMode`
     :param wait: whether or not to wait for result. If green_mode
                  Ignored when green_mode is Synchronous (always waits).
     :type wait: bool
@@ -74,7 +74,7 @@ def get_device_proxy(*args, **kwargs):
     :type timeout: float
     :returns:
         if green_mode is Synchronous or wait is True:
-            :class:`~PyTango.DeviceProxy`
+            :class:`~tango.DeviceProxy`
         else if green_mode is Futures:
             :class:`concurrent.futures.Future`
         else if green_mode is Gevent:
@@ -167,8 +167,8 @@ def __DeviceProxy__get_green_mode(self):
     :rtype: GreenMode
 
     .. seealso::
-        :func:`PyTango.get_green_mode`
-        :func:`PyTango.set_green_mode`
+        :func:`tango.get_green_mode`
+        :func:`tango.set_green_mode`
 
     New in PyTango 8.1.0
     """
@@ -180,7 +180,7 @@ def __DeviceProxy__get_green_mode(self):
 def __DeviceProxy__set_green_mode(self, green_mode=None):
     """Sets the green mode to be used by this DeviceProxy
     Setting it to None means use the global PyTango green mode
-    (see :func:`PyTango.get_green_mode`).
+    (see :func:`tango.get_green_mode`).
 
     :param green_mode: the new green mode
     :type green_mode: GreenMode
@@ -368,7 +368,7 @@ def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None, extract_as=
         by default, TANGO is initialized with the **polling** model. If you want
         to use the **push** model (the one with the callback parameter), you
         need to change the global TANGO model to PUSH_CALLBACK.
-        You can do this with the :meth:`PyTango.ApiUtil.set_asynch_cb_sub_model`
+        You can do this with the :meth:`tango.ApiUtil.set_asynch_cb_sub_model`
     """
     if cb is None:
         return self.__read_attributes_asynch(attr_names)
@@ -436,7 +436,7 @@ def __DeviceProxy__write_attributes_asynch(self, attr_values, cb=None):
         by default, TANGO is initialized with the **polling** model. If you want
         to use the **push** model (the one with the callback parameter), you
         need to change the global TANGO model to PUSH_CALLBACK.
-        You can do this with the :meth:`PyTango.ApiUtil.set_asynch_cb_sub_model`
+        You can do this with the :meth:`tango.ApiUtil.set_asynch_cb_sub_model`
     """
     if cb is None:
         return self.__write_attributes_asynch(attr_values)
@@ -472,31 +472,31 @@ def __DeviceProxy__write_read_attributes(self, name_val,
 
 def __DeviceProxy__get_property(self, propname, value=None):
     """
-    get_property(propname, value=None) -> PyTango.DbData
+    get_property(propname, value=None) -> tango.DbData
 
             Get a (list) property(ies) for a device.
 
             This method accepts the following types as propname parameter:
             1. string [in] - single property data to be fetched
             2. sequence<string> [in] - several property data to be fetched
-            3. PyTango.DbDatum [in] - single property data to be fetched
-            4. PyTango.DbData [in,out] - several property data to be fetched.
+            3. tango.DbDatum [in] - single property data to be fetched
+            4. tango.DbData [in,out] - several property data to be fetched.
             5. sequence<DbDatum> - several property data to be feteched
 
             Note: for cases 3, 4 and 5 the 'value' parameter if given, is IGNORED.
 
-            If value is given it must be a PyTango.DbData that will be filled with the
+            If value is given it must be a tango.DbData that will be filled with the
             property values
 
         Parameters :
             - propname : (any) property(ies) name(s)
             - value : (DbData) (optional, default is None meaning that the
-                      method will create internally a PyTango.DbData and return
+                      method will create internally a tango.DbData and return
                       it filled with the property values
 
         Return     : (DbData) object containing the property(ies) value(s). If a
-                     PyTango.DbData is given as parameter, it returns the same
-                     object otherwise a new PyTango.DbData is returned
+                     tango.DbData is given as parameter, it returns the same
+                     object otherwise a new tango.DbData is returned
 
         Throws     : NonDbDevice, ConnectionFailed (with database),
                      CommunicationFailed (with database),
@@ -539,8 +539,8 @@ def __DeviceProxy__put_property(self, value):
 
             Insert or update a list of properties for this device.
             This method accepts the following types as value parameter:
-            1. PyTango.DbDatum - single property data to be inserted
-            2. PyTango.DbData - several property data to be inserted
+            1. tango.DbDatum - single property data to be inserted
+            2. tango.DbData - several property data to be inserted
             3. sequence<DbDatum> - several property data to be inserted
             4. dict<str, DbDatum> - keys are property names and value has data to be inserted
             5. dict<str, seq<str>> - keys are property names and value has data to be inserted
@@ -548,8 +548,8 @@ def __DeviceProxy__put_property(self, value):
 
         Parameters :
             - value : can be one of the following:
-                1. PyTango.DbDatum - single property data to be inserted
-                2. PyTango.DbData - several property data to be inserted
+                1. tango.DbDatum - single property data to be inserted
+                2. tango.DbData - several property data to be inserted
                 3. sequence<DbDatum> - several property data to be inserted
                 4. dict<str, DbDatum> - keys are property names and value has data to be inserted
                 5. dict<str, seq<str>> - keys are property names and value has data to be inserted
@@ -582,7 +582,7 @@ def __DeviceProxy__put_property(self, value):
             new_value.append(db_datum)
         value = new_value
     else:
-        raise TypeError('value must be a PyTango.DbDatum, PyTango.DbData,'\
+        raise TypeError('value must be a tango.DbDatum, tango.DbData,'\
                         'a sequence<DbDatum> or a dictionary')
     return self._put_property(value)
 
@@ -594,8 +594,8 @@ def __DeviceProxy__delete_property(self, value):
             This method accepts the following types as value parameter:
 
                 1. string [in] - single property to be deleted
-                2. PyTango.DbDatum [in] - single property data to be deleted
-                3. PyTango.DbData [in] - several property data to be deleted
+                2. tango.DbDatum [in] - single property data to be deleted
+                3. tango.DbData [in] - several property data to be deleted
                 4. sequence<string> [in]- several property data to be deleted
                 5. sequence<DbDatum> [in] - several property data to be deleted
                 6. dict<str, obj> [in] - keys are property names to be deleted (values are ignored)
@@ -605,8 +605,8 @@ def __DeviceProxy__delete_property(self, value):
             - value : can be one of the following:
 
                 1. string [in] - single property data to be deleted
-                2. PyTango.DbDatum [in] - single property data to be deleted
-                3. PyTango.DbData [in] - several property data to be deleted
+                2. tango.DbDatum [in] - single property data to be deleted
+                3. tango.DbData [in] - several property data to be deleted
                 4. sequence<string> [in]- several property data to be deleted
                 5. sequence<DbDatum> [in] - several property data to be deleted
                 6. dict<str, obj> [in] - keys are property names to be deleted (values are ignored)
@@ -638,8 +638,8 @@ def __DeviceProxy__delete_property(self, value):
             else:
                 new_value.append(DbDatum(k))
     else:
-        raise TypeError('value must be a string, PyTango.DbDatum, '\
-                        'PyTango.DbData, a sequence or a dictionary')
+        raise TypeError('value must be a string, tango.DbDatum, '\
+                        'tango.DbData, a sequence or a dictionary')
 
     return self._delete_property(new_value)
 
@@ -704,7 +704,7 @@ def __DeviceProxy__get_attribute_config(self, value):
     get_attribute_config( self, names) -> AttributeInfoList
 
             Return the attribute configuration for the list of specified attributes. To get all the
-            attributes pass a sequence containing the constant PyTango.constants.AllAttr
+            attributes pass a sequence containing the constant tango.constants.AllAttr
 
         Parameters :
                 - names : (sequence<str>) attribute names
@@ -742,7 +742,7 @@ def __DeviceProxy__get_attribute_config_ex(self, value):
 
             Return the extended attribute configuration for the list of
             specified attributes. To get all the attributes pass a sequence
-            containing the constant PyTango.constants.AllAttr
+            containing the constant tango.constants.AllAttr
 
         Parameters :
                 - names : (sequence<str>) attribute names
@@ -836,7 +836,7 @@ def __DeviceProxy__get_pipe_config(self, value=None):
     get_pipe_config( self, names) -> PipeInfoList
 
             Return the pipe configuration for the list of specified pipes. To get all the
-            pipes pass a sequence containing the constant PyTango.constants.AllPipe
+            pipes pass a sequence containing the constant tango.constants.AllPipe
 
         Parameters :
                 - names : (sequence<str>) pipe names
@@ -1374,12 +1374,12 @@ def __doc_DeviceProxy():
     a DeviceProxy, a Tango Device name must be set in the object constructor.
 
     Example :
-       dev = PyTango.DeviceProxy("sys/tg_test/1")
+       dev = tango.DeviceProxy("sys/tg_test/1")
 
     DeviceProxy(dev_name, green_mode=None, wait=True, timeout=True) -> DeviceProxy
     DeviceProxy(self, dev_name, need_check_acc, green_mode=None, wait=True, timeout=True) -> DeviceProxy
 
-    Creates a new :class:`~PyTango.DeviceProxy`.
+    Creates a new :class:`~tango.DeviceProxy`.
 
     :param dev_name: the device name or alias
     :type dev_name: str
@@ -1389,9 +1389,9 @@ def __doc_DeviceProxy():
     :type need_check_acc: bool
     :param green_mode: determines the mode of execution of the device (including.
                       the way it is created). Defaults to the current global
-                      green_mode (check :func:`~PyTango.get_green_mode` and
-                      :func:`~PyTango.set_green_mode`)
-    :type green_mode: :obj:`~PyTango.GreenMode`
+                      green_mode (check :func:`~tango.get_green_mode` and
+                      :func:`~tango.set_green_mode`)
+    :type green_mode: :obj:`~tango.GreenMode`
     :param wait: whether or not to wait for result. If green_mode
                  Ignored when green_mode is Synchronous (always waits).
     :type wait: bool
@@ -1401,13 +1401,13 @@ def __doc_DeviceProxy():
     :type timeout: float
     :returns:
         if green_mode is Synchronous or wait is True:
-            :class:`~PyTango.DeviceProxy`
+            :class:`~tango.DeviceProxy`
         elif green_mode is Futures:
             :class:`concurrent.futures.Future`
         elif green_mode is Gevent:
             :class:`gevent.event.AsynchResult`
     :throws:
-        * :class:`~PyTango.DevFailed` if green_mode is Synchronous or wait is True
+        * :class:`~tango.DevFailed` if green_mode is Synchronous or wait is True
           and there is an error creating the device.
         * :class:`concurrent.futures.TimeoutError` if green_mode is Futures,
           wait is False, timeout is not None and the time to create the device
@@ -1636,7 +1636,7 @@ def __doc_DeviceProxy():
     attribute_list_query(self) -> sequence<AttributeInfo>
 
             Query the device for info on all attributes. This method returns
-            a sequence of PyTango.AttributeInfo.
+            a sequence of tango.AttributeInfo.
 
         Parameters : None
         Return     : (sequence<AttributeInfo>) containing the
@@ -1650,7 +1650,7 @@ def __doc_DeviceProxy():
     attribute_list_query_ex(self) -> sequence<AttributeInfoEx>
 
             Query the device for info on all attributes. This method returns
-            a sequence of PyTango.AttributeInfoEx.
+            a sequence of tango.AttributeInfoEx.
 
         Parameters : None
         Return     : (sequence<AttributeInfoEx>) containing the
@@ -1671,8 +1671,8 @@ def __doc_DeviceProxy():
             - attr_name  : (str) The name of the attribute to read.
             - extract_as : (ExtractAs) Defaults to numpy.
             - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
-                           (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
-                           :meth:`~PyTango.DeviceProxy.set_green_mode`).
+                           (see :meth:`~tango.DeviceProxy.get_green_mode` and
+                           :meth:`~tango.DeviceProxy.set_green_mode`).
             - wait       : (bool) whether or not to wait for result. If green_mode
                            is *Synchronous*, this parameter is ignored as it always
                            waits for the result.
@@ -1717,8 +1717,8 @@ def __doc_DeviceProxy():
                 - attr_names : (sequence<str>) A list of attributes to read.
                 - extract_as : (ExtractAs) Defaults to numpy.
                 - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
-                               (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
-                               :meth:`~PyTango.DeviceProxy.set_green_mode`).
+                               (see :meth:`~tango.DeviceProxy.get_green_mode` and
+                               :meth:`~tango.DeviceProxy.set_green_mode`).
                 - wait       : (bool) whether or not to wait for result. If green_mode
                                is *Synchronous*, this parameter is ignored as it always
                                waits for the result.
@@ -1750,8 +1750,8 @@ def __doc_DeviceProxy():
                 - attr_info : (AttributeInfo)
                 - value : The value. For non SCALAR attributes it may be any sequence of sequences.
                 - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
-                               (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
-                               :meth:`~PyTango.DeviceProxy.set_green_mode`).
+                               (see :meth:`~tango.DeviceProxy.get_green_mode` and
+                               :meth:`~tango.DeviceProxy.set_green_mode`).
                 - wait       : (bool) whether or not to wait for result. If green_mode
                                is *Synchronous*, this parameter is ignored as it always
                                waits for the result.
@@ -1778,8 +1778,8 @@ def __doc_DeviceProxy():
         Parameters :
                 - name_val: A list of pairs (attr_name, value). See write_attribute
                 - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
-                               (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
-                               :meth:`~PyTango.DeviceProxy.set_green_mode`).
+                               (see :meth:`~tango.DeviceProxy.get_green_mode` and
+                               :meth:`~tango.DeviceProxy.set_green_mode`).
                 - wait       : (bool) whether or not to wait for result. If green_mode
                                is *Synchronous*, this parameter is ignored as it always
                                waits for the result.
@@ -1807,7 +1807,7 @@ def __doc_DeviceProxy():
             the server can't be interrupted by other clients.
 
         Parameters : see write_attribute(attr_name, value)
-        Return     : A PyTango.DeviceAttribute object.
+        Return     : A tango.DeviceAttribute object.
 
         Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked,
                      DevFailed from device, WrongData
@@ -1837,8 +1837,8 @@ def __doc_DeviceProxy():
                 - attr_names : (sequence<str>) A list of attributes to read.
                 - extract_as : (ExtractAs) Defaults to numpy.
                 - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
-                               (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
-                               :meth:`~PyTango.DeviceProxy.set_green_mode`).
+                               (see :meth:`~tango.DeviceProxy.get_green_mode` and
+                               :meth:`~tango.DeviceProxy.set_green_mode`).
                 - wait       : (bool) whether or not to wait for result. If green_mode
                                is *Synchronous*, this parameter is ignored as it always
                                waits for the result.
@@ -1878,8 +1878,8 @@ def __doc_DeviceProxy():
             - pipe_name  : (str) The name of the pipe to read.
             - extract_as : (ExtractAs) Defaults to numpy.
             - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
-                           (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
-                           :meth:`~PyTango.DeviceProxy.set_green_mode`).
+                           (see :meth:`~tango.DeviceProxy.get_green_mode` and
+                           :meth:`~tango.DeviceProxy.set_green_mode`).
             - wait       : (bool) whether or not to wait for result. If green_mode
                            is *Synchronous*, this parameter is ignored as it always
                            waits for the result.
@@ -2278,7 +2278,7 @@ def __doc_DeviceProxy():
 
         Parameters :
             - event_id : (int) event identifier
-        Return     : (PyTango.TimeVal) representing the arrival time
+        Return     : (tango.TimeVal) representing the arrival time
 
         Throws     : EventSystemFailed
 
@@ -2341,7 +2341,7 @@ def __doc_DeviceProxy():
         Parameters :
             - lock_validity : (int) lock validity time in seconds
                                 (optional, default value is
-                                PyTango.constants.DEFAULT_LOCK_VALIDITY)
+                                tango.constants.DEFAULT_LOCK_VALIDITY)
         Return     : None
 
         New in PyTango 7.0.0
@@ -2419,7 +2419,7 @@ def __doc_DeviceProxy():
             If the device is not locked, the method returns False.
 
         Parameters :
-            - lockinfo [out] : (PyTango.LockInfo) object that will be filled
+            - lockinfo [out] : (tango.LockInfo) object that will be filled
                                 with lock informantion
         Return     : (bool) True if the device is locked by us.
                      Otherwise, False
