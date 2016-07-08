@@ -1,4 +1,4 @@
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 .. highlight:: python
    :linenothreshold: 3
@@ -296,7 +296,7 @@ This is explained in details in the
 
 Since version 8.1, PyTango provides a helper module which simplifies the
 development of a Tango device server. This helper is provided through the
-:mod:`PyTango.server` module.
+:mod:`tango.server` module.
 
 Here is a simple example on how to write a *Clock* device server using the
 high level API
@@ -338,31 +338,31 @@ high level API
 
 **line 7**
     tango device class definition. A Tango device must inherit from
-    :class:`PyTango.server.Device`
+    :class:`tango.server.Device`
 
 **line 8**
     mandatory *magic* line. A Tango device must define the metaclass as
-    :class:`PyTango.server.DeviceClass`. This has to be done due to a limitation
+    :class:`tango.server.DeviceClass`. This has to be done due to a limitation
     on boost-python
 
 **line 10-12**
     definition of the *time* attribute. By default, attributes are double, scalar,
-    read-only. Check the :class:`~PyTango.server.attribute` for the complete
+    read-only. Check the :class:`~tango.server.attribute` for the complete
     list of attribute options.
 
 **line 14-16**
     the method *strftime* is exported as a Tango command. In receives a string
     as argument and it returns a string. If a method is to be exported as a
     Tango command, it must be decorated as such with the
-    :func:`~PyTango.server.command` decorator
+    :func:`~tango.server.command` decorator
 
 **line 18-23**
-    definition of the *info* pipe. Check the :class:`~PyTango.server.pipe`
+    definition of the *info* pipe. Check the :class:`~tango.server.pipe`
     for the complete list of pipe options.
 
 **line 28**
     start the Tango run loop. The mandatory argument is a list of python classes
-    that are to be exported as Tango classes. Check :func:`~PyTango.server.run`
+    that are to be exported as Tango classes. Check :func:`~tango.server.run`
     for the complete list of options
 
 Here is a more complete example on how to write a *PowerSupply* device server
@@ -467,13 +467,13 @@ Basic logging
 ~~~~~~~~~~~~~
 
 The most basic way to write a log message on your device is to use the
-:class:`~PyTango.server.Device` logging related methods:
+:class:`~tango.server.Device` logging related methods:
 
-    * :meth:`~PyTango.server.Device.debug_stream`
-    * :meth:`~PyTango.server.Device.info_stream`
-    * :meth:`~PyTango.server.Device.warn_stream`
-    * :meth:`~PyTango.server.Device.error_stream`
-    * :meth:`~PyTango.server.Device.fatal_stream`
+    * :meth:`~tango.server.Device.debug_stream`
+    * :meth:`~tango.server.Device.info_stream`
+    * :meth:`~tango.server.Device.warn_stream`
+    * :meth:`~tango.server.Device.error_stream`
+    * :meth:`~tango.server.Device.fatal_stream`
 
 Example::
 
@@ -539,11 +539,11 @@ value. Your output would look something like::
     1282208997 [-1215965504] DEBUG test/pydsexp/1 <- read_Long_attr()
 
 Decorators exist for all tango log levels:
-    * :class:`PyTango.DebugIt`
-    * :class:`PyTango.InfoIt`
-    * :class:`PyTango.WarnIt`
-    * :class:`PyTango.ErrorIt`
-    * :class:`PyTango.FatalIt`
+    * :class:`tango.DebugIt`
+    * :class:`tango.InfoIt`
+    * :class:`tango.WarnIt`
+    * :class:`tango.ErrorIt`
+    * :class:`tango.FatalIt`
 
 The decorators receive three optional arguments:
     * show_args - shows method arguments in log message (defaults to False)
@@ -712,16 +712,16 @@ There are two ways to create a new device which are described below.
 Tango imposes a limitation: the tango class(es) of the device(s) that is(are)
 to be created must have been registered before the server starts.
 If you use the high level API, the tango class(es) must be listed in the call
-to :func:`~PyTango.server.run`. If you use the lower level server API, it must
-be done using individual calls to :meth:`~PyTango.Util.add_class`.
+to :func:`~tango.server.run`. If you use the lower level server API, it must
+be done using individual calls to :meth:`~tango.Util.add_class`.
 
 
 Dynamic device from a known tango class name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you know the tango class name but you don't have access to the :class:`PyTango.DeviceClass`
+If you know the tango class name but you don't have access to the :class:`tango.DeviceClass`
 (or you are too lazy to search how to get it ;-) the way to do it is call
-:meth:`~PyTango.Util.create_device` / :meth:`~PyTango.Util.delete_device`.
+:meth:`~tango.Util.create_device` / :meth:`~tango.Util.delete_device`.
 Here is an example of implementing a tango command on one of your devices that
 creates a device of some arbitrary class (the example assumes the tango commands
 'CreateDevice' and 'DeleteDevice' receive a parameter of type DevVarStringArray
@@ -753,9 +753,9 @@ some device properties.
 Dynamic device from a known tango class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you already have access to the :class:`~PyTango.DeviceClass` object that
+If you already have access to the :class:`~tango.DeviceClass` object that
 corresponds to the tango class of the device to be created you can call directly
-the :meth:`~PyTango.DeviceClass.create_device` / :meth:`~PyTango.DeviceClass.delete_device`.
+the :meth:`~tango.DeviceClass.create_device` / :meth:`~tango.DeviceClass.delete_device`.
 For example, if you wish to create a clone of your device, you can create a
 tango command called *Clone*::
 
@@ -896,10 +896,10 @@ form of a command definition is:
     ``'cmd_name' : [ [in_type, <"In desc">], [out_type, <"Out desc">], <{opt parameters}>]``
 
 The first element of the value list is itself a list with the command input
-data type (one of the :class:`PyTango.ArgType` pseudo enumeration value) and
+data type (one of the :class:`tango.ArgType` pseudo enumeration value) and
 optionally a string describing this input argument. The second element of the
 value list is also a list with the command output data type (one of the
-:class:`PyTango.ArgType` pseudo enumeration value) and optionaly a string
+:class:`tango.ArgType` pseudo enumeration value) and optionaly a string
 describing it. These two elements are mandatory. The third list element is
 optional and allows additional command definition. The authorized element for
 this :class:`dict` are summarized in the following array:
@@ -931,10 +931,10 @@ For any kind of attributes, the mandatory parameters are:
     ``[attr data type, attr data format, attr data R/W type]``
 
 The attribute data type is one of the possible value for attributes of the
-:class:`PyTango.ArgType` pseudo enunmeration. The attribute data format is one
-of the possible value of the :class:`PyTango.AttrDataFormat` pseudo enumeration
+:class:`tango.ArgType` pseudo enunmeration. The attribute data format is one
+of the possible value of the :class:`tango.AttrDataFormat` pseudo enumeration
 and the attribute R/W type is one of the possible value of the
-:class:`PyTango.AttrWriteType` pseudo enumeration. For spectrum attribute,
+:class:`tango.AttrWriteType` pseudo enumeration. For spectrum attribute,
 you have to add the maximum X size (a number). For image attribute, you have
 to add the maximun X and Y dimension (two numbers). The authorized elements for
 the :class:`dict` defining optional parameters are summarized in the following

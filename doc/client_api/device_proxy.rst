@@ -1,9 +1,9 @@
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 DeviceProxy
 -----------
 
-.. autoclass:: PyTango.DeviceProxy
+.. autoclass:: tango.DeviceProxy
     :show-inheritance: 
     :members:
     :inherited-members:

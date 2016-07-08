@@ -1,40 +1,40 @@
 Logging decorators
 ==================
 
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 LogIt
 -----
 
-.. autoclass:: PyTango.LogIt
+.. autoclass:: tango.LogIt
     :members:
 
 DebugIt
 -------
 
-.. autoclass:: PyTango.DebugIt
+.. autoclass:: tango.DebugIt
     :members:
 
 InfoIt
 ------
 
-.. autoclass:: PyTango.InfoIt
+.. autoclass:: tango.InfoIt
     :members:
 
 WarnIt
 -------
 
-.. autoclass:: PyTango.WarnIt
+.. autoclass:: tango.WarnIt
     :members:
 
 ErrorIt
 -------
 
-.. autoclass:: PyTango.ErrorIt
+.. autoclass:: tango.ErrorIt
     :members:
 
 FatalIt
 -------
 
-.. autoclass:: PyTango.FatalIt
+.. autoclass:: tango.FatalIt
     :members:

@@ -82,7 +82,7 @@ Client
 ------
 
 Finally you can get your hands dirty. The first thing to do is start a python
-console and import the :mod:`PyTango` module. The following example shows
+console and import the :mod:`tango` module. The following example shows
 how to create a proxy to an existing TANGO device, how to read and write
 attributes and execute commands from a python console::
 
@@ -156,7 +156,7 @@ attributes and execute commands from a python console::
 
     >>>
 
-This is just the tip of the iceberg. Check the :class:`~PyTango.DeviceProxy` for
+This is just the tip of the iceberg. Check the :class:`~tango.DeviceProxy` for
 the complete API.
 
 PyTango comes with an integrated IPython_ based console called :ref:`itango`.

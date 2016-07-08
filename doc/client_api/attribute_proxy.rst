@@ -1,9 +1,9 @@
 AttributeProxy
 --------------
 
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
-.. autoclass:: PyTango.AttributeProxy
+.. autoclass:: tango.AttributeProxy
     :members:
 
 

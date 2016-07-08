@@ -1,4 +1,4 @@
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 .. highlight:: python
    :linenothreshold: 4
@@ -57,13 +57,13 @@ all of which containing the following kind of key-value pairs:
 Throwing exception in a device server
 -------------------------------------
 
-The C++ :class:`~PyTango::Except` class with its most important methods have
+The C++ :class:`~tango::Except` class with its most important methods have
 been wrapped to Python. Therefore, in a Python device server, you have the
 following methods to throw, re-throw or print a Tango::DevFailed exception :
 
-- :meth:`~PyTango.Except.throw_exception` which is a static method
-- :meth:`~PyTango.Except.re_throw_exception` which is also a static method
-- :meth:`~PyTango.Except.print_exception` which is also a static method
+- :meth:`~tango.Except.throw_exception` which is a static method
+- :meth:`~tango.Except.re_throw_exception` which is also a static method
+- :meth:`~tango.Except.print_exception` which is also a static method
 
 The following code is an example of a command method requesting a command on a
 sub-device and re-throwing the exception in case of::
@@ -83,19 +83,19 @@ sub-device and re-throwing the exception in case of::
 Exception API
 -------------
 
-.. autoclass:: PyTango.Except
+.. autoclass:: tango.Except
    :show-inheritance:
    :members:
 
-.. autoclass:: PyTango.DevError
+.. autoclass:: tango.DevError
    :show-inheritance:
    :members:
 
-.. autoexception:: PyTango.DevFailed
+.. autoexception:: tango.DevFailed
    :show-inheritance:
    :members:
 
-.. autoexception:: PyTango.ConnectionFailed
+.. autoexception:: tango.ConnectionFailed
    :show-inheritance:
 
     This exception is thrown when a problem occurs during the connection
@@ -120,7 +120,7 @@ Exception API
         The device name
 
 
-.. autoexception:: PyTango.CommunicationFailed
+.. autoexception:: tango.CommunicationFailed
    :show-inheritance:
 
     This exception is thrown when a communication problem is detected during
@@ -147,7 +147,7 @@ Exception API
     +-------+-------------------------+----------------------------------------------------+----------+
 
 
-.. autoexception:: PyTango.WrongNameSyntax
+.. autoexception:: tango.WrongNameSyntax
    :show-inheritance:
 
 This exception has only one level of Tango::DevError structure. The possible
@@ -171,7 +171,7 @@ value for the reason field are :
     **API_WrongWildcardUsage**
         This error occurs if there is a bad usage of the wildcard character
 
-.. autoexception:: PyTango.NonDbDevice
+.. autoexception:: tango.NonDbDevice
    :show-inheritance:
 
     This exception has only one level of Tango::DevError structure. The reason
@@ -179,7 +179,7 @@ value for the reason field are :
     when using the DeviceProxy or AttributeProxy class database access for
     non-database device.
 
-.. autoexception:: PyTango.WrongData
+.. autoexception:: tango.WrongData
    :show-inheritance:
 
     This exception has only one level of Tango::DevError structure.
@@ -204,7 +204,7 @@ value for the reason field are :
         This error occurs when trying to extract command data with a type
         different than the type used to send the data
 
-.. autoexception:: PyTango.NonSupportedFeature
+.. autoexception:: tango.NonSupportedFeature
    :show-inheritance:
 
     This exception is thrown by the API layer when a request to a feature
@@ -212,7 +212,7 @@ value for the reason field are :
     implementing Tango device interface n-x. There is one possible value for
     the reason field which is API_UnsupportedFeature.
 
-.. autoexception:: PyTango.AsynCall
+.. autoexception:: tango.AsynCall
    :show-inheritance:
 
     This exception is thrown by the API layer when a the asynchronous model id
@@ -231,7 +231,7 @@ value for the reason field are :
         request (For instance, using the asynchronous request identifier returned
         by a command_inout_asynch() method with a read_attribute_reply() attribute).
 
-.. autoexception:: PyTango.AsynReplyNotArrived
+.. autoexception:: tango.AsynReplyNotArrived
    :show-inheritance:
 
     This exception is thrown by the API layer when:
@@ -241,7 +241,7 @@ value for the reason field are :
 
     There is one possible value for the reason field which is API_AsynReplyNotArrived.
 
-.. autoexception:: PyTango.EventSystemFailed
+.. autoexception:: tango.EventSystemFailed
    :show-inheritance:
 
     This exception is thrown by the API layer when subscribing or unsubscribing
@@ -269,7 +269,7 @@ value for the reason field are :
         method
 
 
-.. autoexception:: PyTango.DeviceUnlocked
+.. autoexception:: tango.DeviceUnlocked
    :show-inheritance:
 
     This exception is thrown by the API layer when a device locked by the
@@ -284,11 +284,11 @@ value for the reason field are :
     side. The second layer is added by the client API layer with informations on
     which API call generates the exception and device name.
 
-.. autoexception:: PyTango.NotAllowed
+.. autoexception:: tango.NotAllowed
    :show-inheritance:
 
 
-.. autoexception:: PyTango.NamedDevFailedList
+.. autoexception:: tango.NamedDevFailedList
    :show-inheritance:
 
     This exception is only thrown by the DeviceProxy::write_attributes()
