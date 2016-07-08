@@ -1,34 +1,34 @@
 Attribute classes
 =================
 
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 Attr
 ----
 
-.. autoclass:: PyTango.Attr
+.. autoclass:: tango.Attr
     :members:
 
 Attribute
 ---------
 
-.. autoclass:: PyTango.Attribute
+.. autoclass:: tango.Attribute
     :members:
 
 WAttribute
 ----------
 
-.. autoclass:: PyTango.WAttribute
+.. autoclass:: tango.WAttribute
     :members:
 
 MultiAttribute
 --------------
 
-.. autoclass:: PyTango.MultiAttribute
+.. autoclass:: tango.MultiAttribute
     :members:
     
 UserDefaultAttrProp
 -------------------
 
-.. autoclass:: PyTango.UserDefaultAttrProp
+.. autoclass:: tango.UserDefaultAttrProp
     :members:

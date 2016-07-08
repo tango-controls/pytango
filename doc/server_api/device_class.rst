@@ -1,7 +1,7 @@
 DeviceClass
 ===========
 
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
-.. autoclass:: PyTango.DeviceClass
+.. autoclass:: tango.DeviceClass
     :members:

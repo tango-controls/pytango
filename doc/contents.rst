@@ -1,5 +1,5 @@
 
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 .. _contents: 
 

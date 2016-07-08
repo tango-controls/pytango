@@ -1,15 +1,15 @@
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 Green mode
 ----------
 
 PyTango supports cooperative green Tango objects. Since version 8.1 two *green*
-modes have been added: :obj:`~PyTango.GreenMode.Futures` and
-:obj:`~PyTango.GreenMode.Gevent`.
+modes have been added: :obj:`~tango.GreenMode.Futures` and
+:obj:`~tango.GreenMode.Gevent`.
 
-The :obj:`~PyTango.GreenMode.Futures` uses the standard python module
+The :obj:`~tango.GreenMode.Futures` uses the standard python module
 :mod:`concurrent.futures`.
-The :obj:`~PyTango.GreenMode.Gevent` mode uses the well known gevent_ library.
+The :obj:`~tango.GreenMode.Gevent` mode uses the well known gevent_ library.
 
 Currently, in version 8.1, only :class:`DeviceProxy` has been modified to work
 in a green cooperative way. If the work is found to be useful, the same can
@@ -71,12 +71,12 @@ Using :mod:`concurrent.futures` cooperative mode in PyTango is relatively easy::
     >>> print(dev.state())
     RUNNING
 
-The :func:`PyTango.futures.DeviceProxy` API is exactly the same as the standard
-:class:`~PyTango.DeviceProxy`. The difference is in the semantics of the methods
+The :func:`tango.futures.DeviceProxy` API is exactly the same as the standard
+:class:`~tango.DeviceProxy`. The difference is in the semantics of the methods
 that involve synchronous network calls (constructor included) which may block
 the execution for a relatively big amount of time.
 The list of methods that have been modified to accept *futures* semantics are,
-on the :func:`PyTango.futures.DeviceProxy`:
+on the :func:`tango.futures.DeviceProxy`:
 
 * Constructor
 * :meth:`~DeviceProxy.state`
@@ -89,7 +89,7 @@ on the :func:`PyTango.futures.DeviceProxy`:
 * :meth:`~DeviceProxy.ping`
 
 So how does this work in fact? I see no difference from using the *standard* 
-:class:`~PyTango.DeviceProxy`.
+:class:`~tango.DeviceProxy`.
 Well, this is, in fact, one of the goals: be able to use a *futures* cooperation
 without changing the API. Behind the scenes the methods mentioned before have
 been modified to be able to work cooperatively.
@@ -103,7 +103,7 @@ the method to execute. The default is `None` which means wait forever. If *wait*
 is set to `False`, the *timeout* is ignored.
 
 If *wait* is set to `True`, the result is the same as executing the 
-*standard* method on a :class:`~PyTango.DeviceProxy`.
+*standard* method on a :class:`~tango.DeviceProxy`.
 If, *wait* is set to `False`, the result will be a 
 :class:`concurrent.futures.Future`. In this case, to get the actual value
 you will need to do something like::
@@ -175,12 +175,12 @@ Using gevent_ cooperative mode in PyTango is relatively easy::
     >>> print(dev.state())
     RUNNING
 
-The :func:`PyTango.gevent.DeviceProxy` API is exactly the same as the standard
-:class:`~PyTango.DeviceProxy`. The difference is in the semantics of the methods
+The :func:`tango.gevent.DeviceProxy` API is exactly the same as the standard
+:class:`~tango.DeviceProxy`. The difference is in the semantics of the methods
 that involve synchronous network calls (constructor included) which may block
 the execution for a relatively big amount of time.
 The list of methods that have been modified to accept *gevent* semantics are,
-on the :func:`PyTango.gevent.DeviceProxy`:
+on the :func:`tango.gevent.DeviceProxy`:
 
 * Constructor
 * :meth:`~DeviceProxy.state`
@@ -193,7 +193,7 @@ on the :func:`PyTango.gevent.DeviceProxy`:
 * :meth:`~DeviceProxy.ping`
 
 So how does this work in fact? I see no difference from using the *standard* 
-:class:`~PyTango.DeviceProxy`.
+:class:`~tango.DeviceProxy`.
 Well, this is, in fact, one of the goals: be able to use a gevent cooperation
 without changing the API. Behind the scenes the methods mentioned before have
 been modified to be able to work cooperatively with other greenlets.
@@ -207,7 +207,7 @@ the method to execute. The default timeout is `None` which means wait forever.
 If *wait* is set to `False`, the *timeout* is ignored.
 
 If *wait* is set to `True`, the result is the same as executing the 
-*standard* method on a :class:`~PyTango.DeviceProxy`.
+*standard* method on a :class:`~tango.DeviceProxy`.
 If, *wait* is set to `False`, the result will be a 
 :class:`gevent.event.AsyncResult`. In this case, to get the actual value
 you will need to do something like::
