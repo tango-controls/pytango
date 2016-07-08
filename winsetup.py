@@ -28,7 +28,7 @@ def main():
 
     winsetup_dir = osp.dirname(osp.abspath(__file__))
     os.chdir(winsetup_dir)
-    setup_name = "ssetup.py"
+    setup_name = "setup.py"
     bitmap = osp.join(winsetup_dir, 'doc', 'logo-medium.bmp')
     ver = ".".join(map(str, sys.version_info[:2]))
 
