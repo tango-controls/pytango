@@ -22,7 +22,7 @@ __docformat__ = "restructuredtext"
 
 import inspect
 
-from ._PyTango import Except, CmdArgType, DispLevel, AttrDataFormat, \
+from ._tango import Except, CmdArgType, DispLevel, AttrDataFormat, \
     Pipe, PipeWriteType, PipeSerialModel, UserDefaultPipeProp
 from .utils import is_non_str_seq, is_pure_str
 
@@ -167,14 +167,14 @@ class PipeData(object):
         except:
             throw_ex("Wrong data write type in pipe argument for "
                      "pipe %s in class %s\nPipe write type must be a "
-                     "PyTango.PipeWriteType" % (pipe_name, name))
+                     "tango.PipeWriteType" % (pipe_name, name))
         try:
             self.display_level = DispLevel(extra_info.get("display level", 
                                                           DispLevel.OPERATOR))
         except:
             throw_ex("Wrong display level in pipe information for "
                      "pipe %s in class %s\nPipe information for "
-                     "display level is not a PyTango.DispLevel"
+                     "display level is not a tango.DispLevel"
                      % (pipe_name, name))
 
         self.pipe_class = extra_info.get("klass", Pipe)

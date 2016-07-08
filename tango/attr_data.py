@@ -22,9 +22,9 @@ __docformat__ = "restructuredtext"
 
 import inspect
 
-from ._PyTango import Except, CmdArgType, AttrDataFormat, AttrWriteType
-from ._PyTango import DispLevel, UserDefaultAttrProp
-from ._PyTango import Attr, SpectrumAttr, ImageAttr
+from ._tango import Except, CmdArgType, AttrDataFormat, AttrWriteType
+from ._tango import DispLevel, UserDefaultAttrProp
+from ._tango import Attr, SpectrumAttr, ImageAttr
 from .utils import is_non_str_seq, is_pure_str
 
 
@@ -203,7 +203,7 @@ class AttrData(object):
         except:
             throw_ex("Wrong data type in attribute argument for attribute %s "
                      "in class %s\nAttribute data type (first element in first "
-                     "sequence) must be a PyTango.CmdArgType"
+                     "sequence) must be a tango.CmdArgType"
                      % (attr_name, name))
         
         # get format
@@ -212,7 +212,7 @@ class AttrData(object):
         except:
             throw_ex("Wrong data format in attribute argument for attribute %s "
                      "in class %s\nAttribute data format (second element in "
-                     "first sequence) must be a PyTango.AttrDataFormat"
+                     "first sequence) must be a tango.AttrDataFormat"
                      % (attr_name, name))
         
         if self.attr_format == AttrDataFormat.SCALAR:
@@ -262,14 +262,14 @@ class AttrData(object):
             throw_ex("Wrong data write type in attribute argument for "
                      "attribute %s in class %s\nAttribute write type (third "
                      "element in first sequence) must be a "
-                     "PyTango.AttrWriteType" % (attr_name, name))
+                     "tango.AttrWriteType" % (attr_name, name))
         try:
             self.display_level = DispLevel(extra_info.get("display level", 
                                                           DispLevel.OPERATOR))
         except:
             throw_ex("Wrong display level in attribute information for "
                      "attribute %s in class %s\nAttribute information for "
-                     "display level is not a PyTango.DispLevel"
+                     "display level is not a tango.DispLevel"
                      % (attr_name, name))
         try:
             self.polling_period = int(extra_info.get("polling period", -1))

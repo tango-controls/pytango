@@ -21,7 +21,7 @@ __docformat__ = "restructuredtext"
 
 import collections
 
-from ._PyTango import Except, DevFailed, DeviceClass, CmdArgType, \
+from ._tango import Except, DevFailed, DeviceClass, CmdArgType, \
     DispLevel, UserDefaultAttrProp
 from .pyutil import Util
 
@@ -409,7 +409,7 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
     except:
         msg = "Wrong data type in command argument for command %s in " \
               "class %s\nCommand parameter type (first element in first " \
-              "sequence) must be a PyTango.CmdArgType"
+              "sequence) must be a tango.CmdArgType"
         __throw_create_command_exception(msg)
 
     param_desc = ""
@@ -439,7 +439,7 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
     except:
         msg = "Wrong data type in command result for command %s in " \
               "class %s\nCommand result type (first element in second " \
-              "sequence) must be a PyTango.CmdArgType" % (cmd_name, name)
+              "sequence) must be a tango.CmdArgType" % (cmd_name, name)
         __throw_create_command_exception(msg)
 
     result_desc = ""
@@ -476,7 +476,7 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
                 except:
                     msg = "Wrong data type in command information for command %s in " \
                           "class %s\nCommand information for display level is not a " \
-                          "PyTango.DispLevel" % (cmd_name, name)
+                          "tango.DispLevel" % (cmd_name, name)
                     __throw_create_command_exception(msg)
             elif info_name_lower == "default command":
                 if not is_pure_str(info_value):
@@ -575,7 +575,7 @@ def __DeviceClass__create_device(self, device_name, alias=None, cb=None):
             registered in the database and BEFORE the init_device for the
             newly created device is called
 
-        Throws PyTango.DevFailed:
+        Throws tango.DevFailed:
             - the device name exists already or
             - the given class is not registered for this DS.
             - the cb is not a callable
@@ -602,7 +602,7 @@ def __DeviceClass__delete_device(self, device_name):
             Deletes an existing device from the database and from this running
             server
 
-            Throws PyTango.DevFailed:
+            Throws tango.DevFailed:
                 - the device name doesn't exist in the database
                 - the device name doesn't exist in this DS.
 
@@ -718,7 +718,7 @@ def __doc_DeviceClass():
             is sent to to the device server process.
             The second version of the method is available only under Linux.
 
-        Throws PyTango.DevFailed:
+        Throws tango.DevFailed:
             - if the signal number is out of range
             - if the operating system failed to register a signal for the process.
 
@@ -815,33 +815,33 @@ def __doc_DeviceClass():
     """ )
 
     document_method("get_device_list", """
-    get_device_list(self) -> sequence<PyTango.DeviceImpl>
+    get_device_list(self) -> sequence<tango.DeviceImpl>
 
-            Gets the list of PyTango.DeviceImpl objects for this class
+            Gets the list of tango.DeviceImpl objects for this class
 
         Parameters : None
-        Return     : (sequence<PyTango.DeviceImpl>) list of PyTango.DeviceImpl objects for this class
+        Return     : (sequence<tango.DeviceImpl>) list of tango.DeviceImpl objects for this class
     """ )
 
     document_method("get_command_list", """
-    get_command_list(self) -> sequence<PyTango.Command>
+    get_command_list(self) -> sequence<tango.Command>
 
-            Gets the list of PyTango.Command objects for this class
+            Gets the list of tango.Command objects for this class
 
         Parameters : None
-        Return     : (sequence<PyTango.Command>) list of PyTango.Command objects for this class
+        Return     : (sequence<tango.Command>) list of tango.Command objects for this class
         
         New in PyTango 8.0.0
     """ )
 
     document_method("get_cmd_by_name", """
-    get_cmd_by_name(self, (str)cmd_name) -> PyTango.Command
+    get_cmd_by_name(self, (str)cmd_name) -> tango.Command
 
             Get a reference to a command object.
 
         Parameters :
             - cmd_name : (str) command name
-        Return     : (PyTango.Command) PyTango.Command object
+        Return     : (tango.Command) tango.Command object
         
         New in PyTango 8.0.0
     """ )

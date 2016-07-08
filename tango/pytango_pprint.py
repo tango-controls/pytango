@@ -19,7 +19,7 @@ __docformat__ = "restructuredtext"
 
 import operator
 
-from ._PyTango import (StdStringVector, StdLongVector, CommandInfoList,
+from ._tango import (StdStringVector, StdLongVector, CommandInfoList,
     AttributeInfoList, AttributeInfoListEx, PipeInfoList,
     DeviceDataHistoryList,
     GroupReplyList, GroupAttrReplyList, GroupCmdReplyList,

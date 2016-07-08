@@ -20,11 +20,11 @@ import functools
 
 import six
 
-import PyTango
-from PyTango import DeviceProxy as Device
-from PyTango import CmdArgType
-from PyTango.codec import loads
-from PyTango.codec import dumps as _dumps
+import tango
+from tango import DeviceProxy as Device
+from tango import CmdArgType
+from tango.codec import loads
+from tango.codec import dumps as _dumps
 
 _FMT = "pickle"
 
@@ -51,7 +51,7 @@ class _DeviceHelper(object):
         self.device = Device(dev_name, *args, **kwargs)
         self.slots = weakref.WeakKeyDictionary()
 
-    def connect(self, signal, slot, event_type=PyTango.EventType.CHANGE_EVENT):
+    def connect(self, signal, slot, event_type=tango.EventType.CHANGE_EVENT):
         i = self.device.subscribe_event(signal, event_type, slot)
         self.slots[slot] = i
         return i
@@ -76,7 +76,7 @@ class _DeviceHelper(object):
                     if attr_name.lower() in self.__ATTR_FILTER:
                         continue
                     cache[attr_name] = attr_info
-            except PyTango.DevFailed:
+            except tango.DevFailed:
                 pass
             self.__attr_cache = cache
         return cache
@@ -110,7 +110,7 @@ class _DeviceHelper(object):
                     cmd_func.__doc__ = cmd_info.in_type_desc
                     cmd_info.func = cmd_func
                     cache[cmd_name] = cmd_info
-            except PyTango.DevFailed:
+            except tango.DevFailed:
                 pass
             self.__cmd_cache = cache
         return cache
@@ -138,7 +138,7 @@ class _DeviceHelper(object):
         if result:
             result = dev.read_attribute(name)
             value = result.value
-            if result.type == PyTango.DevEncoded:
+            if result.type == tango.DevEncoded:
                 result = loads(*value)
             else:
                 result = value
@@ -152,7 +152,7 @@ class _DeviceHelper(object):
         result = self.get_attr_info(name)
         if result is None:
             raise KeyError("Unknown attribute %s" % name)
-        if result.data_type == PyTango.DevEncoded:
+        if result.data_type == tango.DevEncoded:
             self.device.write_attribute(name, dumps(value))
         else:
             self.device.write_attribute(name, value)
@@ -166,7 +166,7 @@ class _DeviceHelper(object):
             info = self.device.info()
             self.__dict__["__info"] = info
             return info
-        except PyTango.DevFailed:
+        except tango.DevFailed:
             return None
 
     def __getitem__(self, name):
@@ -205,7 +205,7 @@ class Object(object):
             r = self._helper.get(name)
         except KeyError as ke:
             six.raise_from(AttributeError('Unknown {0}'.format(name)), ke)
-        if isinstance(r, PyTango.CommandInfo):
+        if isinstance(r, tango.CommandInfo):
             self.__dict__[name] = r.func
             return r.func
         return r
@@ -262,7 +262,7 @@ def get_commands_config(obj, refresh=False):
     return obj._helper.get_cmd_cache(refresh=refresh)
 
 
-def connect(obj, signal, slot, event_type=PyTango.EventType.CHANGE_EVENT):
+def connect(obj, signal, slot, event_type=tango.EventType.CHANGE_EVENT):
     """Experimental function. Not part of the official API"""
     return obj._helper.connect(signal, slot, event_type=event_type)
 

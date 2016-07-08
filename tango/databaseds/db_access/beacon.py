@@ -9,9 +9,9 @@ import Queue
 import re
 import weakref
 import datetime
-import PyTango
+import tango
 
-th_exc = PyTango.Except.throw_exception
+th_exc = tango.Except.throw_exception
 
 from ..db_errors import *
 

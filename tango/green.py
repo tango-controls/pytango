@@ -28,7 +28,7 @@ import os
 from functools import wraps, partial
 
 # Tango imports
-from ._PyTango import GreenMode
+from ._tango import GreenMode
 
 # Gevent imports
 from .tango_gevent import get_global_executor as get_gevent_executor
@@ -74,13 +74,13 @@ def set_green_mode(green_mode=None):
         return
     if green_mode == GreenMode.Gevent:
         # check if we can change to gevent mode
-        import PyTango.gevent
+        import tango.gevent
     elif green_mode == GreenMode.Futures:
         # check if we can change to futures mode
-        import PyTango.futures
+        import tango.futures
     elif green_mode == GreenMode.Asyncio:
         # check if we can change to asyncio mode
-        import PyTango.asyncio
+        import tango.asyncio
     __current_green_mode = green_mode
 
 

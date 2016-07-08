@@ -17,8 +17,8 @@ __all__ = [ "NumpyType", "numpy_type", "numpy_spectrum", "numpy_image" ]
 
 __docformat__ = "restructuredtext"
 
-from ._PyTango import Except
-from ._PyTango import constants
+from ._tango import Except
+from ._tango import constants
 
 from .attribute_proxy import AttributeProxy
 import collections
@@ -38,9 +38,9 @@ def _define_numpy():
         import numpy
         import operator
 
-        ArgType = _PyTango.CmdArgType
-        AttributeInfo = _PyTango.AttributeInfo
-        Attribute = _PyTango.Attribute
+        ArgType = _tango.CmdArgType
+        AttributeInfo = _tango.AttributeInfo
+        Attribute = _tango.Attribute
 
         class NumpyType(object):
 
@@ -91,7 +91,7 @@ def _define_numpy():
                 numpy_spectrum(self, tg_type, dim_x, dim_y) -> numpy.array
                 numpy_spectrum(self, tg_type, sequence) -> numpy.array
 
-                        Get a square numpy array to be used with PyTango.
+                        Get a square numpy array to be used with tango.
                         One version gets dim_x and creates an object with
                         this size. The other version expects any sequence to
                         convert.
@@ -116,7 +116,7 @@ def _define_numpy():
                 numpy_image(self, tg_type, dim_x, dim_y) -> numpy.array
                 numpy_image(self, tg_type, sequence) -> numpy.array
 
-                        Get a square numpy array to be used with PyTango.
+                        Get a square numpy array to be used with tango.
                         One version gets dim_x and dim_y and creates an object with
                         this size. The other version expects a square sequence of
                         sequences to convert.

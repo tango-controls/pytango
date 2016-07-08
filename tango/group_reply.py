@@ -18,7 +18,7 @@ __all__ = ["group_reply_init"]
 __docformat__ = "restructuredtext"
 
 from .utils import document_method as __document_method
-from ._PyTango import GroupReply, GroupCmdReply, GroupAttrReply, ExtractAs
+from ._tango import GroupReply, GroupCmdReply, GroupAttrReply, ExtractAs
 
 def __GroupCmdReply__get_data(self):
     return self.get_data_raw().extract()

@@ -18,7 +18,7 @@ __all__ = ["device_data_init"]
 __docformat__ = "restructuredtext"
 
 from .utils import document_method as __document_method
-from ._PyTango import DeviceData
+from ._tango import DeviceData
 
 def __DeviceData__get_data(self):
     return self.get_data_raw().extract()

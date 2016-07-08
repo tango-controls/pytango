@@ -17,7 +17,7 @@ __all__ = ["auto_monitor_init"]
 
 __docformat__ = "restructuredtext"
 
-from ._PyTango import AutoTangoMonitor, AutoTangoAllowThreads
+from ._tango import AutoTangoMonitor, AutoTangoAllowThreads
 
 
 def __AutoTangoMonitor__enter__(self):

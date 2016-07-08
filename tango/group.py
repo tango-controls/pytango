@@ -19,7 +19,7 @@ __docformat__ = "restructuredtext"
 
 import operator
 
-from ._PyTango import __Group as _RealGroup, StdStringVector
+from ._tango import __Group as _RealGroup, StdStringVector
 from .utils import seq_2_StdStringVector, is_pure_str
 from .utils import document_method as __document_method
 import collections
@@ -476,7 +476,7 @@ def __doc_Group():
         Parameters :
             - cmd_name   : (str) Command name
             - param      : (any) parameter value
-            - param_list : (PyTango.DeviceDataList) sequence of parameters.
+            - param_list : (tango.DeviceDataList) sequence of parameters.
                            When given, it's length must match the group size.
             - forget     : (bool) Fire and forget flag. If set to true, it means that
                            no reply is expected (i.e. the caller does not care
@@ -693,7 +693,7 @@ def __doc_Group():
         Parameters:
             - cmd_name   : (str) Command name
             - param      : (any) parameter value
-            - param_list : (PyTango.DeviceDataList) sequence of parameters.
+            - param_list : (tango.DeviceDataList) sequence of parameters.
                            When given, it's length must match the group size.
             - forward    : (bool) If it is set to true (the default) request is
                             forwarded to subgroups. Otherwise, it is only applied

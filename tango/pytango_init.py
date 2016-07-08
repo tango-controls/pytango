@@ -38,8 +38,8 @@ from .pyutil import pyutil_init
 from .time_val import time_val_init
 from .auto_monitor import auto_monitor_init
 from .pipe import pipe_init
-from ._PyTango import constants
-from ._PyTango import _get_tango_lib_release
+from ._tango import constants
+from ._tango import _get_tango_lib_release
 
 __INITIALIZED = False
 __DOC = True

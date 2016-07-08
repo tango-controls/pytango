@@ -11,10 +11,10 @@
 
 """
 This is an internal PyTango module. It completes the binding of
-:class:`PyTango.AttributeProxy`.
+:class:`tango.AttributeProxy`.
 
-To access these members use directly :mod:`PyTango` module and NOT
-PyTango.attribute_proxy.
+To access these members use directly :mod:`tango` module and NOT
+tango.attribute_proxy.
 """
 
 __all__ = [ "AttributeProxy", "attribute_proxy_init", "get_attribute_proxy" ]
@@ -23,8 +23,8 @@ __docformat__ = "restructuredtext"
 
 import collections
 
-from ._PyTango import StdStringVector, DbData, DbDatum, DeviceProxy
-from ._PyTango import __AttributeProxy as _AttributeProxy
+from ._tango import StdStringVector, DbData, DbDatum, DeviceProxy
+from ._tango import __AttributeProxy as _AttributeProxy
 from .utils import seq_2_StdStringVector, seq_2_DbData, DbData_2_dict
 from .utils import is_pure_str, is_non_str_seq
 from .green import result, submit, get_green_mode, get_wait_default_value
@@ -35,9 +35,9 @@ def get_attribute_proxy(*args, **kwargs):
     get_attribute_proxy(self, full_attr_name, green_mode=None, wait=True, timeout=True) -> AttributeProxy
     get_attribute_proxy(self, device_proxy, attr_name, green_mode=None, wait=True, timeout=True) -> AttributeProxy
 
-    Returns a new :class:`~PyTango.AttributeProxy`.
+    Returns a new :class:`~tango.AttributeProxy`.
     There is no difference between using this function and the direct
-    :class:`~PyTango.AttributeProxy` constructor if you use the default kwargs.
+    :class:`~tango.AttributeProxy` constructor if you use the default kwargs.
 
     The added value of this function becomes evident when you choose a green_mode
     to be *Futures* or *Gevent*. The AttributeProxy constructor internally makes some
@@ -46,15 +46,15 @@ def get_attribute_proxy(*args, **kwargs):
 
     :param full_attr_name: the full name of the attribute
     :type full_attr_name: str
-    :param device_proxy: the :class:`~PyTango.DeviceProxy`
+    :param device_proxy: the :class:`~tango.DeviceProxy`
     :type device_proxy: DeviceProxy
     :param attr_name: attribute name for the given device proxy
     :type attr_name: str
     :param green_mode: determines the mode of execution of the device (including
                       the way it is created). Defaults to the current global
-                      green_mode (check :func:`~PyTango.get_green_mode` and
-                      :func:`~PyTango.set_green_mode`)
-    :type green_mode: :obj:`~PyTango.GreenMode`
+                      green_mode (check :func:`~tango.get_green_mode` and
+                      :func:`~tango.set_green_mode`)
+    :type green_mode: :obj:`~tango.GreenMode`
     :param wait: whether or not to wait for result. If green_mode
                  Ignored when green_mode is Synchronous (always waits).
     :type wait: bool
@@ -64,7 +64,7 @@ def get_attribute_proxy(*args, **kwargs):
     :type timeout: float
     :returns:
         if green_mode is Synchronous or wait is True:
-            :class:`~PyTango.AttributeProxy`
+            :class:`~tango.AttributeProxy`
         else if green_mode is Futures:
             :class:`concurrent.futures.Future`
         else if green_mode is Gevent:
@@ -98,24 +98,24 @@ def __AttributeProxy__get_property(self, propname, value=None):
             This method accepts the following types as propname parameter:
             1. string [in] - single property data to be fetched
             2. sequence<string> [in] - several property data to be fetched
-            3. PyTango.DbDatum [in] - single property data to be fetched
-            4. PyTango.DbData [in,out] - several property data to be fetched.
+            3. tango.DbDatum [in] - single property data to be fetched
+            4. tango.DbData [in,out] - several property data to be fetched.
             5. sequence<DbDatum> - several property data to be feteched
 
             Note: for cases 3, 4 and 5 the 'value' parameter if given, is IGNORED.
 
-            If value is given it must be a PyTango.DbData that will be filled with the
+            If value is given it must be a tango.DbData that will be filled with the
             property values
 
         Parameters :
             - propname : (str) property(ies) name(s)
-            - value : (PyTango.DbData) (optional, default is None meaning that the
-                      method will create internally a PyTango.DbData and return
+            - value : (tango.DbData) (optional, default is None meaning that the
+                      method will create internally a tango.DbData and return
                       it filled with the property values
 
         Return     : (DbData) containing the property(ies) value(s). If a
-                     PyTango.DbData is given as parameter, it returns the same
-                     object otherwise a new PyTango.DbData is returned
+                     tango.DbData is given as parameter, it returns the same
+                     object otherwise a new tango.DbData is returned
 
         Throws     : NonDbDevice, ConnectionFailed (with database),
                      CommunicationFailed (with database),
@@ -158,8 +158,8 @@ def __AttributeProxy__put_property(self, value):
 
             Insert or update a list of properties for this attribute.
             This method accepts the following types as value parameter:
-            1. PyTango.DbDatum - single property data to be inserted
-            2. PyTango.DbData - several property data to be inserted
+            1. tango.DbDatum - single property data to be inserted
+            2. tango.DbData - several property data to be inserted
             3. sequence<DbDatum> - several property data to be inserted
             4. dict<str, DbDatum> - keys are property names and value has data to be inserted
             5. dict<str, seq<str>> - keys are property names and value has data to be inserted
@@ -167,8 +167,8 @@ def __AttributeProxy__put_property(self, value):
 
         Parameters :
             - value : can be one of the following:
-                1. PyTango.DbDatum - single property data to be inserted
-                2. PyTango.DbData - several property data to be inserted
+                1. tango.DbDatum - single property data to be inserted
+                2. tango.DbData - several property data to be inserted
                 3. sequence<DbDatum> - several property data to be inserted
                 4. dict<str, DbDatum> - keys are property names and value has data to be inserted
                 5. dict<str, seq<str>> - keys are property names and value has data to be inserted
@@ -201,7 +201,7 @@ def __AttributeProxy__put_property(self, value):
             new_value.append(db_datum)
         value = new_value
     else:
-        raise TypeError('value must be a PyTango.DbDatum, PyTango.DbData,'\
+        raise TypeError('value must be a tango.DbDatum, tango.DbData,'\
                         'a sequence<DbDatum> or a dictionary')
     return self._put_property(value)
 
@@ -213,8 +213,8 @@ def __AttributeProxy__delete_property(self, value):
         This method accepts the following types as value parameter:
 
             1. string [in] - single property to be deleted
-            2. PyTango.DbDatum [in] - single property data to be deleted
-            3. PyTango.DbData [in] - several property data to be deleted
+            2. tango.DbDatum [in] - single property data to be deleted
+            3. tango.DbData [in] - several property data to be deleted
             4. sequence<string> [in]- several property data to be deleted
             5. sequence<DbDatum> [in] - several property data to be deleted
             6. dict<str, obj> [in] - keys are property names to be deleted
@@ -226,8 +226,8 @@ def __AttributeProxy__delete_property(self, value):
             - value : can be one of the following:
 
                 1. string [in] - single property data to be deleted
-                2. PyTango.DbDatum [in] - single property data to be deleted
-                3. PyTango.DbData [in] - several property data to be deleted
+                2. tango.DbDatum [in] - single property data to be deleted
+                3. tango.DbData [in] - several property data to be deleted
                 4. sequence<string> [in]- several property data to be deleted
                 5. sequence<DbDatum> [in] - several property data to be deleted
                 6. dict<str, obj> [in] - keys are property names to be deleted
@@ -261,8 +261,8 @@ def __AttributeProxy__delete_property(self, value):
             else:
                 new_value.append(DbDatum(k))
     else:
-        raise TypeError('value must be a string, PyTango.DbDatum, '\
-                        'PyTango.DbData, a sequence or a dictionary')
+        raise TypeError('value must be a string, tango.DbDatum, '\
+                        'tango.DbData, a sequence or a dictionary')
 
     return self._delete_property(new_value)
 
@@ -271,7 +271,7 @@ def __AttributeProxy__delete_property(self, value):
 # AttributeProxy for the constructor (parsing strings if necessary) and some
 # other things. With the _method_* functions defined later it is really easy.
 # One reason to do it this way: get_device_proxy() will always return the
-# same PyTango.DeviceProxy with this implementation. And then we can trust
+# same tango.DeviceProxy with this implementation. And then we can trust
 # it's automatic event unsubscription to handle events.
 class AttributeProxy(object):
     """

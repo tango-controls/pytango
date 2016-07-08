@@ -21,7 +21,7 @@ import time
 import datetime
 import operator
 
-from ._PyTango import TimeVal
+from ._tango import TimeVal
 import numbers
 
 def __TimeVal__init(self, a=None, b=None, c=None):
@@ -71,7 +71,7 @@ def __TimeVal__fromtimestamp(ts):
     """
     fromtimestamp(ts) -> TimeVal
 
-        A static method returning a :class:`PyTango.TimeVal` object representing
+        A static method returning a :class:`tango.TimeVal` object representing
         the given timestamp
     
         Parameters :
@@ -85,7 +85,7 @@ def __TimeVal__fromdatetime(dt):
     """
     fromdatetime(dt) -> TimeVal
 
-        A static method returning a :class:`PyTango.TimeVal` object representing
+        A static method returning a :class:`tango.TimeVal` object representing
         the given :class:`datetime.datetime`
     
         Parameters :
@@ -103,7 +103,7 @@ def __TimeVal__now():
     """
     now() -> TimeVal
 
-        A static method returning a :class:`PyTango.TimeVal` object representing
+        A static method returning a :class:`tango.TimeVal` object representing
         the current time
     
         Parameters : None

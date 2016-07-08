@@ -20,7 +20,7 @@ __docformat__ = "restructuredtext"
 import operator
 import collections
 
-from ._PyTango import Connection, DeviceData, __CallBackAutoDie, CmdArgType, \
+from ._tango import Connection, DeviceData, __CallBackAutoDie, CmdArgType, \
     DeviceProxy, Database, ExtractAs
 from .utils import document_method as __document_method
 from .utils import document_static_method as __document_static_method
@@ -78,8 +78,8 @@ def __Connection__command_inout(self, name, *args, **kwds):
                               command or a DeviceData object with this value inserted.
                               It can be ommited if the command should not get any argument.
                 - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
-                               (see :meth:`~PyTango.DeviceProxy.get_green_mode` and
-                               :meth:`~PyTango.DeviceProxy.set_green_mode`).
+                               (see :meth:`~tango.DeviceProxy.get_green_mode` and
+                               :meth:`~tango.DeviceProxy.set_green_mode`).
                 - wait       : (bool) whether or not to wait for result. If green_mode
                                is *Synchronous*, this parameter is ignored as it always
                                waits for the result.
@@ -175,7 +175,7 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
         by default, TANGO is initialized with the **polling** model. If you want
         to use the **push** model (the one with the callback parameter), you
         need to change the global TANGO model to PUSH_CALLBACK.
-        You can do this with the :meth:`PyTango.ApiUtil.set_asynch_cb_sub_model`
+        You can do this with the :meth:`tango.ApiUtil.set_asynch_cb_sub_model`
     """
     if len(args) == 0: # command_inout_asynch()
         argin = DeviceData()

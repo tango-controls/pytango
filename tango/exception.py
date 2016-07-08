@@ -18,15 +18,15 @@ __all__ = ["exception_init"]
 __docformat__ = "restructuredtext"
 
 from .utils import document_static_method as __document_static_method
-from ._PyTango import Except, DevError, ErrSeverity
+from ._tango import Except, DevError, ErrSeverity
 
 def __to_dev_failed(exc_type=None, exc_value=None, traceback=None):
-    """to_dev_failed(exc_type, exc_value, traceback) -> PyTango.DevFailed
+    """to_dev_failed(exc_type, exc_value, traceback) -> tango.DevFailed
 
             Generate a TANGO DevFailed exception.
-            The exception is created with a single :class:`~PyTango.DevError`
-            object. A default value *PyTango.ErrSeverity.ERR* is defined for
-            the :class:`~PyTango.DevError` severity field.
+            The exception is created with a single :class:`~tango.DevError`
+            object. A default value *tango.ErrSeverity.ERR* is defined for
+            the :class:`~tango.DevError` severity field.
             
             The parameters are the same as the ones generates by a call to
             :func:`sys.exc_info`.
@@ -38,7 +38,7 @@ def __to_dev_failed(exc_type=None, exc_value=None, traceback=None):
                       if the exception type is a class object)
             - traceback : (traceback) traceback object
         
-        Return     : (PyTango.DevFailed) a tango exception object
+        Return     : (tango.DevFailed) a tango exception object
         
         New in PyTango 7.2.1"""
     try:
@@ -83,36 +83,36 @@ def __doc_Except():
         - compare_exception"""
     
     document_static_method("throw_exception", """
-    throw_exception(reason, desc, origin, sever=PyTango.ErrSeverity.ERR) -> None
+    throw_exception(reason, desc, origin, sever=tango.ErrSeverity.ERR) -> None
 
             Generate and throw a TANGO DevFailed exception.
-            The exception is created with a single :class:`~PyTango.DevError` 
-            object. A default value *PyTango.ErrSeverity.ERR* is defined for 
-            the :class:`~PyTango.DevError` severity field.
+            The exception is created with a single :class:`~tango.DevError` 
+            object. A default value *tango.ErrSeverity.ERR* is defined for 
+            the :class:`~tango.DevError` severity field.
         
         Parameters :
-            - reason : (str) The exception :class:`~PyTango.DevError` object reason field
-            - desc   : (str) The exception :class:`~PyTango.DevError` object desc field
-            - origin : (str) The exception :class:`~PyTango.DevError` object origin field
-            - sever  : (PyTango.ErrSeverity) The exception DevError object severity field
+            - reason : (str) The exception :class:`~tango.DevError` object reason field
+            - desc   : (str) The exception :class:`~tango.DevError` object desc field
+            - origin : (str) The exception :class:`~tango.DevError` object origin field
+            - sever  : (tango.ErrSeverity) The exception DevError object severity field
 
         Throws     : DevFailed
     """ )
 
     document_static_method("re_throw_exception", """
-    re_throw_exception(ex, reason, desc, origin, sever=PyTango.ErrSeverity.ERR) -> None
+    re_throw_exception(ex, reason, desc, origin, sever=tango.ErrSeverity.ERR) -> None
 
-            Re-throw a TANGO :class:`~PyTango.DevFailed` exception with one more error.
-            The exception is re-thrown with one more :class:`~PyTango.DevError` object.
-            A default value *PyTango.ErrSeverity.ERR* is defined for the new
-            :class:`~PyTango.DevError` severity field.
+            Re-throw a TANGO :class:`~tango.DevFailed` exception with one more error.
+            The exception is re-thrown with one more :class:`~tango.DevError` object.
+            A default value *tango.ErrSeverity.ERR* is defined for the new
+            :class:`~tango.DevError` severity field.
         
         Parameters :
-            - ex     : (PyTango.DevFailed) The :class:`~PyTango.DevFailed` exception
-            - reason : (str) The exception :class:`~PyTango.DevError` object reason field
-            - desc   : (str) The exception :class:`~PyTango.DevError` object desc field
-            - origin : (str) The exception :class:`~PyTango.DevError` object origin field
-            - sever  : (PyTango.ErrSeverity) The exception DevError object severity field
+            - ex     : (tango.DevFailed) The :class:`~tango.DevFailed` exception
+            - reason : (str) The exception :class:`~tango.DevError` object reason field
+            - desc   : (str) The exception :class:`~tango.DevError` object desc field
+            - origin : (str) The exception :class:`~tango.DevError` object origin field
+            - sever  : (tango.ErrSeverity) The exception DevError object severity field
 
         Throws     : DevFailed
     """ )
@@ -123,7 +123,7 @@ def __doc_Except():
             Print all the details of a TANGO error stack.
         
         Parameters :
-            - ex     : (PyTango.DevErrorList) The error stack reference
+            - ex     : (tango.DevErrorList) The error stack reference
     """ )
 
     document_static_method("print_exception", """
@@ -132,16 +132,16 @@ def __doc_Except():
             Print all the details of a TANGO exception.
         
         Parameters :
-            - ex     : (PyTango.DevFailed) The :class:`~PyTango.DevFailed` exception
+            - ex     : (tango.DevFailed) The :class:`~tango.DevFailed` exception
     """ )
     
     document_static_method("throw_python_exception", """
     throw_python_exception(type, value, traceback) -> None
 
             Generate and throw a TANGO DevFailed exception.
-            The exception is created with a single :class:`~PyTango.DevError`
-            object. A default value *PyTango.ErrSeverity.ERR* is defined for
-            the :class:`~PyTango.DevError` severity field.
+            The exception is created with a single :class:`~tango.DevError`
+            object. A default value *tango.ErrSeverity.ERR* is defined for
+            the :class:`~tango.DevError` severity field.
             
             The parameters are the same as the ones generates by a call to
             :func:`sys.exc_info`.

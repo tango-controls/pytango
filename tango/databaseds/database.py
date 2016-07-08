@@ -14,15 +14,15 @@ except ImportError:
     argparse = None
     from optparse import OptionParser
 
-import PyTango
-from PyTango import AttrWriteType, GreenMode
-from PyTango.server import Device, DeviceMeta
-from PyTango.server import attribute, command
-from PyTango.server import class_property
-from PyTango.server import device_property
-from PyTango.server import run
+import tango
+from tango import AttrWriteType, GreenMode
+from tango.server import Device, DeviceMeta
+from tango.server import attribute, command
+from tango.server import class_property
+from tango.server import device_property
+from tango.server import run
 
-from PyTango.globals import get_class, get_class_by_class, \
+from tango.globals import get_class, get_class_by_class, \
     get_constructed_class_by_class
 
 
@@ -35,7 +35,7 @@ READ_WITH_WRITE = AttrWriteType.READ_WITH_WRITE
 global options
 global WILDCARD_REPLACEMENT
 WILDCARD_REPLACEMENT = True
-class DbInter(PyTango.Interceptors):
+class DbInter(tango.Interceptors):
 
     def create_thread(self):
         pass
@@ -53,11 +53,11 @@ def get_db_name():
     return DB_NAME
 
 
-import db_access
+from . import db_access
 
-th_exc = PyTango.Except.throw_exception
+th_exc = tango.Except.throw_exception
 
-from db_errors import *
+from .db_errors import *
 
 def check_device_name(dev_name):
     if '*' in dev_name:
@@ -163,7 +163,7 @@ class DataBase(Device):
             WILDCARD_REPLACEMENT = m.get_wildcard_replacement()
         except AttributeError:
             pass
-        self.set_state(PyTango.DevState.ON)
+        self.set_state(tango.DevState.ON)
 
     def init_timing_stats(self):
         self.timing_maps = {}
@@ -180,7 +180,7 @@ class DataBase(Device):
 
     def read_Timing_average(self):
         self._log.debug("In read_Timing_average()")
-        
+
         return [x.average for x in self.timing_maps.values()]
 
     def read_Timing_index(self):
@@ -193,7 +193,7 @@ class DataBase(Device):
 
     def read_Timing_info(self):
         self._log.debug("In read_Timing_info()")
-        util = PyTango.Util.instance()
+        util = tango.Util.instance()
         attr_Timing_info_read = []
         attr_Timing_info_read.append("TANGO Database Timing info on host " + util.get_host_name())
         attr_Timing_info_read.append(" ")
@@ -221,9 +221,9 @@ class DataBase(Device):
         """ Get list of device domain name matching the specified
 
         :param argin: The wildcard
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Device name domain list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceDomainList()")
         return self.db.get_device_domain_list(replace_wildcard(argin))
 
@@ -234,9 +234,9 @@ class DataBase(Device):
         process as non exported
 
         :param argin: Device server name (executable/instance)
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbUnExportServer()")
         self.db.unexport_server(argin)
 
@@ -246,9 +246,9 @@ class DataBase(Device):
 
         :param argin: str[0] = device name
         Str[1]...str[n] = attribute name(s)
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteAllDeviceAttributeProperty()")
 
         if len(argin) < 2:
@@ -273,9 +273,9 @@ class DataBase(Device):
         """ Delete an attribute alias.
 
         :param argin: Attriibute alias name.
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteAttributeAlias()")
         self.db.delete_attribute_alias(argin)
 
@@ -286,14 +286,14 @@ class DataBase(Device):
         :param argin: Str[0] = Tango class
         Str[1] = Attribute name
         Str[2] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Attribute name
         Str[1] = Property name
         Str[2] = date
         Str[3] = Property value number (array case)
         Str[4] = Property value 1
         Str[n] = Property value n
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetClassAttributePropertyHist()")
         class_name = argin[0]
         attribute = replace_wildcard(argin[1])
@@ -316,9 +316,9 @@ class DataBase(Device):
         Str[5] = Property value 1
         Str[n] = Property value n (array case)
         .....
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbPutDeviceAttributeProperty2()")
         device_name = argin[0]
         nb_attributes = int(argin[1])
@@ -329,9 +329,9 @@ class DataBase(Device):
         """ Get attribute alias list for a specified filter
 
         :param argin: attribute alias filter string (eg: att*)
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: attribute aliases
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetAttributeAliasList()")
         if not argin:
             argin = "%"
@@ -344,9 +344,9 @@ class DataBase(Device):
         """ Query the database for device exported for the specified class.
 
         :param argin: Class name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Device exported list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetExportdDeviceListForClass()")
         argin = replace_wildcard(argin)
         return self.db.get_exported_device_list_for_class(argin)
@@ -357,9 +357,9 @@ class DataBase(Device):
 
         :param argin: Str[0] = attribute name
         Str[1] = attribute alias
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbPutAttributeAlias()")
 
         if len(argin) < 2:
@@ -379,9 +379,9 @@ class DataBase(Device):
         with name matching the specified filter
 
         :param argin: The filter
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Device server process name list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetServerList()")
         argin = replace_wildcard(argin)
         return self.db.get_server_list(argin)
@@ -396,9 +396,9 @@ class DataBase(Device):
         Str[2] = Device server process host name
         Str[3] = Device server process PID or string ``null``
         Str[4] = Device server process version
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         DbExportDevice(self, argin)
 
     @command(dtype_in=('str',), doc_in='Str[0] = Device name\nStr[1] = Attribute name\nStr[2] = Property name\nStr[n] = Property name', doc_out='none')
@@ -409,9 +409,9 @@ class DataBase(Device):
         Str[1] = Attribute name
         Str[2] = Property name
         Str[n] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteDeviceAttributeProperty()")
 
         if len(argin) < 3:
@@ -439,9 +439,9 @@ class DataBase(Device):
         specified wildcard
 
         :param argin: The wildcard
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Family list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceFamilyList()")
         argin = replace_wildcard(argin)
         return self.db.get_device_family_list(argin)
@@ -451,9 +451,9 @@ class DataBase(Device):
         """ Get a list of devices whose names satisfy the filter.
 
         :param argin: filter
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: list of exported devices
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceWideList()")
         argin = replace_wildcard(argin)
         return self.db.get_device_wide_list(argin)
@@ -469,9 +469,9 @@ class DataBase(Device):
         Str[4] = Property value 1
         Str[n] = Property value n
         ....
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbPutProperty()")
         object_name = argin[0]
         nb_properties = int(argin[1])
@@ -484,9 +484,9 @@ class DataBase(Device):
         :param argin: Str[0]  = Object name
         Str[1] = Property name
         Str[n] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteProperty()")
         obj_name = argin[0]
         for prop_name in argin[1:]:
@@ -501,7 +501,7 @@ class DataBase(Device):
         :param argin: Str[0] = Tango class name
         Str[1] = Attribute name
         Str[n] = Attribute name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Tango class name
         Str[1] = Attribute property  number
         Str[2] = Attribute property 1 name
@@ -512,7 +512,7 @@ class DataBase(Device):
         Str[n + 2] = Attribute property 2 value number (array case)
         Str[n + 3] = Attribute property 2 value
         Str[n + m] = Attribute property 2 value (array case)
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetClassAttributeProperty2()")
         class_name = argin[0]
         return self.db.get_class_attribute_property2(class_name, argin[1:])
@@ -523,9 +523,9 @@ class DataBase(Device):
         """ Get a list of exported devices whose names satisfy the filter (wildcard is
 
         :param argin: filter
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: list of exported devices
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceExportedList()")
         argin = replace_wildcard(argin)
         return self.db.get_device_exported_list(argin)
@@ -535,9 +535,9 @@ class DataBase(Device):
         """ Return alias for device name if found.
 
         :param argin: The device name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: The alias found
-        :rtype: PyTango.DevString """
+        :rtype: tango.DevString """
         self._log.debug("In DbGetDeviceAlias()")
         ret, dev_name, dfm = check_device_name(argin)
         if not ret:
@@ -558,9 +558,9 @@ class DataBase(Device):
         Str[4] = Property name
         Str[5] = Property value
         .....
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbPutClassAttributeProperty()")
         class_name = argin[0]
         nb_attributes = int(argin[1])
@@ -572,9 +572,9 @@ class DataBase(Device):
         """ Get property list for a given Tango class with a specified filter
 
         :param argin: The filter
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Property name list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetClassPropertyList()")
         if not argin:
             argin = "%"
@@ -587,9 +587,9 @@ class DataBase(Device):
         """ Get device alias name with a specific filter
 
         :param argin: The filter
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Device alias list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceAliasList()")
         if not argin:
             argin = "%"
@@ -604,9 +604,9 @@ class DataBase(Device):
 
         :param argin: Str[0] = Tango class name
         Str[1] = Attribute name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteClassAttribute()")
 
         if len(argin) < 2:
@@ -625,13 +625,13 @@ class DataBase(Device):
 
         :param argin: Str[0] = Tango class
         Str[1] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Property name
         Str[1] = date
         Str[2] = Property value number (array case)
         Str[3] = Property value 1
         Str[n] = Property value n
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetClassPropertyHist()")
         class_name = argin[0]
         prop_name = argin[1]
@@ -643,9 +643,9 @@ class DataBase(Device):
 
         :param argin: Str[0] = Device name
         Str[1] = Attribute name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteDeviceAttribute()")
 
         if len(argin) < 2:
@@ -672,12 +672,12 @@ class DataBase(Device):
         It executes the specified  SELECT command on TANGO database and returns its result without filter.
 
         :param argin: MySql Select command
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: MySql Select command result
          - svalues : select results
          - lvalue[n] : =0 if svalue[n] is null else =1
          (last lvalue -1) is number of rows, (last lvalue) is number of fields
-        :rtype: PyTango.DevVarLongStringArray """
+        :rtype: tango.DevVarLongStringArray """
         self._log.debug("In DbMySqlSelect()")
         tmp_argin = argin.lower()
 
@@ -708,9 +708,9 @@ class DataBase(Device):
         Str[4] = Property name
         Str[5] = Property value
         .....
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbPutDeviceAttributeProperty()")
         device_name = argin[0]
         nb_attributes = int(argin[1])
@@ -724,14 +724,14 @@ class DataBase(Device):
         :param argin: Str[0] = Device name
         Str[1] = Attribute name
         Str[n] = Attribute name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Device name
         Str[1] = Attribute property  number
         Str[2] = Attribute property 1 name
         Str[3] = Attribute property 1 value
         Str[n + 1] = Attribute property 2 name
         Str[n + 2] = Attribute property 2 value
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceAttributeProperty()")
         dev_name = argin[0]
         return self.db.get_device_attribute_property(dev_name, argin[1:])
@@ -744,9 +744,9 @@ class DataBase(Device):
 
         :param argin: Str[0] = Object name
         Str[1] = filter
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Property name list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetPropertyList()")
         object_name = argin[0]
         wildcard = replace_wildcard(argin[1])
@@ -758,12 +758,12 @@ class DataBase(Device):
         """ Get Tango classes/device list embedded in a specific device server
 
         :param argin: Device server process name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Str[0] = Device name
         Str[1] = Tango class
         Str[n] = Device name
         Str[n + 1] = Tango class
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceClassList()")
         return self.db.get_device_class_list(argin)
 
@@ -772,9 +772,9 @@ class DataBase(Device):
         """ Mark a device as non exported in database
 
         :param argin: Device name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbUnExportDevice()")
         dev_name = argin[0].lower()
         self.db.unexport_device(dev_name)
@@ -784,9 +784,9 @@ class DataBase(Device):
         """ Get device name from its alias.
 
         :param argin: Alias name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Device name
-        :rtype: PyTango.DevString """
+        :rtype: tango.DevString """
         self._log.debug("In DbGetAliasDevice()")
         if not argin:
             argin = "%"
@@ -799,9 +799,9 @@ class DataBase(Device):
         """ Delete a devcie from database
 
         :param argin: device name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteDevice()")
 
         ret, dev_name, dfm = check_device_name(argin)
@@ -819,9 +819,9 @@ class DataBase(Device):
 
         :param argin: Str[0] = Device name
         Str[1] = Wildcard
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: attribute name list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceAttributeList()")
         dev_name = argin[0]
         wildcard = argin[1]
@@ -836,9 +836,9 @@ class DataBase(Device):
         """ Get info about all servers running on specified host, name, mode and level
 
         :param argin: Host name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Server info for all servers running on specified host
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetHostServersInfo()")
         argin = replace_wildcard(argin)
         return self.db.get_host_servers_info(argin)
@@ -849,9 +849,9 @@ class DataBase(Device):
 
         :param argin: str[0] = old device server name (exec/instance)
         str[1] =  new device server name (exec/instance)
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbRenameServer()")
 
         if len(argin) < 2:
@@ -877,9 +877,9 @@ class DataBase(Device):
         """ Get host list with name matching the specified filter
 
         :param argin: The filter
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Host name list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetHostList()")
         argin = replace_wildcard(argin)
         return self.db.get_host_list(argin)
@@ -889,12 +889,12 @@ class DataBase(Device):
         """ Get class inheritance for the specified device.
 
         :param argin: Device name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Classes off the specified device.
         [0] - is the class of the device.
         [1] - is the class from the device class is inherited.
         ........and so on
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetClassInheritanceForDevice()")
         return self.db.get_class_inheritance_for_device(argin)
 
@@ -904,9 +904,9 @@ class DataBase(Device):
         """ Delete server from the database but dont delete device properties
 
         :param argin: Device server name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteServer()")
 
         if '*' in argin or '%' in argin or not '/' in argin:
@@ -923,9 +923,9 @@ class DataBase(Device):
         If alias not found in database, returns an empty string.
 
         :param argin: The attribute alias name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: The attribute name (device/attribute)
-        :rtype: PyTango.DevString """
+        :rtype: tango.DevString """
         self._log.debug("In DbGetAttributeAlias()")
         return self.db.get_attribute_alias(argin)
 
@@ -936,9 +936,9 @@ class DataBase(Device):
         device server startup sequence.
 
         :param argin: Elt[0] = DS name (exec_name/inst_name), Elt[1] = Host name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: All the data needed by the device server during its startup sequence. Precise list depend on the device server
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDataForServerCache()")
         ##  TODO
         return ['']
@@ -950,7 +950,7 @@ class DataBase(Device):
         :param argin: Str[0] = Object name
         Str[1] = Property name
         Str[n] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Object name
         Str[1] = Property number
         Str[2] = Property name
@@ -961,7 +961,7 @@ class DataBase(Device):
         Str[n + 2] = Property value number (array case)
         Str[n + 3] = Property value 1
         Str[n + m] = Property value m
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetProperty()")
         object_name = argin[0]
         return self.db.get_property(object_name, argin[1:])
@@ -971,9 +971,9 @@ class DataBase(Device):
         """ Get list of Tango classes for a device server
 
         :param argin: device server process name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: list of classes for this device server
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceServerClassList()")
         argin = replace_wildcard(argin)
         return self.db.get_server_class_list(argin)
@@ -990,9 +990,9 @@ class DataBase(Device):
         Str[4] = Property value 1
         Str[n] = Property value n
         ....
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbPutDeviceProperty()")
         device_name = argin[0]
         nb_properties = int(argin[1])
@@ -1003,9 +1003,9 @@ class DataBase(Device):
         """ Reset the timing attribute values.
 
         :param :
-        :type: PyTango.DevVoid
+        :type: tango.DevVoid
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In ResetTimingValues()")
         for tmp_timing in self.timing_maps.itervalues():
             tmp_timing.average = 0.
@@ -1019,9 +1019,9 @@ class DataBase(Device):
         """ Get a list of host:port for all database server defined in the control system
 
         :param :
-        :type: PyTango.DevVoid
+        :type: tango.DevVoid
         :return: List of host:port with one element for each database server
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetCSDbServerList()")
         return self.db.get_csdb_server_list()
 
@@ -1037,9 +1037,9 @@ class DataBase(Device):
         Str[4] = Property value 1
         Str[n] = Property value n
         ....
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbPutClassProperty()")
         class_name = argin[0]
         nb_properties = int(argin[1])
@@ -1051,7 +1051,7 @@ class DataBase(Device):
         """ Import a device from the database
 
         :param argin: Device name (or alias)
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Str[0] = device name
         Str[1] = CORBA IOR
         Str[2] = device version
@@ -1061,7 +1061,7 @@ class DataBase(Device):
 
         Lg[0] = Exported flag
         Lg[1] = Device server process PID
-        :rtype: PyTango.DevVarLongStringArray """
+        :rtype: tango.DevVarLongStringArray """
         self._log.debug("In DbImportDevice()")
         return self.db.import_device(argin.lower())
 
@@ -1073,9 +1073,9 @@ class DataBase(Device):
         :param argin: Str[0] = Device name
         Str[1] = Property name
         Str[n] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteDeviceProperty()")
         dev_name = argin[0]
         for prop_name in argin[1:]:
@@ -1086,9 +1086,9 @@ class DataBase(Device):
         """ Get Tango class for the specified device.
 
         :param argin: Device name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Device Tango class
-        :rtype: PyTango.DevString """
+        :rtype: tango.DevString """
         self._log.debug("In DbGetClassForDevice()")
         return self.db.get_class_for_device(argin)
 
@@ -1099,14 +1099,14 @@ class DataBase(Device):
         :param argin: Str[0] = Device name
         Str[1] = Attribute name
         Str[2] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Attribute name
         Str[1] = Property name
         Str[2] = date
         Str[3] = Property value number (array case)
         Str[4] = Property value 1
         Str[n] = Property value n
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceAttributePropertyHist()")
         dev_name = argin[0]
         attribute = replace_wildcard(argin[1])
@@ -1118,9 +1118,9 @@ class DataBase(Device):
         """ Get info about host, mode and level for specified server
 
         :param argin: server name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: server info
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetServerInfo()")
         return self.db.get_server_info(argin)
 
@@ -1130,9 +1130,9 @@ class DataBase(Device):
 
         :param argin: Str[0] = device name
         Str[1] = alias name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbPutDeviceAlias()")
 
         if len(argin) < 2:
@@ -1153,9 +1153,9 @@ class DataBase(Device):
 
         :param argin: Str[0] = device name
         Str[1] = Filter
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Property name list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDevicePropertyList()")
         device_name = argin[0]
         prop_filter = argin[1]
@@ -1169,9 +1169,9 @@ class DataBase(Device):
         the specified filter
 
         :param argin: The filter
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Device server process name list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetHostServerList()")
         argin = replace_wildcard(argin)
         return self.db.get_host_server_list(argin)
@@ -1183,7 +1183,7 @@ class DataBase(Device):
         :param argin: Str[0] = Tango class
         Str[1] = Property name
         Str[2] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Tango class
         Str[1] = Property number
         Str[2] = Property name
@@ -1191,7 +1191,7 @@ class DataBase(Device):
         Str[4] = Property value
         Str[n] = Propery value (array case)
         ....
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetClassProperty()")
         class_name = argin[0]
         return self.db.get_class_property(class_name,argin[1:])
@@ -1202,9 +1202,9 @@ class DataBase(Device):
         matching the specified filter
 
         :param argin: The filter
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Object name list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetObjectList()")
         argin = replace_wildcard(argin)
         return self.db.get_object_list(argin)
@@ -1217,9 +1217,9 @@ class DataBase(Device):
         Str[1] = Attribute name
         Str[2] = Property name
         Str[n] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteClassAttributeProperty()")
 
         if len(argin) < 3:
@@ -1238,9 +1238,9 @@ class DataBase(Device):
         """ Returns the instance names found for specified server.
 
         :param argin: Server name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: The instance names found for specified server.
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetInstanceNameList()")
         return self.db.get_instance_name_list(argin)
 
@@ -1250,9 +1250,9 @@ class DataBase(Device):
         Returns one empty string if nothing found in database
 
         :param argin: The attribute name (dev_name/att_name)
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: The attribute alias name (or empty string)
-        :rtype: PyTango.DevString """
+        :rtype: tango.DevString """
         self._log.debug("In DbGetAttributeAlias2()")
         attr_name = argin[0]
         return self.db.get_attribute_alias2(attr_name)
@@ -1266,9 +1266,9 @@ class DataBase(Device):
         Str[2] = Tango class name
         Str[n] = Device name
         Str[n + 1] = Tango class name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbAddServer()")
 
         if len(argin) < 3 or not len(argin) % 2:
@@ -1293,9 +1293,9 @@ class DataBase(Device):
         """ Get event channel info from database
 
         :param argin: name of event channel or factory
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: export information e.g. IOR
-        :rtype: PyTango.DevVarLongStringArray """
+        :rtype: tango.DevVarLongStringArray """
         self._log.debug("In DbImportEvent()")
         argin = replace_wildcard(argin.lower())
         return self.db.import_event(argin)
@@ -1306,13 +1306,13 @@ class DataBase(Device):
 
         :param argin: Str[0] = Device name
         Str[1] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Property name
         Str[1] = date
         Str[2] = Property value number (array case)
         Str[3] = Property value 1
         Str[n] = Property value n
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDevicePropertyHist()")
         device_name = argin[0]
         prop_name = argin[1]
@@ -1324,9 +1324,9 @@ class DataBase(Device):
         It returns only the server executable name without instance name as DbGetServerList.
 
         :param argin: wildcard for server names.
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: server names found.
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetServerNameList()")
         argin = replace_wildcard(argin)
         return self.db.get_server_name_list(argin)
@@ -1342,7 +1342,7 @@ class DataBase(Device):
         :param argin: Str[0] = Device name
         Str[1] = Attribute name
         Str[n] = Attribute name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Device name
         Str[1] = Attribute property  number
         Str[2] = Attribute property 1 name
@@ -1353,7 +1353,7 @@ class DataBase(Device):
         Str[n + 2] = Attribute property 2 value number (array case)
         Str[n + 3] = Attribute property 2 value
         Str[n + m] = Attribute property 2 value (array case)
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceAttributeProperty2()")
         dev_name = argin[0]
         return self.db.get_device_attribute_property2(dev_name, argin[1:])
@@ -1365,9 +1365,9 @@ class DataBase(Device):
         :param argin: Str[0] = Tango class name
         Str[1] = Property name
         Str[n] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteClassProperty()")
         klass_name = argin[0]
         for prop_name in argin[1:]:
@@ -1378,9 +1378,9 @@ class DataBase(Device):
         """ Mark one event channel as non exported in database
 
         :param argin: name of event channel or factory to unexport
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: none
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbUnExportEvent()")
         event_name = argin[0].lower()
         self.db.unexport_event(event_name)
@@ -1392,7 +1392,7 @@ class DataBase(Device):
         stored in database
 
         :param :
-        :type: PyTango.DevVoid
+        :type: tango.DevVoid
         :return: Miscellaneous info like:
         - Device defined in database
         - Device marked as exported in database
@@ -1403,7 +1403,7 @@ class DataBase(Device):
         - Device attribute properties defined in database
         - Class attribute properties defined in database
         - Object properties defined in database
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbInfo()")
         return self.db.info()
 
@@ -1414,14 +1414,14 @@ class DataBase(Device):
         :param argin: Str[0] = Tango class name
         Str[1] = Attribute name
         Str[n] = Attribute name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Tango class name
         Str[1] = Attribute property  number
         Str[2] = Attribute property 1 name
         Str[3] = Attribute property 1 value
         Str[n + 1] = Attribute property 2 name
         Str[n + 2] = Attribute property 2 value
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetClassAttributeProperty()")
         class_name = argin[0]
         return self.db.get_class_attribute_property(class_name, argin[1:])
@@ -1440,9 +1440,9 @@ class DataBase(Device):
         Str[5] = Property value 1
         Str[n] = Property value n (array case)
         .....
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbPutClassAttributeProperty2()")
         class_name = argin[0]
         nb_attributes = int(argin[1])
@@ -1453,9 +1453,9 @@ class DataBase(Device):
         """ Update server info including host, mode and level
 
         :param argin: server info
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbPutServerInfo()")
 
         if len(argin) < 4:
@@ -1480,9 +1480,9 @@ class DataBase(Device):
         """ Delete a device alias.
 
         :param argin: device alias name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteDeviceAlias()")
         self.db.delete_device_alias(argin)
 
@@ -1496,9 +1496,9 @@ class DataBase(Device):
         Str[2] = Notifd host name
         Str[3] = Notifd pid
         Str[4] = Notifd version
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbExportEvent()")
 
         if len(argin) < 5:
@@ -1519,7 +1519,7 @@ class DataBase(Device):
         :param argin: Str[0] = Device name
         Str[1] = Property name
         Str[n] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Device name
         Str[1] = Property number
         Str[2] = Property name
@@ -1530,7 +1530,7 @@ class DataBase(Device):
         Str[n + 2] = Property value number (array case)
         Str[n + 3] = Property value 1
         Str[n + m] = Property value m
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceProperty()")
         device_name = argin[0]
         return self.db.get_device_property(device_name, argin[1:])
@@ -1540,7 +1540,7 @@ class DataBase(Device):
         """ Returns info from DbImportDevice and started/stopped dates.
 
         :param argin: Device name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Str[0] = Device name
         Str[1] = CORBA IOR
         Str[2] = Device version
@@ -1552,7 +1552,7 @@ class DataBase(Device):
 
         Lg[0] = Device exported flag
         Lg[1] = Device Server process PID (or -1 if not set)
-        :rtype: PyTango.DevVarLongStringArray """
+        :rtype: tango.DevVarLongStringArray """
         self._log.debug("In DbGetDeviceInfo()")
         ret, dev_name, dfm = check_device_name(argin)
         if not ret:
@@ -1568,13 +1568,13 @@ class DataBase(Device):
 
         :param argin: Str[0] = Object name
         Str[2] = Property name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Property name
         Str[1] = date
         Str[2] = Property value number (array case)
         Str[3] = Property value 1
         Str[n] = Property value n
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetPropertyHist()")
         object_name = argin[0]
         prop_name = argin[1]
@@ -1587,9 +1587,9 @@ class DataBase(Device):
         specified filter
 
         :param argin: The filter
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Device names member list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceMemberList()")
         argin = replace_wildcard(argin)
         return self.db.get_device_member_list(argin)
@@ -1599,9 +1599,9 @@ class DataBase(Device):
         """ Get Tango class list with a specified filter
 
         :param argin: Filter
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: Class list
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetClassList()")
         server = replace_wildcard(argin)
         return self.db.get_class_list(server)
@@ -1612,9 +1612,9 @@ class DataBase(Device):
         If the given alias is not found in database, returns an empty string
 
         :param argin: The attribute alias
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return: The attribute name (dev_name/att_name)
-        :rtype: PyTango.DevString """
+        :rtype: tango.DevString """
         self._log.debug("In DbGetAliasAttribute()")
         alias_name = argin[0]
         return self.db.get_alias_attribute(alias_name)
@@ -1624,9 +1624,9 @@ class DataBase(Device):
         """ delete info related to a Tango devvice server process
 
         :param argin: Device server name
-        :type: PyTango.DevString
+        :type: tango.DevString
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbDeleteServerInfo()")
         self.db.delete_server_info(argin)
 
@@ -1636,10 +1636,10 @@ class DataBase(Device):
 
         :param argin: Str[0] = Tango class name
         Str[1] = Attribute name filter (eg: att*)
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: Str[0] = Class attribute name
         Str[n] = Class attribute name
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetClassAttributeList()")
         class_name = argin[0]
         wildcard = replace_wildcard(argin[1])
@@ -1652,9 +1652,9 @@ class DataBase(Device):
         :param argin: Str[0] = Full device server process name
         Str[1] = Device name
         Str[2] = Tango class name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return:
-        :rtype: PyTango.DevVoid """
+        :rtype: tango.DevVoid """
         self._log.debug("In DbAddDevice()")
 
         if len(argin) < 3:
@@ -1684,9 +1684,9 @@ class DataBase(Device):
 
         :param argin: argin[0] : server name
         argin[1] : class name
-        :type: PyTango.DevVarStringArray
+        :type: tango.DevVarStringArray
         :return: The list of devices for specified server and class.
-        :rtype: PyTango.DevVarStringArray """
+        :rtype: tango.DevVarStringArray """
         self._log.debug("In DbGetDeviceList()")
         server_name = replace_wildcard(argin[0])
         class_name = replace_wildcard(argin[1])
@@ -1704,9 +1704,9 @@ def DbExportDevice(self, argin):
     Str[2] = Device server process host name
     Str[3] = Device server process PID or string ``null``
     Str[4] = Device server process version
-    :type: PyTango.DevVarStringArray
+    :type: tango.DevVarStringArray
     :return:
-    :rtype: PyTango.DevVoid """
+    :rtype: tango.DevVoid """
     self._log.debug("In DbExportDevice()")
     if len(argin) < 5:
         self.warn_stream("DataBase::DbExportDevice(): insufficient export info for device ")
@@ -1753,7 +1753,7 @@ def main(argv = None):
     port = options.port
     if port is None:
         try:
-            _, port = PyTango.ApiUtil.get_env_var("TANGO_HOST").split(":")
+            _, port = tango.ApiUtil.get_env_var("TANGO_HOST").split(":")
         except:
             port = 10000
 
@@ -1827,8 +1827,8 @@ def __run(db_name,argv):
 
         ./DataBaseds pydb-test -ORBendPoint giop:tcp::11000
     """
-    PyTango.Util.set_use_db(False)
-    util = PyTango.Util(argv)
+    tango.Util.set_use_db(False)
+    util = tango.Util(argv)
     __monkey_patch_util(util)
     __monkey_patch_database_class()
 
@@ -1837,7 +1837,7 @@ def __run(db_name,argv):
 
     def post_init_cb():
         logging.debug("post_init_cb()")
-        util = PyTango.Util.instance()
+        util = tango.Util.instance()
         dserver = util.get_dserver_device()
         dserver_name = dserver.get_name()
         dserver_ior = util.get_dserver_ior(dserver)

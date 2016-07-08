@@ -19,7 +19,7 @@ long TANGO_VERSION_HEX;
 
 void export_constants()
 {
-    object consts_module(handle<>(borrowed(PyImport_AddModule("PyTango.constants"))));
+    object consts_module(handle<>(borrowed(PyImport_AddModule("tango.constants"))));
     scope().attr("constants") = consts_module;
     scope consts_scope = consts_module;
 
