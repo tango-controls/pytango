@@ -58,7 +58,7 @@ When making a bug report don't forget to select *PyTango* in **Category**.
 It is also helpfull if you can put in the ticket description the PyTango information.
 It can be a dump of::
 
-   $ python -c "from PyTango.utils import info; print(info())"
+   $ python -c "from tango.utils import info; print(info())"
 
 Test the connection to the Device and get it's current state
 ------------------------------------------------------------
@@ -66,7 +66,7 @@ Test the connection to the Device and get it's current state
 One of the most basic examples is to get a reference to a device and
 determine if it is running or not::
 
-    from PyTango import DeviceProxy
+    from tango import DeviceProxy
 
     # Get proxy on the tango_test1 device
     print("Creating proxy to TangoTest device...")
@@ -83,13 +83,13 @@ Read and write attributes
 
 Basic read/write attribute operations::
 
-    from PyTango import DeviceProxy
+    from tango import DeviceProxy
 
     # Get proxy on the tango_test1 device
     print("Creating proxy to TangoTest device...")
     tango_test = DeviceProxy("sys/tg_test/1")
 
-    # Read a scalar attribute. This will return a PyTango.DeviceAttribute
+    # Read a scalar attribute. This will return a tango.DeviceAttribute
     # Member 'value' contains the attribute value
     scalar = tango_test.read_attribute("long_scalar")
     print("Long_scalar value = {0}".format(scalar.value))
@@ -128,7 +128,7 @@ more memory efficient PyTango. You can also use numpy to specify the values when
 writing attributes, especially if you know the exact attribute type::
 
     import numpy
-    from PyTango import DeviceProxy
+    from tango import DeviceProxy
 
     # Get proxy on the tango_test1 device
     print("Creating proxy to TangoTest device...")
@@ -149,7 +149,7 @@ Execute commands
 As you can see in the following example, when scalar types are used, the Tango
 binding automagically manages the data types, and writing scripts is quite easy::
 
-    from PyTango import DeviceProxy
+    from tango import DeviceProxy
 
     # Get proxy on the tango_test1 device
     print("Creating proxy to TangoTest device...")
@@ -176,7 +176,7 @@ Execute commands with more complex types
 In this case you have to use put your arguments data in the correct python
 structures::
 
-    from PyTango import DeviceProxy
+    from tango import DeviceProxy
 
     # Get proxy on the tango_test1 device
     print("Creating proxy to TangoTest device...")
@@ -210,7 +210,7 @@ Registering devices
 
 Here is how to define devices in the Tango DataBase::
 
-    from PyTango import Database, DbDevInfo
+    from tango import Database, DbDevInfo
 
     #  A reference on the DataBase
     db = Database()
@@ -250,7 +250,7 @@ The following python script example (containing some functions and instructions
 manipulating a Galil motor axis device server) gives an idea of how the Tango
 API should be accessed from Python::
 
-    from PyTango import DeviceProxy
+    from tango import DeviceProxy
 
     # connecting to the motor axis device
     axis1 = DeviceProxy("microxas/motorisation/galilbox")
@@ -305,9 +305,9 @@ high level API
    :linenos:
 
     import time
-    from PyTango.server import run
-    from PyTango.server import Device, DeviceMeta
-    from PyTango.server import attribute, command, pipe
+    from tango.server import run
+    from tango.server import Device, DeviceMeta
+    from tango.server import attribute, command, pipe
 
 
     class Clock(Device):
@@ -381,9 +381,9 @@ using the high level API. The example contains:
     from time import time
     from numpy.random import random_sample
 
-    from PyTango import AttrQuality, AttrWriteType, DispLevel, run
-    from PyTango.server import Device, DeviceMeta, attribute, command
-    from PyTango.server import class_property, device_property
+    from tango import AttrQuality, AttrWriteType, DispLevel, run
+    from tango.server import Device, DeviceMeta, attribute, command
+    from tango.server import class_property, device_property
 
 
     class PowerSupply(Device):
@@ -528,7 +528,7 @@ Logging with decorators
 PyTango provides a set of decorators that place automatic log messages when
 you enter and when you leave a python method. For example::
 
-    @PyTango.DebugIt()
+    @tango.DebugIt()
     def read_Long_attr(self, the_att):
         the_att.set_value(self.attr_long)
 
@@ -552,7 +552,7 @@ The decorators receive three optional arguments:
 
 Example::
 
-    @PyTango.DebugIt(show_args=True, show_ret=True)
+    @tango.DebugIt(show_args=True, show_ret=True)
     def IOLong(self, in_data):
         return in_data * 2
 
@@ -571,7 +571,7 @@ separated python files: A :class:`PLC` class in a :file:`PLC.py`::
 
     # PLC.py
 
-    from PyTango.server import Device, DeviceMeta, run
+    from tango.server import Device, DeviceMeta, run
 
     class PLC(Device):
         __metaclass__ = DeviceMeta
@@ -585,7 +585,7 @@ separated python files: A :class:`PLC` class in a :file:`PLC.py`::
 
     # IRMirror.py
 
-    from PyTango.server import Device, DeviceMeta, run
+    from tango.server import Device, DeviceMeta, run
 
     class IRMirror(Device):
         __metaclass__ = DeviceMeta
@@ -601,7 +601,7 @@ a :file:`PLCMirror.py` containing the code::
 
     # PLCMirror.py
 
-    from PyTango.server import run
+    from tango.server import run
     from PLC import PLC
     from IRMirror import IRMirror
 
@@ -680,15 +680,15 @@ Here is an example of a device which has a TANGO command called
 point attribute with the specified name::
 
 
-    from PyTango import Util, Attr
-    from PyTango.server import DeviceMeta, Device, command
+    from tango import Util, Attr
+    from tango.server import DeviceMeta, Device, command
 
     class MyDevice(Device):
     	__metaclass__ = DeviceMeta
 
 	@command(dtype_in=str)
         def CreateFloatAttribute(self, attr_name):
-	    attr = Attr(attr_name, PyTango.DevDouble)
+	    attr = Attr(attr_name, tango.DevDouble)
 	    self.add_attribute(attr, self.read_General, self.write_General)
 
 	def read_General(self, attr):
@@ -727,8 +727,8 @@ creates a device of some arbitrary class (the example assumes the tango commands
 'CreateDevice' and 'DeleteDevice' receive a parameter of type DevVarStringArray
 with two strings. No error processing was done on the code for simplicity sake)::
 
-    from PyTango import Util
-    from PyTango.server import DeviceMeta, Device, command
+    from tango import Util
+    from tango.server import DeviceMeta, Device, command
 
     class MyDevice(Device):
     	__metaclass__ = DeviceMeta
@@ -759,7 +759,7 @@ the :meth:`~tango.DeviceClass.create_device` / :meth:`~tango.DeviceClass.delete_
 For example, if you wish to create a clone of your device, you can create a
 tango command called *Clone*::
 
-    class MyDevice(PyTango.Device_4Impl):
+    class MyDevice(tango.Device_4Impl):
 
         def fill_new_device_properties(self, dev_name):
             prop_names = db.get_device_property_list(self.get_name(), "*")
@@ -809,10 +809,10 @@ The rule of this part of a Tango device server is to:
 The following is a typical code for this main function::
 
     if __name__ == '__main__':
-        util = PyTango.Util(sys.argv)
+        util = tango.Util(sys.argv)
         util.add_class(PyDsExpClass, PyDsExp)
 
-        U = PyTango.Util.instance()
+        U = tango.Util.instance()
         U.server_init()
         U.server_run()
 
@@ -842,22 +842,22 @@ The rule of this class is to :
 
 In our example, the code of this Python class looks like::
 
-    class PyDsExpClass(PyTango.DeviceClass):
+    class PyDsExpClass(tango.DeviceClass):
 
-        cmd_list = { 'IOLong' : [ [ PyTango.ArgType.DevLong, "Number" ],
-                                  [ PyTango.ArgType.DevLong, "Number * 2" ] ],
-                     'IOStringArray' : [ [ PyTango.ArgType.DevVarStringArray, "Array of string" ],
-                                         [ PyTango.ArgType.DevVarStringArray, "This reversed array"] ],
+        cmd_list = { 'IOLong' : [ [ tango.ArgType.DevLong, "Number" ],
+                                  [ tango.ArgType.DevLong, "Number * 2" ] ],
+                     'IOStringArray' : [ [ tango.ArgType.DevVarStringArray, "Array of string" ],
+                                         [ tango.ArgType.DevVarStringArray, "This reversed array"] ],
         }
 
-        attr_list = { 'Long_attr' : [ [ PyTango.ArgType.DevLong ,
-                                        PyTango.AttrDataFormat.SCALAR ,
-                                        PyTango.AttrWriteType.READ],
+        attr_list = { 'Long_attr' : [ [ tango.ArgType.DevLong ,
+                                        tango.AttrDataFormat.SCALAR ,
+                                        tango.AttrWriteType.READ],
                                       { 'min alarm' : 1000, 'max alarm' : 1500 } ],
 
-                     'Short_attr_rw' : [ [ PyTango.ArgType.DevShort,
-                                           PyTango.AttrDataFormat.SCALAR,
-                                           PyTango.AttrWriteType.READ_WRITE ] ]
+                     'Short_attr_rw' : [ [ tango.ArgType.DevShort,
+                                           tango.AttrDataFormat.SCALAR,
+                                           tango.AttrWriteType.READ_WRITE ] ]
         }
 
 
@@ -879,7 +879,7 @@ initializing some specific data member, you will have to code a class
 constructor. An example of such a contructor is ::
 
     def __init__(self, name):
-        PyTango.DeviceClass.__init__(self, name)
+        tango.DeviceClass.__init__(self, name)
         self.set_type("TestDevice")
 
 The device type is set at line 3.
@@ -943,7 +943,7 @@ array:
     +-------------------+-----------------------------------+------------------------------------------+
     |       key         |              value                |            definition                    |
     +===================+===================================+==========================================+
-    | "display level"   | PyTango.DispLevel enum value      |   The attribute display level            |
+    | "display level"   | tango.DispLevel enum value      |   The attribute display level            |
     +-------------------+-----------------------------------+------------------------------------------+
     |"polling period"   |          Any number               | The attribute polling period (mS)        |
     +-------------------+-----------------------------------+------------------------------------------+
@@ -985,16 +985,16 @@ The PyDsExp class in Python
 The rule of this class is to implement methods executed by commands and attributes.
 In our example, the code of this class looks like::
 
-    class PyDsExp(PyTango.Device_4Impl):
+    class PyDsExp(tango.Device_4Impl):
 
         def __init__(self,cl,name):
-            PyTango.Device_4Impl.__init__(self, cl, name)
+            tango.Device_4Impl.__init__(self, cl, name)
             self.info_stream('In PyDsExp.__init__')
             PyDsExp.init_device(self)
 
         def init_device(self):
             self.info_stream('In Python init_device method')
-            self.set_state(PyTango.DevState.ON)
+            self.set_state(tango.DevState.ON)
             self.attr_short_rw = 66
             self.attr_long = 1246
 
@@ -1008,7 +1008,7 @@ In our example, the code of this class looks like::
         #------------------------------------------------------------------
 
         def is_IOLong_allowed(self):
-            return self.get_state() == PyTango.DevState.ON
+            return self.get_state() == tango.DevState.ON
 
         def IOLong(self, in_data):
             self.info_stream('IOLong', in_data)
@@ -1019,7 +1019,7 @@ In our example, the code of this class looks like::
         #------------------------------------------------------------------
 
         def is_IOStringArray_allowed(self):
-            return self.get_state() == PyTango.DevState.ON
+            return self.get_state() == tango.DevState.ON
 
         def IOStringArray(self, in_data):
             l = range(len(in_data)-1, -1, -1)
@@ -1046,7 +1046,7 @@ In our example, the code of this class looks like::
             the_att.set_value(self.attr_long)
 
         def is_Long_attr_allowed(self, req_type):
-            return self.get_state() in (PyTango.DevState.ON,)
+            return self.get_state() in (tango.DevState.ON,)
 
         def read_Short_attr_rw(self, the_att):
             self.info_stream("read_Short_attr_rw")
@@ -1059,10 +1059,10 @@ In our example, the code of this class looks like::
             self.attr_short_rw = the_att.get_write_value()
 
         def is_Short_attr_rw_allowed(self, req_type):
-            return self.get_state() in (PyTango.DevState.ON,)
+            return self.get_state() in (tango.DevState.ON,)
 
 **Line 1**
-    The PyDsExp class has to inherit from the PyTango.Device_4Impl
+    The PyDsExp class has to inherit from the tango.Device_4Impl
 **Line 3 to 6**
     PyDsExp class constructor. Note that at line 6, it calls the *init_device()*
     method
@@ -1089,7 +1089,7 @@ In our example, the code of this class looks like::
     Python integer.
 **Line 56 to 59**
     The method executed when the *Long_attr* attribute is read. Note that before
-    PyTango 7 it sets the attribute value with the PyTango.set_attribute_value
+    PyTango 7 it sets the attribute value with the tango.set_attribute_value
     function. Now the same can be done using the set_value of the attribute
     object
 **Line 61 to 62**
@@ -1164,7 +1164,7 @@ calls a command named IOLong::
 
     def is_IOLong_allowed(self):
         self.debug_stream("in is_IOLong_allowed")
-        return self.get_state() == PyTango.DevState.ON
+        return self.get_state() == tango.DevState.ON
 
     def IOLong(self, in_data):
         self.info_stream('IOLong', in_data)

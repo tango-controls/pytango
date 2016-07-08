@@ -70,8 +70,8 @@ sub-device and re-throwing the exception in case of::
 
     try:
         dev.command_inout("SubDevCommand")
-    except PyTango.DevFailed as df:
-        PyTango.Except.re_throw_exception(df,
+    except tango.DevFailed as df:
+        tango.Except.re_throw_exception(df,
             "MyClass_CommandFailed",
             "Sub device command SubdevCommand failed",
             "Command()")
