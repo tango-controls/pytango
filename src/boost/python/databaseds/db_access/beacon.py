@@ -533,22 +533,28 @@ class beacon(object):
         return (result_long,result_str)
 
     @_info
-    def get_device_list(self,server_name, class_name ):
+    def get_device_list(self,server_name, class_name):
         if server_name == '*':
-            server_nodes = self._personal_2_node.values()
-        else:
-            server_nodes = filter(None,[self._personal_2_node.get(server_name)])
-        if not server_nodes:
+            r_list = list()
+            for server_node in self._personal_2_node.values():
+                device_list = server_node.get('device')
+                r_list.extend(self._tango_name_from_class(device_list,class_name))
+            return r_list
+
+        server_node = self._personal_2_node.get(server_name)
+        if server_node is None:
             return []
-        ret = list()
-        for server_node in server_nodes:
-            device_list = server_node.get('device')
-            m = re.compile(class_name.replace('*','.*'))
-            if isinstance(device_list,list) :
-                ret.extend([x.get('tango_name') for x in device_list if m.match(x.get('class',''))])
-            elif isinstance(device_list,dict) and m.match(device_list.get('class','')) :
-                ret.append(device_list.get('tango_name'))
-        return ret
+        device_list = server_node.get('device')
+        return self._tango_name_from_class(device_list,class_name)
+    
+    def _tango_name_from_class(self,device_list,class_name):
+        m = re.compile(class_name.replace('*','.*'))
+        if isinstance(device_list,list) :
+            return [x.get('tango_name') for x in device_list if m.match(x.get('class',''))]
+        elif isinstance(device_list,dict) and m.match(device_list.get('class','')) :
+            return [device_list.get('tango_name')]
+        else:
+            return []
     
     @_info
     def get_device_wide_list(self, wildcard):
