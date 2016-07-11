@@ -495,11 +495,13 @@ def setup_args():
     if sphinx:
         cmdclass['build_doc'] = build_doc
 
+    long_description = open('README.rst').read()
+
     opts = dict(
         name='pytango',
         version=Release.version,
         description=Release.description,
-        long_description=Release.long_description,
+        long_description=long_description,
         author=author[0],
         author_email=author[1],
         url=Release.url,
