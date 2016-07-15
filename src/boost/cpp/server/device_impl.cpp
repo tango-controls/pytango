@@ -484,6 +484,16 @@ namespace PyDeviceImpl
         SAFE_PUSH_EVENT_DATE_QUALITY_VARGS(self, name, filt_names, filt_vals, data, t, quality, x, y)
     }
 
+    /* **********************************
+     * data ready event
+     * **********************************/
+    inline void push_data_ready_event(Tango::DeviceImpl &self, const str &name,
+                                      long ctr)
+    {
+        SAFE_PUSH(self, attr, name)
+        self.push_data_ready_event(__att_name, ctr); //__att_name from SAFE_PUSH
+    }
+
     void check_attribute_method_defined(PyObject *self,
                                         const std::string &attr_name,
                                         const std::string &method_name)
@@ -1358,9 +1368,6 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_change_event_overload,
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_archive_event_overload,
                                        Tango::DeviceImpl::set_archive_event, 2, 3)
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(push_data_ready_event_overload,
-                                       Tango::DeviceImpl::push_data_ready_event, 1, 2)
-
 BOOST_PYTHON_FUNCTION_OVERLOADS(remove_attribute_overload,
                                 PyDeviceImpl::remove_attribute, 2, 3)
                                        
@@ -1588,8 +1595,10 @@ void export_device_impl()
             (void (*) (Tango::DeviceImpl &, str &, object &, object &, object &, double, Tango::AttrQuality, long, long))
             &PyDeviceImpl::push_event)
 
-        .def("push_data_ready_event", &Tango::DeviceImpl::push_data_ready_event,
-            push_data_ready_event_overload())
+        .def("push_data_ready_event",
+            (void (*) (Tango::DeviceImpl &, str &, long))
+            &PyDeviceImpl::push_data_ready_event,
+            (arg_("self"), arg_("attr_name"), arg_("ctr")))
 
         .def("push_att_conf_event", &Tango::DeviceImpl::push_att_conf_event)
 
