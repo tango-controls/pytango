@@ -151,6 +151,7 @@ class beacon(object):
             server_node = static.Node(self._config,filename = 'tango/%s.yml' % server_name.replace('/','_'))
             server_node['server'],server_node['personal_name'] = server_name.split('/')
             self._personal_2_node[server_name] = server_node
+            self._tango_name_2_node['dserver/%s' % server_name.lower()] = server_node
 
         device_node = static.Node(self._config,parent=server_node)
         device_node['tango_name'] = tango_name
