@@ -874,7 +874,8 @@ class beacon(object):
 
     @_info
     def put_device_property(self, device_name, nb_properties, attr_prop_list):
-        device_node = self._tango_name_2_node.get(device_name.lower())
+        device_name = device_name.lower()
+        device_node = self._tango_name_2_node.get(device_name)
         old_properties = device_node.get('properties')
         if isinstance(old_properties,str): #reference
             properties_key = old_properties.split('/')
