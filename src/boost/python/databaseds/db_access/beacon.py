@@ -333,8 +333,9 @@ class beacon(object):
 
     @_info
     def get_class_attribute_list(self, class_name, wildcard):
-        class_properties = self._get_class_attribute(class_name,prop_name)
-        return _filter(wildcard,class_properties)
+        redis = settings.get_cache()
+        attributes = [x for x in redis.scan_iter(match='tango.class.attribute.%s' % class_name)]
+        return _filter(wildcard,attributes)
 
     @_info
     def get_class_attribute_property(self, class_name, attributes):
