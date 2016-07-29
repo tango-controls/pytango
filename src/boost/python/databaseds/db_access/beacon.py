@@ -35,7 +35,7 @@ else:
 
 def _filter(wildcard,l) :
     wildcard = wildcard.replace('*','.*')
-    m = re.compile(wildcard)
+    m = re.compile(wildcard,re.IGNORECASE)
     return [x for x in l if x is not None and m.match(x)]
 
 class beacon(object):
@@ -548,7 +548,7 @@ class beacon(object):
         return self._tango_name_from_class(device_list,class_name)
     
     def _tango_name_from_class(self,device_list,class_name):
-        m = re.compile(class_name.replace('*','.*'))
+        m = re.compile(class_name.replace('*','.*'),re.IGNORECASE)
         if isinstance(device_list,list) :
             return [x.get('tango_name') for x in device_list if m.match(x.get('class',''))]
         elif isinstance(device_list,dict) and m.match(device_list.get('class','')) :
