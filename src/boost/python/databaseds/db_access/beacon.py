@@ -420,7 +420,7 @@ class beacon(object):
         
     @_info
     def get_class_property_list(self, class_name):
-        properties = self._class_name_2_node.get(class_name).get("properties", dict())
+        properties = self._class_name_2_node.get(class_name,dict()).get("properties", dict())
         return [k for k,v in properties.iteritems() if not isinstance(v,dict)]
         #cache = settings.get_cache()
         #return cache.keys('tango.class.properties.%s*' % class_name)
