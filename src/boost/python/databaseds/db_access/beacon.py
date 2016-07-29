@@ -72,6 +72,7 @@ class beacon(object):
 
     def _index(self):
         #Tango indexing
+        self._strong_node_ref = set()
         self._personal_2_node = weakref.WeakValueDictionary()
         self._tango_name_2_node = weakref.WeakValueDictionary()
         self._class_name_2_node = weakref.WeakValueDictionary()
@@ -155,8 +156,10 @@ class beacon(object):
             server_node['personal_name'] = personal_name
             self._personal_2_node[server_name] = server_node
             self._tango_name_2_node['dserver/%s' % server_name.lower()] = server_node
-
+            self._strong_node_ref.add(server_node)
+            
         device_node = static.Node(self._config,parent=server_node)
+        self._strong_node_ref.add(device_node)
         device_node['tango_name'] = tango_name
         device_node['class'] = klass_name
         if alias is not None:
