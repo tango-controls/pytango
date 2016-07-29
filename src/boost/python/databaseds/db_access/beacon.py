@@ -810,17 +810,24 @@ class beacon(object):
     @_info
     def put_class_property(self, class_name, nb_properties, attr_prop_list):
         attr_id = 0
+        class_node = self._class_name_2_node.get(class_name)
+        if class_node is None:
+            class_node = static.Node(self._config,parent=self._config.root,
+                                     filename = 'tango/%s.yml' % class_name.replace('/','_'))
+            class_node['class'] = class_name
+            self._strong_node_ref.add(class_node)
+            self._class_name_2_node[class_name] = class_node
+            
+        properties = class_node.get('properties',dict())
         for k in range(nb_properties):
-            attr_name,nb_properties = attr_prop_list[attr_id],int(attr_prop_list[attr_id + 1])
+            prop_name,nb_values = attr_prop_list[attr_id],int(attr_prop_list[attr_id + 1])
             attr_id += 2
-            class_properties = self._get_class_properties(class_name,prop_name)
-            new_values = {}
-            for prop_id in range(attr_id,attr_id + nb_properties * 2,2) :
-                prop_name,prop_val = attr_prop_list[prop_id],attr_prop_list[prop_id + 1]
-                new_values[prop_name] = prop_val
-            attr_id += nb_properties *2
-            class_properties.set(new_values)
-
+            if nb_values == 1:
+                properties[prop_name] = attr_prop_list[attr_id]
+            else:
+                properties[prop_name] = list(attr_prop_list[attr_id:])
+        class_node['properties'] = properties
+        class_node.save()
     @_info
     def put_device_alias(self, device_name, device_alias):
         device_node = self._tango_name_2_node.get(device_name)
