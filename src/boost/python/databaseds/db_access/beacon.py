@@ -106,7 +106,7 @@ class beacon(object):
 
     def _index_tango(self,v) :
         klass = v.get('class')
-        if klass is not None:
+        if klass is not None and v.parent.get('device') is None:
             self._class_name_2_node[klass] = v
 
         personal_name = v.get('personal_name')
