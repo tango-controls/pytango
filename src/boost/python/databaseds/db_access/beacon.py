@@ -145,11 +145,14 @@ class beacon(object):
         device_node = self._tango_name_2_node.get(tango_name)
         if device_node is not None:    # There is a problem?
             return
-            
+        server_exe_name,personal_name = server_name.split('/')
+        personal_name = personal_name.lower()
+        server_name = '%s/%s' % (server_exe_name,personal_name)
         server_node = self._personal_2_node.get(server_name)
         if server_node is None:
             server_node = static.Node(self._config,filename = 'tango/%s.yml' % server_name.replace('/','_'))
-            server_node['server'],server_node['personal_name'] = server_name.split('/')
+            server_node['server'] = server_exe_name
+            server_node['personal_name'] = personal_name
             self._personal_2_node[server_name] = server_node
             self._tango_name_2_node['dserver/%s' % server_name.lower()] = server_node
 
