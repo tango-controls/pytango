@@ -955,7 +955,7 @@ class beacon(object):
         cache = settings.get_cache()
         exported_devices = cache.keys('tango.info.sys/database*')
         result = []
-        for exp_dev in exported_devices:
+        for key_name in exported_devices:
             info = settings.HashSetting(key_name)
             result.append(info.get('IOR'))
         return result
