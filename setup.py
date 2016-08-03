@@ -48,7 +48,7 @@ def pkg_config(*packages, **config):
         "-l": "libraries",
     }
     cmd = ["pkg-config", "--cflags-only-I",
-           "--libs-only-L", " ".join(packages)]
+           "--libs-only-L", "--libs-only-l", " ".join(packages)]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     result = proc.wait()
     result = str(proc.communicate()[0].decode("utf-8"))
