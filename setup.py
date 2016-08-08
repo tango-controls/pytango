@@ -305,7 +305,7 @@ class install(dftinstall):
         # on all different systems.
         if self.install_html is None:
             self.install_html = os.path.join(self.install_data,
-                                             'share', 'doc', 'PyTango', 'html')
+                                             'share', 'doc', 'pytango', 'html')
 
     def has_html(self):
         return sphinx is not None
