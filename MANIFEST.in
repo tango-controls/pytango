@@ -1,5 +1,6 @@
 include LICENSE.txt
 
+graft ext
 graft doc
 graft tests
 
