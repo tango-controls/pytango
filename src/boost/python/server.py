@@ -17,7 +17,7 @@ from __future__ import absolute_import
 
 __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
            "command", "device_property", "class_property",
-           "run", "server_run", "Server", "get_worker", "get_async_worker"]
+           "run", "server_run", "Server", "get_worker", "get_gevent_worker"]
 
 import os
 import sys
@@ -553,8 +553,6 @@ class Device(LatestDeviceImpl):
         if args is None:
             args = sys.argv[1:]
         args = [cls.__name__] + list(args)
-        green_mode = getattr(cls, 'green_mode', None)
-        kwargs.setdefault("green_mode", green_mode)
         return run((cls,), args, **kwargs)
 
 
@@ -978,7 +976,7 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
     if green_mode is None:
         from PyTango import get_green_mode
         green_mode = get_green_mode()
-    async_mode = green_mode in (GreenMode.Gevent, GreenMode.Asyncio)
+    gevent_mode = green_mode == GreenMode.Gevent
 
     import PyTango
     if msg_stream is None:
@@ -994,15 +992,15 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
     if util is None:
         util = PyTango.Util(args)
 
-    if async_mode:
+    if gevent_mode:
         util.set_serial_model(PyTango.SerialModel.NO_SYNC)
-        worker = _create_async_worker(green_mode)
+        worker = _create_gevent_worker()
         set_worker(worker)
 
     worker = get_worker()
 
     if event_loop is not None:
-        if async_mode:
+        if gevent_mode:
             event_loop = functools.partial(worker.execute, event_loop)
         util.server_set_event_loop(event_loop)
 
@@ -1018,10 +1016,10 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
         worker.stop()
         log.debug("server loop exit")
 
-    if async_mode:
+    if gevent_mode:
         tango_thread_id = worker.run_in_thread(tango_loop)
         worker.run()
-        log.debug("async worker finished")
+        log.debug("gevent worker finished")
     else:
         tango_loop()
 
@@ -1223,24 +1221,17 @@ def set_worker(worker):
     __WORKER = worker
 
 
-__ASYNC_WORKER = None
-def get_async_worker():
-    global __ASYNC_WORKER
-    return __ASYNC_WORKER
-
-
-def _create_async_worker(green_mode):
-    global __ASYNC_WORKER
-    if __ASYNC_WORKER:
-        return __ASYNC_WORKER
-    if green_mode == GreenMode.Gevent:
-        _ASYNC_WORKER = _create_gevent_worker()
-    if green_mode == GreenMode.Asyncio:
-        _ASYNC_WORKER = _create_asyncio_worker()
-    return _ASYNC_WORKER
+__GEVENT_WORKER = None
+def get_gevent_worker():
+    global __GEVENT_WORKER
+    return __GEVENT_WORKER
 
 
 def _create_gevent_worker():
+    global __GEVENT_WORKER
+    if __GEVENT_WORKER:
+        return __GEVENT_WORKER
+
     try:
         from queue import Queue
     except:
@@ -1310,63 +1301,8 @@ def _create_gevent_worker():
             self.__tasks.put(task)
             self.__watcher.send()
 
-    return GeventWorker()
-
-
-def _create_asyncio_worker():
-    import concurrent.futures
-
-    try:
-        import asyncio
-    except ImportError:
-        import trollius as asyncio
-
-    try:
-        from asyncio import run_coroutine_threadsafe
-    except ImportError:
-        from .asyncio_tools import run_coroutine_threadsafe
-
-    class LoopExecutor(concurrent.futures.Executor):
-        """An Executor subclass that uses an event loop
-        to execute calls asynchronously."""
-
-        def __init__(self, loop=None):
-            """Initialize the executor with a given loop."""
-            self.loop = loop or asyncio.get_event_loop()
-
-        def submit(self, fn, *args, **kwargs):
-            """Schedule the callable fn, to be executed as fn(*args **kwargs).
-            Return a Future representing the execution of the callable."""
-            corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
-            return run_coroutine_threadsafe(corofn(), loop)
-
-        def run_in_thread(self, func, *args, **kwargs):
-            """Schedule a blocking callback."""
-            callback = lambda: func(*args, **kwargs)
-            coro = self.loop.run_in_executor(None, callback)
-            # That is not actually necessary since coro is actually
-            # a future. But it is an implementation detail and it
-            # might be changed later on.
-            asyncio.async(coro)
-
-        def run(self, timeout=None):
-            """Run the asyncio event loop."""
-            self.loop.run_forever()
-
-        def stop(self):
-            """Run the asyncio event loop."""
-            self.loop.stop()
-
-        def execute(self, fn, *args, **kwargs):
-            """Execute the callable fn as fn(*args **kwargs)."""
-            return self.submit(fn, *args, **kwargs).result()
-
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    return LoopExecutor(loop=loop)
+    __GEVENT_WORKER = GeventWorker()
+    return __GEVENT_WORKER
 
 
 _CLEAN_UP_TEMPLATE = """
@@ -1606,8 +1542,8 @@ class Server:
         self.__protocol = protocol
         self.__tango_classes = _to_classes(tango_classes or [])
         self.__tango_devices = []
-        if self.async_mode:
-            self.__worker = _create_async_worker(self.green_mode)
+        if self.gevent_mode:
+            self.__worker = _create_gevent_worker()
         else:
             self.__worker = get_worker()
         set_worker(self.__worker)
@@ -1716,13 +1652,13 @@ class Server:
 
     def __initialize(self):
         self.log.debug("initialize")
-        async_mode = self.async_mode
+        gevent_mode = self.gevent_mode
         event_loop = self.__event_loop_callback
 
         util = self.tango_util
         u_instance = util.instance()
 
-        if async_mode:
+        if gevent_mode:
             if event_loop:
                 event_loop = functools.partial(self.worker.execute,
                                                event_loop)
@@ -1731,11 +1667,11 @@ class Server:
 
         _add_classes(util, self.__tango_classes)
 
-        if async_mode:
+        if gevent_mode:
             tango_thread_id = self.worker.run_in_thread(self.__tango_loop)
 
     def __run(self, timeout=None):
-        if self.async_mode:
+        if self.gevent_mode:
             return self.worker.run(timeout=timeout)
         else:
             self.__tango_loop()
@@ -1801,8 +1737,8 @@ class Server:
         self.__green_mode = gm
 
     @property
-    def async_mode(self):
-        return self.green_mode in (GreenMode.Gevent, GreenMode.Asyncio)
+    def gevent_mode(self):
+        return self.green_mode == GreenMode.Gevent
 
     @property
     def worker(self):
@@ -1904,12 +1840,12 @@ class Server:
 
     def run(self, timeout=None):
         self.log.debug("run")
-        async_mode = self.async_mode
+        gevent_mode = self.gevent_mode
         running = self.__running
         if not running:
             self.__prepare()
             self.__initialize()
         else:
-            if not async_mode:
+            if not gevent_mode:
                 raise RuntimeError("Server is already running")
         self.__run(timeout=timeout)

@@ -14,7 +14,7 @@ import sys
 import types
 
 __all__ = ["get_global_threadpool", "get_global_executor",
-           "get_event_loop", "submit", "spawn", "wait"]
+           "get_event_loop", "submit", "spawn"]
 
 def get_global_threadpool():
     import gevent
@@ -95,6 +95,3 @@ def get_event_loop():
         __event_loop = gevent.spawn(loop, queue)
         __event_loop.submit = submit
     return __event_loop
-
-def wait(greenlet, timeout=None):
-    return greenlet.get(timeout=timeout)

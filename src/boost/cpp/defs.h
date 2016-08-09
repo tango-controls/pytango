@@ -56,7 +56,6 @@ namespace PyTango
     enum GreenMode {
         GreenModeSynchronous,
         GreenModeFutures,
-        GreenModeGevent,
-        GreenModeAsyncio
+        GreenModeGevent
     };
 }

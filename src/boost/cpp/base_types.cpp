@@ -245,7 +245,6 @@ void export_base_types()
         .value("Synchronous", PyTango::GreenModeSynchronous)
         .value("Futures", PyTango::GreenModeFutures)
         .value("Gevent", PyTango::GreenModeGevent)
-        .value("Asyncio", PyTango::GreenModeAsyncio)
     ;
 
     enum_<PyTango::ImageFormat>("_ImageFormat")

@@ -9,7 +9,7 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-__all__ = ["get_global_executor", "submit", "spawn", "wait"]
+__all__ = ["uses_future", "get_global_executor", "submit", "spawn"] 
 
 __global_executor = None
 
@@ -38,10 +38,6 @@ def get_global_executor():
 
 def submit(fn, *args, **kwargs):
     return get_global_executor().submit(fn, *args, **kwargs)
-
-
-def wait(fut, timeout=None):
-    return fut.result(timeout=timeout)
 
 
 spawn = submit
