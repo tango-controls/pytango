@@ -13,31 +13,32 @@
 This is an internal PyTango module.
 """
 
-__all__ = [ "Group", "group_init" ]
+__all__ = ["Group", "group_init"]
 
 __docformat__ = "restructuredtext"
-
-import operator
 
 from ._tango import __Group as _RealGroup, StdStringVector
 from .utils import seq_2_StdStringVector, is_pure_str
 from .utils import document_method as __document_method
 import collections
 
+
 def _apply_to(fn, key):
     if isinstance(key, slice):
         if key.step:
-            return [ fn(x) for x in range(key.start, key.stop, key.step) ]
+            return [fn(x) for x in range(key.start, key.stop, key.step)]
         else:
-            return [ fn(x) for x in range(key.start, key.stop) ]
+            return [fn(x) for x in range(key.start, key.stop)]
     else:
         return fn(key)
+
 
 def _get_one_item(group, key):
     x = group.get_group(key)
     if x is not None:
         return x
     return group.get_device(key)
+
 
 # I define Group as a proxy to __Group, where group is the actual
 # C++ Tango::Group object. Most functions just call the __group object
@@ -52,14 +53,14 @@ class Group:
     """A Tango Group represents a hierarchy of tango devices. The hierarchy
     may have more than one level. The main goal is to group devices with
     same attribute(s)/command(s) to be able to do parallel requests."""
-    
+
     def __init__(self, name):
         if is_pure_str(name):
             name = _RealGroup(name)
         if not isinstance(name, _RealGroup):
             raise TypeError("Constructor expected receives a str")
         self.__group = name
-    
+
     def add(self, pattern_subgroup, timeout_ms=-1):
         if isinstance(pattern_subgroup, Group):
             name = pattern_subgroup.__group.get_name()
@@ -95,10 +96,10 @@ class Group:
         if internal is None:
             return None
         return Group(internal)
-    
+
     def __contains__(self, pattern):
         return self.contains(pattern)
-        
+
     def __getitem__(self, key):
         fn = lambda x: _get_one_item(self, x)
         return _apply_to(fn, key)
@@ -129,9 +130,10 @@ class Group:
         idx = self.__group.write_attribute_asynch(attr_name, value, forward=forward, multi=multi)
         return self.__group.write_attribute_reply(idx)
 
+
 def __init_proxy_Group():
     proxy_methods = [
-        #'add',
+        # 'add',
         'command_inout_asynch',
         'command_inout_reply',
         'contains',
@@ -140,7 +142,7 @@ def __init_proxy_Group():
         'get_device',
         'get_device_list',
         'get_fully_qualified_name',
-        #'get_group',
+        # 'get_group',
         'get_name',
         'get_size',
         'is_enabled',
@@ -154,8 +156,8 @@ def __init_proxy_Group():
         'remove_all',
         'set_timeout_millis',
         'write_attribute_asynch',
-        'write_attribute_reply',]
-        
+        'write_attribute_reply']
+
     def proxy_call_define(fname):
         def fn(self, *args, **kwds):
             return getattr(self._Group__group, fname)(*args, **kwds)
@@ -164,10 +166,10 @@ def __init_proxy_Group():
 
     for fname in proxy_methods:
         proxy_call_define(fname)
-    
-    #Group.add.__func__.__doc__ = _RealGroup.add.__doc__
-    #Group.get_group.__func__.__doc__ = _RealGroup.get_group.__doc__
-    #Group.__doc__ = _RealGroup.__doc__
+
+    # Group.add.__func__.__doc__ = _RealGroup.add.__doc__
+    # Group.get_group.__func__.__doc__ = _RealGroup.get_group.__doc__
+    # Group.__doc__ = _RealGroup.__doc__
 
 
 def __doc_Group():
@@ -176,7 +178,7 @@ def __doc_Group():
 
     document_method("_add", """
     add(self, patterns, timeout_ms=-1) -> None
-        
+
             Attaches any device which name matches one of the specified patterns.
 
             This method first asks to the Tango database the list of device names
@@ -199,25 +201,25 @@ def __doc_Group():
         Return     : None
 
         Throws     : TypeError, ArgumentError
-    """ )
+    """)
 
     document_method("_remove", """
     remove(self, patterns, forward=True) -> None
-        
-            Removes any group or device which name matches the specified pattern. 
-            
+
+            Removes any group or device which name matches the specified pattern.
+
             The pattern parameter can be a group name, a device name or a device
             name pattern (e.g domain_*/family/member_*).
-            
+
             Since we can have groups with the same name in the hierarchy, a group
             name can be fully qualified to specify which group should be removed.
             Considering the following group:
 
                 ::
 
-                    -> gauges 
-                    | -> cell-01 
-                    |     |-> penning 
+                    -> gauges
+                    | -> cell-01
+                    |     |-> penning
                     |     |    |-> ...
                     |     |-> pirani
                     |          |-> ...
@@ -227,14 +229,14 @@ def __doc_Group():
                     |     |-> pirani
                     |          |-> ...
                     | -> cell-03
-                    |     |-> ... 
-                    |     
-                    | -> ...  
-            
+                    |     |-> ...
+                    |
+                    | -> ...
+
             A call to gauges->remove("penning") will remove any group named
             "penning" in the hierarchy while gauges->remove("gauges.cell-02.penning")
             will only remove the specified group.
-        
+
         Parameters :
             - patterns   : (str | sequence<str>) A string with the pattern or a
                            list of patterns.
@@ -243,36 +245,36 @@ def __doc_Group():
                            it is only applied to the local set of elements.
                            For instance, the following code remove any
                            stepper motor in the hierarchy:
-                           
+
                                root_group->remove("*/stepper_motor/*");
-                
+
         Return     : None
-        
-        Throws     : 
+
+        Throws     :
     """ )
 
     document_method("remove_all", """
     remove_all(self) -> None
-    
+
         Removes all elements in the _RealGroup. After such a call, the _RealGroup is empty.
     """ )
 
     document_method("contains", """
     contains(self, pattern, forward=True) -> bool
-        
+
         Parameters :
             - pattern    : (str) The pattern can be a fully qualified or simple
                             group name, a device name or a device name pattern.
             - forward    : (bool) If fwd is set to true (the default), the remove
                             request is also forwarded to subgroups. Otherwise,
                             it is only applied to the local set of elements.
-                
+
         Return     : (bool) Returns true if the hierarchy contains groups and/or
                      devices which name matches the specified pattern. Returns
                      false otherwise.
-        
-        Throws     : 
-    """ )
+
+        Throws     :
+    """)
 
 
     document_method("get_device", """
@@ -302,11 +304,11 @@ def __doc_Group():
             The request is systematically forwarded to subgroups (i.e. if no device
             named device_name could be found in the local set of devices, the
             request is forwarded to subgroups).
-            
+
         Parameters :
             - dev_name    : (str) Device name.
             - idx         : (int) Device number.
-                
+
         Return     : (DeviceProxy) Be aware that this method returns a
                     different DeviceProxy referring to the same device each time.
                     So, do not use it directly for permanent things.
@@ -320,9 +322,9 @@ def __doc_Group():
                         # GOOD:
                         dp = g.get_device("my/device/01")
                         dp.subscribe_events('attr', callback)
-        
+
         Throws     : DevFailed
-    """ )
+    """)
 
     document_method("get_device_list", """
     get_device_list(self, forward=True) -> sequence<str>
@@ -330,17 +332,17 @@ def __doc_Group():
             Considering the following hierarchy:
 
             ::
-        
+
                 g2.add("my/device/04")
                 g2.add("my/device/05")
-                
+
                 g4.add("my/device/08")
                 g4.add("my/device/09")
-                
+
                 g3.add("my/device/06")
                 g3.add(g4)
                 g3.add("my/device/07")
-                
+
                 g1.add("my/device/01")
                 g1.add(g2)
                 g1.add("my/device/03")
@@ -351,7 +353,7 @@ def __doc_Group():
             If set to true, the results will be organized as follows:
 
             ::
-        
+
                     dl = g1.get_device_list(True)
 
                 dl[0] contains "my/device/01" which belongs to g1
@@ -363,11 +365,11 @@ def __doc_Group():
                 dl[6] contains "my/device/09" which belongs to g1.g3.g4
                 dl[7] contains "my/device/07" which belongs to g1.g3
                 dl[8] contains "my/device/02" which belongs to g1
-                
+
             If the forward option is set to false, the results are:
 
             ::
-        
+
                     dl = g1.get_device_list(False);
 
                 dl[0] contains "my/device/01" which belongs to g1
@@ -379,12 +381,12 @@ def __doc_Group():
             - forward : (bool) If it is set to true (the default), the request
                         is forwarded to sub-groups. Otherwise, it is only
                         applied to the local set of devices.
-                
+
         Return     : (sequence<str>) The list of devices currently in the hierarchy.
-        
+
         Throws     :
-    """ )
-    
+    """)
+
     document_method("get_group", """
     get_group(self, group_name ) -> Group
 
@@ -394,13 +396,13 @@ def __doc_Group():
             Considering the following group:
 
             ::
-                    
+
                 -> gauges
                     |-> cell-01
                     |    |-> penning
-                    |    |    |-> ... 
+                    |    |    |-> ...
                     |    |-> pirani
-                    |    |-> ... 
+                    |    |-> ...
                     |-> cell-02
                     |    |-> penning
                     |    |    |-> ...
@@ -409,65 +411,65 @@ def __doc_Group():
                     | -> cell-03
                     |    |-> ...
                     |
-                    | -> ...  
+                    | -> ...
 
             A call to gauges.get_group("penning") returns the first group named
             "penning" in the hierarchy (i.e. gauges.cell-01.penning) while
             gauges.get_group("gauges.cell-02.penning'') returns the specified group.
-            
+
             The request is systematically forwarded to subgroups (i.e. if no group
             named group_name could be found in the local set of elements, the request
             is forwarded to subgroups).
-        
+
         Parameters :
             - group_name : (str)
-        
+
         Return     : (Group)
-        
+
         Throws     :
-        
+
         New in PyTango 7.0.0
-    """ )
+    """)
 
 # Tango methods (~ DeviceProxy interface)
     document_method("ping", """
     ping(self, forward=True) -> bool
 
             Ping all devices in a group.
-        
+
         Parameters :
             - forward    : (bool) If fwd is set to true (the default), the request
                             is also forwarded to subgroups. Otherwise, it is
                             only applied to the local set of devices.
-                
+
         Return     : (bool) This method returns true if all devices in
                      the group are alive, false otherwise.
-        
-        Throws     : 
-    """ )
+
+        Throws     :
+    """)
 
     document_method("set_timeout_millis", """
     set_timeout_millis(self, timeout_ms) -> bool
-        
+
             Set client side timeout for all devices composing the group in
             milliseconds. Any method which takes longer than this time to execute
             will throw an exception.
 
         Parameters :
             - timeout_ms : (int)
-                
+
         Return     : None
-        
+
         Throws     : (errors are ignored)
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     document_method("command_inout_asynch", """
     command_inout_asynch(self, cmd_name, forget=False, forward=True, reserved=-1 ) -> int
     command_inout_asynch(self, cmd_name, param, forget=False, forward=True, reserved=-1 ) -> int
     command_inout_asynch(self, cmd_name, param_list, forget=False, forward=True, reserved=-1 ) -> int
-    
+
             Executes a Tango command on each device in the group asynchronously.
             The method sends the request to all devices and returns immediately.
             Pass the returned request id to Group.command_inout_reply() to obtain
@@ -486,12 +488,12 @@ def __doc_Group():
                             to the local set of devices.
             - reserved : (int) is reserved for internal purpose and should not be
                             used. This parameter may disappear in a near future.
-                
+
         Return     : (int) request id. Pass the returned request id to
                     Group.command_inout_reply() to obtain the results.
-        
+
         Throws     :
-    """ )
+    """)
 
     document_method("command_inout_reply", """
     command_inout_reply(self, req_id, timeout_ms=0) -> sequence<GroupCmdReply>
@@ -507,11 +509,11 @@ def __doc_Group():
                             exception. This exception will be part of the
                             global reply. If timeout_ms is set to 0,
                             command_inout_reply waits "indefinitely".
-                
+
         Return     : (sequence<GroupCmdReply>)
-        
-        Throws     : 
-    """ )
+
+        Throws     :
+    """)
 
     document_method("read_attribute_asynch", """
     read_attribute_asynch(self, attr_name, forward=True, reserved=-1 ) -> int
@@ -526,10 +528,10 @@ def __doc_Group():
                             to the local set of devices.
             - reserved  : (int) is reserved for internal purpose and should not be
                             used. This parameter may disappear in a near future.
-                
+
         Return     : (int) request id. Pass the returned request id to
                     Group.read_attribute_reply() to obtain the results.
-        
+
         Throws     :
     """ )
 
@@ -546,10 +548,10 @@ def __doc_Group():
                             to the local set of devices.
             - reserved   : (int) is reserved for internal purpose and should not be
                             used. This parameter may disappear in a near future.
-                
+
         Return     : (int) request id. Pass the returned request id to
                     Group.read_attributes_reply() to obtain the results.
-        
+
         Throws     :
     """ )
 
@@ -566,11 +568,11 @@ def __doc_Group():
                             exception. This exception will be part of the
                             global reply. If timeout_ms is set to 0,
                             read_attribute_reply waits "indefinitely".
-                
+
         Return     : (sequence<GroupAttrReply>)
-        
+
         Throws     :
-    """ )
+    """)
 
     document_method("read_attributes_reply", """
     read_attributes_reply(self, req_id, timeout_ms=0 ) -> sequence<GroupAttrReply>
@@ -585,11 +587,11 @@ def __doc_Group():
                            exception. This exception will be part of the
                            global reply. If timeout_ms is set to 0,
                            read_attributes_reply waits "indefinitely".
-                
+
         Return     : (sequence<GroupAttrReply>)
-        
+
         Throws     :
-    """ )
+    """)
 
     document_method("write_attribute_asynch", """
     write_attribute_asynch(self, attr_name, value, forward=True, multi=False ) -> int
@@ -609,13 +611,13 @@ def __doc_Group():
                           values, and each value is applied to the corresponding
                           device in the group. In this case len(value) must be
                           equal to group.get_size()!
-                
+
         Return     : (int) request id. Pass the returned request id to
                     Group.write_attribute_reply() to obtain the acknowledgements.
-        
+
         Throws     :
-    """ )
-        
+    """)
+
     document_method("write_attribute_reply", """
     write_attribute_reply(self, req_id, timeout_ms=0 ) -> sequence<GroupReply>
 
@@ -629,19 +631,19 @@ def __doc_Group():
                             exception. This exception will be part of the
                             global reply. If timeout_ms is set to 0,
                             write_attribute_reply waits "indefinitely".
-                
+
         Return     : (sequence<GroupReply>)
-        
+
         Throws     :
-    """ )
-        
+    """)
+
     document_method("get_name", """
         Get the name of the group. Eg: Group('name').get_name() == 'name'
-    """ )
+    """)
     document_method("get_fully_qualified_name", """
         Get the complete (dpt-separated) name of the group. This takes into
         consideration the name of the group and its parents.
-    """ )
+    """)
     document_method("enable", "Enables a group or a device element in a group.")
     document_method("disable", "Disables a group or a device element in a group.")
     document_method("is_enabled", "Check if a group is enabled.\nNew in PyTango 7.0.0")
@@ -653,21 +655,21 @@ def __doc_Group():
         Parameters :
             - forward : (bool) If it is set to true (the default), the request is
                         forwarded to sub-groups.
-                
+
         Return     : (int) The number of the devices in the hierarchy
-        
+
         Throws     :
-    """ )
-    
+    """)
+
     def document_method(method_name, desc, append=True):
         return __document_method(Group, method_name, desc, append)
 
     document_method("add", _RealGroup._add.__doc__, False)
     document_method("add", """
     add(self, subgroup, timeout_ms=-1) -> None
-        
+
             Attaches a (sub)_RealGroup.
-            
+
             To remove the subgroup use the remove() method.
 
         Parameters :
@@ -680,7 +682,7 @@ def __doc_Group():
         Return     : None
 
         Throws     : TypeError, ArgumentError
-    """ )
+    """)
 
     document_method("command_inout", """
     command_inout(self, cmd_name, forward=True) -> sequence<GroupCmdReply>
@@ -700,29 +702,30 @@ def __doc_Group():
                             to the local set of devices.
 
         Return : (sequence<GroupCmdReply>)
-    """ )
+    """)
 
     document_method("read_attribute", """
     read_attribute(self, attr_name, forward=True) -> sequence<GroupAttrReply>
 
             Just a shortcut to do:
                 self.read_attribute_reply(self.read_attribute_asynch(...))
-    """ )
+    """)
 
     document_method("read_attributes", """
     read_attributes(self, attr_names, forward=True) -> sequence<GroupAttrReply>
 
             Just a shortcut to do:
                 self.read_attributes_reply(self.read_attributes_asynch(...))
-    """ )
-    
+    """)
+
     document_method("write_attribute", """
     write_attribute(self, attr_name, value, forward=True, multi=False) -> sequence<GroupReply>
 
             Just a shortcut to do:
                 self.write_attribute_reply(self.write_attribute_asynch(...))
-    """ )
-    
+    """)
+
+
 def group_init(doc=True):
     if doc:
         __doc_Group()
