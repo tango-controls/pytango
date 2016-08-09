@@ -159,10 +159,11 @@ attributes and execute commands from a python console::
 This is just the tip of the iceberg. Check the :class:`~tango.DeviceProxy` for
 the complete API.
 
-PyTango comes with an integrated IPython_ based console called :ref:`itango`.
-It provides helpers to simplify console usage. You can use this console instead
-of the traditional python console. Be aware, though, that many of the *tricks*
-you can do in an :ref:`itango` console cannot be done in a python program.
+PyTango used to come with an integrated IPython_ based console called
+:ref:`itango`, now moved to a separate project. It provides helpers to simplify
+console usage. You can use this console instead of the traditional python
+console. Be aware, though, that many of the *tricks* you can do in an
+:ref:`itango` console cannot be done in a python program.
 
 Server
 ------
