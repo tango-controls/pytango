@@ -47,8 +47,10 @@ def _get_one_item(group, key):
 # The proxy is useful for add(group). In this case the parameter 'group'
 # becomes useless. With the proxy we make that parameter come to live
 # again before returning.
-# The other function that needs to be adapted to this is get_group because
+# Another function that needs to be adapted to this is get_group because
 # we want to return a Group, not a __Group!
+# The get_device method also needs to be adapted in order to properly
+# initialize the returned proxy with its python attributes.
 class Group:
     """A Tango Group represents a hierarchy of tango devices. The hierarchy
     may have more than one level. The main goal is to group devices with
@@ -90,6 +92,11 @@ class Group:
             return self.__group._remove(std_patterns, forward)
         else:
             raise TypeError('Parameter patterns: Should be a str or a sequence of str.')
+
+    def get_device(self, name_or_index):
+        proxy = self.__group.get_device(name_or_index)
+        proxy.__init__(proxy)
+        return proxy
 
     def get_group(self, group_name):
         internal = self.__group.get_group(group_name)
@@ -133,16 +140,16 @@ class Group:
 
 def __init_proxy_Group():
     proxy_methods = [
-        # 'add',
+        # 'add',  # Needs to be adapted
         'command_inout_asynch',
         'command_inout_reply',
         'contains',
         'disable',
         'enable',
-        'get_device',
+        # 'get_device',  # Needs to be adapted
         'get_device_list',
         'get_fully_qualified_name',
-        # 'get_group',
+        # 'get_group',   # Needs to be adapted
         'get_name',
         'get_size',
         'is_enabled',
