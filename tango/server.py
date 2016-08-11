@@ -826,6 +826,8 @@ class attribute(AttrData):
             kwargs['fget'] = fget
 
         super(attribute, self).__init__(name, class_name)
+        self.__doc__ = kwargs.get('doc', kwargs.get('description',
+                                                    'TANGO attribute'))
         if 'dtype' in kwargs:
             kwargs['dtype'], kwargs['dformat'] = \
                 _get_tango_type_format(kwargs['dtype'],
@@ -840,6 +842,8 @@ class attribute(AttrData):
     # --------------------
 
     def __get__(self, obj, objtype):
+        if obj is None:
+            return self
         return self.get_attribute(obj)
 
     def __set__(self, obj, value):
@@ -987,6 +991,8 @@ class pipe(PipeData):
             kwargs['fget'] = fget
 
         super(pipe, self).__init__(name, class_name)
+        self.__doc__ = kwargs.get('doc', kwargs.get('description',
+                                                    'TANGO pipe'))
         self.build_from_dict(kwargs)
         if self.pipe_write == PipeWriteType.PIPE_READ_WRITE:
             raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
@@ -1000,6 +1006,8 @@ class pipe(PipeData):
     # --------------------
 
     def __get__(self, obj, objtype):
+        if obj is None:
+            return self
         return self.get_attribute(obj)
 
     def __set__(self, obj, value):
@@ -1025,6 +1033,36 @@ class pipe(PipeData):
 
     def __call__(self, fget):
         return type(self)(fget=fget, **self._kwargs)
+
+
+def __build_command_doc(f, name, dtype_in, doc_in, dtype_out, doc_out):
+    doc = "'{0}' TANGO command".format(name)
+    if dtype_in is not None:
+        arg_spec = inspect.getargspec(f)
+        if len(arg_spec.args) > 1:
+            # arg[0] should be self and arg[1] the command argument
+            param_name = arg_spec.args[1]
+        else:
+            param_name = 'arg'
+        dtype_in_str = str(dtype_in)
+        if not isinstance(dtype_in, str):
+            try:
+                dtype_in_str = dtype_in.__name__
+            except:
+                pass
+        msg = doc_in or '(not documented)'
+        doc += '\n\n:param {0}: {1}\n:type {0}: {2}'.format(param_name, msg,
+                                                           dtype_in_str)
+    if dtype_out is not None:
+        dtype_out_str = str(dtype_out)
+        if not isinstance(dtype_out, str):
+            try:
+                dtype_out_str = dtype_out.__name__
+            except:
+                pass
+        msg = doc_out or '(not documented)'
+        doc += '\n\n:return: {0}\n:rtype: {1}'.format(msg, dtype_out_str)
+    return doc
 
 
 def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
@@ -1090,11 +1128,12 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
             green_mode=green_mode)
     name = f.__name__
 
-    dtype_in, dformat_in = _get_tango_type_format(dtype_in, dformat_in)
-    dtype_out, dformat_out = _get_tango_type_format(dtype_out, dformat_out)
 
-    din = [from_typeformat_to_type(dtype_in, dformat_in), doc_in]
-    dout = [from_typeformat_to_type(dtype_out, dformat_out), doc_out]
+    dtype_format_in = _get_tango_type_format(dtype_in, dformat_in)
+    dtype_format_out = _get_tango_type_format(dtype_out, dformat_out)
+
+    din = [from_typeformat_to_type(*dtype_format_in), doc_in]
+    dout = [from_typeformat_to_type(*dtype_format_out), doc_out]
 
     if green_mode == GreenMode.Synchronous:
         cmd = f
@@ -1104,6 +1143,15 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
             return get_worker().execute(f, self, *args, **kwargs)
 
     cmd.__tango_command__ = name, [din, dout]
+
+    # try to create a minimalistic __doc__
+    if cmd.__doc__ is None:
+        try:
+            cmd.__doc__ = __build_command_doc(f, name, dtype_in, doc_in,
+                                              dtype_out, doc_out)
+        except Exception as e:
+            cmd.__doc__ = "TANGO command"
+
     return cmd
 
 
@@ -1117,8 +1165,11 @@ class _BaseProperty(object):
         self.doc = doc
         self.default_value = default_value
         self.update_db = update_db
+        self.__doc__ = doc or 'TANGO property'
 
     def __get__(self, obj, objtype):
+        if obj is None:
+            return self
         return obj._tango_properties.get(self.name)
 
     def __set__(self, obj, value):
