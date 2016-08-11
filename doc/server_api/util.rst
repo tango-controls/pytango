@@ -1,8 +1,8 @@
 Util
 ====
 
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
-.. autoclass:: PyTango.Util
+.. autoclass:: tango.Util
     :members:
     :inherited-members:

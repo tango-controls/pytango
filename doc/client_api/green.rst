@@ -6,16 +6,15 @@ Green API
 =========
 
 Summary:
-    * :func:`PyTango.get_green_mode` 
-    * :func:`PyTango.set_green_mode` 
-    * :func:`PyTango.futures.DeviceProxy` 
-    * :func:`PyTango.gevent.DeviceProxy` 
+    * :func:`tango.get_green_mode`
+    * :func:`tango.set_green_mode`
+    * :func:`tango.futures.DeviceProxy`
+    * :func:`tango.gevent.DeviceProxy`
 
-.. autofunction:: PyTango.get_green_mode
+.. autofunction:: tango.get_green_mode
 
-.. autofunction:: PyTango.set_green_mode
+.. autofunction:: tango.set_green_mode
 
-.. autofunction:: PyTango.futures.DeviceProxy
+.. autofunction:: tango.futures.DeviceProxy
 
-.. autofunction:: PyTango.gevent.DeviceProxy
-
+.. autofunction:: tango.gevent.DeviceProxy

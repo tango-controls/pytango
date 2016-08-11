@@ -1,22 +1,23 @@
 
-.. currentmodule:: PyTango.server
+.. currentmodule:: tango.server
 
 .. _pytango-hlapi:
 
 High level server API
 =====================
 
-.. automodule:: PyTango.server
+.. automodule:: tango.server
 
 .. hlist::
 
-   * :class:`~PyTango.server.Device`
-   * :class:`~PyTango.server.attribute`
-   * :class:`~PyTango.server.command`
-   * :class:`~PyTango.server.device_property`
-   * :class:`~PyTango.server.class_property`
-   * :func:`~PyTango.server.run`
-   * :func:`~PyTango.server.server_run`
+   * :class:`~tango.server.Device`
+   * :class:`~tango.server.attribute`
+   * :class:`~tango.server.command`
+   * :class:`~tango.server.pipe`
+   * :class:`~tango.server.device_property`
+   * :class:`~tango.server.class_property`
+   * :func:`~tango.server.run`
+   * :func:`~tango.server.server_run`
 
 This module provides a high level device server API. It implements
 :ref:`TEP1 <pytango-TEP1>`. It exposes an easier API for developing a Tango
@@ -26,9 +27,9 @@ Here is a simple example on how to write a *Clock* device server using the
 high level API::
     
     import time
-    from PyTango.server import run
-    from PyTango.server import Device, DeviceMeta
-    from PyTango.server import attribute, command   
+    from tango.server import run
+    from tango.server import Device, DeviceMeta
+    from tango.server import attribute, command   
 
 
     class Clock(Device):
@@ -64,9 +65,9 @@ using the high level API. The example contains:
     from time import time
     from numpy.random import random_sample
 
-    from PyTango import AttrQuality, AttrWriteType, DispLevel, server_run
-    from PyTango.server import Device, DeviceMeta, attribute, command
-    from PyTango.server import class_property, device_property
+    from tango import AttrQuality, AttrWriteType, DispLevel, server_run
+    from tango.server import Device, DeviceMeta, attribute, command
+    from tango.server import class_property, device_property
 
     class PowerSupply(Device):
         __metaclass__ = DeviceMeta
@@ -128,16 +129,16 @@ using the high level API. The example contains:
 When declaring attributes, properties or commands, one of the most important
 information is the data type. It is given by the keyword argument *dtype*.
 In order to provide a more *pythonic* interface, this argument is not restricted
-to the :obj:`~PyTango.CmdArgType` options.
+to the :obj:`~tango.CmdArgType` options.
 
-For example, to define a *SCALAR* :obj:`~PyTango.CmdArgType.DevLong`
+For example, to define a *SCALAR* :obj:`~tango.CmdArgType.DevLong`
 attribute you have several possibilities:
 
 #. :obj:`int`
 #. 'int'
 #. 'int32'
 #. 'integer' 
-#. :obj:`PyTango.CmdArgType.DevLong`
+#. :obj:`tango.CmdArgType.DevLong`
 #. 'DevLong' 
 #. :obj:`numpy.int32`
 
@@ -283,6 +284,9 @@ dtype argument                            converts to tango type
  
  ``DevVarDoubleStringArray``               ``DevVarDoubleStringArray``
  ``'DevVarDoubleStringArray'``             ``DevVarDoubleStringArray``
+
+ ``DevPipeBlob``                           ``DevPipeBlob``
+ ``'DevPipeBlob'``                         ``DevPipeBlob``
 ========================================  ========================================
 
 .. autoclass:: Device
@@ -293,6 +297,8 @@ dtype argument                            converts to tango type
 .. autoclass:: attribute
 
 .. autofunction:: command
+
+.. autoclass:: pipe
 
 .. autoclass:: device_property
 

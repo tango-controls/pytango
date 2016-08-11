@@ -2,7 +2,7 @@
 Group
 -----
 
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 
 .. GroupElement is the base class of Group, but is not the base of
@@ -12,7 +12,7 @@ Group
 Group class
 ~~~~~~~~~~~
 
-.. autoclass:: PyTango.Group
+.. autoclass:: tango.Group
     :show-inheritance:
     :inherited-members:
     :members:
@@ -24,20 +24,20 @@ GroupReply classes
 Group member functions do not return the same as their DeviceProxy counterparts,
 but objects that contain them. This is:
 
-    - *write attribute* family returns PyTango.GroupReplyList
-    - *read attribute* family returns PyTango.GroupAttrReplyList
-    - *command inout* family returns PyTango.GroupCmdReplyList
+    - *write attribute* family returns tango.GroupReplyList
+    - *read attribute* family returns tango.GroupAttrReplyList
+    - *command inout* family returns tango.GroupCmdReplyList
 
 The Group*ReplyList objects are just list-like objects containing
-:class:`~PyTango.GroupReply`, :class:`~PyTango.GroupAttrReply` and
+:class:`~tango.GroupReply`, :class:`~tango.GroupAttrReply` and
 :class:`~GroupCmdReply` elements that will be described now.
 
 Note also that GroupReply is the base of GroupCmdReply and GroupAttrReply.
 
-.. autoclass:: PyTango.GroupReply
+.. autoclass:: tango.GroupReply
     :members:
 
-.. autoclass:: PyTango.GroupAttrReply
+.. autoclass:: tango.GroupAttrReply
     :show-inheritance:
     :members:
 

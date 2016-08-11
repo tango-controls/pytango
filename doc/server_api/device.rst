@@ -1,18 +1,18 @@
 Device
 ======
 
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 DeviceImpl
 ----------
 
-.. autoclass:: PyTango.DeviceImpl
+.. autoclass:: tango.DeviceImpl
     :members:
 
 Device_2Impl
 ------------
 
-.. autoclass:: PyTango.Device_2Impl
+.. autoclass:: tango.Device_2Impl
     :show-inheritance:
     :inherited-members:
     :members:
@@ -20,7 +20,7 @@ Device_2Impl
 Device_3Impl
 ------------
 
-.. autoclass:: PyTango.Device_3Impl
+.. autoclass:: tango.Device_3Impl
     :show-inheritance:
     :inherited-members:
     :members:
@@ -28,7 +28,7 @@ Device_3Impl
 Device_4Impl
 ------------
 
-.. autoclass:: PyTango.Device_4Impl
+.. autoclass:: tango.Device_4Impl
     :show-inheritance:
     :inherited-members:
     :members:
@@ -36,6 +36,6 @@ Device_4Impl
 DServer
 ----------
 
-.. autoclass:: PyTango.DServer
+.. autoclass:: tango.DServer
     :show-inheritance:
     :members:

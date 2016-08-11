@@ -16,34 +16,22 @@ import struct
 import platform
 import subprocess
 
-from distutils.core import setup, Extension
-from distutils.cmd import Command
+from setuptools import setup, Extension
+from setuptools import Command
+from setuptools.command.build_ext import build_ext as dftbuild_ext
+from setuptools.command.install import install as dftinstall
+
 from distutils.command.build import build as dftbuild
-from distutils.command.build_ext import build_ext as dftbuild_ext
-from distutils.command.install import install as dftinstall
 from distutils.unixccompiler import UnixCCompiler
 from distutils.version import StrictVersion as V
 
 try:
     import sphinx
     import sphinx.util.console
-    sphinx.util.console.color_terminal = lambda : False
+    sphinx.util.console.color_terminal = lambda: False
     from sphinx.setup_command import BuildDoc
 except ImportError:
     sphinx = None
-
-try:
-    import IPython
-    _IPY_ROOT = os.path.dirname(os.path.abspath(IPython.__file__))
-    if V(IPython.__version__) > V('0.10'):
-        import IPython.utils.path
-        get_ipython_dir = IPython.utils.path.get_ipython_dir
-    else:
-        import IPython.genutils
-        get_ipython_dir = IPython.genutils.get_ipython_dir
-    _IPY_LOCAL = str(get_ipython_dir())
-except:
-    IPython = None
 
 try:
     import numpy
@@ -60,7 +48,7 @@ def pkg_config(*packages, **config):
         "-l": "libraries",
     }
     cmd = ["pkg-config", "--cflags-only-I",
-           "--libs-only-L", " ".join(packages)]
+           "--libs-only-L", "--libs-only-l", " ".join(packages)]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     result = proc.wait()
     result = str(proc.communicate()[0].decode("utf-8"))
@@ -81,7 +69,7 @@ def abspath(*path):
 
 def get_release_info():
     name = "release"
-    release_dir = abspath('src', 'boost', 'python')
+    release_dir = abspath('tango')
     data = imp.find_module(name, [release_dir])
     release = imp.load_module(name, *data)
     return release.Release
@@ -120,36 +108,8 @@ def has_numpy(with_src=True):
     return ret
 
 
-def get_script_files():
-
-    FILTER_OUT = []  # "winpostinstall.py",
-
-    if os.name != "nt":
-        FILTER_OUT.append("pytango_winpostinstall.py")
-
-    scripts_dir = abspath("scripts")
-    scripts = []
-    items = os.listdir(scripts_dir)
-    for item in items:
-        # avoid hidden files
-        if item.startswith("."):
-            continue
-        abs_item = os.path.join(scripts_dir, item)
-        # avoid non files
-        if not os.path.isfile(abs_item):
-            continue
-        if item.endswith('c') and item[:-1] in items:
-            continue
-        # avoid any core dump... of course there isn't any :-) but just in case
-        if item.startswith('core'):
-            continue
-        if item in FILTER_OUT:
-            continue
-        scripts.append('scripts/' + item)
-    return scripts
-
-
-def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None):
+def add_lib(name, dirs, sys_libs,
+            env_name=None, lib_name=None, inc_suffix=None):
     if env_name is None:
         env_name = name.upper() + '_ROOT'
     ENV = os.environ.get(env_name)
@@ -171,7 +131,7 @@ def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None)
             if os.path.isdir(lib64_dir):
                 lib_dirs.insert(0, lib64_dir)
         dirs['library_dirs'].extend(lib_dirs)
-        
+
         if lib_name.startswith('lib'):
             lib_name = lib_name[3:]
         dirs['libraries'].append(lib_name)
@@ -179,16 +139,25 @@ def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None)
 
 class build(dftbuild):
 
-    user_options = dftbuild.user_options + \
-        [('without-ipython', None, "Tango IPython extension"),
-         ('strip-lib', None, "strips the shared library of debugging symbols (Unix like systems only)"),
-         ('no-doc', None, "do not build documentation") ]
+    user_options = list(dftbuild.user_options)
 
-    boolean_options = dftbuild.boolean_options + ['without-ipython', 'strip-lib', 'no-doc']
+    # Strip library option
+    user_options.append((
+        'strip-lib',
+        None,
+        "strips the shared library of debugging symbols"
+        " (Unix like systems only)"))
 
-    def initialize_options (self):
+    # No documentation option
+    user_options.append((
+        'no-doc',
+        None,
+        "do not build documentation"))
+
+    boolean_options = dftbuild.boolean_options + ['strip-lib', 'no-doc']
+
+    def initialize_options(self):
         dftbuild.initialize_options(self)
-        self.without_ipython = None
         self.strip_lib = None
         self.no_doc = None
 
@@ -200,33 +169,30 @@ class build(dftbuild):
             self.warn('NOT using numpy: it is not available')
         elif get_c_numpy() is None:
             self.warn("NOT using numpy: numpy available but C source is not")
-
-        if IPython and not self.without_ipython:
-            if V(IPython.__version__) > V('0.10'):
-                self.distribution.py_modules.append('IPython.config.profile.tango.ipython_config')
-            else:
-                self.distribution.py_modules.append('IPython.Extensions.ipy_profile_tango')
-
         dftbuild.run(self)
-
         if self.strip_lib:
-            if 'posix' in os.name:
-                has_objcopy = os.system("type objcopy") == 0
-                if has_objcopy:
-                    d = abspath(self.build_lib, "PyTango")
-                    orig_dir = os.path.abspath(os.curdir)
-                    so = "_PyTango.so"
-                    dbg = so + ".dbg"
-                    try:
-                        os.chdir(d)
-                        is_stripped = os.system('file %s | grep -q "not stripped" || exit 1' % so) != 0
-                        if not is_stripped:
-                            os.system("objcopy --only-keep-debug %s %s" % (so, dbg))
-                            os.system("objcopy --strip-debug --strip-unneeded %s" % (so,))
-                            os.system("objcopy --add-gnu-debuglink=%s %s" % (dbg, so))
-                            os.system("chmod -x %s" % (dbg,))
-                    finally:
-                        os.chdir(orig_dir)
+            self.strip_debug_symbols()
+
+    def strip_debug_symbols(self):
+        if 'posix' not in os.name:
+            return
+        if os.system("type objcopy") != 0:
+            return
+        d = abspath(self.build_lib, "tango")
+        orig_dir = os.path.abspath(os.curdir)
+        so = "_tango.so"
+        dbg = so + ".dbg"
+        try:
+            os.chdir(d)
+            stripped_cmd = 'file %s | grep -q "not stripped" || exit 1' % so
+            not_stripped = os.system(stripped_cmd) == 0
+            if not_stripped:
+                os.system("objcopy --only-keep-debug %s %s" % (so, dbg))
+                os.system("objcopy --strip-debug --strip-unneeded %s" % (so,))
+                os.system("objcopy --add-gnu-debuglink=%s %s" % (dbg, so))
+                os.system("chmod -x %s" % (dbg,))
+        finally:
+            os.chdir(orig_dir)
 
     def has_doc(self):
         if self.no_doc:
@@ -234,7 +200,9 @@ class build(dftbuild):
         if sphinx is None:
             return False
         if V(sphinx.__version__) <= V("0.6.5"):
-            print("Documentation will not be generated: sphinx version (%s) too low. Needs 0.6.6" % sphinx.__version__)
+            print("Documentation will not be generated:"
+                  " sphinx version (%s) too low."
+                  " Needs 0.6.6" % sphinx.__version__)
             return False
         setup_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.isdir(os.path.join(setup_dir, 'doc'))
@@ -250,11 +218,13 @@ class build_ext(dftbuild_ext):
             compiler_pars = self.compiler.compiler_so
             while '-Wstrict-prototypes' in compiler_pars:
                 del compiler_pars[compiler_pars.index('-Wstrict-prototypes')]
-            #self.compiler.compiler_so = " ".join(compiler_pars)
+            # self.compiler.compiler_so = " ".join(compiler_pars)
 
             # mimic tango check to activate C++0x extension
             compiler = self.compiler.compiler
-            proc = subprocess.Popen(compiler + ["-dumpversion"], stdout=subprocess.PIPE)
+            proc = subprocess.Popen(
+                compiler + ["-dumpversion"],
+                stdout=subprocess.PIPE)
             pipe = proc.stdout
             proc.wait()
             gcc_ver = pipe.readlines()[0].decode().strip()
@@ -265,7 +235,7 @@ class build_ext(dftbuild_ext):
     def build_extension(self, ext):
         if self.use_cpp_0x:
             ext.extra_compile_args += ['-std=c++0x']
-            ext.define_macros += [ ('PYTANGO_HAS_UNIQUE_PTR', '1') ]
+            ext.define_macros += [('PYTANGO_HAS_UNIQUE_PTR', '1')]
         dftbuild_ext.build_extension(self, ext)
 
 
@@ -285,15 +255,21 @@ if sphinx:
 
 class install_html(Command):
 
-    user_options = [
-        ('install-dir=', 'd', 'base directory for installing HTML documentation files')]
+    user_options = []
+
+    # Install directory option
+    user_options.append((
+        'install-dir=',
+        'd',
+        'base directory for installing HTML documentation files'))
 
     def initialize_options(self):
         self.install_dir = None
 
     def finalize_options(self):
-        self.set_undefined_options('install',
-                                   ('install_html', 'install_dir'))
+        self.set_undefined_options(
+            'install',
+            ('install_html', 'install_dir'))
 
     def run(self):
         build_doc_cmd = self.get_finalized_command('build_doc')
@@ -303,8 +279,13 @@ class install_html(Command):
 
 class install(dftinstall):
 
-    user_options = dftinstall.user_options + \
-        [('install-html=', None, "installation directory for HTML documentation"), ]
+    user_options = list(dftinstall.user_options)
+
+    # HTML directory option
+    user_options.append((
+        'install-html=',
+        None,
+        "installation directory for HTML documentation"))
 
     def initialize_options(self):
         dftinstall.initialize_options(self)
@@ -312,18 +293,19 @@ class install(dftinstall):
 
     def finalize_options(self):
         dftinstall.finalize_options(self)
-        # We do a hack here. We cannot trust the 'install_base' value because it
-        # is not always the final target. For example, in unix, the install_base
-        # is '/usr' and all other install_* are directly relative to it. However,
-        # in unix-local (like ubuntu) install_base is still '/usr' but, for
-        # example, install_data, is '$install_base/local' which breaks everything.
-        #
-        # The hack consists in using install_data instead of install_base since
-        # install_data seems to be, in practice, the proper install_base on all
-        # different systems.
+        # We do a hack here. We  cannot trust the 'install_base' value because
+        # it  is not  always  the final  target.  For  example,  in unix,  the
+        # install_base is '/usr' and all other install_* are directly relative
+        # to  it. However,in  unix-local (like  ubuntu) install_base  is still
+        # '/usr'  but,  for  example, install_data,  is  '$install_base/local'
+        # which breaks everything.
+
+        # The  hack consists  in  using install_data  instead of  install_base
+        # since install_data seems to be, in practice, the proper install_base
+        # on all different systems.
         if self.install_html is None:
             self.install_html = os.path.join(self.install_data,
-                                             'share', 'doc', 'PyTango', 'html')
+                                             'share', 'doc', 'pytango', 'html')
 
     def has_html(self):
         return sphinx is not None
@@ -333,14 +315,17 @@ class install(dftinstall):
 
 
 def setup_args():
-    macros = []
 
     directories = {
         'include_dirs': [],
         'library_dirs': [],
-        'libraries':    ['tango'],
+        'libraries':    [],
     }
     sys_libs = []
+
+    # Link specifically to libtango version 9
+    tangolib = ':libtango.so.9' if 'linux' in sys.platform else 'tango'
+    directories['libraries'].append(tangolib)
 
     add_lib('omni', directories, sys_libs, lib_name='omniORB4')
     add_lib('zmq', directories, sys_libs, lib_name='libzmq')
@@ -357,13 +342,16 @@ def setup_args():
                            'mint' in dist_name
             py_ver = platform.python_version_tuple()
             if debian_based:
-                # when building with multiple version of python on debian we need
-                # to link against boost_python-py25/-py26 etc...
+                # when building with  multiple version of python  on debian we
+                # need to link against boost_python-py25/-py26 etc...
                 pyver = "-py"
                 pyver += "".join(map(str, py_ver[:2]))
                 boost_library_name += pyver
             elif 'gentoo' in dist_name:
                 boost_library_name += "-" + ".".join(map(str, py_ver[:2]))
+            elif 'fedora' in dist_name or 'centos' in dist_name:
+                if int(py_ver[0]) == 3:
+                    boost_library_name += '3'
     else:
         inc_dir = os.path.join(BOOST_ROOT, 'include')
         lib_dirs = [os.path.join(BOOST_ROOT, 'lib')]
@@ -383,10 +371,11 @@ def setup_args():
     if numpy_c_include is not None:
         directories['include_dirs'].append(numpy_c_include)
 
+    macros = []
     if not has_numpy():
         macros.append(('DISABLE_PYTANGO_NUMPY', None))
     else:
-        macros.append(('PYTANGO_NUMPY_VERSION', '"' + str(numpy.__version__) + '"'))
+        macros.append(('PYTANGO_NUMPY_VERSION', '"%s"' % numpy.__version__))
 
     if 'posix' in os.name:
         directories = pkg_config(*sys_libs, **directories)
@@ -398,41 +387,42 @@ def setup_args():
     please_debug = False
 
     packages = [
-        'PyTango',
-        'PyTango.ipython',
-        'PyTango.ipython.ipython_00_10',
-        'PyTango.ipython.ipython_00_11',
-        'PyTango.ipython.ipython_10_00',
-        'PyTango.databaseds',
-        'PyTango.databaseds.db_access',
+        'tango',
+        'tango.databaseds',
+        'tango.databaseds.db_access',
     ]
 
-    py_modules = []
+    py_modules = [
+        'PyTango',  # Backward compatibilty
+    ]
 
     provides = [
-        'PyTango',
+        'tango',
+        'PyTango',  # Backward compatibilty
     ]
 
     requires = [
         'boost_python (>=1.33)',
-        'numpy (>=1.1)'
+        'numpy (>=1.1)',
+        'six',
+    ]
+
+    install_requires = [
+        'six',
     ]
 
     package_data = {
-        'PyTango' : [],
+        'PyTango': [],
     }
 
-    scripts = get_script_files()
-
     data_files = []
-    if os.name == 'nt':
-        data_files.append(('scripts', ['doc/_static/itango.ico']))
 
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Environment :: Other Environment',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
+        'License :: OSI Approved ::'
+        ' GNU Library or Lesser General Public License (LGPL)',
         'Natural Language :: English',
         'Operating System :: Microsoft :: Windows',
         'Operating System :: POSIX',
@@ -451,7 +441,7 @@ def setup_args():
     # and then uncommenting this line. Someday maybe this will be
     # automated...
     extra_compile_args = [
-#        '-includesrc/precompiled_header.hpp',
+        # '-include ext/precompiled_header.hpp',
     ]
 
     extra_link_args = [
@@ -461,28 +451,32 @@ def setup_args():
 
     if please_debug:
         extra_compile_args += ['-g', '-O0']
-        extra_link_args += ['-g' , '-O0']
+        extra_link_args += ['-g', '-O0']
 
-    src_dir = abspath('src', 'boost', 'cpp')
+    src_dir = abspath('ext')
     client_dir = src_dir
     server_dir = os.path.join(src_dir, 'server')
-    _clientfiles = [ os.path.join(client_dir, fname)
-                        for fname in os.listdir(client_dir)
-                            if fname.endswith('.cpp') ]
-    _clientfiles.sort()
-    _serverfiles = [ os.path.join(server_dir, fname)
-                         for fname in os.listdir(server_dir)
-                             if fname.endswith('.cpp') ]
-    _serverfiles.sort()
-    _cppfiles = _clientfiles + _serverfiles
 
-    include_dirs = uniquify(directories['include_dirs'] + [client_dir, server_dir])
+    clientfiles = sorted(
+        os.path.join(client_dir, fname)
+        for fname in os.listdir(client_dir)
+        if fname.endswith('.cpp'))
+
+    serverfiles = sorted(
+        os.path.join(server_dir, fname)
+        for fname in os.listdir(server_dir)
+        if fname.endswith('.cpp'))
+
+    cppfiles = clientfiles + serverfiles
+    directories['include_dirs'].extend([client_dir, server_dir])
+
+    include_dirs = uniquify(directories['include_dirs'])
     library_dirs = uniquify(directories['library_dirs'])
     libraries = uniquify(directories['libraries'])
 
-    _pytango = Extension(
-        name='_PyTango',
-        sources=_cppfiles,
+    pytango_ext = Extension(
+        name='_tango',
+        sources=cppfiles,
         include_dirs=include_dirs,
         library_dirs=library_dirs,
         libraries=libraries,
@@ -492,19 +486,22 @@ def setup_args():
         language='c++',
         depends=[])
 
-    cmdclass = {'build'        : build,
-                'build_ext'    : build_ext,
-                'install_html' : install_html,
-                'install'      : install }
+    cmdclass = {
+        'build': build,
+        'build_ext': build_ext,
+        'install_html': install_html,
+        'install': install}
 
     if sphinx:
         cmdclass['build_doc'] = build_doc
 
+    long_description = open('README.rst').read()
+
     opts = dict(
-        name='PyTango',
+        name='pytango',
         version=Release.version,
         description=Release.description,
-        long_description=Release.long_description,
+        long_description=long_description,
         author=author[0],
         author_email=author[1],
         url=Release.url,
@@ -512,20 +509,20 @@ def setup_args():
         platforms=Release.platform,
         license=Release.license,
         packages=packages,
-        package_dir={ 'PyTango' : os.path.join('src', 'boost', 'python') },
         py_modules=py_modules,
         classifiers=classifiers,
         package_data=package_data,
         data_files=data_files,
-        scripts=scripts,
         provides=provides,
         keywords=Release.keywords,
         requires=requires,
-        ext_package='PyTango',
-        ext_modules=[_pytango],
+        install_requires=install_requires,
+        ext_package='tango',
+        ext_modules=[pytango_ext],
         cmdclass=cmdclass)
 
     return opts
+
 
 def main():
     return setup(**setup_args())

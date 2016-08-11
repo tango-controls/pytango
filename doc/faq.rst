@@ -1,13 +1,14 @@
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 .. _pytango-faq:
 
 FAQ
 ===
 
-Answers to general Tango questions can be found at http://www.tango-controls.org/tutorials
+Answers to general Tango questions can be found in the
+`general tango tutorial <http://www.tango-controls.org/resources/tutorials>`_.
 
-Please also check http://www.tango-controls.org/howtos for a list of Tango howtos
+Please also check the `general tango how to <http://www.tango-controls.org/resources/howto>`_.
 
 **Where are the usual bjam files?**
 
@@ -56,11 +57,11 @@ PyTango3.
 Changing your python import from::
 
     import PyTango
-    
+
 to::
 
     import PyTango3 as PyTango
-    
+
 should allow you to execute your old PyTango code using the new PyTango 7 library.
 
 Please note that you should as soon as possible migrate the code to Tango 7
@@ -132,7 +133,7 @@ not always the same. The following table summarizes the differences:
 |                         | 2. sequence<str>                          |  2. list<str>                             |
 +-------------------------+-------------------------------------------+-------------------------------------------+
 
-Note that starting from PyTango 7 you **cannot assume anything** about the concrete 
+Note that starting from PyTango 7 you **cannot assume anything** about the concrete
 sequence implementation for the tango array types in PyTango.
 This means that the following code (valid in PyTango <= 3.0.4)::
 
@@ -151,7 +152,7 @@ must be replaced with::
     if operator.isSequence(da.value) and not type(da.value) in types.StringTypes:
         print "array_attr is NOT a scalar attribute"
 
-Note that the above example is intended for demonstration purposes only. For 
+Note that the above example is intended for demonstration purposes only. For
 reference, the proper code would be::
 
     import PyTango
@@ -159,7 +160,7 @@ reference, the proper code would be::
     da = dp.read_attribute("array_attr")
     if not da.data_format is PyTango.AttrDataFormat.SCALAR:
         print "array_attr is NOT a scalar attribute"
-    
+
 *Server*
 
 
@@ -180,19 +181,19 @@ reference, the proper code would be::
     - the result of a read_attribute call on a :class:`DeviceProxy` / :class:`Group`
       is now a :class:`DeviceAttribute` object
     - write_attribute does not accept AttributeValue anymore
-    
+
     (See :class:`DeviceProxy` API documentation for more details)
-    
+
 #. command_inout for commands with parameter type DevVar****StringArray don't accept items in second sequence not being strings:
     For example, a tango command 'DevVoid Go(DevVarDoubleArray)' in tango 3.0.4
     could be executed by calling::
-        
+
         dev_proxy.command_inout( 'Go', [[1.0, 2.0], [1, 2, 3]] )
-    
+
     and the second list would internally be converted to ['1', '2', '3'].
-    Starting from PyTango 7 this is not allowed anymore. So the above code 
+    Starting from PyTango 7 this is not allowed anymore. So the above code
     must be changed to::
-    
+
         dev_proxy.command_inout( 'Go', [[1.0, 2.0], ['1', '2', '3']] )
 
 #. :class:`EventType` enumeration constants changed to match C++ enumeration
@@ -204,7 +205,7 @@ reference, the proper code would be::
     - ATTR_CONF_EVENT remains
 
 #. Exception handling
-    in 3.0.4 :class:`DevFailed` was a tuple of dictionaries. 
+    in 3.0.4 :class:`DevFailed` was a tuple of dictionaries.
     Now :class:`DevFailed` is a tuple of :class:`DevError`.
     This means that code::
 
@@ -223,9 +224,9 @@ reference, the proper code would be::
 
 *Optional*
 
-The following is a list of API improvements. Some where added for performance 
-reasons, others to allow for a more pythonic interface, others still to reflect 
-more adequately the C++ interface. They are not mandatory since the original 
+The following is a list of API improvements. Some where added for performance
+reasons, others to allow for a more pythonic interface, others still to reflect
+more adequately the C++ interface. They are not mandatory since the original
 interface will still be available.
 
 **Why is there a "-Wstrict-prototypes" warning when I compile PyTango?**
@@ -234,10 +235,10 @@ interface will still be available.
 The PyTango prefered build system (distutils) uses the same flags used to compile
 Python to compile PyTango. It happens that Python is compiled as a pure C library
 while PyTango is a C++ library. Unfortunately one of the flags used by Python is
-the "-Wstrict-prototypes" which makes sence in a C compilation but not in a C++ 
+the "-Wstrict-prototypes" which makes sence in a C compilation but not in a C++
 compilation.
 For reference here is the complete error message you may have:
-    
+
     `cc1plus: warning: command line option "-Wstrict-prototypes" is valid for Ada/C/ObjC but not for C++`
 
 Do not worry about this warning since the compiler is ignoring the presence of this flag
@@ -255,4 +256,3 @@ you should see many warnings of type:
     `(WARNING/2) error while formatting signature for PyTango.Device_4Impl.always_executed_hook: **arg is not a Python function**`
 
 Do not worry since sphinx is able to generate the proper documentation.
-

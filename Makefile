@@ -31,7 +31,7 @@
 # - PY_VER: use a specific python version (default is empty) (ex: 3.2)
 
 # Build "in parallel":
-# make prepare && make -j5 
+# make prepare && make -j5
 #
 # Install "in parallel":
 # make prepare && make -j5 && make install prefix=<install dir>
@@ -67,7 +67,7 @@ prefix=$(_PY_DIR)/site-packages
 endif
 endif
 
-SRC_DIR = src/boost/cpp
+SRC_DIR = ext
 
 ifndef OBJS_DIR
 OBJS_DIR := objs_py$(PY_VER_S)
@@ -141,8 +141,7 @@ MACROS := -DNDEBUG -DPYTANGO_HAS_UNIQUE_PTR -DPYTANGO_NUMPY_VERSION=$(PYTANGO_NU
 CFLAGS := -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC -g $(OPTIMIZE_CC) $(MACROS) $(TANGO_CFLAGS) $(INCLUDE_DIRS) $(QUOTE_INCLUDE_DIRS)
 LNFLAGS := $(LN_DIRS) $(LN_LIBS)
 
-LIB_NAME := _PyTango.so
-LIB_NAME_STATIC := _PyTangoStatic.so
+LIB_NAME := _tango.so
 LIB_SYMB_NAME := $(LIB_NAME).dbg
 
 OBJS := \
@@ -154,6 +153,8 @@ $(OBJS_DIR)/attribute_dimension.o \
 $(OBJS_DIR)/attribute_event_info.o \
 $(OBJS_DIR)/attribute_info.o \
 $(OBJS_DIR)/attribute_info_ex.o \
+$(OBJS_DIR)/device_pipe.o \
+$(OBJS_DIR)/pipe_info.o \
 $(OBJS_DIR)/attribute_proxy.o \
 $(OBJS_DIR)/base_types.o \
 $(OBJS_DIR)/callback.o \
@@ -193,6 +194,7 @@ $(OBJS_DIR)/version.o \
 $(OBJS_DIR)/attr.o \
 $(OBJS_DIR)/attribute.o \
 $(OBJS_DIR)/command.o \
+$(OBJS_DIR)/pipe.o \
 $(OBJS_DIR)/device_class.o \
 $(OBJS_DIR)/device_impl.o \
 $(OBJS_DIR)/dserver.o \
@@ -203,6 +205,7 @@ $(OBJS_DIR)/multi_class_attribute.o \
 $(OBJS_DIR)/subdev.o \
 $(OBJS_DIR)/tango_util.o \
 $(OBJS_DIR)/user_default_attr_prop.o \
+$(OBJS_DIR)/user_default_pipe_prop.o \
 $(OBJS_DIR)/wattribute.o \
 $(OBJS_DIR)/auto_monitor.o
 
@@ -220,6 +223,7 @@ to_py.h \
 attr.h \
 attribute.h \
 command.h \
+pipe.h \
 device_class.h \
 device_impl.h
 
@@ -244,7 +248,7 @@ init:
 	@echo Using python $(PY_VER)
 	@echo CFLAGS  = $(CFLAGS)
 	@echo LNFLAGS = $(LNFLAGS)
-	@echo -n "Preparing build directories... " 
+	@echo -n "Preparing build directories... "
 	@mkdir -p $(OBJS_DIR)
 	@echo $(OK)
 
@@ -292,20 +296,21 @@ clean:
 	@rm -f $(OBJS_DIR)/*.o
 	@echo $(OK)
 
-clean-all: 
+clean-all:
 	@echo -n Cleaning all...
 	@rm -rf $(OBJS_DIR)
 	@echo $(OK)
 
 install-py:
-	@echo -n "Installing python files into $(prefix)/PyTango... "
-	@mkdir -p $(prefix)/PyTango
-	@rsync -r src/boost/python/ $(prefix)/PyTango/
+	@echo -n "Installing python files into $(prefix)/tango... "
+	@mkdir -p $(prefix)/tango
+	@rsync -r tango/ $(prefix)/tango/
+	@rsync PyTango.py $(prefix)/
 	@echo $(OK)
 
 install-lib:
-	@echo -n "Installing binary files into $(prefix)/PyTango... "
-	@rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/PyTango
+	@echo -n "Installing binary files into $(prefix)/tango... "
+	@rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/tango
 	@echo $(OK)
 
 install-all: install-py install-lib

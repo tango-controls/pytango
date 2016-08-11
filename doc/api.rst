@@ -1,5 +1,5 @@
 
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 .. _pytango-api:
 
@@ -7,7 +7,7 @@
 PyTango API
 ===========
 
-.. automodule:: PyTango
+.. automodule:: tango
 
 .. toctree::
     :maxdepth: 1

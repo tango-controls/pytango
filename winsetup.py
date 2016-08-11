@@ -28,7 +28,7 @@ def main():
 
     winsetup_dir = osp.dirname(osp.abspath(__file__))
     os.chdir(winsetup_dir)
-    setup_name = "ssetup.py"
+    setup_name = "setup.py"
     bitmap = osp.join(winsetup_dir, 'doc', 'logo-medium.bmp')
     ver = ".".join(map(str, sys.version_info[:2]))
 
@@ -42,9 +42,7 @@ def main():
 #    temp_dir = osp.join(temp_base_dir, "PyTango", config_name)
     if plat_name == 'x64':
         plat_name = 'win-amd64'
-    
-    install_script = osp.join(winsetup_dir, 'scripts', 'pytango_winpostinstall.py')
-    install_script = 'pytango_winpostinstall.py'
+
     try:
         cmd_line =  '%s %s ' % (executable, setup_name)
         cmd_line += 'build_py --force --no-compile ' \
@@ -57,15 +55,13 @@ def main():
         cmd_line += 'bdist_msi --skip-build --target-version=%s ' \
                     '--bdist-dir=%s ' \
                     '--dist-dir=%s ' \
-                    '--install-script=%s ' \
-                    '--plat-name=%s ' % (ver, bdist_dir, dist_dir, install_script, plat_name)
+                    '--plat-name=%s ' % (ver, bdist_dir, dist_dir, plat_name)
         cmd_line += 'bdist_wininst --skip-build --target-version=%s ' \
                     '--bdist-dir=%s ' \
                     '--dist-dir=%s ' \
                     '--title="PyTango 8" ' \
                     '--bitmap="%s" ' \
-                    '--install-script=%s ' \
-                    '--plat-name=%s ' % (ver, bdist_dir, dist_dir, bitmap, install_script, plat_name)
+                    '--plat-name=%s ' % (ver, bdist_dir, dist_dir, bitmap, plat_name)
         os.system(cmd_line)
     except:
         print("Failed:")

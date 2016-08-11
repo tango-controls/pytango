@@ -12,7 +12,9 @@ Installing
 Linux
 ~~~~~
 
-PyTango is available on linux as an official debian/ubuntu package::
+PyTango is available on linux as an official debian/ubuntu package:
+
+.. sourcecode:: console
 
     $ sudo apt-get install python-pytango
 
@@ -35,14 +37,18 @@ First, make sure you have the following packages already installed (all of them
 are available from the major official distribution repositories):
 
 * `boost-python`_ (including boost-python-dev)
-* `numpy`_ 
+* `numpy`_
 * `IPython`_ (optional, highly recommended)
 
-Then install PyTango either from pip::
+Then install PyTango either from pip:
+
+.. sourcecode:: console
 
     $ pip install PyTango
 
-or easy_install::
+or easy_install:
+
+.. sourcecode:: console
 
     $ easy_install -U PyTango
 
@@ -55,7 +61,7 @@ PyTango team provides a limited set of binary PyTango distributables for
 Windows XP/Vista/7/8. The complete list of binaries can be downloaded from
 `PyPI`_.
 
-Select the proper windows package, download it and finally execute the 
+Select the proper windows package, download it and finally execute the
 installion wizard.
 
 Compiling
@@ -64,14 +70,16 @@ Compiling
 Linux
 ~~~~~
 
-Since PyTango 7 the build system used to compile PyTango is the standard python 
+Since PyTango 7 the build system used to compile PyTango is the standard python
 distutils.
 
-Besides the binaries for the three dependencies mentioned above, you also need 
+Besides the binaries for the three dependencies mentioned above, you also need
 the development files for the respective libraries.
 
 You can get the latest ``.tar.gz`` from `PyPI`_ or directly
-the latest SVN checkout::
+the latest SVN checkout:
+
+.. sourcecode:: console
 
     $ svn co http://svn.code.sf.net/p/tango-cs/code/bindings/PyTango/trunk PyTango
     $ cd PyTango
@@ -81,9 +89,11 @@ the latest SVN checkout::
 This will install PyTango in the system python installation directory and, since
 version 8.0.0, it will also install :ref:`itango` as an IPython_ extension.
 
-If whish to install in a different directory, replace the last line with::
-    
-    $ # private installation to your user (usually ~/.local/lib/python<X>.<Y>/site-packages
+If you whish to install in a different directory, replace the last line with:
+
+.. sourcecode:: console
+
+    $ # private installation to your user (usually ~/.local/lib/python<X>.<Y>/site-packages)
     $ python setup.py install --user
 
     $ # or specific installation directory
@@ -100,27 +110,11 @@ source package under :file:`doc/windows_notes.txt`.
 Testing
 -------
 
-If you have IPython_ installed, the best way to test your PyTango installation
-is by starting the new PyTango CLI called :ref:`itango` by typing on the command
-line::
+To test the installation, import ``tango`` and check ``tango.Release.version``:
 
-    $ itango
+.. sourcecode:: console
 
-then, in ITango type:
-
-.. sourcecode:: itango
-
-    ITango [1]: PyTango.Release.version
-    Result [1]: '8.0.2'
-
-(if you are wondering, :ref:`itango` automaticaly does ``import PyTango`` 
-for you!)
-
-If you don't have IPython_ installed, to test the installation start a
-python console and type:
-
-    >>> import PyTango
-    >>> PyTango.Release.version
-    '8.0.2'
+    $ python -c "import tango; print(tango.Release.version)"
+    9.2.0
 
 Next steps: Check out the :ref:`pytango-quick-tour`.

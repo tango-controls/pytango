@@ -1,29 +1,29 @@
 Database API
 ============
 
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
-.. autoclass:: PyTango.Database
+.. autoclass:: tango.Database
     :members:
 
-.. autoclass:: PyTango.DbDatum
+.. autoclass:: tango.DbDatum
     :members:
 
-.. autoclass:: PyTango.DbDevExportInfo
+.. autoclass:: tango.DbDevExportInfo
     :members:
 
-.. autoclass:: PyTango.DbDevExportInfo
+.. autoclass:: tango.DbDevExportInfo
     :members:
 
-.. autoclass:: PyTango.DbDevImportInfo
+.. autoclass:: tango.DbDevImportInfo
     :members:
 
-.. autoclass:: PyTango.DbDevInfo
+.. autoclass:: tango.DbDevInfo
     :members:
 
-.. autoclass:: PyTango.DbHistory
+.. autoclass:: tango.DbHistory
     :members:
 
-.. autoclass:: PyTango.DbServerInfo
+.. autoclass:: tango.DbServerInfo
     :members:
 

@@ -1,5 +1,5 @@
 
-.. currentmodule:: PyTango.server
+.. currentmodule:: tango.server
 
 .. _pytango-TEP1:
 
@@ -113,22 +113,22 @@ with the new API.
 All tango features should be available by direct usage of the new simplified,
 cleaner high-level API and through direct access to the low-level API.
     
-Automatic inheritance from the latest** :class:`~PyTango.DeviceImpl` 
+Automatic inheritance from the latest** :class:`~tango.DeviceImpl` 
 --------------------------------------------------------------------------------
 
 Currently Devices need to inherit from a direct Tango device implementation
-(:class:`~PyTango.DeviceImpl`, or :class:`~PyTango.Device_2Impl`,
-:class:`~PyTango.Device_3Impl`, :class:`~PyTango.Device_4Impl`, etc)
+(:class:`~tango.DeviceImpl`, or :class:`~tango.Device_2Impl`,
+:class:`~tango.Device_3Impl`, :class:`~tango.Device_4Impl`, etc)
 according to the tango version being used during the development.
 
 In order to keep the code up to date with tango, every time a new Tango IDL
 is released, the code of **every** device server needs to be manually
 updated to ihnerit from the newest tango version.
 
-By inheriting from a new high-level :class:`~PyTango.server.Device` (which
+By inheriting from a new high-level :class:`~tango.server.Device` (which
 itself automatically *decides* from which DeviceImpl version it should
 inherit), the device servers are always up to date with the latest tango
-release without need for manual intervention (see :mod:`PyTango.server`).
+release without need for manual intervention (see :mod:`tango.server`).
 
 Low-level way::
 
@@ -140,14 +140,14 @@ High-level way::
     class Motor(PyTango.server.Device):
         pass
     
-Default implementation of :class:`~PyTango.server.Device` constructor
+Default implementation of :class:`~tango.server.Device` constructor
 --------------------------------------------------------------------------------
 
 99% of the different device classes which inherit from low level
-:class:`~PyTango.DeviceImpl` only implement `__init__` to call their
-`init_device` (see :mod:`PyTango.server`).
+:class:`~tango.DeviceImpl` only implement `__init__` to call their
+`init_device` (see :mod:`tango.server`).
 
-:class:`~PyTango.server.Device` already calls init_device.
+:class:`~tango.server.Device` already calls init_device.
 
 Low-level way::
 
@@ -165,15 +165,15 @@ High-level way::
         
         pass
 
-Default implementation of :meth:`~PyTango.server.Device.init_device`
+Default implementation of :meth:`~tango.server.Device.init_device`
 --------------------------------------------------------------------------------
 
 99% of different device classes which inherit from low level
-:class:`~PyTango.DeviceImpl` have an implementation of `init_device` which
-*at least* calls :meth:`~PyTango.DeviceImpl.get_device_properties`
-(see :mod:`PyTango.server`).
+:class:`~tango.DeviceImpl` have an implementation of `init_device` which
+*at least* calls :meth:`~tango.DeviceImpl.get_device_properties`
+(see :mod:`tango.server`).
 
-:meth:`~PyTango.server.Device.init_device` already calls :meth:`~PyTango.server.Device.get_device_properties`.
+:meth:`~tango.server.Device.init_device` already calls :meth:`~tango.server.Device.get_device_properties`.
 
 Low-level way::
 
@@ -188,19 +188,19 @@ High-level way::
         # Nothing to be done!
         pass
 
-Remove the need to code :class:`~PyTango.DeviceClass`
+Remove the need to code :class:`~tango.DeviceClass`
 --------------------------------------------------------------------------------
 
 99% of different device servers only need to implement their own subclass
-of :class:`~PyTango.DeviceClass` to register the attribute, commands,
+of :class:`~tango.DeviceClass` to register the attribute, commands,
 device and class properties by using the corresponding
-:obj:`~PyTango.DeviceClass.attr_list`, :obj:`~PyTango.DeviceClass.cmd_list`,
-:obj:`~PyTango.DeviceClass.device_property_list` and :obj:`~PyTango.DeviceClass.class_property_list`.
+:obj:`~tango.DeviceClass.attr_list`, :obj:`~tango.DeviceClass.cmd_list`,
+:obj:`~tango.DeviceClass.device_property_list` and :obj:`~tango.DeviceClass.class_property_list`.
 
 With the high-level API we completely remove the need to code the
-:class:`~PyTango.DeviceClass` by registering attribute, commands,
-device and class properties in the :class:`~PyTango.server.Device` with a more
-pythonic API (see :mod:`PyTango.server`)
+:class:`~tango.DeviceClass` by registering attribute, commands,
+device and class properties in the :class:`~tango.server.Device` with a more
+pythonic API (see :mod:`tango.server`)
 
 
 #. Hide `<Device>Class` class completely
@@ -279,7 +279,7 @@ Simplify `main()`
 the typical `main()` method could be greatly simplified.
 initializing tango, registering tango classes, initializing and running the
 server loop and managing errors could all be done with the single function
-call to :func:`~PyTango.server_run`
+call to :func:`~tango.server_run`
 
 Low-level way::
 
@@ -595,7 +595,7 @@ And the equivalent HLAPI version of the code would be::
 References
 ==========
 
-:mod:`PyTango.server`
+:mod:`tango.server`
 
 Changes
 =======

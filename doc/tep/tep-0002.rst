@@ -1,5 +1,5 @@
 
-.. currentmodule:: PyTango.databaseds
+.. currentmodule:: tango.databaseds
 
 .. _pytango-TEP2:
 
@@ -294,7 +294,7 @@ python DataBaseds with sqlite3 implementation.
 Development
 =================
 
-The development is being done in PyTango SVN trunk in the :mod:`PyTango.databaseds`
+The development is being done in PyTango SVN trunk in the :mod:`tango.databaseds`
 module.
 
 You can checkout with::

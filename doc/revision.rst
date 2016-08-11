@@ -83,9 +83,11 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 01/10/14 | `8.21 <http://www.tango-controls.org/static/PyTango/v815/doc/html/index.html>`_  | Update to PyTango 8.1.5                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| 05/02/15 | `8.22 <http://www.tango-controls.org/static/PyTango/v816/doc/html/index.html>`_  | Update to PyTango 8.1.6                             | T\. Coutinho          |
+| 05/02/15 | `8.22 <http://www.esrf.fr/computing/cs/tango/pytango/v816/index.html>`_          | Update to PyTango 8.1.6                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| 02/02/15 | `8.23 <http://www.tango-controls.org/static/PyTango/v817/doc/html/index.html>`_  | Update to PyTango 8.1.8                             | T\. Coutinho          |
+| 03/02/16 | `8.23 <http://www.esrf.fr/computing/cs/tango/pytango/v818/index.html>`_          | Update to PyTango 8.1.8                             | T\. Coutinho          |
++----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
+| 26/02/16 | `9.2  <http://www.esrf.fr/computing/cs/tango/pytango/v920/index.html>`_          | Update to PyTango 9.2.0a                            | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _pytango-version-history:
@@ -96,6 +98,17 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
+| 9.2.0a   | 9.2 alpha release. Missing:                                                                                                                                           |
+|          |                                                                                                                                                                       |
+|          |     - writtable pipes (client and server)                                                                                                                             |
+|          |     - dynamic commands (server)                                                                                                                                       |
+|          |     - device interface change event (client and server)                                                                                                               |
+|          |     - pipe event (client and server)                                                                                                                                  |
+|          |                                                                                                                                                                       |
+|          | Bug fixes:                                                                                                                                                            |
+|          |                                                                                                                                                                       |
+|          |     - `776:  [pytango][8.1.8] SyntaxError: invalid syntax <https://sourceforge.net/p/tango-cs/bugs/776/>`_                                                            |
++----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.8    | Features:                                                                                                                                                             |
 |          |                                                                                                                                                                       |
 |          |     - `110:  device property with auto update in database <https://sourceforge.net/p/tango-cs/feature-requests/110>`_                                                 |

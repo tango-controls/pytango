@@ -23,6 +23,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+*.cfg
 MANIFEST
 
 # Installer logs
@@ -47,4 +48,4 @@ doc/_build/
 *.qhc
 
 # Backup files
-*.~
+*~
