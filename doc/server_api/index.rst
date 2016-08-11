@@ -1,4 +1,4 @@
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 Server API
 ----------

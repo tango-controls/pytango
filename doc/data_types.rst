@@ -1,4 +1,4 @@
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 .. _pytango-data-types:
 
@@ -183,13 +183,13 @@ much more efficient.
 |                         |                 | 1. sequence<:py:obj:`str`>                                                | 1. sequence<:py:obj:`str`> (decoded with *latin-1*, aka *ISO-8859-1*)     |
 +-------------------------+-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 
-For SPECTRUM and IMAGES the actual sequence object used depends on the context 
+For SPECTRUM and IMAGES the actual sequence object used depends on the context
 where the tango data is used, and the availability of :py:mod:`numpy`.
 
 1. for properties the sequence is always a :py:class:`list`. Example::
-    
-    >>> import PyTango
-    >>> db = PyTango.Database()
+
+    >>> import tango
+    >>> db = tango.Database()
     >>> s = db.get_property(["TangoSynchrotrons"])
     >>> print type(s)
     <type 'list'>

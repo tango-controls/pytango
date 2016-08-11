@@ -1,4 +1,4 @@
-.. currentmodule:: PyTango
+.. currentmodule:: tango
 
 Enumerations & other classes
 ----------------------------
@@ -6,60 +6,60 @@ Enumerations & other classes
 Enumerations
 ~~~~~~~~~~~~
 
-.. autoclass:: PyTango.LockerLanguage
+.. autoclass:: tango.LockerLanguage
 
-.. autoclass:: PyTango.CmdArgType
+.. autoclass:: tango.CmdArgType
 
-.. autoclass:: PyTango.MessBoxType
+.. autoclass:: tango.MessBoxType
 
-.. autoclass:: PyTango.PollObjType
+.. autoclass:: tango.PollObjType
 
-.. autoclass:: PyTango.PollCmdCode
+.. autoclass:: tango.PollCmdCode
 
-.. autoclass:: PyTango..SerialModel
+.. autoclass:: tango..SerialModel
 
-.. autoclass:: PyTango.AttReqType
+.. autoclass:: tango.AttReqType
 
-.. autoclass:: PyTango.LockCmdCode
+.. autoclass:: tango.LockCmdCode
 
-.. autoclass:: PyTango.LogLevel
+.. autoclass:: tango.LogLevel
 
-.. autoclass:: PyTango.LogTarget
+.. autoclass:: tango.LogTarget
 
-.. autoclass:: PyTango.EventType
+.. autoclass:: tango.EventType
 
-.. autoclass:: PyTango.KeepAliveCmdCode
+.. autoclass:: tango.KeepAliveCmdCode
 
-.. autoclass:: PyTango.AccessControlType
+.. autoclass:: tango.AccessControlType
 
-.. autoclass:: PyTango.asyn_req_type
+.. autoclass:: tango.asyn_req_type
 
-.. autoclass:: PyTango.cb_sub_model
+.. autoclass:: tango.cb_sub_model
 
-.. autoclass:: PyTango.AttrQuality
+.. autoclass:: tango.AttrQuality
 
-.. autoclass:: PyTango.AttrWriteType
+.. autoclass:: tango.AttrWriteType
 
-.. autoclass:: PyTango.AttrDataFormat
+.. autoclass:: tango.AttrDataFormat
 
-.. autoclass:: PyTango.PipeWriteType
+.. autoclass:: tango.PipeWriteType
 
-.. autoclass:: PyTango.DevSource
+.. autoclass:: tango.DevSource
 
-.. autoclass:: PyTango.ErrSeverity
+.. autoclass:: tango.ErrSeverity
 
-.. autoclass:: PyTango.DevState
+.. autoclass:: tango.DevState
 
-.. autoclass:: PyTango.DispLevel
+.. autoclass:: tango.DispLevel
 
-.. autoclass:: PyTango.GreenMode
+.. autoclass:: tango.GreenMode
 
 
 Other classes
 ~~~~~~~~~~~~~
 
-.. autoclass:: PyTango.Release
+.. autoclass:: tango.Release
     :members:
     
-.. autoclass:: PyTango.TimeVal
+.. autoclass:: tango.TimeVal
     :members:
