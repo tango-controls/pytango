@@ -12,6 +12,8 @@
 """This module exposes a asyncio version of :class:`PyTango.DeviceProxy` and
 :class:`PyTango.AttributeProxy"""
 
+from __future__ import absolute_import
+
 __all__ = ["DeviceProxy", "AttributeProxy", "check_requirements",
            "get_event_loop"]
 
