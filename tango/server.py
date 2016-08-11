@@ -1066,7 +1066,9 @@ def __build_command_doc(f, name, dtype_in, doc_in, dtype_out, doc_out):
 
 
 def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
-            dtype_out=None, dformat_out=None, doc_out="", green_mode=None):
+            dtype_out=None, dformat_out=None, doc_out="",
+            display_level=None, polling_period=None,
+            green_mode=None):
     """
     Declares a new tango command in a :class:`Device`.
     To be used like a decorator in the methods you want to declare as
@@ -1093,6 +1095,7 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
                      dtype_out=bool, doc_out='True if it worked, False otherwise')
             def Pressurize(self, pressure):
                 self.info_stream('Pressurizing to %f...' % pressure)
+                return True
 
     .. note::
         avoid using *dformat* parameter. If you need a SPECTRUM
@@ -1113,6 +1116,10 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
     :type dformat_out: AttrDataFormat
     :param doc_out: return value documentation
     :type doc_out: str
+    :param display_level: display level for the command (optional)
+    :type display_level: DispLevel
+    :param polling_period: polling period in milliseconds (optional)
+    :type polling_period: int
     :param green_mode:
         set green mode on this specific command. Default value is None meaning
         use the server green mode. Set it to GreenMode.Synchronous to force
@@ -1120,20 +1127,30 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
 
     .. versionadded:: 8.1.7
         added green_mode option
+
+    .. versionadded:: 9.2.0
+        added display_level and polling_period optional argument
     """
     if f is None:
-        return functools.partial(command,
+        return functools.partial(
+            command,
             dtype_in=dtype_in, dformat_in=dformat_in, doc_in=doc_in,
             dtype_out=dtype_out, dformat_out=dformat_out, doc_out=doc_out,
+            display_level=display_level, polling_period=polling_period,
             green_mode=green_mode)
     name = f.__name__
-
 
     dtype_format_in = _get_tango_type_format(dtype_in, dformat_in)
     dtype_format_out = _get_tango_type_format(dtype_out, dformat_out)
 
     din = [from_typeformat_to_type(*dtype_format_in), doc_in]
     dout = [from_typeformat_to_type(*dtype_format_out), doc_out]
+
+    config_dict = {}
+    if display_level is not None:
+        config_dict['Display level'] = display_level
+    if polling_period is not None:
+        config_dict['Polling period'] = polling_period
 
     if green_mode == GreenMode.Synchronous:
         cmd = f
@@ -1142,14 +1159,14 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
         def cmd(self, *args, **kwargs):
             return get_worker().execute(f, self, *args, **kwargs)
 
-    cmd.__tango_command__ = name, [din, dout]
+    cmd.__tango_command__ = name, [din, dout, config_dict]
 
     # try to create a minimalistic __doc__
     if cmd.__doc__ is None:
         try:
-            cmd.__doc__ = __build_command_doc(f, name, dtype_in, doc_in,
-                                              dtype_out, doc_out)
-        except Exception as e:
+            cmd.__doc__ = __build_command_doc(
+                f, name, dtype_in, doc_in, dtype_out, doc_out)
+        except Exception:
             cmd.__doc__ = "TANGO command"
 
     return cmd
