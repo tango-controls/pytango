@@ -67,7 +67,7 @@ prefix=$(_PY_DIR)/site-packages
 endif
 endif
 
-SRC_DIR = src/boost/cpp
+SRC_DIR = ext
 
 ifndef OBJS_DIR
 OBJS_DIR := objs_py$(PY_VER_S)
@@ -302,14 +302,15 @@ clean-all:
 	@echo $(OK)
 
 install-py:
-	@echo -n "Installing python files into $(prefix)/PyTango... "
-	@mkdir -p $(prefix)/PyTango
-	@rsync -r src/boost/python/ $(prefix)/PyTango/
+	@echo -n "Installing python files into $(prefix)/tango... "
+	@mkdir -p $(prefix)/tango
+	@rsync -r tango/ $(prefix)/tango/
+	@rsync PyTango.py $(prefix)/
 	@echo $(OK)
 
 install-lib:
-	@echo -n "Installing binary files into $(prefix)/PyTango... "
-	@rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/PyTango
+	@echo -n "Installing binary files into $(prefix)/tango... "
+	@rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/tango
 	@echo $(OK)
 
 install-all: install-py install-lib
