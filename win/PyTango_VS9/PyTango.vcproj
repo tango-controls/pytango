@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="PyTango"
 	ProjectGUID="{764A5ECE-11AE-4363-9A1C-573972A1BADD}"
 	RootNamespace="PyTango_VS9"
@@ -3367,91 +3367,99 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\attr.h"
+				RelativePath="..\..\ext\server\attr.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\attribute.h"
+				RelativePath="..\..\ext\server\attribute.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\base_types_numpy.hpp"
+				RelativePath="..\..\ext\base_types_numpy.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\callback.h"
+				RelativePath="..\..\ext\callback.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\command.h"
+				RelativePath="..\..\ext\server\command.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\defs.h"
+				RelativePath="..\..\ext\defs.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\device_attribute.h"
+				RelativePath="..\..\ext\device_attribute.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\device_attribute_numpy.hpp"
+				RelativePath="..\..\ext\device_attribute_numpy.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\device_class.h"
+				RelativePath="..\..\ext\server\device_class.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\device_impl.h"
+				RelativePath="..\..\ext\server\device_impl.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\exception.h"
+				RelativePath="..\..\ext\device_pipe.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\fast_from_py.h"
+				RelativePath="..\..\ext\exception.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\fast_from_py_numpy.hpp"
+				RelativePath="..\..\ext\fast_from_py.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\from_py.h"
+				RelativePath="..\..\ext\fast_from_py_numpy.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\precompiled_header.h"
+				RelativePath="..\..\ext\from_py.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\pytgutils.h"
+				RelativePath="..\..\ext\server\pipe.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\pyutils.h"
+				RelativePath="..\..\ext\precompiled_header.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\tango_numpy.h"
+				RelativePath="..\..\ext\pytgutils.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\tgutils.h"
+				RelativePath="..\..\ext\pyutils.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\to_py.h"
+				RelativePath="..\..\ext\tango_numpy.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\to_py_numpy.hpp"
+				RelativePath="..\..\ext\tgutils.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\wattribute_numpy.hpp"
+				RelativePath="..\..\ext\to_py.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\to_py_numpy.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\server\wattribute_numpy.hpp"
 				>
 			</File>
 		</Filter>
@@ -3461,239 +3469,259 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\boost\cpp\api_util.cpp"
+				RelativePath="..\..\ext\api_util.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\archive_event_info.cpp"
+				RelativePath="..\..\ext\archive_event_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\attr.cpp"
+				RelativePath="..\..\ext\server\attr.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\attr_conf_event_data.cpp"
+				RelativePath="..\..\ext\attr_conf_event_data.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\attribute.cpp"
+				RelativePath="..\..\ext\server\attribute.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\attribute_alarm_info.cpp"
+				RelativePath="..\..\ext\attribute_alarm_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\attribute_dimension.cpp"
+				RelativePath="..\..\ext\attribute_dimension.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\attribute_event_info.cpp"
+				RelativePath="..\..\ext\attribute_event_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\attribute_info.cpp"
+				RelativePath="..\..\ext\attribute_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\attribute_info_ex.cpp"
+				RelativePath="..\..\ext\attribute_info_ex.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\attribute_proxy.cpp"
+				RelativePath="..\..\ext\attribute_proxy.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\base_types.cpp"
+				RelativePath="..\..\ext\server\auto_monitor.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\callback.cpp"
+				RelativePath="..\..\ext\base_types.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\change_event_info.cpp"
+				RelativePath="..\..\ext\callback.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\command.cpp"
+				RelativePath="..\..\ext\change_event_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\command_info.cpp"
+				RelativePath="..\..\ext\server\command.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\connection.cpp"
+				RelativePath="..\..\ext\command_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\constants.cpp"
+				RelativePath="..\..\ext\connection.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\data_ready_event_data.cpp"
+				RelativePath="..\..\ext\constants.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\database.cpp"
+				RelativePath="..\..\ext\data_ready_event_data.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\db.cpp"
+				RelativePath="..\..\ext\database.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\dev_command_info.cpp"
+				RelativePath="..\..\ext\db.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\dev_error.cpp"
+				RelativePath="..\..\ext\dev_command_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\device_attribute.cpp"
+				RelativePath="..\..\ext\dev_error.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\device_attribute_config.cpp"
+				RelativePath="..\..\ext\device_attribute.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\device_attribute_history.cpp"
+				RelativePath="..\..\ext\device_attribute_config.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\device_class.cpp"
+				RelativePath="..\..\ext\device_attribute_history.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\device_data.cpp"
+				RelativePath="..\..\ext\server\device_class.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\device_data_history.cpp"
+				RelativePath="..\..\ext\device_data.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\device_impl.cpp"
+				RelativePath="..\..\ext\device_data_history.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\device_info.cpp"
+				RelativePath="..\..\ext\server\device_impl.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\device_proxy.cpp"
+				RelativePath="..\..\ext\device_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\dserver.cpp"
+				RelativePath="..\..\ext\device_pipe.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\encoded_attribute.cpp"
+				RelativePath="..\..\ext\device_proxy.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\enums.cpp"
+				RelativePath="..\..\ext\server\dserver.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\event_data.cpp"
+				RelativePath="..\..\ext\server\encoded_attribute.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\exception.cpp"
+				RelativePath="..\..\ext\enums.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\from_py.cpp"
+				RelativePath="..\..\ext\event_data.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\group.cpp"
+				RelativePath="..\..\ext\exception.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\group_reply.cpp"
+				RelativePath="..\..\ext\from_py.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\group_reply_list.cpp"
+				RelativePath="..\..\ext\group.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\locker_info.cpp"
+				RelativePath="..\..\ext\group_reply.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\locking_thread.cpp"
+				RelativePath="..\..\ext\group_reply_list.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\log4tango.cpp"
+				RelativePath="..\..\ext\locker_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\multi_attribute.cpp"
+				RelativePath="..\..\ext\locking_thread.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\multi_class_attribute.cpp"
+				RelativePath="..\..\ext\server\log4tango.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\periodic_event_info.cpp"
+				RelativePath="..\..\ext\server\multi_attribute.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\poll_device.cpp"
+				RelativePath="..\..\ext\server\multi_class_attribute.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\precompiled_header.cpp"
+				RelativePath="..\..\ext\periodic_event_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\pytango.cpp"
+				RelativePath="..\..\ext\server\pipe.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\pytgutils.cpp"
+				RelativePath="..\..\ext\pipe_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\pyutils.cpp"
+				RelativePath="..\..\ext\poll_device.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\subdev.cpp"
+				RelativePath="..\..\ext\precompiled_header.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\tango_util.cpp"
+				RelativePath="..\..\ext\pytango.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\time_val.cpp"
+				RelativePath="..\..\ext\pytgutils.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\to_py.cpp"
+				RelativePath="..\..\ext\pyutils.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\user_default_attr_prop.cpp"
+				RelativePath="..\..\ext\server\subdev.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\version.cpp"
+				RelativePath="..\..\ext\server\tango_util.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\boost\cpp\server\wattribute.cpp"
+				RelativePath="..\..\ext\time_val.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\to_py.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\server\user_default_attr_prop.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\server\user_default_pipe_prop.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\version.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\server\wattribute.cpp"
 				>
 			</File>
 		</Filter>

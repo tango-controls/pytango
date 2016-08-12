@@ -90,20 +90,20 @@
         Description="[PyTango]: Starting python $(WinSetupArgs)"
     />
 
-    <UserMacro Name="PyTangoBaseFile" Value="_PyTango" />
+    <UserMacro Name="PyTangoBaseFile" Value="_tango" />
     
-    <UserMacro Name="TangoMajorVer" Value="8" />
-    <UserMacro Name="TangoMinorVer" Value="1" />
+    <UserMacro Name="TangoMajorVer" Value="9" />
+    <UserMacro Name="TangoMinorVer" Value="2" />
     <UserMacro Name="TangoPatchVer" Value="2" />
     <UserMacro Name="TangoVer" Value="$(TangoMajorVer).$(TangoMinorVer).$(TangoPatchVer)" />
 
-    <UserMacro Name="PyTangoMajorVer" Value="8" />
-    <UserMacro Name="PyTangoMinorVer" Value="1" />
-    <UserMacro Name="PyTangoPatchVer" Value="6" />
+    <UserMacro Name="PyTangoMajorVer" Value="9" />
+    <UserMacro Name="PyTangoMinorVer" Value="2" />
+    <UserMacro Name="PyTangoPatchVer" Value="0" />
     <UserMacro Name="PyTangoVer" Value="$(PyTangoMajorVer).$(PyTangoMinorVer).$(PyTangoPatchVer)" />
 
     <UserMacro Name="BoostMajorVer" Value="1" />
-    <UserMacro Name="BoostMinorVer" Value="53" />
+    <UserMacro Name="BoostMinorVer" Value="61" />
     <UserMacro Name="BoostPatchVer" Value="0" />
     <UserMacro Name="BoostVer" Value="$(BoostMajorVer).$(BoostMinorVer).$(BoostPatchVer)" />
   
@@ -111,9 +111,9 @@
     <!-- <UserMacro Name="RootDir" Value="C:\Users\coutinho\bin" /> -->
     <UserMacro Name="RootDir" Value="C:" />
 
-    <UserMacro Name="TangoBaseDir" Value="$(RootDir)\tango-$(TangoVer)" />
+    <UserMacro Name="TangoBaseDir" Value="$(RootDir)\wsp\tango" />
   
-    <UserMacro Name="BoostBaseDir" Value="$(RootDir)\boost-$(BoostVer)" />
+    <UserMacro Name="BoostBaseDir" Value="$(RootDir)\wsp\boost-$(BoostVer)" />
     <UserMacro Name="PythonBaseDir" Value="C:\Python" />
 
     <UserMacro Name="VCMajorVer" Value="9" />
@@ -151,10 +151,10 @@
     <UserMacro Name="BDistDir" Value="$(BaseBDistDir)\$(RelPrefixDir)" />
 
     <!-- to be set to OutputDir and IntDir -->
-    <UserMacro Name="PyTangoBuildDir" Value="$(BuildDir)\$(ProjectName)" />
-    <UserMacro Name="PyTangoTempDir" Value="$(TempDir)\$(ProjectName)" />
+    <UserMacro Name="PyTangoBuildDir" Value="$(BuildDir)\tango" />
+    <UserMacro Name="PyTangoTempDir" Value="$(TempDir)\tango" />
 
-    <UserMacro Name="BaseSrcDir" Value="$(BaseDir)\src\boost\cpp" />
+    <UserMacro Name="BaseSrcDir" Value="$(BaseDir)\ext" />
     <UserMacro Name="CommonIncludeDirs" Value="$(BoostIncludeDir);$(TangoIncludeDir);$(BaseSrcDir);$(BaseSrcDir)\server" />
 
     <UserMacro Name="Python26Dir" Value="$(PythonDir)\26" />
