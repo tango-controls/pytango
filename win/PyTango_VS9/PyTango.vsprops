@@ -94,7 +94,7 @@
     
     <UserMacro Name="TangoMajorVer" Value="9" />
     <UserMacro Name="TangoMinorVer" Value="2" />
-    <UserMacro Name="TangoPatchVer" Value="2" />
+    <UserMacro Name="TangoPatchVer" Value="0" />
     <UserMacro Name="TangoVer" Value="$(TangoMajorVer).$(TangoMinorVer).$(TangoPatchVer)" />
 
     <UserMacro Name="PyTangoMajorVer" Value="9" />
