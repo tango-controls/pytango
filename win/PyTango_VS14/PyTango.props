@@ -4,7 +4,7 @@
     <PyTangoBaseFile>_tango</PyTangoBaseFile>
     <TangoMajorVer>9</TangoMajorVer>
     <TangoMinorVer>2</TangoMinorVer>
-    <TangoPatchVer>2</TangoPatchVer>
+    <TangoPatchVer>0</TangoPatchVer>
     <TangoVer>$(TangoMajorVer).$(TangoMinorVer).$(TangoPatchVer)</TangoVer>
     <PyTangoMajorVer>9</PyTangoMajorVer>
     <PyTangoMinorVer>2</PyTangoMinorVer>
