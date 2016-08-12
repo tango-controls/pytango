@@ -244,13 +244,6 @@ namespace PyTango
         bopy::object
         __extract_array(T& obj, size_t elt_idx, PyTango::ExtractAs extract_as)
         {
-	    if (tangoArrayTypeConst == Tango::DEVVAR_LONGSTRINGARRAY ||
-	        tangoArrayTypeConst == Tango::DEVVAR_DOUBLESTRINGARRAY)
-	    {
-                assert(false);
-		return bopy::object();
-	    }
-
             typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
 
             TangoArrayType tmp_arr;
@@ -280,7 +273,43 @@ namespace PyTango
             }
             return data;
         }
- 
+
+        template <>
+        bopy::object
+        __extract_array<Tango::DevicePipe, Tango::DEVVAR_LONGSTRINGARRAY>
+	(Tango::DevicePipe& pipe, size_t elt_idx, PyTango::ExtractAs extract_as)
+        {
+            assert(false);
+            return bopy::object();
+        }
+
+        template <>
+        bopy::object
+        __extract_array<Tango::DevicePipe, Tango::DEVVAR_DOUBLESTRINGARRAY>
+	(Tango::DevicePipe& pipe, size_t elt_idx, PyTango::ExtractAs extract_as)
+        {
+            assert(false);
+            return bopy::object();
+        }
+
+        template <>
+        bopy::object
+        __extract_array<Tango::DevicePipeBlob, Tango::DEVVAR_LONGSTRINGARRAY>
+	(Tango::DevicePipeBlob& blob, size_t elt_idx, PyTango::ExtractAs extract_as)
+        {
+            assert(false);
+            return bopy::object();
+        }
+
+        template <>
+        bopy::object
+        __extract_array<Tango::DevicePipeBlob, Tango::DEVVAR_DOUBLESTRINGARRAY>
+	(Tango::DevicePipeBlob& blob, size_t elt_idx, PyTango::ExtractAs extract_as)
+        {
+            assert(false);
+            return bopy::object();
+        }
+
         template <long tangoArrayTypeConst>
         bopy::object
         extract_array(Tango::DevicePipe& self, size_t elt_idx,
