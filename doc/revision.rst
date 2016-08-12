@@ -87,6 +87,8 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 02/02/15 | `8.23 <http://www.tango-controls.org/static/PyTango/v817/doc/html/index.html>`_  | Update to PyTango 8.1.8                             | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
+| 12/08/16 |  8.24                                                                            | Update to PyTango 8.1.9                             | V\. Michel            |
++----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _pytango-version-history:
 
@@ -96,8 +98,21 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
+| 8.1.9    | Features:                                                                                                                                                             |
+|          |                                                                                                                                                                       |
+|          |     - `PR #2: asyncio support for both client and server API <https://github.com/tango-cs/pytango/pull/2>`_                                                           |
+|          |     - `PR #6: Expose AutoTangoMonitor and AutoTangoAllowThreads <https://github.com/tango-cs/pytango/pull/6>`_                                                        |
+|          |                                                                                                                                                                       |
+|          | Bug fixes:                                                                                                                                                            |
+|          |                                                                                                                                                                       |
+|          |     - `PR #31: Get -l flags from pkg-config <https://github.com/tango-cs/pytango/pull/31>`_                                                                           |
+|          |     - `PR #15: Rename itango script to itango3 for python3 <https://github.com/tango-cs/pytango/pull/15>`_                                                            |
+|          |     - `PR #14: Avoid deprecation warning with IPython 4.x <https://github.com/tango-cs/pytango/pull/14>`_                                                             |
++----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 8.1.8    | Features:                                                                                                                                                             |
 |          |                                                                                                                                                                       |
+|          |     - `PR #3: Add a run_server class method to Device <https://github.com/tango-cs/pytango/pull/3>`_                                                                  |
+|          |     - `PR #4: Add device inheritance <https://github.com/tango-cs/pytango/pull/4>`_                                                                                   |
 |          |     - `110:  device property with auto update in database <https://sourceforge.net/p/tango-cs/feature-requests/110>`_                                                 |
 |          |                                                                                                                                                                       |
 |          | Bug fixes:                                                                                                                                                            |
