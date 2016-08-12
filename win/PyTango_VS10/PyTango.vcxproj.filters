@@ -11,249 +11,270 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\boost\cpp\server\attr.h">
+    <ClInclude Include="..\..\ext\server\attr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\server\attribute.h">
+    <ClInclude Include="..\..\ext\server\attribute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\base_types_numpy.hpp">
+    <ClInclude Include="..\..\ext\base_types_numpy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\callback.h">
+    <ClInclude Include="..\..\ext\callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\server\command.h">
+    <ClInclude Include="..\..\ext\server\command.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\defs.h">
+    <ClInclude Include="..\..\ext\defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\device_attribute.h">
+    <ClInclude Include="..\..\ext\device_attribute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\device_attribute_numpy.hpp">
+    <ClInclude Include="..\..\ext\device_attribute_numpy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\server\device_class.h">
+    <ClInclude Include="..\..\ext\server\device_class.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\server\device_impl.h">
+    <ClInclude Include="..\..\ext\server\device_impl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\exception.h">
+    <ClInclude Include="..\..\ext\device_pipe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\fast_from_py.h">
+    <ClInclude Include="..\..\ext\exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\fast_from_py_numpy.hpp">
+    <ClInclude Include="..\..\ext\fast_from_py.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\from_py.h">
+    <ClInclude Include="..\..\ext\fast_from_py_numpy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\precompiled_header.h">
+    <ClInclude Include="..\..\ext\from_py.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\pytgutils.h">
+    <ClInclude Include="..\..\ext\pipe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\pyutils.h">
+    <ClInclude Include="..\..\ext\precompiled_header.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\tango_numpy.h">
+    <ClInclude Include="..\..\ext\pytgutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\tgutils.h">
+    <ClInclude Include="..\..\ext\pyutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\to_py.h">
+    <ClInclude Include="..\..\ext\tango_numpy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\to_py_numpy.hpp">
+    <ClInclude Include="..\..\ext\tgutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\boost\cpp\server\wattribute_numpy.hpp">
+    <ClInclude Include="..\..\ext\to_py.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\to_py_numpy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\server\wattribute_numpy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\boost\cpp\api_util.cpp">
+    <ClCompile Include="..\..\ext\api_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\archive_event_info.cpp">
+    <ClCompile Include="..\..\ext\archive_event_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\attr.cpp">
+    <ClCompile Include="..\..\ext\server\attr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\attr_conf_event_data.cpp">
+    <ClCompile Include="..\..\ext\attr_conf_event_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\attribute.cpp">
+    <ClCompile Include="..\..\ext\server\attribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\attribute_alarm_info.cpp">
+    <ClCompile Include="..\..\ext\server\auto_monitor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\attribute_dimension.cpp">
+    <ClCompile Include="..\..\ext\attribute_alarm_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\attribute_event_info.cpp">
+    <ClCompile Include="..\..\ext\attribute_dimension.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\attribute_info.cpp">
+    <ClCompile Include="..\..\ext\attribute_event_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\attribute_info_ex.cpp">
+    <ClCompile Include="..\..\ext\attribute_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\attribute_proxy.cpp">
+    <ClCompile Include="..\..\ext\attribute_info_ex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\base_types.cpp">
+    <ClCompile Include="..\..\ext\attribute_proxy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\callback.cpp">
+    <ClCompile Include="..\..\ext\base_types.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\change_event_info.cpp">
+    <ClCompile Include="..\..\ext\callback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\command.cpp">
+    <ClCompile Include="..\..\ext\change_event_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\command_info.cpp">
+    <ClCompile Include="..\..\ext\server\command.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\connection.cpp">
+    <ClCompile Include="..\..\ext\command_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\constants.cpp">
+    <ClCompile Include="..\..\ext\connection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\data_ready_event_data.cpp">
+    <ClCompile Include="..\..\ext\constants.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\database.cpp">
+    <ClCompile Include="..\..\ext\data_ready_event_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\db.cpp">
+    <ClCompile Include="..\..\ext\database.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\dev_command_info.cpp">
+    <ClCompile Include="..\..\ext\db.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\dev_error.cpp">
+    <ClCompile Include="..\..\ext\dev_command_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\device_attribute.cpp">
+    <ClCompile Include="..\..\ext\dev_error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\device_attribute_config.cpp">
+    <ClCompile Include="..\..\ext\device_attribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\device_attribute_history.cpp">
+    <ClCompile Include="..\..\ext\device_attribute_config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\device_class.cpp">
+    <ClCompile Include="..\..\ext\device_attribute_history.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\device_data.cpp">
+    <ClCompile Include="..\..\ext\server\device_class.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\device_data_history.cpp">
+    <ClCompile Include="..\..\ext\device_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\device_impl.cpp">
+    <ClCompile Include="..\..\ext\device_data_history.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\device_info.cpp">
+    <ClCompile Include="..\..\ext\server\device_impl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\device_proxy.cpp">
+    <ClCompile Include="..\..\ext\device_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\dserver.cpp">
+    <ClCompile Include="..\..\ext\device_pipe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\encoded_attribute.cpp">
+    <ClCompile Include="..\..\ext\device_proxy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\enums.cpp">
+    <ClCompile Include="..\..\ext\server\dserver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\event_data.cpp">
+    <ClCompile Include="..\..\ext\server\encoded_attribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\exception.cpp">
+    <ClCompile Include="..\..\ext\enums.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\from_py.cpp">
+    <ClCompile Include="..\..\ext\event_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\group.cpp">
+    <ClCompile Include="..\..\ext\exception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\group_reply.cpp">
+    <ClCompile Include="..\..\ext\from_py.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\group_reply_list.cpp">
+    <ClCompile Include="..\..\ext\group.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\locker_info.cpp">
+    <ClCompile Include="..\..\ext\group_reply.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\locking_thread.cpp">
+    <ClCompile Include="..\..\ext\group_reply_list.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\log4tango.cpp">
+    <ClCompile Include="..\..\ext\locker_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\multi_attribute.cpp">
+    <ClCompile Include="..\..\ext\locking_thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\multi_class_attribute.cpp">
+    <ClCompile Include="..\..\ext\server\log4tango.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\periodic_event_info.cpp">
+    <ClCompile Include="..\..\ext\server\multi_attribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\poll_device.cpp">
+    <ClCompile Include="..\..\ext\server\multi_class_attribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\precompiled_header.cpp">
+    <ClCompile Include="..\..\ext\periodic_event_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\pytango.cpp">
+    <ClCompile Include="..\..\ext\server\pipe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\pytgutils.cpp">
+    <ClCompile Include="..\..\ext\pipe_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\pyutils.cpp">
+    <ClCompile Include="..\..\ext\poll_device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\subdev.cpp">
+    <ClCompile Include="..\..\ext\precompiled_header.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\tango_util.cpp">
+    <ClCompile Include="..\..\ext\pytango.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\time_val.cpp">
+    <ClCompile Include="..\..\ext\pytgutils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\to_py.cpp">
+    <ClCompile Include="..\..\ext\pyutils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\user_default_attr_prop.cpp">
+    <ClCompile Include="..\..\ext\server\subdev.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\version.cpp">
+    <ClCompile Include="..\..\ext\server\tango_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\boost\cpp\server\wattribute.cpp">
+    <ClCompile Include="..\..\ext\time_val.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\to_py.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\server\user_default_attr_prop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\server\user_default_pipe_prop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\server\wattribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

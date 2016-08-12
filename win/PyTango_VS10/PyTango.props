@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="UserMacros">
-    <PyTangoBaseFile>_PyTango</PyTangoBaseFile>
-    <TangoMajorVer>8</TangoMajorVer>
-    <TangoMinorVer>1</TangoMinorVer>
-    <TangoPatchVer>2</TangoPatchVer>
+    <PyTangoBaseFile>_tango</PyTangoBaseFile>
+    <TangoMajorVer>9</TangoMajorVer>
+    <TangoMinorVer>2</TangoMinorVer>
+    <TangoPatchVer>0</TangoPatchVer>
     <TangoVer>$(TangoMajorVer).$(TangoMinorVer).$(TangoPatchVer)</TangoVer>
-    <PyTangoMajorVer>8</PyTangoMajorVer>
-    <PyTangoMinorVer>1</PyTangoMinorVer>
-    <PyTangoPatchVer>6</PyTangoPatchVer>
+    <PyTangoMajorVer>9</PyTangoMajorVer>
+    <PyTangoMinorVer>2</PyTangoMinorVer>
+    <PyTangoPatchVer>0</PyTangoPatchVer>
     <PyTangoVer>$(PyTangoMajorVer).$(PyTangoMinorVer).$(PyTangoPatchVer)</PyTangoVer>
 
     <BoostMajorVer>1</BoostMajorVer>
-    <BoostMinorVer>53</BoostMinorVer>
+    <BoostMinorVer>61</BoostMinorVer>
     <BoostPatchVer>0</BoostPatchVer>
     <BoostVer>$(BoostMajorVer).$(BoostMinorVer).$(BoostPatchVer)</BoostVer>
 
@@ -20,8 +20,8 @@
     <!-- <RootDir>C:\Users\coutinho\bin</RootDir> -->
     <RootDir>C:</RootDir>
     
-    <TangoBaseDir>$(RootDir)\tango-$(TangoVer)</TangoBaseDir>
-    <BoostBaseDir>$(RootDir)\boost-$(BoostVer)</BoostBaseDir>
+    <TangoBaseDir>$(RootDir)\wsp\tango</TangoBaseDir>
+    <BoostBaseDir>$(RootDir)\wsp\boost-$(BoostVer)</BoostBaseDir>
     
     <PythonBaseDir>C:\Python</PythonBaseDir>
     
@@ -55,10 +55,10 @@
     <BDistDir>$(BaseBDistDir)\$(RelPrefixDir)</BDistDir>
     
     <!-- to be set to OutputDir and IntDir -->
-    <PyTangoBuildDir>$(BuildDir)\$(ProjectName)</PyTangoBuildDir>
-    <PyTangoTempDir>$(TempDir)\$(ProjectName)</PyTangoTempDir>
+    <PyTangoBuildDir>$(BuildDir)\tango</PyTangoBuildDir>
+    <PyTangoTempDir>$(TempDir)\tango</PyTangoTempDir>
     
-    <BaseSrcDir>$(BaseDir)\src\boost\cpp</BaseSrcDir>
+    <BaseSrcDir>$(BaseDir)\ext</BaseSrcDir>
     <CommonIncludeDirs>$(BoostIncludeDir);$(TangoIncludeDir);$(BaseSrcDir);$(BaseSrcDir)\server</CommonIncludeDirs>
     
     <Python33Dir>$(PythonDir)\33</Python33Dir>
