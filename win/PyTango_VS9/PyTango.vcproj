@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="PyTango"
 	ProjectGUID="{764A5ECE-11AE-4363-9A1C-573972A1BADD}"
 	RootNamespace="PyTango_VS9"
