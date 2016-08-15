@@ -56,7 +56,9 @@ Bugs can be reported as tickets in `TANGO Source forge <https://sourceforge.net/
 When making a bug report don't forget to select *PyTango* in **Category**.
 
 It is also helpfull if you can put in the ticket description the PyTango information.
-It can be a dump of::
+It can be a dump of:
+
+.. sourcecode:: console
 
    $ python -c "from tango.utils import info; print(info())"
 
@@ -943,7 +945,7 @@ array:
     +-------------------+-----------------------------------+------------------------------------------+
     |       key         |              value                |            definition                    |
     +===================+===================================+==========================================+
-    | "display level"   | tango.DispLevel enum value      |   The attribute display level            |
+    | "display level"   | tango.DispLevel enum value        |   The attribute display level            |
     +-------------------+-----------------------------------+------------------------------------------+
     |"polling period"   |          Any number               | The attribute polling period (mS)        |
     +-------------------+-----------------------------------+------------------------------------------+
