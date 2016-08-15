@@ -722,15 +722,15 @@ class attribute(AttrData):
     parameter              type                                       default value                                 description
     ===================== ================================ ======================================= =======================================================================================
     name                   :obj:`str`                       class member name                       alternative attribute name
-    dtype                  :obj:`object`                    :obj:`~tango.CmdArgType.DevDouble`    data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
-    dformat                :obj:`~tango.AttrDataFormat`   :obj:`~tango.AttrDataFormat.SCALAR`   data format
+    dtype                  :obj:`object`                    :obj:`~tango.CmdArgType.DevDouble`      data type (see :ref:`Data type equivalence <pytango-hlapi-datatypes>`)
+    dformat                :obj:`~tango.AttrDataFormat`     :obj:`~tango.AttrDataFormat.SCALAR`     data format
     max_dim_x              :obj:`int`                       1                                       maximum size for x dimension (ignored for SCALAR format)
     max_dim_y              :obj:`int`                       0                                       maximum size for y dimension (ignored for SCALAR and SPECTRUM formats)
-    display_level          :obj:`~tango.DispLevel`        :obj:`~tango.DisLevel.OPERATOR`       display level
+    display_level          :obj:`~tango.DispLevel`          :obj:`~tango.DisLevel.OPERATOR`         display level
     polling_period         :obj:`int`                       -1                                      polling period
     memorized              :obj:`bool`                      False                                   attribute should or not be memorized
     hw_memorized           :obj:`bool`                      False                                   write method should be called at startup when restoring memorize value (dangerous!)
-    access                 :obj:`~tango.AttrWriteType`    :obj:`~tango.AttrWriteType.READ`      read only/ read write / write only access
+    access                 :obj:`~tango.AttrWriteType`      :obj:`~tango.AttrWriteType.READ`        read only/ read write / write only access
     fget (or fread)        :obj:`str` or :obj:`callable`    'read_<attr_name>'                      read method name or method object
     fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<attr_name>'                     write method name or method object
     is_allowed             :obj:`str` or :obj:`callable`    'is_<attr_name>_allowed'                is allowed method name or method object
@@ -755,9 +755,9 @@ class attribute(AttrData):
     archive_abs_change     :obj:`str`                       None
     archive_rel_change     :obj:`str`                       None
     archive_period         :obj:`str`                       None
-    green_mode             :obj:`~tango.GreenMode`        None                                    green mode for read and write. None means use server green mode.
-    read_green_mode        :obj:`~tango.GreenMode`        None                                    green mode for read. None means use server green mode.
-    write_green_mode       :obj:`~tango.GreenMode`        None                                    green mode for write. None means use server green mode.
+    green_mode             :obj:`~tango.GreenMode`          None                                    green mode for read and write. None means use server green mode.
+    read_green_mode        :obj:`~tango.GreenMode`          None                                    green mode for read. None means use server green mode.
+    write_green_mode       :obj:`~tango.GreenMode`          None                                    green mode for write. None means use server green mode.
     ===================== ================================ ======================================= =======================================================================================
 
     .. note::
@@ -919,16 +919,16 @@ class pipe(PipeData):
     parameter              type                                       default value                                 description
     ===================== ================================ ======================================= =======================================================================================
     name                   :obj:`str`                       class member name                       alternative pipe name
-    display_level          :obj:`~tango.DispLevel`        :obj:`~tango.DisLevel.OPERATOR`       display level
-    access                 :obj:`~tango.PipeWriteType`    :obj:`~tango.PipeWriteType.READ`      read only/ read write access
+    display_level          :obj:`~tango.DispLevel`          :obj:`~tango.DisLevel.OPERATOR`         display level
+    access                 :obj:`~tango.PipeWriteType`      :obj:`~tango.PipeWriteType.READ`        read only/ read write access
     fget (or fread)        :obj:`str` or :obj:`callable`    'read_<pipe_name>'                      read method name or method object
     fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<pipe_name>'                     write method name or method object
     is_allowed             :obj:`str` or :obj:`callable`    'is_<pipe_name>_allowed'                is allowed method name or method object
     label                  :obj:`str`                       '<pipe_name>'                           pipe label
     doc (or description)   :obj:`str`                       ''                                      pipe description
-    green_mode             :obj:`~tango.GreenMode`        None                                    green mode for read and write. None means use server green mode.
-    read_green_mode        :obj:`~tango.GreenMode`        None                                    green mode for read. None means use server green mode.
-    write_green_mode       :obj:`~tango.GreenMode`        None                                    green mode for write. None means use server green mode.
+    green_mode             :obj:`~tango.GreenMode`          None                                    green mode for read and write. None means use server green mode.
+    read_green_mode        :obj:`~tango.GreenMode`          None                                    green mode for read. None means use server green mode.
+    write_green_mode       :obj:`~tango.GreenMode`          None                                    green mode for write. None means use server green mode.
     ===================== ================================ ======================================= =======================================================================================
 
     The same example with a read-write ROI, a customized label and description::
