@@ -13,17 +13,21 @@ import sys
 import os
 import re
 
-# tango imports
-import tango
-from tango import Release
-
-print("Building documentation for PyTango {0}".format(Release.version_long))
-print("Using PyTango from: {0}".format(os.path.dirname(tango.__file__)))
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.append(os.path.abspath('sphinxext'))
+sys.path.append(os.path.abspath('../'))
+sys.path.append(os.path.abspath('./'))
+
+
+# Import tango
+try:
+    import tango
+except ImportError:
+    from mock_tango_extension import tango
+from tango import Release
+print("Building documentation for PyTango {0}".format(Release.version_long))
+print("Using PyTango from: {0}".format(os.path.dirname(tango.__file__)))
 
 needs_sphinx = "1.0"
 
@@ -35,12 +39,8 @@ extensions = ['sphinx.ext.pngmath',
               'sphinx.ext.autodoc',
               'sphinx.ext.doctest',
               'sphinx.ext.intersphinx',
-              'sphinx.ext.todo']
-
-# disable until graphviz works in pyhon 3
-if sys.hexversion < 0x03000000:
-    extensions.append('sphinx.ext.graphviz')
-
+              'sphinx.ext.todo',
+              'sphinx.ext.graphviz']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -256,7 +256,7 @@ intersphinx_mapping = {
     'http://api.mongodb.org/python/current/' : None,
     'http://packages.python.org/CouchDB/' : None,
     'http://pycassa.github.com/pycassa/' : None,
-    'http://docs.sqlalchemy.org/en/rel_0_7/' : None,
+    'http://docs.sqlalchemy.org/en/latest/' : None,
 }
 
 todo_include_todos = True
