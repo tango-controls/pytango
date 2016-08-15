@@ -1,0 +1,6 @@
+name: py35
+dependencies:
+- python=3.5
+- numpy
+- gevent
+- graphviz
