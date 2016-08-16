@@ -1,17 +1,48 @@
+"""Mock the tango._tango extension module.
+
+This is useful to build the documentation without building the extension.
+However this is a bit tricky since the python side relies on what the
+extension exposes. Here is the list of the mocking aspects that require
+special attention:
+- __doc__ should not contain the mock documentation
+- __mro__ is required for autodoc
+- __name__ attribute is required
+- Device_6Impl class should not be accessible
+- the __base__ attribute for Device_[X]Impl is required
+- it shoud be possible to set __init__, __getattr__ and __setattr__ methods
+- tango.base_types.__document_enum needs to be patched before it is called
+- the mocks should not have any public methods such as assert_[...]
+- _tango.constants.TgLibVers is required (e.g. '9.2.2')
+- _tango._get_tango_lib_release function is required (e.g. lambda: 922)
+- tango._tango AND tango.constants modules have to be patched
+
+Patching tango._tango using sys.modules does not seem to work for python
+version older than 3.5 (failed with 2.7 and 3.4)
+"""
+
 __all__ = ['tango']
 
 # Imports
 import sys
 from mock import MagicMock
 
+# Constants
+TANGO_VERSION = '9.2.2'
+TANGO_VERSION_INT = int(TANGO_VERSION[::2])
+
 
 # Extension mock class
 class ExtensionMock(MagicMock):
+
+    # Remove the mock documentation
     __doc__ = None
-    __mro__ = ()
+
+    # The method resolution order is required for autodoc
+    __mro__ = object,
 
     @property
     def __name__(self):
+        # __name__ is used for some objects
         return self._mock_name.split('.')[-1]
 
     def __getattr__(self, name):
@@ -55,8 +86,8 @@ def document_enum(klass, enum_name, desc, append=True):
 
 # Patch the extension module
 _tango = ExtensionMock(name='_tango')
-_tango.constants.TgLibVers = "9.2.2"
-_tango._get_tango_lib_release.return_value = 922
+_tango.constants.TgLibVers = TANGO_VERSION
+_tango._get_tango_lib_release.return_value = TANGO_VERSION_INT
 
 
 # Patch modules
@@ -64,7 +95,6 @@ sys.modules['tango._tango'] = _tango
 sys.modules['tango.constants'] = _tango.constants
 print('Mocking tango._tango extension module')
 
+
 # Try to import
 import tango
-import tango.futures
-import tango.gevent
