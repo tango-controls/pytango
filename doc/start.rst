@@ -9,6 +9,7 @@ Getting started
 Installing
 ----------
 
+
 Linux
 ~~~~~
 
@@ -23,10 +24,11 @@ RPM packages are also available for RHEL & CentOS:
 .. hlist::
    :columns: 2
 
-   * `RHEL 5/CentOS 5 32bits <ftp://ftp.maxlab.lu.se/pub/maxlab/packages/el5/i386/repoview/index.html>`_
-   * `RHEL 5/CentOS 5 64bits <ftp://ftp.maxlab.lu.se/pub/maxlab/packages/el5/x86_64/repoview/index.html>`_
-   * `RHEL 6/CentOS 6 32bits <ftp://ftp.maxlab.lu.se/pub/maxlab/packages/el6/i386/repoview/index.html>`_
-   * `RHEL 6/CentOS 6 64bits <ftp://ftp.maxlab.lu.se/pub/maxlab/packages/el6/x86_64/repoview/index.html>`_
+   * `CentOS 6 32bits <http://pubrepo.maxiv.lu.se/rpm/el6/x86_64/>`_
+   * `CentOS 6 64bits <http://pubrepo.maxiv.lu.se/rpm/el6/x86_64/>`_
+   * `CentOS 7 64bits <http://pubrepo.maxiv.lu.se/rpm/el7/x86_64/>`_
+   * `Fedora 23 32bits <http://pubrepo.maxiv.lu.se/rpm/fc23/i/386/>`_
+   * `Fedora 23 64bits <http://pubrepo.maxiv.lu.se/rpm/fc23/x86_64/>`_
 
 PyPi
 ~~~~
@@ -38,7 +40,6 @@ are available from the major official distribution repositories):
 
 * `boost-python`_ (including boost-python-dev)
 * `numpy`_
-* `IPython`_ (optional, highly recommended)
 
 Then install PyTango either from pip:
 
@@ -70,8 +71,8 @@ Compiling
 Linux
 ~~~~~
 
-Since PyTango 7 the build system used to compile PyTango is the standard python
-distutils.
+Since PyTango 9 the build system used to compile PyTango is the standard python
+setuptools.
 
 Besides the binaries for the three dependencies mentioned above, you also need
 the development files for the respective libraries.
@@ -81,14 +82,13 @@ the latest SVN checkout:
 
 .. sourcecode:: console
 
-    $ svn co http://svn.code.sf.net/p/tango-cs/code/bindings/PyTango/trunk PyTango
-    $ cd PyTango
+    $ git clone https://github.com/tango-cs/pytango.git
+    $ cd pytango
     $ python setup.py build
     $ sudo python setup.py install
 
-This will install PyTango in the system python installation directory and, since
-version 8.0.0, it will also install :ref:`itango` as an IPython_ extension.
-
+This will install PyTango in the system python installation directory.
+(Since PyTango9, :ref:`itango` has been removed to a separate project and it will not be installed with PyTango.)
 If you whish to install in a different directory, replace the last line with:
 
 .. sourcecode:: console
