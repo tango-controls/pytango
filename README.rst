@@ -52,7 +52,7 @@ PyTango_ is available on PyPI_ as ``pytango``::
     $ pip install pytango
 
 Alternatively, PyTango_ can be built and installed from the
-`sources <PyTango_>`__::
+`sources`_::
 
     $ python setup.py install
 
@@ -75,7 +75,7 @@ For an interactive use, consider using ITango_, a tango IPython_ profile.
 Documentation
 -------------
 
-Check out the `documentation <Documentation_>`__ for more informations.
+Check out the documentation_ for more informations.
 
 
 
@@ -84,7 +84,7 @@ Support and contribution
 
 You can get support from the `Tango forums`_, for both Tango_ and PyTango_ questions.
 
-All contributions,  `PR and bug reports <PyTango_>`__ are welcome!
+All contributions,  `PR and bug reports`_ are welcome!
 
 
 .. _Tango: http://tango-controls.org/
@@ -104,5 +104,7 @@ All contributions,  `PR and bug reports <PyTango_>`__ are welcome!
 .. _ITango: http://pypi.python.org/pypi/itango
 .. _IPython: http://ipython.org
 
-.. _Documentation: http://esrf.eu/computing/cs/tango/tango_doc/kernel_doc/pytango
-.. _Tango forums: http://tango-controls.org/community/forums
+.. _documentation: http://pytango.readthedocs.io/en/latest/index.html
+.. _Tango forums: http://tango-controls.org/community/forum
+.. _PR and bug reports: PyTango_
+.. _sources: PyTango_
