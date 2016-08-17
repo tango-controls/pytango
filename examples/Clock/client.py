@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
-# This file is part of PyTango (http://www.tinyurl.com/PyTango)
+# This file is part of PyTango (http://pytango.rtfd.io)
 #
 # Copyright 2013-2015 European Synchrotron Radiation Facility, Grenoble, France
 #
