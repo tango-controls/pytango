@@ -104,7 +104,7 @@ All contributions,  `PR and bug reports`_ are welcome!
 .. _ITango: http://pypi.python.org/pypi/itango
 .. _IPython: http://ipython.org
 
-.. _documentation: http://pytango.readthedocs.io/en/latest/index.html
+.. _documentation: http://pytango.readthedocs.io/en/latestl
 .. _Tango forums: http://tango-controls.org/community/forum
 .. _PR and bug reports: PyTango_
 .. _sources: PyTango_
