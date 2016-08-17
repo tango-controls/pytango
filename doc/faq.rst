@@ -10,34 +10,42 @@ Answers to general Tango questions can be found in the
 
 Please also check the `general tango how to <http://www.tango-controls.org/resources/howto/>`_.
 
-**How can I contribute to pytango and documentation ?**
-You can open pull requests on `PyTango github page <https://github.com/tango-cs/pytango/pulls>`_.
 
-**I got a libbost_python error when I try to import PyTango module**
+**How can I report an issue?**
 
-doing:
-    >>> import PyTango
-    ImportError: libboost_python-gcc43-mt-1_38.so.1.38.0: cannot open shared object file: No such file or directory
+Bug reports are very valuable for the community.
+
+Please open a new issue on the `github issue page <https://github.com/tango-cs/pytango/issues>`_.
+
+
+**How can I contribute to PyTango and the documentation?**
+
+Contribution are always welcome!
+
+You can open pull requests on the `github PR page <https://github.com/tango-cs/pytango/pulls>`_.
+
+
+**I got a libbost_python error when I try to import tango module...**
+
+For instance::
+
+    >>> import tango
+    ImportError: libboost_python.so.1.53.0: cannot open shared object file: No such file or directory
 
 You must check that you have the correct boost python installed on your computer.
-To see which boost python file PyTango needs type::
+To see which boost python file PyTango needs, type:
 
-    $ ldd /usr/lib/python2.5/site-packages/PyTango/_PyTango.so
-    linux-vdso.so.1 =>  (0x00007fff48bfe000)
-    libtango.so.7 => /home/homer/local/lib/libtango.so.7 (0x00007f393fabb000)
-    liblog4tango.so.4 => /home/homer/local/lib/liblog4tango.so.4 (0x00007f393f8a0000)
-    **libboost_python-gcc43-mt-1_38.so.1.38.0 => not found**
-    libpthread.so.0 => /lib/libpthread.so.0 (0x00007f393f65e000)
-    librt.so.1 => /lib/librt.so.1 (0x00007f393f455000)
-    libdl.so.2 => /lib/libdl.so.2 (0x00007f393f251000)
-    libomniORB4.so.1 => /usr/local/lib/libomniORB4.so.1 (0x00007f393ee99000)
-    libomniDynamic4.so.1 => /usr/local/lib/libomniDynamic4.so.1 (0x00007f393e997000)
-    libomnithread.so.3 => /usr/local/lib/libomnithread.so.3 (0x00007f393e790000)
-    libCOS4.so.1 => /usr/local/lib/libCOS4.so.1 (0x00007f393e359000)
-    libgcc_s.so.1 => /lib/libgcc_s.so.1 (0x00007f393e140000)
-    libc.so.6 => /lib/libc.so.6 (0x00007f393ddce000)
-    libstdc++.so.6 => /usr/lib/libstdc++.so.6 (0x00007f393dac1000)
-    libm.so.6 => /lib/libm.so.6 (0x00007f393d83b000)
-    /lib64/ld-linux-x86-64.so.2 (0x00007f3940a4c000)
+.. sourcecode:: console
+
+    $ ldd /usr/lib64/python2.7/site-packages/tango/_tango.so
+        linux-vdso.so.1 =>  (0x00007ffea7562000)
+        libtango.so.9 => /lib64/libtango.so.9 (0x00007fac04011000)
+        libomniORB4.so.1 => /lib64/libomniORB4.so.1 (0x00007fac03c62000)
+        libboost_python.so.1.53.0 => not found
+        [...]
 
 
+**I have more questions, where can I ask?**
+
+The `Tango forum <http://www.tango-controls.org/community/forum>`_ is a good place to get some support.
+Meet us in the `Python section <http://www.tango-controls.org/community/forum/c/development/python/>`_.
