@@ -10,6 +10,9 @@ Answers to general Tango questions can be found in the
 
 Please also check the `general tango how to <http://www.tango-controls.org/resources/howto/>`_.
 
+**How can I contribute to pytango and documentation ?**
+You can open pull requests on `PyTango github page <https://github.com/tango-cs/pytango/pulls>`_.
+
 **I got a libbost_python error when I try to import PyTango module**
 
 doing:
