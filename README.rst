@@ -87,13 +87,13 @@ You can get support from the `Tango forums`_, for both Tango_ and PyTango_ quest
 All contributions,  `PR and bug reports`_ are welcome!
 
 
-.. _Tango: http://tango-controls.org/
-.. _Tango C++ API: http://esrf.eu/computing/cs/tango/tango_doc/kernel_doc/cpp_doc/index.html
-.. _PyTango: http://github.com/tango-cs/PyTango
+.. _Tango: http://tango-controls.org
+.. _Tango C++ API: http://esrf.eu/computing/cs/tango/tango_doc/kernel_doc/cpp_doc
+.. _PyTango: http://github.com/tango-cs/pytango
 .. _PyPI: http://pypi.python.org/pypi/pytango
 
-.. _libtango: http://tango-controls.org/downloads/source/
-.. _Boost.Python: http://boost.org/doc/libs/1_61_0/libs/python/doc/html/index.html
+.. _libtango: http://tango-controls.org/downloads/source
+.. _Boost.Python: http://boost.org/doc/libs/1_61_0/libs/python/doc/html
 .. _numpy: http://pypi.python.org/pypi/numpy
 .. _six: http://pypi.python.org/pypi/six
 .. _setuptools: http://pypi.python.org/pypi/setuptools

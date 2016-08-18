@@ -13,7 +13,7 @@
 This is the main PyTango package file.
 Documentation for this package can be found online:
 
-http://www.tango-controls.org/static/PyTango/latest/doc/html/index.html
+http://pytango.readthedocs.io
 """
 
 from __future__ import print_function

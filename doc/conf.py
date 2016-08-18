@@ -236,13 +236,13 @@ latex_show_urls = 'no'
 # -- Options for RST -----------------------------------------------------------
 
 rst_epilog = """\
-.. _Tango: http://www.tango-controls.org/
-.. _Python: http://python.org/
-.. _IPython: http://ipython.org/
-.. _numpy: http://www.numpy.org/
-.. _gevent: http://www.gevent.org/
-.. _boost-python: http://www.boost.org/libs/python/
-.. _PyPi: https://pypi.python.org/pypi/PyTango/
+.. _Tango: http://www.tango-controls.org
+.. _Python: http://python.org
+.. _IPython: http://ipython.org
+.. _numpy: http://www.numpy.org
+.. _gevent: http://www.gevent.org
+.. _boost-python: http://www.boost.org/libs/python
+.. _PyPi: https://pypi.python.org/pypi/pytango
 
 """
 
@@ -250,13 +250,13 @@ rst_epilog = """\
 
 intersphinx_mapping = {
     'http://docs.python.org/dev': None,
-    'http://docs.scipy.org/doc/scipy/reference' : None,
-    'http://docs.scipy.org/doc/numpy' : None,
-    'http://ipython.org/ipython-doc/stable/' : None,
-    'http://api.mongodb.org/python/current/' : None,
-    'http://packages.python.org/CouchDB/' : None,
-    'http://pycassa.github.com/pycassa/' : None,
-    'http://docs.sqlalchemy.org/en/latest/' : None,
+    'http://docs.scipy.org/doc/scipy/reference': None,
+    'http://docs.scipy.org/doc/numpy': None,
+    'http://ipython.org/ipython-doc/stable': None,
+    'http://api.mongodb.org/python/current': None,
+    'http://packages.python.org/CouchDB': None,
+    'http://pycassa.github.com/pycassa': None,
+    'http://docs.sqlalchemy.org/en/latest': None,
 }
 
 todo_include_todos = True
