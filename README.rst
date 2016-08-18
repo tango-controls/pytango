@@ -1,6 +1,10 @@
 PyTango
 =======
 
+|Doc Status|
+
+Main website: http://pytango.rtfd.io
+
 Python binding for Tango_, a library dedicated to distributed control systems.
 
 
@@ -86,6 +90,9 @@ You can get support from the `Tango forums`_, for both Tango_ and PyTango_ quest
 
 All contributions,  `PR and bug reports`_ are welcome!
 
+.. |Doc Status| image:: https://readthedocs.org/projects/pytango/badge/?version=latest
+                :target: http://pytango.readthedocs.io/en/latest/?badge=latest
+                :alt: PyTango documentation status
 
 .. _Tango: http://tango-controls.org
 .. _Tango C++ API: http://esrf.eu/computing/cs/tango/tango_doc/kernel_doc/cpp_doc
