@@ -409,8 +409,10 @@ class beacon(object):
             if isinstance(values,list):
                 values = [str(x) for x in values]
                 properties_array.extend([prop_name,str(len(values))] + values)
-            else:
+            elif values:
                 properties_array.extend([prop_name,'1',str(values)])
+            else:
+                properties_array.extend([prop_name,'0'])
             result.extend(properties_array)
         return result
         
