@@ -27,7 +27,7 @@ const char *non_string_seq = "Parameter must be a non string sequence "
 
 const char *non_valid_image = "Parameter must be an IMAGE. This is a sequence"
                               " of sequences (with all the sub-sequences having"
-                              " the same lenght) or a bidimensional numpy.array";
+                              " the same length) or a bidimensional numpy.array";
 
 const char *non_valid_spectrum = "Parameter must be an SPECTRUM. This is a"
                               " sequence of scalar values or a unidimensional"

@@ -377,13 +377,13 @@ namespace PyTango { namespace Pipe {
         // the Tango C++ API doesnt't provide a way to do it
         Py_ssize_t size = bopy::len(py_value);
 	std::vector<std::string> elem_names;
-	for(size_t i = 0; i < size; ++i)
+	for(ssize_t i = 0; i < size; ++i)
 	{
 	    elem_names.push_back(bopy::extract<std::string>(py_value[i]["name"]));
 	}
 	obj.set_data_elt_names(elem_names);
 
-	for(size_t i = 0; i < size; ++i)
+	for(ssize_t i = 0; i < size; ++i)
 	{
             bopy::object item = py_value[i];
             std::string item_name = bopy::extract<std::string>(item["name"]);
