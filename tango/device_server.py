@@ -1570,7 +1570,7 @@ def __doc_Attribute():
                      can be any type of FLAT sequence of elements compatible with the
                      attribute type.
                      In the new form (without dim_x or dim_y) data should be any
-                     sequence for SPECTRUM and a SEQUENCE of equal-lenght SEQUENCES
+                     sequence for SPECTRUM and a SEQUENCE of equal-length SEQUENCES
                      for IMAGE attributes.
                      The recommended sequence is a C continuous and aligned numpy
                      array, as it can be optimized.
@@ -1596,7 +1596,7 @@ def __doc_Attribute():
                      can be any type of FLAT sequence of elements compatible with the
                      attribute type.
                      In the new form (without dim_x or dim_y) data should be any
-                     sequence for SPECTRUM and a SEQUENCE of equal-lenght SEQUENCES
+                     sequence for SPECTRUM and a SEQUENCE of equal-length SEQUENCES
                      for IMAGE attributes.
                      The recommended sequence is a C continuous and aligned numpy
                      array, as it can be optimized.
