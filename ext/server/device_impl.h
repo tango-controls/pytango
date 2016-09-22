@@ -124,6 +124,8 @@ public:
     /** a reference to itself */
     PyObject *the_self;
 
+    std::string the_status;
+
     PyDeviceImplBase(PyObject *self);
 
     virtual ~PyDeviceImplBase();
