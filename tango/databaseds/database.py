@@ -1043,7 +1043,7 @@ class DataBase(Device):
         self._log.debug("In DbPutClassProperty()")
         class_name = argin[0]
         nb_properties = int(argin[1])
-        self.db.put_class_property(class_name, properties, argin[2:])
+        self.db.put_class_property(class_name, nb_properties, argin[2:])
 
     @stats
     @command(dtype_in='str', doc_in='Device name (or alias)', dtype_out='DevVarLongStringArray', doc_out='Str[0] = device name\nStr[1] = CORBA IOR\nStr[2] = device version\nStr[3] = device server process name\nStr[4] = host name\nStr[5] = Tango class name\n\nLg[0] = Exported flag\nLg[1] = Device server process PID')
