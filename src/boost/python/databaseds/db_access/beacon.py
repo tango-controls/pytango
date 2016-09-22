@@ -35,7 +35,7 @@ else:
 
 def _filter(wildcard,l) :
     wildcard = wildcard.replace('*','.*')
-    m = re.compile(wildcard)
+    m = re.compile(wildcard,re.IGNORECASE)
     return [x for x in l if x is not None and m.match(x)]
 
 class beacon(object):
@@ -72,6 +72,7 @@ class beacon(object):
 
     def _index(self):
         #Tango indexing
+        self._strong_node_ref = set()
         self._personal_2_node = weakref.WeakValueDictionary()
         self._tango_name_2_node = weakref.WeakValueDictionary()
         self._class_name_2_node = weakref.WeakValueDictionary()
@@ -106,7 +107,7 @@ class beacon(object):
 
     def _index_tango(self,v) :
         klass = v.get('class')
-        if klass is not None:
+        if klass is not None and v.parent.get('device') is None:
             self._class_name_2_node[klass] = v
 
         personal_name = v.get('personal_name')
@@ -145,14 +146,20 @@ class beacon(object):
         device_node = self._tango_name_2_node.get(tango_name)
         if device_node is not None:    # There is a problem?
             return
-            
+        server_exe_name,personal_name = server_name.split('/')
+        personal_name = personal_name.lower()
+        server_name = '%s/%s' % (server_exe_name,personal_name)
         server_node = self._personal_2_node.get(server_name)
         if server_node is None:
             server_node = static.Node(self._config,filename = 'tango/%s.yml' % server_name.replace('/','_'))
-            server_node['server'],server_node['personal_name'] = server_name.split('/')
+            server_node['server'] = server_exe_name
+            server_node['personal_name'] = personal_name
             self._personal_2_node[server_name] = server_node
-
+            self._tango_name_2_node['dserver/%s' % server_name.lower()] = server_node
+            self._strong_node_ref.add(server_node)
+            
         device_node = static.Node(self._config,parent=server_node)
+        self._strong_node_ref.add(device_node)
         device_node['tango_name'] = tango_name
         device_node['class'] = klass_name
         if alias is not None:
@@ -332,8 +339,9 @@ class beacon(object):
 
     @_info
     def get_class_attribute_list(self, class_name, wildcard):
-        class_properties = self._get_class_attribute(class_name,prop_name)
-        return _filter(wildcard,class_properties)
+        redis = settings.get_cache()
+        attributes = [x for x in redis.scan_iter(match='tango.class.attribute.%s' % class_name)]
+        return _filter(wildcard,attributes)
 
     @_info
     def get_class_attribute_property(self, class_name, attributes):
@@ -401,8 +409,10 @@ class beacon(object):
             if isinstance(values,list):
                 values = [str(x) for x in values]
                 properties_array.extend([prop_name,str(len(values))] + values)
-            else:
+            elif values:
                 properties_array.extend([prop_name,'1',str(values)])
+            else:
+                properties_array.extend([prop_name,'0'])
             result.extend(properties_array)
         return result
         
@@ -412,7 +422,7 @@ class beacon(object):
         
     @_info
     def get_class_property_list(self, class_name):
-        properties = self._class_name_2_node.get(class_name).get("properties", dict())
+        properties = self._class_name_2_node.get(class_name,dict()).get("properties", dict())
         return [k for k,v in properties.iteritems() if not isinstance(v,dict)]
         #cache = settings.get_cache()
         #return cache.keys('tango.class.properties.%s*' % class_name)
@@ -532,22 +542,28 @@ class beacon(object):
         return (result_long,result_str)
 
     @_info
-    def get_device_list(self,server_name, class_name ):
+    def get_device_list(self,server_name, class_name):
         if server_name == '*':
-            server_nodes = self._personal_2_node.values()
-        else:
-            server_nodes = filter(None,[self._personal_2_node.get(server_name)])
-        if not server_nodes:
+            r_list = list()
+            for server_node in self._personal_2_node.values():
+                device_list = server_node.get('device')
+                r_list.extend(self._tango_name_from_class(device_list,class_name))
+            return r_list
+
+        server_node = self._personal_2_node.get(server_name)
+        if server_node is None:
             return []
-        ret = list()
-        for server_node in server_nodes:
-            device_list = server_node.get('device')
-            m = re.compile(class_name.replace('*','.*'))
-            if isinstance(device_list,list) :
-                ret.extend([x.get('tango_name') for x in device_list if m.match(x.get('class',''))])
-            elif isinstance(device_list,dict) and m.match(device_list.get('class','')) :
-                ret.append(device_list.get('tango_name'))
-        return ret
+        device_list = server_node.get('device')
+        return self._tango_name_from_class(device_list,class_name)
+    
+    def _tango_name_from_class(self,device_list,class_name):
+        m = re.compile(class_name.replace('*','.*'),re.IGNORECASE)
+        if isinstance(device_list,list) :
+            return [x.get('tango_name') for x in device_list if m.match(x.get('class',''))]
+        elif isinstance(device_list,dict) and m.match(device_list.get('class','')) :
+            return [device_list.get('tango_name')]
+        else:
+            return []
     
     @_info
     def get_device_wide_list(self, wildcard):
@@ -803,17 +819,24 @@ class beacon(object):
     @_info
     def put_class_property(self, class_name, nb_properties, attr_prop_list):
         attr_id = 0
+        class_node = self._class_name_2_node.get(class_name)
+        if class_node is None:
+            class_node = static.Node(self._config,parent=self._config.root,
+                                     filename = 'tango/%s.yml' % class_name.replace('/','_'))
+            class_node['class'] = class_name
+            self._strong_node_ref.add(class_node)
+            self._class_name_2_node[class_name] = class_node
+            
+        properties = class_node.get('properties',dict())
         for k in range(nb_properties):
-            attr_name,nb_properties = attr_prop_list[attr_id],int(attr_prop_list[attr_id + 1])
+            prop_name,nb_values = attr_prop_list[attr_id],int(attr_prop_list[attr_id + 1])
             attr_id += 2
-            class_properties = self._get_class_properties(class_name,prop_name)
-            new_values = {}
-            for prop_id in range(attr_id,attr_id + nb_properties * 2,2) :
-                prop_name,prop_val = attr_prop_list[prop_id],attr_prop_list[prop_id + 1]
-                new_values[prop_name] = prop_val
-            attr_id += nb_properties *2
-            class_properties.set(new_values)
-
+            if nb_values == 1:
+                properties[prop_name] = attr_prop_list[attr_id]
+            else:
+                properties[prop_name] = list(attr_prop_list[attr_id:])
+        class_node['properties'] = properties
+        class_node.save()
     @_info
     def put_device_alias(self, device_name, device_alias):
         device_node = self._tango_name_2_node.get(device_name)
@@ -856,7 +879,8 @@ class beacon(object):
 
     @_info
     def put_device_property(self, device_name, nb_properties, attr_prop_list):
-        device_node = self._tango_name_2_node.get(device_name.lower())
+        device_name = device_name.lower()
+        device_node = self._tango_name_2_node.get(device_name)
         old_properties = device_node.get('properties')
         if isinstance(old_properties,str): #reference
             properties_key = old_properties.split('/')
@@ -933,7 +957,7 @@ class beacon(object):
         cache = settings.get_cache()
         exported_devices = cache.keys('tango.info.sys/database*')
         result = []
-        for exp_dev in exported_devices:
+        for key_name in exported_devices:
             info = settings.HashSetting(key_name)
             result.append(info.get('IOR'))
         return result
