@@ -413,25 +413,50 @@ def __patch_pipe_methods(tango_device_klass, pipe):
         __patch_pipe_write_method(tango_device_klass, pipe)
 
 
-def __patch_init_delete_device(klass):
+def __patch_standard_device_methods(klass):
     # TODO allow to force non green mode
-    green_mode = True
 
-    if green_mode == GreenMode.Synchronous:
-        pass
-    else:
-        init_device_orig = klass.init_device
-        @functools.wraps(init_device_orig)
-        def init_device(self):
-            return get_worker().execute(init_device_orig, self)
-        setattr(klass, "init_device", init_device)
+    init_device_orig = klass.init_device
 
-        delete_device_orig = klass.delete_device
-        @functools.wraps(delete_device_orig)
-        def delete_device(self):
-            return get_worker().execute(delete_device_orig, self)
-        setattr(klass, "delete_device", delete_device)
+    @functools.wraps(init_device_orig)
+    def init_device(self):
+        return get_worker().execute(init_device_orig, self)
+    setattr(klass, "init_device", init_device)
 
+    delete_device_orig = klass.delete_device
+
+    @functools.wraps(delete_device_orig)
+    def delete_device(self):
+        return get_worker().execute(delete_device_orig, self)
+    setattr(klass, "delete_device", delete_device)
+
+    dev_state_orig = klass.dev_state
+
+    @functools.wraps(dev_state_orig)
+    def dev_state(self):
+        return get_worker().execute(dev_state_orig, self)
+    setattr(klass, "dev_state", dev_state)
+
+    dev_status_orig = klass.dev_status
+
+    @functools.wraps(dev_status_orig)
+    def dev_status(self):
+        return get_worker().execute(dev_status_orig, self)
+    setattr(klass, "dev_status", dev_status)
+
+    read_attr_hardware_orig = klass.read_attr_hardware
+
+    @functools.wraps(read_attr_hardware_orig)
+    def read_attr_hardware(self, attr_list):
+        return get_worker().execute(read_attr_hardware_orig, self, attr_list)
+    setattr(klass, "read_attr_hardware", read_attr_hardware)
+
+    always_executed_hook_orig = klass.always_executed_hook
+
+    @functools.wraps(always_executed_hook_orig)
+    def always_executed_hook(self):
+        return get_worker().execute(always_executed_hook_orig, self)
+    setattr(klass, "always_executed_hook", always_executed_hook)
 
 
 class _DeviceClass(DeviceClass):
@@ -508,7 +533,7 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
                 cmd_name, cmd_info = attr_obj.__tango_command__
                 cmd_list[cmd_name] = cmd_info
 
-    __patch_init_delete_device(tango_device_klass)
+    __patch_standard_device_methods(tango_device_klass)
 
     devclass_name = klass_name + "Class"
 
@@ -627,6 +652,15 @@ class Device(LatestDeviceImpl):
     def delete_device(self):
         pass
     delete_device.__doc__ == LatestDeviceImpl.delete_device.__doc__
+
+    def read_attr_hardware(self, attr_list):
+        return LatestDeviceImpl.read_attr_hardware(self, attr_list)
+
+    def dev_state(self):
+        return LatestDeviceImpl.dev_state(self)
+
+    def dev_status(self):
+        return LatestDeviceImpl.dev_status(self)
 
     def get_device_properties(self, ds_class = None):
         if ds_class is None:
