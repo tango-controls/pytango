@@ -1599,6 +1599,7 @@ def _create_gevent_worker():
         from queue import Queue
     except:
         from Queue import Queue
+    from threading import current_thread
 
     import gevent
     import gevent.event
@@ -1633,10 +1634,15 @@ def _create_gevent_worker():
             self.__stop_event = gevent.event.Event()
             self.__watcher = gevent.get_hub().loop.async()
             self.__watcher.start(self.__step)
+            self.__lock = gevent._threading.Lock()
+            self.__id = id(current_thread())
 
         def __step(self):
             task = self.__tasks.get()
             return task.run()
+
+        def is_gevent_thread(self):
+            return self.__id == id(current_thread())
 
         def run_in_thread(self, func, *args, **kwargs):
             thread_id = gevent._threading.start_new_thread(func, args, kwargs)
@@ -1647,11 +1653,14 @@ def _create_gevent_worker():
                                timeout=timeout)
 
         def execute(self, func, *args, **kwargs):
+            if self.is_gevent_thread():
+                return func(*args, **kwargs)
             event = gevent._threading.Event()
             task = self.Task(event, func, *args, **kwargs)
-            self.__tasks.put(task)
-            self.__watcher.send()
-            event.wait()
+            with self.__lock:
+                self.__tasks.put(task)
+                self.__watcher.send()
+                event.wait()
             if task.exception:
                 if issubclass(task.exception[0], DevFailed):
                     raise task.exception[1]
