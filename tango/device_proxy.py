@@ -130,6 +130,15 @@ def __check_read_pipe(dev_pipe):
         raise DevFailed(*dev_pipe.get_err_stack())
     return dev_pipe
 
+def __init_device_proxy_internals(proxy):
+    if proxy.__dict__.get('_initialized', False):
+        return
+    executors = dict((key, None) for key in GreenMode.names)
+    proxy.__dict__['_green_mode'] = None
+    proxy.__dict__['_initialized'] = True
+    proxy.__dict__['_executors'] = executors
+    proxy.__dict__['_pending_unsubscribe'] = {}
+
 def __DeviceProxy__get_cmd_cache(self):
     try:
         ret = self.__dict__['__cmd_cache']
@@ -152,15 +161,11 @@ def __DeviceProxy__get_pipe_cache(self):
     return ret
 
 def __DeviceProxy__init__(self, *args, **kwargs):
-    self.__dict__['_green_mode'] = kwargs.pop('green_mode', None)
-    self.__dict__['_executors'] = executors = {}
-    self.__dict__['_pending_unsubscribe'] = {}
-#    self.__dict__['__cmd_cache'] = {}
-#    self.__dict__['__attr_cache'] = ()
-#    self.__dict__['__pipe_cache'] = ()
-    executors[GreenMode.Futures] = kwargs.pop('executor', None)
-    executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
-    executors[GreenMode.Asyncio] = kwargs.pop('asyncio_executor', None)
+    __init_device_proxy_internals(self)
+    self._green_mode = kwargs.pop('green_mode', None)
+    self._executors[GreenMode.Futures] = kwargs.pop('executor', None)
+    self._executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
+    self._executors[GreenMode.Asyncio] = kwargs.pop('asyncio_executor', None)
     return DeviceProxy.__init_orig__(self, *args, **kwargs)
 
 def __DeviceProxy__get_green_mode(self):
