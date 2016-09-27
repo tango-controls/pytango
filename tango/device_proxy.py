@@ -228,7 +228,7 @@ def __DeviceProxy__getattr(self, name):
     # trait_names is a feature of IPython. Hopefully they will solve
     # ticket http://ipython.scipy.org/ipython/ipython/ticket/229 someday
     # and the ugly trait_names could be removed.
-    if name[:2] == "__" or name == 'trait_names':
+    if name.startswith("_") or name == 'trait_names':
         raise AttributeError(name)
 
     name_l = name.lower()
