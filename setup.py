@@ -353,7 +353,7 @@ def setup_args():
             suffix = "-py{v[0]}{v[1]}".format(v=PYTHON_VERSION)
             boost_library_name += suffix
         elif REDHAT:
-            if PYTHON_VERSION >= (3,):
+            if PYTHON_VERSION >= ('3',):
                 boost_library_name += '3'
         elif GENTOO:
             suffix = "-{v[0]}.{v[1]}".format(v=PYTHON_VERSION)
