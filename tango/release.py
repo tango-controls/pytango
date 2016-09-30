@@ -27,6 +27,8 @@ class Release:
           of the version number: major, minor, micro, releaselevel, and
         serial.
         - version: (str) package version in format <major>.<minor>.<micro>
+        - release: (str) pre-release, post-release or development release;
+          it is empty for final releases.
         - version_long: (str) package version in format
           <major>.<minor>.<micro><releaselevel><serial>
         - version_description: (str) short description for the current
@@ -45,7 +47,10 @@ class Release:
     name = 'PyTango'
     version_info = (9, 2, 0)
     version = '.'.join(map(str, version_info[:3]))
-    version_long = version + ''.join(map(str, version_info[3:]))
+    release = ''.join(map(str, version_info[3:]))
+    separator = '.' if 'dev' in release or 'post' in release else ''
+    version_long = version + separator + release
+
     version_description = 'This version implements the C++ Tango 9.2 API.'
     version_number = int(version.replace('.', ''))
     description = 'A python binding for the Tango control system'
