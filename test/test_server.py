@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from six import add_metaclass
+
 from tango import DevState
 from tango.server import Device, DeviceMeta
 
@@ -8,8 +10,9 @@ from context import TangoTestContext
 
 def test_empty_device():
 
+    @add_metaclass(DeviceMeta)
     class TestDevice(Device):
-        __metaclass__ = DeviceMeta
+        pass
 
     with TangoTestContext(TestDevice) as proxy:
         assert proxy.state() == DevState.UNKNOWN
@@ -18,11 +21,9 @@ def test_empty_device():
 
 def test_set_state():
 
+    @add_metaclass(DeviceMeta)
     class TestDevice(Device):
-        __metaclass__ = DeviceMeta
-
         def init_device(self):
-            print('hey')
             self.set_state(DevState.ON)
 
     with TangoTestContext(TestDevice) as proxy:
@@ -37,9 +38,8 @@ def test_set_status():
         "with special characters such as",
         "Café à la crème"))
 
+    @add_metaclass(DeviceMeta)
     class TestDevice(Device):
-        __metaclass__ = DeviceMeta
-
         def init_device(self):
             self.set_state(DevState.ON)
             self.set_status(status)

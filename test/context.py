@@ -27,7 +27,8 @@ def retry(period, errors, pause=0.001):
                 sleep(pause)
                 try:
                     return func(*args, **kwargs)
-                except errors as e:
+                except errors as exc:
+                    e = exc
                     first = False
             raise e
         return wrapper
