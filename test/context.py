@@ -54,7 +54,7 @@ class TangoTestContext(object):
 
     def __init__(self, device, device_cls=None, server_name=None,
                  instance_name=None, device_name=None, properties={},
-                 db="tango.db", port=0, debug=0, daemon=False, process=True):
+                 db="tango.db", port=0, debug=0, daemon=False, process=False):
         """Inititalize the context to run a given device."""
         # Argument
         tangoclass = device.__name__
