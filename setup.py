@@ -417,6 +417,15 @@ def setup_args():
         'six',
     ]
 
+    setup_requires = [
+        'pytest-runner',
+    ]
+
+    tests_require = [
+        'pytest',
+        'pytest-xdist',
+    ]
+
     package_data = {
         'PyTango': [],
     }
@@ -523,6 +532,8 @@ def setup_args():
         keywords=Release.keywords,
         requires=requires,
         install_requires=install_requires,
+        setup_requires=setup_requires,
+        tests_require=tests_require,
         ext_package='tango',
         ext_modules=[pytango_ext],
         cmdclass=cmdclass)
