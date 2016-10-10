@@ -2,6 +2,7 @@
 
 # Imports
 import platform
+import tempfile
 from socket import socket
 from functools import wraps
 from time import sleep, time
@@ -54,7 +55,7 @@ class TangoTestContext(object):
 
     def __init__(self, device, device_cls=None, server_name=None,
                  instance_name=None, device_name=None, properties={},
-                 db="tango.db", port=0, debug=0, daemon=False, process=False):
+                 db=None, port=0, debug=0, daemon=False, process=False):
         """Inititalize the context to run a given device."""
         # Argument
         tangoclass = device.__name__
@@ -66,6 +67,8 @@ class TangoTestContext(object):
             device_name = 'test/nodb/' + server_name.lower()
         if not port:
             port = get_port()
+        if db is None:
+            _, db = tempfile.mkstemp()
         # Attributes
         self.port = port
         self.device_name = device_name
@@ -73,8 +76,8 @@ class TangoTestContext(object):
         self.host = "{0}:{1}/".format(platform.node(), self.port)
         self.device = self.server = None
         # File
-        self.generate_db_file(server_name, instance_name, device_name,
-                              tangoclass, properties, db)
+        self.generate_db_file(server_name, instance_name, device_name, db,
+                              tangoclass, properties)
         # Command args
         string = self.command.format(server_name, instance_name, port, db)
         string += " -v{0}".format(debug) if debug else ""
@@ -95,8 +98,8 @@ class TangoTestContext(object):
         self.thread.daemon = daemon
 
     @staticmethod
-    def generate_db_file(server, instance, device,
-                         tangoclass=None, properties={}, db="tango.db"):
+    def generate_db_file(server, instance, device, db,
+                         tangoclass=None, properties={}):
         """Generate a database file corresponding to the given arguments."""
         if not tangoclass:
             tangoclass = server

@@ -12,7 +12,7 @@ from context import TangoTestContext
 
 # Fixtures
 
-@pytest.fixture(params=DevState.names.values())
+@pytest.fixture(params=DevState.values.values())
 def state(request):
     return request.param
 
