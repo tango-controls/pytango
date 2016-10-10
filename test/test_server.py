@@ -3,16 +3,39 @@
 import pytest
 from six import add_metaclass
 
-from tango import DevState
-from tango.server import Device, DeviceMeta
+import tango
+from tango import DevState, utils
+from tango.server import Device, DeviceMeta, command
 
 from context import TangoTestContext
 
+
+# Fixtures
 
 @pytest.fixture(params=DevState.names.values())
 def state(request):
     return request.param
 
+
+@pytest.fixture(params=utils._scalar_types)
+def type_value(request):
+    dtype = request.param
+    # Unsupported types
+    if dtype in [tango.DevInt, tango.ConstDevString,
+                 tango.DevEncoded, tango.DevUChar]:
+        pytest.xfail('Should we support those types?')
+    # Supported types
+    if dtype in utils._scalar_str_types:
+        return dtype, ['hey hey', 'my my']
+    if dtype in utils._scalar_bool_types:
+        return dtype, [False, True]
+    if dtype in utils._scalar_int_types:
+        return dtype, [1, 2]
+    if dtype in utils._scalar_float_types:
+        return dtype, [2.71, 3.14]
+
+
+# Test state/status
 
 def test_empty_device():
 
@@ -54,3 +77,21 @@ def test_set_status():
     with TangoTestContext(TestDevice) as proxy:
         assert proxy.state() == DevState.ON
         assert proxy.status() == status
+
+
+# Test commands
+
+def test_identity_command(type_value):
+    dtype, values = type_value
+
+    @add_metaclass(DeviceMeta)
+    class TestDevice(Device):
+
+        @command(dtype_in=dtype, dtype_out=dtype)
+        def identity(self, arg):
+            return arg
+
+    with TangoTestContext(TestDevice) as proxy:
+        for value in values:
+            expected = pytest.approx(value)
+            assert proxy.identity(value) == expected
