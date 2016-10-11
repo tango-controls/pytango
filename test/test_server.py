@@ -4,8 +4,9 @@ import pytest
 from six import add_metaclass
 
 import tango
-from tango import DevState, utils
-from tango.server import Device, DeviceMeta, command
+from tango import DevState, AttrWriteType, utils
+from tango.server import Device, DeviceMeta
+from tango.server import command, attribute, device_property
 
 from context import TangoTestContext
 
@@ -95,3 +96,61 @@ def test_identity_command(type_value):
         for value in values:
             expected = pytest.approx(value)
             assert proxy.identity(value) == expected
+
+
+# Test attributes
+
+def test_read_write_attribute(type_value):
+    dtype, values = type_value
+
+    @add_metaclass(DeviceMeta)
+    class TestDevice(Device):
+
+        @attribute(dtype=dtype, access=AttrWriteType.READ_WRITE)
+        def attr(self):
+            return self.attr_value
+
+        @attr.write
+        def attr(self, value):
+            self.attr_value = value
+
+    with TangoTestContext(TestDevice) as proxy:
+        for value in values:
+            proxy.attr = value
+            expected = pytest.approx(value)
+            assert proxy.attr == expected
+
+
+# Test properties
+
+@pytest.fixture
+def device_with_property(type_value):
+    dtype, values = type_value
+    default = values[0]
+    other = values[1]
+
+    @add_metaclass(DeviceMeta)
+    class TestDevice(Device):
+
+        prop = device_property(dtype=dtype, default_value=default)
+
+        @command(dtype_out=dtype)
+        def get_prop(self):
+            return self.prop
+
+    return TestDevice, default, other
+
+
+def test_default_property(device_with_property):
+    TestDevice, default, _ = device_with_property
+    with TangoTestContext(TestDevice) as proxy:
+        expected = pytest.approx(default)
+        assert proxy.get_prop() == expected
+
+
+def test_device_property(device_with_property):
+    TestDevice, _, value = device_with_property
+    properties = {'prop': value}
+    with TangoTestContext(TestDevice, properties=properties) as proxy:
+        expected = pytest.approx(value)
+        assert proxy.get_prop() == expected
