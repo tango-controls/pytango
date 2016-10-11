@@ -78,7 +78,7 @@ class TangoTestContext(object):
         self.host = "{0}:{1}/".format(platform.node(), self.port)
         self.device = self.server = None
         # File
-        self.generate_db_file(server_name, instance_name, device_name, db,
+        self.generate_db_file(server_name, instance_name, device_name,
                               tangoclass, properties)
         # Command args
         string = self.command.format(server_name, instance_name, port, db)
@@ -99,18 +99,17 @@ class TangoTestContext(object):
         self.thread = cls(target=target, args=args)
         self.thread.daemon = daemon
 
-    @staticmethod
-    def generate_db_file(server, instance, device, db,
+    def generate_db_file(self, server, instance, device,
                          tangoclass=None, properties={}):
         """Generate a database file corresponding to the given arguments."""
         if not tangoclass:
             tangoclass = server
         # Open the file
-        with open(db, 'w') as f:
+        with open(self.db, 'w') as f:
             f.write("/".join((server, instance, "DEVICE", tangoclass)))
             f.write(': "' + device + '"\n')
         # Create database
-        db = Database(db)
+        db = Database(self.db)
         # Patched the property dict to avoid a PyTango bug
         patched = dict((key, value if value != '' else ' ')
                        for key, value in properties.items())
