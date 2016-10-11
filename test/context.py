@@ -1,6 +1,7 @@
 """Contain the context to run a device without a database."""
 
 # Imports
+import os
 import platform
 import tempfile
 from socket import socket
@@ -70,6 +71,7 @@ class TangoTestContext(object):
         if db is None:
             _, db = tempfile.mkstemp()
         # Attributes
+        self.db = db
         self.port = port
         self.device_name = device_name
         self.server_name = "/".join(("dserver", server_name, instance_name))
@@ -142,6 +144,7 @@ class TangoTestContext(object):
         if self.server:
             self.server.command_inout('Kill')
         self.thread.join(timeout)
+        os.unlink(self.db)
 
     def join(self, timeout=None):
         self.thread.join(timeout)
