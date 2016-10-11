@@ -422,7 +422,6 @@ def setup_args():
     ]
 
     tests_require = [
-        'pytest',
         'pytest-xdist',
     ]
 
