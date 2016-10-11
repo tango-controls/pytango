@@ -2,9 +2,10 @@ sudo: false
 
 language: python
 
+os: linux
+
 python:
-  - 2.7
-  - 3.4
+  - 3.5
 
 cache:
   directories:
@@ -17,7 +18,8 @@ before_install:
   - conda update --yes conda
 
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION 
+  - conda create --yes --name buildenv python=$TRAVIS_PYTHON_VERSION
+  - source activate buildenv
   - conda install --yes -c vxgmichel tango=9.2.2
   - conda install --yes numpy  # Not a strong requirement yet
 
