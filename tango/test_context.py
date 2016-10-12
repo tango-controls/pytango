@@ -79,7 +79,7 @@ class DeviceTestContext(object):
 
     def __init__(self, device, device_cls=None, server_name=None,
                  instance_name=None, device_name=None, properties={},
-                 db=None, port=0, debug=5, daemon=False, process=False):
+                 db=None, port=0, debug=3, daemon=False, process=False):
         """Inititalize the context to run a given device."""
         # Argument
         tangoclass = device.__name__
@@ -156,6 +156,9 @@ class DeviceTestContext(object):
 
     @retry(connect_time, [ConnectionFailed, DevFailed])
     def connect(self):
+        if not self.thread.is_alive():
+            raise RuntimeError(
+                'The server did not start. Check stdout for more information.')
         self.device = DeviceProxy(self.get_device_access())
         self.device.ping()
         self.server = DeviceProxy(self.get_server_access())
