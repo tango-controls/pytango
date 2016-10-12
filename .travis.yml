@@ -10,7 +10,6 @@ python:
 cache:
   directories:
     - ./miniconda  # Conda environment
-    - ./build      # pytango build
     - ./.eggs      # pytest eggs
 
 before_install:
