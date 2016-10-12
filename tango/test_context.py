@@ -1,32 +1,44 @@
-"""Contain the context to run a device without a database."""
+"""Provide a context to run a device without a database."""
+
+from __future__ import absolute_import
+
+__all__ = ["DeviceTestContext", "run_device_test_context"]
 
 # Imports
 import os
+import time
+import socket
 import platform
 import tempfile
-from socket import socket
-from functools import wraps
-from time import sleep, time
+import functools
+
+# Concurrency imports
 from threading import Thread
 from multiprocessing import Process
 
-# PyTango imports
-from tango.server import run
-from tango import DeviceProxy, Database, ConnectionFailed, DevFailed
+# CLI imports
+from ast import literal_eval
+from importlib import import_module
+from argparse import ArgumentParser
+
+# Local imports
+from .server import run
+from . import DeviceProxy, Database, ConnectionFailed, DevFailed
 
 
-# Retry decorator
+# Helpers
+
 def retry(period, errors, pause=0.001):
     """Retry decorator."""
     errors = tuple(errors)
 
     def dec(func):
-        @wraps(func)
+        @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            stop = time() + period
+            stop = time.time() + period
             first = True
-            while first or time() < stop:
-                sleep(pause)
+            while first or time.time() < stop:
+                time.sleep(pause)
                 try:
                     return func(*args, **kwargs)
                 except errors as exc:
@@ -37,17 +49,28 @@ def retry(period, errors, pause=0.001):
     return dec
 
 
-# Get available port
 def get_port():
-    sock = socket()
+    sock = socket.socket()
     sock.bind(('', 0))
     res = sock.getsockname()[1]
     del sock
     return res
 
 
-# No database Tango context
-class TangoTestContext(object):
+def literal_dict(arg):
+    return dict(literal_eval(arg))
+
+
+def device(path):
+    """Get the device class from a given module."""
+    module_name, device_name = path.rsplit(".", 1)
+    module = import_module(module_name)
+    return getattr(module, device_name)
+
+
+# Device test context
+
+class DeviceTestContext(object):
     """ Context to run a device without a database."""
 
     nodb = "#dbase=no"
@@ -56,7 +79,7 @@ class TangoTestContext(object):
 
     def __init__(self, device, device_cls=None, server_name=None,
                  instance_name=None, device_name=None, properties={},
-                 db=None, port=0, debug=0, daemon=False, process=False):
+                 db=None, port=0, debug=5, daemon=False, process=False):
         """Inititalize the context to run a given device."""
         # Argument
         tangoclass = device.__name__
@@ -157,3 +180,46 @@ class TangoTestContext(object):
     def __exit__(self, exc_type, exception, trace):
         """Exit method for context support."""
         self.stop()
+
+
+# Command line interface
+
+def parse_command_line_args(args=None):
+    """Parse arguments given in command line."""
+    desc = "Run a given device on a given port."
+    parser = ArgumentParser(description=desc)
+    # Add arguments
+    msg = 'The device to run as a python path.'
+    parser.add_argument('device', metavar='DEVICE',
+                        type=device, help=msg)
+    msg = "The port to use."
+    parser.add_argument('--port', metavar='PORT',
+                        type=int, help=msg, default=0)
+    msg = "The debug level."
+    parser.add_argument('--debug', metavar='DEBUG',
+                        type=int, help=msg, default=0)
+    msg = "The properties to set as python dict."
+    parser.add_argument('--prop', metavar='PROP',
+                        type=literal_dict, help=msg, default='{}')
+    # Parse arguments
+    namespace = parser.parse_args(args)
+    return namespace.device, namespace.port, namespace.prop, namespace.debug
+
+
+def run_device_test_context(args=None):
+    device, port, properties, debug = parse_command_line_args(args)
+    context = DeviceTestContext(
+        device, properties=properties, port=port, debug=debug)
+    context.start()
+    msg = '{0} started on port {1} with properties {2}'
+    print(msg.format(device.__name__, context.port, properties))
+    print('Device access: {}'.format(context.get_device_access()))
+    print('Server access: {}'.format(context.get_server_access()))
+    context.join()
+    print("Done")
+
+
+# Main execution
+
+if __name__ == "__main__":
+    run_device_test_context()
