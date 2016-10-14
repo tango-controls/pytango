@@ -505,7 +505,7 @@ def setup_args():
 
     opts = dict(
         name='pytango',
-        version=Release.version,
+        version=Release.version_long,
         description=Release.description,
         long_description=long_description,
         author=author[0],
