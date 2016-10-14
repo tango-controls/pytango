@@ -75,7 +75,8 @@ class DeviceTestContext(object):
 
     nodb = "#dbase=no"
     command = "{0} {1} -ORBendPoint giop:tcp::{2} -file={3}"
-    connect_time = 6.0
+    connect_timeout = 6.0
+    disconnect_timeout = connect_timeout
 
     def __init__(self, device, device_cls=None, server_name=None,
                  instance_name=None, device_name=None, properties={},
@@ -154,7 +155,7 @@ class DeviceTestContext(object):
         self.connect()
         return self
 
-    @retry(connect_time, [ConnectionFailed, DevFailed])
+    @retry(connect_timeout, [ConnectionFailed, DevFailed])
     def connect(self):
         if not self.thread.is_alive():
             raise RuntimeError(
@@ -168,10 +169,12 @@ class DeviceTestContext(object):
         """Kill the server."""
         if self.server:
             self.server.command_inout('Kill')
-        self.thread.join(timeout)
+        self.join(timeout)
         os.unlink(self.db)
 
     def join(self, timeout=None):
+        if timeout is None:
+            timeout = self.disconnect_timeout
         self.thread.join(timeout)
 
     def __enter__(self):
