@@ -6,15 +6,11 @@ __all__ = ["DeviceTestContext", "run_device_test_context"]
 
 # Imports
 import os
-import time
-import socket
-import platform
+import six
+import struct
 import tempfile
-import functools
-
-# Concurrency imports
-from threading import Thread
-from multiprocessing import Process
+import threading
+import collections
 
 # CLI imports
 from ast import literal_eval
@@ -23,38 +19,41 @@ from argparse import ArgumentParser
 
 # Local imports
 from .server import run
-from . import DeviceProxy, Database, ConnectionFailed, DevFailed
+from . import DeviceProxy, Database, Util
 
 
 # Helpers
 
-def retry(period, errors, pause=0.001):
-    """Retry decorator."""
-    errors = tuple(errors)
-
-    def dec(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            stop = time.time() + period
-            first = True
-            while first or time.time() < stop:
-                time.sleep(pause)
-                try:
-                    return func(*args, **kwargs)
-                except errors as exc:
-                    e = exc
-                    first = False
-            raise e
-        return wrapper
-    return dec
+IOR = collections.namedtuple(
+    'IOR',
+    'first dtype_length dtype nb_profile tag '
+    'length major minor wtf host_length host port body')
 
 
-def get_port():
-    sock = socket.socket()
-    sock.bind(('', 0))
-    res = sock.getsockname()[1]
-    del sock
-    return res
+def ascii_to_bytes(s):
+    convert = lambda x: six.int2byte(int(x, 16))
+    return b''.join(convert(s[i:i+2]) for i in range(0, len(s), 2))
+
+
+def parse_ior(encoded_ior):
+    assert encoded_ior[:4] == 'IOR:'
+    ior = ascii_to_bytes(encoded_ior[4:])
+    dtype_length = struct.unpack_from('II', ior)[-1]
+    form = 'II{:d}sIIIBBHI'.format(dtype_length)
+    host_length = struct.unpack_from(form, ior)[-1]
+    form = 'II{:d}sIIIBBHI{:d}sH0I'.format(dtype_length, host_length)
+    values = struct.unpack_from(form, ior)
+    values += (ior[struct.calcsize(form):],)
+    strip = lambda x: x[:-1] if isinstance(x, bytes) else x
+    return IOR(*map(strip, values))
+
+
+def get_server_host_port():
+    util = Util.instance()
+    ds = util.get_dserver_device()
+    encoded_ior = util.get_dserver_ior(ds)
+    ior = parse_ior(encoded_ior)
+    return ior.host.decode(), ior.port
 
 
 def literal_dict(arg):
@@ -73,14 +72,14 @@ def device(path):
 class DeviceTestContext(object):
     """ Context to run a device without a database."""
 
-    nodb = "#dbase=no"
+    nodb = "dbase=no"
     command = "{0} {1} -ORBendPoint giop:tcp::{2} -file={3}"
-    connect_timeout = 6.0
+    connect_timeout = 1.0
     disconnect_timeout = connect_timeout
 
     def __init__(self, device, device_cls=None, server_name=None,
                  instance_name=None, device_name=None, properties={},
-                 db=None, port=0, debug=3, daemon=False, process=False):
+                 db=None, port=0, debug=3, daemon=False):
         """Inititalize the context to run a given device."""
         # Argument
         tangoclass = device.__name__
@@ -90,17 +89,16 @@ class DeviceTestContext(object):
             instance_name = server_name.lower()
         if not device_name:
             device_name = 'test/nodb/' + server_name.lower()
-        if not port:
-            port = get_port()
         if db is None:
             _, db = tempfile.mkstemp()
         # Attributes
         self.db = db
+        self.host = ''
         self.port = port
         self.device_name = device_name
         self.server_name = "/".join(("dserver", server_name, instance_name))
-        self.host = "{0}:{1}/".format(platform.node(), self.port)
         self.device = self.server = None
+        self.waiter = threading.Event()
         # File
         self.generate_db_file(server_name, instance_name, device_name,
                               tangoclass, properties)
@@ -119,9 +117,14 @@ class DeviceTestContext(object):
             target = device.run_server
             args = (cmd_args,)
         # Thread
-        cls = Process if process else Thread
-        self.thread = cls(target=target, args=args)
+        cls = threading.Thread
+        kwargs = {'post_init_callback': self.post_init}
+        self.thread = cls(target=target, args=args, kwargs=kwargs)
         self.thread.daemon = daemon
+
+    def post_init(self):
+        self.host, self.port = get_server_host_port()
+        self.waiter.set()
 
     def generate_db_file(self, server, instance, device,
                          tangoclass=None, properties={}):
@@ -134,7 +137,7 @@ class DeviceTestContext(object):
             f.write(': "' + device + '"\n')
         # Create database
         db = Database(self.db)
-        # Patched the property dict to avoid a PyTango bug
+        # Patch the property dict to avoid a PyTango bug
         patched = dict((key, value if value != '' else ' ')
                        for key, value in properties.items())
         # Write properties
@@ -143,11 +146,13 @@ class DeviceTestContext(object):
 
     def get_device_access(self):
         """Return the full device name."""
-        return self.host+self.device_name+self.nodb
+        form = 'tango://{0}:{1}/{2}#{3}'
+        return form.format(self.host, self.port, self.device_name, self.nodb)
 
     def get_server_access(self):
         """Return the full server name."""
-        return self.host+self.server_name+self.nodb
+        form = 'tango://{0}:{1}/{2}#{3}'
+        return form.format(self.host, self.port, self.server_name, self.nodb)
 
     def start(self):
         """Run the server."""
@@ -155,26 +160,27 @@ class DeviceTestContext(object):
         self.connect()
         return self
 
-    @retry(connect_timeout, [ConnectionFailed, DevFailed])
     def connect(self):
-        if not self.thread.is_alive():
+        if not self.waiter.wait(self.connect_timeout):
             raise RuntimeError(
-                'The server did not start. Check stdout for more information.')
-        self.device = DeviceProxy(self.get_device_access())
-        self.device.ping()
+                'The server did not start. '
+                'Check stdout/stderr for more information.')
+        # Get server proxy
+        print(self.get_server_access())
         self.server = DeviceProxy(self.get_server_access())
         self.server.ping()
+        # Get device proxy
+        self.device = DeviceProxy(self.get_device_access())
+        self.device.ping()
 
-    def stop(self, timeout=None):
+    def stop(self):
         """Kill the server."""
         if self.server:
             self.server.command_inout('Kill')
-        self.join(timeout)
+        self.join(self.disconnect_timeout)
         os.unlink(self.db)
 
     def join(self, timeout=None):
-        if timeout is None:
-            timeout = self.disconnect_timeout
         self.thread.join(timeout)
 
     def __enter__(self):
@@ -200,10 +206,10 @@ def parse_command_line_args(args=None):
                         type=device, help=msg)
     msg = "The port to use."
     parser.add_argument('--port', metavar='PORT',
-                        type=int, help=msg, default=0)
+                        type=int, help=msg, default=8888)
     msg = "The debug level."
     parser.add_argument('--debug', metavar='DEBUG',
-                        type=int, help=msg, default=0)
+                        type=int, help=msg, default=3)
     msg = "The properties to set as python dict."
     parser.add_argument('--prop', metavar='PROP',
                         type=literal_dict, help=msg, default='{}')
