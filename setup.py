@@ -45,6 +45,8 @@ POSIX = 'posix' in os.name
 WINDOWS = 'nt' in os.name
 IS64 = 8 * struct.calcsize("P") == 64
 PYTHON_VERSION = platform.python_version_tuple()
+PYTHON2 = ('2',) <= PYTHON_VERSION < ('3',)
+PYTHON3 = ('3',) <= PYTHON_VERSION < ('4',)
 
 # Linux distribution
 distribution = platform.linux_distribution()[0].lower() if POSIX else ""
@@ -52,6 +54,9 @@ distribution_match = lambda names: any(x in distribution for x in names)
 DEBIAN = distribution_match(['debian', 'ubuntu', 'mint'])
 REDHAT = distribution_match(['redhat', 'fedora', 'centos'])
 GENTOO = distribution_match(['gentoo'])
+
+# Arguments
+TESTING = any(x in sys.argv for x in ['test', 'pytest'])
 
 
 def pkg_config(*packages, **config):
@@ -353,7 +358,7 @@ def setup_args():
             suffix = "-py{v[0]}{v[1]}".format(v=PYTHON_VERSION)
             boost_library_name += suffix
         elif REDHAT:
-            if PYTHON_VERSION >= ('3',):
+            if PYTHON3:
                 boost_library_name += '3'
         elif GENTOO:
             suffix = "-{v[0]}.{v[1]}".format(v=PYTHON_VERSION)
@@ -415,6 +420,16 @@ def setup_args():
 
     install_requires = [
         'six',
+    ]
+
+    setup_requires = [
+        'pytest-runner' if TESTING else '',
+    ]
+
+    tests_require = [
+        'pytest-xdist',
+        'gevent',
+        'trollius' if PYTHON2 else '',
     ]
 
     package_data = {
@@ -523,6 +538,8 @@ def setup_args():
         keywords=Release.keywords,
         requires=requires,
         install_requires=install_requires,
+        setup_requires=setup_requires,
+        tests_require=tests_require,
         ext_package='tango',
         ext_modules=[pytango_ext],
         cmdclass=cmdclass)
