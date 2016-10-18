@@ -26,7 +26,6 @@ import types
 import inspect
 import logging
 import weakref
-import operator
 import functools
 import traceback
 
@@ -1296,14 +1295,14 @@ def __to_cb(post_init_callback):
 
     err_msg = "post_init_callback must be a callable or " \
               "sequence <callable [, args, [, kwargs]]>"
-    if operator.isCallable(post_init_callback):
+    if callable(post_init_callback):
         f = post_init_callback
     elif is_non_str_seq(post_init_callback):
         length = len(post_init_callback)
         if length < 1 or length > 3:
             raise TypeError(err_msg)
         cb = post_init_callback[0]
-        if not operator.isCallable(cb):
+        if not callable(cb):
             raise TypeError(err_msg)
         args, kwargs = [], {}
         if length > 1:
