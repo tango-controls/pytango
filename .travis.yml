@@ -1,6 +1,10 @@
 sudo: false
 language: python
 os: linux
+branches:
+  only:
+    - master
+    - develop
 
 python:
   - 2.7
