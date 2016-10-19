@@ -429,6 +429,7 @@ def setup_args():
     tests_require = [
         'pytest-xdist',
         'gevent',
+        'psutil',
         'trollius' if PYTHON2 else '',
     ]
 
