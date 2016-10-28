@@ -2,15 +2,17 @@
 
 from __future__ import absolute_import
 
-__all__ = ["DeviceTestContext", "run_device_test_context"]
-
 # Imports
 import os
 import six
 import struct
 import tempfile
-import threading
 import collections
+
+# Concurrency imports
+import threading
+import multiprocessing
+from six.moves import queue
 
 # CLI imports
 from ast import literal_eval
@@ -20,6 +22,8 @@ from argparse import ArgumentParser
 # Local imports
 from .server import run
 from . import DeviceProxy, Database, Util
+
+__all__ = ["DeviceTestContext", "run_device_test_context"]
 
 
 # Helpers
@@ -74,12 +78,12 @@ class DeviceTestContext(object):
 
     nodb = "dbase=no"
     command = "{0} {1} -ORBendPoint giop:tcp::{2} -file={3}"
-    connect_timeout = 1.0
+    connect_timeout = 1.
     disconnect_timeout = connect_timeout
 
     def __init__(self, device, device_cls=None, server_name=None,
                  instance_name=None, device_name=None, properties={},
-                 db=None, port=0, debug=3, daemon=False):
+                 db=None, port=0, debug=3, process=False, daemon=False):
         """Inititalize the context to run a given device."""
         # Argument
         tangoclass = device.__name__
@@ -91,6 +95,9 @@ class DeviceTestContext(object):
             device_name = 'test/nodb/' + server_name.lower()
         if db is None:
             _, db = tempfile.mkstemp()
+        # Patch bug #819
+        if process:
+            os.environ['ORBscanGranularity'] = '0'
         # Attributes
         self.db = db
         self.host = ''
@@ -98,7 +105,7 @@ class DeviceTestContext(object):
         self.device_name = device_name
         self.server_name = "/".join(("dserver", server_name, instance_name))
         self.device = self.server = None
-        self.waiter = threading.Event()
+        self.queue = multiprocessing.Queue() if process else queue.Queue()
         # File
         self.generate_db_file(server_name, instance_name, device_name,
                               tangoclass, properties)
@@ -117,14 +124,14 @@ class DeviceTestContext(object):
             target = device.run_server
             args = (cmd_args,)
         # Thread
-        cls = threading.Thread
         kwargs = {'post_init_callback': self.post_init}
+        cls = multiprocessing.Process if process else threading.Thread
         self.thread = cls(target=target, args=args, kwargs=kwargs)
         self.thread.daemon = daemon
 
     def post_init(self):
-        self.host, self.port = get_server_host_port()
-        self.waiter.set()
+        host, port = get_server_host_port()
+        self.queue.put((host, port))
 
     def generate_db_file(self, server, instance, device,
                          tangoclass=None, properties={}):
@@ -161,12 +168,14 @@ class DeviceTestContext(object):
         return self
 
     def connect(self):
-        if not self.waiter.wait(self.connect_timeout):
+        try:
+            self.host, self.port = self.queue.get(
+                timeout=self.connect_timeout)
+        except queue.Empty:
             raise RuntimeError(
                 'The server did not start. '
                 'Check stdout/stderr for more information.')
         # Get server proxy
-        print(self.get_server_access())
         self.server = DeviceProxy(self.get_server_access())
         self.server.ping()
         # Get device proxy
