@@ -1,7 +1,8 @@
 PyTango
 =======
 
-|Doc Status|
+|Doc Status| 
+|Pypi Version|
 
 Main website: http://pytango.rtfd.io
 
@@ -91,8 +92,12 @@ You can get support from the `Tango forums`_, for both Tango_ and PyTango_ quest
 All contributions,  `PR and bug reports`_ are welcome!
 
 .. |Doc Status| image:: https://readthedocs.org/projects/pytango/badge/?version=latest
-                :target: http://pytango.readthedocs.io/en/latest/?badge=latest
+                :target: http://pytango.readthedocs.io/en/latest
                 :alt: PyTango documentation status
+
+.. |Pypi Version| image:: https://img.shields.io/pypi/v/PyTango.svg
+                  :target: https://pypi.python.org/pypi/PyTango
+                  :alt: PyTango latest version on Pypi
 
 .. _Tango: http://tango-controls.org
 .. _Tango C++ API: http://esrf.eu/computing/cs/tango/tango_doc/kernel_doc/cpp_doc
