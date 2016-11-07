@@ -107,11 +107,10 @@ def test_read_write_attribute(typed_values, server_green_mode):
 
 # Test properties
 
-@pytest.fixture
-def device_with_property(typed_values, server_green_mode):
+def test_device_property(typed_values, server_green_mode):
     dtype, values = typed_values
     default = values[0]
-    other = values[1]
+    value = values[1]
 
     @add_metaclass(DeviceMeta)
     class TestDevice(Device):
@@ -123,19 +122,12 @@ def device_with_property(typed_values, server_green_mode):
         def get_prop(self):
             return self.prop
 
-    return TestDevice, default, other
-
-
-def test_default_property(device_with_property):
-    TestDevice, default, _ = device_with_property
-    with DeviceTestContext(TestDevice) as proxy:
+    with DeviceTestContext(TestDevice, process=True) as proxy:
         expected = pytest.approx(default)
         assert proxy.get_prop() == expected
 
-
-def test_device_property(device_with_property):
-    TestDevice, _, value = device_with_property
-    properties = {'prop': value}
-    with DeviceTestContext(TestDevice, properties=properties) as proxy:
+    with DeviceTestContext(TestDevice,
+                           properties={'prop': value},
+                           process=True) as proxy:
         expected = pytest.approx(value)
         assert proxy.get_prop() == expected
