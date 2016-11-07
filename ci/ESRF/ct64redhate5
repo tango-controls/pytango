@@ -1,7 +1,0 @@
-export realos=redhate5_64
-export BOOST_ROOT=/segfs/bliss/source/python/PyTango/PyTango7/redhate5
-export OMNI_ROOT=/segfs/tango/release/redhate5
-export TANGO_ROOT=/segfs/tango/release/redhate5
-export NUMPY_ROOT=/segfs/bliss/depot/pythonbliss_5.0/installdir/redhate5/python/lib/python2.6/site-packages/numpy/core
-export LD_LIBRARY_PATH=/segfs/tango/release/redhate5/lib:${LD_LIBRARY_PATH}
-export PKG_CONFIG_PATH=/segfs/tango/release/redhate5/lib/pkgconfig
