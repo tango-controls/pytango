@@ -26,7 +26,8 @@ __all__ = [
     "document_method", "document_static_method", "document_enum",
     "CaselessList", "CaselessDict", "EventCallBack", "get_home",
     "from_version_str_to_hex_str", "from_version_str_to_int",
-    "seq_2_StdStringVector", "StdStringVector_2_seq" ]
+    "seq_2_StdStringVector", "StdStringVector_2_seq",
+    "TO_TANGO_TYPE"]
 
 __docformat__ = "restructuredtext"
 
@@ -78,9 +79,9 @@ _array_types = _array_numerical_types + _array_bool_types + _array_str_types + \
 
 _binary_types = (CmdArgType.DevEncoded, CmdArgType.DevVarCharArray)
 
+
 def __build_to_tango_type():
-    ret = \
-    {
+    ret = {
         int         : CmdArgType.DevLong64,
         str         : CmdArgType.DevString,
         bool        : CmdArgType.DevBoolean,
@@ -89,11 +90,11 @@ def __build_to_tango_type():
         chr         : CmdArgType.DevUChar,
         None        : CmdArgType.DevVoid,
 
-        'int'       : CmdArgType.DevLong,
+        'int'       : CmdArgType.DevLong64,
         'int16'     : CmdArgType.DevShort,
         'int32'     : CmdArgType.DevLong,
         'int64'     : CmdArgType.DevLong64,
-        'uint'      : CmdArgType.DevULong,
+        'uint'      : CmdArgType.DevULong64,
         'uint16'    : CmdArgType.DevUShort,
         'uint32'    : CmdArgType.DevULong,
         'uint64'    : CmdArgType.DevULong64,
@@ -122,7 +123,6 @@ def __build_to_tango_type():
     except NameError:
         pass
 
-
     for key in dir(CmdArgType):
         if key.startswith("Dev"):
             value = getattr(CmdArgType, key)
@@ -130,18 +130,18 @@ def __build_to_tango_type():
 
     if constants.NUMPY_SUPPORT:
         import numpy
-        FROM_TANGO_TO_NUMPY_TYPE = { \
-                   CmdArgType.DevBoolean : numpy.bool8,
-                     CmdArgType.DevUChar : numpy.ubyte,
-                     CmdArgType.DevShort : numpy.short,
-                    CmdArgType.DevUShort : numpy.ushort,
-                      CmdArgType.DevLong : numpy.int32,
-                     CmdArgType.DevULong : numpy.uint32,
-                    CmdArgType.DevLong64 : numpy.int64,
-                   CmdArgType.DevULong64 : numpy.uint64,
-                    CmdArgType.DevString : numpy.str,
-                    CmdArgType.DevDouble : numpy.float64,
-                     CmdArgType.DevFloat : numpy.float32,
+        FROM_TANGO_TO_NUMPY_TYPE = {
+            CmdArgType.DevBoolean: numpy.bool8,
+            CmdArgType.DevUChar: numpy.ubyte,
+            CmdArgType.DevShort: numpy.short,
+            CmdArgType.DevUShort: numpy.ushort,
+            CmdArgType.DevLong: numpy.int32,
+            CmdArgType.DevULong: numpy.uint32,
+            CmdArgType.DevLong64: numpy.int64,
+            CmdArgType.DevULong64: numpy.uint64,
+            CmdArgType.DevString: numpy.str,
+            CmdArgType.DevDouble: numpy.float64,
+            CmdArgType.DevFloat: numpy.float32,
         }
 
         for key, value in FROM_TANGO_TO_NUMPY_TYPE.items():

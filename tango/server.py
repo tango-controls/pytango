@@ -15,10 +15,6 @@ from __future__ import with_statement
 from __future__ import print_function
 from __future__ import absolute_import
 
-__all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
-           "command", "pipe", "device_property", "class_property",
-           "run", "server_run", "Server", "get_worker", "get_async_worker"]
-
 import os
 import sys
 import copy
@@ -29,91 +25,24 @@ import weakref
 import functools
 import traceback
 
-from ._tango import (CmdArgType, AttrDataFormat, AttrWriteType,
-                       DevFailed, Except, GreenMode, constants,
-                       Database, DbDevInfo, DevState, CmdArgType,
-                       Attr, PipeWriteType)
+from ._tango import (AttrDataFormat, AttrWriteType,
+                     DevFailed, Except, GreenMode, constants,
+                     Database, DbDevInfo, DevState, CmdArgType,
+                     PipeWriteType)
 from .attr_data import AttrData
 from .pipe_data import PipeData
 from .device_class import DeviceClass
 from .utils import (get_latest_device_class, is_seq, is_non_str_seq,
-                    scalar_to_array_type)
+                    scalar_to_array_type, TO_TANGO_TYPE)
 from .codec import loads, dumps
+
+__all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
+           "command", "pipe", "device_property", "class_property",
+           "run", "server_run", "Server", "get_worker", "get_async_worker"]
 
 API_VERSION = 2
 
 LatestDeviceImpl = get_latest_device_class()
-
-def __build_to_tango_type():
-    ret = \
-    {
-        int         : CmdArgType.DevLong64,
-        str         : CmdArgType.DevString,
-        bool        : CmdArgType.DevBoolean,
-        bytearray   : CmdArgType.DevEncoded,
-        float       : CmdArgType.DevDouble,
-        chr         : CmdArgType.DevUChar,
-        None        : CmdArgType.DevVoid,
-
-        'int'       : CmdArgType.DevLong64,
-        'int16'     : CmdArgType.DevShort,
-        'int32'     : CmdArgType.DevLong,
-        'int64'     : CmdArgType.DevLong64,
-        'uint'      : CmdArgType.DevULong64,
-        'uint16'    : CmdArgType.DevUShort,
-        'uint32'    : CmdArgType.DevULong,
-        'uint64'    : CmdArgType.DevULong64,
-        'str'       : CmdArgType.DevString,
-        'string'    : CmdArgType.DevString,
-        'text'      : CmdArgType.DevString,
-        'bool'      : CmdArgType.DevBoolean,
-        'boolean'   : CmdArgType.DevBoolean,
-        'bytes'     : CmdArgType.DevEncoded,
-        'bytearray' : CmdArgType.DevEncoded,
-        'float'     : CmdArgType.DevDouble,
-        'float32'   : CmdArgType.DevFloat,
-        'float64'   : CmdArgType.DevDouble,
-        'double'    : CmdArgType.DevDouble,
-        'byte'      : CmdArgType.DevUChar,
-        'chr'       : CmdArgType.DevUChar,
-        'char'      : CmdArgType.DevUChar,
-        'None'      : CmdArgType.DevVoid,
-        'state'     : CmdArgType.DevState,
-        'enum'      : CmdArgType.DevEnum,
-    }
-
-    try:
-        ret[long] = ret[int]
-    except NameError:
-        pass
-
-
-    for key in dir(CmdArgType):
-        if key.startswith("Dev"):
-            value = getattr(CmdArgType, key)
-            ret[key] = ret[value] = value
-
-    if constants.NUMPY_SUPPORT:
-        import numpy
-        FROM_TANGO_TO_NUMPY_TYPE = { \
-                   CmdArgType.DevBoolean : numpy.bool8,
-                     CmdArgType.DevUChar : numpy.ubyte,
-                     CmdArgType.DevShort : numpy.short,
-                    CmdArgType.DevUShort : numpy.ushort,
-                      CmdArgType.DevLong : numpy.int32,
-                     CmdArgType.DevULong : numpy.uint32,
-                    CmdArgType.DevLong64 : numpy.int64,
-                   CmdArgType.DevULong64 : numpy.uint64,
-                    CmdArgType.DevString : numpy.str,
-                    CmdArgType.DevDouble : numpy.float64,
-                     CmdArgType.DevFloat : numpy.float32,
-        }
-
-        for key, value in FROM_TANGO_TO_NUMPY_TYPE.items():
-            ret[value] = key
-    return ret
-
-TO_TANGO_TYPE = __build_to_tango_type()
 
 
 def _get_tango_type_format(dtype=None, dformat=None):
