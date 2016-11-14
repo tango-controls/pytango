@@ -16,6 +16,20 @@ This is an internal PyTango module.
 from __future__ import with_statement
 from __future__ import print_function
 
+import os
+import sys
+import numbers
+import collections
+
+from ._tango import StdStringVector, StdDoubleVector, \
+    DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
+    EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
+    DevState, CommunicationFailed
+
+from . import _tango
+from .constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
+from .release import Release
+
 __all__ = [
     "requires_pytango", "requires_tango",
     "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
@@ -31,53 +45,73 @@ __all__ = [
 
 __docformat__ = "restructuredtext"
 
-import os
-import sys
-import numbers
-import collections
 
-from ._tango import StdStringVector, StdDoubleVector, \
-    DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
-    EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
-    DevState, CommunicationFailed
+# Types
 
-from . import _tango
-from .constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
-from .release import Release
+_scalar_int_types = (
+    CmdArgType.DevShort,
+    CmdArgType.DevUShort,
+    CmdArgType.DevInt,
+    CmdArgType.DevLong,
+    CmdArgType.DevULong,
+    CmdArgType.DevLong64,
+    CmdArgType.DevULong64,)
 
+_scalar_float_types = (
+    CmdArgType.DevFloat,
+    CmdArgType.DevDouble,)
 
-_scalar_int_types = (CmdArgType.DevShort, CmdArgType.DevUShort,
-    CmdArgType.DevInt, CmdArgType.DevLong, CmdArgType.DevULong,
-    CmdArgType.DevLong64, CmdArgType.DevULong64)
+_scalar_numerical_types = (
+    _scalar_int_types +
+    _scalar_float_types)
 
-_scalar_float_types = (CmdArgType.DevFloat, CmdArgType.DevDouble,)
+_scalar_str_types = (
+    CmdArgType.DevString,
+    CmdArgType.ConstDevString,)
 
-_scalar_numerical_types = _scalar_int_types + _scalar_float_types
+_scalar_bool_types = (
+    CmdArgType.DevBoolean,)
 
-_scalar_str_types = (CmdArgType.DevString, CmdArgType.ConstDevString,)
+_scalar_types = (
+    _scalar_numerical_types +
+    _scalar_str_types +
+    _scalar_bool_types +
+    (CmdArgType.DevEncoded,
+     CmdArgType.DevUChar,))
 
-_scalar_bool_types = (CmdArgType.DevBoolean,)
+_array_int_types = (
+    CmdArgType.DevVarShortArray,
+    CmdArgType.DevVarUShortArray,
+    CmdArgType.DevVarLongArray,
+    CmdArgType.DevVarULongArray,
+    CmdArgType.DevVarLong64Array,
+    CmdArgType.DevVarULong64Array)
 
-_scalar_types = _scalar_numerical_types + _scalar_str_types + \
-    _scalar_bool_types + (CmdArgType.DevEncoded, CmdArgType.DevUChar)
+_array_float_types = (
+    CmdArgType.DevVarFloatArray,
+    CmdArgType.DevVarDoubleArray)
 
-_array_int_types = (CmdArgType.DevVarShortArray, CmdArgType.DevVarUShortArray,
-                    CmdArgType.DevVarLongArray, CmdArgType.DevVarULongArray,
-                    CmdArgType.DevVarLong64Array, CmdArgType.DevVarULong64Array)
+_array_numerical_types = (
+    _array_int_types +
+    _array_float_types)
 
-_array_float_types = (CmdArgType.DevVarFloatArray, CmdArgType.DevVarDoubleArray)
+_array_str_types = (
+    CmdArgType.DevVarStringArray,)
 
-_array_numerical_types = _array_int_types + _array_float_types
+_array_bool_types = (
+    CmdArgType.DevVarBooleanArray,)
 
-_array_str_types = (CmdArgType.DevVarStringArray,)
-
-_array_bool_types = (CmdArgType.DevVarBooleanArray,)
-
-_array_types = _array_numerical_types + _array_bool_types + _array_str_types + \
+_array_types = (
+    _array_numerical_types +
+    _array_bool_types +
+    _array_str_types +
     (CmdArgType.DevVarCharArray,
-     CmdArgType.DevVarDoubleStringArray, CmdArgType.DevVarLongStringArray)
+     CmdArgType.DevVarDoubleStringArray,
+     CmdArgType.DevVarLongStringArray,))
 
-_binary_types = (CmdArgType.DevEncoded, CmdArgType.DevVarCharArray)
+_binary_types = (
+    CmdArgType.DevEncoded,
+    CmdArgType.DevVarCharArray,)
 
 
 def __build_to_tango_type():
@@ -176,12 +210,13 @@ __NO_STR_VALUE = AlrmValueNotSpec, StatusNotSet
 
 __device_classes = None
 
-bool_ = lambda value_str : value_str.lower() == "true"
+bool_ = lambda value_str: value_str.lower() == "true"
 
 
 def __import(name):
     __import__(name)
     return sys.modules[name]
+
 
 def __requires(package_name, min_version=None, conflicts=(),
                software_name="Software"):
@@ -218,6 +253,7 @@ def __requires(package_name, min_version=None, conflicts=(),
         raise Exception(msg)
     return True
 
+
 def requires_pytango(min_version=None, conflicts=(),
                      software_name="Software"):
     """
@@ -253,8 +289,7 @@ def requires_pytango(min_version=None, conflicts=(),
                       conflicts=conflicts, software_name=software_name)
 
 
-def requires_tango(min_version=None, conflicts=(),
-                     software_name="Software"):
+def requires_tango(min_version=None, conflicts=(), software_name="Software"):
     """
     Determines if the required Tango version for the running
     software is present. If not an exception is thrown.
@@ -297,8 +332,8 @@ def get_tango_device_classes():
         while True:
             dc = "Device_{0}Impl".format(i)
             try:
-               __device_classes.append(getattr(_tango, dc))
-               i = i + 1
+                __device_classes.append(getattr(_tango, dc))
+                i = i + 1
             except AttributeError:
                 break
     return __device_classes
@@ -396,7 +431,7 @@ def is_pure_str(obj):
     :return: True is the given obj is a string or False otherwise
     :rtype: :py:obj:`bool`
     """
-    return isinstance(obj , __str_klasses)
+    return isinstance(obj, __str_klasses)
 
 
 def is_seq(obj):
@@ -482,6 +517,7 @@ def is_scalar(tg_type):
     return tg_type in _scalar_types
 
 is_scalar_type = is_scalar
+
 
 def is_array(tg_type):
     """Tells if the given tango type is an array type
@@ -585,6 +621,7 @@ def is_bool(tg_type, inc_array=False):
 
 is_bool_type = is_bool
 
+
 def is_str(tg_type, inc_array=False):
     """Tells if the given tango type is string
 
@@ -637,7 +674,8 @@ def seq_2_StdStringVector(seq, vec=None):
         :rtype: :class:`tango.StdStringVector`
     """
     if vec is None:
-        if isinstance(seq, StdStringVector): return seq
+        if isinstance(seq, StdStringVector):
+            return seq
         vec = StdStringVector()
     if not isinstance(vec, StdStringVector):
         raise TypeError('vec must be a tango.StdStringVector')
@@ -676,7 +714,8 @@ def seq_2_StdDoubleVector(seq, vec=None):
         :rtype: :class:`tango.StdDoubleVector`
     """
     if vec is None:
-        if isinstance(seq, StdDoubleVector): return seq
+        if isinstance(seq, StdDoubleVector):
+            return seq
         vec = StdDoubleVector()
     if not isinstance(vec, StdDoubleVector):
         raise TypeError('vec must be a tango.StdDoubleVector')
@@ -695,10 +734,12 @@ def StdDoubleVector_2_seq(vec, seq=None):
         :return: a python sequence filled with the same contents as seq
         :rtype: sequence<float>
     """
-    if seq is None: seq = []
+    if seq is None:
+        seq = []
     if not isinstance(vec, StdDoubleVector):
         raise TypeError('vec must be a tango.StdDoubleVector')
-    for e in vec: seq.append(float(e))
+    for e in vec:
+        seq.append(float(e))
     return seq
 
 
@@ -714,11 +755,13 @@ def seq_2_DbDevInfos(seq, vec=None):
         :rtype: :class:`tango.DbDevInfos`
     """
     if vec is None:
-        if isinstance(seq, DbDevInfos): return seq
+        if isinstance(seq, DbDevInfos):
+            return seq
         vec = DbDevInfos()
     if not isinstance(vec, DbDevInfos):
         raise TypeError('vec must be a tango.DbDevInfos')
-    for e in seq: vec.append(e)
+    for e in seq:
+        vec.append(e)
     return vec
 
 
@@ -734,11 +777,13 @@ def seq_2_DbDevExportInfos(seq, vec=None):
         :rtype: :class:`tango.DbDevExportInfos`
     """
     if vec is None:
-        if isinstance(seq, DbDevExportInfos): return seq
+        if isinstance(seq, DbDevExportInfos):
+            return seq
         vec = DbDevExportInfos()
     if not isinstance(vec, DbDevExportInfos):
         raise TypeError('vec must be a tango.DbDevExportInfos')
-    for e in seq: vec.append(e)
+    for e in seq:
+        vec.append(e)
     return vec
 
 
@@ -763,9 +808,12 @@ def seq_2_DbData(seq, vec=None):
 
 
 def DbData_2_dict(db_data, d=None):
-    if d is None: d = {}
+    if d is None:
+        d = {}
     if not isinstance(db_data, DbData):
-        raise TypeError('db_data must be a tango.DbData. A %s found instead' % type(db_data))
+        raise TypeError(
+            'db_data must be a tango.DbData. A %s found instead' %
+            type(db_data))
     for db_datum in db_data:
         d[db_datum.name] = db_datum.value_string
     return d
@@ -809,7 +857,7 @@ def _seqStr_2_obj_from_type(seq, tg_type):
     if tg_type == CmdArgType.DevBoolean:
         return seq[0].lower() == 'true'
 
-    #sequence cases
+    # sequence cases
     if tg_type in (CmdArgType.DevVarCharArray, CmdArgType.DevVarStringArray):
         return seq
 
@@ -865,7 +913,7 @@ def _seqStr_2_obj_from_type_format(seq, tg_type, tg_format):
                 argout.append(tmp)
             return argout
 
-    #UNKNOWN_FORMAT
+    # UNKNOWN_FORMAT
     return _seqStr_2_obj_from_type(tg_type, seq)
 
 
@@ -1018,25 +1066,29 @@ class CaselessList(list):
         list.__init__(self)
         for entry in inlist:
             if not isinstance(entry, str):
-                raise TypeError('Members of this object must be strings. ' \
-                                'You supplied \"%s\" which is \"%s\"' %
-                                (entry, type(entry)))
+                raise TypeError(
+                    'Members of this object must be strings. '
+                    'You supplied \"%s\" which is \"%s\"' %
+                    (entry, type(entry)))
             self.append(entry)
 
     def findentry(self, item):
         """A caseless way of checking if an item is in the list or not.
         It returns None or the entry."""
         if not isinstance(item, str):
-            raise TypeError('Members of this object must be strings. '\
-                            'You supplied \"%s\"' % type(item))
+            raise TypeError(
+                'Members of this object must be strings. '
+                'You supplied \"%s\"' % type(item))
         for entry in self:
-            if item.lower() == entry.lower(): return entry
+            if item.lower() == entry.lower():
+                return entry
         return None
 
     def __contains__(self, item):
         """A caseless way of checking if a list has a member in it or not."""
         for entry in self:
-            if item.lower() == entry.lower(): return True
+            if item.lower() == entry.lower():
+                return True
         return False
 
     def remove(self, item):
@@ -1062,26 +1114,30 @@ class CaselessList(list):
     def append(self, item):
         """Adds an item to the list and checks it's a string."""
         if not isinstance(item, str):
-            raise TypeError('Members of this object must be strings. ' \
-                            'You supplied \"%s\"' % type(item))
+            raise TypeError(
+                'Members of this object must be strings. '
+                'You supplied \"%s\"' % type(item))
         list.append(self, item)
 
     def extend(self, item):
         """Extend the list with another list. Each member of the list must be
         a string."""
         if not isinstance(item, list):
-            raise TypeError('You can only extend lists with lists. ' \
-                            'You supplied \"%s\"' % type(item))
+            raise TypeError(
+                'You can only extend lists with lists. '
+                'You supplied \"%s\"' % type(item))
         for entry in item:
             if not isinstance(entry, str):
-                raise TypeError('Members of this object must be strings. '\
-                                'You supplied \"%s\"' % type(entry))
+                raise TypeError(
+                    'Members of this object must be strings. '
+                    'You supplied \"%s\"' % type(entry))
             list.append(self, entry)
 
     def count(self, item):
         """Counts references to 'item' in a caseless manner.
         If item is not a string it will always return 0."""
-        if not isinstance(item, str): return 0
+        if not isinstance(item, str):
+            return 0
         count = 0
         for entry in self:
             if item.lower() == entry.lower():
@@ -1095,12 +1151,14 @@ class CaselessList(list):
         minindex and maxindex are also optional arguments
         s.index(x[, i[, j]]) return smallest k such that s[k] == x and i <= k < j
         """
-        if maxindex == None: maxindex = len(self)
+        if maxindex is None:
+            maxindex = len(self)
         minindex = max(0, minindex) - 1
         maxindex = min(len(self), maxindex)
         if not isinstance(item, str):
-            raise TypeError('Members of this object must be strings. '\
-                            'You supplied \"%s\"' % type(item))
+            raise TypeError(
+                'Members of this object must be strings. '
+                'You supplied \"%s\"' % type(item))
         index = minindex
         while index < maxindex:
             index += 1
@@ -1112,8 +1170,9 @@ class CaselessList(list):
         """s.insert(i, x) same as s[i:i] = [x]
         Raises TypeError if x isn't a string."""
         if not isinstance(x, str):
-            raise TypeError('Members of this object must be strings. ' \
-                            'You supplied \"%s\"' % type(x))
+            raise TypeError(
+                'Members of this object must be strings. '
+                'You supplied \"%s\"' % type(x))
         list.insert(self, i, x)
 
     def __setitem__(self, index, value):
@@ -1126,16 +1185,19 @@ class CaselessList(list):
         """
         if isinstance(index, int):
             if not isinstance(value, str):
-                raise TypeError('Members of this object must be strings. ' \
-                                'You supplied \"%s\"' % type(value))
+                raise TypeError(
+                    'Members of this object must be strings. '
+                    'You supplied \"%s\"' % type(value))
             list.__setitem__(self, index, value)
         elif isinstance(index, slice):
             if not hasattr(value, '__len__'):
-                raise TypeError('Value given to set slice is not a sequence object.')
+                raise TypeError(
+                    'Value given to set slice is not a sequence object.')
             for entry in value:
                 if not isinstance(entry, str):
-                    raise TypeError('Members of this object must be strings. ' \
-                                    'You supplied \"%s\"' % type(entry))
+                    raise TypeError(
+                        'Members of this object must be strings. '
+                        'You supplied \"%s\"' % type(entry))
             list.__setitem__(self, index, value)
         else:
             raise TypeError('Indexes must be integers or slice objects.')
@@ -1144,8 +1206,9 @@ class CaselessList(list):
         """Called to implement assignment to self[i:j]."""
         for entry in sequence:
             if not isinstance(entry, str):
-                raise TypeError('Members of this object must be strings. ' \
-                                'You supplied \"%s\"' % type(entry))
+                raise TypeError(
+                    'Members of this object must be strings. '
+                    'You supplied \"%s\"' % type(entry))
         list.__setslice__(self, i, j, sequence)
 
     def __getslice__(self, i, j):
@@ -1175,7 +1238,8 @@ class CaselessList(list):
 
     def __iadd__(self, item):
         """To add a list in place."""
-        for entry in item: self.append(entry)
+        for entry in item:
+            self.append(entry)
 
     def __mul__(self, item):
         """To multiply itself, and return a CaselessList.
@@ -1212,7 +1276,7 @@ class CaselessDict(dict):
         dict.__delitem__(self, k.lower())
 
     def has_key(self, key):
-        return dict.has_key(self, key.lower())
+        return key.lower() in self
 
     def get(self, key, def_val=None):
         return dict.get(self, key.lower(), def_val)
@@ -1241,9 +1305,11 @@ __BASE_LINE = "notifd"
 __END_NOTIFD_LINE = "/DEVICE/notifd:"
 __NOTIFD_FACTORY_PREFIX = "notifd/factory/"
 
-def notifd2db(notifd_ior_file=__DEFAULT_FACT_IOR_FILE, files=None, host=None, out=sys.stdout):
+
+def notifd2db(notifd_ior_file=__DEFAULT_FACT_IOR_FILE,
+              files=None, host=None, out=sys.stdout):
     ior_string = ""
-    with file(notifd_ior_file) as ior_file:
+    with open(notifd_ior_file) as ior_file:
         ior_string = ior_file.read()
 
     if files is None:
@@ -1251,20 +1317,22 @@ def notifd2db(notifd_ior_file=__DEFAULT_FACT_IOR_FILE, files=None, host=None, ou
     else:
         return _notifd2db_file_db(ior_string, files, out=out)
 
+
 def _notifd2db_file_db(ior_string, files, out=sys.stdout):
     raise RuntimeError("Not implemented yet")
 
-    print("going to export notification service event factory to " \
+    print("going to export notification service event factory to "
           "device server property file(s) ...", file=out)
     for f in files:
-        with file(f, "w"):
+        with open(f, "w"):
             pass
     return
+
 
 def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
     from . import Database
 
-    print("going to export notification service event factory to " \
+    print("going to export notification service event factory to "
           "Tango database ...", file=out)
 
     num_retries = 3
@@ -1294,8 +1362,9 @@ def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
     while num_retries > 0:
         try:
             db.command_inout("DbExportEvent", args)
-            print("Successfully exported notification service event " \
-                  "factory for host", host_name, "to Tango database !", file=out)
+            print("Successfully exported notification service event "
+                  "factory for host", host_name, "to Tango database !",
+                  file=out)
             break
         except CommunicationFailed as cf:
             if len(cf.errors) >= 2:
@@ -1310,7 +1379,7 @@ def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
             num_retries = 0
 
     if num_retries == 0:
-        print("Failed to export notification service event factory " \
+        print("Failed to export notification service event factory "
               "to TANGO database", file=out)
 
 
@@ -1358,7 +1427,7 @@ class EventCallBack(object):
         try:
             self._push_event(evt)
         except Exception as e:
-            print("Unexpected error in callback for %s: %s" \
+            print("Unexpected error in callback for %s: %s"
                   % (str(evt), str(e)), file=self._fd)
 
     def _push_event(self, evt):
@@ -1409,7 +1478,8 @@ class EventCallBack(object):
             return "[%s] %s" % (e.reason, e.desc)
 
         if isinstance(evt, EventData):
-            return "[%s] %s" % (evt.attr_value.quality, str(evt.attr_value.value))
+            return "[%s] %s" % (
+                evt.attr_value.quality, str(evt.attr_value.value))
         elif isinstance(evt, AttrConfEventData):
             cfg = evt.attr_conf
             return "label='%s'; unit='%s'" % (cfg.label, cfg.unit)
@@ -1437,7 +1507,8 @@ def get_home():
                 path = os.environ[evar]
                 if os.path.isdir(path):
                     break
-            except: pass
+            except:
+                pass
     if path:
         return path
     else:
@@ -1472,11 +1543,11 @@ def _get_env_var(env_var_name):
     if not os.path.exists(fname):
         return None
 
-    for line in file(fname):
+    for line in open(fname):
         strippedline = line.split('#', 1)[0].strip()
 
         if not strippedline:
-            #empty line
+            # empty line
             continue
 
         tup = strippedline.split('=', 1)
@@ -1490,7 +1561,7 @@ def _get_env_var(env_var_name):
 
 
 def from_version_str_to_hex_str(version_str):
-    v = map(int, version_str.split('.'));
+    v = map(int, version_str.split('.'))
     return "0x%02d%02d%02d00" % (v[0], v[1], v[2])
 
 
