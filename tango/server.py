@@ -92,6 +92,7 @@ def set_complex_value(attr, value):
         else:
             attr.set_value(value)
 
+
 def _get_wrapped_read_method(attribute, read_method):
     read_args = inspect.getargspec(read_method)
     nb_args = len(read_args.args)
@@ -283,14 +284,15 @@ def _get_wrapped_pipe_write_method(pipe, write_method):
         def write_pipe(self, pipe):
             # TODO
             raise NotImplementedError
-            #value = pipe.get_write_value()
-            return write_method(self, value)
+            # value = pipe.get_write_value()
+            # return write_method(self, value)
     else:
         @functools.wraps(write_method)
         def write_pipe(self, pipe):
+            # TODO
             raise NotImplementedError
-            #value = pipe.get_write_value()
-            return get_worker().execute(write_method, self, value)
+            # value = pipe.get_write_value()
+            # return get_worker().execute(write_method, self, value)
     return write_pipe
 
 
@@ -404,10 +406,8 @@ class _DeviceClass(DeviceClass):
                 try:
                     init_dyn_attrs()
                 except Exception:
-                    dev.warn_stream("Failed to initialize dynamic " \
-                                    "attributes")
-                    dev.debug_stream("Details: " + \
-                                     traceback.format_exc())
+                    dev.warn_stream("Failed to initialize dynamic attributes")
+                    dev.debug_stream("Details: " + traceback.format_exc())
 
 
 def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
@@ -585,25 +585,27 @@ class Device(LatestDeviceImpl):
     def dev_status(self):
         return LatestDeviceImpl.dev_status(self)
 
-    def get_device_properties(self, ds_class = None):
+    def get_device_properties(self, ds_class=None):
         if ds_class is None:
             try:
-                # Call this method in a try/except in case this is called during
-                # the DS shutdown sequence
+                # Call this method in a try/except in case this is called
+                # during the DS shutdown sequence
                 ds_class = self.get_device_class()
             except:
                 return
         try:
             pu = self.prop_util = ds_class.prop_util
-            self.device_property_list = copy.deepcopy(ds_class.device_property_list)
+            self.device_property_list = copy.deepcopy(
+                ds_class.device_property_list)
             class_prop = ds_class.class_property_list
-            pu.get_device_properties(self, class_prop, self.device_property_list)
+            pu.get_device_properties(
+                self, class_prop, self.device_property_list)
             for prop_name in class_prop:
                 value = pu.get_property_values(prop_name, class_prop)
                 self._tango_properties[prop_name] = value
             for prop_name in self.device_property_list:
-                value = self.prop_util.get_property_values(prop_name,
-                                                           self.device_property_list)
+                value = self.prop_util.get_property_values(
+                    prop_name, self.device_property_list)
                 self._tango_properties[prop_name] = value
         except DevFailed as df:
             print(80*"-")
@@ -787,8 +789,7 @@ class attribute(AttrData):
                                                     'TANGO attribute'))
         if 'dtype' in kwargs:
             kwargs['dtype'], kwargs['dformat'] = \
-                _get_tango_type_format(kwargs['dtype'],
-                                      kwargs.get('dformat'))
+                _get_tango_type_format(kwargs['dtype'], kwargs.get('dformat'))
         self.build_from_dict(kwargs)
 
     def get_attribute(self, obj):
@@ -952,7 +953,8 @@ class pipe(PipeData):
                                                     'TANGO pipe'))
         self.build_from_dict(kwargs)
         if self.pipe_write == PipeWriteType.PIPE_READ_WRITE:
-            raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
+            raise NotImplementedError(
+                'writtable pipes not implemented in 9.2.0a')
 
     def get_pipe(self, obj):
         dclass = obj.get_device_class()
@@ -1008,8 +1010,8 @@ def __build_command_doc(f, name, dtype_in, doc_in, dtype_out, doc_out):
             except:
                 pass
         msg = doc_in or '(not documented)'
-        doc += '\n\n:param {0}: {1}\n:type {0}: {2}'.format(param_name, msg,
-                                                           dtype_in_str)
+        doc += '\n\n:param {0}: {1}\n:type {0}: {2}'.format(
+            param_name, msg, dtype_in_str)
     if dtype_out is not None:
         dtype_out_str = str(dtype_out)
         if not isinstance(dtype_out, str):
@@ -1215,7 +1217,7 @@ class class_property(_BaseProperty):
 
 def __to_cb(post_init_callback):
     if post_init_callback is None:
-        return lambda : None
+        return lambda: None
 
     err_msg = "post_init_callback must be a callable or " \
               "sequence <callable [, args, [, kwargs]]>"
@@ -1253,7 +1255,7 @@ def _to_classes(classes):
             else:
                 if not hasattr(klass_info, '_api') or klass_info._api < 2:
                     raise Exception(
-                        "When giving a single class, it must " \
+                        "When giving a single class, it must "
                         "implement HLAPI (see tango.server)")
                 klass_klass = klass_info.TangoClassClass
                 klass_name = klass_info.TangoClassName
@@ -1269,7 +1271,7 @@ def _to_classes(classes):
             else:
                 if not hasattr(klass_info, '_api') or klass_info._api < 2:
                     raise Exception(
-                        "When giving a single class, it must " \
+                        "When giving a single class, it must "
                         "implement HLAPI (see tango.server)")
                 klass_klass = klass_info.TangoClassClass
                 klass_name = klass_info.TangoClassName
@@ -1460,7 +1462,7 @@ def run(classes, args=None, msg_stream=sys.stdout,
         a sequence <TangoClass, TangoClassClass>[, tango class name]
     """
     if msg_stream is None:
-        write = lambda msg : None
+        write = lambda msg: None
     else:
         write = msg_stream.write
     try:
@@ -1471,20 +1473,21 @@ def run(classes, args=None, msg_stream=sys.stdout,
     except KeyboardInterrupt:
         write("Exiting: Keyboard interrupt\n")
     except DevFailed as df:
-        write("Exiting: Server exited with tango.DevFailed:\n" + \
+        write("Exiting: Server exited with tango.DevFailed:\n" +
               str(df) + "\n")
         if verbose:
             write(traceback.format_exc())
     except Exception as e:
-        write("Exiting: Server exited with unforseen exception:\n" + \
+        write("Exiting: Server exited with unforseen exception:\n" +
               str(e) + "\n")
         if verbose:
             write(traceback.format_exc())
     write("\nExited\n")
 
+
 def server_run(classes, args=None, msg_stream=sys.stdout,
-        verbose=False, util=None, event_loop=None,
-        post_init_callback=None, green_mode=None):
+               verbose=False, util=None, event_loop=None,
+               post_init_callback=None, green_mode=None):
     """
     Since PyTango 8.1.2 it is just an alias to
     :func:`~tango.server.run`. Use :func:`~tango.server.run`
@@ -1517,13 +1520,17 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
 class BaseWorker:
     def __init__(self, max_queue_size=0):
         pass
+
     def execute(self, func, *args, **kwargs):
         return func(*args, **kwargs)
+
     def stop(self):
         pass
 
 
 __WORKER = BaseWorker()
+__ASYNC_WORKER = None
+
 def get_worker():
     global __WORKER
     return __WORKER
@@ -1534,7 +1541,6 @@ def set_worker(worker):
     __WORKER = worker
 
 
-__ASYNC_WORKER = None
 def get_async_worker():
     global __ASYNC_WORKER
     return __ASYNC_WORKER
