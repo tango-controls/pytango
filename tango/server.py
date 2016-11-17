@@ -28,7 +28,8 @@ from ._tango import DevFailed, Except, GreenMode
 from .attr_data import AttrData
 from .pipe_data import PipeData
 from .device_class import DeviceClass
-from .utils import get_latest_device_class, is_seq, is_non_str_seq
+from .device_server import LatestDeviceImpl
+from .utils import is_seq, is_non_str_seq
 from .utils import scalar_to_array_type, TO_TANGO_TYPE
 
 __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
@@ -37,8 +38,6 @@ __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
            "Server"]
 
 API_VERSION = 2
-
-LatestDeviceImpl = get_latest_device_class()
 
 
 def _get_tango_type_format(dtype=None, dformat=None):
@@ -575,7 +574,7 @@ class Device(LatestDeviceImpl):
 
     def delete_device(self):
         pass
-    delete_device.__doc__ == LatestDeviceImpl.delete_device.__doc__
+    delete_device.__doc__ = LatestDeviceImpl.delete_device.__doc__
 
     def read_attr_hardware(self, attr_list):
         return LatestDeviceImpl.read_attr_hardware(self, attr_list)
