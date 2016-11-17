@@ -15,32 +15,43 @@ This is an internal PyTango module.
 
 from __future__ import print_function
 
-__all__ = [ "ChangeEventProp", "PeriodicEventProp",
-            "ArchiveEventProp","AttributeAlarm", "EventProperties",
-            "AttributeConfig", "AttributeConfig_2",
-            "AttributeConfig_3", "AttributeConfig_5",
-            "MultiAttrProp", "device_server_init"]
-
-__docformat__ = "restructuredtext"
-
 import copy
 
-from ._tango import DeviceImpl, Device_3Impl, Device_4Impl, Device_5Impl, \
-    DevFailed, Attribute, WAttribute, \
-    MultiAttribute, MultiClassAttribute, \
-    Attr, Logger, AttrWriteType, AttrDataFormat, CmdArgType, \
-    DispLevel, UserDefaultAttrProp, StdStringVector
+from ._tango import (
+    DeviceImpl, Device_3Impl, Device_4Impl, Device_5Impl,
+    DevFailed, Attribute, WAttribute,
+    MultiAttribute, MultiClassAttribute,
+    Attr, Logger, AttrWriteType, AttrDataFormat,
+    DispLevel, UserDefaultAttrProp, StdStringVector)
 
 from .utils import document_method as __document_method
-from .utils import copy_doc
+from .utils import copy_doc, get_latest_device_class
 from .attr_data import AttrData
 
 from .log4tango import TangoStream
 
+
+__docformat__ = "restructuredtext"
+
+__all__ = ["ChangeEventProp", "PeriodicEventProp",
+           "ArchiveEventProp", "AttributeAlarm", "EventProperties",
+           "AttributeConfig", "AttributeConfig_2",
+           "AttributeConfig_3", "AttributeConfig_5",
+           "MultiAttrProp", "device_server_init"]
+
+
+class LatestDeviceImpl(get_latest_device_class()):
+    __doc__ = """\
+    Latest implementation of the TANGO device base class (alias for {0}).
+
+    It inherits from CORBA classes where all the network layer is implemented.
+    """.format(get_latest_device_class().__name__)
+
+
 class AttributeAlarm(object):
     """This class represents the python interface for the Tango IDL object
     AttributeAlarm."""
-    
+
     def __init__(self):
         self.min_alarm = ''
         self.max_alarm = ''
