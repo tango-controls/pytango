@@ -25,7 +25,7 @@ class Release:
         - name: (str) package name
         - version_info: (tuple<int,int,int,str,int>) The five components
           of the version number: major, minor, micro, releaselevel, and
-        serial.
+          serial.
         - version: (str) package version in format <major>.<minor>.<micro>
         - release: (str) pre-release, post-release or development release;
           it is empty for final releases.
