@@ -33,7 +33,8 @@ from .utils import scalar_to_array_type, TO_TANGO_TYPE
 
 __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
            "command", "pipe", "device_property", "class_property",
-           "run", "server_run", "get_worker", "get_async_worker"]
+           "run", "server_run", "get_worker", "get_async_worker",
+           "Server"]
 
 API_VERSION = 2
 
@@ -1693,3 +1694,7 @@ def _create_asyncio_worker():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return LoopExecutor(loop=loop)
+
+
+# Avoid circular imports
+from .tango_object import Server
