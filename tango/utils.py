@@ -18,6 +18,7 @@ from __future__ import print_function
 
 import os
 import sys
+import types
 import numbers
 import collections
 
@@ -41,7 +42,7 @@ __all__ = [
     "CaselessList", "CaselessDict", "EventCallBack", "get_home",
     "from_version_str_to_hex_str", "from_version_str_to_int",
     "seq_2_StdStringVector", "StdStringVector_2_seq",
-    "TO_TANGO_TYPE"]
+    "dir2", "TO_TANGO_TYPE"]
 
 __docformat__ = "restructuredtext"
 
@@ -1591,3 +1592,38 @@ PyTango running on:
 """
     msg = msg.format(Release, Compile, Runtime)
     return msg
+
+
+def get_attrs(obj):
+    """Helper for dir2 implementation."""
+    if not hasattr(obj, '__dict__'):
+        return []  # slots only
+    if not isinstance(obj.__dict__, (dict, types.DictProxyType)):
+        raise TypeError("%s.__dict__ is not a dictionary" % obj.__name__)
+    return obj.__dict__.keys()
+
+
+def dir2(obj):
+    """Default dir implementation.
+
+    Inspired by gist: katyukha/dirmixin.py
+    https://gist.github.com/katyukha/c6e5e2b829e247c9b009
+    """
+    attrs = set()
+
+    if not hasattr(obj, '__bases__'):
+        # obj is an instance
+        if not hasattr(obj, '__class__'):
+            # slots
+            return sorted(get_attrs(obj))
+        klass = obj.__class__
+        attrs.update(get_attrs(klass))
+    else:
+        # obj is a class
+        klass = obj
+
+    for cls in klass.__bases__:
+        attrs.update(get_attrs(cls))
+        attrs.update(dir2(cls))
+    attrs.update(get_attrs(obj))
+    return list(attrs)

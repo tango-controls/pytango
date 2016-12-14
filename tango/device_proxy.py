@@ -32,6 +32,7 @@ from .utils import is_pure_str, is_non_str_seq, is_integer
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
 from .utils import seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
+from .utils import dir2
 
 from .green import result, submit, green, green_cb
 from .green import get_green_mode, get_event_loop, get_wait_default_value
@@ -309,18 +310,29 @@ def __DeviceProxy__setattr(self, name, value):
     return super(DeviceProxy, self).__setattr__(name, value)
 
 
-def __DeviceProxy__getAttributeNames(self):
-    """Return list of magic attributes to extend introspection."""
+def __DeviceProxy__dir(self):
+    """Return the attribute list including tango objects."""
+    extra_entries = set()
+    # Add commands
     try:
-        lst = [cmd.cmd_name for cmd in self.command_list_query()]
-        lst += self.get_attribute_list()
-        lst += self.get_pipe_list()
-        lst += list(map(str.lower, lst))
-        lst.sort()
-        return lst
+        extra_entries.update(self.get_command_list())
     except Exception:
         pass
-    return []
+    # Add attributes
+    try:
+        extra_entries.update(self.get_attribute_list())
+    except Exception:
+        pass
+    # Add pipes
+    try:
+        extra_entries.update(self.get_pipe_list())
+    except Exception:
+        pass
+    # Merge with default dir implementation
+    extra_entries.update(map(str.lower, extra_entries))
+    entries = extra_entries.union(dir2(self))
+    return sorted(entries)
+
 
 def __DeviceProxy__getitem(self, key):
     return self.read_attribute(key)
@@ -1314,8 +1326,7 @@ def __init_DeviceProxy():
     DeviceProxy.__getitem__ = __DeviceProxy__getitem
     DeviceProxy.__setitem__ = __DeviceProxy__setitem
     DeviceProxy.__contains__ = __DeviceProxy__contains
-
-    DeviceProxy._getAttributeNames = __DeviceProxy__getAttributeNames
+    DeviceProxy.__dir__ = __DeviceProxy__dir
 
     DeviceProxy.__get_cmd_cache = __DeviceProxy__get_cmd_cache
     DeviceProxy.__get_attr_cache = __DeviceProxy__get_attr_cache
