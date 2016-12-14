@@ -18,6 +18,7 @@ from __future__ import print_function
 
 import os
 import sys
+import six
 import types
 import numbers
 import collections
@@ -1598,7 +1599,9 @@ def get_attrs(obj):
     """Helper for dir2 implementation."""
     if not hasattr(obj, '__dict__'):
         return []  # slots only
-    if not isinstance(obj.__dict__, (dict, types.DictProxyType)):
+    proxy_type = types.MappingProxyType if six.PY3 else types.DictProxyType
+    if not isinstance(obj.__dict__, (dict, proxy_type)):
+        print(type(obj.__dict__), obj)
         raise TypeError("%s.__dict__ is not a dictionary" % obj.__name__)
     return obj.__dict__.keys()
 

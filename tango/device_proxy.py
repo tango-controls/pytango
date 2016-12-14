@@ -331,7 +331,7 @@ def __DeviceProxy__dir(self):
     except Exception:
         pass
     # Merge with default dir implementation
-    extra_entries.update(map(str.lower, extra_entries))
+    extra_entries.update([x.lower() for x in extra_entries])
     entries = extra_entries.union(dir2(self))
     return sorted(entries)
 
