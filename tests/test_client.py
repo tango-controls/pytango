@@ -219,3 +219,25 @@ def test_attribute_list_query_ex(tango_test):
     attrs = tango_test.attribute_list_query_ex()
     assert all(isinstance(a, AttributeInfoEx) for a in attrs)
     assert set(a.name for a in attrs) == set(ATTRIBUTES)
+
+
+def test_device_proxy_dir_method(tango_test):
+    lst = dir(tango_test)
+    attrs = tango_test.get_attribute_list()
+    cmds = tango_test.get_command_list()
+    pipes = tango_test.get_pipe_list()
+    methods = dir(type(tango_test))
+    internals = tango_test.__dict__.keys()
+    # Check attributes
+    assert set(attrs) < set(lst)
+    assert set(map(str.lower, attrs)) < set(lst)
+    # Check commands
+    assert set(cmds) < set(lst)
+    assert set(map(str.lower, cmds)) < set(lst)
+    # Check pipes
+    assert set(pipes) < set(lst)
+    assert set(map(str.lower, pipes)) < set(lst)
+    # Check internals
+    assert set(methods) <= set(lst)
+    # Check internals
+    assert set(internals) <= set(lst)
