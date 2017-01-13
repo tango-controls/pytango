@@ -24,7 +24,7 @@ def get_global_threadpool():
     thread_pool = gevent.get_hub().threadpool
     # before gevent-1.1.0, patch the spawn method to propagate exception raised
     # in the loop to the AsyncResult.
-    if gevent.version_info[0] <= 1 and gevent.version_info[1] < 1:
+    if gevent.version_info < (1, 1):
         thread_pool.submit = patched_spawn
     else:
         thread_pool.submit = thread_pool.spawn
