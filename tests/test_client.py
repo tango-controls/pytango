@@ -20,10 +20,14 @@ from time import sleep
 
 import psutil
 import pytest
-from tango import DeviceProxy, DevFailed
+from functools import partial
+from tango import DeviceProxy, DevFailed, GreenMode
 from tango import DeviceInfo, AttributeInfo, AttributeInfoEx
 from tango.utils import is_str_type, is_int_type, is_float_type, is_bool_type
 
+from tango.gevent import DeviceProxy as gevent_DeviceProxy
+from tango.futures import DeviceProxy as futures_DeviceProxy
+from tango.asyncio import DeviceProxy as asyncio_DeviceProxy
 
 ATTRIBUTES = [
     'ampli',
@@ -90,6 +94,12 @@ ATTRIBUTES = [
     'Status',
 ]
 
+device_proxy_map = {
+    GreenMode.Synchronous: DeviceProxy,
+    GreenMode.Futures: futures_DeviceProxy,
+    GreenMode.Asyncio: partial(asyncio_DeviceProxy, wait=True),
+    GreenMode.Gevent: gevent_DeviceProxy}
+
 
 # Helpers
 
@@ -114,18 +124,18 @@ def start_server(server, inst, device):
     return proc
 
 
-def get_proxy(host, port, device):
+def get_proxy(host, port, device, green_mode):
     access = "tango://{0}:{1}/{2}#dbase=no".format(
         host, port, device)
-    return DeviceProxy(access)
+    return device_proxy_map[green_mode](access)
 
 
-def wait_for_proxy(host, proc, device, retries=50, delay=0.1):
+def wait_for_proxy(host, proc, device, green_mode, retries=50, delay=0.1):
     for i in range(retries):
         ports = get_ports(proc.pid)
         for port in ports:
             try:
-                proxy = get_proxy(host, port, device)
+                proxy = get_proxy(host, port, device, green_mode)
                 proxy.ping()
                 return proxy
             except DevFailed:
@@ -137,14 +147,18 @@ def wait_for_proxy(host, proc, device, retries=50, delay=0.1):
 
 # Fixtures
 
-@pytest.fixture(scope="module")
+@pytest.fixture(params=[GreenMode.Synchronous,
+                        GreenMode.Asyncio,
+                        GreenMode.Gevent],
+                scope="module")
 def tango_test(request):
+    green_mode = request.param
     server = "TangoTest"
     inst = "test"
     device = "sys/tg_test/17"
     host = platform.node()
     proc = start_server(server, inst, device)
-    proxy = wait_for_proxy(host, proc, device)
+    proxy = wait_for_proxy(host, proc, device, green_mode)
 
     yield proxy
 
@@ -173,7 +187,7 @@ def writable_scalar_attribute(request):
 # Tests
 
 def test_ping(tango_test):
-    duration = tango_test.ping()
+    duration = tango_test.ping(wait=True)
     assert isinstance(duration, int)
 
 
@@ -186,7 +200,7 @@ def test_info(tango_test):
 
 def test_read_attribute(tango_test, readable_attribute):
     "Check that readable attributes can be read"
-    tango_test.read_attribute(readable_attribute)
+    tango_test.read_attribute(readable_attribute, wait=True)
 
 
 def test_write_scalar_attribute(tango_test, writable_scalar_attribute):
@@ -194,13 +208,13 @@ def test_write_scalar_attribute(tango_test, writable_scalar_attribute):
     attr_name = writable_scalar_attribute
     config = tango_test.get_attribute_config(writable_scalar_attribute)
     if is_bool_type(config.data_type):
-        tango_test.write_attribute(attr_name, True)
+        tango_test.write_attribute(attr_name, True, wait=True)
     elif is_int_type(config.data_type):
-        tango_test.write_attribute(attr_name, 76)
+        tango_test.write_attribute(attr_name, 76, wait=True)
     elif is_float_type(config.data_type):
-        tango_test.write_attribute(attr_name, -28.2)
+        tango_test.write_attribute(attr_name, -28.2, wait=True)
     elif is_str_type(config.data_type):
-        tango_test.write_attribute(attr_name, "hello")
+        tango_test.write_attribute(attr_name, "hello", wait=True)
     else:
         pytest.xfail("Not currently testing this type")
 

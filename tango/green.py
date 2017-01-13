@@ -217,8 +217,6 @@ def get_object_submitter(obj, green_mode=None):
     if executor is None:
         executor = get_executor(green_mode)
     # Get submitter
-    if green_mode == GreenMode.Gevent:
-        return executor.spawn
     return executor.submit
 
 
@@ -267,7 +265,6 @@ def green(fn):
 
         # return the proper result
         return waiter(ret, timeout=timeout) if wait else ret
-
     return greener
 
 

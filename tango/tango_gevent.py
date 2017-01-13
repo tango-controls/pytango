@@ -18,15 +18,25 @@ import six
 __all__ = ["get_global_threadpool", "get_global_executor",
            "get_event_loop", "submit", "spawn", "wait"]
 
+
 def get_global_threadpool():
     import gevent
-    return gevent.get_hub().threadpool
+    thread_pool = gevent.get_hub().threadpool
+    # before gevent-1.1.0, patch the spawn method to propagate exception raised
+    # in the loop to the AsyncResult.
+    if gevent.version_info < (1, 1):
+        thread_pool.submit = patched_spawn
+    else:
+        thread_pool.submit = thread_pool.spawn
+    return thread_pool
+
 
 class ExceptionWrapper:
     def __init__(self, exception, error_string, tb):
         self.exception = exception
         self.error_string = error_string
         self.tb = tb
+
 
 class wrap_errors(object):
     def __init__(self, func):
@@ -51,27 +61,34 @@ class wrap_errors(object):
     def __getattr__(self, item):
         return getattr(self.func, item)
 
+
 def get_with_exception(g, block=True, timeout=None):
     result = g._get(block, timeout)
     if isinstance(result, ExceptionWrapper):
         # raise the exception using the caller context
-        six.reraise(result.exception, result.error_string,result.tb)
+        six.reraise(result.exception, result.error_string, result.tb)
     else:
         return result
 
-def spawn(fn, *args, **kwargs):
-    # the gevent threadpool do not raise exception with asyncresults, we have to wrap it
+
+def patched_spawn(fn, *args, **kwargs):
+    # the gevent threadpool do not raise exception with asyncresults,
+    # we have to wrap it
     fn = wrap_errors(fn)
     g = get_global_threadpool().spawn(fn, *args, **kwargs)
     g._get = g.get
     g.get = types.MethodType(get_with_exception, g)
     return g
 
+
+def spawn(fn, *args, **kwargs):
+    return get_global_threadpool().submit(fn, *args, **kwargs)
+
+
 get_global_executor = get_global_threadpool
-
 submit = spawn
-
 __event_loop = None
+
 
 def get_event_loop():
     global __event_loop
@@ -97,6 +114,7 @@ def get_event_loop():
         __event_loop = gevent.spawn(loop, queue)
         __event_loop.submit = submit
     return __event_loop
+
 
 def wait(greenlet, timeout=None):
     return greenlet.get(timeout=timeout)
