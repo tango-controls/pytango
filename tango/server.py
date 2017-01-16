@@ -1616,7 +1616,11 @@ def _create_gevent_worker():
 
 def _create_asyncio_worker():
     import concurrent.futures
-    from threading import get_ident
+
+    try:
+        from threading import get_ident
+    except:
+        from threading import _get_ident as get_ident
 
     try:
         import asyncio
