@@ -1,14 +1,14 @@
 import json
 from PyTango import DevState
-from PyTango.server import Device, DeviceMeta, run
+from PyTango.server import Device
 from PyTango.server import attribute, command, device_property
 
+
 class TuringMachine(Device):
-    __metaclass__ = DeviceMeta
 
     blank_symbol = device_property(dtype=str, default_value=" ")
     initial_state = device_property(dtype=str, default_value="init")
-    
+
     def init_device(self):
         Device.init_device(self)
         self.__tape = {}
@@ -35,8 +35,8 @@ class TuringMachine(Device):
         self.__transition_function = tf = {}
         for k, v in json.loads(func_str).items():
             tf[tuple(str(k).split(","))] = map(str, v)
-        print tf
-        
+        print(tf)
+
     @attribute(dtype=str)
     def tape(self):
         s, keys = "", self.__tape.keys()
@@ -57,13 +57,14 @@ class TuringMachine(Device):
             elif y[2] == "L":
                 self.__head -= 1
             self.__state = y[0]
-        print self.__state
+        print(self.__state)
 
     def dev_state(self):
         if self.__state in self.__final_states:
             return DevState.ON
         else:
             return DevState.RUNNING
-            
-    
-run([TuringMachine])
+
+
+if __name__ == "__main__":
+    TuringMachine.run_server()
