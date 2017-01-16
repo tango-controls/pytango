@@ -16,6 +16,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import sys
+import six
 import copy
 import inspect
 import logging
@@ -412,7 +413,7 @@ class _DeviceClass(DeviceClass):
 
 def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     klass_name = tango_device_klass.__name__
-    if not issubclass(tango_device_klass, (Device)):
+    if not issubclass(tango_device_klass, (BaseDevice)):
         msg = "{0} device must inherit from " \
               "tango.server.Device".format(klass_name)
         raise Exception(msg)
@@ -467,7 +468,7 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     return type(devclass_name, (_DeviceClass,), devclass_attrs)
 
 
-def __init_tango_device_klass(tango_device_klass, attrs=None,
+def _init_tango_device_klass(tango_device_klass, attrs=None,
                               tango_class_name=None):
     klass_name = tango_device_klass.__name__
     tango_deviceclass_klass = __create_tango_deviceclass_klass(
@@ -506,60 +507,43 @@ def inheritance_patch(attrs):
                     obj.fset = attrs.get(method_name)
 
 
-def DeviceMeta(name, bases, attrs):
+class DeviceMeta(type(LatestDeviceImpl)):
     """
-    The :py:data:`metaclass` callable for :class:`Device`.Every
-    sub-class of :class:`Device` must have associated this metaclass
-    to itself in order to work properly (boost-python internal
-    limitation).
-
-    Example (python 2.x)::
-
-        from tango.server import Device, DeviceMeta
-
-        class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
-
-    Example (python 3.x)::
-
-        from tango.server import Device, DeviceMeta
-
-        class PowerSupply(Device, metaclass=DeviceMeta):
-            pass
+    The :py:data:`metaclass` callable for :class:`Device`.
 
     This implementation of DeviceMeta makes device inheritance possible.
     """
-    # Get metaclass
-    LatestDeviceImplMeta = type(LatestDeviceImpl)
-    # Attribute dictionary
-    dct = {}
-    # Filter object from bases
-    bases = tuple(base for base in bases if base != object)
-    # Add device to bases
-    if Device not in bases:
-        bases += (Device,)
-    # Set tango objects as attributes
-    for base in reversed(bases):
-        for key, value in base.__dict__.items():
-            if is_tango_object(value):
-                dct[key] = value
-    # Inheritance patch
-    inheritance_patch(attrs)
-    # Update attribute dictionary
-    dct.update(attrs)
-    # Create device class
-    cls = LatestDeviceImplMeta(name, bases, dct)
-    # Initialize device class
-    __init_tango_device_klass(cls, dct)
-    cls.TangoClassName = name
-    # Return device class
-    return cls
+
+    def __new__(metacls, name, bases, attrs):
+        # Attribute dictionary
+        dct = {}
+        # Filter object from bases
+        bases = tuple(base for base in bases if base != object)
+        # Set tango objects as attributes
+        for base in reversed(bases):
+            for key, value in base.__dict__.items():
+                if is_tango_object(value):
+                    dct[key] = value
+        # Inheritance patch
+        inheritance_patch(attrs)
+        # Update attribute dictionary
+        dct.update(attrs)
+        # Create device class
+        cls = type(LatestDeviceImpl).__new__(metacls, name, bases, dct)
+        # Initialize device class
+        _init_tango_device_klass(cls, dct)
+        cls.TangoClassName = name
+        # Return device class
+        return cls
 
 
-class Device(LatestDeviceImpl):
+class BaseDevice(LatestDeviceImpl):
     """
-    High level DeviceImpl API. All Device specific classes should
-    inherit from this class."""
+    Base device class for the High level API.
+
+    It should not be used directly, since this class is not an
+    instance of MetaDevice. Use tango.server.Device instead.
+    """
 
     def __init__(self, cl, name):
         self._tango_properties = {}
@@ -1693,6 +1677,17 @@ def _create_asyncio_worker():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return LoopExecutor(loop=loop)
+
+
+# Instanciate DeviceMeta using BaseDevice
+@six.add_metaclass(DeviceMeta)
+class Device(BaseDevice):
+    """
+    Device class for the high-level API.
+
+    All device specific classes should inherit from this class.
+    """
+    pass
 
 
 # Avoid circular imports
