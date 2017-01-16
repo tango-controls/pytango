@@ -642,7 +642,6 @@ class attribute(AttrData):
     *voltage* in a *PowerSupply* :class:`Device` do::
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             voltage = attribute()
 
@@ -652,7 +651,6 @@ class attribute(AttrData):
     The same can be achieved with::
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             @attribute
             def voltage(self):
@@ -711,7 +709,6 @@ class attribute(AttrData):
     unit and description::
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             current = attribute(label="Current", unit="mA", dtype=int,
                                 access=AttrWriteType.READ_WRITE,
@@ -730,7 +727,6 @@ class attribute(AttrData):
     The same, but using attribute as a decorator::
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             def init_device(self):
                 Device.init_device(self)
@@ -834,7 +830,6 @@ class pipe(PipeData):
     (for Region Of Interest), in a *Detector* :class:`Device` do::
 
         class Detector(Device):
-            __metaclass__ = DeviceMeta
 
             ROI = pipe()
 
@@ -848,7 +843,6 @@ class pipe(PipeData):
     to pass blob data)::
 
         class Detector(Device):
-            __metaclass__ = DeviceMeta
 
             @pipe
             def ROI(self):
@@ -876,7 +870,6 @@ class pipe(PipeData):
     The same example with a read-write ROI, a customized label and description::
 
         class Detector(Device):
-            __metaclass__ = DeviceMeta
 
             ROI = pipe(label='Region Of Interest', doc='The active region of interest',
                        access=PipeWriteType.PIPE_READ_WRITE)
@@ -895,7 +888,6 @@ class pipe(PipeData):
     The same, but using pipe as a decorator::
 
         class Detector(Device):
-            __metaclass__ = DeviceMeta
 
             def init_device(self):
                 Device.init_device(self)
@@ -1024,7 +1016,6 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
     ::
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             @command
             def TurnOn(self):
@@ -1154,7 +1145,6 @@ class device_property(_BaseProperty):
         from tango.server import device_property
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             host = device_property(dtype=str)
 
@@ -1182,7 +1172,6 @@ class class_property(_BaseProperty):
         from tango.server import class_property
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             port = class_property(dtype=int, default_value=9788)
 
@@ -1371,7 +1360,7 @@ def run(classes, args=None, msg_stream=sys.stdout,
         from tango.server import Device, DeviceMeta, run
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
+            pass
 
         run((PowerSupply,))
 
@@ -1396,7 +1385,7 @@ def run(classes, args=None, msg_stream=sys.stdout,
         from tango.server import Device, DeviceMeta, run
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
+            pass
 
         class MyServer(Device_4Impl):
             pass

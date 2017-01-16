@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-from six import add_metaclass
 
-from tango import GreenMode
 from tango import DevState, AttrWriteType
 from tango.server import Device, DeviceMeta
 from tango.server import command, attribute, device_property
@@ -18,7 +16,6 @@ state, typed_values, server_green_mode
 
 def test_empty_device(server_green_mode):
 
-    @add_metaclass(DeviceMeta)
     class TestDevice(Device):
         green_mode = server_green_mode
 
@@ -30,7 +27,6 @@ def test_empty_device(server_green_mode):
 def test_set_state(state, server_green_mode):
     status = 'The device is in {0!s} state.'.format(state)
 
-    @add_metaclass(DeviceMeta)
     class TestDevice(Device):
         green_mode = server_green_mode
 
@@ -49,7 +45,6 @@ def test_set_status(server_green_mode):
         "with special characters such as",
         "Café à la crème"))
 
-    @add_metaclass(DeviceMeta)
     class TestDevice(Device):
         green_mode = server_green_mode
 
@@ -67,7 +62,6 @@ def test_set_status(server_green_mode):
 def test_identity_command(typed_values, server_green_mode):
     dtype, values = typed_values
 
-    @add_metaclass(DeviceMeta)
     class TestDevice(Device):
         green_mode = server_green_mode
 
@@ -86,7 +80,6 @@ def test_identity_command(typed_values, server_green_mode):
 def test_read_write_attribute(typed_values, server_green_mode):
     dtype, values = typed_values
 
-    @add_metaclass(DeviceMeta)
     class TestDevice(Device):
         green_mode = server_green_mode
 
@@ -112,7 +105,6 @@ def test_device_property(typed_values, server_green_mode):
     default = values[0]
     value = values[1]
 
-    @add_metaclass(DeviceMeta)
     class TestDevice(Device):
         green_mode = server_green_mode
 
