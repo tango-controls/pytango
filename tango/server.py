@@ -1616,6 +1616,7 @@ def _create_gevent_worker():
 
 def _create_asyncio_worker():
     import concurrent.futures
+    from threading import get_ident
 
     try:
         import asyncio
@@ -1635,11 +1636,10 @@ def _create_asyncio_worker():
             """Initialize the executor with a given loop."""
             self.loop = loop or asyncio.get_event_loop()
 
-        def submit(self, fn, *args, **kwargs):
-            """Schedule the callable fn, to be executed as fn(*args **kwargs).
+        def submit(self, corofn, *args, **kwargs):
+            """Schedule a coroutine, to be executed as corofn(*args **kwargs).
             Return a Future representing the execution of the callable."""
-            corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
-            return run_coroutine_threadsafe(corofn(), loop)
+            return run_coroutine_threadsafe(corofn(*args, **kwargs), self.loop)
 
         def run_in_thread(self, func, *args, **kwargs):
             """Schedule a blocking callback."""
@@ -1664,7 +1664,10 @@ def _create_asyncio_worker():
 
         def execute(self, fn, *args, **kwargs):
             """Execute the callable fn as fn(*args **kwargs)."""
-            return self.submit(fn, *args, **kwargs).result()
+            corofn = asyncio.coroutine(fn)
+            if self.loop._thread_id == get_ident():
+                return corofn(*args, **kwargs)
+            return self.submit(corofn, *args, **kwargs).result()
 
     try:
         loop = asyncio.get_event_loop()
