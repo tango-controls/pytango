@@ -1668,10 +1668,10 @@ def _create_asyncio_worker():
 
         def execute(self, fn, *args, **kwargs):
             """Execute the callable fn as fn(*args **kwargs)."""
-            corofn = asyncio.coroutine(fn)
+            corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
             if self.loop._thread_id == get_ident():
-                return corofn(*args, **kwargs)
-            return self.submit(corofn, *args, **kwargs).result()
+                return corofn()
+            return self.submit(corofn).result()
 
     try:
         loop = asyncio.get_event_loop()
