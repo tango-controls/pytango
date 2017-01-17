@@ -1,15 +1,28 @@
 # -*- coding: utf-8 -*-
 
+import sys
+import textwrap
 import pytest
 
-from tango import DevState, AttrWriteType
-from tango.server import Device, DeviceMeta
+from tango import DevState, AttrWriteType, GreenMode
+from tango.server import Device
 from tango.server import command, attribute, device_property
 from tango.test_utils import DeviceTestContext
+
+# Asyncio imports
+try:
+    import asyncio
+except ImportError:
+    import trollius as asyncio
 
 # Pytest fixtures
 from tango.test_utils import state, typed_values, server_green_mode
 state, typed_values, server_green_mode
+
+# Constants
+PY3 = sys.version_info >= (3,)
+YIELD_FROM = "yield from" if PY3 else "yield asyncio.From"
+RETURN = "return" if PY3 else "raise asyncio.Return"
 
 
 # Test state/status
@@ -123,3 +136,62 @@ def test_device_property(typed_values, server_green_mode):
                            process=True) as proxy:
         expected = pytest.approx(value)
         assert proxy.get_prop() == expected
+
+
+# Test inheritance
+
+def test_inheritance(server_green_mode):
+
+    class A(Device):
+        green_mode = server_green_mode
+
+        prop1 = device_property(dtype=str, default_value="hello1")
+        prop2 = device_property(dtype=str, default_value="hello2")
+
+        @command(dtype_out=str)
+        def get_prop1(self):
+            return self.prop1
+
+        @command(dtype_out=str)
+        def get_prop2(self):
+            return self.prop2
+
+        @attribute(access=AttrWriteType.READ_WRITE)
+        def attr(self):
+            return self.attr_value
+
+        @attr.write
+        def attr(self, value):
+            self.attr_value = value
+
+        def dev_status(self):
+            return ")`'-.,_"
+
+    class B(A):
+
+        prop2 = device_property(dtype=str, default_value="goodbye2")
+
+        @attribute
+        def attr2(self):
+            return 3.14
+
+        def dev_status(self):
+            return 3 * A.dev_status(self)
+
+        if server_green_mode == GreenMode.Asyncio:
+            code = textwrap.dedent("""\
+                @asyncio.coroutine
+                def dev_status(self):
+                    coro = super(type(self), self).dev_status()
+                    result = {YIELD_FROM}(coro)
+                    {RETURN}(3*result)
+            """).format(**globals())
+            exec(code)
+
+    with DeviceTestContext(B) as proxy:
+        assert proxy.get_prop1() == "hello1"
+        assert proxy.get_prop2() == "goodbye2"
+        proxy.attr = 1.23
+        assert proxy.attr == 1.23
+        assert proxy.attr2 == 3.14
+        assert proxy.status() == ")`'-.,_)`'-.,_)`'-.,_"
