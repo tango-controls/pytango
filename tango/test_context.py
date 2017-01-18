@@ -6,6 +6,7 @@ from __future__ import absolute_import
 import os
 import six
 import struct
+import socket
 import tempfile
 import collections
 
@@ -71,19 +72,36 @@ def device(path):
     return getattr(module, device_name)
 
 
+def get_hostname():
+    """Get the hostname corresponding to the primary, external IP.
+
+    This is useful becauce an explicit hostname is required to get
+    tango events to work properly. Note that localhost does not work
+    either.
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # Connecting to a UDP address doesn't send packets
+    s.connect(('8.8.8.8', 0))
+    # Get ip address
+    ip = s.getsockname()[0]
+    # Return host name
+    return socket.gethostbyaddr(ip)[0].split('.')[0]
+
+
 # Device test context
 
 class DeviceTestContext(object):
     """ Context to run a device without a database."""
 
     nodb = "dbase=no"
-    command = "{0} {1} -ORBendPoint giop:tcp::{2} -file={3}"
+    command = "{0} {1} -ORBendPoint giop:tcp:{2}:{3} -file={4}"
     connect_timeout = 1.
     disconnect_timeout = connect_timeout
 
     def __init__(self, device, device_cls=None, server_name=None,
                  instance_name=None, device_name=None, properties={},
-                 db=None, port=0, debug=3, process=False, daemon=False):
+                 db=None, host=None, port=0, debug=3,
+                 process=False, daemon=False):
         """Inititalize the context to run a given device."""
         # Argument
         tangoclass = device.__name__
@@ -95,12 +113,14 @@ class DeviceTestContext(object):
             device_name = 'test/nodb/' + server_name.lower()
         if db is None:
             _, db = tempfile.mkstemp()
+        if host is None:
+            host = get_hostname()
         # Patch bug #819
         if process:
             os.environ['ORBscanGranularity'] = '0'
         # Attributes
         self.db = db
-        self.host = ''
+        self.host = host
         self.port = port
         self.device_name = device_name
         self.server_name = "/".join(("dserver", server_name, instance_name))
@@ -110,7 +130,8 @@ class DeviceTestContext(object):
         self.generate_db_file(server_name, instance_name, device_name,
                               tangoclass, properties)
         # Command args
-        string = self.command.format(server_name, instance_name, port, db)
+        string = self.command.format(
+            server_name, instance_name, host, port, db)
         string += " -v{0}".format(debug) if debug else ""
         cmd_args = string.split()
         # Target and arguments
@@ -213,6 +234,9 @@ def parse_command_line_args(args=None):
     msg = 'The device to run as a python path.'
     parser.add_argument('device', metavar='DEVICE',
                         type=device, help=msg)
+    msg = "The hostname to use."
+    parser.add_argument('--host', metavar='HOST',
+                        type=str, help=msg, default=None)
     msg = "The port to use."
     parser.add_argument('--port', metavar='PORT',
                         type=int, help=msg, default=8888)
@@ -224,13 +248,14 @@ def parse_command_line_args(args=None):
                         type=literal_dict, help=msg, default='{}')
     # Parse arguments
     namespace = parser.parse_args(args)
-    return namespace.device, namespace.port, namespace.prop, namespace.debug
+    return (namespace.device, namespace.host, namespace.port,
+            namespace.prop, namespace.debug)
 
 
 def run_device_test_context(args=None):
-    device, port, properties, debug = parse_command_line_args(args)
+    device, host, port, properties, debug = parse_command_line_args(args)
     context = DeviceTestContext(
-        device, properties=properties, port=port, debug=debug)
+        device, properties=properties, host=host, port=port, debug=debug)
     context.start()
     msg = '{0} started on port {1} with properties {2}'
     print(msg.format(device.__name__, context.port, properties))
