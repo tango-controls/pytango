@@ -91,7 +91,9 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 | 26/02/16 | `9.2 <http://www.esrf.fr/computing/cs/tango/pytango/v920>`_                      | Update to PyTango 9.2.0a                            | T\. Coutinho          |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
-| 15/08/16 | `9.3 <http://pytango.readthedocs.io/en/9.2.0>`_                                  | Update to PyTango 9.2.0                             | V\. Michel            |
+| 15/08/16 | `9.3 <http://pytango.readthedocs.io/en/v9.2.0>`_                                 | Update to PyTango 9.2.0                             | V\. Michel            |
++----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
+| 23/01/17 | `9.4 <http://pytango.readthedocs.io/en/v9.2.1>`_                                 | Update to PyTango 9.2.1                             | V\. Michel            |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+
 
 .. _pytango-version-history:
@@ -100,8 +102,36 @@ Version history
 ---------------
 
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| version  | Changes                                                                                                                                                               |
+| Version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
+| 9.2.1    | 9.2.1 release.                                                                                                                                                        |
+|          |                                                                                                                                                                       |
+|          | Features:                                                                                                                                                             |
+|          |     - `Pull Requests #70: Add test_context and test_utils modules, used for pytango unit-testing <https://github.com/tango-cs/pytango/issues/70>`_                    |
+|          |                                                                                                                                                                       |
+|          | Changes:                                                                                                                                                              |
+|          |     - `Issue #51: Refactor platform specific code in setup file <https://github.com/tango-cs/pytango/issues/51>`_                                                     |
+|          |     - `Issue #67: Comply with PEP 440 for pre-releases <https://github.com/tango-cs/pytango/issues/67>`_                                                              |
+|          |     - `Pull Request #70: Add unit-testing for the server API <https://github.com/tango-cs/pytango/issues/70>`_                                                        |
+|          |     - `Pull Request #70: Configure Travis CI for continuous integration <https://github.com/tango-cs/pytango/issues/70>`_                                             |
+|          |     - `Pull Request #76: Add unit-testing for the client API <https://github.com/tango-cs/pytango/issues/76>`_                                                        |
+|          |     - `Pull Request #78: Update the python version classifiers <https://github.com/tango-cs/pytango/issues/78>`_                                                      |
+|          |     - `Pull Request #80: Move tango object server to its own module <https://github.com/tango-cs/pytango/issues/80>`_                                                 |
+|          |     - `Pull Request #90: The metaclass definition for tango devices is no longer mandatory <https://github.com/tango-cs/pytango/issues/90>`_                          |
+|          |                                                                                                                                                                       |
+|          | Bug fixes:                                                                                                                                                            |
+|          |     - `Issue #24: Fix dev_status dangling pointer bug <https://github.com/tango-cs/pytango/issues/24>`_                                                               |
+|          |     - `Issue #57: Fix dev_state/status to be gevent safe <https://github.com/tango-cs/pytango/issues/57>`_                                                            |
+|          |     - `Issue #58: Server gevent mode internal call hangs <https://github.com/tango-cs/pytango/issues/58>`_                                                            |
+|          |     - `Pull Request #62: Several fixes in tango.databaseds <https://github.com/tango-cs/pytango/issues/62>`_                                                          |
+|          |     - `Pull Request #63: Follow up on issue #21 (Fix Group.get_device method) <https://github.com/tango-cs/pytango/issues/63>`_                                       |
+|          |     - `Issue #64: Fix AttributeProxy.__dev_proxy to be initialized with python internals <https://github.com/tango-cs/pytango/issues/64>`_                            |
+|          |     - `Issue #74: Fix hanging with an asynchronous tango server fails to start <https://github.com/tango-cs/pytango/issues/74>`_                                      |
+|          |     - `Pull Request #81: Fix DeviceImpl documentation <https://github.com/tango-cs/pytango/issues/81>`_                                                               |
+|          |     - `Issue #82: Fix attribute completion for device proxies with IPython >= 4 <https://github.com/tango-cs/pytango/issues/82>`_                                     |
+|          |     - `Issue #84: Fix gevent threadpool exceptions <https://github.com/tango-cs/pytango/issues/84>`_                                                                  |
+|          |                                                                                                                                                                       |
++----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 9.2.0    | 9.2.0 release.                                                                                                                                                        |
 |          |                                                                                                                                                                       |
 |          | Features:                                                                                                                                                             |
