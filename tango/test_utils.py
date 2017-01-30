@@ -1,14 +1,9 @@
 """Test utilities"""
 
-__all__ = ['DeviceTestContext', 'SimpleDevice']
-
-# Imports
-from six import add_metaclass
-
 # Local imports
 from . import utils
 from . import DevState, CmdArgType, GreenMode
-from .server import Device, DeviceMeta
+from .server import Device
 from .test_context import DeviceTestContext
 
 # Conditional imports
@@ -17,10 +12,11 @@ try:
 except ImportError:
     pytest = None
 
+__all__ = ['DeviceTestContext', 'SimpleDevice']
+
 
 # Test devices
 
-@add_metaclass(DeviceMeta)
 class SimpleDevice(Device):
     def init_device(self):
         self.set_state(DevState.ON)

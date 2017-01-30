@@ -16,6 +16,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import sys
+import six
 import copy
 import inspect
 import logging
@@ -412,7 +413,7 @@ class _DeviceClass(DeviceClass):
 
 def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     klass_name = tango_device_klass.__name__
-    if not issubclass(tango_device_klass, (Device)):
+    if not issubclass(tango_device_klass, (BaseDevice)):
         msg = "{0} device must inherit from " \
               "tango.server.Device".format(klass_name)
         raise Exception(msg)
@@ -467,7 +468,7 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
     return type(devclass_name, (_DeviceClass,), devclass_attrs)
 
 
-def __init_tango_device_klass(tango_device_klass, attrs=None,
+def _init_tango_device_klass(tango_device_klass, attrs=None,
                               tango_class_name=None):
     klass_name = tango_device_klass.__name__
     tango_deviceclass_klass = __create_tango_deviceclass_klass(
@@ -506,60 +507,43 @@ def inheritance_patch(attrs):
                     obj.fset = attrs.get(method_name)
 
 
-def DeviceMeta(name, bases, attrs):
+class DeviceMeta(type(LatestDeviceImpl)):
     """
-    The :py:data:`metaclass` callable for :class:`Device`.Every
-    sub-class of :class:`Device` must have associated this metaclass
-    to itself in order to work properly (boost-python internal
-    limitation).
-
-    Example (python 2.x)::
-
-        from tango.server import Device, DeviceMeta
-
-        class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
-
-    Example (python 3.x)::
-
-        from tango.server import Device, DeviceMeta
-
-        class PowerSupply(Device, metaclass=DeviceMeta):
-            pass
+    The :py:data:`metaclass` callable for :class:`Device`.
 
     This implementation of DeviceMeta makes device inheritance possible.
     """
-    # Get metaclass
-    LatestDeviceImplMeta = type(LatestDeviceImpl)
-    # Attribute dictionary
-    dct = {}
-    # Filter object from bases
-    bases = tuple(base for base in bases if base != object)
-    # Add device to bases
-    if Device not in bases:
-        bases += (Device,)
-    # Set tango objects as attributes
-    for base in reversed(bases):
-        for key, value in base.__dict__.items():
-            if is_tango_object(value):
-                dct[key] = value
-    # Inheritance patch
-    inheritance_patch(attrs)
-    # Update attribute dictionary
-    dct.update(attrs)
-    # Create device class
-    cls = LatestDeviceImplMeta(name, bases, dct)
-    # Initialize device class
-    __init_tango_device_klass(cls, dct)
-    cls.TangoClassName = name
-    # Return device class
-    return cls
+
+    def __new__(metacls, name, bases, attrs):
+        # Attribute dictionary
+        dct = {}
+        # Filter object from bases
+        bases = tuple(base for base in bases if base != object)
+        # Set tango objects as attributes
+        for base in reversed(bases):
+            for key, value in base.__dict__.items():
+                if is_tango_object(value):
+                    dct[key] = value
+        # Inheritance patch
+        inheritance_patch(attrs)
+        # Update attribute dictionary
+        dct.update(attrs)
+        # Create device class
+        cls = type(LatestDeviceImpl).__new__(metacls, name, bases, dct)
+        # Initialize device class
+        _init_tango_device_klass(cls, dct)
+        cls.TangoClassName = name
+        # Return device class
+        return cls
 
 
-class Device(LatestDeviceImpl):
+class BaseDevice(LatestDeviceImpl):
     """
-    High level DeviceImpl API. All Device specific classes should
-    inherit from this class."""
+    Base device class for the High level API.
+
+    It should not be used directly, since this class is not an
+    instance of MetaDevice. Use tango.server.Device instead.
+    """
 
     def __init__(self, cl, name):
         self._tango_properties = {}
@@ -658,7 +642,6 @@ class attribute(AttrData):
     *voltage* in a *PowerSupply* :class:`Device` do::
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             voltage = attribute()
 
@@ -668,7 +651,6 @@ class attribute(AttrData):
     The same can be achieved with::
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             @attribute
             def voltage(self):
@@ -727,7 +709,6 @@ class attribute(AttrData):
     unit and description::
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             current = attribute(label="Current", unit="mA", dtype=int,
                                 access=AttrWriteType.READ_WRITE,
@@ -746,7 +727,6 @@ class attribute(AttrData):
     The same, but using attribute as a decorator::
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             def init_device(self):
                 Device.init_device(self)
@@ -850,7 +830,6 @@ class pipe(PipeData):
     (for Region Of Interest), in a *Detector* :class:`Device` do::
 
         class Detector(Device):
-            __metaclass__ = DeviceMeta
 
             ROI = pipe()
 
@@ -864,7 +843,6 @@ class pipe(PipeData):
     to pass blob data)::
 
         class Detector(Device):
-            __metaclass__ = DeviceMeta
 
             @pipe
             def ROI(self):
@@ -892,7 +870,6 @@ class pipe(PipeData):
     The same example with a read-write ROI, a customized label and description::
 
         class Detector(Device):
-            __metaclass__ = DeviceMeta
 
             ROI = pipe(label='Region Of Interest', doc='The active region of interest',
                        access=PipeWriteType.PIPE_READ_WRITE)
@@ -911,7 +888,6 @@ class pipe(PipeData):
     The same, but using pipe as a decorator::
 
         class Detector(Device):
-            __metaclass__ = DeviceMeta
 
             def init_device(self):
                 Device.init_device(self)
@@ -1040,7 +1016,6 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
     ::
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             @command
             def TurnOn(self):
@@ -1170,7 +1145,6 @@ class device_property(_BaseProperty):
         from tango.server import device_property
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             host = device_property(dtype=str)
 
@@ -1198,7 +1172,6 @@ class class_property(_BaseProperty):
         from tango.server import class_property
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
 
             port = class_property(dtype=int, default_value=9788)
 
@@ -1332,8 +1305,8 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
         log.debug("server loop exit")
 
     if async_mode:
-        tango_thread_id = worker.run_in_thread(tango_loop)
-        worker.run()
+        task = worker.run_in_thread(tango_loop)
+        worker.run(task)
         log.debug("async worker finished")
     else:
         tango_loop()
@@ -1387,7 +1360,7 @@ def run(classes, args=None, msg_stream=sys.stdout,
         from tango.server import Device, DeviceMeta, run
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
+            pass
 
         run((PowerSupply,))
 
@@ -1412,7 +1385,7 @@ def run(classes, args=None, msg_stream=sys.stdout,
         from tango.server import Device, DeviceMeta, run
 
         class PowerSupply(Device):
-            __metaclass__ = DeviceMeta
+            pass
 
         class MyServer(Device_4Impl):
             pass
@@ -1608,12 +1581,14 @@ def _create_gevent_worker():
             return self.__id == id(current_thread())
 
         def run_in_thread(self, func, *args, **kwargs):
-            thread_id = gevent._threading.start_new_thread(func, args, kwargs)
-            return thread_id
+            return gevent.get_hub().threadpool.spawn(func, *args, **kwargs)
 
-        def run(self, timeout=None):
-            return gevent.wait(objects=(self.__stop_event,),
-                               timeout=timeout)
+        def run(self, until=None, timeout=None):
+            if until is not None:
+                objects = until, self.__stop_event
+            else:
+                objects = self.__stop_event,
+            return gevent.wait(objects=objects, timeout=timeout)
 
         def execute(self, func, *args, **kwargs):
             if self.is_gevent_thread():
@@ -1643,6 +1618,11 @@ def _create_asyncio_worker():
     import concurrent.futures
 
     try:
+        from threading import get_ident
+    except:
+        from threading import _get_ident as get_ident
+
+    try:
         import asyncio
     except ImportError:
         import trollius as asyncio
@@ -1660,11 +1640,10 @@ def _create_asyncio_worker():
             """Initialize the executor with a given loop."""
             self.loop = loop or asyncio.get_event_loop()
 
-        def submit(self, fn, *args, **kwargs):
-            """Schedule the callable fn, to be executed as fn(*args **kwargs).
+        def submit(self, corofn, *args, **kwargs):
+            """Schedule a coroutine, to be executed as corofn(*args **kwargs).
             Return a Future representing the execution of the callable."""
-            corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
-            return run_coroutine_threadsafe(corofn(), loop)
+            return run_coroutine_threadsafe(corofn(*args, **kwargs), self.loop)
 
         def run_in_thread(self, func, *args, **kwargs):
             """Schedule a blocking callback."""
@@ -1673,11 +1652,15 @@ def _create_asyncio_worker():
             # That is not actually necessary since coro is actually
             # a future. But it is an implementation detail and it
             # might be changed later on.
-            asyncio.async(coro)
+            return asyncio.async(coro)
 
-        def run(self, timeout=None):
+        def run(self, until=None, timeout=None):
             """Run the asyncio event loop."""
-            self.loop.run_forever()
+            if until is None and timeout is None:
+                return self.loop.run_forever()
+            if until is None:
+                until = asyncio.sleep(timeout, loop=self.loop)
+            return self.loop.run_until_complete(until)
 
         def stop(self):
             """Run the asyncio event loop."""
@@ -1685,7 +1668,10 @@ def _create_asyncio_worker():
 
         def execute(self, fn, *args, **kwargs):
             """Execute the callable fn as fn(*args **kwargs)."""
-            return self.submit(fn, *args, **kwargs).result()
+            corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
+            if self.loop._thread_id == get_ident():
+                return corofn()
+            return self.submit(corofn).result()
 
     try:
         loop = asyncio.get_event_loop()
@@ -1693,6 +1679,17 @@ def _create_asyncio_worker():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return LoopExecutor(loop=loop)
+
+
+# Instanciate DeviceMeta using BaseDevice
+@six.add_metaclass(DeviceMeta)
+class Device(BaseDevice):
+    """
+    Device class for the high-level API.
+
+    All device specific classes should inherit from this class.
+    """
+    pass
 
 
 # Avoid circular imports

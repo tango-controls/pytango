@@ -307,13 +307,10 @@ high level API
    :linenos:
 
     import time
-    from tango.server import run
-    from tango.server import Device, DeviceMeta
-    from tango.server import attribute, command, pipe
+    from tango.server import Device, attribute, command, pipe
 
 
     class Clock(Device):
-        __metaclass__ = DeviceMeta
 
         @attribute
         def time(self):
@@ -332,37 +329,32 @@ high level API
 
 
     if __name__ == "__main__":
-        run([Clock])
+        Clock.run_server()
 
 
-**line 2-4**
+**line 2**
     import the necessary symbols
 
-**line 7**
+**line 5**
     tango device class definition. A Tango device must inherit from
     :class:`tango.server.Device`
 
-**line 8**
-    mandatory *magic* line. A Tango device must define the metaclass as
-    :class:`tango.server.DeviceClass`. This has to be done due to a limitation
-    on boost-python
-
-**line 10-12**
+**line 7-9**
     definition of the *time* attribute. By default, attributes are double, scalar,
     read-only. Check the :class:`~tango.server.attribute` for the complete
     list of attribute options.
 
-**line 14-16**
+**line 11-13**
     the method *strftime* is exported as a Tango command. In receives a string
     as argument and it returns a string. If a method is to be exported as a
     Tango command, it must be decorated as such with the
     :func:`~tango.server.command` decorator
 
-**line 18-23**
+**line 15-20**
     definition of the *info* pipe. Check the :class:`~tango.server.pipe`
     for the complete list of pipe options.
 
-**line 28**
+**line 24**
     start the Tango run loop. The mandatory argument is a list of python classes
     that are to be exported as Tango classes. Check :func:`~tango.server.run`
     for the complete list of options
@@ -383,13 +375,12 @@ using the high level API. The example contains:
     from time import time
     from numpy.random import random_sample
 
-    from tango import AttrQuality, AttrWriteType, DispLevel, run
-    from tango.server import Device, DeviceMeta, attribute, command
+    from tango import AttrQuality, AttrWriteType, DispLevel
+    from tango.server import Device, attribute, command
     from tango.server import class_property, device_property
 
 
     class PowerSupply(Device):
-        __metaclass__ = DeviceMeta
 
         current = attribute(label="Current", dtype=float,
                             display_level=DispLevel.EXPERT,
@@ -428,17 +419,7 @@ using the high level API. The example contains:
 
 
     if __name__ == "__main__":
-        run([PowerSupply])
-
-
-.. note::
-    the ``__metaclass__`` statement is mandatory due to a limitation in the
-    *boost-python* library used by PyTango.
-
-    If you are using python 3 you can write instead::
-
-        class PowerSupply(Device, metaclass=DeviceMeta)
-            pass
+        PowerSupply.run_server()
 
 .. _logging:
 
@@ -573,29 +554,27 @@ separated python files: A :class:`PLC` class in a :file:`PLC.py`::
 
     # PLC.py
 
-    from tango.server import Device, DeviceMeta, run
+    from tango.server import Device
 
     class PLC(Device):
-        __metaclass__ = DeviceMeta
 
         # bla, bla my PLC code
 
     if __name__ == "__main__":
-        run([PLC])
+        PLC.run_server()
 
 ... and a :class:`IRMirror` in a :file:`IRMirror.py`::
 
     # IRMirror.py
 
-    from tango.server import Device, DeviceMeta, run
+    from tango.server import Device
 
     class IRMirror(Device):
-        __metaclass__ = DeviceMeta
 
         # bla, bla my IRMirror code
 
     if __name__ == "__main__":
-        run([IRMirror])
+        IRMirror.run_server()
 
 You want to create a Tango server called `PLCMirror` that is able to contain
 devices from both PLC and IRMirror classes. All you have to do is write
@@ -683,10 +662,9 @@ point attribute with the specified name::
 
 
     from tango import Util, Attr
-    from tango.server import DeviceMeta, Device, command
+    from tango.server import Device, command
 
     class MyDevice(Device):
-    	__metaclass__ = DeviceMeta
 
 	@command(dtype_in=str)
         def CreateFloatAttribute(self, attr_name):
@@ -730,10 +708,9 @@ creates a device of some arbitrary class (the example assumes the tango commands
 with two strings. No error processing was done on the code for simplicity sake)::
 
     from tango import Util
-    from tango.server import DeviceMeta, Device, command
+    from tango.server import Device, command
 
     class MyDevice(Device):
-    	__metaclass__ = DeviceMeta
 
 	@command(dtype_in=[str])
         def CreateDevice(self, pars):

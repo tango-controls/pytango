@@ -132,7 +132,6 @@ class DataBase(Device):
     """
     DataBase TANGO device class
     """
-    __metaclass__ = DeviceMeta
 
     # --- attributes ---------------------------------------
 

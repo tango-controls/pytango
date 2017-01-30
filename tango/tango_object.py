@@ -85,7 +85,6 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
         tango_class_name = obj_klass_name
 
     class DeviceDispatcher(Device):
-        __metaclass__ = DeviceMeta
 
         TangoClassName = tango_class_name
 

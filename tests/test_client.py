@@ -130,13 +130,14 @@ def get_proxy(host, port, device, green_mode):
     return device_proxy_map[green_mode](access)
 
 
-def wait_for_proxy(host, proc, device, green_mode, retries=50, delay=0.1):
+def wait_for_proxy(host, proc, device, green_mode, retries=100, delay=0.01):
     for i in range(retries):
         ports = get_ports(proc.pid)
-        for port in ports:
+        if ports:
             try:
-                proxy = get_proxy(host, port, device, green_mode)
+                proxy = get_proxy(host, ports[0], device, green_mode)
                 proxy.ping()
+                proxy.state()
                 return proxy
             except DevFailed:
                 pass
@@ -200,6 +201,11 @@ def test_info(tango_test):
 
 def test_read_attribute(tango_test, readable_attribute):
     "Check that readable attributes can be read"
+    # This is a hack:
+    # Without this sleep, the following error is very likely to be raised:
+    # -> MARSHAL CORBA system exception: MARSHAL_PassEndOfMessage
+    if readable_attribute == "string_image_ro":
+        sleep(0.05)
     tango_test.read_attribute(readable_attribute, wait=True)
 
 

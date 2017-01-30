@@ -25,15 +25,14 @@ device server.
 
 Here is a simple example on how to write a *Clock* device server using the
 high level API::
-    
+
     import time
     from tango.server import run
-    from tango.server import Device, DeviceMeta
-    from tango.server import attribute, command   
+    from tango.server import Device
+    from tango.server import attribute, command
 
 
     class Clock(Device):
-        __metaclass__ = DeviceMeta
 
         time = attribute()
 
@@ -65,12 +64,11 @@ using the high level API. The example contains:
     from time import time
     from numpy.random import random_sample
 
-    from tango import AttrQuality, AttrWriteType, DispLevel, server_run
-    from tango.server import Device, DeviceMeta, attribute, command
+    from tango import AttrQuality, AttrWriteType, DispLevel
+    from tango.server import Device, attribute, command
     from tango.server import class_property, device_property
 
     class PowerSupply(Device):
-        __metaclass__ = DeviceMeta
 
         voltage = attribute()
 
@@ -83,11 +81,11 @@ using the high level API. The example contains:
                             min_warning=0.5, max_warning=8.0,
                             fget="get_current", fset="set_current",
                             doc="the power supply current")
-    
+
         noise = attribute(label="Noise", dtype=((float,),),
                           max_dim_x=1024, max_dim_y=1024,
                           fget="get_noise")
- 
+
         host = device_property(dtype=str)
         port = class_property(dtype=int, default_value=9788)
 
@@ -97,10 +95,10 @@ using the high level API. The example contains:
 
         def get_current(self):
             return 2.3456, time(), AttrQuality.ATTR_WARNING
-    
+
         def set_current(self, current):
             print("Current set to %f" % current)
-    
+
         def get_noise(self):
             return random_sample((1024, 1024))
 
@@ -109,18 +107,9 @@ using the high level API. The example contains:
             print("Ramping up...")
 
     if __name__ == "__main__":
-        server_run((PowerSupply,))
+        PowerSupply.run_server()
 
 *Pretty cool, uh?*
-
-.. note::
-    the ``__metaclass__`` statement is mandatory due to a limitation in the
-    *boost-python* library used by PyTango.
-    
-    If you are using python 3 you can write instead::
-        
-        class PowerSupply(Device, metaclass=DeviceMeta)
-            pass
 
 .. _pytango-hlapi-datatypes:
 
@@ -137,9 +126,9 @@ attribute you have several possibilities:
 #. :obj:`int`
 #. 'int'
 #. 'int32'
-#. 'integer' 
+#. 'integer'
 #. :obj:`tango.CmdArgType.DevLong`
-#. 'DevLong' 
+#. 'DevLong'
 #. :obj:`numpy.int32`
 
 To define a *SPECTRUM* attribute simply wrap the scalar data type in any
@@ -159,15 +148,15 @@ python sequence of sequences:
 Below is the complete table of equivalences.
 
 ========================================  ========================================
-dtype argument                            converts to tango type                             
+dtype argument                            converts to tango type
 ========================================  ========================================
  ``None``                                  ``DevVoid``
  ``'None'``                                ``DevVoid``
  ``DevVoid``                               ``DevVoid``
  ``'DevVoid'``                             ``DevVoid``
 
- ``DevState``                              ``DevState``                           
- ``'DevState'``                            ``DevState``                           
+ ``DevState``                              ``DevState``
+ ``'DevState'``                            ``DevState``
 
  :py:obj:`bool`                            ``DevBoolean``
  ``'bool'``                                ``DevBoolean``
@@ -211,20 +200,20 @@ dtype argument                            converts to tango type
  ``DevLong64``                             ``DevLong64``
  ``'DevLong64'``                           ``DevLong64``
  :py:obj:`numpy.int64`                     ``DevLong64``
- 
+
  ``'uint64'``                              ``DevULong64``
  ``DevULong64``                            ``DevULong64``
  ``'DevULong64'``                          ``DevULong64``
  :py:obj:`numpy.uint64`                    ``DevULong64``
 
- ``DevInt``                                ``DevInt``                             
- ``'DevInt'``                              ``DevInt``                             
- 
+ ``DevInt``                                ``DevInt``
+ ``'DevInt'``                              ``DevInt``
+
  ``'float32'``                             ``DevFloat``
  ``DevFloat``                              ``DevFloat``
  ``'DevFloat'``                            ``DevFloat``
  :py:obj:`numpy.float32`                   ``DevFloat``
- 
+
  :py:obj:`float`                           ``DevDouble``
  ``'double'``                              ``DevDouble``
  ``'float'``                               ``DevDouble``
@@ -232,14 +221,14 @@ dtype argument                            converts to tango type
  ``DevDouble``                             ``DevDouble``
  ``'DevDouble'``                           ``DevDouble``
  :py:obj:`numpy.float64`                   ``DevDouble``
- 
+
  :py:obj:`str`                             ``DevString``
  ``'str'``                                 ``DevString``
  ``'string'``                              ``DevString``
  ``'text'``                                ``DevString``
  ``DevString``                             ``DevString``
  ``'DevString'``                           ``DevString``
- 
+
  :py:obj:`bytearray`                       ``DevEncoded``
  ``'bytearray'``                           ``DevEncoded``
  ``'bytes'``                               ``DevEncoded``
@@ -248,40 +237,40 @@ dtype argument                            converts to tango type
 
  ``DevVarBooleanArray``                    ``DevVarBooleanArray``
  ``'DevVarBooleanArray'``                  ``DevVarBooleanArray``
- 
+
  ``DevVarCharArray``                       ``DevVarCharArray``
  ``'DevVarCharArray'``                     ``DevVarCharArray``
- 
+
  ``DevVarShortArray``                      ``DevVarShortArray``
  ``'DevVarShortArray'``                    ``DevVarShortArray``
- 
+
  ``DevVarLongArray``                       ``DevVarLongArray``
  ``'DevVarLongArray'``                     ``DevVarLongArray``
- 
+
  ``DevVarLong64Array``                     ``DevVarLong64Array``
  ``'DevVarLong64Array'``                   ``DevVarLong64Array``
- 
+
  ``DevVarULong64Array``                    ``DevVarULong64Array``
  ``'DevVarULong64Array'``                  ``DevVarULong64Array``
- 
+
  ``DevVarFloatArray``                      ``DevVarFloatArray``
  ``'DevVarFloatArray'``                    ``DevVarFloatArray``
- 
+
  ``DevVarDoubleArray``                     ``DevVarDoubleArray``
  ``'DevVarDoubleArray'``                   ``DevVarDoubleArray``
- 
+
  ``DevVarUShortArray``                     ``DevVarUShortArray``
  ``'DevVarUShortArray'``                   ``DevVarUShortArray``
- 
+
  ``DevVarULongArray``                      ``DevVarULongArray``
  ``'DevVarULongArray'``                    ``DevVarULongArray``
- 
+
  ``DevVarStringArray``                     ``DevVarStringArray``
  ``'DevVarStringArray'``                   ``DevVarStringArray``
- 
+
  ``DevVarLongStringArray``                 ``DevVarLongStringArray``
  ``'DevVarLongStringArray'``               ``DevVarLongStringArray``
- 
+
  ``DevVarDoubleStringArray``               ``DevVarDoubleStringArray``
  ``'DevVarDoubleStringArray'``             ``DevVarDoubleStringArray``
 

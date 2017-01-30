@@ -1,14 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ------------------------------------------------------------------------------
-# This file is part of PyTango (http://pytango.rtfd.io)
-#
-# Copyright 2013-2015 European Synchrotron Radiation Facility, Grenoble, France
-#
-# Distributed under the terms of the GNU Lesser General Public License,
-# either version 3 of the License, or (at your option) any later version.
-# See LICENSE.txt for more info.
-# ------------------------------------------------------------------------------
 
 """
 Clock Device server showing how to write a TANGO server with a Clock device
@@ -24,14 +14,10 @@ commands:
 """
 
 import time
-
-from PyTango.server import Device, DeviceMeta
-from PyTango.server import attribute, command
-from PyTango.server import run
+from PyTango.server import Device, attribute, command
 
 
 class Clock(Device):
-    __metaclass__ = DeviceMeta
 
     @attribute(dtype=float)
     def time(self):
@@ -57,4 +43,4 @@ class Clock(Device):
 
 
 if __name__ == "__main__":
-    run([Clock,])
+    Clock.run_server()
