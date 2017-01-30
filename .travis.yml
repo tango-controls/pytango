@@ -1,0 +1,44 @@
+sudo: false
+language: python
+os: linux
+branches:
+  only:
+    - master
+    - develop
+
+python:
+  - 2.7
+  - 3.4
+  - 3.5
+
+cache:
+  directories:
+    - ./miniconda  # Conda environment
+    - ./.eggs      # pytest eggs
+
+before_install:
+  # Add conda to path
+  - export PATH="$PWD/miniconda/bin:$PATH"
+  # Install miniconda if not in cache
+  - conda -V || wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - conda -V || bash miniconda.sh -b -p ./miniconda -f
+  # Update conda
+  - conda update --yes conda
+  # Create build environment if it doesn't exist
+  - source activate buildenv || conda create --yes --name buildenv python=$TRAVIS_PYTHON_VERSION
+  # Activate build environment
+  - source activate buildenv
+
+install:
+  # Install build dependencies
+  - conda install --yes boost
+  - conda install --yes -c vxgmichel tango=9.2.2
+  - conda install --yes numpy  # Not a strong requirement yet
+  # Use conda prefix as root for the dependencies
+  - export BOOST_ROOT=$CONDA_PREFIX TANGO_ROOT=$CONDA_PREFIX ZMQ_ROOT=$CONDA_PREFIX OMNI_ROOT=$CONDA_PREFIX
+
+  # Uncomment the following line if the tests are running in parrallel
+  # with pytest-xdist (see https://github.com/pytest-dev/pytest-xdist/issues/41):
+  # - pip install -U pytest pytest-xdist six mock
+
+script: python setup.py build && python setup.py test

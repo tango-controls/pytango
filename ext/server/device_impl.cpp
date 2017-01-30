@@ -998,9 +998,23 @@ Tango::DevState Device_3ImplWrap::default_dev_state()
 
 Tango::ConstDevString Device_3ImplWrap::dev_status()
 {
-    CALL_DEVICE_METHOD_RET(Device_3Impl, dev_status)
-    // Keep the compiler quiet
-    return "Impossible state";
+    __AUX_DECL_CALL_DEVICE_METHOD
+    try
+    {
+        if (override dev_status = this->get_override("dev_status") )
+	{
+            std::string status = dev_status();
+            this->the_status = status;
+	}
+        else
+	{
+            this->the_status = Device_3Impl::dev_status();
+        }
+    }
+    __AUX_CATCH_PY_EXCEPTION \
+    __AUX_CATCH_EXCEPTION(dev_status)
+
+    return this->the_status.c_str();
 }
 
 Tango::ConstDevString Device_3ImplWrap::default_dev_status()
@@ -1160,9 +1174,23 @@ Tango::DevState Device_4ImplWrap::default_dev_state()
 
 Tango::ConstDevString Device_4ImplWrap::dev_status()
 {
-    CALL_DEVICE_METHOD_RET(Device_4Impl, dev_status)
-    // Keep the compiler quiet
-    return "Impossible state";
+    __AUX_DECL_CALL_DEVICE_METHOD
+    try
+    {
+        if (override dev_status = this->get_override("dev_status") )
+	{
+            std::string status = dev_status();
+            this->the_status = status;
+	}
+        else
+	{
+            this->the_status = Device_4Impl::dev_status();
+        }
+    }
+    __AUX_CATCH_PY_EXCEPTION \
+    __AUX_CATCH_EXCEPTION(dev_status)
+
+    return this->the_status.c_str();
 }
 
 Tango::ConstDevString Device_4ImplWrap::default_dev_status()
@@ -1315,9 +1343,23 @@ Tango::DevState Device_5ImplWrap::default_dev_state()
 
 Tango::ConstDevString Device_5ImplWrap::dev_status()
 {
-    CALL_DEVICE_METHOD_RET(Device_5Impl, dev_status)
-    // Keep the compiler quiet
-    return "Impossible state";
+    __AUX_DECL_CALL_DEVICE_METHOD
+    try
+    {
+        if (override dev_status = this->get_override("dev_status") )
+	{
+            std::string status = dev_status();
+            this->the_status = status;
+	}
+        else
+	{
+            this->the_status = Device_5Impl::dev_status();
+        }
+    }
+    __AUX_CATCH_PY_EXCEPTION \
+    __AUX_CATCH_EXCEPTION(dev_status)
+
+    return this->the_status.c_str();
 }
 
 Tango::ConstDevString Device_5ImplWrap::default_dev_status()

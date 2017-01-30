@@ -9,34 +9,37 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-"""
-This is an internal PyTango module.
-"""
+"""Define python methods for DeviceProxy object."""
 
 from __future__ import with_statement
-
-__all__ = ["device_proxy_init", "get_device_proxy"]
-
-__docformat__ = "restructuredtext"
 
 import time
 import threading
 import collections
 
-from ._tango import StdStringVector, DbData, DbDatum, AttributeInfo, \
-    AttributeInfoEx, AttributeInfoList, AttributeInfoListEx, DeviceProxy, \
-    __CallBackAutoDie, __CallBackPushEvent, EventType, DevFailed, Except, \
-    ExtractAs, GreenMode, constants
+from ._tango import StdStringVector, DbData, DbDatum, AttributeInfo
+from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
+from ._tango import DeviceProxy, __CallBackAutoDie, __CallBackPushEvent
+from ._tango import EventType, DevFailed, Except, ExtractAs, GreenMode
+from ._tango import constants
 
 from .utils import is_pure_str, is_non_str_seq, is_integer
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
 from .utils import seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
+from .utils import dir2
 
 from .green import result, submit, green, green_cb
 from .green import get_green_mode, get_event_loop, get_wait_default_value
 
+
+__all__ = ["device_proxy_init", "get_device_proxy"]
+
+__docformat__ = "restructuredtext"
+
+
 _UNSUBSCRIBE_LIFETIME = 60
+
 
 def get_device_proxy(*args, **kwargs):
     """get_device_proxy(self, dev_name, green_mode=None, wait=True, timeout=True) -> DeviceProxy
@@ -130,6 +133,15 @@ def __check_read_pipe(dev_pipe):
         raise DevFailed(*dev_pipe.get_err_stack())
     return dev_pipe
 
+def __init_device_proxy_internals(proxy):
+    if proxy.__dict__.get('_initialized', False):
+        return
+    executors = dict((key, None) for key in GreenMode.names)
+    proxy.__dict__['_green_mode'] = None
+    proxy.__dict__['_initialized'] = True
+    proxy.__dict__['_executors'] = executors
+    proxy.__dict__['_pending_unsubscribe'] = {}
+
 def __DeviceProxy__get_cmd_cache(self):
     try:
         ret = self.__dict__['__cmd_cache']
@@ -152,15 +164,11 @@ def __DeviceProxy__get_pipe_cache(self):
     return ret
 
 def __DeviceProxy__init__(self, *args, **kwargs):
-    self.__dict__['_green_mode'] = kwargs.pop('green_mode', None)
-    self.__dict__['_executors'] = executors = {}
-    self.__dict__['_pending_unsubscribe'] = {}
-#    self.__dict__['__cmd_cache'] = {}
-#    self.__dict__['__attr_cache'] = ()
-#    self.__dict__['__pipe_cache'] = ()
-    executors[GreenMode.Futures] = kwargs.pop('executor', None)
-    executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
-    executors[GreenMode.Asyncio] = kwargs.pop('asyncio_executor', None)
+    __init_device_proxy_internals(self)
+    self._green_mode = kwargs.pop('green_mode', None)
+    self._executors[GreenMode.Futures] = kwargs.pop('executor', None)
+    self._executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
+    self._executors[GreenMode.Asyncio] = kwargs.pop('asyncio_executor', None)
     return DeviceProxy.__init_orig__(self, *args, **kwargs)
 
 def __DeviceProxy__get_green_mode(self):
@@ -223,7 +231,7 @@ def __DeviceProxy__getattr(self, name):
     # trait_names is a feature of IPython. Hopefully they will solve
     # ticket http://ipython.scipy.org/ipython/ipython/ticket/229 someday
     # and the ugly trait_names could be removed.
-    if name[:2] == "__" or name == 'trait_names':
+    if name.startswith("_") or name == 'trait_names':
         raise AttributeError(name)
 
     name_l = name.lower()
@@ -304,38 +312,55 @@ def __DeviceProxy__setattr(self, name, value):
     return super(DeviceProxy, self).__setattr__(name, value)
 
 
-def __DeviceProxy__getAttributeNames(self):
-    """Return list of magic attributes to extend introspection."""
+def __DeviceProxy__dir(self):
+    """Return the attribute list including tango objects."""
+    extra_entries = set()
+    # Add commands
     try:
-        lst = [cmd.cmd_name for cmd in self.command_list_query()]
-        lst += self.get_attribute_list()
-        lst += self.get_pipe_list()
-        lst += list(map(str.lower, lst))
-        lst.sort()
-        return lst
+        extra_entries.update(self.get_command_list())
     except Exception:
         pass
-    return []
+    # Add attributes
+    try:
+        extra_entries.update(self.get_attribute_list())
+    except Exception:
+        pass
+    # Add pipes
+    try:
+        extra_entries.update(self.get_pipe_list())
+    except Exception:
+        pass
+    # Merge with default dir implementation
+    extra_entries.update([x.lower() for x in extra_entries])
+    entries = extra_entries.union(dir2(self))
+    return sorted(entries)
+
 
 def __DeviceProxy__getitem(self, key):
     return self.read_attribute(key)
 
+
 def __DeviceProxy__setitem(self, key, value):
     return self.write_attribute(key, value)
+
 
 def __DeviceProxy__contains(self, key):
     return key.lower() in map(str.lower, self.get_attribute_list())
 
+
 def __DeviceProxy__read_attribute(self, value, extract_as=ExtractAs.Numpy):
     return __check_read_attribute(self._read_attribute(value, extract_as))
 
-#def __DeviceProxy__read_attribute(self, value, extract_as=ExtractAs.Numpy,
-#                                  green_mode=None, wait=True, timeout=None):
-#    green_mode, submit = submitable(green_mode)
-#    result = submit(__DeviceProxy__read_attribute_raw, self, value, extract_as=extract_as)
-#    return get_result(result, green_mode, wait=wait, timeout=timeout)
 
-def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None, extract_as=ExtractAs.Numpy):
+# def __DeviceProxy__read_attribute(self, value, extract_as=ExtractAs.Numpy,
+#                                   green_mode=None, wait=True, timeout=None):
+#     green_mode, submit = submitable(green_mode)
+#     result = submit(__DeviceProxy__read_attribute_raw, self, value, extract_as=extract_as)
+#     return get_result(result, green_mode, wait=wait, timeout=timeout)
+
+
+def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None,
+                                          extract_as=ExtractAs.Numpy):
     """
     read_attributes_asynch( self, attr_names) -> int
 
@@ -383,6 +408,7 @@ def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None, extract_as=
         cb2.attr_read = cb.attr_read
     return self.__read_attributes_asynch(attr_names, cb2, extract_as)
 
+
 def __DeviceProxy__read_attribute_asynch(self, attr_name, cb=None):
     """
     read_attribute_asynch( self, attr_name) -> int
@@ -394,6 +420,7 @@ def __DeviceProxy__read_attribute_asynch(self, attr_name, cb=None):
     """
     return self.read_attributes_asynch([attr_name], cb)
 
+
 def __DeviceProxy__read_attribute_reply(self, *args, **kwds):
     """
     read_attribute_reply( self, id, extract_as) -> int
@@ -404,6 +431,7 @@ def __DeviceProxy__read_attribute_reply(self, *args, **kwds):
         New in PyTango 7.0.0
     """
     return __check_read_attribute(self.read_attributes_reply(*args, **kwds)[0])
+
 
 def __DeviceProxy__write_attributes_asynch(self, attr_values, cb=None):
     """
@@ -451,6 +479,7 @@ def __DeviceProxy__write_attributes_asynch(self, attr_values, cb=None):
         cb2.attr_write = cb.attr_write
     return self.__write_attributes_asynch(attr_values, cb2)
 
+
 def __DeviceProxy__write_attribute_asynch(self, attr_name, value, cb=None):
     """
     write_attributes_asynch( self, values) -> int
@@ -462,16 +491,19 @@ def __DeviceProxy__write_attribute_asynch(self, attr_name, value, cb=None):
     """
     return self.write_attributes_asynch([(attr_name, value)], cb)
 
+
 def __DeviceProxy__write_read_attribute(self, attr_name, value,
                                         extract_as=ExtractAs.Numpy):
     result = self._write_read_attribute(attr_name, value, extract_as)
     return __check_read_attribute(result)
+
 
 def __DeviceProxy__write_read_attributes(self, name_val,
                                          attr_read_names,
                                          extract_as=ExtractAs.Numpy):
     return self._write_read_attributes(name_val, attr_read_names,
                                        extract_as)
+
 
 def __DeviceProxy__get_property(self, propname, value=None):
     """
@@ -536,6 +568,7 @@ def __DeviceProxy__get_property(self, propname, value=None):
             self._get_property(new_value)
             return DbData_2_dict(new_value)
 
+
 def __DeviceProxy__put_property(self, value):
     """
     put_property(self, value) -> None
@@ -588,6 +621,7 @@ def __DeviceProxy__put_property(self, value):
         raise TypeError('value must be a tango.DbDatum, tango.DbData,'\
                         'a sequence<DbDatum> or a dictionary')
     return self._put_property(value)
+
 
 def __DeviceProxy__delete_property(self, value):
     """
@@ -645,6 +679,7 @@ def __DeviceProxy__delete_property(self, value):
                         'tango.DbData, a sequence or a dictionary')
 
     return self._delete_property(new_value)
+
 
 def __DeviceProxy__get_property_list(self, filter, array=None):
     """
@@ -727,6 +762,7 @@ def __DeviceProxy__get_attribute_config(self, value):
 
     raise TypeError('value must be a string or a sequence<string>')
 
+
 def __DeviceProxy__get_attribute_config_ex(self, value):
     """
     get_attribute_config_ex( self, name) -> AttributeInfoListEx :
@@ -766,6 +802,7 @@ def __DeviceProxy__get_attribute_config_ex(self, value):
         return self._get_attribute_config_ex(v)
 
     raise TypeError('value must be a string or a sequence<string>')
+
 
 def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
     """
@@ -810,6 +847,7 @@ def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
         return self._get_command_config(v)
 
     raise TypeError('value must be a string or a sequence<string>')
+
 
 def __DeviceProxy__get_pipe_config(self, value=None):
     """
@@ -861,6 +899,7 @@ def __DeviceProxy__get_pipe_config(self, value=None):
         return self._get_pipe_config(v)
 
     raise TypeError('value must be a string or a sequence<string>')
+
 
 def __DeviceProxy__set_attribute_config(self, value):
     """
@@ -936,6 +975,7 @@ def __DeviceProxy__set_attribute_config(self, value):
 
     return self._set_attribute_config(v)
 
+
 def __DeviceProxy__set_pipe_config(self, value):
     """
     set_pipe_config( self, pipe_info) -> None
@@ -981,6 +1021,7 @@ def __DeviceProxy__set_pipe_config(self, value):
 
     return self._set_pipe_config(v)
 
+
 def __DeviceProxy__get_event_map_lock(self):
     """
     Internal helper method"""
@@ -990,6 +1031,7 @@ def __DeviceProxy__get_event_map_lock(self):
         self.__dict__['_subscribed_events_lock'] = threading.Lock()
     return self._subscribed_events_lock
 
+
 def __DeviceProxy__get_event_map(self):
     """
     Internal helper method"""
@@ -998,6 +1040,7 @@ def __DeviceProxy__get_event_map(self):
         # calling __setattr__ which requests list of tango attributes from device
         self.__dict__['_subscribed_events'] = dict()
     return self._subscribed_events
+
 
 def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize, filters=[], stateless=False, extract_as=ExtractAs.Numpy):
     """
@@ -1090,6 +1133,7 @@ def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize
         se[event_id] = (cb, event_type, attr_name)
     return event_id
 
+
 def __DeviceProxy__unsubscribe_event(self, event_id):
     """
     unsubscribe_event(self, event_id) -> None
@@ -1127,6 +1171,7 @@ def __DeviceProxy__unsubscribe_event(self, event_id):
         self._pending_unsubscribe[event_id] = evt_info[0], timestamp + _UNSUBSCRIBE_LIFETIME
     self.__unsubscribe_event(event_id)
 
+
 def __DeviceProxy__unsubscribe_event_all(self):
     with self.__get_event_map_lock():
         se = self.__get_event_map()
@@ -1134,6 +1179,7 @@ def __DeviceProxy__unsubscribe_event_all(self):
         se.clear()
     for event_id in event_ids:
         self.__unsubscribe_event(event_id)
+
 
 def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractAs.Numpy):
     """
@@ -1197,6 +1243,7 @@ def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractA
     else:
         raise TypeError("Parameter 'callback' should be None, a callable object or an object with a 'push_event' method.")
 
+
 def __DeviceProxy___get_info_(self):
     """Protected method that gets device info once and stores it in cache"""
     if not hasattr(self, '_dev_info'):
@@ -1206,32 +1253,41 @@ def __DeviceProxy___get_info_(self):
             return __TangoInfo()
     return self._dev_info
 
-def __DeviceProxy__str(self):
-    info = self._get_info_()
-    return "%s(%s)" % (info.dev_class, self.dev_name())
 
 def __DeviceProxy__str(self):
     info = self._get_info_()
     return "%s(%s)" % (info.dev_class, self.dev_name())
+
+
+def __DeviceProxy__str(self):
+    info = self._get_info_()
+    return "%s(%s)" % (info.dev_class, self.dev_name())
+
 
 def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
     r = self.__read_pipe(pipe_name)
     return r.extract(extract_as)
 
+
 def __DeviceProxy__write_pipe(*args, **kwargs):
     raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
+
 
 def __DeviceProxy__read_attributes(self, *args, **kwargs):
     return self._read_attributes(*args, **kwargs)
 
+
 def __DeviceProxy__write_attribute(self, *args, **kwargs):
     return self._write_attribute(*args, **kwargs)
+
 
 def __DeviceProxy__write_attributes(self, *args, **kwargs):
     return self._write_attributes(*args, **kwargs)
 
+
 def __DeviceProxy__ping(self, *args, **kwargs):
     return self._ping(*args, **kwargs)
+
 
 def __DeviceProxy__state(self, *args, **kwargs):
     """state(self) -> DevState
@@ -1255,6 +1311,7 @@ def __DeviceProxy__status(self, *args, **kwargs):
         Return     : (str) describing the device status
     """
     return self._status(*args, **kwargs)
+
 
 def __DeviceProxy__write_attribute_reply(self, *args, **kwargs):
     """
@@ -1297,6 +1354,7 @@ def __DeviceProxy__write_attribute_reply(self, *args, **kwargs):
     """
     return self.write_attributes_reply(*args, **kwargs)
 
+
 def __init_DeviceProxy():
     DeviceProxy.__init_orig__ = DeviceProxy.__init__
     DeviceProxy.__init__ = __DeviceProxy__init__
@@ -1309,8 +1367,7 @@ def __init_DeviceProxy():
     DeviceProxy.__getitem__ = __DeviceProxy__getitem
     DeviceProxy.__setitem__ = __DeviceProxy__setitem
     DeviceProxy.__contains__ = __DeviceProxy__contains
-
-    DeviceProxy._getAttributeNames = __DeviceProxy__getAttributeNames
+    DeviceProxy.__dir__ = __DeviceProxy__dir
 
     DeviceProxy.__get_cmd_cache = __DeviceProxy__get_cmd_cache
     DeviceProxy.__get_attr_cache = __DeviceProxy__get_attr_cache

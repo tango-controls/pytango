@@ -28,6 +28,7 @@ from ._tango import __AttributeProxy as _AttributeProxy
 from .utils import seq_2_StdStringVector, seq_2_DbData, DbData_2_dict
 from .utils import is_pure_str, is_non_str_seq
 from .green import result, submit, get_green_mode, get_wait_default_value
+from .device_proxy import __init_device_proxy_internals as init_device_proxy
 
 
 def get_attribute_proxy(*args, **kwargs):
@@ -293,6 +294,7 @@ class AttributeProxy(object):
         # get_device_proxy() returns a different python object each time
         # we don't want a different object, so we save the current one.
         self.__dev_proxy = dp = self.__attr_proxy.get_device_proxy()
+        init_device_proxy(dp)
         dp.set_green_mode(green_mode)
 
     def get_device_proxy(self):

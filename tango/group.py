@@ -17,10 +17,11 @@ __all__ = ["Group", "group_init"]
 
 __docformat__ = "restructuredtext"
 
+import collections
 from ._tango import __Group as _RealGroup, StdStringVector
 from .utils import seq_2_StdStringVector, is_pure_str
 from .utils import document_method as __document_method
-import collections
+from .device_proxy import __init_device_proxy_internals as init_device_proxy
 
 
 def _apply_to(fn, key):
@@ -95,7 +96,7 @@ class Group:
 
     def get_device(self, name_or_index):
         proxy = self.__group.get_device(name_or_index)
-        proxy.__init__(proxy)
+        init_device_proxy(proxy)
         return proxy
 
     def get_group(self, group_name):
