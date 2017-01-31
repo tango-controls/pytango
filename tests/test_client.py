@@ -204,7 +204,7 @@ def test_read_attribute(tango_test, readable_attribute):
     # This is a hack:
     # Without this sleep, the following error is very likely to be raised:
     # -> MARSHAL CORBA system exception: MARSHAL_PassEndOfMessage
-    if readable_attribute == "string_image_ro":
+    if readable_attribute in ["string_image_ro", "string_spectrum_ro"]:
         sleep(0.05)
     tango_test.read_attribute(readable_attribute, wait=True)
 
