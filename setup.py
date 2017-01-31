@@ -422,16 +422,19 @@ def setup_args():
         'six',
     ]
 
-    setup_requires = [
-        'pytest-runner' if TESTING else '',
-    ]
+    setup_requires = []
+
+    if TESTING:
+        setup_requires += ['pytest-runner']
 
     tests_require = [
         'pytest-xdist',
         'gevent',
         'psutil',
-        'trollius' if PYTHON2 else '',
     ]
+
+    if PYTHON2:
+        tests_require += ['trollius']
 
     package_data = {
         'PyTango': [],
