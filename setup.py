@@ -23,7 +23,7 @@ from setuptools.command.install import install as dftinstall
 
 from distutils.command.build import build as dftbuild
 from distutils.unixccompiler import UnixCCompiler
-from distutils.version import StrictVersion as V
+from distutils.version import LooseVersion as V
 
 # Sphinx imports
 try:
