@@ -22,22 +22,26 @@ class AbstractExecutor(object):
 
     def delegate(self, fn, *args, **kwargs):
         """Delegate an operation and return an accessor."""
-        if self.asynchronous:
+        if not self.asynchronous:
             raise ValueError('Not supported in synchronous mode')
         raise NotImplementedError
 
     def access(self, accessor, timeout=None):
         """Return a result from an accessor."""
-        if self.asynchronous:
+        if not self.asynchronous:
             raise ValueError('Not supported in synchronous mode')
         raise NotImplementedError
 
     def submit(self, fn, *args, **kwargs):
         """Submit an operation"""
+        if not self.asynchronous:
+            return fn(*args, **kwargs)
         raise NotImplementedError
 
     def execute(self, fn, *args, **kwargs):
         """Execute an operation and return the result."""
+        if not self.asynchronous:
+            return fn(*args, **kwargs)
         raise NotImplementedError
 
     def run(self, fn, args=(), kwargs={}, wait=None, timeout=None):
@@ -59,12 +63,6 @@ class SynchronousExecutor(AbstractExecutor):
 
     asynchronous = False
     default_wait = True
-
-    def execute(self, fn, *args, **kwargs):
-        """Execute an operation and return the result."""
-        return fn(*args, **kwargs)
-
-    submit = execute
 
 
 # Default synchronous executor

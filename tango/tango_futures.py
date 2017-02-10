@@ -58,8 +58,10 @@ class FuturesExecutor(AbstractExecutor):
         """Return a result from a single callable."""
         return accessor.result(timeout=timeout)
 
+    def submit(self, fn, *args, **kwargs):
+        """Submit an operation"""
+        return fn(*args, **kwargs)
+
     def execute(self, fn, *args, **kwargs):
         """Execute an operation and return the result."""
         return fn(*args, **kwargs)
-
-    submit = execute
