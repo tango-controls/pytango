@@ -24,8 +24,9 @@ from .attr_data import AttrData
 from .utils import TO_TANGO_TYPE
 from ._tango import AttrDataFormat, CmdArgType, GreenMode
 from ._tango import DbDevInfo, Database, DevState, constants
-from .server import Device, DeviceMeta, _to_classes, _add_classes
-from .server import _create_async_worker, get_worker, set_worker
+from .server import Device, _to_classes, _add_classes
+from .server import get_worker, set_worker
+from .green import get_executor
 
 __all__ = ['Server']
 
@@ -273,7 +274,7 @@ class Server:
         self.__tango_classes = _to_classes(tango_classes or [])
         self.__tango_devices = []
         if self.async_mode:
-            self.__worker = _create_async_worker(self.green_mode)
+            self.__worker = get_executor(self.green_mode)
         else:
             self.__worker = get_worker()
         set_worker(self.__worker)
@@ -398,14 +399,8 @@ class Server:
 
         _add_classes(util, self.__tango_classes)
 
-        if async_mode:
-            tango_thread_id = self.worker.run_in_thread(self.__tango_loop)
-
     def __run(self, timeout=None):
-        if self.async_mode:
-            return self.worker.run(timeout=timeout)
-        else:
-            self.__tango_loop()
+        return self.worker.run(self.__tango_loop, wait=True, timeout=timeout)
 
     def __tango_loop(self):
         self.log.debug("server loop started")
@@ -415,7 +410,6 @@ class Server:
         self._phase = Server.Phase2
         self.log.info("Ready to accept request")
         u_instance.server_run()
-        self.worker.stop()
         if self.__auto_clean:
             self.__clean_up_process()
         self.log.debug("server loop exit")
