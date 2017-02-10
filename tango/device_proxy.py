@@ -11,8 +11,6 @@
 
 """Define python methods for DeviceProxy object."""
 
-from __future__ import with_statement
-
 import time
 import threading
 import collections
@@ -29,8 +27,8 @@ from .utils import seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
 from .utils import dir2
 
-from .green import result, submit, green, green_cb
-from .green import get_green_mode, get_event_loop, get_wait_default_value
+from .green import green, green_callback
+from .green import get_green_mode
 
 
 __all__ = ["device_proxy_init", "get_device_proxy"]
@@ -41,6 +39,7 @@ __docformat__ = "restructuredtext"
 _UNSUBSCRIBE_LIFETIME = 60
 
 
+@green(consume_green_mode=False)
 def get_device_proxy(*args, **kwargs):
     """get_device_proxy(self, dev_name, green_mode=None, wait=True, timeout=True) -> DeviceProxy
     get_device_proxy(self, dev_name, need_check_acc, green_mode=None, wait=True, timeout=None) -> DeviceProxy
@@ -95,17 +94,7 @@ def get_device_proxy(*args, **kwargs):
 
     New in PyTango 8.1.0
     """
-    # we cannot use the green wrapper because it consumes the green_mode and we
-    # want to forward it to the DeviceProxy constructor
-    green_mode = kwargs.get('green_mode', get_green_mode())
-    wait = kwargs.pop('wait', get_wait_default_value(green_mode))
-    timeout = kwargs.pop('timeout', None)
-
-    # make sure the event loop is initialized
-    get_event_loop(green_mode)
-
-    d = submit(green_mode, DeviceProxy, *args, **kwargs)
-    return result(d, green_mode, wait=wait, timeout=timeout)
+    return DeviceProxy(*args, **kwargs)
 
 
 class __TangoInfo(object):
@@ -1109,10 +1098,10 @@ def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize
 
     if isinstance(cb_or_queuesize, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = green_cb(cb_or_queuesize, self.get_green_mode())
+        cb.push_event = green_callback(cb_or_queuesize, self.get_green_mode())
     elif hasattr(cb_or_queuesize, "push_event") and isinstance(cb_or_queuesize.push_event, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = green_cb(cb_or_queuesize.push_event, self.get_green_mode())
+        cb.push_event = green_callback(cb_or_queuesize.push_event, self.get_green_mode())
     elif is_integer(cb_or_queuesize):
         cb = cb_or_queuesize  # queuesize
     else:
