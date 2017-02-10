@@ -24,7 +24,7 @@ import functools
 import traceback
 
 from ._tango import AttrDataFormat, AttrWriteType, CmdArgType, PipeWriteType
-from ._tango import DevFailed, Except, GreenMode
+from ._tango import DevFailed, GreenMode, SerialModel
 
 from .attr_data import AttrData
 from .pipe_data import PipeData
@@ -32,14 +32,31 @@ from .device_class import DeviceClass
 from .device_server import LatestDeviceImpl
 from .utils import is_seq, is_non_str_seq
 from .utils import scalar_to_array_type, TO_TANGO_TYPE
+from .green import get_green_mode, get_executor
+from .pyutil import Util
+
 
 __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
            "command", "pipe", "device_property", "class_property",
-           "run", "server_run", "get_worker", "get_async_worker",
-           "Server"]
+           "run", "server_run", "Server"]
 
 API_VERSION = 2
 
+# Worker access
+
+_WORKER = None
+
+
+def set_worker(worker):
+    global _WORKER
+    _WORKER = worker
+
+
+def get_worker():
+    return _WORKER
+
+
+# Helpers
 
 def _get_tango_type_format(dtype=None, dformat=None):
     if dformat is None:
@@ -1262,11 +1279,8 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
                  event_loop=None, post_init_callback=None,
                  green_mode=None):
     if green_mode is None:
-        from tango import get_green_mode
         green_mode = get_green_mode()
-    async_mode = green_mode in (GreenMode.Gevent, GreenMode.Asyncio)
 
-    import tango
     if msg_stream is None:
         write = lambda msg: None
     else:
@@ -1278,18 +1292,16 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
     post_init_callback = __to_cb(post_init_callback)
 
     if util is None:
-        util = tango.Util(args)
+        util = Util(args)
 
-    if async_mode:
-        util.set_serial_model(tango.SerialModel.NO_SYNC)
-        worker = _create_async_worker(green_mode)
-        set_worker(worker)
+    if green_mode in (GreenMode.Gevent, GreenMode.Asyncio):
+        util.set_serial_model(SerialModel.NO_SYNC)
 
-    worker = get_worker()
+    worker = get_executor(green_mode)
+    set_worker(worker)
 
     if event_loop is not None:
-        if async_mode:
-            event_loop = functools.partial(worker.execute, event_loop)
+        event_loop = functools.partial(worker.execute, event_loop)
         util.server_set_event_loop(event_loop)
 
     log = logging.getLogger("tango")
@@ -1301,16 +1313,9 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
         worker.execute(post_init_callback)
         write("Ready to accept request\n")
         util.server_run()
-        worker.stop()
         log.debug("server loop exit")
 
-    if async_mode:
-        task = worker.run_in_thread(tango_loop)
-        worker.run(task)
-        log.debug("async worker finished")
-    else:
-        tango_loop()
-
+    worker.run(tango_loop, wait=True)
     return util
 
 
@@ -1434,10 +1439,7 @@ def run(classes, args=None, msg_stream=sys.stdout,
         when classes argument is a sequence, the items can also be
         a sequence <TangoClass, TangoClassClass>[, tango class name]
     """
-    if msg_stream is None:
-        write = lambda msg: None
-    else:
-        write = msg_stream.write
+    write = msg_stream.write if msg_stream else lambda msg: None
     try:
         return __server_run(classes, args=args, msg_stream=msg_stream,
                             util=util, event_loop=event_loop,
@@ -1488,197 +1490,6 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
                verbose=verbose, util=util, event_loop=event_loop,
                post_init_callback=post_init_callback,
                green_mode=green_mode)
-
-
-class BaseWorker:
-    def __init__(self, max_queue_size=0):
-        pass
-
-    def execute(self, func, *args, **kwargs):
-        return func(*args, **kwargs)
-
-    def stop(self):
-        pass
-
-
-__WORKER = BaseWorker()
-__ASYNC_WORKER = None
-
-def get_worker():
-    global __WORKER
-    return __WORKER
-
-
-def set_worker(worker):
-    global __WORKER
-    __WORKER = worker
-
-
-def get_async_worker():
-    global __ASYNC_WORKER
-    return __ASYNC_WORKER
-
-
-def _create_async_worker(green_mode):
-    global __ASYNC_WORKER
-    if __ASYNC_WORKER:
-        return __ASYNC_WORKER
-    if green_mode == GreenMode.Gevent:
-        _ASYNC_WORKER = _create_gevent_worker()
-    if green_mode == GreenMode.Asyncio:
-        _ASYNC_WORKER = _create_asyncio_worker()
-    return _ASYNC_WORKER
-
-
-def _create_gevent_worker():
-    try:
-        from queue import Queue
-    except:
-        from Queue import Queue
-    from threading import current_thread
-
-    import gevent
-    import gevent.event
-    import gevent._threading
-
-    class GeventWorker(BaseWorker):
-
-        class Task:
-
-            def __init__(self, event, func, *args, **kwargs):
-                self.__event = event
-                self.__func = func
-                self.__args = args
-                self.__kwargs = kwargs
-                self.value = None
-                self.exception = None
-
-            def __call__(self):
-                func = self.__func
-                if func:
-                    try:
-                        self.value = func(*self.__args, **self.__kwargs)
-                    except:
-                        self.exception = sys.exc_info()
-                self.__event.set()
-
-            def run(self):
-                return gevent.spawn(self)
-
-        def __init__(self, max_queue_size=0):
-            self.__tasks = Queue(max_queue_size)
-            self.__stop_event = gevent.event.Event()
-            self.__watcher = gevent.get_hub().loop.async()
-            self.__watcher.start(self.__step)
-            self.__lock = gevent._threading.Lock()
-            self.__id = id(current_thread())
-
-        def __step(self):
-            task = self.__tasks.get()
-            return task.run()
-
-        def is_gevent_thread(self):
-            return self.__id == id(current_thread())
-
-        def run_in_thread(self, func, *args, **kwargs):
-            return gevent.get_hub().threadpool.spawn(func, *args, **kwargs)
-
-        def run(self, until=None, timeout=None):
-            if until is not None:
-                objects = until, self.__stop_event
-            else:
-                objects = self.__stop_event,
-            return gevent.wait(objects=objects, timeout=timeout)
-
-        def execute(self, func, *args, **kwargs):
-            if self.is_gevent_thread():
-                return func(*args, **kwargs)
-            event = gevent._threading.Event()
-            task = self.Task(event, func, *args, **kwargs)
-            with self.__lock:
-                self.__tasks.put(task)
-                self.__watcher.send()
-                event.wait()
-            if task.exception:
-                if issubclass(task.exception[0], DevFailed):
-                    raise task.exception[1]
-                else:
-                    Except.throw_python_exception(*task.exception)
-            return task.value
-
-        def stop(self):
-            task = self.Task(self.__stop_event, None)
-            self.__tasks.put(task)
-            self.__watcher.send()
-
-    return GeventWorker()
-
-
-def _create_asyncio_worker():
-    import concurrent.futures
-
-    try:
-        from threading import get_ident
-    except:
-        from threading import _get_ident as get_ident
-
-    try:
-        import asyncio
-    except ImportError:
-        import trollius as asyncio
-
-    try:
-        from asyncio import run_coroutine_threadsafe
-    except ImportError:
-        from .asyncio_tools import run_coroutine_threadsafe
-
-    class LoopExecutor(concurrent.futures.Executor):
-        """An Executor subclass that uses an event loop
-        to execute calls asynchronously."""
-
-        def __init__(self, loop=None):
-            """Initialize the executor with a given loop."""
-            self.loop = loop or asyncio.get_event_loop()
-
-        def submit(self, corofn, *args, **kwargs):
-            """Schedule a coroutine, to be executed as corofn(*args **kwargs).
-            Return a Future representing the execution of the callable."""
-            return run_coroutine_threadsafe(corofn(*args, **kwargs), self.loop)
-
-        def run_in_thread(self, func, *args, **kwargs):
-            """Schedule a blocking callback."""
-            callback = lambda: func(*args, **kwargs)
-            coro = self.loop.run_in_executor(None, callback)
-            # That is not actually necessary since coro is actually
-            # a future. But it is an implementation detail and it
-            # might be changed later on.
-            return asyncio.async(coro)
-
-        def run(self, until=None, timeout=None):
-            """Run the asyncio event loop."""
-            if until is None and timeout is None:
-                return self.loop.run_forever()
-            if until is None:
-                until = asyncio.sleep(timeout, loop=self.loop)
-            return self.loop.run_until_complete(until)
-
-        def stop(self):
-            """Run the asyncio event loop."""
-            self.loop.stop()
-
-        def execute(self, fn, *args, **kwargs):
-            """Execute the callable fn as fn(*args **kwargs)."""
-            corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
-            if self.loop._thread_id == get_ident():
-                return corofn()
-            return self.submit(corofn).result()
-
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    return LoopExecutor(loop=loop)
 
 
 # Instanciate DeviceMeta using BaseDevice
