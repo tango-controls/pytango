@@ -14,6 +14,11 @@ from __future__ import absolute_import
 
 # Imports
 import functools
+try:
+    from threading import get_ident
+except:
+    from threading import _get_ident as get_ident
+
 
 # Asyncio imports
 try:
@@ -59,7 +64,11 @@ class AsyncioExecutor(AbstractExecutor):
 
     def __init__(self, loop=None, subexecutor=None):
         if loop is None:
-            loop = asyncio.get_event_loop()
+            try:
+                loop = asyncio.get_event_loop()
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
         self.loop = loop
         self.subexecutor = subexecutor
 
@@ -67,7 +76,7 @@ class AsyncioExecutor(AbstractExecutor):
         """Return the given operation as an asyncio future."""
         callback = functools.partial(fn, *args, **kwargs)
         coro = self.loop.run_in_executor(self.subexecutor, callback)
-        return asyncio.ensure_future(coro)
+        return asyncio.async(coro)
 
     def access(self, accessor, timeout=None):
         """Return a result from an asyncio future."""
@@ -78,10 +87,13 @@ class AsyncioExecutor(AbstractExecutor):
 
     def submit(self, fn, *args, **kwargs):
         """Submit an operation"""
-        coro = asyncio.coroutine(fn)(*args, **kwargs)
-        return run_coroutine_threadsafe(coro, self.loop)
+        corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
+        return run_coroutine_threadsafe(corofn(), self.loop)
 
     def execute(self, fn, *args, **kwargs):
         """Execute an operation and return the result."""
+        if self.loop._thread_id == get_ident():
+            corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
+            return corofn()
         future = self.submit(fn, *args, **kwargs)
         return future.result()

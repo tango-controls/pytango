@@ -40,7 +40,7 @@ class AbstractExecutor(object):
         """Execute an operation and return the result."""
         raise NotImplementedError
 
-    def run(self, fn, args, kwargs, wait=None, timeout=None):
+    def run(self, fn, args=(), kwargs={}, wait=None, timeout=None):
         if wait is None:
             wait = self.default_wait
         # Sychronous (no delegation)
