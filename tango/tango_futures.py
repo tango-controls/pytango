@@ -9,39 +9,57 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-__all__ = ["get_global_executor", "submit", "spawn", "wait"]
+# Future imports
+from __future__ import absolute_import
 
-__global_executor = None
+# Concurrent imports
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 
-MAX_WORKERS = 8
-MODE = 'thread'
+# Tango imports
+from .tango_executor import AbstractExecutor
+
+__all__ = ["FuturesExecutor", "get_global_executor", "set_global_executor"]
 
 
-def __get_executor_class():
-    import concurrent.futures
-    ret = None
-    if MODE == 'thread':
-        ret = concurrent.futures.ThreadPoolExecutor
-    else:
-        ret = concurrent.futures.ProcessPoolExecutor
-    return ret
+# Global executor
+
+_EXECUTOR = None
 
 
 def get_global_executor():
-    global __global_executor
-    if __global_executor is None:
-        klass = __get_executor_class()
-        if klass is not None:
-            __global_executor = klass(max_workers=MAX_WORKERS)
-    return __global_executor
+    global _EXECUTOR
+    if _EXECUTOR is None:
+        _EXECUTOR = FuturesExecutor()
+    return _EXECUTOR
 
 
-def submit(fn, *args, **kwargs):
-    return get_global_executor().submit(fn, *args, **kwargs)
+def set_global_executor(executor):
+    global _EXECUTOR
+    _EXECUTOR = executor
 
 
-def wait(fut, timeout=None):
-    return fut.result(timeout=timeout)
+# Futures executor
 
+class FuturesExecutor(AbstractExecutor):
+    """Futures tango executor"""
 
-spawn = submit
+    asynchronous = True
+    default_wait = True
+
+    def __init__(self, process=False, max_workers=20):
+        cls = ProcessPoolExecutor if process else ThreadPoolExecutor
+        self.subexecutor = cls(max_workers=max_workers)
+
+    def delegate(self, fn, *args, **kwargs):
+        """Return the given operation as a concurrent future."""
+        return self.subexecutor.submit(fn, *args, **kwargs)
+
+    def access(self, accessor, timeout=None):
+        """Return a result from a single callable."""
+        return accessor.result(timeout=timeout)
+
+    def execute(self, fn, *args, **kwargs):
+        """Execute an operation and return the result."""
+        return fn(*args, **kwargs)
+
+    submit = execute

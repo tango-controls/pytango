@@ -9,18 +9,43 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
+# Future imports
 from __future__ import absolute_import
+
+# Imports
 import sys
+import six
 import types
 
-import six
+# Gevent imports
+import gevent.queue
 
-__all__ = ["get_global_threadpool", "get_global_executor",
-           "get_event_loop", "submit", "spawn", "wait"]
+# Tango imports
+from .tango_executor import AbstractExecutor
+
+__all__ = ["get_global_executor", "set_global_executor", "GeventExecutor"]
 
 
-def get_global_threadpool():
-    import gevent
+# Global executor
+
+_EXECUTOR = None
+
+
+def get_global_executor():
+    global _EXECUTOR
+    if _EXECUTOR is None:
+        _EXECUTOR = GeventExecutor()
+    return _EXECUTOR
+
+
+def set_global_executor(executor):
+    global _EXECUTOR
+    _EXECUTOR = executor
+
+
+# Helpers
+
+def get_threadpool():
     thread_pool = gevent.get_hub().threadpool
     # before gevent-1.1.0, patch the spawn method to propagate exception raised
     # in the loop to the AsyncResult.
@@ -80,41 +105,60 @@ def patched_spawn(fn, *args, **kwargs):
     g.get = types.MethodType(get_with_exception, g)
     return g
 
-
 def spawn(fn, *args, **kwargs):
     return get_global_threadpool().submit(fn, *args, **kwargs)
 
 
-get_global_executor = get_global_threadpool
-submit = spawn
-__event_loop = None
 
 
-def get_event_loop():
-    global __event_loop
-    if __event_loop is None:
-        import gevent
-        import gevent.queue
+def make_event_loop():
 
-        def loop(queue):
-            while True:
-                item = queue.get()
-                try:
-                    f, args, kwargs = item
-                    gevent.spawn(f, *args, **kwargs)
-                except Exception as e:
-                    sys.excepthook(*sys.exc_info())
+    def loop(queue):
+        while True:
+            item = queue.get()
+            try:
+                f, args, kwargs = item
+                gevent.spawn(f, *args, **kwargs)
+            except Exception as e:
+                sys.excepthook(*sys.exc_info())
 
-        def submit(fn, *args, **kwargs):
-            l_async = queue.hub.loop.async()
-            queue.put((fn, args, kwargs))
-            l_async.send()
+    def submit(fn, *args, **kwargs):
+        l_async = queue.hub.loop.async()
+        queue.put((fn, args, kwargs))
+        l_async.send()
 
-        queue = gevent.queue.Queue()
-        __event_loop = gevent.spawn(loop, queue)
-        __event_loop.submit = submit
-    return __event_loop
+    queue = gevent.queue.Queue()
+    event_loop = gevent.spawn(loop, queue)
+    event_loop.submit = submit
+    return event_loop
 
+# Gevent executor
 
-def wait(greenlet, timeout=None):
-    return greenlet.get(timeout=timeout)
+class GeventExecutor(AbstractExecutor):
+    """Gevent tango executor"""
+
+    asynchronous = True
+    default_wait = True
+
+    def __init__(self, loop=None, subexecutor=None):
+        if loop is None:
+            loop = make_event_loop()
+        if subexecutor is None:
+            subexecutor = get_threadpool()
+        self.loop = loop
+        self.subexecutor = subexecutor
+
+    def delegate(self, fn, *args, **kwargs):
+        """Return the given operation as an asyncio future."""
+        return self.subexecutor.submit(fn, *args, **kwargs)
+
+    def access(self, accessor, timeout=None):
+        """Return a result from an asyncio future."""
+        return accessor.get(timeout=timeout)
+
+    def submit(self, fn, *args, **kwargs):
+        return self.loop.submit(fn, *args, **kwargs)
+
+    def execute(self, fn, *args, **kwargs):
+        """Execute an operation and return the result."""
+        raise RuntimeError('Not implemented yet')
