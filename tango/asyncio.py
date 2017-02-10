@@ -13,16 +13,13 @@
 :class:`PyTango.AttributeProxy"""
 
 from __future__ import absolute_import
-
-__all__ = ["DeviceProxy", "AttributeProxy", "check_requirements",
-           "get_event_loop"]
-
 from functools import partial
 
-from PyTango import GreenMode
-from PyTango.device_proxy import get_device_proxy
-from PyTango.attribute_proxy import get_attribute_proxy
-from PyTango.tango_asyncio import get_event_loop
+from ._tango import GreenMode
+from .device_proxy import get_device_proxy
+from .attribute_proxy import get_attribute_proxy
+
+__all__ = ["DeviceProxy", "AttributeProxy", "check_requirements"]
 
 
 def check_requirements():
