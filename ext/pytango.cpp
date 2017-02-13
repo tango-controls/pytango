@@ -31,6 +31,7 @@ void export_base_types();
 void export_event_data();
 void export_attr_conf_event_data();
 void export_data_ready_event_data();
+void export_pipe_event_data();
 void export_exceptions();
 void export_api_util();
 void export_connection();
@@ -93,6 +94,7 @@ BOOST_PYTHON_MODULE(_tango)
     export_event_data();
     export_attr_conf_event_data();
     export_data_ready_event_data();
+    export_pipe_event_data();
     export_exceptions();
     export_api_util();
     export_connection();

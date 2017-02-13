@@ -494,6 +494,35 @@ namespace PyDeviceImpl
         self.push_data_ready_event(__att_name, ctr); //__att_name from SAFE_PUSH
     }
 
+    /* **********************************
+     * pipe event
+     * **********************************/
+//	void push_pipe_event (const string &pipe_name, DevFailed *except);
+    inline void push_pipe_event(Tango::DeviceImpl &self, const str &pipe_name, object& exception)
+    {
+//        self.push_pipe_event(__pipe_name, pipe);
+    }
+
+//	void push_pipe_event (const string &pipe_name,Tango::DevicePipeBlob *p_data,bool reuse_it=false);
+    inline void push_pipe_event(Tango::DeviceImpl &self, const str &pipe_name, object& blob, bool reuse)
+    {
+    	std::cout << "device_impl:push_pipe_event" << std::endl;
+    	std::string __pipe_name;
+    	Tango::DevicePipe pipe;
+        from_str_to_char(pipe_name.ptr(), __pipe_name);
+//        self.push_pipe_event(__pipe_name, pipe);
+    }
+
+//	void push_pipe_event (const string &pipe_name, Tango::DevicePipeBlob *p_data, struct timeval &t,bool reuse_it=false);
+    inline void push_pipe_event(Tango::DeviceImpl &self, const str &pipe_name, object& blob, object& timeval, bool reuse)
+    {
+    	std::cout << "device_impl:push_pipe_event with timeval" << std::endl;
+    	std::string __pipe_name;
+    	Tango::DevicePipe pipe;
+        from_str_to_char(pipe_name.ptr(), __pipe_name);
+//        self.push_pipe_event(__pipe_name, pipe);
+    }
+
     void check_attribute_method_defined(PyObject *self,
                                         const std::string &attr_name,
                                         const std::string &method_name)
@@ -1409,7 +1438,6 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_change_event_overload,
                                        Tango::DeviceImpl::set_change_event, 2, 3)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_archive_event_overload,
                                        Tango::DeviceImpl::set_archive_event, 2, 3)
-
 BOOST_PYTHON_FUNCTION_OVERLOADS(remove_attribute_overload,
                                 PyDeviceImpl::remove_attribute, 2, 3)
                                        
@@ -1643,6 +1671,21 @@ void export_device_impl()
             (arg_("self"), arg_("attr_name"), arg_("ctr")))
 
         .def("push_att_conf_event", &Tango::DeviceImpl::push_att_conf_event)
+
+         .def("push_pipe_event",
+            (void (*) (Tango::DeviceImpl &, str &, object&))
+            &PyDeviceImpl::push_pipe_event)
+//            (arg_("self"), arg_("pipe_name"), arg_("exception")))
+
+         .def("push_pipe_event",
+            (void (*) (Tango::DeviceImpl &, str &, object&, bool))
+            &PyDeviceImpl::push_pipe_event)
+//            (arg_("self"), arg_("pipe_name"), arg_("devicePipeBlob"), arg_("reuse")))
+
+         .def("push_pipe_event",
+            (void (*) (Tango::DeviceImpl &, str &, object&, object&, bool))
+            &PyDeviceImpl::push_pipe_event)
+//            (arg_("self"), arg_("pipe_name"), arg_("devicePipeBlob"), arg_("timeval"), arg_("reuse")))
 
         .def("get_logger", &Tango::DeviceImpl::get_logger, return_internal_reference<>())
         .def("__debug_stream", &PyDeviceImpl::debug)

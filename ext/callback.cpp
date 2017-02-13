@@ -139,6 +139,7 @@ static void _run_virtual_once(PyCallBackAutoDie* self, OriginalT * ev, const cha
     AutoPythonGIL gil;
 
     try {
+        std::cout << "callback.cpp:run_virtual once()" << std::endl;
         CopyT* py_ev = new CopyT();
         object py_value = object( handle<>(
                     to_python_indirect<
@@ -214,12 +215,12 @@ namespace {
     template<typename OriginalT>
     static void _push_event(PyCallBackPushEvent* self, OriginalT * ev)
     {
-        // If the event is received after python dies but before the process
+    	// If the event is received after python dies but before the process
         // finishes then discard the event
         if (!Py_IsInitialized())
         {
             cout4 << "Tango event (" << ev->event << " for " 
-                  << ev->attr_name << ") received for after python shutdown. "
+//                  << ev->attr_name << ") received for after python shutdown. "
                   << "Event will be ignored" << std::endl;
             return;
         }
@@ -235,8 +236,9 @@ namespace {
         object py_device;
         if (self->m_weak_device) {
             PyObject* py_c_device = PyWeakref_GET_OBJECT(self->m_weak_device);
-            if (py_c_device && py_c_device != Py_None)
-                py_device = object(handle<>(borrowed(py_c_device)));
+            if (py_c_device && py_c_device != Py_None) {
+               py_device = object(handle<>(borrowed(py_c_device)));
+            }
         }
 
         try
@@ -255,7 +257,7 @@ namespace {
 
 
 boost::python::object PyCallBackPushEvent::get_override(const char* name)
-{ 
+{
     return boost::python::wrapper<Tango::CallBack>::get_override(name); 
 }
 
@@ -298,6 +300,20 @@ void PyCallBackPushEvent::fill_py_event(Tango::DataReadyEventData* ev, object & 
     copy_device(ev, py_ev, py_device);
 }
 
+void PyCallBackPushEvent::fill_py_event(Tango::PipeEventData* ev, object & py_ev, object py_device, PyTango::ExtractAs extract_as)
+{
+	std::cout << "Callback.cpp::fill_py_event()" << std::endl;
+    std::cout << "callback.cpp:fill_py_event()" << ev->pipe_name << std::endl;
+    std::cout << "callback.cpp:fill_py_event()" << ev->event << std::endl;
+    std::cout << "callback.cpp:fill_py_event()" << ev->device << std::endl;
+    std::cout << "callback.cpp:fill_py_event()" << ev->err << std::endl;
+    std::cout << "callback.cpp:fill_py_event()" << ev->pipe_value << std::endl;
+//    std::cout << "callback.cpp:fill_py_event()" << ev->pipe_value->root_blob_name << std::endl;
+	copy_device(ev, py_ev, py_device);
+    if (ev->pipe_value) {
+        py_ev.attr("pipe_value") = *ev->pipe_value;
+    }
+}
 
 
 /*virtual*/ void PyCallBackPushEvent::push_event(Tango::EventData *ev)
@@ -311,6 +327,11 @@ void PyCallBackPushEvent::fill_py_event(Tango::DataReadyEventData* ev, object & 
 }
 
 /*virtual*/ void PyCallBackPushEvent::push_event(Tango::DataReadyEventData *ev)
+{
+    _push_event(this, ev);
+}
+
+/*virtual*/ void PyCallBackPushEvent::push_event(Tango::PipeEventData *ev)
 {
     _push_event(this, ev);
 }
@@ -379,5 +400,7 @@ void export_callback()
             "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send attribute configuration change event(s) to the client. ")
         .def("push_event", (void (PyCallBackAutoDie::*)(Tango::DataReadyEventData*))&PyCallBackAutoDie::push_event,
             "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send attribute data ready event(s) to the client. ")
+	    .def("push_event", (void (PyCallBackAutoDie::*)(Tango::PipeEventData*))&PyCallBackAutoDie::push_event,
+	        "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send pipe event(s) to the client. ")
     ;
 }

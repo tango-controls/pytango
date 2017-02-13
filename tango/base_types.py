@@ -495,8 +495,12 @@ def __doc_base_types():
         - USER_EVENT
         - ATTR_CONF_EVENT
         - DATA_READY_EVENT
+        - INTERFACE_CHANGE_EVENT
+        - PIPE_EVENT
 
         *DATA_READY_EVENT - New in PyTango 7.0.0*
+        *INTERFACE_CHANGE_EVENT - New in PyTango 9.2.2*
+        *PIPE_EVENT - New in PyTango 9.2.2*
 
     """)
 

@@ -1001,6 +1001,23 @@ def __doc_DeviceImpl():
         Throws     : DevFailed If the attribute name is unknown.
     """)
 
+    document_method("push_pipe_event", """
+    push_pipe_event(self, pipe_name, except) -> None
+    push_pipe_event(self, pipe_name, blob, reuse_it) -> None
+    push_pipe_event(self, pipe_name, blob, timeval, reuse_it) -> None
+
+            Push a pipe event for the given blob.
+
+        Parameters :
+            - pipe_name : (str) pipe name
+            - blob  : (DevicePipeBlob) the blob data
+        Return     : None
+
+        Throws     : DevFailed If the pipe name is unknown.
+
+        New in PyTango 9.2.2
+    """ )
+
     document_method("get_logger", """
     get_logger(self) -> Logger
 
@@ -1244,6 +1261,17 @@ def __doc_DeviceImpl():
 
         New in PyTango 7.2.1
     """)
+
+    document_method("push_pipe_event", """
+    push_pipe_event(self, blob) -> None
+
+            Push an pipe event.
+
+        Parameters :  the blob which pipe event will be send.
+        Return     : None
+        
+        New in PyTango 9.2.2
+    """ )
 
     document_method("is_there_subscriber", """
     is_there_subscriber(self, att_name, event_type) -> bool
