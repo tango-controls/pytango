@@ -469,7 +469,6 @@ def setup_args():
     ]
 
     extra_link_args = [
-        '-Wl,--strip-all',
     ]
 
     if please_debug:
