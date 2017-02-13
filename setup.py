@@ -469,7 +469,6 @@ def setup_args():
     ]
 
     extra_link_args = [
-        '-Wl,-h',
         '-Wl,--strip-all',
     ]
 
