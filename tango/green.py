@@ -54,6 +54,66 @@ def get_green_mode():
     return _CURRENT_GREEN_MODE
 
 
+# Abstract executor class
+
+class AbstractExecutor(object):
+
+    asynchronous = NotImplemented
+    default_wait = NotImplemented
+
+    def delegate(self, fn, *args, **kwargs):
+        """Delegate an operation and return an accessor."""
+        if not self.asynchronous:
+            raise ValueError('Not supported in synchronous mode')
+        raise NotImplementedError
+
+    def access(self, accessor, timeout=None):
+        """Return a result from an accessor."""
+        if not self.asynchronous:
+            raise ValueError('Not supported in synchronous mode')
+        raise NotImplementedError
+
+    def submit(self, fn, *args, **kwargs):
+        """Submit an operation"""
+        if not self.asynchronous:
+            return fn(*args, **kwargs)
+        raise NotImplementedError
+
+    def execute(self, fn, *args, **kwargs):
+        """Execute an operation and return the result."""
+        if not self.asynchronous:
+            return fn(*args, **kwargs)
+        raise NotImplementedError
+
+    def run(self, fn, args=(), kwargs={}, wait=None, timeout=None):
+        if wait is None:
+            wait = self.default_wait
+        # Sychronous (no delegation)
+        if not self.asynchronous:
+            if not wait or timeout:
+                raise ValueError('Not supported in synchronous mode')
+            return fn(*args, **kwargs)
+        # Asynchronous delegation
+        accessor = self.delegate(fn, *args, **kwargs)
+        if not wait:
+            return accessor
+        return self.access(accessor, timeout=timeout)
+
+
+class SynchronousExecutor(AbstractExecutor):
+
+    asynchronous = False
+    default_wait = True
+
+
+# Default synchronous executor
+
+def get_synchronous_executor():
+    return _SYNCHRONOUS_EXECUTOR
+
+_SYNCHRONOUS_EXECUTOR = SynchronousExecutor()
+
+
 # Getters
 
 def get_object_green_mode(obj):
@@ -64,8 +124,7 @@ def get_object_green_mode(obj):
 
 def get_executor(green_mode):
     if green_mode == GreenMode.Synchronous:
-        from . import tango_executor
-        return tango_executor.get_synchronous_executor()
+        return get_synchronous_executor()
     if green_mode == GreenMode.Gevent:
         from . import tango_gevent
         return tango_gevent.get_global_executor()

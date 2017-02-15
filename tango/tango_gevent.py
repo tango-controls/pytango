@@ -21,7 +21,7 @@ import types
 import gevent.queue
 
 # Tango imports
-from .tango_executor import AbstractExecutor
+from .green import AbstractExecutor
 
 __all__ = ["get_global_executor", "set_global_executor", "GeventExecutor"]
 
