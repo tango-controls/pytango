@@ -59,6 +59,15 @@ GENTOO = distribution_match(['gentoo'])
 TESTING = any(x in sys.argv for x in ['test', 'pytest'])
 
 
+def get_readme(name='README.rst'):
+    """Get readme file contents without the badges."""
+    with open(name) as f:
+        return '\n'.join(
+            line for line in f.read().splitlines()
+            if not line.startswith('|')
+            or not line.endswith('|'))
+
+
 def pkg_config(*packages, **config):
     config_map = {
         "-I": "include_dirs",
@@ -522,7 +531,7 @@ def setup_args():
     if sphinx:
         cmdclass['build_doc'] = build_doc
 
-    long_description = open('README.rst').read()
+    long_description = get_readme()
 
     opts = dict(
         name='pytango',

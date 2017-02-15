@@ -93,11 +93,12 @@ You can get support from the `Tango forums`_, for both Tango_ and PyTango_ quest
 
 All contributions,  `PR and bug reports`_ are welcome!
 
+
 .. |Doc Status| image:: https://readthedocs.org/projects/pytango/badge/?version=latest
                 :target: http://pytango.readthedocs.io/en/latest
                 :alt:
 
-.. |Build Status| image:: https://travis-ci.org/tango-controls/pytango.svg?branch=master
+.. |Build Status| image:: https://travis-ci.org/tango-controls/pytango.svg
                   :target: https://travis-ci.org/tango-controls/pytango
                   :alt:
 
