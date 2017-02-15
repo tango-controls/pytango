@@ -112,15 +112,18 @@ class __TangoInfo(object):
 # class members
 #-------------------------------------------------------------------------------
 
+
 def __check_read_attribute(dev_attr):
     if dev_attr.has_failed:
         raise DevFailed(*dev_attr.get_err_stack())
     return dev_attr
 
+
 def __check_read_pipe(dev_pipe):
     if dev_pipe.has_failed:
         raise DevFailed(*dev_pipe.get_err_stack())
     return dev_pipe
+
 
 def __init_device_proxy_internals(proxy):
     if proxy.__dict__.get('_initialized', False):
@@ -131,12 +134,14 @@ def __init_device_proxy_internals(proxy):
     proxy.__dict__['_executors'] = executors
     proxy.__dict__['_pending_unsubscribe'] = {}
 
+
 def __DeviceProxy__get_cmd_cache(self):
     try:
         ret = self.__dict__['__cmd_cache']
     except KeyError:
         self.__dict__['__cmd_cache'] = ret = {}
     return ret
+
 
 def __DeviceProxy__get_attr_cache(self):
     try:
@@ -145,12 +150,14 @@ def __DeviceProxy__get_attr_cache(self):
         self.__dict__['__attr_cache'] = ret = ()
     return ret
 
+
 def __DeviceProxy__get_pipe_cache(self):
     try:
         ret = self.__dict__['__pipe_cache']
     except KeyError:
         self.__dict__['__pipe_cache'] = ret = ()
     return ret
+
 
 def __DeviceProxy__init__(self, *args, **kwargs):
     __init_device_proxy_internals(self)
@@ -159,6 +166,7 @@ def __DeviceProxy__init__(self, *args, **kwargs):
     self._executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
     self._executors[GreenMode.Asyncio] = kwargs.pop('asyncio_executor', None)
     return DeviceProxy.__init_orig__(self, *args, **kwargs)
+
 
 def __DeviceProxy__get_green_mode(self):
     """Returns the green mode in use by this DeviceProxy.
@@ -176,6 +184,7 @@ def __DeviceProxy__get_green_mode(self):
     if gm is None:
         gm = get_green_mode()
     return gm
+
 
 def __DeviceProxy__set_green_mode(self, green_mode=None):
     """Sets the green mode to be used by this DeviceProxy
@@ -201,20 +210,25 @@ def __DeviceProxy__refresh_cmd_cache(self):
         cmd_cache[n] = cmd, doc
     self.__dict__['__cmd_cache'] = cmd_cache
 
+
 def __DeviceProxy__refresh_attr_cache(self):
     attr_cache = [attr_name.lower() for attr_name in self.get_attribute_list()]
     self.__dict__['__attr_cache'] = attr_cache
+
 
 def __DeviceProxy__refresh_pipe_cache(self):
     pipe_cache = [pipe_name.lower() for pipe_name in self.get_pipe_list()]
     self.__dict__['__pipe_cache'] = pipe_cache
 
+
 def __get_command_func(dp, cmd_info, name):
     _, doc = cmd_info
+
     def f(*args, **kwds):
         return dp.command_inout(name, *args, **kwds)
     f.__doc__ = doc
     return f
+
 
 def __DeviceProxy__getattr(self, name):
     # trait_names is a feature of IPython. Hopefully they will solve
@@ -1248,11 +1262,6 @@ def __DeviceProxy__str(self):
     return "%s(%s)" % (info.dev_class, self.dev_name())
 
 
-def __DeviceProxy__str(self):
-    info = self._get_info_()
-    return "%s(%s)" % (info.dev_class, self.dev_name())
-
-
 def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
     r = self.__read_pipe(pipe_name)
     return r.extract(extract_as)
@@ -1290,6 +1299,7 @@ def __DeviceProxy__state(self, *args, **kwargs):
                 if dev_st == DevState.ON : ...
     """
     return self._state(*args, **kwargs)
+
 
 def __DeviceProxy__status(self, *args, **kwargs):
     """status(self) -> str
@@ -1471,9 +1481,9 @@ def __doc_DeviceProxy():
 
     """
 
-#-------------------------------------
+# ------------------------------------
 #   General methods
-#-------------------------------------
+# ------------------------------------
 
     document_method("info", """
     info(self) -> DeviceInfo
@@ -1641,17 +1651,19 @@ def __doc_DeviceProxy():
         is an integer"
     """)
 
-#-------------------------------------
+# ------------------------------------
 #   Property methods
-#-------------------------------------
+# ------------------------------------
+
     # get_property -> in code
     # put_property -> in code
     # delete_property -> in code
     # get_property_list -> in code
 
-#-------------------------------------
+# ------------------------------------
 #   Attribute methods
-#-------------------------------------
+# ------------------------------------
+
     document_method("get_attribute_list", """
     get_attribute_list(self) -> sequence<str>
 
@@ -2187,9 +2199,9 @@ def __doc_DeviceProxy():
         New in PyTango 7.0.0
     """)
 
-#-------------------------------------
+# ------------------------------------
 #   Logging administration methods
-#-------------------------------------
+# ------------------------------------
 
     document_method("add_logging_target", """
     add_logging_target(self, target_type_target_name) -> None
@@ -2289,9 +2301,9 @@ def __doc_DeviceProxy():
         New in PyTango 7.0.0
     """)
 
-#-------------------------------------
+# ------------------------------------
 #   Event methods
-#-------------------------------------
+# ------------------------------------
 
     # subscribe_event -> in code
     # unsubscribe_event -> in code
@@ -2351,9 +2363,9 @@ def __doc_DeviceProxy():
             New in PyTango 7.0.0
     """)
 
-#-------------------------------------
+# ------------------------------------
 #   Locking methods
-#-------------------------------------
+# ------------------------------------
     document_method("lock", """
     lock(self, (int)lock_validity) -> None
 
@@ -2475,6 +2487,7 @@ def __doc_DeviceProxy():
 
         New in PyTango 7.0.0
     """)
+
 
 def device_proxy_init(doc=True):
     __init_DeviceProxy()
