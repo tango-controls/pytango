@@ -122,7 +122,10 @@ def get_object_green_mode(obj):
     return get_green_mode()
 
 
-def get_executor(green_mode):
+def get_executor(green_mode=None):
+    if green_mode is None:
+        green_mode = get_green_mode()
+    # Valid green modes
     if green_mode == GreenMode.Synchronous:
         return get_synchronous_executor()
     if green_mode == GreenMode.Gevent:
@@ -134,29 +137,33 @@ def get_executor(green_mode):
     if green_mode == GreenMode.Asyncio:
         from . import asyncio_executor
         return asyncio_executor.get_global_executor()
+    # Invalid green mode
+    raise TypeError("Not a valid green mode")
 
 
 def get_object_executor(obj, green_mode=None):
-    """Returns the proper submit callable for the given object.
+    """Returns the proper executor for the given object.
 
     If the object has *_executors* and *_green_mode* members it returns
     the submit callable for the executor corresponding to the green_mode.
-    Otherwise it returns the global submit callable for the given green_mode.
+    Otherwise it returns the global executor for the given green_mode.
+
+    Note: *None* is a valid object.
 
     :returns: submit callable"""
     # Get green mode
     if green_mode is None:
         green_mode = get_object_green_mode(obj)
     # Get executor
-    executors = getattr(obj, "_executors", {})
-    executor = executors.get(green_mode, None)
+    if hasattr(obj, '_executors'):
+        executor = obj._executors.get(green_mode, None)
     if executor is None:
         executor = get_executor(green_mode)
     # Get submitter
     return executor
 
 
-# Green decorators
+# Green modifiers
 
 def green(fn=None, consume_green_mode=True):
     """Make a function green. Can be used as a decorator."""
@@ -180,10 +187,9 @@ def green(fn=None, consume_green_mode=True):
     return decorator(fn)
 
 
-def green_callback(fn, green_mode=None, executor=None):
+def green_callback(fn, obj=None, green_mode=None):
     """Return a green verion of the given callback."""
-    if executor is None:
-        executor = get_executor(green_mode)
+    executor = get_object_executor(obj, green_mode)
 
     @wraps(fn)
     def greener(*args, **kwargs):
