@@ -12,6 +12,7 @@
 """Define python methods for DeviceProxy object."""
 
 import time
+import textwrap
 import threading
 import collections
 
@@ -1119,22 +1120,29 @@ def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize
     elif is_integer(cb_or_queuesize):
         cb = cb_or_queuesize  # queuesize
     else:
-        raise TypeError("Parameter cb_or_queuesize should be a number, a" + \
-                    " callable object or an object with a 'push_event' method.")
+        raise TypeError(
+            "Parameter cb_or_queuesize should be a number, a"
+            " callable object or an object with a 'push_event' method.")
 
-    event_id = self.__subscribe_event(attr_name, event_type, cb, filters, stateless, extract_as)
+    event_id = self.__subscribe_event(
+        attr_name, event_type, cb, filters, stateless, extract_as)
 
     with self.__get_event_map_lock():
         se = self.__get_event_map()
         evt_data = se.get(event_id)
-        if evt_data is not None:
-            desc = "Internal PyTango error:\n" \
-                   "%s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)\n" \
-                   "Please report error to PyTango" % \
-                   (self, attr_name, event_type, event_id, evt_data[2], evt_data[1])
-            Except.throw_exception("Py_InternalError", desc, "DeviceProxy.subscribe_event")
-        se[event_id] = (cb, event_type, attr_name)
-    return event_id
+        if evt_data is None:
+            se[event_id] = (cb, event_type, attr_name)
+            return event_id
+        # Raise exception
+        desc = textwrap.dedent("""\
+            Internal PyTango error:
+            %s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)
+            Please report error to PyTango""")
+        desc %= self, attr_name, event_type, event_id, evt_data[2], evt_data[1]
+        Except.throw_exception(
+                "Py_InternalError", desc, "DeviceProxy.subscribe_event")
+
+
 
 
 def __DeviceProxy__unsubscribe_event(self, event_id):
