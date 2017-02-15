@@ -126,14 +126,14 @@ def get_executor(green_mode):
     if green_mode == GreenMode.Synchronous:
         return get_synchronous_executor()
     if green_mode == GreenMode.Gevent:
-        from . import tango_gevent
-        return tango_gevent.get_global_executor()
+        from . import gevent_executor
+        return gevent_executor.get_global_executor()
     if green_mode == GreenMode.Futures:
-        from . import tango_futures
-        return tango_futures.get_global_executor()
+        from . import futures_executor
+        return futures_executor.get_global_executor()
     if green_mode == GreenMode.Asyncio:
-        from . import tango_asyncio
-        return tango_asyncio.get_global_executor()
+        from . import asyncio_executor
+        return asyncio_executor.get_global_executor()
 
 
 def get_object_executor(obj, green_mode=None):
