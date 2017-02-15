@@ -155,6 +155,7 @@ def get_object_executor(obj, green_mode=None):
     if green_mode is None:
         green_mode = get_object_green_mode(obj)
     # Get executor
+    executor = None
     if hasattr(obj, '_executors'):
         executor = obj._executors.get(green_mode, None)
     if executor is None:
