@@ -1046,7 +1046,9 @@ def __DeviceProxy__get_event_map(self):
     return self._subscribed_events
 
 
-def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize, filters=[], stateless=False, extract_as=ExtractAs.Numpy):
+def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize,
+                                    filters=[], stateless=False, extract_as=ExtractAs.Numpy,
+                                    green_mode=None):
     """
     subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy) -> int
 
@@ -1113,10 +1115,13 @@ def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize
 
     if isinstance(cb_or_queuesize, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = green_callback(cb_or_queuesize, self.get_green_mode())
-    elif hasattr(cb_or_queuesize, "push_event") and isinstance(cb_or_queuesize.push_event, collections.Callable):
+        cb.push_event = green_callback(
+            cb_or_queuesize, obj=self, green_mode=green_mode)
+    elif hasattr(cb_or_queuesize, "push_event") and \
+         isinstance(cb_or_queuesize.push_event, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = green_callback(cb_or_queuesize.push_event, self.get_green_mode())
+        cb.push_event = green_callback(
+            cb_or_queuesize.push_event, obj=self, green_mode=green_mode)
     elif is_integer(cb_or_queuesize):
         cb = cb_or_queuesize  # queuesize
     else:
@@ -1419,7 +1424,8 @@ def __init_DeviceProxy():
 
     DeviceProxy.__get_event_map = __DeviceProxy__get_event_map
     DeviceProxy.__get_event_map_lock = __DeviceProxy__get_event_map_lock
-    DeviceProxy.subscribe_event = green(__DeviceProxy__subscribe_event)
+    DeviceProxy.subscribe_event = green(
+        __DeviceProxy__subscribe_event, consume_green_mode=False)
     DeviceProxy.unsubscribe_event = green(__DeviceProxy__unsubscribe_event)
     DeviceProxy.__unsubscribe_event_all = __DeviceProxy__unsubscribe_event_all
     DeviceProxy.get_events = __DeviceProxy__get_events
