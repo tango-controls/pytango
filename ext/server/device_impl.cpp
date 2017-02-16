@@ -498,13 +498,13 @@ namespace PyDeviceImpl
      * pipe event
      * **********************************/
 //	void push_pipe_event (const string &pipe_name, DevFailed *except);
-    inline void push_pipe_event(Tango::DeviceImpl &self, const str &pipe_name, object& exception)
+    inline void push_pipe_event(Tango::DeviceImpl &self, str &pipe_name, object& exception)
     {
 //        self.push_pipe_event(__pipe_name, pipe);
     }
 
 //	void push_pipe_event (const string &pipe_name,Tango::DevicePipeBlob *p_data,bool reuse_it=false);
-    inline void push_pipe_event(Tango::DeviceImpl &self, const str &pipe_name, object& blob, bool reuse)
+    inline void push_pipe_event(Tango::DeviceImpl &self, str &pipe_name, object& blob, bool reuse)
     {
     	std::cout << "device_impl:push_pipe_event" << std::endl;
     	std::string __pipe_name;
@@ -514,7 +514,7 @@ namespace PyDeviceImpl
     }
 
 //	void push_pipe_event (const string &pipe_name, Tango::DevicePipeBlob *p_data, struct timeval &t,bool reuse_it=false);
-    inline void push_pipe_event(Tango::DeviceImpl &self, const str &pipe_name, object& blob, object& timeval, bool reuse)
+    inline void push_pipe_event(Tango::DeviceImpl &self, str &pipe_name, object& blob, object& timeval, bool reuse)
     {
     	std::cout << "device_impl:push_pipe_event with timeval" << std::endl;
     	std::string __pipe_name;
