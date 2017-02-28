@@ -16,7 +16,6 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import sys
-import six
 import copy
 import inspect
 import logging
@@ -1493,14 +1492,11 @@ def server_run(classes, args=None, msg_stream=sys.stdout,
 
 
 # Instanciate DeviceMeta using BaseDevice
-@six.add_metaclass(DeviceMeta)
-class Device(BaseDevice):
-    """
+Device = DeviceMeta("Device", (BaseDevice,), {'__doc__': """\
     Device class for the high-level API.
 
     All device specific classes should inherit from this class.
-    """
-    pass
+    """})
 
 
 # Avoid circular imports
