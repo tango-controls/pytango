@@ -936,6 +936,8 @@ def obj_2_str(obj, tg_type=None):
             obj = obj[0]
         return str(obj)
     # sequence cases
+    if obj is None:
+        return ''
     return '\n'.join([str(i) for i in obj])
 
 
