@@ -1,6 +1,7 @@
 
 # Imports
 
+import time
 import socket
 from functools import partial
 
@@ -82,5 +83,6 @@ def test_subscribe_event(event_device):
         event_device.read_attribute("state", wait=True)
         if len(results) > 1:
             break
+        time.sleep(0.05)
     # Test the event values
     assert results == [0., 1.]
