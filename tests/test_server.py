@@ -7,7 +7,7 @@ import pytest
 from tango import DevState, AttrWriteType, GreenMode
 from tango.server import Device
 from tango.server import command, attribute, device_property
-from tango.test_utils import DeviceTestContext
+from tango.test_utils import DeviceTestContext, assert_close
 
 # Asyncio imports
 try:
@@ -75,6 +75,9 @@ def test_set_status(server_green_mode):
 def test_identity_command(typed_values, server_green_mode):
     dtype, values = typed_values
 
+    if dtype == (bool,):
+        pytest.xfail('Not supported for some reasons')
+
     class TestDevice(Device):
         green_mode = server_green_mode
 
@@ -84,8 +87,7 @@ def test_identity_command(typed_values, server_green_mode):
 
     with DeviceTestContext(TestDevice) as proxy:
         for value in values:
-            expected = pytest.approx(value)
-            assert proxy.identity(value) == expected
+            assert_close(proxy.identity(value), value)
 
 
 # Test attributes
@@ -96,7 +98,8 @@ def test_read_write_attribute(typed_values, server_green_mode):
     class TestDevice(Device):
         green_mode = server_green_mode
 
-        @attribute(dtype=dtype, access=AttrWriteType.READ_WRITE)
+        @attribute(dtype=dtype, max_dim_x=10,
+                   access=AttrWriteType.READ_WRITE)
         def attr(self):
             return self.attr_value
 
@@ -107,14 +110,38 @@ def test_read_write_attribute(typed_values, server_green_mode):
     with DeviceTestContext(TestDevice) as proxy:
         for value in values:
             proxy.attr = value
-            expected = pytest.approx(value)
-            assert proxy.attr == expected
+            assert_close(proxy.attr, value)
 
 
 # Test properties
 
-def test_device_property(typed_values, server_green_mode):
+def test_device_property_no_default(typed_values, server_green_mode):
     dtype, values = typed_values
+    patched_dtype = dtype if dtype != (bool,) else (int,)
+    default = values[0]
+    value = values[1]
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        prop = device_property(dtype=dtype)
+
+        @command(dtype_out=patched_dtype)
+        def get_prop(self):
+            return default if self.prop is None else self.prop
+
+    with DeviceTestContext(TestDevice, process=True) as proxy:
+        assert_close(proxy.get_prop(), default)
+
+    with DeviceTestContext(TestDevice,
+                           properties={'prop': value},
+                           process=True) as proxy:
+        assert_close(proxy.get_prop(), value)
+
+
+def test_device_property_with_default_value(typed_values, server_green_mode):
+    dtype, values = typed_values
+    patched_dtype = dtype if dtype != (bool,) else (int,)
     default = values[0]
     value = values[1]
 
@@ -123,19 +150,18 @@ def test_device_property(typed_values, server_green_mode):
 
         prop = device_property(dtype=dtype, default_value=default)
 
-        @command(dtype_out=dtype)
+        @command(dtype_out=patched_dtype)
         def get_prop(self):
+            print(self.prop)
             return self.prop
 
     with DeviceTestContext(TestDevice, process=True) as proxy:
-        expected = pytest.approx(default)
-        assert proxy.get_prop() == expected
+        assert_close(proxy.get_prop(), default)
 
     with DeviceTestContext(TestDevice,
                            properties={'prop': value},
                            process=True) as proxy:
-        expected = pytest.approx(value)
-        assert proxy.get_prop() == expected
+        assert_close(proxy.get_prop(), value)
 
 
 # Test inheritance
