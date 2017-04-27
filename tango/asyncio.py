@@ -13,16 +13,13 @@
 :class:`PyTango.AttributeProxy"""
 
 from __future__ import absolute_import
-
-__all__ = ["DeviceProxy", "AttributeProxy", "check_requirements",
-           "get_event_loop"]
-
 from functools import partial
 
-from PyTango import GreenMode
-from PyTango.device_proxy import get_device_proxy
-from PyTango.attribute_proxy import get_attribute_proxy
-from PyTango.tango_asyncio import get_event_loop
+from ._tango import GreenMode
+from .device_proxy import get_device_proxy
+from .attribute_proxy import get_attribute_proxy
+
+__all__ = ["DeviceProxy", "AttributeProxy", "check_requirements"]
 
 
 def check_requirements():
@@ -47,8 +44,7 @@ def check_requirements():
 check_requirements()
 
 DeviceProxy = partial(get_device_proxy,
-                      green_mode=GreenMode.Asyncio,
-                      wait=False)
+                      green_mode=GreenMode.Asyncio)
 DeviceProxy.__doc__ = """
     DeviceProxy(self, dev_name, wait=False, timeout=None)
         -> DeviceProxy
@@ -94,8 +90,7 @@ DeviceProxy.__doc__ = """
 """
 
 AttributeProxy = partial(get_attribute_proxy,
-                         green_mode=GreenMode.Asyncio,
-                         wait=False)
+                         green_mode=GreenMode.Asyncio)
 AttributeProxy.__doc__ = """
     AttributeProxy(self, full_attr_name, wait=False, timeout=False)
         -> AttributeProxy

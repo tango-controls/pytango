@@ -40,7 +40,7 @@ def __CallBackAutoDie__cmd_ended_aux(self, fn):
 def __get_command_inout_param(self, cmd_name, cmd_param=None):
     if cmd_param is None:
         return DeviceData()
-    
+
     if isinstance(cmd_param, DeviceData):
         return cmd_param
 
@@ -71,7 +71,7 @@ def __Connection__command_inout(self, name, *args, **kwds):
     command_inout( self, cmd_name, cmd_param=None, green_mode=None, wait=True, timeout=None) -> any
 
             Execute a command on a device.
-            
+
         Parameters :
                 - cmd_name  : (str) Command name.
                 - cmd_param : (any) It should be a value of the type expected by the
@@ -89,7 +89,7 @@ def __Connection__command_inout(self, name, *args, **kwds):
                                Ignored when green_mode is Synchronous or wait is False.
         Return     : The result of the command. The type depends on the command. It may be None.
 
-        Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked, DevFailed from device 
+        Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked, DevFailed from device
                      TimeoutError (green_mode == Futures) If the future didn't finish executing before the given timeout.
                      Timeout (green_mode == Gevent) If the async result didn't finish executing before the given timeout.
 
@@ -113,7 +113,7 @@ def __Connection__command_inout_raw(self, cmd_name, cmd_param = None):
     command_inout_raw( self, cmd_name, cmd_param=None) -> DeviceData
 
             Execute a command on a device.
-        
+
         Parameters :
                 - cmd_name  : (str) Command name.
                 - cmd_param : (any) It should be a value of the type expected by the
@@ -121,7 +121,7 @@ def __Connection__command_inout_raw(self, cmd_name, cmd_param = None):
                               It can be ommited if the command should not get any argument.
         Return     : A DeviceData object.
 
-        Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked, DevFailed from device 
+        Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked, DevFailed from device
     """
     param = __get_command_inout_param(self, cmd_name, cmd_param)
     return self.__command_inout(cmd_name, param)
@@ -131,11 +131,11 @@ def __Connection__command_inout_raw(self, cmd_name, cmd_param = None):
 def __Connection__command_inout_asynch(self, cmd_name, *args):
     """
     command_inout_asynch(self, cmd_name) -> id
-    command_inout_asynch(self, cmd_name, cmd_param) -> id    
+    command_inout_asynch(self, cmd_name, cmd_param) -> id
     command_inout_asynch(self, cmd_name, cmd_param, forget) -> id
-    
+
             Execute asynchronously (polling model) a command on a device
-            
+
         Parameters :
                 - cmd_name  : (str) Command name.
                 - cmd_param : (any) It should be a value of the type expected by the
@@ -154,12 +154,12 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
                      needed to get the command result (see command_inout_reply)
 
         Throws     : ConnectionFailed, TypeError, anything thrown by command_query
-        
+
     command_inout_asynch( self, cmd_name, callback) -> None
     command_inout_asynch( self, cmd_name, cmd_param, callback) -> None
-    
+
             Execute asynchronously (callback model) a command on a device.
-            
+
         Parameters :
                 - cmd_name  : (str) Command name.
                 - cmd_param : (any)It should be a value of the type expected by the
@@ -218,7 +218,7 @@ __Connection__command_inout_asynch.__name__ = "command_inout_asynch"
 def __Connection__command_inout_reply(self, idx, timeout=None):
     """
     command_inout_reply(self, id) -> DeviceData
-    
+
             Check if the answer of an asynchronous command_inout is arrived
             (polling model). If the reply is arrived and if it is a valid
             reply, it is returned to the caller in a DeviceData object. If
@@ -231,7 +231,7 @@ def __Connection__command_inout_reply(self, idx, timeout=None):
         Throws     : AsynCall, AsynReplyNotArrived, CommunicationFailed, DevFailed from device
 
     command_inout_reply(self, id, timeout) -> DeviceData
-    
+
             Check if the answer of an asynchronous command_inout is arrived
             (polling model). id is the asynchronous call identifier. If the
             reply is arrived and if it is a valid reply, it is returned to
@@ -252,7 +252,7 @@ def __Connection__command_inout_reply(self, idx, timeout=None):
         r = self.command_inout_reply_raw(idx)
     else:
         r = self.command_inout_reply_raw(idx, timeout)
-    
+
     if isinstance(r, DeviceData):
         try:
             return r.extract(self.defaultCommandExtractAs)
@@ -261,28 +261,28 @@ def __Connection__command_inout_reply(self, idx, timeout=None):
     else:
         return r
 __Connection__command_inout_reply.__name__ = "command_inout_reply"
-    
+
 def __init_Connection():
     Connection.defaultCommandExtractAs = ExtractAs.Numpy
     Connection.command_inout_raw = __Connection__command_inout_raw
     Connection.command_inout = green(__Connection__command_inout)
     Connection.command_inout_asynch = __Connection__command_inout_asynch
     Connection.command_inout_reply = __Connection__command_inout_reply
-    
+
 def __doc_Connection():
     def document_method(method_name, desc, append=True):
         return __document_method(Connection, method_name, desc, append)
 
     def document_static_method(method_name, desc, append=True):
         return __document_static_method(Connection, method_name, desc, append)
-    
+
     Connection.__doc__ = """
         The abstract Connection class for DeviceProxy. Not to be initialized directly.
     """
 
     document_method("dev_name", """
     dev_name(self) -> str
-    
+
             Return the device name as it is stored locally
 
         Parameters : None
@@ -291,7 +291,7 @@ def __doc_Connection():
 
     document_method("get_db_host", """
     get_db_host(self) -> str
-    
+
             Returns a string with the database host.
 
         Parameters : None
@@ -302,7 +302,7 @@ def __doc_Connection():
 
     document_method("get_db_port", """
     get_db_port(self) -> str
-    
+
             Returns a string with the database port.
 
         Parameters : None
@@ -313,7 +313,7 @@ def __doc_Connection():
 
     document_method("get_db_port_num", """
     get_db_port_num(self) -> int
-    
+
             Returns an integer with the database port.
 
         Parameters : None
@@ -324,7 +324,7 @@ def __doc_Connection():
 
     document_method("get_from_env_var", """
     get_from_env_var(self) -> bool
-    
+
             Returns True if determined by environment variable or
             False otherwise
 
@@ -337,7 +337,7 @@ def __doc_Connection():
 
     document_method("connect", """
     connect(self, corba_name) -> None
-    
+
             Creates a connection to a TANGO device using it's stringified
             CORBA reference i.e. IOR or corbaloc.
 
@@ -350,7 +350,7 @@ def __doc_Connection():
 
     document_method("reconnect", """
     reconnect(self, db_used) -> None
-    
+
             Reconnecto to a CORBA object.
 
         Parameters :
@@ -362,7 +362,7 @@ def __doc_Connection():
 
     document_method("get_idl_version", """
     get_idl_version(self) -> int
-    
+
             Get the version of the Tango Device interface implemented
             by the device
 
@@ -372,7 +372,7 @@ def __doc_Connection():
 
     document_method("set_timeout_millis", """
     set_timeout_millis(self, timeout) -> None
-    
+
             Set client side timeout for device in milliseconds. Any method
             which takes longer than this time to execute will throw an
             exception
@@ -386,7 +386,7 @@ def __doc_Connection():
 
     document_method("get_timeout_millis", """
     get_timeout_millis(self) -> int
-    
+
             Get the client side timeout in milliseconds
 
         Parameters : None
@@ -395,7 +395,7 @@ def __doc_Connection():
 
     document_method("get_source", """
     get_source(self) -> DevSource
-    
+
             Get the data source(device, polling buffer, polling buffer
             then device) used by command_inout or read_attribute methods
 
@@ -408,7 +408,7 @@ def __doc_Connection():
 
     document_method("set_source", """
     set_source(self, source) -> None
-    
+
             Set the data source(device, polling buffer, polling buffer
             then device) for command_inout and read_attribute methods.
 
@@ -421,7 +421,7 @@ def __doc_Connection():
 
     document_method("get_transparency_reconnection", """
     get_transparency_reconnection(self) -> bool
-    
+
             Returns the device transparency reconnection flag.
 
         Parameters : None
@@ -431,7 +431,7 @@ def __doc_Connection():
 
     document_method("set_transparency_reconnection", """
     set_transparency_reconnection(self, yesno) -> None
-    
+
             Set the device transparency reconnection flag
 
         Parameters :
@@ -442,7 +442,7 @@ def __doc_Connection():
 
     document_method("command_inout_reply_raw", """
     command_inout_reply_raw(self, id) -> DeviceData
-    
+
             Check if the answer of an asynchronous command_inout is arrived
             (polling model). If the reply is arrived and if it is a valid
             reply, it is returned to the caller in a DeviceData object. If
@@ -457,7 +457,7 @@ def __doc_Connection():
 
     document_method("command_inout_reply_raw", """
     command_inout_reply_raw(self, id, timeout) -> DeviceData
-    
+
             Check if the answer of an asynchronous command_inout is arrived
             (polling model). id is the asynchronous call identifier. If the
             reply is arrived and if it is a valid reply, it is returned to
@@ -481,11 +481,11 @@ def __doc_Connection():
 
     document_method("get_asynch_replies", """
     get_asynch_replies(self) -> None
-    
+
             Try to obtain data returned by a command asynchronously
             requested. This method does not block if the reply has not yet
             arrived. It fires callback for already arrived replies.
-            
+
         Parameters : None
         Return     : None
 
@@ -494,13 +494,13 @@ def __doc_Connection():
 
     document_method("get_asynch_replies", """
     get_asynch_replies(self, call_timeout) -> None
-    
+
             Try to obtain data returned by a command asynchronously
             requested. This method blocks for the specified timeout if the
             reply is not yet arrived. This method fires callback when the
             reply arrived. If the timeout is set to 0, the call waits
             undefinitely for the reply
-            
+
         Parameters :
             - call_timeout : (int) timeout in miliseconds
         Return     : None
@@ -512,10 +512,10 @@ def __doc_Connection():
     cancel_asynch_request(self, id ) -> None
 
             Cancel a running asynchronous request
-            
+
             This is a client side call. Obviously, the call cannot be
             aborted while it is running in the device.
-            
+
         Parameters :
             - id : The asynchronous call identifier
         Return     : None
@@ -525,12 +525,12 @@ def __doc_Connection():
 
     document_method("cancel_all_polling_asynch_request", """
     cancel_all_polling_asynch_request(self) -> None
-    
+
             Cancel all running asynchronous request
-            
+
             This is a client side call. Obviously, the calls cannot be
             aborted while it is running in the device.
-            
+
         Parameters : None
         Return     : None
 
@@ -540,12 +540,12 @@ def __doc_Connection():
     #//
     #// Control access related methods
     #//
-        
+
     document_method("get_access_control", """
     get_access_control(self) -> AccessControlType
-    
+
             Returns the current access control type
-            
+
         Parameters : None
         Return     : (AccessControlType) The current access control type
 
@@ -554,9 +554,9 @@ def __doc_Connection():
 
     document_method("set_access_control", """
     set_access_control(self, acc) -> None
-            
+
             Sets the current access control type
-            
+
         Parameters :
             - acc: (AccessControlType) the type of access
                    control to set
@@ -567,9 +567,9 @@ def __doc_Connection():
 
     document_method("get_access_right", """
     get_access_right(self) -> AccessControlType
-    
+
             Returns the current access control type
-            
+
         Parameters : None
         Return     : (AccessControlType) The current access control type
 
@@ -578,48 +578,48 @@ def __doc_Connection():
 
     document_static_method("get_fqdn", """
     get_fqdn(self) -> str
-    
+
             Returns the fully qualified domain name
 
         Parameters : None
         Return     : (str) the fully qualified domain name
-        
+
         New in PyTango 7.2.0
     """)
 
     document_method("is_dbase_used", """
     is_dbase_used(self) -> bool
-            
+
             Returns if the database is being used
-            
+
         Parameters : None
         Return     : (bool) True if the database is being used
 
         New in PyTango 7.2.0
     """)
-    
+
     document_method("get_dev_host", """
     get_dev_host(self) -> str
-            
+
             Returns the current host
-            
+
         Parameters : None
         Return     : (str) the current host
 
         New in PyTango 7.2.0
     """)
-    
+
     document_method("get_dev_port", """
     get_dev_port(self) -> str
-            
+
             Returns the current port
-            
+
         Parameters : None
         Return     : (str) the current port
 
         New in PyTango 7.2.0
     """)
-    
+
 def connection_init(doc=True):
     __init_Connection()
     if doc:

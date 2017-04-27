@@ -11,9 +11,8 @@
 
 """Define python methods for DeviceProxy object."""
 
-from __future__ import with_statement
-
 import time
+import textwrap
 import threading
 import collections
 
@@ -29,8 +28,8 @@ from .utils import seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
 from .utils import dir2
 
-from .green import result, submit, green, green_cb
-from .green import get_green_mode, get_event_loop, get_wait_default_value
+from .green import green, green_callback
+from .green import get_green_mode
 
 
 __all__ = ["device_proxy_init", "get_device_proxy"]
@@ -41,6 +40,7 @@ __docformat__ = "restructuredtext"
 _UNSUBSCRIBE_LIFETIME = 60
 
 
+@green(consume_green_mode=False)
 def get_device_proxy(*args, **kwargs):
     """get_device_proxy(self, dev_name, green_mode=None, wait=True, timeout=True) -> DeviceProxy
     get_device_proxy(self, dev_name, need_check_acc, green_mode=None, wait=True, timeout=None) -> DeviceProxy
@@ -95,17 +95,7 @@ def get_device_proxy(*args, **kwargs):
 
     New in PyTango 8.1.0
     """
-    # we cannot use the green wrapper because it consumes the green_mode and we
-    # want to forward it to the DeviceProxy constructor
-    green_mode = kwargs.get('green_mode', get_green_mode())
-    wait = kwargs.pop('wait', get_wait_default_value(green_mode))
-    timeout = kwargs.pop('timeout', None)
-
-    # make sure the event loop is initialized
-    get_event_loop(green_mode)
-
-    d = submit(green_mode, DeviceProxy, *args, **kwargs)
-    return result(d, green_mode, wait=wait, timeout=timeout)
+    return DeviceProxy(*args, **kwargs)
 
 
 class __TangoInfo(object):
@@ -123,15 +113,18 @@ class __TangoInfo(object):
 # class members
 #-------------------------------------------------------------------------------
 
+
 def __check_read_attribute(dev_attr):
     if dev_attr.has_failed:
         raise DevFailed(*dev_attr.get_err_stack())
     return dev_attr
 
+
 def __check_read_pipe(dev_pipe):
     if dev_pipe.has_failed:
         raise DevFailed(*dev_pipe.get_err_stack())
     return dev_pipe
+
 
 def __init_device_proxy_internals(proxy):
     if proxy.__dict__.get('_initialized', False):
@@ -142,12 +135,14 @@ def __init_device_proxy_internals(proxy):
     proxy.__dict__['_executors'] = executors
     proxy.__dict__['_pending_unsubscribe'] = {}
 
+
 def __DeviceProxy__get_cmd_cache(self):
     try:
         ret = self.__dict__['__cmd_cache']
     except KeyError:
         self.__dict__['__cmd_cache'] = ret = {}
     return ret
+
 
 def __DeviceProxy__get_attr_cache(self):
     try:
@@ -156,12 +151,14 @@ def __DeviceProxy__get_attr_cache(self):
         self.__dict__['__attr_cache'] = ret = ()
     return ret
 
+
 def __DeviceProxy__get_pipe_cache(self):
     try:
         ret = self.__dict__['__pipe_cache']
     except KeyError:
         self.__dict__['__pipe_cache'] = ret = ()
     return ret
+
 
 def __DeviceProxy__init__(self, *args, **kwargs):
     __init_device_proxy_internals(self)
@@ -170,6 +167,7 @@ def __DeviceProxy__init__(self, *args, **kwargs):
     self._executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
     self._executors[GreenMode.Asyncio] = kwargs.pop('asyncio_executor', None)
     return DeviceProxy.__init_orig__(self, *args, **kwargs)
+
 
 def __DeviceProxy__get_green_mode(self):
     """Returns the green mode in use by this DeviceProxy.
@@ -187,6 +185,7 @@ def __DeviceProxy__get_green_mode(self):
     if gm is None:
         gm = get_green_mode()
     return gm
+
 
 def __DeviceProxy__set_green_mode(self, green_mode=None):
     """Sets the green mode to be used by this DeviceProxy
@@ -212,20 +211,25 @@ def __DeviceProxy__refresh_cmd_cache(self):
         cmd_cache[n] = cmd, doc
     self.__dict__['__cmd_cache'] = cmd_cache
 
+
 def __DeviceProxy__refresh_attr_cache(self):
     attr_cache = [attr_name.lower() for attr_name in self.get_attribute_list()]
     self.__dict__['__attr_cache'] = attr_cache
+
 
 def __DeviceProxy__refresh_pipe_cache(self):
     pipe_cache = [pipe_name.lower() for pipe_name in self.get_pipe_list()]
     self.__dict__['__pipe_cache'] = pipe_cache
 
+
 def __get_command_func(dp, cmd_info, name):
     _, doc = cmd_info
+
     def f(*args, **kwds):
         return dp.command_inout(name, *args, **kwds)
     f.__doc__ = doc
     return f
+
 
 def __DeviceProxy__getattr(self, name):
     # trait_names is a feature of IPython. Hopefully they will solve
@@ -1042,7 +1046,9 @@ def __DeviceProxy__get_event_map(self):
     return self._subscribed_events
 
 
-def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize, filters=[], stateless=False, extract_as=ExtractAs.Numpy):
+def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize,
+                                    filters=[], stateless=False, extract_as=ExtractAs.Numpy,
+                                    green_mode=None):
     """
     subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy) -> int
 
@@ -1109,29 +1115,39 @@ def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize
 
     if isinstance(cb_or_queuesize, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = green_cb(cb_or_queuesize, self.get_green_mode())
-    elif hasattr(cb_or_queuesize, "push_event") and isinstance(cb_or_queuesize.push_event, collections.Callable):
+        cb.push_event = green_callback(
+            cb_or_queuesize, obj=self, green_mode=green_mode)
+    elif hasattr(cb_or_queuesize, "push_event") and \
+         isinstance(cb_or_queuesize.push_event, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = green_cb(cb_or_queuesize.push_event, self.get_green_mode())
+        cb.push_event = green_callback(
+            cb_or_queuesize.push_event, obj=self, green_mode=green_mode)
     elif is_integer(cb_or_queuesize):
         cb = cb_or_queuesize  # queuesize
     else:
-        raise TypeError("Parameter cb_or_queuesize should be a number, a" + \
-                    " callable object or an object with a 'push_event' method.")
+        raise TypeError(
+            "Parameter cb_or_queuesize should be a number, a"
+            " callable object or an object with a 'push_event' method.")
 
-    event_id = self.__subscribe_event(attr_name, event_type, cb, filters, stateless, extract_as)
+    event_id = self.__subscribe_event(
+        attr_name, event_type, cb, filters, stateless, extract_as)
 
     with self.__get_event_map_lock():
         se = self.__get_event_map()
         evt_data = se.get(event_id)
-        if evt_data is not None:
-            desc = "Internal PyTango error:\n" \
-                   "%s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)\n" \
-                   "Please report error to PyTango" % \
-                   (self, attr_name, event_type, event_id, evt_data[2], evt_data[1])
-            Except.throw_exception("Py_InternalError", desc, "DeviceProxy.subscribe_event")
-        se[event_id] = (cb, event_type, attr_name)
-    return event_id
+        if evt_data is None:
+            se[event_id] = (cb, event_type, attr_name)
+            return event_id
+        # Raise exception
+        desc = textwrap.dedent("""\
+            Internal PyTango error:
+            %s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)
+            Please report error to PyTango""")
+        desc %= self, attr_name, event_type, event_id, evt_data[2], evt_data[1]
+        Except.throw_exception(
+                "Py_InternalError", desc, "DeviceProxy.subscribe_event")
+
+
 
 
 def __DeviceProxy__unsubscribe_event(self, event_id):
@@ -1259,11 +1275,6 @@ def __DeviceProxy__str(self):
     return "%s(%s)" % (info.dev_class, self.dev_name())
 
 
-def __DeviceProxy__str(self):
-    info = self._get_info_()
-    return "%s(%s)" % (info.dev_class, self.dev_name())
-
-
 def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
     r = self.__read_pipe(pipe_name)
     return r.extract(extract_as)
@@ -1301,6 +1312,7 @@ def __DeviceProxy__state(self, *args, **kwargs):
                 if dev_st == DevState.ON : ...
     """
     return self._state(*args, **kwargs)
+
 
 def __DeviceProxy__status(self, *args, **kwargs):
     """status(self) -> str
@@ -1412,7 +1424,8 @@ def __init_DeviceProxy():
 
     DeviceProxy.__get_event_map = __DeviceProxy__get_event_map
     DeviceProxy.__get_event_map_lock = __DeviceProxy__get_event_map_lock
-    DeviceProxy.subscribe_event = green(__DeviceProxy__subscribe_event)
+    DeviceProxy.subscribe_event = green(
+        __DeviceProxy__subscribe_event, consume_green_mode=False)
     DeviceProxy.unsubscribe_event = green(__DeviceProxy__unsubscribe_event)
     DeviceProxy.__unsubscribe_event_all = __DeviceProxy__unsubscribe_event_all
     DeviceProxy.get_events = __DeviceProxy__get_events
@@ -1482,9 +1495,9 @@ def __doc_DeviceProxy():
 
     """
 
-#-------------------------------------
+# ------------------------------------
 #   General methods
-#-------------------------------------
+# ------------------------------------
 
     document_method("info", """
     info(self) -> DeviceInfo
@@ -1652,17 +1665,19 @@ def __doc_DeviceProxy():
         is an integer"
     """)
 
-#-------------------------------------
+# ------------------------------------
 #   Property methods
-#-------------------------------------
+# ------------------------------------
+
     # get_property -> in code
     # put_property -> in code
     # delete_property -> in code
     # get_property_list -> in code
 
-#-------------------------------------
+# ------------------------------------
 #   Attribute methods
-#-------------------------------------
+# ------------------------------------
+
     document_method("get_attribute_list", """
     get_attribute_list(self) -> sequence<str>
 
@@ -2198,9 +2213,9 @@ def __doc_DeviceProxy():
         New in PyTango 7.0.0
     """)
 
-#-------------------------------------
+# ------------------------------------
 #   Logging administration methods
-#-------------------------------------
+# ------------------------------------
 
     document_method("add_logging_target", """
     add_logging_target(self, target_type_target_name) -> None
@@ -2300,9 +2315,9 @@ def __doc_DeviceProxy():
         New in PyTango 7.0.0
     """)
 
-#-------------------------------------
+# ------------------------------------
 #   Event methods
-#-------------------------------------
+# ------------------------------------
 
     # subscribe_event -> in code
     # unsubscribe_event -> in code
@@ -2362,9 +2377,9 @@ def __doc_DeviceProxy():
             New in PyTango 7.0.0
     """)
 
-#-------------------------------------
+# ------------------------------------
 #   Locking methods
-#-------------------------------------
+# ------------------------------------
     document_method("lock", """
     lock(self, (int)lock_validity) -> None
 
@@ -2486,6 +2501,7 @@ def __doc_DeviceProxy():
 
         New in PyTango 7.0.0
     """)
+
 
 def device_proxy_init(doc=True):
     __init_DeviceProxy()
