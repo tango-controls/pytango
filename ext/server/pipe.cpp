@@ -14,6 +14,7 @@
 #include "pytgutils.h"
 #include "pipe.h"
 #include "fast_from_py.h"
+#include <boost/python.hpp>
 
 #define __AUX_DECL_CALL_PIPE_METHOD \
     PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev); \
@@ -446,3 +447,109 @@ void export_pipe()
 	;
 
 }
+namespace PyDevicePipe
+{
+	template<typename T>
+	int check_convert(const bopy::object &value, T& result)
+	{
+		int rc = 0;
+		bopy::extract<T> item(value);
+		if (item.check()) {
+			result = item();
+			rc = 1;
+		}
+		return rc;
+	}
+	template<typename T>
+	int check_convert_list(const bopy::list &values, std::vector<T>& result)
+	{
+		int rc = 0;
+		for (auto i=0; i<len(values); i++) {
+			T item;
+			if (check_convert(values[i], item)) {
+				std::cout << "item " << item << std::endl;
+				result.push_back(item);
+				rc = 1;
+			} else {
+				// If its not the required type
+				// It also assumes the list is all of the same type
+				rc = 0;
+				break;
+			}
+		}
+		return rc;
+	}
+	void __set_value(Tango::DevicePipeBlob& dpb, bopy::dict& dict) {
+		std::cout << "In __set_value()" << std::endl;
+		int nitems = len(dict);
+		std::vector<std::string> elem_names;
+		for (auto i=0; i<nitems; i++) {
+			std::string s = bopy::extract<std::string>(dict.keys()[i]);
+			elem_names.push_back(bopy::extract<std::string>(dict.keys()[i]));
+		}
+		dpb.set_data_elt_names(elem_names);
+
+		bopy::list values = dict.values();
+		for (auto i=0; i <nitems; ++i) {
+			bopy::object value = values[i];
+			std::string str;
+			int ival;
+			double dval;
+			bopy::list plist;
+			bopy::tuple ptuple;
+			if (check_convert(value, str)) {
+				std::cout << "got string" << str << std::endl;
+				dpb << str;
+			} else if (check_convert(value, ival)) {
+				std::cout << "got int" << ival << std::endl;
+				dpb << ival;
+			} else if (check_convert(value, dval)) {
+				std::cout << "got double" << dval << std::endl;
+				dpb << dval;
+			} else if (check_convert(value, plist)) {
+				std::vector<std::string> vecstr;
+				std::vector<int> vecint;
+				std::vector<double> vecdbl;
+				if (check_convert_list(plist, vecstr)) {
+					std::cout << "got string vector" << std::endl;
+					dpb << vecstr;
+				} else if (check_convert_list(plist, vecint)) {
+					std::cout << "got int vector" << std::endl;
+					dpb << vecint;
+					dpb.print(std::cout,2 ,true);
+				} else if (check_convert_list(plist, vecdbl)) {
+					std::cout << "got double vector" << std::endl;
+					dpb << vecdbl;
+				} else {
+					std::cout << "Unsupported Pipe Event vector type. Please report to PyTango team" << std::endl;
+				}
+				std::cout << "---------------------" << std::endl;
+				dpb.print(std::cout,2 ,true);
+			} else if (check_convert(value, ptuple)) {
+				bopy::dict pdict;
+				std::cout << "got tuple" << std::endl;
+				if (check_convert(ptuple[0], str) && check_convert(ptuple[1], pdict)) {
+					Tango::DevicePipeBlob inner_blob(str);
+					__set_value(inner_blob, pdict);
+					std::cout << "got inner blob" << std::endl;
+					dpb << inner_blob;
+				}
+			} else {
+				std::cout << "Unsupported Pipe Event  type. Please report to PyTango team" << std::endl;
+			}
+		}
+		std::cout << "---------------------" << std::endl;
+		dpb.print(std::cout,2 ,true);
+	}
+	void set_value(Tango::DevicePipeBlob& dpb, bopy::object& data)
+	{
+		PyObject* data_ptr = data.ptr();
+		bopy::tuple t = bopy::extract<bopy::tuple>(data_ptr);
+		std::string name = bopy::extract<std::string>(t[0]);
+		dpb.set_name(name);
+
+		bopy::dict dict = bopy::extract<bopy::dict>(t[1]);
+		__set_value(dpb, dict);
+	}
+
+} // namespace PyDevicePipe

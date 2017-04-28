@@ -82,5 +82,8 @@ namespace PyTango { namespace Pipe {
 
 }} // namespace PyTango::Pipe
 
+namespace PyDevicePipe
+{
+    void set_value(Tango::DevicePipeBlob &, boost::python::object &);
 
-
+} // namespace PyDevicePipe

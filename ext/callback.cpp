@@ -14,6 +14,7 @@
 #include "callback.h"
 #include "device_attribute.h"
 #include "exception.h"
+#include "device_pipe.h"
 
 using namespace boost::python;
 
@@ -139,7 +140,6 @@ static void _run_virtual_once(PyCallBackAutoDie* self, OriginalT * ev, const cha
     AutoPythonGIL gil;
 
     try {
-        std::cout << "callback.cpp:run_virtual once()" << std::endl;
         CopyT* py_ev = new CopyT();
         object py_value = object( handle<>(
                     to_python_indirect<
@@ -302,19 +302,17 @@ void PyCallBackPushEvent::fill_py_event(Tango::DataReadyEventData* ev, object & 
 
 void PyCallBackPushEvent::fill_py_event(Tango::PipeEventData* ev, object & py_ev, object py_device, PyTango::ExtractAs extract_as)
 {
-	std::cout << "Callback.cpp::fill_py_event()" << std::endl;
-    std::cout << "callback.cpp:fill_py_event()" << ev->pipe_name << std::endl;
-    std::cout << "callback.cpp:fill_py_event()" << ev->event << std::endl;
-    std::cout << "callback.cpp:fill_py_event()" << ev->device << std::endl;
-    std::cout << "callback.cpp:fill_py_event()" << ev->err << std::endl;
-    std::cout << "callback.cpp:fill_py_event()" << ev->pipe_value << std::endl;
-//    std::cout << "callback.cpp:fill_py_event()" << ev->pipe_value->root_blob_name << std::endl;
-	copy_device(ev, py_ev, py_device);
+    copy_device(ev, py_ev, py_device);
     if (ev->pipe_value) {
-        py_ev.attr("pipe_value") = *ev->pipe_value;
+#ifdef PYTANGO_HAS_UNIQUE_PTR
+        Tango::DevicePipe *pipe_value = new Tango::DevicePipe;
+        (*pipe_value) = std::move(*ev->pipe_value);
+#else
+        Tango::DevicePipe *pipe_value = new Tango::DevicePipe(*ev->pipe_value);
+#endif
+        py_ev.attr("pipe_value") = PyTango::DevicePipe::convert_to_python(pipe_value, extract_as);
     }
 }
-
 
 /*virtual*/ void PyCallBackPushEvent::push_event(Tango::EventData *ev)
 {

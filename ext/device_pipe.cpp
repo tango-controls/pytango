@@ -68,7 +68,7 @@ namespace PyTango
             Tango::DevicePipeBlob val;
             bopy::str name(self.get_data_elt_name(elt_idx));
             self >> val;
-            bopy::object data(val);
+            bopy::object data = extract(val, PyTango::ExtractAsNumpy);
             return bopy::make_tuple(name, data);
         }        
 
@@ -410,6 +410,10 @@ void export_device_pipe()
 
         .def("extract", 
 	     (bopy::object (*) (Tango::DevicePipe &, PyTango::ExtractAs))
+	     PyTango::DevicePipe::extract)
+
+		 .def("extract",
+	     (bopy::object (*) (Tango::DevicePipeBlob &, PyTango::ExtractAs))
 	     PyTango::DevicePipe::extract)
     ;
 }

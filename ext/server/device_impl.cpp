@@ -17,6 +17,7 @@
 #include "server/attr.h"
 #include "server/attribute.h"
 #include "to_py.h"
+#include "pipe.h"
 
 extern const char *param_must_be_seq;
 
@@ -497,30 +498,21 @@ namespace PyDeviceImpl
     /* **********************************
      * pipe event
      * **********************************/
-//	void push_pipe_event (const string &pipe_name, DevFailed *except);
-    inline void push_pipe_event(Tango::DeviceImpl &self, str &pipe_name, object& exception)
+    inline void push_pipe_event(Tango::DeviceImpl &self, str &pipe_name, object& pipe_data)
     {
-//        self.push_pipe_event(__pipe_name, pipe);
-    }
-
-//	void push_pipe_event (const string &pipe_name,Tango::DevicePipeBlob *p_data,bool reuse_it=false);
-    inline void push_pipe_event(Tango::DeviceImpl &self, str &pipe_name, object& blob, bool reuse)
-    {
-    	std::cout << "device_impl:push_pipe_event" << std::endl;
     	std::string __pipe_name;
-    	Tango::DevicePipe pipe;
-        from_str_to_char(pipe_name.ptr(), __pipe_name);
-//        self.push_pipe_event(__pipe_name, pipe);
-    }
-
-//	void push_pipe_event (const string &pipe_name, Tango::DevicePipeBlob *p_data, struct timeval &t,bool reuse_it=false);
-    inline void push_pipe_event(Tango::DeviceImpl &self, str &pipe_name, object& blob, object& timeval, bool reuse)
-    {
-    	std::cout << "device_impl:push_pipe_event with timeval" << std::endl;
-    	std::string __pipe_name;
-    	Tango::DevicePipe pipe;
-        from_str_to_char(pipe_name.ptr(), __pipe_name);
-//        self.push_pipe_event(__pipe_name, pipe);
+    	from_str_to_char(pipe_name.ptr(), __pipe_name);
+    	boost::python::extract<Tango::DevFailed> except_convert(pipe_data);
+    	if (except_convert.check()) {
+    		self.push_pipe_event(__pipe_name, const_cast<Tango::DevFailed*>(&except_convert()));
+    		return;
+    	}
+    	Tango::DevicePipeBlob dpb;
+    	struct timeval tv;
+    	gettimeofday(&tv, NULL);
+    	bool reuse = false;
+    	PyDevicePipe::set_value(dpb, pipe_data);
+    	self.push_pipe_event(__pipe_name, &dpb, tv, reuse);
     }
 
     void check_attribute_method_defined(PyObject *self,
@@ -1674,18 +1666,8 @@ void export_device_impl()
 
          .def("push_pipe_event",
             (void (*) (Tango::DeviceImpl &, str &, object&))
-            &PyDeviceImpl::push_pipe_event)
-//            (arg_("self"), arg_("pipe_name"), arg_("exception")))
-
-         .def("push_pipe_event",
-            (void (*) (Tango::DeviceImpl &, str &, object&, bool))
-            &PyDeviceImpl::push_pipe_event)
-//            (arg_("self"), arg_("pipe_name"), arg_("devicePipeBlob"), arg_("reuse")))
-
-         .def("push_pipe_event",
-            (void (*) (Tango::DeviceImpl &, str &, object&, object&, bool))
-            &PyDeviceImpl::push_pipe_event)
-//            (arg_("self"), arg_("pipe_name"), arg_("devicePipeBlob"), arg_("timeval"), arg_("reuse")))
+            &PyDeviceImpl::push_pipe_event,
+            (arg_("self"), arg_("pipe_name"), arg_("pipe_data")))
 
         .def("get_logger", &Tango::DeviceImpl::get_logger, return_internal_reference<>())
         .def("__debug_stream", &PyDeviceImpl::debug)
