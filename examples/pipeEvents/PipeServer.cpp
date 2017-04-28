@@ -390,9 +390,15 @@ void PipeServer::cmd_push_pipe_event(Tango::DevShort argin)
 		de_names.push_back("Azerty_2DE");
 		dpb.set_data_elt_names(de_names);
 
+		std::vector<Tango::DevFloat> v_df;
+		v_df.clear();
+		v_df.push_back(3.142);
+		v_df.push_back(6.284);
+		v_df.push_back(12.568);
+		v_df.push_back(25.136);
 		string str("Barcelona");
 
-		dpb << str << v_dl;
+		dpb << str << v_df;
 
 #ifdef WIN32
 		struct _timeb tv;
