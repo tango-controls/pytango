@@ -35,8 +35,9 @@ class PipeServer(Device):
     @command(dtype_in=('int'), doc_in="Pipe event test case 0 - 4")
     def cmd_push_pipe_event(self, argin):
         if argin == 0:
-            float_list = [3.33,3.34]
-            inner_inner_data = [("InnerInnerFirstDE",111),("InneraaaaaaaInnerSecondDE",float_list)]
+            float_list = [3.33,3.34,3.35,3.36]
+            inner_int_list = [11,12,13,14,15]
+            inner_inner_data = [("InnerInnerFirstDE",111),("InnerInnerSecondDE",float_list),("InnerInnerThirdDE",inner_int_list)]
             inner_inner_blob = ("InnerInner",dict(inner_inner_data))
             inner_data = [("InnerFirstDE","Grenoble"),("InnerSecondDE",inner_inner_blob),("InnerThirdDE",True)]
             inner_blob = ("Inner", dict(inner_data))

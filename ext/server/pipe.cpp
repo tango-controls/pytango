@@ -449,107 +449,100 @@ void export_pipe()
 }
 namespace PyDevicePipe
 {
+	static void throw_wrong_python_data_type(const std::string &name, const char *method) {
+		TangoSys_OMemStream o;
+		o << "Wrong Python type for pipe " << name << ends;
+		Tango::Except::throw_exception("PyDs_WrongPythonDataTypeForPipe",
+				o.str(), method);
+	}
+
+	template<typename T, long tangoTypeConst>
+	void __append_scalar(T &obj, const std::string &name, bopy::object& py_value) {
+		typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+		TangoScalarType value;
+		from_py<tangoTypeConst>::convert(py_value, value);
+		obj << value;
+	}
+
+	template<typename T, long tangoArrayTypeConst>
+	void __append_array(T& obj, const std::string &name, bopy::object& py_value) {
+		typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
+
+		TangoArrayType* value = fast_convert2array<tangoArrayTypeConst>(py_value);
+		obj << value;
+	}
+
 	template<typename T>
-	int check_convert(const bopy::object &value, T& result)
-	{
-		int rc = 0;
+	bool __check_type(const bopy::object& value) {
+		bopy::extract<T> item(value);
+		return item.check();
+	}
+
+	template<typename T>
+	bool __convert(const bopy::object& value, T& py_item_data) {
 		bopy::extract<T> item(value);
 		if (item.check()) {
-			result = item();
-			rc = 1;
+			py_item_data = item();
+			return true;
 		}
-		return rc;
+		return false;
 	}
-	template<typename T>
-	int check_convert_list(const bopy::list &values, std::vector<T>& result)
-	{
-		int rc = 0;
-		for (auto i=0; i<len(values); i++) {
-			T item;
-			if (check_convert(values[i], item)) {
-				std::cout << "item " << item << std::endl;
-				result.push_back(item);
-				rc = 1;
+
+	void __append(Tango::DevicePipeBlob& dpb, const std::string& name, bopy::object& value) {
+		if (__check_type<string>(value)) {
+			__append_scalar<Tango::DevicePipeBlob, Tango::DEV_STRING>(dpb, name, value);
+		} else if (__check_type<int>(value)) {
+			__append_scalar<Tango::DevicePipeBlob, Tango::DEV_LONG64>(dpb, name, value);
+		} else if (__check_type<double>(value)) {
+			__append_scalar<Tango::DevicePipeBlob, Tango::DEV_DOUBLE>(dpb, name, value);
+		} else if (__check_type<bool>(value)) {
+			__append_scalar<Tango::DevicePipeBlob, Tango::DEV_BOOLEAN>(dpb, name, value);
+		} else if (__check_type<bopy::list>(value)) {
+			if (__check_type<string>(value[0])) {
+				__append_array<Tango::DevicePipeBlob, Tango::DEVVAR_STRINGARRAY>(dpb, name, value);
+			} else if (__check_type<int>(value[0])) {
+				__append_array<Tango::DevicePipeBlob, Tango::DEVVAR_LONG64ARRAY>(dpb, name, value);
+			} else if (__check_type<double>(value[0])) {
+				__append_array<Tango::DevicePipeBlob, Tango::DEVVAR_DOUBLEARRAY>(dpb, name, value);
 			} else {
-				// If its not the required type
-				// It also assumes the list is all of the same type
-				rc = 0;
-				break;
+				throw_wrong_python_data_type(name, "__append");
 			}
+		} else {
+			throw_wrong_python_data_type(name, "__append");
 		}
-		return rc;
 	}
+
 	void __set_value(Tango::DevicePipeBlob& dpb, bopy::dict& dict) {
-		std::cout << "In __set_value()" << std::endl;
 		int nitems = len(dict);
 		std::vector<std::string> elem_names;
 		for (auto i=0; i<nitems; i++) {
-			std::string s = bopy::extract<std::string>(dict.keys()[i]);
 			elem_names.push_back(bopy::extract<std::string>(dict.keys()[i]));
 		}
 		dpb.set_data_elt_names(elem_names);
 
 		bopy::list values = dict.values();
 		for (auto i=0; i <nitems; ++i) {
-			bopy::object value = values[i];
-			std::string str;
-			int ival;
-			double dval;
-			bopy::list plist;
+			bopy::object item = values[i];
+			// Check if the value is an inner blob
 			bopy::tuple ptuple;
-			if (check_convert(value, str)) {
-				std::cout << "got string" << str << std::endl;
-				dpb << str;
-			} else if (check_convert(value, ival)) {
-				std::cout << "got int" << ival << std::endl;
-				dpb << ival;
-			} else if (check_convert(value, dval)) {
-				std::cout << "got double" << dval << std::endl;
-				dpb << dval;
-			} else if (check_convert(value, plist)) {
-				std::vector<std::string> vecstr;
-				std::vector<int> vecint;
-				std::vector<double> vecdbl;
-				if (check_convert_list(plist, vecstr)) {
-					std::cout << "got string vector" << std::endl;
-					dpb << vecstr;
-				} else if (check_convert_list(plist, vecint)) {
-					std::cout << "got int vector" << std::endl;
-					dpb << vecint;
-					dpb.print(std::cout,2 ,true);
-				} else if (check_convert_list(plist, vecdbl)) {
-					std::cout << "got double vector" << std::endl;
-					dpb << vecdbl;
-				} else {
-					std::cout << "Unsupported Pipe Event vector type. Please report to PyTango team" << std::endl;
-				}
-				std::cout << "---------------------" << std::endl;
-				dpb.print(std::cout,2 ,true);
-			} else if (check_convert(value, ptuple)) {
-				bopy::dict pdict;
-				std::cout << "got tuple" << std::endl;
-				if (check_convert(ptuple[0], str) && check_convert(ptuple[1], pdict)) {
-					Tango::DevicePipeBlob inner_blob(str);
-					__set_value(inner_blob, pdict);
-					std::cout << "got inner blob" << std::endl;
-					dpb << inner_blob;
-				}
+			std::string blob_name;
+			bopy::dict pdict;
+			if (__convert(item, ptuple) && __convert(ptuple[0], blob_name)
+				&& __convert(ptuple[1], pdict)) {
+				Tango::DevicePipeBlob inner_blob(blob_name);
+				__set_value(inner_blob, pdict);
+				dpb << inner_blob;
 			} else {
-				std::cout << "Unsupported Pipe Event  type. Please report to PyTango team" << std::endl;
+				__append(dpb, elem_names[i], item);
 			}
 		}
-		std::cout << "---------------------" << std::endl;
-		dpb.print(std::cout,2 ,true);
 	}
-	void set_value(Tango::DevicePipeBlob& dpb, bopy::object& data)
-	{
-		PyObject* data_ptr = data.ptr();
-		bopy::tuple t = bopy::extract<bopy::tuple>(data_ptr);
-		std::string name = bopy::extract<std::string>(t[0]);
+
+	void set_value(Tango::DevicePipeBlob& dpb, bopy::object& py_data) {
+		std::string name = bopy::extract<std::string>(py_data[0]);
 		dpb.set_name(name);
 
-		bopy::dict dict = bopy::extract<bopy::dict>(t[1]);
-		__set_value(dpb, dict);
+		bopy::dict data = bopy::extract<bopy::dict>(py_data[1]);
+		__set_value(dpb, data);
 	}
-
 } // namespace PyDevicePipe
