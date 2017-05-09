@@ -15,6 +15,8 @@ cache:
   directories:
     - ./miniconda  # Conda environment
     - ./.eggs      # pytest eggs
+    - ./build      # Build environment
+    - ./cached_ext    # Previous extension
 
 before_install:
   # Add conda to path
@@ -41,4 +43,16 @@ install:
   # with pytest-xdist (see https://github.com/pytest-dev/pytest-xdist/issues/41):
   # - pip install -U pytest pytest-xdist six mock
 
-script: python setup.py build && python setup.py test
+before_script:
+  # Make sure old_ext exists
+  - mkdir -p cached_ext
+  # Touch the .so files if the extension hasn't changed
+  - diff cached_ext ext && find build -name _tango*.so -printf "touching %p\n" -exec touch {} + || true
+
+script:
+  # Build the package
+  - python setup.py build
+  # The build directory has been updated, cached_ext needs to be synchronized too
+  - rsync -a --delete ext/ cached_ext/
+  # Run the tests
+  - python setup.py test
