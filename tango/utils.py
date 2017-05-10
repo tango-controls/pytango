@@ -1500,7 +1500,9 @@ class EventCallBack(object):
             return ""
         elif isinstance(evt, PipeEventData):
             return evt.pipe_value
-
+        elif isinstance(evt, DevIntrChangeEventData):
+            print ("utils::_get_value()")
+            return
 
 def get_home():
     """
