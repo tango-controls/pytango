@@ -18,6 +18,7 @@
 #include "server/attribute.h"
 #include "to_py.h"
 
+
 extern const char *param_must_be_seq;
 
 using namespace boost::python;
@@ -1705,3 +1706,25 @@ void export_device_impl()
     implicitly_convertible<auto_ptr<Device_5ImplWrap>, auto_ptr<Tango::Device_5Impl> >();
 
 }
+//namespace PyDevIntrThread
+//{
+//    /* **********************************
+//     * interface change event
+//     * **********************************/
+//    inline void push_devintr_change_event(Tango::DevIntrThread &self)
+//    {
+//    	self.push_event();
+//    }
+//}
+//
+//void export_device_intrthread()
+//{
+//    class_<Tango::DeviceIntrThread, boost::noncopyable>("DeviceImpl",
+//        init<CppDeviceClass *, const char *,
+//             optional<const char *, Tango::DevState, const char *> >())
+//
+//    .def("push_event",
+//        (void (*) (Tango::DevIntrThread &))
+//        &PyDeviceIntrThread::push_devintr_change_event,
+//        (arg_("self")))
+//}

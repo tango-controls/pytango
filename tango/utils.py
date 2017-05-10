@@ -1415,7 +1415,9 @@ class EventCallBack(object):
             return "label='%s'; unit='%s'" % (cfg.label, cfg.unit)
         elif isinstance(evt, DataReadyEventData):
             return ""
-
+        elif isinstance(evt, DevIntrChangeEventData):
+            print ("utils::_get_value()")
+            return
 
 def get_home():
     """

@@ -173,6 +173,7 @@ $(OBJS_DIR)/device_attribute_history.o \
 $(OBJS_DIR)/device_data.o \
 $(OBJS_DIR)/device_data_history.o \
 $(OBJS_DIR)/device_info.o \
+$(OBJS_DIR)/devintr_change_event_data.o \
 $(OBJS_DIR)/device_proxy.o \
 $(OBJS_DIR)/enums.o \
 $(OBJS_DIR)/event_data.o \
