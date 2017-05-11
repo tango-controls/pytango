@@ -306,7 +306,7 @@ namespace PyDeviceProxy
         }
     }
 
-    static int subscribe_event(
+    static int subscribe_event_global(
             bopy::object py_self,
             Tango::EventType event,
             bopy::object py_cb,
@@ -324,35 +324,35 @@ namespace PyDeviceProxy
         }
     }
 
-//    static int subscribe_event(
-//            bopy::object py_self,
-//            const string &attr_name,
-//            Tango::EventType event,
-//            bopy::object py_cb_or_queuesize,
-//            bopy::object &py_filters,
-//            bool stateless,
-//            PyTango::ExtractAs extract_as )
-//    {
-//        Tango::DeviceProxy& self = bopy::extract<Tango::DeviceProxy&>(py_self);
-//        CSequenceFromPython<StdStringVector> filters(py_filters);
-//
-//        PyCallBackPushEvent* cb = 0;
-//        int event_queue_size = 0;
-//        if (bopy::extract<PyCallBackPushEvent&>(py_cb_or_queuesize).check()) {
-//            cb = bopy::extract<PyCallBackPushEvent*>(py_cb_or_queuesize);
-//
-//            cb->set_device(py_self);
-//            cb->set_extract_as(extract_as);
-//
-//            AutoPythonAllowThreads guard;
-//            return self.subscribe_event(attr_name, event, cb, *filters, stateless);
-//        } else {
-//            event_queue_size = bopy::extract<int>(py_cb_or_queuesize);
-//            AutoPythonAllowThreads guard;
-//            return self.subscribe_event(attr_name, event, event_queue_size,
-//                                        *filters, stateless);
-//        }
-//    }
+    static int subscribe_event_attrib(
+            bopy::object py_self,
+            const string &attr_name,
+            Tango::EventType event,
+            bopy::object py_cb_or_queuesize,
+            bopy::object &py_filters,
+            bool stateless,
+            PyTango::ExtractAs extract_as )
+    {
+        Tango::DeviceProxy& self = bopy::extract<Tango::DeviceProxy&>(py_self);
+        CSequenceFromPython<StdStringVector> filters(py_filters);
+
+        PyCallBackPushEvent* cb = 0;
+        int event_queue_size = 0;
+        if (bopy::extract<PyCallBackPushEvent&>(py_cb_or_queuesize).check()) {
+            cb = bopy::extract<PyCallBackPushEvent*>(py_cb_or_queuesize);
+
+            cb->set_device(py_self);
+            cb->set_extract_as(extract_as);
+
+            AutoPythonAllowThreads guard;
+            return self.subscribe_event(attr_name, event, cb, *filters, stateless);
+        } else {
+            event_queue_size = bopy::extract<int>(py_cb_or_queuesize);
+            AutoPythonAllowThreads guard;
+            return self.subscribe_event(attr_name, event, event_queue_size,
+                                        *filters, stateless);
+        }
+    }
 
     static void unsubscribe_event(Tango::DeviceProxy& self, int event)
     {
@@ -814,18 +814,19 @@ void export_device_proxy()
         //
         // Event methods
         //
-        .def("__subscribe_event", &PyDeviceProxy::subscribe_event,
+
+        .def("__subscribe_event", &PyDeviceProxy::subscribe_event_global,
             ( arg_("self"), arg_("event"), arg_("cb_or_queuesize") ))
 
-//        .def("__subscribe_event", &PyDeviceProxy::subscribe_event,
-//            (   arg_("self"),
-//                arg_("attr_name"),
-//                arg_("event"),
-//                arg_("cb_or_queuesize"),
-//                arg_("filters")=bopy::list(),
-//                arg_("stateless")=false,
-//                arg_("extract_as")=PyTango::ExtractAsNumpy )
-//            )
+        .def("__subscribe_event", &PyDeviceProxy::subscribe_event_attrib,
+            (   arg_("self"),
+                arg_("attr_name"),
+                arg_("event"),
+                arg_("cb_or_queuesize"),
+                arg_("filters")=bopy::list(),
+                arg_("stateless")=false,
+                arg_("extract_as")=PyTango::ExtractAsNumpy )
+            )
 
         .def("__unsubscribe_event", &PyDeviceProxy::unsubscribe_event )
 
