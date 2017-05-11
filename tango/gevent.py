@@ -13,34 +13,33 @@
 :class:`tango.AttributeProxy"""
 
 from __future__ import absolute_import
+from functools import partial
+
+from ._tango import GreenMode
+from .device_proxy import get_device_proxy
+from .attribute_proxy import get_attribute_proxy
 
 __all__ = ["DeviceProxy", "AttributeProxy", "check_requirements"]
-
-from functools import partial
-    
-from tango import GreenMode
-from tango.device_proxy import get_device_proxy
-from tango.attribute_proxy import get_attribute_proxy
 
 
 def check_requirements():
     try:
         import gevent
     except ImportError:
-        raise ImportError("No module named gevent. You need to install " \
-                          "gevent module to have access to PyTango gevent " \
-                          "green mode. Consider using the futures green mode " \
+        raise ImportError("No module named gevent. You need to install "
+                          "gevent module to have access to PyTango gevent "
+                          "green mode. Consider using the futures green mode "
                           "instead")
 
     import distutils.version
     gevent_version = ".".join(map(str, gevent.version_info[:3]))
     if distutils.version.StrictVersion(gevent_version) < "1.0":
-        raise ImportError("You need gevent >= 1.0. You are using %s. " \
-                          "Consider using the futures green mode instead" \
+        raise ImportError("You need gevent >= 1.0. You are using %s. "
+                          "Consider using the futures green mode instead"
                           % gevent_version)
 
 
-check_requirements()    
+check_requirements()
 
 
 DeviceProxy = partial(get_device_proxy, green_mode=GreenMode.Gevent)
@@ -49,14 +48,14 @@ DeviceProxy.__doc__ = """
     DeviceProxy(self, dev_name, need_check_acc, wait=True, timeout=True) -> DeviceProxy
 
     Creates a *gevent* enabled :class:`~tango.DeviceProxy`.
-     
+
     The DeviceProxy constructor internally makes some network calls which makes
     it *slow*. By using the gevent *green mode* you are allowing other python
     code to be executed in a cooperative way.
 
     .. note::
         The timeout parameter has no relation with the tango device client side
-        timeout (gettable by :meth:`~tango.DeviceProxy.get_timeout_millis` and 
+        timeout (gettable by :meth:`~tango.DeviceProxy.get_timeout_millis` and
         settable through :meth:`~tango.DeviceProxy.set_timeout_millis`)
 
     :param dev_name: the device name or alias
@@ -77,7 +76,7 @@ DeviceProxy.__doc__ = """
         else:
             :class:`gevent.event.AsynchResult`
     :throws:
-        * a *DevFailed* if wait is True and there is an error creating 
+        * a *DevFailed* if wait is True and there is an error creating
           the device.
         * a *gevent.timeout.Timeout* if wait is False, timeout is not None and
           the time to create the device has expired.
@@ -91,7 +90,7 @@ AttributeProxy.__doc__ = """
     AttributeProxy(self, device_proxy, attr_name, wait=True, timeout=True) -> AttributeProxy
 
     Creates a *gevent* enabled :class:`~tango.AttributeProxy`.
-    
+
     The AttributeProxy constructor internally makes some network calls which
     makes it *slow*. By using the *gevent mode* you are allowing other python
     code to be executed in a cooperative way.
@@ -119,7 +118,7 @@ AttributeProxy.__doc__ = """
           attribute.
         * a *gevent.timeout.Timeout* if wait is False, timeout is not None
           and the time to create the attribute has expired.
-    
+
     New in PyTango 8.1.0
 """
 

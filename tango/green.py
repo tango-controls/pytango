@@ -9,54 +9,25 @@
 # See LICENSE.txt for more info.
 # -----------------------------------------------------------------------------
 
-__all__ = [
-    "get_green_mode", "set_green_mode",
-    "get_executor", "submit", "spawn", "result", "wait",
-    "get_synch_executor", "synch_submit", "synch_wait",
-    "get_gevent_executor", "gevent_submit", "gevent_wait",
-    "get_futures_executor", "futures_submit", "futures_wait",
-    "get_asyncio_executor", "asyncio_submit", "asyncio_wait",
-    "get_object_submitter", "get_object_waiter", "get_object_green_mode",
-    "green", "green_cb", "get_wait_default_value",
-    "get_event_loop", "get_gevent_event_loop"]
-
-__docformat__ = "restructuredtext"
-
 
 # Imports
 import os
-from functools import wraps, partial
+from functools import wraps
 
 # Tango imports
 from ._tango import GreenMode
 
-# Gevent imports
-from .tango_gevent import get_global_executor as get_gevent_executor
-from .tango_gevent import submit as gevent_submit
-from .tango_gevent import wait as gevent_wait
-from .tango_gevent import get_event_loop as get_gevent_event_loop
-
-# Futures imports
-from .tango_futures import get_global_executor as get_futures_executor
-from .tango_futures import submit as futures_submit
-from .tango_futures import wait as futures_wait
-
-# Asyncio imports
-from .tango_asyncio import get_global_executor as get_asyncio_executor
-from .tango_asyncio import submit as asyncio_submit
-from .tango_asyncio import wait as asyncio_wait
-from .tango_asyncio import get_event_loop as get_asyncio_event_loop
-
+__all__ = ['get_green_mode', 'set_green_mode', 'green', 'green_callback',
+           'get_executor', 'get_object_executor']
 
 # Handle current green mode
 
-__default_green_mode = GreenMode.Synchronous
 try:
-    __current_green_mode = getattr(
+    _CURRENT_GREEN_MODE = getattr(
         GreenMode,
         os.environ["PYTANGO_GREEN_MODE"].capitalize())
 except Exception:
-    __current_green_mode = __default_green_mode
+    _CURRENT_GREEN_MODE = GreenMode.Synchronous
 
 
 def set_green_mode(green_mode=None):
@@ -69,19 +40,11 @@ def set_green_mode(green_mode=None):
     :param green_mode: the new global default PyTango green mode
     :type green_mode: GreenMode
     """
-    global __current_green_mode
-    if __current_green_mode == green_mode:
-        return
-    if green_mode == GreenMode.Gevent:
-        # check if we can change to gevent mode
-        import tango.gevent
-    elif green_mode == GreenMode.Futures:
-        # check if we can change to futures mode
-        import tango.futures
-    elif green_mode == GreenMode.Asyncio:
-        # check if we can change to asyncio mode
-        import tango.asyncio
-    __current_green_mode = green_mode
+    global _CURRENT_GREEN_MODE
+    # Make sure the green mode is available
+    get_executor(green_mode)
+    # Set the green mode
+    _CURRENT_GREEN_MODE = green_mode
 
 
 def get_green_mode():
@@ -90,109 +53,70 @@ def get_green_mode():
     :returns: the current global default PyTango green mode
     :rtype: GreenMode
     """
-    return __current_green_mode
+    return _CURRENT_GREEN_MODE
 
 
-# Synchronous execution
+# Abstract executor class
 
-class SynchExecutor(object):
+class AbstractExecutor(object):
+
+    asynchronous = NotImplemented
+    default_wait = NotImplemented
+
+    def delegate(self, fn, *args, **kwargs):
+        """Delegate an operation and return an accessor."""
+        if not self.asynchronous:
+            raise ValueError('Not supported in synchronous mode')
+        raise NotImplementedError
+
+    def access(self, accessor, timeout=None):
+        """Return a result from an accessor."""
+        if not self.asynchronous:
+            raise ValueError('Not supported in synchronous mode')
+        raise NotImplementedError
+
     def submit(self, fn, *args, **kwargs):
-        return fn(*args, **kwargs)
+        """Submit an operation"""
+        if not self.asynchronous:
+            return fn(*args, **kwargs)
+        raise NotImplementedError
 
-__synch_executor = SynchExecutor()
+    def execute(self, fn, *args, **kwargs):
+        """Execute an operation and return the result."""
+        if not self.asynchronous:
+            return fn(*args, **kwargs)
+        raise NotImplementedError
 
-
-def get_synch_executor():
-    return __synch_executor
-
-
-def synch_submit(fn, *args, **kwargs):
-    return get_synch_executor().submit(fn, *args, **kwargs)
-
-
-def synch_wait(res, timeout=None):
-    return res
-
-
-# Excutor, submitter and waiter mapping
-
-__executor_map = {
-    GreenMode.Synchronous: get_synch_executor,
-    GreenMode.Futures:     get_futures_executor,
-    GreenMode.Gevent:      get_gevent_executor,
-    GreenMode.Asyncio:     get_asyncio_executor,
-}
-
-__submit_map = {
-    GreenMode.Synchronous: synch_submit,
-    GreenMode.Futures:     futures_submit,
-    GreenMode.Gevent:      gevent_submit,
-    GreenMode.Asyncio:     asyncio_submit,
-}
-
-__wait_map = {
-    GreenMode.Synchronous: synch_wait,
-    GreenMode.Futures:     futures_wait,
-    GreenMode.Gevent:      gevent_wait,
-    GreenMode.Asyncio:     asyncio_wait,
-}
+    def run(self, fn, args=(), kwargs={}, wait=None, timeout=None):
+        if wait is None:
+            wait = self.default_wait
+        # Sychronous (no delegation)
+        if not self.asynchronous:
+            if not wait or timeout:
+                raise ValueError('Not supported in synchronous mode')
+            return fn(*args, **kwargs)
+        # Asynchronous delegation
+        accessor = self.delegate(fn, *args, **kwargs)
+        if not wait:
+            return accessor
+        return self.access(accessor, timeout=timeout)
 
 
-__event_loop_map = {
-    GreenMode.Synchronous: (lambda: None),
-    GreenMode.Futures:     (lambda: None),
-    GreenMode.Gevent:      get_gevent_event_loop,
-    GreenMode.Asyncio:     get_asyncio_event_loop,
-}
+class SynchronousExecutor(AbstractExecutor):
+
+    asynchronous = False
+    default_wait = True
+
+
+# Default synchronous executor
+
+def get_synchronous_executor():
+    return _SYNCHRONOUS_EXECUTOR
+
+_SYNCHRONOUS_EXECUTOR = SynchronousExecutor()
 
 
 # Getters
-
-def get_executor(mode):
-    return __executor_map[mode]()
-
-
-def get_submitter(mode):
-    return __submit_map[mode]
-
-
-def get_waiter(mode):
-    return __wait_map[mode]
-
-
-def get_wait_default_value(mode):
-    if mode is None:
-        mode = get_green_mode()
-    return mode not in (GreenMode.Asyncio,)
-
-
-# Generic submitter/spawner and waiter
-
-def submit(mode, fn, *args, **kwargs):
-    return get_submitter(mode)(fn, *args, **kwargs)
-
-spawn = submit
-
-
-def wait_result(ret, green_mode=None, timeout=None):
-    if green_mode is None:
-        green_mode = get_green_mode()
-    return get_waiter(green_mode)(ret, timeout=timeout)
-
-wait = wait_result
-
-
-def result(ret, green_mode=None, wait=True, timeout=None):
-    if not wait:
-        return ret
-    return wait_result(ret, green_mode=green_mode, timeout=timeout)
-
-
-def get_event_loop(mode):
-    return __event_loop_map[mode]()
-
-
-# Get object submitter, waiter and green_mode
 
 def get_object_green_mode(obj):
     if hasattr(obj, "get_green_mode"):
@@ -200,85 +124,78 @@ def get_object_green_mode(obj):
     return get_green_mode()
 
 
-def get_object_submitter(obj, green_mode=None):
-    """Returns the proper submit callable for the given object.
+def get_executor(green_mode=None):
+    if green_mode is None:
+        green_mode = get_green_mode()
+    # Valid green modes
+    if green_mode == GreenMode.Synchronous:
+        return get_synchronous_executor()
+    if green_mode == GreenMode.Gevent:
+        from . import gevent_executor
+        return gevent_executor.get_global_executor()
+    if green_mode == GreenMode.Futures:
+        from . import futures_executor
+        return futures_executor.get_global_executor()
+    if green_mode == GreenMode.Asyncio:
+        from . import asyncio_executor
+        return asyncio_executor.get_global_executor()
+    # Invalid green mode
+    raise TypeError("Not a valid green mode")
+
+
+def get_object_executor(obj, green_mode=None):
+    """Returns the proper executor for the given object.
 
     If the object has *_executors* and *_green_mode* members it returns
     the submit callable for the executor corresponding to the green_mode.
-    Otherwise it returns the global submit callable for the given green_mode.
+    Otherwise it returns the global executor for the given green_mode.
+
+    Note: *None* is a valid object.
 
     :returns: submit callable"""
     # Get green mode
     if green_mode is None:
         green_mode = get_object_green_mode(obj)
     # Get executor
-    executors = getattr(obj, "_executors", {})
-    executor = executors.get(green_mode, None)
+    executor = None
+    if hasattr(obj, '_executors'):
+        executor = obj._executors.get(green_mode, None)
     if executor is None:
         executor = get_executor(green_mode)
     # Get submitter
-    if green_mode == GreenMode.Gevent:
-        return executor.spawn
-    return executor.submit
+    return executor
 
 
-def get_object_waiter(obj, green_mode=None):
-    """Returns the proper wait callable for the given object.
+# Green modifiers
 
-    If the object has *_executors* and *_green_mode* members it returns
-    the wait callable for the executor corresponding to the green_mode.
-    Otherwise it returns the global wait callable for the given green_mode.
+def green(fn=None, consume_green_mode=True):
+    """Make a function green. Can be used as a decorator."""
 
-    :returns: wait callable"""
-    # Get green mode
-    if green_mode is None:
-        green_mode = get_object_green_mode(obj)
-    # Get waiter
-    waiter = get_waiter(green_mode)
-    # Asyncio corner case
-    if green_mode == GreenMode.Asyncio:
-        executors = getattr(obj, "_executors", {})
-        executor = executors.get(GreenMode.Asyncio)
-        if executor is None:
-            return waiter
-        return partial(waiter, loop=executor.loop)
-    # Return waiter
-    return waiter
+    def decorator(fn):
 
+        @wraps(fn)
+        def greener(obj, *args, **kwargs):
+            args = (obj,) + args
+            wait = kwargs.pop('wait', None)
+            timeout = kwargs.pop('timeout', None)
+            access = kwargs.pop if consume_green_mode else kwargs.get
+            green_mode = access('green_mode', None)
+            executor = get_object_executor(obj, green_mode)
+            return executor.run(fn, args, kwargs, wait=wait, timeout=timeout)
 
-# Green decorators
+        return greener
 
-def green(fn):
-    """make a method green. Can be used as a decorator"""
-
-    @wraps(fn)
-    def greener(self, *args, **kwargs):
-        # first take out all green parameters
-        green_mode = kwargs.pop('green_mode', get_object_green_mode(self))
-        wait = kwargs.pop('wait', get_wait_default_value(green_mode))
-        timeout = kwargs.pop('timeout', None)
-
-        # get the proper submitable for the given green_mode
-        submitter = get_object_submitter(self, green_mode)
-        waiter = get_object_waiter(self, green_mode)
-
-        # submit the method
-        ret = submitter(fn, self, *args, **kwargs)
-
-        # return the proper result
-        return waiter(ret, timeout=timeout) if wait else ret
-
-    return greener
+    if fn is None:
+        return decorator
+    return decorator(fn)
 
 
-def green_cb(fn, green_mode=None):
-    """return a green verion of the given callback."""
-    event_loop = get_event_loop(green_mode)
-    if event_loop is None:
-        return fn
+def green_callback(fn, obj=None, green_mode=None):
+    """Return a green verion of the given callback."""
+    executor = get_object_executor(obj, green_mode)
 
     @wraps(fn)
     def greener(*args, **kwargs):
-        event_loop.submit(fn, *args, **kwargs)
+        return executor.submit(fn, *args, **kwargs)
 
     return greener

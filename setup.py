@@ -23,8 +23,9 @@ from setuptools.command.install import install as dftinstall
 
 from distutils.command.build import build as dftbuild
 from distutils.unixccompiler import UnixCCompiler
-from distutils.version import StrictVersion as V
+from distutils.version import LooseVersion as V
 
+# Sphinx imports
 try:
     import sphinx
     import sphinx.util.console
@@ -33,12 +34,38 @@ try:
 except ImportError:
     sphinx = None
 
+# Detect numpy
 try:
     import numpy
 except ImportError:
     numpy = None
 
-is64 = 8 * struct.calcsize("P") == 64
+# Platform constants
+POSIX = 'posix' in os.name
+WINDOWS = 'nt' in os.name
+IS64 = 8 * struct.calcsize("P") == 64
+PYTHON_VERSION = platform.python_version_tuple()
+PYTHON2 = ('2',) <= PYTHON_VERSION < ('3',)
+PYTHON3 = ('3',) <= PYTHON_VERSION < ('4',)
+
+# Linux distribution
+distribution = platform.linux_distribution()[0].lower() if POSIX else ""
+distribution_match = lambda names: any(x in distribution for x in names)
+DEBIAN = distribution_match(['debian', 'ubuntu', 'mint'])
+REDHAT = distribution_match(['redhat', 'fedora', 'centos'])
+GENTOO = distribution_match(['gentoo'])
+
+# Arguments
+TESTING = any(x in sys.argv for x in ['test', 'pytest'])
+
+
+def get_readme(name='README.rst'):
+    """Get readme file contents without the badges."""
+    with open(name) as f:
+        return '\n'.join(
+            line for line in f.read().splitlines()
+            if not line.startswith('|')
+            or not line.endswith('|'))
 
 
 def pkg_config(*packages, **config):
@@ -126,7 +153,7 @@ def add_lib(name, dirs, sys_libs,
             dirs['include_dirs'].append(inc_dir)
 
         lib_dirs = [os.path.join(ENV, 'lib')]
-        if is64:
+        if IS64:
             lib64_dir = os.path.join(ENV, 'lib64')
             if os.path.isdir(lib64_dir):
                 lib_dirs.insert(0, lib64_dir)
@@ -174,7 +201,7 @@ class build(dftbuild):
             self.strip_debug_symbols()
 
     def strip_debug_symbols(self):
-        if 'posix' not in os.name:
+        if not POSIX:
             return
         if os.system("type objcopy") != 0:
             return
@@ -324,7 +351,7 @@ def setup_args():
     sys_libs = []
 
     # Link specifically to libtango version 9
-    tangolib = ':libtango.so.9' if 'linux' in sys.platform else 'tango'
+    tangolib = ':libtango.so.9' if POSIX else 'tango'
     directories['libraries'].append(tangolib)
 
     add_lib('omni', directories, sys_libs, lib_name='omniORB4')
@@ -336,26 +363,19 @@ def setup_args():
     BOOST_ROOT = os.environ.get('BOOST_ROOT')
     boost_library_name = 'boost_python'
     if BOOST_ROOT is None:
-        if 'linux' in sys.platform:
-            dist_name = platform.linux_distribution()[0].lower()
-            debian_based = 'debian' in dist_name or 'ubuntu' in dist_name or \
-                           'mint' in dist_name
-            py_ver = platform.python_version_tuple()
-            if debian_based:
-                # when building with  multiple version of python  on debian we
-                # need to link against boost_python-py25/-py26 etc...
-                pyver = "-py"
-                pyver += "".join(map(str, py_ver[:2]))
-                boost_library_name += pyver
-            elif 'gentoo' in dist_name:
-                boost_library_name += "-" + ".".join(map(str, py_ver[:2]))
-            elif 'fedora' in dist_name or 'centos' in dist_name:
-                if int(py_ver[0]) == 3:
-                    boost_library_name += '3'
+        if DEBIAN:
+            suffix = "-py{v[0]}{v[1]}".format(v=PYTHON_VERSION)
+            boost_library_name += suffix
+        elif REDHAT:
+            if PYTHON3:
+                boost_library_name += '3'
+        elif GENTOO:
+            suffix = "-{v[0]}.{v[1]}".format(v=PYTHON_VERSION)
+            boost_library_name += suffix
     else:
         inc_dir = os.path.join(BOOST_ROOT, 'include')
         lib_dirs = [os.path.join(BOOST_ROOT, 'lib')]
-        if is64:
+        if IS64:
             lib64_dir = os.path.join(BOOST_ROOT, 'lib64')
             if os.path.isdir(lib64_dir):
                 lib_dirs.insert(0, lib64_dir)
@@ -377,7 +397,7 @@ def setup_args():
     else:
         macros.append(('PYTANGO_NUMPY_VERSION', '"%s"' % numpy.__version__))
 
-    if 'posix' in os.name:
+    if POSIX:
         directories = pkg_config(*sys_libs, **directories)
 
     Release = get_release_info()
@@ -411,6 +431,20 @@ def setup_args():
         'six',
     ]
 
+    setup_requires = []
+
+    if TESTING:
+        setup_requires += ['pytest-runner']
+
+    tests_require = [
+        'pytest-xdist',
+        'gevent',
+        'psutil',
+    ]
+
+    if PYTHON2:
+        tests_require += ['trollius']
+
     package_data = {
         'PyTango': [],
     }
@@ -430,7 +464,9 @@ def setup_args():
         'Operating System :: Unix',
         'Programming Language :: C',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Scientific/Engineering',
         'Topic :: Software Development :: Libraries',
     ]
@@ -445,8 +481,6 @@ def setup_args():
     ]
 
     extra_link_args = [
-        '-Wl,-h',
-        '-Wl,--strip-all',
     ]
 
     if please_debug:
@@ -495,11 +529,11 @@ def setup_args():
     if sphinx:
         cmdclass['build_doc'] = build_doc
 
-    long_description = open('README.rst').read()
+    long_description = get_readme()
 
     opts = dict(
         name='pytango',
-        version=Release.version,
+        version=Release.version_long,
         description=Release.description,
         long_description=long_description,
         author=author[0],
@@ -517,6 +551,8 @@ def setup_args():
         keywords=Release.keywords,
         requires=requires,
         install_requires=install_requires,
+        setup_requires=setup_requires,
+        tests_require=tests_require,
         ext_package='tango',
         ext_modules=[pytango_ext],
         cmdclass=cmdclass)
