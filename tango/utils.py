@@ -1498,8 +1498,7 @@ class EventCallBack(object):
         elif isinstance(evt, DataReadyEventData):
             return ""
         elif isinstance(evt, PipeEventData):
-            print ("utils::_get_value()")
-            return
+            return evt.pipe_value
 
 
 def get_home():

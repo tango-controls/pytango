@@ -1247,8 +1247,6 @@ def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractA
             return self.__get_attr_conf_events(event_id, extract_as)
         elif event_type in (EventType.DATA_READY_EVENT,):
             return self.__get_data_ready_events(event_id, extract_as)
-        elif event_type in (EventType.INTERFACE_CHANGE_EVENT,):
-            raise NotImplementedError("event_type not implemented event_type: " + str(event_type))
         elif event_type in (EventType.PIPE_EVENT,):
             return self.__get_pipe_events(event_id, extract_as)
         else:
