@@ -47,7 +47,6 @@ __all__ = [
 
 __docformat__ = "restructuredtext"
 
-
 # Types
 
 _scalar_int_types = (
@@ -118,40 +117,40 @@ _binary_types = (
 
 def __build_to_tango_type():
     ret = {
-        int         : CmdArgType.DevLong64,
-        str         : CmdArgType.DevString,
-        bool        : CmdArgType.DevBoolean,
-        bytearray   : CmdArgType.DevEncoded,
-        float       : CmdArgType.DevDouble,
-        chr         : CmdArgType.DevUChar,
-        None        : CmdArgType.DevVoid,
+        int: CmdArgType.DevLong64,
+        str: CmdArgType.DevString,
+        bool: CmdArgType.DevBoolean,
+        bytearray: CmdArgType.DevEncoded,
+        float: CmdArgType.DevDouble,
+        chr: CmdArgType.DevUChar,
+        None: CmdArgType.DevVoid,
 
-        'int'       : CmdArgType.DevLong64,
-        'int16'     : CmdArgType.DevShort,
-        'int32'     : CmdArgType.DevLong,
-        'int64'     : CmdArgType.DevLong64,
-        'uint'      : CmdArgType.DevULong64,
-        'uint16'    : CmdArgType.DevUShort,
-        'uint32'    : CmdArgType.DevULong,
-        'uint64'    : CmdArgType.DevULong64,
-        'str'       : CmdArgType.DevString,
-        'string'    : CmdArgType.DevString,
-        'text'      : CmdArgType.DevString,
-        'bool'      : CmdArgType.DevBoolean,
-        'boolean'   : CmdArgType.DevBoolean,
-        'bytes'     : CmdArgType.DevEncoded,
-        'bytearray' : CmdArgType.DevEncoded,
-        'float'     : CmdArgType.DevDouble,
-        'float32'   : CmdArgType.DevFloat,
-        'float64'   : CmdArgType.DevDouble,
-        'double'    : CmdArgType.DevDouble,
-        'byte'      : CmdArgType.DevUChar,
-        'chr'       : CmdArgType.DevUChar,
-        'char'      : CmdArgType.DevUChar,
-        'None'      : CmdArgType.DevVoid,
-        'state'     : CmdArgType.DevState,
-        'enum'      : CmdArgType.DevEnum,
-        'blob'      : CmdArgType.DevPipeBlob,
+        'int': CmdArgType.DevLong64,
+        'int16': CmdArgType.DevShort,
+        'int32': CmdArgType.DevLong,
+        'int64': CmdArgType.DevLong64,
+        'uint': CmdArgType.DevULong64,
+        'uint16': CmdArgType.DevUShort,
+        'uint32': CmdArgType.DevULong,
+        'uint64': CmdArgType.DevULong64,
+        'str': CmdArgType.DevString,
+        'string': CmdArgType.DevString,
+        'text': CmdArgType.DevString,
+        'bool': CmdArgType.DevBoolean,
+        'boolean': CmdArgType.DevBoolean,
+        'bytes': CmdArgType.DevEncoded,
+        'bytearray': CmdArgType.DevEncoded,
+        'float': CmdArgType.DevDouble,
+        'float32': CmdArgType.DevFloat,
+        'float64': CmdArgType.DevDouble,
+        'double': CmdArgType.DevDouble,
+        'byte': CmdArgType.DevUChar,
+        'chr': CmdArgType.DevUChar,
+        'char': CmdArgType.DevUChar,
+        'None': CmdArgType.DevVoid,
+        'state': CmdArgType.DevState,
+        'enum': CmdArgType.DevEnum,
+        'blob': CmdArgType.DevPipeBlob,
     }
 
     try:
@@ -184,29 +183,29 @@ def __build_to_tango_type():
             ret[value] = key
     return ret
 
+
 TO_TANGO_TYPE = __build_to_tango_type()
 
 _scalar_to_array_type = {
-    CmdArgType.DevBoolean : CmdArgType.DevVarBooleanArray,
-    CmdArgType.DevUChar : CmdArgType.DevVarCharArray,
-    CmdArgType.DevShort : CmdArgType.DevVarShortArray,
-    CmdArgType.DevUShort : CmdArgType.DevVarUShortArray,
-    CmdArgType.DevInt : CmdArgType.DevVarLongArray,
-    CmdArgType.DevLong : CmdArgType.DevVarLongArray,
-    CmdArgType.DevULong : CmdArgType.DevVarULongArray,
-    CmdArgType.DevLong64 : CmdArgType.DevVarLong64Array,
-    CmdArgType.DevULong64 : CmdArgType.DevVarULong64Array,
-    CmdArgType.DevFloat : CmdArgType.DevVarFloatArray,
-    CmdArgType.DevDouble : CmdArgType.DevVarDoubleArray,
-    CmdArgType.DevString : CmdArgType.DevVarStringArray,
-    CmdArgType.ConstDevString : CmdArgType.DevVarStringArray,
+    CmdArgType.DevBoolean: CmdArgType.DevVarBooleanArray,
+    CmdArgType.DevUChar: CmdArgType.DevVarCharArray,
+    CmdArgType.DevShort: CmdArgType.DevVarShortArray,
+    CmdArgType.DevUShort: CmdArgType.DevVarUShortArray,
+    CmdArgType.DevInt: CmdArgType.DevVarLongArray,
+    CmdArgType.DevLong: CmdArgType.DevVarLongArray,
+    CmdArgType.DevULong: CmdArgType.DevVarULongArray,
+    CmdArgType.DevLong64: CmdArgType.DevVarLong64Array,
+    CmdArgType.DevULong64: CmdArgType.DevVarULong64Array,
+    CmdArgType.DevFloat: CmdArgType.DevVarFloatArray,
+    CmdArgType.DevDouble: CmdArgType.DevVarDoubleArray,
+    CmdArgType.DevString: CmdArgType.DevVarStringArray,
+    CmdArgType.ConstDevString: CmdArgType.DevVarStringArray,
 }
 
 # add derived scalar types to scalar to array map
 for k, v in TO_TANGO_TYPE.items():
     if v in _scalar_to_array_type:
         _scalar_to_array_type[k] = _scalar_to_array_type[v]
-
 
 __NO_STR_VALUE = AlrmValueNotSpec, StatusNotSet
 
@@ -350,7 +349,6 @@ try:
 except NameError:
     __str_klasses = str,
 
-
 __int_klasses = int,
 __number_klasses = numbers.Number,
 __seq_klasses = collections.Sequence, bytearray, StdStringVector
@@ -373,6 +371,7 @@ except NameError:
 
 if constants.NUMPY_SUPPORT:
     import numpy
+
     __int_klasses = tuple(list(__int_klasses) + [numpy.integer])
     __number_klasses = tuple(list(__number_klasses) + [numpy.number])
     __seq_klasses = tuple(list(__seq_klasses) + [numpy.ndarray])
@@ -387,7 +386,7 @@ def __get_tango_type(obj):
     from .device_server import DataElement
     if is_non_str_seq(obj):
         tg_type, tg_format = get_tango_type(obj[0])
-        tg_format = AttrDataFormat(int(tg_format)+1)
+        tg_format = AttrDataFormat(int(tg_format) + 1)
         return tg_type, tg_format
     elif is_pure_str(obj):
         r = CmdArgType.DevString
@@ -518,6 +517,7 @@ def is_scalar(tg_type):
     global _scalar_types
     return tg_type in _scalar_types
 
+
 is_scalar_type = is_scalar
 
 
@@ -532,6 +532,7 @@ def is_array(tg_type):
     """
     global _array_types
     return tg_type in _array_types
+
 
 is_array_type = is_array
 
@@ -555,6 +556,7 @@ def is_numerical(tg_type, inc_array=False):
         return False
     return tg_type in _array_numerical_types
 
+
 is_numerical_type = is_numerical
 
 
@@ -576,6 +578,7 @@ def is_int(tg_type, inc_array=False):
     if not inc_array:
         return False
     return tg_type in _array_int_types
+
 
 is_int_type = is_int
 
@@ -599,6 +602,7 @@ def is_float(tg_type, inc_array=False):
         return False
     return tg_type in _array_float_types
 
+
 is_float_type = is_float
 
 
@@ -620,6 +624,7 @@ def is_bool(tg_type, inc_array=False):
     if not inc_array:
         return False
     return tg_type in _array_bool_types
+
 
 is_bool_type = is_bool
 
@@ -643,6 +648,7 @@ def is_str(tg_type, inc_array=False):
         return False
     return tg_type in _array_str_types
 
+
 is_str_type = is_str
 
 
@@ -660,6 +666,7 @@ def is_bin(tg_type, inc_array=False):
     """
     global _scalar_bin_types
     return tg_type in _scalar_bin_types
+
 
 is_bin_type = is_bin
 
@@ -839,11 +846,10 @@ def seqStr_2_obj(seq, tg_type, tg_format=None):
 
 
 def _seqStr_2_obj_from_type(seq, tg_type):
-
     if is_pure_str(seq):
         seq = seq,
 
-    #    Scalar cases
+    # Scalar cases
     global _scalar_int_types
     if tg_type in _scalar_int_types:
         return int(seq[0])
@@ -1066,6 +1072,7 @@ class CaselessList(list):
     Inherited methods :
     __imul__, __len__, __iter__, pop, reverse, sort
     """
+
     def __init__(self, inlist=[]):
         list.__init__(self)
         for entry in inlist:
@@ -1304,6 +1311,7 @@ class CaselessDict(dict):
     def keys(self):
         return CaselessList(dict.keys(self))
 
+
 __DEFAULT_FACT_IOR_FILE = "/tmp/rdifact.ior"
 __BASE_LINE = "notifd"
 __END_NOTIFD_LINE = "/DEVICE/notifd:"
@@ -1463,9 +1471,9 @@ class EventCallBack(object):
             value = self._get_value(evt)
         except Exception as e:
             value = "Unexpected exception in getting event value: %s" % str(e)
-        d = { "date" : date, "reception_date" : reception_date,
-              "type" : evt_type, "dev_name" : dev_name, "name" : attr_name,
-              "value" : value }
+        d = {"date": date, "reception_date": reception_date,
+             "type": evt_type, "dev_name": dev_name, "name": attr_name,
+             "value": value}
         print(self._msg.format(**d), file=self._fd)
 
     def _append(self, evt):

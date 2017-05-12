@@ -16,7 +16,7 @@ This is an internal PyTango module.
 from __future__ import with_statement
 from __future__ import print_function
 
-__all__ = [ "AttrData" ]
+__all__ = ["AttrData"]
 
 __docformat__ = "restructuredtext"
 
@@ -31,7 +31,7 @@ from .utils import is_non_str_seq, is_pure_str
 class AttrData(object):
     """A helper class that contains the same information one of the items in
     DeviceClass.attr_list but in object form"""
-    
+
     def __init__(self, name, class_name, attr_info=None):
         self.class_name = class_name
         self.attr_name = name
@@ -66,7 +66,7 @@ class AttrData(object):
         self = cls(name, class_name)
         self.build_from_dict(attr_dict)
         return self
-        
+
     def build_from_dict(self, attr_dict):
         self.attr_type = attr_dict.pop('dtype', CmdArgType.DevDouble)
         self.attr_format = attr_dict.pop('dformat', AttrDataFormat.SCALAR)
@@ -76,7 +76,7 @@ class AttrData(object):
         self.polling_period = attr_dict.pop('polling_period', -1)
         self.memorized = attr_dict.pop('memorized', False)
         self.hw_memorized = attr_dict.pop('hw_memorized', False)
-        
+
         is_access_explicit = "access" in attr_dict
         if is_access_explicit:
             self.attr_write = attr_dict.pop('access')
@@ -92,7 +92,7 @@ class AttrData(object):
                 self.attr_write = AttrWriteType.WRITE
             else:
                 self.attr_write = AttrWriteType.READ
-            
+
         fread = attr_dict.pop('fget', attr_dict.pop('fread', None))
         if fread is not None:
             if is_pure_str(fread):
@@ -110,7 +110,7 @@ class AttrData(object):
             if is_pure_str(fisallowed):
                 self.is_allowed_name = fisallowed
             elif inspect.isroutine(fisallowed):
-                self.is_allowed_name = fisallowed.__name__        
+                self.is_allowed_name = fisallowed.__name__
         self.attr_class = attr_dict.pop("klass", self.DftAttrClassMap[self.attr_format])
         self.attr_args.extend((self.attr_name, self.attr_type, self.attr_write))
         if not self.attr_format == AttrDataFormat.SCALAR:
@@ -120,7 +120,7 @@ class AttrData(object):
         if len(attr_dict):
             self.att_prop = self.__create_user_default_attr_prop(attr_dict)
         return self
-    
+
     def _set_name(self, name):
         old_name = self.attr_name
         self.attr_name = name
@@ -132,7 +132,7 @@ class AttrData(object):
                 self.write_method_name = "write_" + name
             if self.is_allowed_name is None:
                 self.is_allowed_name = "is_" + name + "_allowed"
-    
+
     def __throw_exception(self, msg, meth="create_attribute()"):
         Except.throw_exception("PyDs_WrongAttributeDefinition", msg, meth)
 
@@ -143,10 +143,10 @@ class AttrData(object):
         doc = extra_info.pop('doc', None)
         if doc is not None:
             extra_info['description'] = doc
-        
+
         for k, v in extra_info.items():
             k_lower = k.lower()
-            method_name = "set_%s" % k_lower.replace(' ','_')
+            method_name = "set_%s" % k_lower.replace(' ', '_')
             if hasattr(p, method_name):
                 method = getattr(p, method_name)
                 if method_name == 'set_enum_labels':
@@ -168,35 +168,35 @@ class AttrData(object):
         attr_name = self.attr_name
         throw_ex = self.__throw_exception
         # check for well defined attribute info
-        
+
         # check parameter
         if not is_non_str_seq(attr_info):
             throw_ex("Wrong data type for value for describing attribute %s in "
-                     "class %s\nMust be a sequence with 1 or 2 elements" 
+                     "class %s\nMust be a sequence with 1 or 2 elements"
                      % (attr_name, name))
 
         if len(attr_info) < 1 or len(attr_info) > 2:
             throw_ex("Wrong number of argument for describing attribute %s in "
                      "class %s\nMust be a sequence with 1 or 2 elements"
                      % (attr_name, name))
-        
+
         extra_info = {}
         if len(attr_info) == 2:
             # attr_info[1] must be a dictionary
             # extra_info = attr_info[1], with all the keys lowercase
             for k, v in attr_info[1].items():
                 extra_info[k.lower()] = v
-        
+
         attr_info = attr_info[0]
-        
+
         attr_info_len = len(attr_info)
         # check parameter
         if not is_non_str_seq(attr_info) or \
-           attr_info_len < 3 or attr_info_len > 5:
+                        attr_info_len < 3 or attr_info_len > 5:
             throw_ex("Wrong data type for describing mandatory information for "
                      "attribute %s in class %s\nMust be a sequence with 3, 4 "
                      "or 5 elements" % (attr_name, name))
-        
+
         # get data type
         try:
             self.attr_type = CmdArgType(attr_info[0])
@@ -205,7 +205,7 @@ class AttrData(object):
                      "in class %s\nAttribute data type (first element in first "
                      "sequence) must be a tango.CmdArgType"
                      % (attr_name, name))
-        
+
         # get format
         try:
             self.attr_format = AttrDataFormat(attr_info[1])
@@ -214,7 +214,7 @@ class AttrData(object):
                      "in class %s\nAttribute data format (second element in "
                      "first sequence) must be a tango.AttrDataFormat"
                      % (attr_name, name))
-        
+
         if self.attr_format == AttrDataFormat.SCALAR:
             if attr_info_len != 3:
                 throw_ex("Wrong data type in attribute argument for attribute "
@@ -246,7 +246,7 @@ class AttrData(object):
                 throw_ex("Wrong data type in attribute argument for attribute "
                          "%s in class %s\n4th element in sequence describing "
                          "mandatory dim_x attribute parameter for image "
-                         "attribute must be an integer"  % (attr_name, name))
+                         "attribute must be an integer" % (attr_name, name))
             try:
                 self.dim_y = int(attr_info[4])
             except:
@@ -254,8 +254,8 @@ class AttrData(object):
                          "%s in class %s\n5th element in sequence desribing "
                          "mandatory dim_y attribute parameter for image "
                          "attribute must be an integer" % (attr_name, name))
-        
-        #get write type
+
+        # get write type
         try:
             self.attr_write = AttrWriteType(attr_info[2])
         except:
@@ -264,7 +264,7 @@ class AttrData(object):
                      "element in first sequence) must be a "
                      "tango.AttrWriteType" % (attr_name, name))
         try:
-            self.display_level = DispLevel(extra_info.get("display level", 
+            self.display_level = DispLevel(extra_info.get("display level",
                                                           DispLevel.OPERATOR))
         except:
             throw_ex("Wrong display level in attribute information for "
@@ -291,10 +291,10 @@ class AttrData(object):
             self.memorized = True
         else:
             self.memorized = False
-        
+
         if self.attr_type == CmdArgType.DevEnum:
             if not 'enum_labels' in extra_info:
-                throw_ex("Missing 'enum_labels' key in attr_list definition "\
+                throw_ex("Missing 'enum_labels' key in attr_list definition " \
                          "for enum attribute %s in class %s" % (attr_name, name))
             self.enum_labels = extra_info["enum_labels"]
 
@@ -304,12 +304,12 @@ class AttrData(object):
             self.attr_args.append(self.dim_x)
             if not self.attr_format == AttrDataFormat.SPECTRUM:
                 self.attr_args.append(self.dim_y)
-                
+
         att_prop = None
         if extra_info:
             att_prop = self.__create_user_default_attr_prop(extra_info)
         self.att_prop = att_prop
-    
+
     def to_attr(self):
         attr = self.attr_class(*self.attr_args)
         if self.att_prop is not None:
@@ -321,7 +321,7 @@ class AttrData(object):
         if self.polling_period > 0:
             attr.set_polling_period(self.polling_period)
         return attr
-        
-    DftAttrClassMap = { AttrDataFormat.SCALAR : Attr,
-                        AttrDataFormat.SPECTRUM: SpectrumAttr,
-                        AttrDataFormat.IMAGE : ImageAttr }
+
+    DftAttrClassMap = {AttrDataFormat.SCALAR: Attr,
+                       AttrDataFormat.SPECTRUM: SpectrumAttr,
+                       AttrDataFormat.IMAGE: ImageAttr}

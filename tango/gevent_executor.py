@@ -32,7 +32,6 @@ from .green import AbstractExecutor
 
 __all__ = ["get_global_executor", "set_global_executor", "GeventExecutor"]
 
-
 # Global executor
 
 _EXECUTOR = None
@@ -78,6 +77,7 @@ def wrap_errors(func):
             return func(*args, **kwargs)
         except:
             return ExceptionWrapper(*sys.exc_info())
+
     return wrapper
 
 
@@ -102,7 +102,6 @@ def spawn(threadpool, fn, *args, **kwargs):
 # Gevent task and event loop
 
 class GeventTask:
-
     def __init__(self, event, func, *args, **kwargs):
         self.event = event
         self.func = func
@@ -130,7 +129,6 @@ class GeventTask:
 
 
 class GeventLoop:
-
     def __init__(self):
         self.thread_id = get_ident()
         self.tasks = gevent.queue.Queue()

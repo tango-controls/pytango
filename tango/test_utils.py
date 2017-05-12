@@ -56,14 +56,13 @@ if numpy and pytest:
         except ValueError:
             numpy.testing.assert_allclose(a, b)
 
-
 # Pytest fixtures
 
 if pytest:
-
     @pytest.fixture(params=DevState.values.values())
     def state(request):
         return request.param
+
 
     @pytest.fixture(
         params=list(TYPED_VALUES.items()),
@@ -71,9 +70,11 @@ if pytest:
     def typed_values(request):
         return request.param
 
+
     @pytest.fixture(params=GreenMode.values.values())
     def green_mode(request):
         return request.param
+
 
     @pytest.fixture(params=[
         GreenMode.Synchronous,

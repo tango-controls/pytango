@@ -20,7 +20,6 @@ from .green import AbstractExecutor
 
 __all__ = ["FuturesExecutor", "get_global_executor", "set_global_executor"]
 
-
 # Global executor
 
 _EXECUTOR = None

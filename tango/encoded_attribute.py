@@ -27,6 +27,7 @@ from .utils import is_pure_str, is_seq
 if constants.NUMPY_SUPPORT:
     try:
         import numpy
+
         np = numpy
     except:
         np = None
@@ -35,6 +36,7 @@ else:
 
 _allowed_extract = ExtractAs.Numpy, ExtractAs.String, ExtractAs.Tuple, \
                    ExtractAs.List
+
 
 def __EncodedAttribute_encode_jpeg_gray8(self, gray8, width=0, height=0, quality=100.0):
     """Encode a 8 bit grayscale image as JPEG format
@@ -73,6 +75,7 @@ def __EncodedAttribute_encode_jpeg_gray8(self, gray8, width=0, height=0, quality
     """
     self._generic_encode_gray8(gray8, width=width, height=height, quality=quality, format=_ImageFormat.JpegImage)
 
+
 def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
     """Encode a 8 bit grayscale image (no compression)
     
@@ -108,6 +111,7 @@ def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
     """
     self._generic_encode_gray8(gray8, width=width, height=height, format=_ImageFormat.RawImage)
 
+
 def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, quality=0, format=_ImageFormat.RawImage):
     """Internal usage only"""
     if not is_seq(gray8):
@@ -130,10 +134,10 @@ def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, qual
         else:
             if gray8.itemsize != 1:
                 raise TypeError("Expected numpy array with itemsize == 1")
-        if gray8.flags.c_contiguous != True:
+        if not gray8.flags.c_contiguous:
             raise TypeError("Currently, only contiguous, aligned numpy arrays "
                             "are supported")
-        if gray8.flags.aligned != True:
+        if not gray8.flags.aligned:
             raise TypeError("Currently, only contiguous, aligned numpy arrays "
                             "are supported")
 
@@ -152,6 +156,7 @@ def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, qual
         self._encode_gray8(gray8, width, height)
     elif format == _ImageFormat.JpegImage:
         self._encode_jpeg_gray8(gray8, width, height, quality)
+
 
 def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
     """Encode a 16 bit grayscale image (no compression)
@@ -196,7 +201,6 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
             raise ValueError("When giving a string as data, you must also "
                              "supply width and height")
 
-
     if np and isinstance(gray16, np.ndarray):
         if gray16.ndim != 2:
             if not width or not height:
@@ -207,10 +211,10 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
         else:
             if gray16.itemsize != 2:
                 raise TypeError("Expected numpy array with itemsize == 2")
-        if gray16.flags.c_contiguous != True:
+        if not gray16.flags.c_contiguous:
             raise TypeError("Currently, only contiguous, aligned numpy arrays "
                             "are supported")
-        if gray16.flags.aligned != True:
+        if not gray16.flags.aligned:
             raise TypeError("Currently, only contiguous, aligned numpy arrays "
                             "are supported")
 
@@ -228,6 +232,7 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
             width /= 2
 
     self._encode_gray16(gray16, width, height)
+
 
 def __EncodedAttribute_encode_jpeg_rgb24(self, rgb24, width=0, height=0, quality=100.0):
     """Encode a 24 bit rgb color image as JPEG format.
@@ -267,6 +272,7 @@ def __EncodedAttribute_encode_jpeg_rgb24(self, rgb24, width=0, height=0, quality
     """
     self._generic_encode_rgb24(rgb24, width=width, height=height, quality=quality, format=_ImageFormat.JpegImage)
 
+
 def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
     """Encode a 24 bit color image (no compression)
     
@@ -303,6 +309,7 @@ def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
     """
     self._generic_encode_rgb24(rgb24, width=width, height=height, format=_ImageFormat.RawImage)
 
+
 def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, quality=0, format=_ImageFormat.RawImage):
     """Internal usage only"""
     if not is_seq(rgb24):
@@ -325,10 +332,10 @@ def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, qual
         else:
             if rgb24.itemsize != 1:
                 raise TypeError("Expected numpy array with itemsize == 1")
-        if rgb24.flags.c_contiguous != True:
+        if not rgb24.flags.c_contiguous:
             raise TypeError("Currently, only contiguous, aligned numpy arrays "
                             "are supported")
-        if rgb24.flags.aligned != True:
+        if not rgb24.flags.aligned:
             raise TypeError("Currently, only contiguous, aligned numpy arrays "
                             "are supported")
 
@@ -348,6 +355,7 @@ def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, qual
         self._encode_rgb24(rgb24, width, height)
     elif format == _ImageFormat.JpegImage:
         self._encode_jpeg_rgb24(rgb24, width, height, quality)
+
 
 def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality=100.0):
     """Encode a 32 bit rgb color image as JPEG format.
@@ -401,10 +409,10 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
         else:
             if rgb32.itemsize != 4:
                 raise TypeError("Expected numpy array with itemsize == 4")
-        if rgb32.flags.c_contiguous != True:
+        if not rgb32.flags.c_contiguous:
             raise TypeError("Currently, only contiguous, aligned numpy arrays "
                             "are supported")
-        if rgb32.flags.aligned != True:
+        if not rgb32.flags.aligned:
             raise TypeError("Currently, only contiguous, aligned numpy arrays "
                             "are supported")
 
@@ -459,6 +467,7 @@ def __EncodedAttribute_decode_gray8(self, da, extract_as=ExtractAs.Numpy):
         raise TypeError("extract_as must be one of Numpy, String, Tuple, List")
     return self._decode_gray8(da, extract_as)
 
+
 def __EncodedAttribute_decode_gray16(self, da, extract_as=ExtractAs.Numpy):
     """Decode a 16 bits grayscale image (GRAY16) and returns a 16 bits gray scale image.
     
@@ -493,6 +502,7 @@ def __EncodedAttribute_decode_gray16(self, da, extract_as=ExtractAs.Numpy):
     if extract_as not in _allowed_extract:
         raise TypeError("extract_as must be one of Numpy, String, Tuple, List")
     return self._decode_gray16(da, extract_as)
+
 
 def __EncodedAttribute_decode_rgb32(self, da, extract_as=ExtractAs.Numpy):
     """Decode a color image (JPEG_RGB or RGB24) and returns a 32 bits RGB image.
@@ -529,6 +539,7 @@ def __EncodedAttribute_decode_rgb32(self, da, extract_as=ExtractAs.Numpy):
         raise TypeError("extract_as must be one of Numpy, String, Tuple, List")
     return self._decode_rgb32(da, extract_as)
 
+
 def __init_EncodedAttribute():
     EncodedAttribute._generic_encode_gray8 = __EncodedAttribute_generic_encode_gray8
     EncodedAttribute.encode_gray8 = __EncodedAttribute_encode_gray8
@@ -542,8 +553,10 @@ def __init_EncodedAttribute():
     EncodedAttribute.decode_gray16 = __EncodedAttribute_decode_gray16
     EncodedAttribute.decode_rgb32 = __EncodedAttribute_decode_rgb32
 
+
 def __doc_EncodedAttribute():
     pass
+
 
 def encoded_attribute_init(doc=True):
     __init_EncodedAttribute()

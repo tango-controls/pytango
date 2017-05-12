@@ -15,7 +15,7 @@ This is an internal PyTango module.
 
 from __future__ import print_function
 
-__all__ = [ "DeviceClass", "device_class_init" ]
+__all__ = ["DeviceClass", "device_class_init"]
 
 __docformat__ = "restructuredtext"
 
@@ -39,7 +39,7 @@ class PropUtil:
     """An internal Property util class"""
 
     scalar_int_types = (CmdArgType.DevShort, CmdArgType.DevUShort,
-        CmdArgType.DevInt, CmdArgType.DevLong, CmdArgType.DevULong,)
+                        CmdArgType.DevInt, CmdArgType.DevLong, CmdArgType.DevULong,)
 
     scalar_long_types = (CmdArgType.DevLong64, CmdArgType.DevULong64)
 
@@ -50,8 +50,8 @@ class PropUtil:
     scalar_str_types = (CmdArgType.DevString, CmdArgType.ConstDevString,)
 
     scalar_types = scalar_numerical_types + scalar_str_types + \
-        (CmdArgType.DevBoolean, CmdArgType.DevEncoded,
-         CmdArgType.DevUChar, CmdArgType.DevVoid)
+                   (CmdArgType.DevBoolean, CmdArgType.DevEncoded,
+                    CmdArgType.DevUChar, CmdArgType.DevVoid)
 
     def __init__(self):
         self.db = None
@@ -73,15 +73,15 @@ class PropUtil:
         """
         for name in class_prop:
             type = self.get_property_type(name, class_prop)
-            val  = self.get_property_values(name, class_prop)
-            val  = self.values2string(val, type)
+            val = self.get_property_values(name, class_prop)
+            val = self.values2string(val, type)
             desc = self.get_property_description(name, class_prop)
             dev_class.add_wiz_class_prop(name, desc, val)
 
         for name in dev_prop:
             type = self.get_property_type(name, dev_prop)
-            val  = self.get_property_values(name, dev_prop)
-            val  = self.values2string(val, type)
+            val = self.get_property_values(name, dev_prop)
+            val = self.values2string(val, type)
             desc = self.get_property_description(name, dev_prop)
             dev_class.add_wiz_dev_prop(name, desc, val)
 
@@ -107,7 +107,7 @@ class PropUtil:
         # if value defined in database, store it
         for name in class_prop:
             if props[name]:
-                type   = self.get_property_type(name, class_prop)
+                type = self.get_property_type(name, class_prop)
                 values = self.stringArray2values(props[name], type)
                 self.set_property_values(name, class_prop, values)
             else:
@@ -129,7 +129,7 @@ class PropUtil:
         if dev_prop == {} or Util._UseDb == False:
             return
 
-        #    Call database to get properties
+        # Call database to get properties
         props = self.db.get_device_property(dev.get_name(), list(dev_prop.keys()))
         #    if value defined in database, store it
         for name in dev_prop:
@@ -150,7 +150,7 @@ class PropUtil:
                         if not self.is_empty_seq(values):
                             self.set_property_values(name, dev_prop, values)
             else:
-                    #    Try to get it from class property
+                #    Try to get it from class property
                 values = self.get_property_values(name, class_prop)
                 if not self.is_empty_seq(values):
                     if not self.is_seq(values):
@@ -229,7 +229,7 @@ class PropUtil:
                 Return     : (obj) the value for the given property name"""
         try:
             tg_type = self.get_property_type(prop_name, properties)
-            val  = properties[prop_name][2]
+            val = properties[prop_name][2]
         except:
             val = []
 
@@ -274,7 +274,7 @@ def __DeviceClass__init__(self, name):
         for prop_name in self.class_property_list:
             if not hasattr(self, prop_name):
                 setattr(self, prop_name, pu.get_property_values(prop_name,
-                        self.class_property_list))
+                                                                self.class_property_list))
     except DevFailed as df:
         print("PyDS: %s: A Tango error occured in the constructor:" % name)
         Except.print_exception(df)
@@ -282,11 +282,14 @@ def __DeviceClass__init__(self, name):
         print("PyDS: %s: An error occured in the constructor:" % name)
         print(str(e))
 
+
 def __DeviceClass__str__(self):
     return '%s(%s)' % (self.__class__.__name__, self.get_name())
 
+
 def __DeviceClass__repr__(self):
-    return '%s(%s)' % (self.__class__.__name__, self.get_name())    
+    return '%s(%s)' % (self.__class__.__name__, self.get_name())
+
 
 def __throw_create_attribute_exception(msg):
     """
@@ -296,6 +299,7 @@ def __throw_create_attribute_exception(msg):
     Except.throw_exception("PyDs_WrongAttributeDefinition", msg,
                            "create_attribute()")
 
+
 def __throw_create_command_exception(msg):
     """
     Helper method to throw DevFailed exception when inside
@@ -304,12 +308,13 @@ def __throw_create_command_exception(msg):
     Except.throw_exception("PyDs_WrongCommandDefinition", msg,
                            "create_command()")
 
+
 def __DeviceClass__create_user_default_attr_prop(self, attr_name, extra_info):
     """for internal usage only"""
     p = UserDefaultAttrProp()
     for k, v in extra_info.items():
         k_lower = k.lower()
-        method_name = "set_%s" % k_lower.replace(' ','_')
+        method_name = "set_%s" % k_lower.replace(' ', '_')
         if hasattr(p, method_name):
             method = getattr(p, method_name)
             method(str(v))
@@ -322,6 +327,7 @@ def __DeviceClass__create_user_default_attr_prop(self, attr_name, extra_info):
                   "is not recognized!" % (attr_name, name, k)
             self.__throw_create_attribute_exception(msg)
     return p
+
 
 def __DeviceClass__attribute_factory(self, attr_list):
     """for internal usage only"""
@@ -344,6 +350,7 @@ def __DeviceClass__attribute_factory(self, attr_list):
                                attr_data.is_allowed_name,
                                attr_data.att_prop)
 
+
 def __DeviceClass__pipe_factory(self, pipe_list):
     """for internal usage only"""
     for pipe_name, pipe_info in self.pipe_list.items():
@@ -359,6 +366,7 @@ def __DeviceClass__pipe_factory(self, pipe_list):
                           pipe_data.is_allowed_name,
                           pipe_data.pipe_prop)
 
+
 def __DeviceClass__command_factory(self):
     """for internal usage only"""
     name = self.get_name()
@@ -372,6 +380,7 @@ def __DeviceClass__command_factory(self):
 
     for cmd_name, cmd_info in self.cmd_list.items():
         __create_command(self, deviceimpl_class, cmd_name, cmd_info)
+
 
 def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
     """for internal usage only"""
@@ -529,8 +538,10 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
                          display_level, default_command,
                          polling_period, is_allowed_name)
 
+
 def __DeviceClass__new_device(self, klass, dev_class, dev_name):
     return klass(dev_class, dev_name)
+
 
 def __DeviceClass__device_factory(self, device_list):
     """for internal usage only"""
@@ -562,6 +573,7 @@ def __DeviceClass__device_factory(self, device_list):
         else:
             self.export_device(dev, dev.get_name())
     self.py_dev_list += tmp_dev_list
+
 
 def __DeviceClass__create_device(self, device_name, alias=None, cb=None):
     """
@@ -595,6 +607,7 @@ def __DeviceClass__create_device(self, device_name, alias=None, cb=None):
     util = Util.instance()
     util.create_device(self.get_name(), device_name, alias=alias, cb=cb)
 
+
 def __DeviceClass__delete_device(self, device_name):
     """
         delete_device(self, klass_name, device_name) -> None
@@ -616,7 +629,8 @@ def __DeviceClass__delete_device(self, device_name):
     util = Util.instance()
     util.delete_device(self.get_name(), device_name)
 
-def __DeviceClass__dyn_attr(self,device_list):
+
+def __DeviceClass__dyn_attr(self, device_list):
     """
         dyn_attr(self,device_list) -> None
 
@@ -629,7 +643,8 @@ def __DeviceClass__dyn_attr(self,device_list):
         Return     : None"""
     pass
 
-def __DeviceClass__device_destroyer(self,name):
+
+def __DeviceClass__device_destroyer(self, name):
     """for internal usage only"""
     name = name.lower()
     for d in self.py_dev_list:
@@ -643,7 +658,7 @@ def __DeviceClass__device_destroyer(self,name):
             self.py_dev_list.remove(d)
             return
     err_mess = "Device " + name + " not in Tango class device list!"
-    Except.throw_exception("PyAPI_CantDestroyDevice",err_mess,"DeviceClass.device_destroyer")
+    Except.throw_exception("PyAPI_CantDestroyDevice", err_mess, "DeviceClass.device_destroyer")
 
 
 def __DeviceClass__device_name_factory(self, dev_name_list):
@@ -661,7 +676,7 @@ def __DeviceClass__device_name_factory(self, dev_name_list):
         Return     : None"""
     pass
 
-    
+
 def __init_DeviceClass():
     DeviceClass.class_property_list = {}
     DeviceClass.device_property_list = {}
@@ -677,7 +692,7 @@ def __init_DeviceClass():
     DeviceClass._pipe_factory = __DeviceClass__pipe_factory
     DeviceClass._command_factory = __DeviceClass__command_factory
     DeviceClass._new_device = __DeviceClass__new_device
-    
+
     DeviceClass.device_factory = __DeviceClass__device_factory
     DeviceClass.create_device = __DeviceClass__create_device
     DeviceClass.delete_device = __DeviceClass__delete_device
@@ -687,13 +702,12 @@ def __init_DeviceClass():
 
 
 def __doc_DeviceClass():
-
     DeviceClass.__doc__ = """
     Base class for all TANGO device-class class.
     A TANGO device-class class is a class where is stored all
     data/method common to all devices of a TANGO device class
     """
-    
+
     def document_method(method_name, desc, append=True):
         return __document_method(DeviceClass, method_name, desc, append)
 
@@ -707,7 +721,7 @@ def __doc_DeviceClass():
             - corba_dev_name : (str) CORBA device name. Default value is 'Unused'
 
         Return     : None
-    """ )
+    """)
 
     document_method("register_signal", """
     register_signal(self, signo) -> None
@@ -731,7 +745,7 @@ def __doc_DeviceClass():
                             handler is written. A default false value is provided
         
         Return     : None
-    """ )
+    """)
 
     document_method("unregister_signal", """
     unregister_signal(self, signo) -> None
@@ -743,7 +757,7 @@ def __doc_DeviceClass():
         Parameters :
             - signo : (int) signal identifier
         Return     : None
-    """ )
+    """)
 
     document_method("signal_handler", """
     signal_handler(self, signo) -> None
@@ -757,7 +771,7 @@ def __doc_DeviceClass():
         Parameters :
             - signo : (int) signal identifier
         Return     : None
-    """ )
+    """)
 
     document_method("get_name", """
     get_name(self) -> str
@@ -766,7 +780,7 @@ def __doc_DeviceClass():
 
         Parameters : None
         Return     : (str) the TANGO device class name.
-    """ )
+    """)
 
     document_method("get_type", """
     get_type(self) -> str
@@ -775,7 +789,7 @@ def __doc_DeviceClass():
 
         Parameters : None
         Return     : (str) the TANGO device type name
-    """ )
+    """)
 
     document_method("get_doc_url", """
     get_doc_url(self) -> str
@@ -784,7 +798,7 @@ def __doc_DeviceClass():
 
         Parameters : None
         Return     : (str) the TANGO device type name
-    """ )
+    """)
 
     document_method("set_type", """
     set_type(self, dev_type) -> None
@@ -794,7 +808,7 @@ def __doc_DeviceClass():
         Parameters :
             - dev_type : (str) the new TANGO device type name
         Return     : None
-    """ )
+    """)
 
     document_method("get_cvs_tag", """
     get_cvs_tag(self) -> str
@@ -803,7 +817,7 @@ def __doc_DeviceClass():
 
         Parameters : None
         Return     : (str) cvs tag
-    """ )
+    """)
 
     document_method("get_cvs_location", """
     get_cvs_location(self) -> None
@@ -812,7 +826,7 @@ def __doc_DeviceClass():
 
         Parameters : None
         Return     : (str) cvs location
-    """ )
+    """)
 
     document_method("get_device_list", """
     get_device_list(self) -> sequence<tango.DeviceImpl>
@@ -821,7 +835,7 @@ def __doc_DeviceClass():
 
         Parameters : None
         Return     : (sequence<tango.DeviceImpl>) list of tango.DeviceImpl objects for this class
-    """ )
+    """)
 
     document_method("get_command_list", """
     get_command_list(self) -> sequence<tango.Command>
@@ -832,7 +846,7 @@ def __doc_DeviceClass():
         Return     : (sequence<tango.Command>) list of tango.Command objects for this class
         
         New in PyTango 8.0.0
-    """ )
+    """)
 
     document_method("get_cmd_by_name", """
     get_cmd_by_name(self, (str)cmd_name) -> tango.Command
@@ -844,8 +858,8 @@ def __doc_DeviceClass():
         Return     : (tango.Command) tango.Command object
         
         New in PyTango 8.0.0
-    """ )
-    
+    """)
+
     document_method("add_wiz_dev_prop", """
     add_wiz_dev_prop(self, str, str) -> None
     add_wiz_dev_prop(self, str, str, str) -> None
@@ -854,7 +868,7 @@ def __doc_DeviceClass():
 
         Parameters : None
         Return     : None
-    """ )
+    """)
 
     document_method("add_wiz_class_prop", """
     add_wiz_class_prop(self, str, str) -> None
@@ -864,7 +878,8 @@ def __doc_DeviceClass():
 
         Parameters : None
         Return     : None
-    """ )
+    """)
+
 
 def device_class_init(doc=True):
     __init_DeviceClass()

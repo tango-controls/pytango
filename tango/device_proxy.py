@@ -31,11 +31,9 @@ from .utils import dir2
 from .green import green, green_callback
 from .green import get_green_mode
 
-
 __all__ = ["device_proxy_init", "get_device_proxy"]
 
 __docformat__ = "restructuredtext"
-
 
 _UNSUBSCRIBE_LIFETIME = 60
 
@@ -108,10 +106,11 @@ class __TangoInfo(object):
         self.server_id = 'Unknown'
         self.server_version = 1
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Pythonic API: transform tango commands into methods and tango attributes into
 # class members
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 
 
 def __check_read_attribute(dev_attr):
@@ -227,6 +226,7 @@ def __get_command_func(dp, cmd_info, name):
 
     def f(*args, **kwds):
         return dp.command_inout(name, *args, **kwds)
+
     f.__doc__ = doc
     return f
 
@@ -276,6 +276,7 @@ def __DeviceProxy__getattr(self, name):
         return self.read_pipe(name)
 
     raise AttributeError(name)
+
 
 def __DeviceProxy__setattr(self, name, value):
     name_l = name.lower()
@@ -622,7 +623,7 @@ def __DeviceProxy__put_property(self, value):
             new_value.append(db_datum)
         value = new_value
     else:
-        raise TypeError('value must be a tango.DbDatum, tango.DbData,'\
+        raise TypeError('value must be a tango.DbDatum, tango.DbData,' \
                         'a sequence<DbDatum> or a dictionary')
     return self._put_property(value)
 
@@ -659,7 +660,7 @@ def __DeviceProxy__delete_property(self, value):
                     DevFailed from device (DB_SQLError)
     """
     if isinstance(value, DbData) or isinstance(value, StdStringVector) or \
-       is_pure_str(value):
+            is_pure_str(value):
         new_value = value
     elif isinstance(value, DbDatum):
         new_value = DbData()
@@ -679,7 +680,7 @@ def __DeviceProxy__delete_property(self, value):
             else:
                 new_value.append(DbDatum(k))
     else:
-        raise TypeError('value must be a string, tango.DbDatum, '\
+        raise TypeError('value must be a string, tango.DbDatum, ' \
                         'tango.DbData, a sequence or a dictionary')
 
     return self._delete_property(new_value)
@@ -726,6 +727,7 @@ def __DeviceProxy__get_property_list(self, filter, array=None):
         return array
 
     raise TypeError('array must be a mutable sequence<string>')
+
 
 def __DeviceProxy__get_attribute_config(self, value):
     """
@@ -1046,9 +1048,9 @@ def __DeviceProxy__get_event_map(self):
     return self._subscribed_events
 
 
-def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize,
-                                    filters=[], stateless=False, extract_as=ExtractAs.Numpy,
-                                    green_mode=None):
+def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
+                                   filters=[], stateless=False, extract_as=ExtractAs.Numpy,
+                                   green_mode=None):
     """
     subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy) -> int
 
@@ -1118,7 +1120,7 @@ def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize
         cb.push_event = green_callback(
             cb_or_queuesize, obj=self, green_mode=green_mode)
     elif hasattr(cb_or_queuesize, "push_event") and \
-         isinstance(cb_or_queuesize.push_event, collections.Callable):
+            isinstance(cb_or_queuesize.push_event, collections.Callable):
         cb = __CallBackPushEvent()
         cb.push_event = green_callback(
             cb_or_queuesize.push_event, obj=self, green_mode=green_mode)
@@ -1145,9 +1147,7 @@ def __DeviceProxy__subscribe_event (self, attr_name, event_type, cb_or_queuesize
             Please report error to PyTango""")
         desc %= self, attr_name, event_type, event_id, evt_data[2], evt_data[1]
         Except.throw_exception(
-                "Py_InternalError", desc, "DeviceProxy.subscribe_event")
-
-
+            "Py_InternalError", desc, "DeviceProxy.subscribe_event")
 
 
 def __DeviceProxy__unsubscribe_event(self, event_id):
@@ -1235,11 +1235,11 @@ def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractA
         queuesize, event_type, attr_name = self.__get_event_map().get(event_id, (None, None, None))
         if event_type is None:
             raise ValueError("Invalid event_id. You are not subscribed to event %s." % str(event_id))
-        if event_type in ( EventType.CHANGE_EVENT,
-                           EventType.QUALITY_EVENT,
-                           EventType.PERIODIC_EVENT,
-                           EventType.ARCHIVE_EVENT,
-                           EventType.USER_EVENT ):
+        if event_type in (EventType.CHANGE_EVENT,
+                          EventType.QUALITY_EVENT,
+                          EventType.PERIODIC_EVENT,
+                          EventType.ARCHIVE_EVENT,
+                          EventType.USER_EVENT):
             return self.__get_data_events(event_id, extract_as)
         elif event_type in (EventType.ATTR_CONF_EVENT,):
             return self.__get_attr_conf_events(event_id, extract_as)
@@ -1257,7 +1257,8 @@ def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractA
         cb.push_event = callback.push_event
         return self.__get_callback_events(event_id, cb, extract_as)
     else:
-        raise TypeError("Parameter 'callback' should be None, a callable object or an object with a 'push_event' method.")
+        raise TypeError(
+            "Parameter 'callback' should be None, a callable object or an object with a 'push_event' method.")
 
 
 def __DeviceProxy___get_info_(self):
@@ -1495,9 +1496,9 @@ def __doc_DeviceProxy():
 
     """
 
-# ------------------------------------
-#   General methods
-# ------------------------------------
+    # ------------------------------------
+    #   General methods
+    # ------------------------------------
 
     document_method("info", """
     info(self) -> DeviceInfo
@@ -1600,9 +1601,9 @@ def __doc_DeviceProxy():
                 print(black_box(4))
     """)
 
-#-------------------------------------
-#   Device methods
-#-------------------------------------
+    # -------------------------------------
+    #   Device methods
+    # -------------------------------------
 
     document_method("get_command_list", """
     get_command_list(self) -> sequence<str>
@@ -1665,18 +1666,18 @@ def __doc_DeviceProxy():
         is an integer"
     """)
 
-# ------------------------------------
-#   Property methods
-# ------------------------------------
+    # ------------------------------------
+    #   Property methods
+    # ------------------------------------
 
     # get_property -> in code
     # put_property -> in code
     # delete_property -> in code
     # get_property_list -> in code
 
-# ------------------------------------
-#   Attribute methods
-# ------------------------------------
+    # ------------------------------------
+    #   Attribute methods
+    # ------------------------------------
 
     document_method("get_attribute_list", """
     get_attribute_list(self) -> sequence<str>
@@ -1932,9 +1933,9 @@ def __doc_DeviceProxy():
         New in PyTango 9.2.0
     """)
 
-#-------------------------------------
-#   Pipe methods
-#-------------------------------------
+    # -------------------------------------
+    #   Pipe methods
+    # -------------------------------------
 
     document_method("read_pipe", """
     read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> tuple
@@ -1974,9 +1975,9 @@ def __doc_DeviceProxy():
 
     document_method("write_pipe", """TODO""")
 
-#-------------------------------------
-#   History methods
-#-------------------------------------
+    # -------------------------------------
+    #   History methods
+    # -------------------------------------
     document_method("command_history", """
     command_history(self, cmd_name, depth) -> sequence<DeviceDataHistory>
 
@@ -2009,9 +2010,9 @@ def __doc_DeviceProxy():
                      CommunicationFailed, DevFailed from device
     """)
 
-#-------------------------------------
-#   Polling administration methods
-#-------------------------------------
+    # -------------------------------------
+    #   Polling administration methods
+    # -------------------------------------
 
     document_method("polling_status", """
     polling_status(self) -> sequence<str>
@@ -2113,9 +2114,9 @@ def __doc_DeviceProxy():
         Return     : None
     """)
 
-#-------------------------------------
-#   Asynchronous methods
-#-------------------------------------
+    # -------------------------------------
+    #   Asynchronous methods
+    # -------------------------------------
 
     # read_attribute_asynch -> in code
     # read_attributes_asynch -> in code
@@ -2213,9 +2214,9 @@ def __doc_DeviceProxy():
         New in PyTango 7.0.0
     """)
 
-# ------------------------------------
-#   Logging administration methods
-# ------------------------------------
+    # ------------------------------------
+    #   Logging administration methods
+    # ------------------------------------
 
     document_method("add_logging_target", """
     add_logging_target(self, target_type_target_name) -> None
@@ -2315,9 +2316,9 @@ def __doc_DeviceProxy():
         New in PyTango 7.0.0
     """)
 
-# ------------------------------------
-#   Event methods
-# ------------------------------------
+    # ------------------------------------
+    #   Event methods
+    # ------------------------------------
 
     # subscribe_event -> in code
     # unsubscribe_event -> in code
@@ -2377,9 +2378,9 @@ def __doc_DeviceProxy():
             New in PyTango 7.0.0
     """)
 
-# ------------------------------------
-#   Locking methods
-# ------------------------------------
+    # ------------------------------------
+    #   Locking methods
+    # ------------------------------------
     document_method("lock", """
     lock(self, (int)lock_validity) -> None
 

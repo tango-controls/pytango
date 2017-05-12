@@ -34,7 +34,6 @@ from .utils import scalar_to_array_type, TO_TANGO_TYPE
 from .green import get_green_mode, get_executor
 from .pyutil import Util
 
-
 __all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
            "command", "pipe", "device_property", "class_property",
            "run", "server_run", "Server"]
@@ -363,6 +362,7 @@ def __patch_standard_device_methods(klass):
     @functools.wraps(init_device_orig)
     def init_device(self):
         return get_worker().execute(init_device_orig, self)
+
     setattr(klass, "init_device", init_device)
 
     delete_device_orig = klass.delete_device
@@ -370,6 +370,7 @@ def __patch_standard_device_methods(klass):
     @functools.wraps(delete_device_orig)
     def delete_device(self):
         return get_worker().execute(delete_device_orig, self)
+
     setattr(klass, "delete_device", delete_device)
 
     dev_state_orig = klass.dev_state
@@ -377,6 +378,7 @@ def __patch_standard_device_methods(klass):
     @functools.wraps(dev_state_orig)
     def dev_state(self):
         return get_worker().execute(dev_state_orig, self)
+
     setattr(klass, "dev_state", dev_state)
 
     dev_status_orig = klass.dev_status
@@ -384,6 +386,7 @@ def __patch_standard_device_methods(klass):
     @functools.wraps(dev_status_orig)
     def dev_status(self):
         return get_worker().execute(dev_status_orig, self)
+
     setattr(klass, "dev_status", dev_status)
 
     read_attr_hardware_orig = klass.read_attr_hardware
@@ -391,6 +394,7 @@ def __patch_standard_device_methods(klass):
     @functools.wraps(read_attr_hardware_orig)
     def read_attr_hardware(self, attr_list):
         return get_worker().execute(read_attr_hardware_orig, self, attr_list)
+
     setattr(klass, "read_attr_hardware", read_attr_hardware)
 
     always_executed_hook_orig = klass.always_executed_hook
@@ -398,11 +402,11 @@ def __patch_standard_device_methods(klass):
     @functools.wraps(always_executed_hook_orig)
     def always_executed_hook(self):
         return get_worker().execute(always_executed_hook_orig, self)
+
     setattr(klass, "always_executed_hook", always_executed_hook)
 
 
 class _DeviceClass(DeviceClass):
-
     def __init__(self, name):
         DeviceClass.__init__(self, name)
         self.set_type(name)
@@ -485,7 +489,7 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
 
 
 def _init_tango_device_klass(tango_device_klass, attrs=None,
-                              tango_class_name=None):
+                             tango_class_name=None):
     klass_name = tango_device_klass.__name__
     tango_deviceclass_klass = __create_tango_deviceclass_klass(
         tango_device_klass, attrs=attrs)
@@ -574,6 +578,7 @@ class BaseDevice(LatestDeviceImpl):
 
     def delete_device(self):
         pass
+
     delete_device.__doc__ = LatestDeviceImpl.delete_device.__doc__
 
     def read_attr_hardware(self, attr_list):
@@ -608,7 +613,7 @@ class BaseDevice(LatestDeviceImpl):
                     prop_name, self.device_property_list)
                 self._tango_properties[prop_name] = value
         except DevFailed as df:
-            print(80*"-")
+            print(80 * "-")
             print(df)
             raise df
 
@@ -1123,7 +1128,6 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
 
 
 class _BaseProperty(object):
-
     def __init__(self, dtype, doc='', default_value=None, update_db=False):
         self.name = None
         self.__value = None
@@ -1497,7 +1501,6 @@ Device = DeviceMeta("Device", (BaseDevice,), {'__doc__': """\
 
     All device specific classes should inherit from this class.
     """})
-
 
 # Avoid circular imports
 from .tango_object import Server

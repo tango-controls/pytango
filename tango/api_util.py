@@ -21,12 +21,13 @@ from ._tango import ApiUtil
 
 from .utils import document_method, document_static_method, _get_env_var
 
+
 def __init_api_util():
     if not hasattr(ApiUtil, "get_env_var"):
         ApiUtil.get_env_var = staticmethod(_get_env_var)
 
+
 def __doc_api_util():
-    
     ApiUtil.__doc__ = """
     This class allows you to access the tango syncronization model API.
     It is designed as a singleton. To get a reference to the singleton object
@@ -37,7 +38,7 @@ def __doc_api_util():
         
     New in PyTango 7.1.3
     """
-    
+
     document_static_method(ApiUtil, "instance", """
     instance() -> ApiUtil
 
@@ -47,7 +48,7 @@ def __doc_api_util():
         Return     : (ApiUtil) a reference to the ApiUtil singleton object.
 
         New in PyTango 7.1.3
-    """ )
+    """)
 
     document_method(ApiUtil, "pending_asynch_call", """
     pending_asynch_call(self, req) -> int
@@ -65,8 +66,8 @@ def __doc_api_util():
         Return     : (int) the number of pending requests for the given type
 
         New in PyTango 7.1.3
-    """ )
-    
+    """)
+
     document_method(ApiUtil, "get_asynch_replies", """
     get_asynch_replies(self) -> None
 
@@ -102,7 +103,7 @@ def __doc_api_util():
                      callback methods.
         
         New in PyTango 7.1.3
-    """ )
+    """)
 
     document_method(ApiUtil, "set_asynch_cb_sub_model", """
     set_asynch_cb_sub_model(self, model) -> None
@@ -118,7 +119,7 @@ def __doc_api_util():
         Return     : None
 
         New in PyTango 7.1.3
-    """ )
+    """)
 
     document_method(ApiUtil, "get_asynch_cb_sub_model", """
     get_asynch_cb_sub_model(self) -> cb_sub_model
@@ -129,7 +130,8 @@ def __doc_api_util():
         Return     : (cb_sub_model) the active asynchronous callback sub-model.
 
         New in PyTango 7.1.3
-    """ )
+    """)
+
 
 def api_util_init(doc=True):
     __init_api_util()

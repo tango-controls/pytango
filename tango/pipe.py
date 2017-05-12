@@ -11,8 +11,6 @@
 
 __all__ = ['PipeConfig']
 
-
-
 from ._tango import Pipe, PipeWriteType, UserDefaultPipeProp, \
     AttrDataFormat, CmdArgType, DevState, DispLevel, constants
 
@@ -38,8 +36,8 @@ class PipeConfig(object):
 def __get_pipe_type_simple(obj):
     if is_non_str_seq(obj):
         if len(obj) == 2 and \
-           is_pure_str(obj[0]) and \
-           (is_non_str_seq(obj[1]) or isinstance(obj[1], dict)):
+                is_pure_str(obj[0]) and \
+                (is_non_str_seq(obj[1]) or isinstance(obj[1], dict)):
             tg_type = CmdArgType.DevPipeBlob
         else:
             tg_type = __get_pipe_type(obj[0])
@@ -58,7 +56,7 @@ def __get_pipe_type_simple(obj):
         raise ValueError('Cannot determine object tango type')
     return tg_type
 
-    
+
 def __get_pipe_type_numpy_support(obj):
     import numpy
     try:
@@ -149,8 +147,8 @@ def __doc_UserDefaultPipeProp():
         Parameters :
             - def_label : (str) the user default label property 
         Return     : None
-    """ )
-    
+    """)
+
     document_method("set_description", """
     set_description(self, def_description) -> None
 
@@ -159,10 +157,10 @@ def __doc_UserDefaultPipeProp():
         Parameters : 
             - def_description : (str) the user default description property 
         Return     : None
-    """ )
+    """)
 
 
 def pipe_init(doc=True):
     __init_Pipe()
     if doc:
-        __doc_UserDefaultPipeProp()        
+        __doc_UserDefaultPipeProp()

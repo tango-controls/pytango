@@ -41,7 +41,6 @@ def check_requirements():
 
 check_requirements()
 
-
 DeviceProxy = partial(get_device_proxy, green_mode=GreenMode.Gevent)
 DeviceProxy.__doc__ = """
     DeviceProxy(self, dev_name, wait=True, timeout=True) -> DeviceProxy

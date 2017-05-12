@@ -30,7 +30,6 @@ from .attr_data import AttrData
 
 from .log4tango import TangoStream
 
-
 __docformat__ = "restructuredtext"
 
 __all__ = ["ChangeEventProp", "PeriodicEventProp",
@@ -70,6 +69,7 @@ class ChangeEventProp(object):
         self.rel_change = ''
         self.abs_change = ''
         self.extensions = []
+
 
 class PeriodicEventProp(object):
     """This class represents the python interface for the Tango IDL object
@@ -295,7 +295,7 @@ def __DeviceImpl__get_device_properties(self, ds_class=None):
         for prop_name in self.device_property_list:
             setattr(self, prop_name, self.prop_util.get_property_values(prop_name, self.device_property_list))
     except DevFailed as df:
-        print(80*"-")
+        print(80 * "-")
         print(df)
         raise df
 
@@ -448,6 +448,7 @@ def __DeviceImpl__info_stream(self, msg, *args):
     """
     self.__info_stream(msg % args)
 
+
 def __DeviceImpl__warn_stream(self, msg, *args):
     """
     warn_stream(self, msg, *args) -> None
@@ -463,6 +464,7 @@ def __DeviceImpl__warn_stream(self, msg, *args):
         Return     : None
     """
     self.__warn_stream(msg % args)
+
 
 def __DeviceImpl__error_stream(self, msg, *args):
     """
@@ -749,7 +751,7 @@ def __doc_DeviceImpl():
         Parameters : None
         Return     : (DevState) the device's previous state
 
-    """ )
+    """)
 
     document_method("get_name", """
     get_name(self) -> (str)
@@ -1872,19 +1874,19 @@ def __doc_WAttribute():
         Return     : (int) the new value data length
     """)
 
-#    document_method("set_write_value", """
-#    set_write_value(self, data, dim_x = 1, dim_y = 0) -> None
-#
-#            Set the writable attribute value.
-#
-#        Parameters :
-#            - data : the data to be set. Data must be compatible with the attribute type and format.
-#                     for SPECTRUM and IMAGE attributes, data can be any type of sequence of elements
-#                     compatible with the attribute type
-#            - dim_x : (int) the attribute set value x length. Default value is 1
-#            - dim_y : (int) the attribute set value y length. Default value is 0
-#        Return     : None
-#    """)
+    #    document_method("set_write_value", """
+    #    set_write_value(self, data, dim_x = 1, dim_y = 0) -> None
+    #
+    #            Set the writable attribute value.
+    #
+    #        Parameters :
+    #            - data : the data to be set. Data must be compatible with the attribute type and format.
+    #                     for SPECTRUM and IMAGE attributes, data can be any type of sequence of elements
+    #                     compatible with the attribute type
+    #            - dim_x : (int) the attribute set value x length. Default value is 1
+    #            - dim_y : (int) the attribute set value y length. Default value is 0
+    #        Return     : None
+    #    """)
 
     document_method("get_write_value", """
     get_write_value(self, lst) -> None  <= DEPRECATED
@@ -1897,6 +1899,7 @@ def __doc_WAttribute():
             - lst : [out] (list) a list object that will be filled with the attribute write value (DEPRECATED)
         Return     : (obj) the attribute write value.
     """)
+
 
 def __doc_MultiClassAttribute():
     def document_method(method_name, desc, append=True):
@@ -1947,6 +1950,7 @@ def __doc_MultiClassAttribute():
 
         New in PyTango 7.2.1
     """)
+
 
 def __doc_MultiAttribute():
     def document_method(method_name, desc, append=True):
@@ -2082,6 +2086,7 @@ def __doc_MultiAttribute():
 
         New in PyTango 7.2.1
     """)
+
 
 def __doc_Attr():
     def document_method(method_name, desc, append=True):
@@ -2381,6 +2386,7 @@ def __doc_Attr():
             - props : (StdAttrPropertyVector) new class level attribute properties
         Return     : None
     """)
+
 
 def __doc_UserDefaultAttrProp():
     def document_method(method_name, desc, append=True):

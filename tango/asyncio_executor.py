@@ -14,11 +14,11 @@ from __future__ import absolute_import
 
 # Imports
 import functools
+
 try:
     from threading import get_ident
 except:
     from threading import _get_ident as get_ident
-
 
 # Asyncio imports
 try:
@@ -30,17 +30,14 @@ try:
 except ImportError:
     from .asyncio_tools import run_coroutine_threadsafe
 
-
 # Tango imports
 from .green import AbstractExecutor
 
 __all__ = ["AsyncioExecutor", "get_global_executor", "set_global_executor"]
 
-
 # Asyncio compatibility
 
 ensure_future = getattr(asyncio, 'ensure_future', getattr(asyncio, 'async'))
-
 
 # Global executor
 

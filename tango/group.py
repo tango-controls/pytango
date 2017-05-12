@@ -169,15 +169,16 @@ def __init_proxy_Group():
     def proxy_call_define(fname):
         def fn(self, *args, **kwds):
             return getattr(self._Group__group, fname)(*args, **kwds)
+
         fn.__doc__ = getattr(_RealGroup, fname).__doc__
         setattr(Group, fname, fn)
 
     for fname in proxy_methods:
         proxy_call_define(fname)
 
-    # Group.add.__func__.__doc__ = _RealGroup.add.__doc__
-    # Group.get_group.__func__.__doc__ = _RealGroup.get_group.__doc__
-    # Group.__doc__ = _RealGroup.__doc__
+        # Group.add.__func__.__doc__ = _RealGroup.add.__doc__
+        # Group.get_group.__func__.__doc__ = _RealGroup.get_group.__doc__
+        # Group.__doc__ = _RealGroup.__doc__
 
 
 def __doc_Group():
@@ -259,13 +260,13 @@ def __doc_Group():
         Return     : None
 
         Throws     :
-    """ )
+    """)
 
     document_method("remove_all", """
     remove_all(self) -> None
 
         Removes all elements in the _RealGroup. After such a call, the _RealGroup is empty.
-    """ )
+    """)
 
     document_method("contains", """
     contains(self, pattern, forward=True) -> bool
@@ -283,7 +284,6 @@ def __doc_Group():
 
         Throws     :
     """)
-
 
     document_method("get_device", """
     get_device(self, dev_name) -> DeviceProxy
@@ -439,7 +439,7 @@ def __doc_Group():
         New in PyTango 7.0.0
     """)
 
-# Tango methods (~ DeviceProxy interface)
+    # Tango methods (~ DeviceProxy interface)
     document_method("ping", """
     ping(self, forward=True) -> bool
 
@@ -541,7 +541,7 @@ def __doc_Group():
                     Group.read_attribute_reply() to obtain the results.
 
         Throws     :
-    """ )
+    """)
 
     document_method("read_attributes_asynch", """
     read_attributes_asynch(self, attr_names, forward=True, reserved=-1 ) -> int
@@ -561,7 +561,7 @@ def __doc_Group():
                     Group.read_attributes_reply() to obtain the results.
 
         Throws     :
-    """ )
+    """)
 
     document_method("read_attribute_reply", """
     read_attribute_reply(self, req_id, timeout_ms=0 ) -> sequence<GroupAttrReply>

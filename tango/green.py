@@ -59,7 +59,6 @@ def get_green_mode():
 # Abstract executor class
 
 class AbstractExecutor(object):
-
     asynchronous = NotImplemented
     default_wait = NotImplemented
 
@@ -103,7 +102,6 @@ class AbstractExecutor(object):
 
 
 class SynchronousExecutor(AbstractExecutor):
-
     asynchronous = False
     default_wait = True
 
@@ -112,6 +110,7 @@ class SynchronousExecutor(AbstractExecutor):
 
 def get_synchronous_executor():
     return _SYNCHRONOUS_EXECUTOR
+
 
 _SYNCHRONOUS_EXECUTOR = SynchronousExecutor()
 
@@ -172,7 +171,6 @@ def green(fn=None, consume_green_mode=True):
     """Make a function green. Can be used as a decorator."""
 
     def decorator(fn):
-
         @wraps(fn)
         def greener(obj, *args, **kwargs):
             args = (obj,) + args
