@@ -244,6 +244,8 @@ rst_epilog = """\
 .. _asyncio: https://asyncio.readthedocs.io/en/latest/
 .. _boost-python: http://www.boost.org/libs/python
 .. _PyPi: https://pypi.python.org/pypi/pytango
+.. _issues: https://github.com/tango-controls/pytango/issues
+.. _PRs: https://github.com/tango-controls/pytango/pulls
 
 """
 

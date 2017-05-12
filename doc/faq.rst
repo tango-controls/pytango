@@ -15,14 +15,14 @@ Please also check the `general tango how to <http://www.tango-controls.org/resou
 
 Bug reports are very valuable for the community.
 
-Please open a new issue on the `github issue page <https://github.com/tango-cs/pytango/issues>`_.
+Please open a new issue on the GitHub issues_ page.
 
 
 **How can I contribute to PyTango and the documentation?**
 
 Contribution are always welcome!
 
-You can open pull requests on the `github PR page <https://github.com/tango-cs/pytango/pulls>`_.
+You can open pull requests on the GitHub PRs_ page.
 
 
 **I got a libbost_python error when I try to import tango module...**
