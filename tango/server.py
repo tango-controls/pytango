@@ -481,7 +481,7 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
                           device_property_list=device_property_list,
                           cmd_list=cmd_list, attr_list=attr_list,
                           pipe_list=pipe_list)
-    return type(devclass_name, (_DeviceClass,), devclass_attrs)
+    return type(_DeviceClass)(devclass_name, (_DeviceClass,), devclass_attrs)
 
 
 def _init_tango_device_klass(tango_device_klass, attrs=None,
