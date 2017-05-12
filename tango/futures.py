@@ -30,7 +30,7 @@ def check_requirements():
             raise ImportError("No module named concurrent. You need to " \
                               "install the futures backport module to have " \
                               "access to PyTango futures green mode")
-                              
+
 
 check_requirements()
 

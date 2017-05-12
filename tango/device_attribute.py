@@ -22,23 +22,32 @@ import copy
 from .utils import document_method as __document_method
 from ._tango import DeviceAttribute, ExtractAs
 
+
 def __DeviceAttribute__get_data(self):
     return self.get_data_raw().extract()
+
 
 def __DeviceAttribute__init(self, da=None):
     if da is None:
         DeviceAttribute.__init_orig(self)
     else:
         DeviceAttribute.__init_orig(self, da)
-        try: self.value = copy.deepcopy(da.value)
-        except: pass
-        try: self.w_value = copy.deepcopy(da.w_value)
-        except: pass
-        try: self.scalar_w_value = da.scalar_w_value
-        except: pass
+        try:
+            self.value = copy.deepcopy(da.value)
+        except:
+            pass
+        try:
+            self.w_value = copy.deepcopy(da.w_value)
+        except:
+            pass
+        try:
+            self.scalar_w_value = da.scalar_w_value
+        except:
+            pass
         self.type = da.type
         self.is_empty = da.is_empty
         self.has_failed = da.has_failed
+
 
 def __doc_DeviceAttribute():
     def document_method(method_name, desc, append=True):
@@ -84,7 +93,7 @@ def __doc_DeviceAttribute():
         
         Parameters : None
         Return     : (TimeVal) The attribute read timestamp.
-    """ )
+    """)
 
     document_method("get_err_stack", """
     get_err_stack(self) -> sequence<DevError>
@@ -94,7 +103,7 @@ def __doc_DeviceAttribute():
 
         Parameters : None
         Return     : (sequence<DevError>)
-    """ )
+    """)
 
     document_method("set_w_dim_x", """
     set_w_dim_x(self, val) -> None
@@ -107,7 +116,7 @@ def __doc_DeviceAttribute():
         Return     : None
         
         New in PyTango 8.0.0
-    """ )
+    """)
 
     document_method("set_w_dim_y", """
     set_w_dim_y(self, val) -> None
@@ -120,12 +129,14 @@ def __doc_DeviceAttribute():
         Return     : None
         
         New in PyTango 8.0.0
-    """ )
-    
+    """)
+
+
 def __init_DeviceAttribute():
     DeviceAttribute.__init_orig = DeviceAttribute.__init__
     DeviceAttribute.__init__ = __DeviceAttribute__init
     DeviceAttribute.ExtractAs = ExtractAs
+
 
 def device_attribute_init(doc=True):
     __init_DeviceAttribute()

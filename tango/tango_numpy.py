@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = [ "NumpyType", "numpy_type", "numpy_spectrum", "numpy_image" ]
+__all__ = ["NumpyType", "numpy_type", "numpy_spectrum", "numpy_image"]
 
 __docformat__ = "restructuredtext"
 
@@ -23,6 +23,7 @@ from ._tango import constants
 from .attribute_proxy import AttributeProxy
 import collections
 
+
 def _numpy_invalid(*args, **kwds):
     Except.throw_exception(
         "PyTango_InvalidConversion",
@@ -30,10 +31,11 @@ def _numpy_invalid(*args, **kwds):
         "NumpyType.tango_to_numpy"
     )
 
+
 def _define_numpy():
     if not constants.NUMPY_SUPPORT:
         return None, _numpy_invalid, _numpy_invalid, _numpy_invalid
-    
+
     try:
         import numpy
         import operator
@@ -72,7 +74,7 @@ def _define_numpy():
             def tango_to_numpy(param):
                 if isinstance(param, ArgType):
                     tg_type = param
-                if isinstance(param, AttributeInfo): # or AttributeInfoEx
+                if isinstance(param, AttributeInfo):  # or AttributeInfoEx
                     tg_type = param.data_type
                 elif isinstance(param, Attribute):
                     tg_type = param.get_data_type()
@@ -134,11 +136,12 @@ def _define_numpy():
                 if dim_y is None:
                     return numpy.array(dim_x, dtype=np_type)
                 else:
-                    return numpy.ndarray(shape=(dim_y,dim_x,), dtype=np_type)
-        
+                    return numpy.ndarray(shape=(dim_y, dim_x,), dtype=np_type)
+
         return NumpyType, NumpyType.spectrum, \
-            NumpyType.image, NumpyType.tango_to_numpy
+               NumpyType.image, NumpyType.tango_to_numpy
     except Exception:
         return None, _numpy_invalid, _numpy_invalid, _numpy_invalid
+
 
 NumpyType, numpy_spectrum, numpy_image, numpy_type = _define_numpy()

@@ -26,15 +26,15 @@ Example::
             attr.set_value(self._current)
 """
 
-__all__ = [ "TangoStream", "LogIt", "DebugIt", "InfoIt", "WarnIt", 
-            "ErrorIt", "FatalIt" ]
+__all__ = ["TangoStream", "LogIt", "DebugIt", "InfoIt", "WarnIt",
+           "ErrorIt", "FatalIt"]
 
 __docformat__ = "restructuredtext"
 
 import functools
 
+
 class TangoStream:
-    
     def __init__(self, fn):
         self._fn = fn
         self._accum = ""
@@ -47,12 +47,12 @@ class TangoStream:
                 self.flush()
         except ValueError:
             pass
-        
+
     def flush(self):
         b = self._accum
         if b is None or len(self._accum) == 0:
             return
-        #take the '\n' because the log adds it
+        # take the '\n' because the log adds it
         if b[-1] == '\n': b = b[:-1]
         self._fn(b)
         self._accum = ""
@@ -80,7 +80,7 @@ class LogIt(object):
         * show_kwargs - shows keyword method arguments in log message (defaults to False)
         * show_ret - shows return value in log message (defaults to False)
     """
-    
+
     def __init__(self, show_args=False, show_kwargs=False, show_ret=False):
         """Initializes de LogIt object.
             
@@ -95,7 +95,7 @@ class LogIt(object):
     def __compact_elem(self, v, maxlen=25):
         v = repr(v)
         if len(v) > maxlen:
-            v = v[:maxlen-6] + " [...]"
+            v = v[:maxlen - 6] + " [...]"
         return v
 
     def __compact_elems(self, elems):
@@ -110,7 +110,7 @@ class LogIt(object):
         return "%s=%s" % (k, self.__compact(v, maxlen=maxlen))
 
     def __compact_dict(self, d, maxlen=None):
-        return ( self.__compact_item(k,v) for k,v in d.items() )
+        return (self.__compact_item(k, v) for k, v in d.items())
 
     def __compact_dict_str(self, d, maxlen=None):
         return ", ".join(self.__compact_dict(d, maxlen=maxlen))
@@ -148,6 +148,7 @@ class LogIt(object):
                     if self._show_ret:
                         sret = self.__compact_elem(ret) + " "
                     log("{0}<- {1}()".format(sret, f_name))
+
         log_stream._wrapped = f
         return log_stream
 
@@ -228,7 +229,7 @@ class WarnIt(LogIt):
         * show_kwargs - shows keyword method arguments in log message (defaults to False)
         * show_ret - shows return value in log message (defaults to False)
     """
-    
+
     def is_enabled(self, d):
         return d.get_logger().is_warn_enabled()
 
@@ -256,7 +257,7 @@ class ErrorIt(LogIt):
         * show_kwargs - shows keyword method arguments in log message (defaults to False)
         * show_ret - shows return value in log message (defaults to False)
     """
-    
+
     def is_enabled(self, d):
         return d.get_logger().is_error_enabled()
 
@@ -284,7 +285,7 @@ class FatalIt(LogIt):
         * show_kwargs - shows keyword method arguments in log message (defaults to False)
         * show_ret - shows return value in log message (defaults to False)
     """
-    
+
     def is_enabled(self, d):
         return d.get_logger().is_fatal_enabled()
 

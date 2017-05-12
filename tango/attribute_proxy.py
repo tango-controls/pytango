@@ -146,6 +146,7 @@ def __AttributeProxy__get_property(self, propname, value=None):
             self._get_property(new_value)
             return DbData_2_dict(new_value)
 
+
 def __AttributeProxy__put_property(self, value):
     """
     put_property(self, value) -> None
@@ -195,9 +196,10 @@ def __AttributeProxy__put_property(self, value):
             new_value.append(db_datum)
         value = new_value
     else:
-        raise TypeError('value must be a tango.DbDatum, tango.DbData,'\
+        raise TypeError('value must be a tango.DbDatum, tango.DbData,' \
                         'a sequence<DbDatum> or a dictionary')
     return self._put_property(value)
+
 
 def __AttributeProxy__delete_property(self, value):
     """
@@ -235,7 +237,7 @@ def __AttributeProxy__delete_property(self, value):
                     DevFailed from device (DB_SQLError)
     """
     if isinstance(value, DbData) or isinstance(value, StdStringVector) or \
-       is_pure_str(value):
+            is_pure_str(value):
         new_value = value
     elif isinstance(value, DbDatum):
         new_value = DbData()
@@ -255,10 +257,11 @@ def __AttributeProxy__delete_property(self, value):
             else:
                 new_value.append(DbDatum(k))
     else:
-        raise TypeError('value must be a string, tango.DbDatum, '\
+        raise TypeError('value must be a string, tango.DbDatum, ' \
                         'tango.DbData, a sequence or a dictionary')
 
     return self._delete_property(new_value)
+
 
 # It is easier to reimplement AttributeProxy in python using DeviceProxy than
 # wrapping C++ AttributeProxy. However I still rely in the original
@@ -281,6 +284,7 @@ class AttributeProxy(object):
         Note: PyTango implementation of AttributeProxy is in part a
         python reimplementation of the AttributeProxy found on the C++ API.
     """
+
     def __init__(self, *args, **kwds):
         green_mode = kwds.pop('green_mode', get_green_mode())
         self.__attr_proxy = _AttributeProxy(*args, **kwds)
@@ -319,90 +323,97 @@ class AttributeProxy(object):
     def __repr__(self):
         return "AttributeProxy(%s)" % self.name()
 
+
 def _method_dev_and_name(dp_fn_name, doc=True):
     def __new_fn(self, *args, **kwds):
         return getattr(self._AttributeProxy__dev_proxy, dp_fn_name)(self.name(), *args, **kwds)
+
     if doc:
-        __new_fn.__doc__ =  "This method is a simple way to do:\n" + \
-                            "\tself.get_device_proxy()."+dp_fn_name+ \
-                            "(self.name(), ...)\n\n" + \
-                            "For convenience, here is the documentation of DeviceProxy." + \
-                            dp_fn_name + "(...):\n" + \
-                            str(getattr(DeviceProxy, dp_fn_name).__doc__)
+        __new_fn.__doc__ = "This method is a simple way to do:\n" + \
+                           "\tself.get_device_proxy()." + dp_fn_name + \
+                           "(self.name(), ...)\n\n" + \
+                           "For convenience, here is the documentation of DeviceProxy." + \
+                           dp_fn_name + "(...):\n" + \
+                           str(getattr(DeviceProxy, dp_fn_name).__doc__)
     __new_fn.__name__ = dp_fn_name
     return __new_fn
+
 
 def _method_device(dp_fn_name, doc=True):
     def __new_fn(self, *args, **kwds):
         return getattr(self._AttributeProxy__dev_proxy, dp_fn_name)(*args, **kwds)
+
     if doc:
-        __new_fn.__doc__ =  "This method is a simple way to do:\n" + \
-                            "\tself.get_device_proxy()."+dp_fn_name+ \
-                            "(...)\n\n" + \
-                            "For convenience, here is the documentation of DeviceProxy." + \
-                            dp_fn_name + "(...):\n" + \
-                            str(getattr(DeviceProxy, dp_fn_name).__doc__)
+        __new_fn.__doc__ = "This method is a simple way to do:\n" + \
+                           "\tself.get_device_proxy()." + dp_fn_name + \
+                           "(...)\n\n" + \
+                           "For convenience, here is the documentation of DeviceProxy." + \
+                           dp_fn_name + "(...):\n" + \
+                           str(getattr(DeviceProxy, dp_fn_name).__doc__)
     __new_fn.__name__ = dp_fn_name
     return __new_fn
+
 
 def _method_attribute(dp_fn_name, doc=True):
     def __new_fn(self, *args, **kwds):
         return getattr(self._AttributeProxy__attr_proxy, dp_fn_name)(*args, **kwds)
+
     if doc:
-        __new_fn.__doc__ =  getattr(_AttributeProxy, dp_fn_name).__doc__
+        __new_fn.__doc__ = getattr(_AttributeProxy, dp_fn_name).__doc__
     __new_fn.__name__ = dp_fn_name
     return __new_fn
 
-def __init_AttributeProxy(doc=True):
 
-    _AttributeProxy.get_property        = __AttributeProxy__get_property
-    _AttributeProxy.put_property        = __AttributeProxy__put_property
-    _AttributeProxy.delete_property     = __AttributeProxy__delete_property
+def __init_AttributeProxy(doc=True):
+    _AttributeProxy.get_property = __AttributeProxy__get_property
+    _AttributeProxy.put_property = __AttributeProxy__put_property
+    _AttributeProxy.delete_property = __AttributeProxy__delete_property
 
     # General methods
-    #AttributeProxy.name                manually defined
-    AttributeProxy.status               = _method_device('status', doc=doc)
-    AttributeProxy.state                = _method_device('state', doc=doc)
-    AttributeProxy.ping                 = _method_device('ping', doc=doc)
-    AttributeProxy.get_transparency_reconnection=_method_device('get_transparency_reconnection', doc=doc)
-    AttributeProxy.set_transparency_reconnection=_method_device('set_transparency_reconnection', doc=doc)
+    # AttributeProxy.name                manually defined
+    AttributeProxy.status = _method_device('status', doc=doc)
+    AttributeProxy.state = _method_device('state', doc=doc)
+    AttributeProxy.ping = _method_device('ping', doc=doc)
+    AttributeProxy.get_transparency_reconnection = _method_device('get_transparency_reconnection', doc=doc)
+    AttributeProxy.set_transparency_reconnection = _method_device('set_transparency_reconnection', doc=doc)
 
     # Property methods
-    AttributeProxy.get_property         = _method_attribute('get_property', doc=doc)
-    AttributeProxy.put_property         = _method_attribute('put_property', doc=doc)
-    AttributeProxy.delete_property      = _method_attribute('delete_property', doc=doc)
+    AttributeProxy.get_property = _method_attribute('get_property', doc=doc)
+    AttributeProxy.put_property = _method_attribute('put_property', doc=doc)
+    AttributeProxy.delete_property = _method_attribute('delete_property', doc=doc)
 
     # Attribute methods
-    AttributeProxy.get_config           = _method_dev_and_name('get_attribute_config', doc=doc)
-    AttributeProxy.set_config           = _method_device('set_attribute_config', doc=doc)
+    AttributeProxy.get_config = _method_dev_and_name('get_attribute_config', doc=doc)
+    AttributeProxy.set_config = _method_device('set_attribute_config', doc=doc)
 
-    AttributeProxy.write                = _method_dev_and_name('write_attribute', doc=doc)
-    AttributeProxy.read                 = _method_dev_and_name('read_attribute', doc=doc)
-    AttributeProxy.write_read           = _method_dev_and_name('write_read_attribute', doc=doc)
+    AttributeProxy.write = _method_dev_and_name('write_attribute', doc=doc)
+    AttributeProxy.read = _method_dev_and_name('read_attribute', doc=doc)
+    AttributeProxy.write_read = _method_dev_and_name('write_read_attribute', doc=doc)
 
     # History methods...
-    AttributeProxy.history              = _method_dev_and_name('attribute_history', doc=doc)
+    AttributeProxy.history = _method_dev_and_name('attribute_history', doc=doc)
 
     # Polling administration methods
-    AttributeProxy.poll                 = _method_dev_and_name('poll_attribute', doc=doc)
-    AttributeProxy.get_poll_period      = _method_dev_and_name('get_attribute_poll_period', doc=doc)
-    AttributeProxy.is_polled            = _method_dev_and_name('is_attribute_polled', doc=doc)
-    AttributeProxy.stop_poll            = _method_dev_and_name('stop_poll_attribute', doc=doc)
+    AttributeProxy.poll = _method_dev_and_name('poll_attribute', doc=doc)
+    AttributeProxy.get_poll_period = _method_dev_and_name('get_attribute_poll_period', doc=doc)
+    AttributeProxy.is_polled = _method_dev_and_name('is_attribute_polled', doc=doc)
+    AttributeProxy.stop_poll = _method_dev_and_name('stop_poll_attribute', doc=doc)
 
     # Asynchronous methods
-    AttributeProxy.read_asynch          = _method_dev_and_name('read_attribute_asynch', doc=doc)
-    AttributeProxy.read_reply           = _method_device('read_attribute_reply', doc=doc)
-    AttributeProxy.write_asynch         = _method_device('write_attribute_asynch', doc=doc)
-    AttributeProxy.write_reply          = _method_device('write_attribute_reply', doc=doc)
+    AttributeProxy.read_asynch = _method_dev_and_name('read_attribute_asynch', doc=doc)
+    AttributeProxy.read_reply = _method_device('read_attribute_reply', doc=doc)
+    AttributeProxy.write_asynch = _method_device('write_attribute_asynch', doc=doc)
+    AttributeProxy.write_reply = _method_device('write_attribute_reply', doc=doc)
 
     # Event methods
-    AttributeProxy.subscribe_event      = _method_dev_and_name('subscribe_event', doc=doc)
-    AttributeProxy.unsubscribe_event    = _method_device('unsubscribe_event', doc=doc)
+    AttributeProxy.subscribe_event = _method_dev_and_name('subscribe_event', doc=doc)
+    AttributeProxy.unsubscribe_event = _method_device('unsubscribe_event', doc=doc)
 
-    AttributeProxy.get_events           = _method_device('get_events', doc=doc)
-    AttributeProxy.event_queue_size     = _method_device('event_queue_size', doc=doc)
-    AttributeProxy.get_last_event_date  = _method_device('get_last_event_date', doc=doc)
+    AttributeProxy.get_events = _method_device('get_events', doc=doc)
+    AttributeProxy.event_queue_size = _method_device('event_queue_size', doc=doc)
+    AttributeProxy.get_last_event_date = _method_device('get_last_event_date', doc=doc)
     AttributeProxy.is_event_queue_empty = _method_device('is_event_queue_empty', doc=doc)
+
 
 def attribute_proxy_init(doc=True):
     __init_AttributeProxy(doc=doc)

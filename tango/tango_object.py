@@ -30,7 +30,6 @@ from .green import get_executor
 
 __all__ = ['Server']
 
-
 _CLEAN_UP_TEMPLATE = """
 import sys
 from tango import Database
@@ -65,11 +64,11 @@ def __to_tango_type_fmt(value):
             shape_l = len(value.shape)
             if shape_l == 1:
                 dfmt = AttrDataFormat.SPECTRUM
-                max_dim_x = max(2**16, value.shape[0])
+                max_dim_x = max(2 ** 16, value.shape[0])
             elif shape_l == 2:
                 dfmt = AttrDataFormat.IMAGE
-                max_dim_x = max(2**16, value.shape[0])
-                max_dim_y = max(2**16, value.shape[1])
+                max_dim_x = max(2 ** 16, value.shape[0])
+                max_dim_y = max(2 ** 16, value.shape[1])
         else:
             dtype = CmdArgType.DevEncoded
     return dtype, dfmt, max_dim_x, max_dim_y

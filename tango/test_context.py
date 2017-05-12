@@ -26,7 +26,6 @@ from . import DeviceProxy, Database, Util
 
 __all__ = ["DeviceTestContext", "run_device_test_context"]
 
-
 # Helpers
 
 IOR = collections.namedtuple(
@@ -37,7 +36,7 @@ IOR = collections.namedtuple(
 
 def ascii_to_bytes(s):
     convert = lambda x: six.int2byte(int(x, 16))
-    return b''.join(convert(s[i:i+2]) for i in range(0, len(s), 2))
+    return b''.join(convert(s[i:i + 2]) for i in range(0, len(s), 2))
 
 
 def parse_ior(encoded_ior):

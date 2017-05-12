@@ -30,6 +30,7 @@ _FMT = "pickle"
 
 dumps = functools.partial(_dumps, _FMT)
 
+
 def _command(device, cmd_info, *args, **kwargs):
     name = cmd_info.cmd_name
     if cmd_info.in_type == CmdArgType.DevEncoded:
@@ -42,7 +43,6 @@ def _command(device, cmd_info, *args, **kwargs):
 
 
 class _DeviceHelper(object):
-
     __CMD_FILTER = set(("init", "state", "status"))
     __ATTR_FILTER = set(("state", "status"))
 
@@ -270,4 +270,3 @@ def connect(obj, signal, slot, event_type=tango.EventType.CHANGE_EVENT):
 def disconnect(obj, signal, slot):
     """Experimental function. Not part of the official API"""
     return obj._helper.disconnect(signal, slot)
-

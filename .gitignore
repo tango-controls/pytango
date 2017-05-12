@@ -50,3 +50,6 @@ doc/_build/
 
 # Backup files
 *~
+
+# PyCharm projects files
+.idea
