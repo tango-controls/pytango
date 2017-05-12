@@ -89,6 +89,32 @@ def test_identity_command(typed_values, server_green_mode):
         for value in values:
             assert_close(proxy.identity(value), value)
 
+def test_polled_command(server_green_mode):
+
+    dct = {'Polling1':100, 'Polling2': 100000, 'Polling3': 500}
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        @command(polling_period = dct["Polling1"])
+        def Polling1(self):
+            pass
+
+        @command(polling_period = dct["Polling2"])
+        def Polling2(self):
+            pass
+
+        @command(polling_period = dct["Polling3"])
+        def Polling3(self):
+            pass
+
+
+    with DeviceTestContext(TestDevice) as proxy:
+        ans = proxy.polling_status()
+        for x in ans:
+            lines = x.split('\n')
+            assert dct[lines[0].split('= ')[1]] == int(lines[1].split('= ')[1])
+
 
 # Test attributes
 
