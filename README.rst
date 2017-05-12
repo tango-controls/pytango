@@ -91,7 +91,7 @@ Support and contribution
 
 You can get support from the `Tango forums`_, for both Tango_ and PyTango_ questions.
 
-All contributions,  `PR and bug reports`_ are welcome!
+All contributions,  `PR and bug reports`_ are welcome, please see: `How to Contribute`_ !
 
 
 .. |Doc Status| image:: https://readthedocs.org/projects/pytango/badge/?version=latest
@@ -131,3 +131,4 @@ All contributions,  `PR and bug reports`_ are welcome!
 .. _Tango forums: http://tango-controls.org/community/forum
 .. _PR and bug reports: PyTango_
 .. _sources: PyTango_
+.. _How to Contribute: http://pytango.readthedocs.io/en/latest/howto.html
