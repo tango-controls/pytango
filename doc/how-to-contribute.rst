@@ -18,7 +18,6 @@ Workflow
 A normal Git workflow is used. You can find how to automate your git branching workflow example_.
 Good practices:
 
-* You can create pull requests, you don't have to use your fork,
 * There is no special policy regarding commit messages. They should be short (50 chars or less) and contain summary of all changes,
 * A CONTRIBUTING file is required,
 * Pull requests should be ALWAYS made to develop branch, not to a master branch.
