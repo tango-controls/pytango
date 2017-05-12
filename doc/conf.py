@@ -241,6 +241,7 @@ rst_epilog = """\
 .. _IPython: http://ipython.org
 .. _numpy: http://www.numpy.org
 .. _gevent: http://www.gevent.org
+.. _asyncio: https://asyncio.readthedocs.io/en/latest/
 .. _boost-python: http://www.boost.org/libs/python
 .. _PyPi: https://pypi.python.org/pypi/pytango
 
