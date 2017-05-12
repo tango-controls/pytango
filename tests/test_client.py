@@ -265,7 +265,7 @@ def test_device_proxy_dir_method(tango_test):
 
 def test_device_polling_command(tango_test):
 
-    dct = {"SwitchStates": 1000, "DevVoid": 10000, "SwitchStates": 5000}
+    dct = {"SwitchStates": 1000, "DevVoid": 10000, "DumpExecutionState": 5000}
 
     for command in dct.items():
         tango_test.poll_command(command[0], command[1])
