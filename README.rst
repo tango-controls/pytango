@@ -5,6 +5,7 @@ PyTango
 |Build Status|
 |Pypi Version|
 |Python Versions|
+|Anaconda Cloud|
 
 Main website: http://pytango.rtfd.io
 
@@ -109,6 +110,10 @@ All contributions,  `PR and bug reports`_ are welcome!
 .. |Python Versions| image:: https://img.shields.io/pypi/pyversions/PyTango.svg
                      :target: https://pypi.python.org/pypi/PyTango/
                      :alt:
+
+.. |Anaconda Cloud| image:: https://anaconda.org/tango-controls/pytango/badges/version.svg
+                    :target: https://anaconda.org/tango-controls/pytango
+                    :alt:
 
 .. _Tango: http://tango-controls.org
 .. _Tango C++ API: http://esrf.eu/computing/cs/tango/tango_doc/kernel_doc/cpp_doc
