@@ -276,3 +276,18 @@ def test_device_polling_command(tango_test):
         command = lines[0].split('= ')[1]
         period = int(lines[1].split('= ')[1])
         assert dct[command] == period
+
+
+def test_device_polling_attribute(tango_test):
+
+    dct = {"boolean_scalar": 1000, "double_scalar": 10000, "long_scalar": 5000}
+
+    for attr, poll_period in dct.items():
+        tango_test.poll_attribute(attr, poll_period)
+
+    ans = tango_test.polling_status()
+    for x in ans:
+        lines = x.split('\n')
+        attr = lines[0].split('= ')[1]
+        poll_period = int(lines[1].split('= ')[1])
+        assert dct[attr] == poll_period

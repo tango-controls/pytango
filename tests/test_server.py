@@ -249,3 +249,31 @@ def test_inheritance(server_green_mode):
         assert proxy.attr == 1.23
         assert proxy.attr2 == 3.14
         assert proxy.status() == ")`'-.,_)`'-.,_)`'-.,_"
+
+
+def test_polled_attribute(server_green_mode):
+
+    dct = {'PolledAttribute1': 100, 'PolledAttribute2': 100000, 'PolledAttribute3': 500}
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        @attribute(polling_period=dct["PolledAttribute1"])
+        def PolledAttribute1(self):
+            return 42.0
+
+        @attribute(polling_period=dct["PolledAttribute2"])
+        def PolledAttribute2(self):
+            return 43.0
+
+        @attribute(polling_period=dct["PolledAttribute3"])
+        def PolledAttribute3(self):
+            return 44.0
+
+    with DeviceTestContext(TestDevice) as proxy:
+        ans = proxy.polling_status()
+        for x in ans:
+            lines = x.split('\n')
+            attr = lines[0].split('= ')[1]
+            poll_period = int(lines[1].split('= ')[1])
+            assert dct[attr] == poll_period
