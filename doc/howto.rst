@@ -12,6 +12,14 @@ How to
 This is a small list of how-tos specific to PyTango. A more general Tango how-to
 list can be found `here <http://www.tango-controls.org/resources/howto>`_.
 
+How to contribute
+-----------------
+
+Everyone is welcome to contribute to PyTango project.
+If you don't feel comfortable with writing core PyTango we are looking for contributors to documentation or/and tests.
+
+It refers to the next section, see :ref:`how-to-contribute`.
+
 
 Check the default TANGO host
 ----------------------------

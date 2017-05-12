@@ -3,7 +3,7 @@
 .. highlight:: python
    :linenothreshold: 3
 
-.. _pytango-howto:
+.. _how-to-contribute:
 
 =================
 How to Contribute
