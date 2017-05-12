@@ -54,5 +54,8 @@ from accessing other parts of your device (attributes, in particular). This
 means that in :obj:`~tango.GreenMode.Asyncio` green mode there is no monitor
 lock!
 
+The example below shows how asyncio can be used to write an asynchronous
+Tango device:
+
 .. literalinclude:: ../../examples/asyncio_green_mode/asyncio_device_example.py
     :linenos:
