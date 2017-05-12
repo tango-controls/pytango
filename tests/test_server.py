@@ -111,9 +111,11 @@ def test_polled_command(server_green_mode):
 
     with DeviceTestContext(TestDevice) as proxy:
         ans = proxy.polling_status()
-        for x in ans:
-            lines = x.split('\n')
-            assert dct[lines[0].split('= ')[1]] == int(lines[1].split('= ')[1])
+    for info in ans:
+        lines = info.split('\n')
+        comm = lines[0].split('= ')[1]
+        period = int(lines[1].split('= ')[1])
+        assert dct[comm] == period
 
 
 # Test attributes
