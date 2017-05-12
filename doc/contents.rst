@@ -14,7 +14,7 @@ Contents
     start
     quicktour
     ITango <itango>
-    green
+    green_modes/green
     API <api>
     How to <howto>
     FAQ <faq>
