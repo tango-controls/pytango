@@ -267,10 +267,12 @@ def test_device_polling_command(tango_test):
 
     dct = {"SwitchStates": 1000, "DevVoid": 10000, "DumpExecutionState": 5000}
 
-    for command in dct.items():
-        tango_test.poll_command(command[0], command[1])
+    for command, period in dct.items():
+        tango_test.poll_command(command, period)
 
     ans = tango_test.polling_status()
-    for x in ans:
-        lines = x.split('\n')
-        assert dct[lines[0].split('= ')[1]] == int(lines[1].split('= ')[1])
+    for info in ans:
+        lines = info.split('\n')
+        command = lines[0].split('= ')[1]
+        period = int(lines[1].split('= ')[1])
+        assert dct[command] == period
