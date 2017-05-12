@@ -39,7 +39,7 @@ Python dependencies:
 Build dependencies:
 
 - setuptools_
-- sphinx_ < 1.5
+- sphinx_
 
 Optional dependencies:
 
