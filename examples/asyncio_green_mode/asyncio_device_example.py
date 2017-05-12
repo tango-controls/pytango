@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """Demo Tango Device Server using asyncio green mode"""
 
 import asyncio
