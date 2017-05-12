@@ -261,3 +261,18 @@ def test_device_proxy_dir_method(tango_test):
     assert set(methods) <= set(lst)
     # Check internals
     assert set(internals) <= set(lst)
+
+
+def test_device_polling_command(tango_test):
+
+    dct = {"SwitchStates": 1000, "DevVoid": 10000, "DumpExecutionState": 5000}
+
+    for command, period in dct.items():
+        tango_test.poll_command(command, period)
+
+    ans = tango_test.polling_status()
+    for info in ans:
+        lines = info.split('\n')
+        command = lines[0].split('= ')[1]
+        period = int(lines[1].split('= ')[1])
+        assert dct[command] == period
