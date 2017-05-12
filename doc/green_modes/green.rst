@@ -17,8 +17,8 @@ Python distribution since version 3.5 of Python; it's available on PyPI for
 older ones).
 
 You can set the PyTango green mode at a global level. Set the environment
-variable :envvar:`PYTANGO_GREEN_MODE` to either *futures* or *gevent*
-(case incensitive). If this environment variable is not defined the PyTango
+variable :envvar:`PYTANGO_GREEN_MODE` to either *futures*, *gevent* or *asyncio*
+(case insensitive). If this environment variable is not defined the PyTango
 global green mode defaults to *Synchronous*.
 
 .. include:: green_modes_client.rst

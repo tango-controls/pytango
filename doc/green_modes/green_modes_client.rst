@@ -140,9 +140,7 @@ gevent mode
 .. warning::
    Before using gevent mode please note that at the time of writing this
    documentation, *tango.gevent* requires the latest version 1.0 of
-   gevent (which has been released the day before :-P). Also take into
-   account that gevent_ 1.0 is *not* available on python 3.
-   Please consider using the *Futures* mode instead.
+   gevent (which has been released the day before :-P).
 
 Using gevent_ cooperative mode in PyTango is relatively easy::
 
@@ -243,3 +241,16 @@ Here is another example using :meth:`~DeviceProxy.read_attribute`::
    `True` (default) doesn't prevent other greenlets from running in *parallel*.
    This is, in fact, one of the major bonus of working with :mod:`gevent` when
    compared with :mod:`concurrent.futures`
+
+asyncio mode
+~~~~~~~~~~~~
+
+Asyncio_ mode is similar to gevent but it uses explicit coroutines. You can compare gevent and asyncio examples.
+
+.. literalinclude:: ../../examples/asyncio_green_mode/asyncio_simple_example.py
+    :linenos:
+
+Below you can find TCP server example.
+
+.. literalinclude:: ../../examples/asyncio_green_mode/tcp_server_example.py
+    :linenos:
