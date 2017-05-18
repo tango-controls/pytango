@@ -415,6 +415,66 @@ def __DeviceImpl___remove_attr_meth(self, attr_name):
         cl.dyn_att_added_methods.remove(attr_name)
 
 
+def __DeviceImpl__add_command(self, cmd, device_level=True):
+    """
+        add_command(self, cmd, level=TANGO::OPERATOR) -> cmd
+
+        Add a new command to the device command list.
+
+        Parameters :
+            - cmd          : the new command to be added to the list
+            - device_level : Set this flag to true if the command must be added
+                             for only this device
+        Return     : Command
+        Throws     : DevFailed
+    """
+    add_name = cmd.__name__
+    add_name_in_list = False      # This flag is always False, what use is it?
+    try:
+        config = dict(cmd.__tango_command__[1][2])
+        if config and ("Display level" in config):
+            disp_level = config["Display level"]
+        else:
+            disp_level = DispLevel.OPERATOR
+        self._add_command(cmd.__name__, cmd.__tango_command__[1], disp_level,
+                          device_level)
+        if add_name_in_list:
+            cl = self.get_device_class()
+            cl.dyn_cmd_added_methods.append(name)
+    except:
+        if add_name_in_list:
+            self._remove_cmd(cmd_name)
+        raise
+    return cmd
+
+def __DeviceImpl__remove_command(self, cmd_name, free_it = False, clean_db = True):
+    """
+        remove_command(self, attr_name) -> None
+
+            Remove one command from the device command list.
+
+        Parameters :
+            - cmd_name : (str) command name to be removed from the list
+            - free_it  : Boolean set to true if the command object must be freed.
+            - clean_db : Clean command related information (included polling info 
+                         if the command is polled) from database.
+         Return     : None
+
+        Throws     : DevFailed
+    """
+    try:
+        # Call this method in a try/except in case remove
+        # is called during the DS shutdown sequence
+        cl = self.get_device_class()
+    except:
+        return
+
+    if cl.dyn_cmd_added_methods.count(attr_name) != 0:
+        cl.dyn_cmd_added_methods.remove(attr_name)
+
+    self._remove_command(cmd_name, free_it, clean_db)
+
+
 def __DeviceImpl__debug_stream(self, msg, *args):
     """
     debug_stream(self, msg, *args) -> None
@@ -546,6 +606,8 @@ def __init_DeviceImpl():
     DeviceImpl.add_attribute = __DeviceImpl__add_attribute
     DeviceImpl.remove_attribute = __DeviceImpl__remove_attribute
     DeviceImpl._remove_attr_meth = __DeviceImpl___remove_attr_meth
+    DeviceImpl.add_command = __DeviceImpl__add_command
+    DeviceImpl.remove_command = __DeviceImpl__remove_command
     DeviceImpl.__str__ = __DeviceImpl__str
     DeviceImpl.__repr__ = __DeviceImpl__str
     DeviceImpl.debug_stream = __DeviceImpl__debug_stream

@@ -16,6 +16,7 @@
 #include "server/device_impl.h"
 #include "server/attr.h"
 #include "server/attribute.h"
+#include "server/command.h"
 #include "to_py.h"
 #include "pipe.h"
 
@@ -667,6 +668,35 @@ namespace PyDeviceImpl
     {
         string str(att_name);
         self.remove_attribute(str, false, clean_db);
+    }
+
+    void add_command(Tango::DeviceImpl &self, boost::python::object cmd_name, boost::python::object cmd_data,
+    		boost::python::object disp_level, bool device_level = false)
+    {
+        PyCmd *py_cmd_ptr = nullptr;
+        Tango::Command *cmd_ptr = nullptr;
+        std::string name = boost::python::extract<std::string>(cmd_name);
+
+        std::string in_desc = boost::python::extract<std::string>(cmd_data[0][1]);
+        std::string out_desc = boost::python::extract<std::string>(cmd_data[1][1]);
+
+        Tango::CmdArgType argtype_in = boost::python::extract<Tango::CmdArgType>(cmd_data[0][0]);
+        Tango::CmdArgType argtype_out = boost::python::extract<Tango::CmdArgType>(cmd_data[1][0]);
+        Tango::DispLevel display_level = boost::python::extract<Tango::DispLevel>(disp_level);
+
+        py_cmd_ptr = new PyCmd(name, argtype_in, argtype_out, in_desc, out_desc, display_level);
+        cmd_ptr = py_cmd_ptr;
+        //
+        // Install the command in Tango.
+        //
+        self.add_command(cmd_ptr, device_level);
+    }
+
+    void remove_command(Tango::DeviceImpl &self, boost::python::object cmd_name,
+                        bool free_it = false, bool clean_db = true)
+    {
+        std::string name = boost::python::extract<std::string>(cmd_name);
+        self.remove_command(name, free_it, clean_db);
     }
 
     inline void debug(Tango::DeviceImpl &self, const string &msg)
@@ -1483,6 +1513,8 @@ void export_device_impl()
         .def("_add_attribute", &PyDeviceImpl::add_attribute)
         .def("_remove_attribute", &PyDeviceImpl::remove_attribute,
             remove_attribute_overload())
+        .def("_add_command", &PyDeviceImpl::add_command)
+        .def("_remove_command", &PyDeviceImpl::remove_command)
         //@TODO .def("get_device_class")
         //@TODO .def("get_db_device")
         .def("is_attribute_polled", &PyDeviceImpl::is_attribute_polled)
