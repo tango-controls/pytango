@@ -178,6 +178,7 @@ $(OBJS_DIR)/enums.o \
 $(OBJS_DIR)/event_data.o \
 $(OBJS_DIR)/exception.o \
 $(OBJS_DIR)/from_py.o \
+$(OBJS_DIR)/fwdAttr.o \
 $(OBJS_DIR)/group.o \
 $(OBJS_DIR)/group_reply.o \
 $(OBJS_DIR)/group_reply_list.o \

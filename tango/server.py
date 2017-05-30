@@ -27,6 +27,7 @@ from ._tango import DevFailed, GreenMode, SerialModel
 
 from .attr_data import AttrData
 from .pipe_data import PipeData
+from .fwdAttr import FwdAttr
 from .device_class import DeviceClass
 from .device_server import LatestDeviceImpl
 from .utils import is_seq, is_non_str_seq
@@ -454,7 +455,8 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
             else:
                 attr_name = attr_obj.attr_name
             attr_list[attr_name] = attr_obj
-            __patch_attr_methods(tango_device_klass, attr_obj)
+            if not attr_obj.forward:
+                __patch_attr_methods(tango_device_klass, attr_obj)
         elif isinstance(attr_obj, pipe):
             if attr_obj.pipe_name is None:
                 attr_obj._set_name(attr_name)
@@ -720,6 +722,7 @@ class attribute(AttrData):
     green_mode             :obj:`~tango.GreenMode`          None                                    green mode for read and write. None means use server green mode.
     read_green_mode        :obj:`~tango.GreenMode`          None                                    green mode for read. None means use server green mode.
     write_green_mode       :obj:`~tango.GreenMode`          None                                    green mode for write. None means use server green mode.
+    forwarded              :obj:'bool'                      False                                   the attribute should be forwarded if True
     ===================== ================================ ======================================= =======================================================================================
 
     .. note::
@@ -771,21 +774,25 @@ class attribute(AttrData):
 
     def __init__(self, fget=None, **kwargs):
         self._kwargs = dict(kwargs)
-        name = kwargs.pop("name", None)
+        self.name = kwargs.pop("name", None)
         class_name = kwargs.pop("class_name", None)
-        green_mode = kwargs.pop("green_mode", True)
-        self.read_green_mode = kwargs.pop("read_green_mode", green_mode)
-        self.write_green_mode = kwargs.pop("write_green_mode", green_mode)
+        forward = kwargs.get("forwarded", False)
+        if forward:
+            if "label" in kwargs and len(kwargs) > 2:
+                raise
+        else:
+            green_mode = kwargs.pop("green_mode", True)
+            self.read_green_mode = kwargs.pop("read_green_mode", green_mode)
+            self.write_green_mode = kwargs.pop("write_green_mode", green_mode)
 
-        if fget:
-            if inspect.isroutine(fget):
-                self.fget = fget
-                if 'doc' not in kwargs and 'description' not in kwargs:
-                    if fget.__doc__ is not None:
-                        kwargs['doc'] = fget.__doc__
-            kwargs['fget'] = fget
-
-        super(attribute, self).__init__(name, class_name)
+            if fget:
+                if inspect.isroutine(fget):
+                    self.fget = fget
+                    if 'doc' not in kwargs and 'description' not in kwargs:
+                        if fget.__doc__ is not None:
+                            kwargs['doc'] = fget.__doc__
+                kwargs['fget'] = fget
+        super(attribute, self).__init__(self.name, class_name)
         self.__doc__ = kwargs.get('doc', kwargs.get('description',
                                                     'TANGO attribute'))
         if 'dtype' in kwargs:
