@@ -27,7 +27,6 @@ from ._tango import DevFailed, GreenMode, SerialModel
 
 from .attr_data import AttrData
 from .pipe_data import PipeData
-from .fwdAttr import FwdAttr
 from .device_class import DeviceClass
 from .device_server import LatestDeviceImpl
 from .utils import is_seq, is_non_str_seq
