@@ -336,19 +336,22 @@ def __DeviceClass__attribute_factory(self, attr_list):
             attr_data = attr_info
         else:
             attr_data = AttrData(attr_name, self.get_name(), attr_info)
-        self._create_attribute(attr_list, attr_data.attr_name,
-                               attr_data.attr_type,
-                               attr_data.attr_format,
-                               attr_data.attr_write,
-                               attr_data.dim_x, attr_data.dim_y,
-                               attr_data.display_level,
-                               attr_data.polling_period,
-                               attr_data.memorized,
-                               attr_data.hw_memorized,
-                               attr_data.read_method_name,
-                               attr_data.write_method_name,
-                               attr_data.is_allowed_name,
-                               attr_data.att_prop)
+        if attr_data.forward:
+            self._create_fwd_attribute(attr_list,attr_data.name, attr_data.att_prop)
+        else:
+            self._create_attribute(attr_list, attr_data.attr_name,
+                                   attr_data.attr_type,
+                                   attr_data.attr_format,
+                                   attr_data.attr_write,
+                                   attr_data.dim_x, attr_data.dim_y,
+                                   attr_data.display_level,
+                                   attr_data.polling_period,
+                                   attr_data.memorized,
+                                   attr_data.hw_memorized,
+                                   attr_data.read_method_name,
+                                   attr_data.write_method_name,
+                                   attr_data.is_allowed_name,
+                                   attr_data.att_prop)
 
 
 def __DeviceClass__pipe_factory(self, pipe_list):

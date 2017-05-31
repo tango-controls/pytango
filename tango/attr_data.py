@@ -23,8 +23,8 @@ __docformat__ = "restructuredtext"
 import inspect
 
 from ._tango import Except, CmdArgType, AttrDataFormat, AttrWriteType
-from ._tango import DispLevel, UserDefaultAttrProp
-from ._tango import Attr, SpectrumAttr, ImageAttr
+from ._tango import DispLevel, UserDefaultAttrProp, UserDefaultFwdAttrProp
+from ._tango import Attr, SpectrumAttr, ImageAttr, FwdAttr
 from .utils import is_non_str_seq, is_pure_str
 
 
@@ -55,6 +55,7 @@ class AttrData(object):
         self.attr_class = None
         self.attr_args = []
         self.att_prop = None
+        self.forward = False
         if attr_info is not None:
             self.from_attr_info(attr_info)
 
@@ -68,57 +69,67 @@ class AttrData(object):
         return self
 
     def build_from_dict(self, attr_dict):
-        self.attr_type = attr_dict.pop('dtype', CmdArgType.DevDouble)
-        self.attr_format = attr_dict.pop('dformat', AttrDataFormat.SCALAR)
-        self.dim_x = attr_dict.pop('max_dim_x', 1)
-        self.dim_y = attr_dict.pop('max_dim_y', 0)
-        self.display_level = attr_dict.pop('display_level', DispLevel.OPERATOR)
-        self.polling_period = attr_dict.pop('polling_period', -1)
-        self.memorized = attr_dict.pop('memorized', False)
-        self.hw_memorized = attr_dict.pop('hw_memorized', False)
 
-        is_access_explicit = "access" in attr_dict
-        if is_access_explicit:
-            self.attr_write = attr_dict.pop('access')
-        else:
-            # access is defined by which methods were defined
-            r_explicit = "fread" in attr_dict or "fget" in attr_dict
-            w_explicit = "fwrite" in attr_dict or "fset" in attr_dict
-            if r_explicit and w_explicit:
-                self.attr_write = AttrWriteType.READ_WRITE
-            elif r_explicit:
-                self.attr_write = AttrWriteType.READ
-            elif w_explicit:
-                self.attr_write = AttrWriteType.WRITE
+        self.forward = attr_dict.pop("forwarded", False)
+        if not self.forward:
+            self.attr_type = attr_dict.pop('dtype', CmdArgType.DevDouble)
+            self.attr_format = attr_dict.pop('dformat', AttrDataFormat.SCALAR)
+            self.dim_x = attr_dict.pop('max_dim_x', 1)
+            self.dim_y = attr_dict.pop('max_dim_y', 0)
+            self.display_level = attr_dict.pop('display_level', DispLevel.OPERATOR)
+            self.polling_period = attr_dict.pop('polling_period', -1)
+            self.memorized = attr_dict.pop('memorized', False)
+            self.hw_memorized = attr_dict.pop('hw_memorized', False)
+
+            is_access_explicit = "access" in attr_dict
+            if is_access_explicit:
+                self.attr_write = attr_dict.pop('access')
             else:
-                self.attr_write = AttrWriteType.READ
+                # access is defined by which methods were defined
+                r_explicit = "fread" in attr_dict or "fget" in attr_dict
+                w_explicit = "fwrite" in attr_dict or "fset" in attr_dict
+                if r_explicit and w_explicit:
+                    self.attr_write = AttrWriteType.READ_WRITE
+                elif r_explicit:
+                    self.attr_write = AttrWriteType.READ
+                elif w_explicit:
+                    self.attr_write = AttrWriteType.WRITE
+                else:
+                    self.attr_write = AttrWriteType.READ
 
-        fread = attr_dict.pop('fget', attr_dict.pop('fread', None))
-        if fread is not None:
-            if is_pure_str(fread):
-                self.read_method_name = fread
-            elif inspect.isroutine(fread):
-                self.read_method_name = fread.__name__
-        fwrite = attr_dict.pop('fset', attr_dict.pop('fwrite', None))
-        if fwrite is not None:
-            if is_pure_str(fwrite):
-                self.write_method_name = fwrite
-            elif inspect.isroutine(fwrite):
-                self.write_method_name = fwrite.__name__
-        fisallowed = attr_dict.pop('fisallowed', None)
-        if fisallowed is not None:
-            if is_pure_str(fisallowed):
-                self.is_allowed_name = fisallowed
-            elif inspect.isroutine(fisallowed):
-                self.is_allowed_name = fisallowed.__name__
-        self.attr_class = attr_dict.pop("klass", self.DftAttrClassMap[self.attr_format])
-        self.attr_args.extend((self.attr_name, self.attr_type, self.attr_write))
-        if not self.attr_format == AttrDataFormat.SCALAR:
-            self.attr_args.append(self.dim_x)
-            if not self.attr_format == AttrDataFormat.SPECTRUM:
-                self.attr_args.append(self.dim_y)
+            fread = attr_dict.pop('fget', attr_dict.pop('fread', None))
+            if fread is not None:
+                if is_pure_str(fread):
+                    self.read_method_name = fread
+                elif inspect.isroutine(fread):
+                    self.read_method_name = fread.__name__
+            fwrite = attr_dict.pop('fset', attr_dict.pop('fwrite', None))
+            if fwrite is not None:
+                if is_pure_str(fwrite):
+                    self.write_method_name = fwrite
+                elif inspect.isroutine(fwrite):
+                    self.write_method_name = fwrite.__name__
+            fisallowed = attr_dict.pop('fisallowed', None)
+            if fisallowed is not None:
+                if is_pure_str(fisallowed):
+                    self.is_allowed_name = fisallowed
+                elif inspect.isroutine(fisallowed):
+                    self.is_allowed_name = fisallowed.__name__
+            self.attr_class = attr_dict.pop("klass", self.DftAttrClassMap[self.attr_format])
+            self.attr_args.extend((self.attr_name, self.attr_type, self.attr_write))
+            if not self.attr_format == AttrDataFormat.SCALAR:
+                self.attr_args.append(self.dim_x)
+                if not self.attr_format == AttrDataFormat.SPECTRUM:
+                    self.attr_args.append(self.dim_y)
+        else:
+            self.attr_class = FwdAttr
+            self.attr_args = [self.name]
+
         if len(attr_dict):
-            self.att_prop = self.__create_user_default_attr_prop(attr_dict)
+            if self.forward:
+                self.att_prop = self.__create_user_default_fwdattr_prop(attr_dict)
+            else:
+                self.att_prop = self.__create_user_default_attr_prop(attr_dict)
         return self
 
     def _set_name(self, name):
@@ -135,6 +146,12 @@ class AttrData(object):
 
     def __throw_exception(self, msg, meth="create_attribute()"):
         Except.throw_exception("PyDs_WrongAttributeDefinition", msg, meth)
+
+    def __create_user_default_fwdattr_prop(self, extra_info):
+        """for internal usage only"""
+        p = UserDefaultFwdAttrProp()
+        p.set_label(extra_info["label"])
+        return p
 
     def __create_user_default_attr_prop(self, extra_info):
         """for internal usage only"""
