@@ -21,6 +21,10 @@ namespace PyTango
 { 
     namespace DevicePipe 
     {
+        bopy::object
+        extract(Tango::DevicePipeBlob& blob,
+                PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy);
+
         void
         update_values(Tango::DevicePipe& self, bopy::object& py_value,
                       PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy);

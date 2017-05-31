@@ -21,8 +21,10 @@ from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
 from ._tango import DeviceProxy, __CallBackAutoDie, __CallBackPushEvent
 from ._tango import EventType, DevFailed, Except, ExtractAs, GreenMode
 from ._tango import PipeInfo, PipeInfoList, constants
+from ._tango import constants, DevicePipe, CmdArgType, DevState
 
-from .utils import is_pure_str, is_non_str_seq, is_integer
+from .utils import TO_TANGO_TYPE, scalar_to_array_type
+from .utils import is_pure_str, is_non_str_seq, is_integer, is_number
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
 from .utils import seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
@@ -1285,9 +1287,90 @@ def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
     r = self.__read_pipe(pipe_name)
     return r.extract(extract_as)
 
+#-------------duplicate code from pipe.py--------------------------
+def __get_pipe_type_simple(obj):
+    if is_non_str_seq(obj):
+        if len(obj) == 2 and \
+           is_pure_str(obj[0]) and \
+           (is_non_str_seq(obj[1]) or isinstance(obj[1], dict)):
+            tg_type = CmdArgType.DevPipeBlob
+        else:
+            tg_type = __get_pipe_type(obj[0])
+            tg_type = scalar_to_array_type(tg_type)
+    elif is_pure_str(obj):
+        tg_type = CmdArgType.DevString
+    elif isinstance(obj, DevState):
+        tg_type = CmdArgType.DevState
+    elif isinstance(obj, bool):
+        tg_type = CmdArgType.DevBoolean
+    elif is_integer(obj):
+        tg_type = CmdArgType.DevLong64
+    elif is_number(obj):
+        tg_type = CmdArgType.DevDouble
+    else:
+        raise ValueError('Cannot determine object tango type')
+    return tg_type
 
-def __DeviceProxy__write_pipe(*args, **kwargs):
-    raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
+    
+def __get_pipe_type_numpy_support(obj):
+    import numpy
+    try:
+        ndim, dtype = obj.ndim, str(obj.dtype)
+    except AttributeError:
+        return __get_pipe_type_simple(obj)
+    if ndim > 1:
+        raise TypeError('cannot translate numpy array with {0} '
+                        'dimensions to tango type'.format(obj.ndim))
+    tg_type = TO_TANGO_TYPE[dtype]
+    if ndim > 0:
+        tg_type = scalar_to_array_type(dtype)
+    return tg_type
+
+
+def __get_tango_type(dtype):
+    if is_non_str_seq(dtype):
+        tg_type = dtype[0]
+        if is_non_str_seq(tg_type):
+            raise TypeError("Pipe doesn't support 2D data")
+        tg_type = TO_TANGO_TYPE[tg_type]
+        tg_type = scalar_to_array_type(tg_type)
+    else:
+        tg_type = TO_TANGO_TYPE[dtype]
+    return tg_type
+
+
+def __get_pipe_type(obj, dtype=None):
+    if dtype is not None:
+        return __get_tango_type(dtype)
+    if constants.NUMPY_SUPPORT:
+        return __get_pipe_type_numpy_support(obj)
+    return __get_pipe_type_simple(obj)
+
+def __sanatize_pipe_element(elem):
+    if isinstance(elem, dict):
+        result = dict(elem)
+    else:
+        result = dict(name=elem[0], value=elem[1])
+    result['value'] = value = result.get('value', result.pop('blob', None))
+    result['dtype'] = dtype = __get_pipe_type(value, dtype=result.get('dtype'))
+    if dtype == CmdArgType.DevPipeBlob:
+        result['value'] = value[0], __sanatize_pipe_blob(value[1])
+    return result
+
+
+def __sanatize_pipe_blob(blob):
+    result = []
+    if isinstance(blob, dict):
+        return [__sanatize_pipe_element((k, v)) for k, v in blob.items()]
+    else:
+        return [__sanatize_pipe_element(elem) for elem in blob]
+
+#--------------------end duplicate code ---------------------------------------
+
+def __DeviceProxy__write_pipe(self, *args, **kwargs):
+    pipe_name, (blob_name, blob_data) = args
+    sani_blob_data = __sanatize_pipe_blob(blob_data)
+    self.__write_pipe(pipe_name, blob_name, sani_blob_data)
 
 
 def __DeviceProxy__read_attributes(self, *args, **kwargs):
@@ -1978,7 +2061,39 @@ def __doc_DeviceProxy():
         New in PyTango 9.2.0
     """)
 
-    document_method("write_pipe", """TODO""")
+    document_method("write_pipe", """
+    write_pipe(self, blob, green_mode=None, wait=True, timeout=None)
+
+            Write a *blob* to a single pipe. The *blob* comprises: a tuple with two elements: blob name (string) and blob
+            data (sequence). The blob data consists of a sequence where each element is a dictionary with the
+            following keys:
+
+            - name: blob element name
+            - dtype: tango data type
+            - value: blob element data (str for DevString, etc)
+
+        In case dtype is ``DevPipeBlob``, value is also a *blob*.
+
+        Parameters :
+            - blob       : a tuple with two elements: blob name (string) and blob
+                           data (sequence).
+            - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
+                           (see :meth:`~tango.DeviceProxy.get_green_mode` and
+                           :meth:`~tango.DeviceProxy.set_green_mode`).
+            - wait       : (bool) whether or not to wait for result. If green_mode
+                           is *Synchronous*, this parameter is ignored as it always
+                           waits for the result.
+                           Ignored when green_mode is Synchronous (always waits).
+            - timeout    : (float) The number of seconds to wait for the result.
+                           If None, then there is no limit on the wait time.
+                           Ignored when green_mode is Synchronous or wait is False.
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device
+                     TimeoutError (green_mode == Futures) If the future didn't finish executing before the given timeout.
+                     Timeout (green_mode == Gevent) If the async result didn't finish executing before the given timeout.
+
+        New in PyTango 9.2.1
+    """)
 
     # -------------------------------------
     #   History methods

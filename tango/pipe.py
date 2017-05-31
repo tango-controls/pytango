@@ -120,6 +120,8 @@ def __Pipe__set_value(self, value):
     value = __sanatize_pipe_blob(blob)
     self._set_value(value)
 
+def __Pipe__get_value(self):
+    return (self.get_root_blob_name(), self._get_value());
 
 def __init_Pipe():
     Pipe.set_value = __Pipe__set_value
