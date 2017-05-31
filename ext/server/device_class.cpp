@@ -355,6 +355,7 @@ namespace PyDeviceClass
     {
         boost::python::list py_pipe_list;
         vector<Tango::Pipe *> pipe_list = self.get_pipe_list(dev_name);
+//        vector<Tango::Pipe *> pipe_list = self.get_pipe_list();
         for(vector<Tango::Pipe *>::iterator it = pipe_list.begin();
 	    it != pipe_list.end(); ++it)
         {

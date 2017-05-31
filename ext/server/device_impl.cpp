@@ -17,6 +17,7 @@
 #include "server/attr.h"
 #include "server/attribute.h"
 #include "to_py.h"
+#include "pipe.h"
 
 extern const char *param_must_be_seq;
 
@@ -492,6 +493,26 @@ namespace PyDeviceImpl
     {
         SAFE_PUSH(self, attr, name)
         self.push_data_ready_event(__att_name, ctr); //__att_name from SAFE_PUSH
+    }
+
+    /* **********************************
+     * pipe event
+     * **********************************/
+    inline void push_pipe_event(Tango::DeviceImpl &self, str &pipe_name, object& pipe_data)
+    {
+    	std::string __pipe_name;
+    	from_str_to_char(pipe_name.ptr(), __pipe_name);
+    	boost::python::extract<Tango::DevFailed> except_convert(pipe_data);
+    	if (except_convert.check()) {
+    		self.push_pipe_event(__pipe_name, const_cast<Tango::DevFailed*>(&except_convert()));
+    		return;
+    	}
+    	Tango::DevicePipeBlob dpb;
+    	struct timeval tv;
+    	gettimeofday(&tv, NULL);
+    	bool reuse = false;
+		PyDevicePipe::set_value(dpb, pipe_data);
+    	self.push_pipe_event(__pipe_name, &dpb, tv, reuse);
     }
 
     void check_attribute_method_defined(PyObject *self,
@@ -1409,7 +1430,6 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_change_event_overload,
                                        Tango::DeviceImpl::set_change_event, 2, 3)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_archive_event_overload,
                                        Tango::DeviceImpl::set_archive_event, 2, 3)
-
 BOOST_PYTHON_FUNCTION_OVERLOADS(remove_attribute_overload,
                                 PyDeviceImpl::remove_attribute, 2, 3)
                                        
@@ -1643,6 +1663,11 @@ void export_device_impl()
             (arg_("self"), arg_("attr_name"), arg_("ctr")))
 
         .def("push_att_conf_event", &Tango::DeviceImpl::push_att_conf_event)
+
+         .def("push_pipe_event",
+            (void (*) (Tango::DeviceImpl &, str &, object&))
+            &PyDeviceImpl::push_pipe_event,
+            (arg_("self"), arg_("pipe_name"), arg_("pipe_data")))
 
         .def("get_logger", &Tango::DeviceImpl::get_logger, return_internal_reference<>())
         .def("__debug_stream", &PyDeviceImpl::debug)

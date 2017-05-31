@@ -1073,6 +1073,8 @@ def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
                             * EventType.ATTR_CONF_EVENT
                             * EventType.DATA_READY_EVENT
                             * EventType.USER_EVENT
+                            * EventType.INTERFACE_CHANGE_EVENT
+                            * EventType.PIPE_EVENT
             - callback  : (callable) Is any callable object or an object with a
                           callable "push_event" method.
             - filters   : (sequence<str>) A variable list of name,value pairs
@@ -1245,6 +1247,8 @@ def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractA
             return self.__get_attr_conf_events(event_id, extract_as)
         elif event_type in (EventType.DATA_READY_EVENT,):
             return self.__get_data_ready_events(event_id, extract_as)
+        elif event_type in (EventType.PIPE_EVENT,):
+            return self.__get_pipe_events(event_id, extract_as)
         else:
             assert (False)
             raise ValueError("Unknown event_type: " + str(event_type))

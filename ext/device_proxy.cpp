@@ -408,6 +408,12 @@ namespace PyDeviceProxy
                                                 (py_self, event_id);
     }
 
+    static bopy::object
+    get_events__pipe_data(bopy::object py_self, int event_id, PyTango::ExtractAs extract_as)
+    {
+        return get_events__aux<Tango::PipeEventData, Tango::PipeEventDataList>(py_self, event_id, extract_as);
+    }
+
     static boost::shared_ptr<Tango::DeviceProxy> makeDeviceProxy1(const std::string& name)
     {
 	Tango::DeviceProxy* dp = NULL;
@@ -814,6 +820,9 @@ void export_device_proxy()
 
         .def("__get_data_ready_events", PyDeviceProxy::get_events__data_ready,
             ( arg_("self"), arg_("event_id")) )
+
+        .def("__get_pipe_events", PyDeviceProxy::get_events__pipe_data,
+            ( arg_("self"), arg_("event_id"), arg_("extract_as")=PyTango::ExtractAsNumpy ))
 
         // methods to access data in event queues
         .def("event_queue_size", &Tango::DeviceProxy::event_queue_size,

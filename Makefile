@@ -184,6 +184,7 @@ $(OBJS_DIR)/group_reply_list.o \
 $(OBJS_DIR)/locker_info.o \
 $(OBJS_DIR)/locking_thread.o \
 $(OBJS_DIR)/periodic_event_info.o \
+$(OBJS_DIR)/pipe_event_data.o \
 $(OBJS_DIR)/poll_device.o \
 $(OBJS_DIR)/pytango.o \
 $(OBJS_DIR)/pytgutils.o \
