@@ -1,20 +1,23 @@
-import PyTango
-import numpy
 import time
-from PyTango import DevState
-import pdb
+import numpy
+
+import tango
+from tango import DevState
+
 
 class EventManager():
-     
+
     def __init__(self, dp):
         self._deviceProxy = dp
         if dp is not None:
             print "Subscribed to TestPipe"
-            self._event_id = dp.subscribe_event("TestPipe", PyTango.EventType.PIPE_EVENT, self)
- 
+            self._event_id = dp.subscribe_event("TestPipe",
+                                                tango.EventType.PIPE_EVENT,
+                                                self)
+
     def unsubscribe(self):
         self._deviceProxy.unsubscribe_event(self._event_id)
- 
+
     def push_event(self, ev):
         print "Event -----push_event-----------------"
         print "Timestamp:      ", ev.reception_date
@@ -38,9 +41,8 @@ class EventManager():
             for i in range(nb_elt):
                 print "Elements:       ", ev.pipe_value.data[i]
 
-
 def main():
-    dev=PyTango.DeviceProxy('pipeServer/tango/1')
+    dev=tango.DeviceProxy('pipeServer/tango/1')
     print dev
     em = EventManager(dev)
     time.sleep(3000.0)
