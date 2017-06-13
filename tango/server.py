@@ -42,7 +42,7 @@ API_VERSION = 2
 
 # Worker access
 
-_WORKER = None
+_WORKER = get_executor()
 
 
 def set_worker(worker):
