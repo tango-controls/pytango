@@ -15,6 +15,7 @@ from __future__ import with_statement
 from __future__ import print_function
 from __future__ import absolute_import
 
+import pdb
 import sys
 import copy
 import inspect
@@ -465,9 +466,13 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
             __patch_pipe_methods(tango_device_klass, attr_obj)
         elif isinstance(attr_obj, device_property):
             attr_obj.name = attr_name
+            if attr_obj.mandatory is True and attr_obj._BaseProperty__value is None:
+                msg = "Device property {0} is mandatory ".format(attr_name)
+                raise Exception(msg)
             device_property_list[attr_name] = [attr_obj.dtype,
                                                attr_obj.doc,
-                                               attr_obj.default_value]
+                                               attr_obj.default_value,
+                                               attr_obj.mandatory]
         elif isinstance(attr_obj, class_property):
             attr_obj.name = attr_name
             class_property_list[attr_name] = [attr_obj.dtype,
@@ -1134,15 +1139,16 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
 
 
 class _BaseProperty(object):
-    def __init__(self, dtype, doc='', default_value=None, update_db=False):
+    def __init__(self, dtype, doc='', mandatory=False, default_value=None, update_db=False):
         self.name = None
-        self.__value = None
+#        self.__value = None
         dtype = from_typeformat_to_type(*_get_tango_type_format(dtype))
         self.dtype = dtype
         self.doc = doc
         self.default_value = default_value
         self.update_db = update_db
         self.__doc__ = doc or 'TANGO property'
+        self.mandatory = mandatory
 
     def __get__(self, obj, objtype):
         if obj is None:
@@ -1173,10 +1179,12 @@ class device_property(_BaseProperty):
         class PowerSupply(Device):
 
             host = device_property(dtype=str)
+            port = device_property(dtype=int, mandatory=True)
 
     :param dtype: Data type (see :ref:`pytango-data-types`)
     :param doc: property documentation (optional)
     :param default_value: default value for the property (optional)
+    :param mandatory (optional: default is False)
     :param update_db: tells if set value should write the value to database.
                      [default: False]
     :type update_db: bool
