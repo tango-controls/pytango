@@ -19,11 +19,15 @@ class MandatoryPropertyServer(Device):
     Port = device_property(
         dtype='int', doc='The port number', default_value=3456
     )
+    Ctrl = device_property(
+        dtype='int', doc='The controller number', default_value=22, mandatory=True
+    )
 
     def init_device(self):
         Device.init_device(self)
         print 'port: ', self.Port
         print 'host: ', self.HostName
+        print 'ctrl: ', self.Ctrl 
         self.set_state(tango.DevState.ON)
 
 # ----------

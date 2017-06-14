@@ -15,7 +15,6 @@ from __future__ import with_statement
 from __future__ import print_function
 from __future__ import absolute_import
 
-import pdb
 import sys
 import copy
 import inspect
@@ -466,9 +465,8 @@ def __create_tango_deviceclass_klass(tango_device_klass, attrs=None):
             __patch_pipe_methods(tango_device_klass, attr_obj)
         elif isinstance(attr_obj, device_property):
             attr_obj.name = attr_name
-            if attr_obj.mandatory is True and attr_obj._BaseProperty__value is None:
-                msg = "Device property {0} is mandatory ".format(attr_name)
-                raise Exception(msg)
+            # if you modify the attr_obj order then you should
+            # take care of the code in get_device_properties()
             device_property_list[attr_name] = [attr_obj.dtype,
                                                attr_obj.doc,
                                                attr_obj.default_value,
@@ -618,6 +616,11 @@ class BaseDevice(LatestDeviceImpl):
                 value = self.prop_util.get_property_values(
                     prop_name, self.device_property_list)
                 self._tango_properties[prop_name] = value
+                properties = self.device_property_list[prop_name]
+                mandatory = properties[3]
+                if mandatory is True and value is None:
+                    msg = "Device property {0} is mandatory ".format(prop_name)
+                    raise Exception(msg)
         except DevFailed as df:
             print(80 * "-")
             print(df)
@@ -1139,7 +1142,7 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
 
 
 class _BaseProperty(object):
-    def __init__(self, dtype, doc='', mandatory=False, default_value=None, update_db=False):
+    def __init__(self, dtype, doc='', default_value=None, update_db=False):
         self.name = None
 #        self.__value = None
         dtype = from_typeformat_to_type(*_get_tango_type_format(dtype))
@@ -1148,7 +1151,6 @@ class _BaseProperty(object):
         self.default_value = default_value
         self.update_db = update_db
         self.__doc__ = doc or 'TANGO property'
-        self.mandatory = mandatory
 
     def __get__(self, obj, objtype):
         if obj is None:
@@ -1192,7 +1194,9 @@ class device_property(_BaseProperty):
     .. versionadded:: 8.1.7
         added update_db option
     """
-    pass
+    def __init__(self, dtype, doc='', mandatory=False, default_value=None, update_db=False):
+        super(device_property, self).__init__(dtype, doc, default_value, update_db)
+        self.mandatory = mandatory
 
 
 class class_property(_BaseProperty):
