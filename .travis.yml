@@ -57,4 +57,4 @@ script:
   # Run the tests
   - python setup.py test
   # Kill all the hanging tango test processes
-  - killall TangoTest || true
+  - killall -9 TangoTest || true
