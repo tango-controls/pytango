@@ -1,38 +1,25 @@
-import tango
-from tango.server import Device, device_property
-from tango.server import attribute
+from __future__ import print_function
 
-__all__ = ["MandatoryPropertyServer", "main"]
+from tango import DevState
+from tango.server import Device, device_property
 
 
 class MandatoryPropertyServer(Device):
-    """
-    """
 
-    # -----------------
-    # Device Properties
-    # -----------------
+    Hostname = device_property(
+        dtype='str', mandatory=True,
+        doc='The controller host address')
 
-    HostName = device_property(
-        dtype='str', doc='The controller host address', mandatory=True
-    )
     Port = device_property(
-        dtype='int', doc='The port number', default_value=3456
-    )
-    Ctrl = device_property(
-        dtype='int', doc='The controller number', default_value=22, mandatory=True
-    )
+        dtype='int', default_value=3456,
+        doc='The controller port number')
 
     def init_device(self):
         Device.init_device(self)
-        print 'port: ', self.Port
-        print 'host: ', self.HostName
-        print 'ctrl: ', self.Ctrl 
-        self.set_state(tango.DevState.ON)
+        print('Port: ', self.Port)
+        print('Host: ', self.Hostname)
+        self.set_state(DevState.ON)
 
-# ----------
-# Run server
-# ----------
 
 if __name__ == '__main__':
     MandatoryPropertyServer.run_server()

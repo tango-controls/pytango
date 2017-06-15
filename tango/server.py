@@ -618,7 +618,7 @@ class BaseDevice(LatestDeviceImpl):
                 self._tango_properties[prop_name] = value
                 properties = self.device_property_list[prop_name]
                 mandatory = properties[3]
-                if mandatory is True and value is None:
+                if mandatory and value is None:
                     msg = "Device property {0} is mandatory ".format(prop_name)
                     raise Exception(msg)
         except DevFailed as df:
@@ -1144,7 +1144,6 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
 class _BaseProperty(object):
     def __init__(self, dtype, doc='', default_value=None, update_db=False):
         self.name = None
-#        self.__value = None
         dtype = from_typeformat_to_type(*_get_tango_type_format(dtype))
         self.dtype = dtype
         self.doc = doc
@@ -1185,8 +1184,8 @@ class device_property(_BaseProperty):
 
     :param dtype: Data type (see :ref:`pytango-data-types`)
     :param doc: property documentation (optional)
-    :param default_value: default value for the property (optional)
     :param mandatory (optional: default is False)
+    :param default_value: default value for the property (optional)
     :param update_db: tells if set value should write the value to database.
                      [default: False]
     :type update_db: bool
@@ -1194,9 +1193,15 @@ class device_property(_BaseProperty):
     .. versionadded:: 8.1.7
         added update_db option
     """
-    def __init__(self, dtype, doc='', mandatory=False, default_value=None, update_db=False):
-        super(device_property, self).__init__(dtype, doc, default_value, update_db)
+    def __init__(self, dtype, doc='', mandatory=False, 
+                 default_value=None, update_db=False):
+        super(device_property, self).__init__(dtype, doc,default_value,
+                                              update_db)
         self.mandatory = mandatory
+        if mandatory and default_value is not None:
+            msg = "device_property arguments mandatory " \
+                  "and default_value are incompatible"
+            raise Exception(msg)
 
 
 class class_property(_BaseProperty):
