@@ -78,7 +78,7 @@ def test_subscribe_event(event_device):
         "attr", EventType.CHANGE_EVENT, callback, wait=True)
     event_device.command_inout("send_event", wait=True)
     # Wait for tango event
-    retries = 10
+    retries = 20
     for _ in range(retries):
         event_device.read_attribute("state", wait=True)
         if len(results) > 1:

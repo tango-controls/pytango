@@ -94,7 +94,7 @@ class DeviceTestContext(object):
 
     nodb = "dbase=no"
     command = "{0} {1} -ORBendPoint giop:tcp:{2}:{3} -file={4}"
-    connect_timeout = 1.
+    connect_timeout = 3.
     disconnect_timeout = connect_timeout
 
     def __init__(self, device, device_cls=None, server_name=None,
