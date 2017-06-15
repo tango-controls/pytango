@@ -432,6 +432,7 @@ namespace PyDeviceProxy
         return get_events__aux<Tango::PipeEventData, Tango::PipeEventDataList>(py_self, event_id, extract_as);
     }
 
+    static bopy::object
     get_events__devintr_change_data(bopy::object py_self, int event_id, PyTango::ExtractAs extract_as)
     {
         return get_events__aux<Tango::DevIntrChangeEventData, Tango::DevIntrChangeEventDataList>(py_self, event_id, extract_as);
