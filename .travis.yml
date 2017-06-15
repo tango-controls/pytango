@@ -56,3 +56,5 @@ script:
   - rsync -a --delete ext/ cached_ext/
   # Run the tests
   - python setup.py test
+  # Kill all the hanging tango test processes
+  - killall TangoTest || true
