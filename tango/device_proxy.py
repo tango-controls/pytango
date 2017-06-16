@@ -11,7 +11,6 @@
 
 """Define python methods for DeviceProxy object."""
 
-import pdb
 import time
 import textwrap
 import threading
@@ -1135,7 +1134,6 @@ def __DeviceProxy__subscribe_event (self, *args, **kwargs):
             other subscribe_event() version.
     """
 
-    pdb.set_trace()
     nargs = len(args)
     if is_integer(args[0]) and args[0] == EventType.INTERFACE_CHANGE_EVENT:
         event_type = args[0]
@@ -1191,20 +1189,17 @@ def __DeviceProxy__subscribe_event_global (self, event_type, cb,
 
         event_id = self.__subscribe_event(event_type, cbfn, stateless)
 
-    with self.__get_event_map_lock():
-        se = self.__get_event_map()
-        evt_data = se.get(event_id)
-        if evt_data is None:
-            se[event_id] = (cbfn, event_type, "NoAttrName")
-            return event_id
-        # Raise exception
-        desc = textwrap.dedent("""\
-            Internal PyTango error:
-            %s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)
-            Please report error to PyTango""")
-        desc %= self, attr_name, event_type, event_id, evt_data[2], evt_data[1]
-        Except.throw_exception(
-            "Py_InternalError", desc, "DeviceProxy.subscribe_event")
+        with self.__get_event_map_lock():
+            se = self.__get_event_map()
+            evt_data = se.get(event_id)
+            if evt_data is not None:
+                desc = "Internal PyTango error:\n" \
+                   "%s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)\n" \
+                   "Please report error to PyTango" % \
+                   (self, event_type, event_id, evt_data[2], evt_data[1])
+                Except.throw_exception("Py_InternalError", desc, "DeviceProxy.subscribe_event")
+        se[event_id] = (cbfn, event_type, "dummy")
+        return event_id
 
 def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
                                           cb_or_queuesize,
@@ -1220,7 +1215,7 @@ def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
             isinstance(cb_or_queuesize.push_event, collections.Callable):
         cb = __CallBackPushEvent()
         cb.push_event = green_callback(
-            cb_or_queuesize.push_event, obj=self, green_mode=green_mode())
+            cb_or_queuesize.push_event, obj=self, green_mode=green_mode)
     elif is_integer(cb_or_queuesize):
         cb = cb_or_queuesize  # queuesize
     else:
