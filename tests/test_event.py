@@ -49,7 +49,20 @@ class EventDevice(Device):
     def send_event(self):
         self.push_change_event("attr", 1.)
 
+    @command(dtype_in=str)
+    def add_dyn_attr(self, name):
+        attr = attribute(
+            name=name,
+            dtype='float',
+            fget=self.read)
+        self.add_attribute(attr)
 
+    @command(dtype_in=str)
+    def delete_dyn_attr(self, name):
+        self._remove_attribute(name)
+
+    def read(self, attr):
+        attr.set_value(1.23)
 # Device fixture
 
 @pytest.fixture(params=[GreenMode.Synchronous,
@@ -68,7 +81,7 @@ def event_device(request):
 
 # Tests
 
-def test_subscribe_event(event_device):
+def test_subscribe_change_event(event_device):
     results = []
 
     def callback(evt):
@@ -86,3 +99,45 @@ def test_subscribe_event(event_device):
         time.sleep(0.05)
     # Test the event values
     assert results == [0., 1.]
+
+
+def test_subscribe_interface_event(event_device):
+    results = []
+
+    def callback(evt):
+        results.append(evt)
+
+    event_device.subscribe_event(
+        "attr", EventType.INTERFACE_CHANGE_EVENT, callback, wait=True)
+    event_device.command_inout("add_dyn_attr", 'bla', wait=True)
+    event_device.read_attribute('bla', wait=True) == 1.23
+    # Wait for tango event
+    retries = 30
+    for _ in range(retries):
+        event_device.read_attribute("state", wait=True)
+        if len(results) > 1:
+            break
+        time.sleep(0.05)
+    event_device.command_inout("delete_dyn_attr", 'bla', wait=True)
+    # Wait for tango event
+    retries = 30
+    for _ in range(retries):
+        event_device.read_attribute("state", wait=True)
+        if len(results) > 2:
+            break
+        time.sleep(0.05)
+    # Test the first event value
+    assert set(cmd.cmd_name for cmd in results[0].cmd_list) == \
+        {'Init', 'State', 'Status', 'add_dyn_attr', 'delete_dyn_attr', 'send_event'}
+    assert set(att.name for att in results[0].att_list) == \
+        {'attr', 'State', 'Status'}
+    # Test the second event value
+    assert set(cmd.cmd_name for cmd in results[1].cmd_list) == \
+        {'Init', 'State', 'Status', 'add_dyn_attr', 'delete_dyn_attr', 'send_event'}
+    assert set(att.name for att in results[1].att_list) == \
+        {'attr', 'State', 'Status', 'bla'}
+    # Test the third event value
+    assert set(cmd.cmd_name for cmd in results[2].cmd_list) == \
+        {'Init', 'State', 'Status', 'add_dyn_attr', 'delete_dyn_attr', 'send_event'}
+    assert set(att.name for att in results[2].att_list) == \
+        {'attr', 'State', 'Status'}
