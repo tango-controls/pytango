@@ -298,5 +298,5 @@ def test_mandatory_device_property(typed_values, server_green_mode):
                            process=True) as proxy:
         assert_close(proxy.get_prop(), value)
 
-    with DeviceTestContext(TestDevice, process=True) as proxy:
-        pass # What do we expect to happen here?
+#    with DeviceTestContext(TestDevice, process=True) as proxy:
+#        pass # What do we expect to happen here?
