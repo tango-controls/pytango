@@ -11,6 +11,7 @@
 
 """Define python methods for DeviceProxy object."""
 
+import pdb
 import time
 import textwrap
 import threading
@@ -1134,6 +1135,7 @@ def __DeviceProxy__subscribe_event (self, *args, **kwargs):
             other subscribe_event() version.
     """
 
+    pdb.set_trace()
     nargs = len(args)
     if is_integer(args[0]) and args[0] == EventType.INTERFACE_CHANGE_EVENT:
         event_type = args[0]
@@ -1144,7 +1146,8 @@ def __DeviceProxy__subscribe_event (self, *args, **kwargs):
             stateless = args[2]
         if nargs == 4:
             green_mode = args[3]
-        __DeviceProxy__subscribe_event_global (self, event_type, cb, stateless, green_mode)
+        __DeviceProxy__subscribe_event_global (
+            self, event_type, cb, stateless, green_mode)
     else:
         attr_name = args[0]
         event_type= args[1]
@@ -1161,46 +1164,63 @@ def __DeviceProxy__subscribe_event (self, *args, **kwargs):
             extract_as = args[5]
         if nargs == 7:
             green_mode = args[6]
-        __DeviceProxy__subscribe_event_attrib (self, attr_name, event_type, cb_or_queuesize, filters, stateless, extract_as, green_mode)
+        __DeviceProxy__subscribe_event_attrib (self, attr_name, event_type,
+                                               cb_or_queuesize, filters,
+                                               stateless, extract_as,
+                                               green_mode)
 
-def __DeviceProxy__subscribe_event_global (self, event_type, cb, stateless=False, green_mode=None):
+def __DeviceProxy__subscribe_event_global (self, event_type, cb,
+                                           stateless=False, green_mode=None):
 
     if event_type != EventType.INTERFACE_CHANGE_EVENT:
         raise TypeError("This method is only for Interface Change Events")
     else:
         if isinstance(cb, collections.Callable):
             cbfn = __CallBackPushEvent()
-            cbfn.push_event = green_callback(cb, obj=self, green_mode=green_mode)
-        elif hasattr(cb, "push_event") and isinstance(cb.push_event, collections.Callable):
+            cbfn.push_event = green_callback(
+                cb, obj=self, green_mode=green_mode)
+        elif hasattr(cb, "push_event") and isinstance(
+                cb.push_event, collections.Callable):
             cbfn = __CallBackPushEvent()
-            cbfn.push_event = green_callback(cb.push_event, obj=self, green_mode=green_mode)
+            cbfn.push_event = green_callback(
+                cb.push_event, obj=self, green_mode=green_mode)
         else:
-            raise TypeError("Parameter cb should be a callable object or an object with a 'push_event' method.")
+            raise TypeError(
+                "Parameter cb should be a callable object or "
+                "an object with a 'push_event' method.")
 
         event_id = self.__subscribe_event(event_type, cbfn, stateless)
 
-        with self.__get_event_map_lock():
-            se = self.__get_event_map()
-            evt_data = se.get(event_id)
-            if evt_data is not None:
-                desc = "Internal PyTango error:\n" \
-                   "%s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)\n" \
-                   "Please report error to PyTango" % \
-                   (self, event_type, event_id, evt_data[2], evt_data[1])
-                Except.throw_exception("Py_InternalError", desc, "DeviceProxy.subscribe_event")
-        se[event_id] = (cbfn, event_type, "dummy")
-        return event_id
+    with self.__get_event_map_lock():
+        se = self.__get_event_map()
+        evt_data = se.get(event_id)
+        if evt_data is None:
+            se[event_id] = (cbfn, event_type, "NoAttrName")
+            return event_id
+        # Raise exception
+        desc = textwrap.dedent("""\
+            Internal PyTango error:
+            %s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)
+            Please report error to PyTango""")
+        desc %= self, attr_name, event_type, event_id, evt_data[2], evt_data[1]
+        Except.throw_exception(
+            "Py_InternalError", desc, "DeviceProxy.subscribe_event")
 
-def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type, cb_or_queuesize,
-                                    filters=[], stateless=False, extract_as=ExtractAs.Numpy,
-                                    green_mode=None):
+def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
+                                          cb_or_queuesize,
+                                          filters=[], stateless=False,
+                                          extract_as=ExtractAs.Numpy,
+                                          green_mode=None):
 
     if isinstance(cb_or_queuesize, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = green_cb(cb_or_queuesize, self.get_green_mode())
-    elif hasattr(cb_or_queuesize, "push_event") and isinstance(cb_or_queuesize.push_event, collections.Callable):
+        cb.push_event = green_callback(
+            cb_or_queuesize, obj=self, green_mode=green_mode)
+    elif hasattr(cb_or_queuesize, "push_event") and \
+            isinstance(cb_or_queuesize.push_event, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = green_cb(cb_or_queuesize.push_event, self.get_green_mode())
+        cb.push_event = green_callback(
+            cb_or_queuesize.push_event, obj=self, green_mode=green_mode())
     elif is_integer(cb_or_queuesize):
         cb = cb_or_queuesize  # queuesize
     else:
@@ -1214,14 +1234,17 @@ def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type, cb_or_que
     with self.__get_event_map_lock():
         se = self.__get_event_map()
         evt_data = se.get(event_id)
-        if evt_data is not None:
-            desc = "Internal PyTango error:\n" \
-                   "%s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)\n" \
-                   "Please report error to PyTango" % \
-                   (self, attr_name, event_type, event_id, evt_data[2], evt_data[1])
-            Except.throw_exception("Py_InternalError", desc, "DeviceProxy.subscribe_event")
-        se[event_id] = (cb, event_type, attr_name)
-    return event_id
+        if evt_data is None:
+            se[event_id] = (cb, event_type, attr_name)
+            return event_id
+        # Raise exception
+        desc = textwrap.dedent("""\
+            Internal PyTango error:
+            %s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)
+            Please report error to PyTango""")
+        desc %= self, attr_name, event_type, event_id, evt_data[2], evt_data[1]
+        Except.throw_exception(
+            "Py_InternalError", desc, "DeviceProxy.subscribe_event")
 
 def __DeviceProxy__unsubscribe_event(self, event_id):
     """
