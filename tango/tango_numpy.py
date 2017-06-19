@@ -17,8 +17,8 @@ __all__ = ["NumpyType", "numpy_type", "numpy_spectrum", "numpy_image"]
 
 __docformat__ = "restructuredtext"
 
-from ._tango import Except
-from ._tango import constants
+from ._tango import Except, Attribute, AttributeInfo, constants
+from ._tango import CmdArgType as ArgType
 
 from .attribute_proxy import AttributeProxy
 import collections
@@ -39,10 +39,6 @@ def _define_numpy():
     try:
         import numpy
         import operator
-
-        ArgType = _tango.CmdArgType
-        AttributeInfo = _tango.AttributeInfo
-        Attribute = _tango.Attribute
 
         class NumpyType(object):
 

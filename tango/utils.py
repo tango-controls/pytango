@@ -26,7 +26,7 @@ import collections
 from ._tango import StdStringVector, StdDoubleVector, \
     DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
     EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
-    DevState, CommunicationFailed
+    DevState, CommunicationFailed, PipeEventData
 
 from . import _tango
 from .constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
@@ -36,7 +36,7 @@ __all__ = [
     "requires_pytango", "requires_tango",
     "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
     "is_number", "is_scalar_type", "is_array_type", "is_numerical_type",
-    "is_int_type", "is_float_type", "is_bool_type", "is_bin_type",
+    "is_int_type", "is_float_type", "is_bool_type", "is_binary_type",
     "is_str_type", "obj_2_str", "seqStr_2_obj",
     "scalar_to_array_type",
     "document_method", "document_static_method", "document_enum",
@@ -652,7 +652,7 @@ def is_str(tg_type, inc_array=False):
 is_str_type = is_str
 
 
-def is_bin(tg_type, inc_array=False):
+def is_binary(tg_type, inc_array=False):
     """Tells if the given tango type is binary
 
     :param tg_type: tango type
@@ -664,11 +664,11 @@ def is_bin(tg_type, inc_array=False):
     :return: True if the given tango type is binary or False otherwise
     :rtype: :py:obj:`bool`
     """
-    global _scalar_bin_types
-    return tg_type in _scalar_bin_types
+    global _binary_types
+    return tg_type in _binary_types
 
 
-is_bin_type = is_bin
+is_binary_type = is_binary
 
 
 def seq_2_StdStringVector(seq, vec=None):
@@ -1580,7 +1580,7 @@ def from_version_str_to_hex_str(version_str):
 
 
 def from_version_str_to_int(version_str):
-    return int(from_version_str_to_hex_str(version_str, 16))
+    return int(from_version_str_to_hex_str(version_str), 16)
 
 
 def info():

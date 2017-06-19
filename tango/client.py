@@ -46,6 +46,9 @@ class _DeviceHelper(object):
     __CMD_FILTER = set(("init", "state", "status"))
     __ATTR_FILTER = set(("state", "status"))
 
+    __attr_cache = None
+    __cmd_cache = None
+
     def __init__(self, dev_name, *args, **kwargs):
         self.dev_name = dev_name
         self.device = Device(dev_name, *args, **kwargs)
@@ -61,11 +64,8 @@ class _DeviceHelper(object):
         self.device.unsubscribe_event(i)
 
     def get_attr_cache(self, refresh=False):
-        try:
-            cache = self.__attr_cache
-            if not cache:
-                refresh = True
-        except AttributeError:
+        cache = self.__attr_cache
+        if not cache:
             refresh = True
         if refresh:
             cache = {}
@@ -91,11 +91,8 @@ class _DeviceHelper(object):
             return cache.get(name)
 
     def get_cmd_cache(self, refresh=False):
-        try:
-            cache = self.__cmd_cache
-            if not cache:
-                refresh = True
-        except AttributeError:
+        cache = self.__cmd_cache
+        if not cache:
             refresh = True
         if refresh:
             cache = {}

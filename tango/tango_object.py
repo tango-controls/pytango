@@ -509,10 +509,8 @@ class Server:
     def register_tango_device(self, klass, name):
         if inspect.isclass(klass):
             if isinstance(klass, Device):
-                kk, Device.TangoClassClass
-                k = Device
-                kname = Device.TangoClassName
-                # TODO: ??
+                # TODO
+                raise NotImplementedError
             else:
                 raise ValueError
         else:

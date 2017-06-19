@@ -777,8 +777,10 @@ class attribute(AttrData):
         class_name = kwargs.pop("class_name", None)
         forward = kwargs.get("forwarded", False)
         if forward:
-            if "label" in kwargs and len(kwargs) > 2:
-                raise
+            expected = 2 if "label" in kwargs else 1
+            if len(kwargs) > expected:
+                raise TypeError(
+                    "Forwarded attributes only support label argument")
         else:
             green_mode = kwargs.pop("green_mode", True)
             self.read_green_mode = kwargs.pop("read_green_mode", green_mode)

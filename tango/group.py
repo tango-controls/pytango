@@ -669,11 +669,11 @@ def __doc_Group():
         Throws     :
     """)
 
-    def document_method(method_name, desc, append=True):
+    def document_group_method(method_name, desc, append=True):
         return __document_method(Group, method_name, desc, append)
 
-    document_method("add", _RealGroup._add.__doc__, False)
-    document_method("add", """
+    document_group_method("add", _RealGroup._add.__doc__, False)
+    document_group_method("add", """
     add(self, subgroup, timeout_ms=-1) -> None
 
             Attaches a (sub)_RealGroup.
@@ -692,7 +692,7 @@ def __doc_Group():
         Throws     : TypeError, ArgumentError
     """)
 
-    document_method("command_inout", """
+    document_group_method("command_inout", """
     command_inout(self, cmd_name, forward=True) -> sequence<GroupCmdReply>
     command_inout(self, cmd_name, param, forward=True) -> sequence<GroupCmdReply>
     command_inout(self, cmd_name, param_list, forward=True) -> sequence<GroupCmdReply>
@@ -712,21 +712,21 @@ def __doc_Group():
         Return : (sequence<GroupCmdReply>)
     """)
 
-    document_method("read_attribute", """
+    document_group_method("read_attribute", """
     read_attribute(self, attr_name, forward=True) -> sequence<GroupAttrReply>
 
             Just a shortcut to do:
                 self.read_attribute_reply(self.read_attribute_asynch(...))
     """)
 
-    document_method("read_attributes", """
+    document_group_method("read_attributes", """
     read_attributes(self, attr_names, forward=True) -> sequence<GroupAttrReply>
 
             Just a shortcut to do:
                 self.read_attributes_reply(self.read_attributes_asynch(...))
     """)
 
-    document_method("write_attribute", """
+    document_group_method("write_attribute", """
     write_attribute(self, attr_name, value, forward=True, multi=False) -> sequence<GroupReply>
 
             Just a shortcut to do:
