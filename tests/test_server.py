@@ -277,3 +277,26 @@ def test_polled_attribute(server_green_mode):
             attr = lines[0].split('= ')[1]
             poll_period = int(lines[1].split('= ')[1])
             assert dct[attr] == poll_period
+
+def test_mandatory_device_property(typed_values, server_green_mode):
+    dtype, values = typed_values
+    patched_dtype = dtype if dtype != (bool,) else (int,)
+    default, value = values[:2]
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        prop = device_property(dtype=dtype, mandatory=True)
+
+        @command(dtype_out=patched_dtype)
+        def get_prop(self):
+            return self.prop
+
+
+    with DeviceTestContext(TestDevice,
+                           properties={'prop': value},
+                           process=True) as proxy:
+        assert_close(proxy.get_prop(), value)
+
+#    with DeviceTestContext(TestDevice, process=True) as proxy:
+#        pass # What do we expect to happen here?
