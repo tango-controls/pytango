@@ -145,14 +145,19 @@ class DeviceTestContext(object):
             runserver = partial(device.run_server, cmd_args)
         # Thread
         cls = multiprocessing.Process if process else threading.Thread
-        self.thread = cls(target=self.target, args=(runserver,))
+        self.thread = cls(target=self.target, args=(runserver, process))
         self.thread.daemon = daemon
 
-    def target(self, runserver):
+    def target(self, runserver, process=False):
         try:
             runserver(post_init_callback=self.post_init, raises=True)
         except:
-            self.queue.put(sys.exc_info())
+            etype, value, tb = sys.exc_info()
+            # Traceback objects can't be pickled
+            if process:
+                tb = None
+            # Put exception in the queue
+            self.queue.put((etype, value, tb))
 
     def post_init(self):
         host, port = get_server_host_port()
