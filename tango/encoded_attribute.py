@@ -17,8 +17,6 @@ __all__ = ["encoded_attribute_init"]
 
 __docformat__ = "restructuredtext"
 
-import collections
-
 from ._tango import EncodedAttribute, ExtractAs, _ImageFormat
 from ._tango import constants
 
@@ -34,13 +32,13 @@ if constants.NUMPY_SUPPORT:
 else:
     np = None
 
-_allowed_extract = ExtractAs.Numpy, ExtractAs.String, ExtractAs.Tuple, \
-                   ExtractAs.List
+_allowed_extract = (
+    ExtractAs.Numpy, ExtractAs.String, ExtractAs.Tuple, ExtractAs.List)
 
 
 def __EncodedAttribute_encode_jpeg_gray8(self, gray8, width=0, height=0, quality=100.0):
     """Encode a 8 bit grayscale image as JPEG format
-    
+
            :param gray8: an object containning image information
            :type gray8: :py:obj:`str` or :class:`numpy.ndarray` or seq< seq<element> >
            :param width: image width. **MUST** be given if gray8 is a string or
@@ -53,19 +51,19 @@ def __EncodedAttribute_encode_jpeg_gray8(self, gray8, width=0, height=0, quality
            :type height: :py:obj:`int`
            :param quality: Quality of JPEG (0=poor quality 100=max quality) (default is 100.0)
            :type quality: :py:obj:`float`
-           
+
        .. note::
            When :class:`numpy.ndarray` is given:
-        
+
                - gray8 **MUST** be CONTIGUOUS, ALIGNED
                - if gray8.ndims != 2, width and height **MUST** be given and
                  gray8.nbytes **MUST** match width*height
                - if gray8.ndims == 2, gray8.itemsize **MUST** be 1 (typically,
                  gray8.dtype is one of `numpy.dtype.byte`, `numpy.dtype.ubyte`,
                  `numpy.dtype.int8` or `numpy.dtype.uint8`)
-    
+
        Example::
-           
+
            def read_myattr(self, attr):
                enc = tango.EncodedAttribute()
                data = numpy.arange(100, dtype=numpy.byte)
@@ -78,7 +76,7 @@ def __EncodedAttribute_encode_jpeg_gray8(self, gray8, width=0, height=0, quality
 
 def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
     """Encode a 8 bit grayscale image (no compression)
-    
+
            :param gray8: an object containning image information
            :type gray8: :py:obj:`str` or :class:`numpy.ndarray` or seq< seq<element> >
            :param width: image width. **MUST** be given if gray8 is a string or
@@ -89,19 +87,19 @@ def __EncodedAttribute_encode_gray8(self, gray8, width=0, height=0):
                           or if it is a :class:`numpy.ndarray` with ndims != 2.
                           Otherwise it is calculated internally.
            :type height: :py:obj:`int`
-           
+
        .. note::
            When :class:`numpy.ndarray` is given:
-        
+
                - gray8 **MUST** be CONTIGUOUS, ALIGNED
                - if gray8.ndims != 2, width and height **MUST** be given and
                  gray8.nbytes **MUST** match width*height
                - if gray8.ndims == 2, gray8.itemsize **MUST** be 1 (typically,
                  gray8.dtype is one of `numpy.dtype.byte`, `numpy.dtype.ubyte`,
                  `numpy.dtype.int8` or `numpy.dtype.uint8`)
-    
+
        Example::
-           
+
            def read_myattr(self, attr):
                enc = tango.EncodedAttribute()
                data = numpy.arange(100, dtype=numpy.byte)
@@ -160,7 +158,7 @@ def __EncodedAttribute_generic_encode_gray8(self, gray8, width=0, height=0, qual
 
 def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
     """Encode a 16 bit grayscale image (no compression)
-    
+
            :param gray16: an object containning image information
            :type gray16: :py:obj:`str` or :py:obj:`buffer` or :class:`numpy.ndarray` or seq< seq<element> >
            :param width: image width. **MUST** be given if gray16 is a string or
@@ -171,19 +169,19 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
                           or if it is a :class:`numpy.ndarray` with ndims != 2.
                           Otherwise it is calculated internally.
            :type height: :py:obj:`int`
-    
+
        .. note::
            When :class:`numpy.ndarray` is given:
-        
+
                - gray16 **MUST** be CONTIGUOUS, ALIGNED
                - if gray16.ndims != 2, width and height **MUST** be given and
                  gray16.nbytes/2 **MUST** match width*height
                - if gray16.ndims == 2, gray16.itemsize **MUST** be 2 (typically,
                  gray16.dtype is one of `numpy.dtype.int16`, `numpy.dtype.uint16`,
                  `numpy.dtype.short` or `numpy.dtype.ushort`)
-    
+
        Example::
-           
+
            def read_myattr(self, attr):
                enc = tango.EncodedAttribute()
                data = numpy.arange(100, dtype=numpy.int16)
@@ -236,7 +234,7 @@ def __EncodedAttribute_encode_gray16(self, gray16, width=0, height=0):
 
 def __EncodedAttribute_encode_jpeg_rgb24(self, rgb24, width=0, height=0, quality=100.0):
     """Encode a 24 bit rgb color image as JPEG format.
-    
+
            :param rgb24: an object containning image information
            :type rgb24: :py:obj:`str` or :class:`numpy.ndarray` or seq< seq<element> >
            :param width: image width. **MUST** be given if rgb24 is a string or
@@ -249,10 +247,10 @@ def __EncodedAttribute_encode_jpeg_rgb24(self, rgb24, width=0, height=0, quality
            :type height: :py:obj:`int`
            :param quality: Quality of JPEG (0=poor quality 100=max quality) (default is 100.0)
            :type quality: :py:obj:`float`
-           
+
        .. note::
            When :class:`numpy.ndarray` is given:
-        
+
                - rgb24 **MUST** be CONTIGUOUS, ALIGNED
                - if rgb24.ndims != 3, width and height **MUST** be given and
                  rgb24.nbytes/3 **MUST** match width*height
@@ -260,9 +258,9 @@ def __EncodedAttribute_encode_jpeg_rgb24(self, rgb24, width=0, height=0, quality
                  rgb24.dtype is one of `numpy.dtype.byte`, `numpy.dtype.ubyte`,
                  `numpy.dtype.int8` or `numpy.dtype.uint8`) and shape **MUST** be
                  (height, width, 3)
-       
+
        Example::
-           
+
            def read_myattr(self, attr):
                enc = tango.EncodedAttribute()
                # create an 'image' where each pixel is R=0x01, G=0x01, B=0x01
@@ -275,7 +273,7 @@ def __EncodedAttribute_encode_jpeg_rgb24(self, rgb24, width=0, height=0, quality
 
 def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
     """Encode a 24 bit color image (no compression)
-    
+
            :param rgb24: an object containning image information
            :type rgb24: :py:obj:`str` or :class:`numpy.ndarray` or seq< seq<element> >
            :param width: image width. **MUST** be given if rgb24 is a string or
@@ -286,10 +284,10 @@ def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
                           or if it is a :class:`numpy.ndarray` with ndims != 3.
                           Otherwise it is calculated internally.
            :type height: :py:obj:`int`
-           
+
        .. note::
            When :class:`numpy.ndarray` is given:
-        
+
                - rgb24 **MUST** be CONTIGUOUS, ALIGNED
                - if rgb24.ndims != 3, width and height **MUST** be given and
                  rgb24.nbytes/3 **MUST** match width*height
@@ -297,9 +295,9 @@ def __EncodedAttribute_encode_rgb24(self, rgb24, width=0, height=0):
                  rgb24.dtype is one of `numpy.dtype.byte`, `numpy.dtype.ubyte`,
                  `numpy.dtype.int8` or `numpy.dtype.uint8`) and shape **MUST** be
                  (height, width, 3)
-       
+
        Example::
-           
+
            def read_myattr(self, attr):
                enc = tango.EncodedAttribute()
                # create an 'image' where each pixel is R=0x01, G=0x01, B=0x01
@@ -359,7 +357,7 @@ def __EncodedAttribute_generic_encode_rgb24(self, rgb24, width=0, height=0, qual
 
 def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality=100.0):
     """Encode a 32 bit rgb color image as JPEG format.
-    
+
            :param rgb32: an object containning image information
            :type rgb32: :py:obj:`str` or :class:`numpy.ndarray` or seq< seq<element> >
            :param width: image width. **MUST** be given if rgb32 is a string or
@@ -370,18 +368,18 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
                           or if it is a :class:`numpy.ndarray` with ndims != 2.
                           Otherwise it is calculated internally.
            :type height: :py:obj:`int`
-    
+
        .. note::
            When :class:`numpy.ndarray` is given:
-        
+
                - rgb32 **MUST** be CONTIGUOUS, ALIGNED
                - if rgb32.ndims != 2, width and height **MUST** be given and
                  rgb32.nbytes/4 **MUST** match width*height
                - if rgb32.ndims == 2, rgb32.itemsize **MUST** be 4 (typically,
                  rgb32.dtype is one of `numpy.dtype.int32`, `numpy.dtype.uint32`)
-    
+
        Example::
-           
+
            def read_myattr(self, attr):
                enc = tango.EncodedAttribute()
                data = numpy.arange(100, dtype=numpy.int32)
@@ -434,27 +432,27 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
 
 def __EncodedAttribute_decode_gray8(self, da, extract_as=ExtractAs.Numpy):
     """Decode a 8 bits grayscale image (JPEG_GRAY8 or GRAY8) and returns a 8 bits gray scale image.
-    
+
         :param da: :class:`DeviceAttribute` that contains the image
         :type da: :class:`DeviceAttribute`
         :param extract_as: defaults to ExtractAs.Numpy
         :type extract_as: ExtractAs
         :return: the decoded data
-        
+
         - In case String string is choosen as extract method, a tuple is returned:
             width<int>, height<int>, buffer<str>
         - In case Numpy is choosen as extract method, a :class:`numpy.ndarray` is
           returned with ndim=2, shape=(height, width) and dtype=numpy.uint8.
         - In case Tuple or List are choosen, a tuple<tuple<int>> or list<list<int>>
           is returned.
-        
+
        .. warning::
-           The PyTango calls that return a :class:`DeviceAttribute` 
+           The PyTango calls that return a :class:`DeviceAttribute`
            (like :meth:`DeviceProxy.read_attribute` or :meth:`DeviceProxy.command_inout`)
-           automatically extract the contents by default. This method requires 
-           that the given :class:`DeviceAttribute` is obtained from a 
+           automatically extract the contents by default. This method requires
+           that the given :class:`DeviceAttribute` is obtained from a
            call which **DOESN'T** extract the contents. Example::
-               
+
                dev = tango.DeviceProxy("a/b/c")
                da = dev.read_attribute("my_attr", extract_as=tango.ExtractAs.Nothing)
                enc = tango.EncodedAttribute()
@@ -470,7 +468,7 @@ def __EncodedAttribute_decode_gray8(self, da, extract_as=ExtractAs.Numpy):
 
 def __EncodedAttribute_decode_gray16(self, da, extract_as=ExtractAs.Numpy):
     """Decode a 16 bits grayscale image (GRAY16) and returns a 16 bits gray scale image.
-    
+
         :param da: :class:`DeviceAttribute` that contains the image
         :type da: :class:`DeviceAttribute`
         :param extract_as: defaults to ExtractAs.Numpy
@@ -485,12 +483,12 @@ def __EncodedAttribute_decode_gray16(self, da, extract_as=ExtractAs.Numpy):
           is returned.
 
        .. warning::
-           The PyTango calls that return a :class:`DeviceAttribute` 
+           The PyTango calls that return a :class:`DeviceAttribute`
            (like :meth:`DeviceProxy.read_attribute` or :meth:`DeviceProxy.command_inout`)
-           automatically extract the contents by default. This method requires 
-           that the given :class:`DeviceAttribute` is obtained from a 
+           automatically extract the contents by default. This method requires
+           that the given :class:`DeviceAttribute` is obtained from a
            call which **DOESN'T** extract the contents. Example::
-               
+
                dev = tango.DeviceProxy("a/b/c")
                da = dev.read_attribute("my_attr", extract_as=tango.ExtractAs.Nothing)
                enc = tango.EncodedAttribute()
@@ -506,7 +504,7 @@ def __EncodedAttribute_decode_gray16(self, da, extract_as=ExtractAs.Numpy):
 
 def __EncodedAttribute_decode_rgb32(self, da, extract_as=ExtractAs.Numpy):
     """Decode a color image (JPEG_RGB or RGB24) and returns a 32 bits RGB image.
-    
+
         :param da: :class:`DeviceAttribute` that contains the image
         :type da: :class:`DeviceAttribute`
         :param extract_as: defaults to ExtractAs.Numpy
@@ -519,14 +517,14 @@ def __EncodedAttribute_decode_rgb32(self, da, extract_as=ExtractAs.Numpy):
           returned with ndim=2, shape=(height, width) and dtype=numpy.uint32.
         - In case Tuple or List are choosen, a tuple<tuple<int>> or list<list<int>>
           is returned.
-        
+
        .. warning::
-           The PyTango calls that return a :class:`DeviceAttribute` 
+           The PyTango calls that return a :class:`DeviceAttribute`
            (like :meth:`DeviceProxy.read_attribute` or :meth:`DeviceProxy.command_inout`)
-           automatically extract the contents by default. This method requires 
-           that the given :class:`DeviceAttribute` is obtained from a 
+           automatically extract the contents by default. This method requires
+           that the given :class:`DeviceAttribute` is obtained from a
            call which **DOESN'T** extract the contents. Example::
-               
+
                dev = tango.DeviceProxy("a/b/c")
                da = dev.read_attribute("my_attr", extract_as=tango.ExtractAs.Nothing)
                enc = tango.EncodedAttribute()

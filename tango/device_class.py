@@ -50,8 +50,8 @@ class PropUtil:
     scalar_str_types = (CmdArgType.DevString, CmdArgType.ConstDevString,)
 
     scalar_types = scalar_numerical_types + scalar_str_types + \
-                   (CmdArgType.DevBoolean, CmdArgType.DevEncoded,
-                    CmdArgType.DevUChar, CmdArgType.DevVoid)
+        (CmdArgType.DevBoolean, CmdArgType.DevEncoded,
+         CmdArgType.DevUChar, CmdArgType.DevVoid)
 
     def __init__(self):
         self.db = None
@@ -98,7 +98,7 @@ class PropUtil:
 
                 Return     : None"""
         # initialize default values
-        if class_prop == {} or Util._UseDb == False:
+        if class_prop == {} or not Util._UseDb:
             return
 
         # call database to get properties
@@ -126,7 +126,7 @@ class PropUtil:
 
                 Return     : None"""
         #    initialize default properties
-        if dev_prop == {} or Util._UseDb == False:
+        if dev_prop == {} or not Util._UseDb:
             return
 
         # Call database to get properties
@@ -320,7 +320,7 @@ def __DeviceClass__create_user_default_attr_prop(self, attr_name, extra_info):
             method(str(v))
         elif k == 'delta_time':
             p.set_delta_t(str(v))
-        elif not k_lower in ('display level', 'polling period', 'memorized'):
+        elif k_lower not in ('display level', 'polling period', 'memorized'):
             name = self.get_name()
             msg = "Wrong definition of attribute %s in " \
                   "class %s\nThe object extra information '%s' " \
@@ -337,7 +337,7 @@ def __DeviceClass__attribute_factory(self, attr_list):
         else:
             attr_data = AttrData(attr_name, self.get_name(), attr_info)
         if attr_data.forward:
-            self._create_fwd_attribute(attr_list,attr_data.name, attr_data.att_prop)
+            self._create_fwd_attribute(attr_list, attr_data.name, attr_data.att_prop)
         else:
             self._create_attribute(attr_list, attr_data.attr_name,
                                    attr_data.attr_type,
@@ -586,7 +586,7 @@ def __DeviceClass__create_device(self, device_name, alias=None, cb=None):
             DeviceImpl for it and calls init_device (just like it is done for
             existing devices when the DS starts up)
 
-            An optional parameter callback is called AFTER the device is 
+            An optional parameter callback is called AFTER the device is
             registered in the database and BEFORE the init_device for the
             newly created device is called
 
@@ -743,10 +743,10 @@ def __doc_DeviceClass():
             - signo : (int) signal identifier
             - own_handler : (bool) true if you want the device signal handler
                             to be executed in its own handler instead of being
-                            executed by the signal thread. If this parameter 
+                            executed by the signal thread. If this parameter
                             is set to true, care should be taken on how the
                             handler is written. A default false value is provided
-        
+
         Return     : None
     """)
 
@@ -847,7 +847,7 @@ def __doc_DeviceClass():
 
         Parameters : None
         Return     : (sequence<tango.Command>) list of tango.Command objects for this class
-        
+
         New in PyTango 8.0.0
     """)
 
@@ -859,7 +859,7 @@ def __doc_DeviceClass():
         Parameters :
             - cmd_name : (str) command name
         Return     : (tango.Command) tango.Command object
-        
+
         New in PyTango 8.0.0
     """)
 

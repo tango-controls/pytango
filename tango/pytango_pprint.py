@@ -17,8 +17,6 @@ __all__ = ["pytango_pprint_init"]
 
 __docformat__ = "restructuredtext"
 
-import operator
-
 from ._tango import (StdStringVector, StdLongVector, CommandInfoList,
                      AttributeInfoList, AttributeInfoListEx, PipeInfoList,
                      DeviceDataHistoryList,
@@ -43,7 +41,7 @@ import collections
 
 def __inc_param(obj, name):
     ret = not name.startswith('_')
-    ret &= not name in ('except_flags',)
+    ret &= name not in ('except_flags',)
     ret &= not isinstance(getattr(obj, name), collections.Callable)
     return ret
 

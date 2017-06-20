@@ -1016,7 +1016,7 @@ def __doc_DeviceImpl():
         Throws     : DevFailed If the pipe name is unknown.
 
         New in PyTango 9.2.2
-    """ )
+    """)
 
     document_method("get_logger", """
     get_logger(self) -> Logger
@@ -1269,9 +1269,9 @@ def __doc_DeviceImpl():
 
         Parameters :  the blob which pipe event will be send.
         Return     : None
-        
+
         New in PyTango 9.2.2
-    """ )
+    """)
 
     document_method("is_there_subscriber", """
     is_there_subscriber(self, att_name, event_type) -> bool

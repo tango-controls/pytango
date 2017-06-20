@@ -17,15 +17,15 @@ __all__ = ["base_types_init"]
 
 __docformat__ = "restructuredtext"
 
-from ._tango import (StdStringVector, StdLongVector, StdDoubleVector, \
-                     CommandInfoList, AttributeInfoList, AttributeInfoListEx, DbData, \
-                     DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList, \
-                     DeviceDataHistoryList, StdGroupReplyVector, \
-                     StdGroupCmdReplyVector, StdGroupAttrReplyVector, \
-                     ArchiveEventInfo, EventData, AttrConfEventData, AttributeAlarmInfo, \
-                     AttributeDimension, AttributeEventInfo, DeviceAttributeConfig, \
-                     AttributeInfo, AttributeInfoEx, ChangeEventInfo, PeriodicEventInfo, \
-                     DevCommandInfo, CommandInfo, DataReadyEventData, DeviceInfo, \
+from ._tango import (StdStringVector, StdLongVector, StdDoubleVector,
+                     CommandInfoList, AttributeInfoList, AttributeInfoListEx, DbData,
+                     DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList,
+                     DeviceDataHistoryList, StdGroupReplyVector,
+                     StdGroupCmdReplyVector, StdGroupAttrReplyVector,
+                     ArchiveEventInfo, EventData, AttrConfEventData, AttributeAlarmInfo,
+                     AttributeDimension, AttributeEventInfo, DeviceAttributeConfig,
+                     AttributeInfo, AttributeInfoEx, ChangeEventInfo, PeriodicEventInfo,
+                     DevCommandInfo, CommandInfo, DataReadyEventData, DeviceInfo,
                      LockerInfo, PollDevice, TimeVal, AttrWriteType, AttrDataFormat, DispLevel)
 
 from .utils import document_method, is_integer
@@ -89,25 +89,25 @@ def __DeviceAttributeConfig__getinitargs__(self):
 
 
 def __DeviceAttributeConfig__getstate__(self):
-    ret = self.name, \
-          int(self.writable), \
-          int(self.data_format), \
-          self.data_type, \
-          self.max_dim_x, \
-          self.max_dim_y, \
-          self.description, \
-          self.label, \
-          self.unit, \
-          self.standard_unit, \
-          self.display_unit, \
-          self.format, \
-          self.min_value, \
-          self.max_value, \
-          self.min_alarm, \
-          self.max_alarm, \
-          self.writable_attr_name, \
-          StdStringVector_2_seq(self.extensions)
-    return ret
+    return (
+        self.name,
+        int(self.writable),
+        int(self.data_format),
+        self.data_type,
+        self.max_dim_x,
+        self.max_dim_y,
+        self.description,
+        self.label,
+        self.unit,
+        self.standard_unit,
+        self.display_unit,
+        self.format,
+        self.min_value,
+        self.max_value,
+        self.min_alarm,
+        self.max_alarm,
+        self.writable_attr_name,
+        StdStringVector_2_seq(self.extensions))
 
 
 def __DeviceAttributeConfig__setstate__(self, state):
@@ -159,13 +159,14 @@ def __AttributeAlarmInfo__getinitargs__(self):
 
 
 def __AttributeAlarmInfo__getstate__(self):
-    return self.min_alarm, \
-           self.max_alarm, \
-           self.min_warning, \
-           self.max_warning, \
-           self.delta_t, \
-           self.delta_val, \
-           StdStringVector_2_seq(self.extensions)
+    return (
+        self.min_alarm,
+        self.max_alarm,
+        self.min_warning,
+        self.max_warning,
+        self.delta_t,
+        self.delta_val,
+        StdStringVector_2_seq(self.extensions))
 
 
 def __AttributeAlarmInfo__setstate__(self, state):
@@ -187,9 +188,10 @@ def __ChangeEventInfo__getinitargs__(self):
 
 
 def __ChangeEventInfo__getstate__(self):
-    return self.rel_change, \
-           self.abs_change, \
-           StdStringVector_2_seq(self.extensions)
+    return (
+        self.rel_change,
+        self.abs_change,
+        StdStringVector_2_seq(self.extensions))
 
 
 def __ChangeEventInfo__setstate__(self, state):
@@ -207,8 +209,9 @@ def __PeriodicEventInfo__getinitargs__(self):
 
 
 def __PeriodicEventInfo__getstate__(self):
-    return self.period, \
-           StdStringVector_2_seq(self.extensions)
+    return (
+        self.period,
+        StdStringVector_2_seq(self.extensions))
 
 
 def __PeriodicEventInfo__setstate__(self, state):
@@ -225,10 +228,11 @@ def __ArchiveEventInfo__getinitargs__(self):
 
 
 def __ArchiveEventInfo__getstate__(self):
-    return self.archive_rel_change, \
-           self.archive_abs_change, \
-           self.archive_period, \
-           StdStringVector_2_seq(self.extensions)
+    return (
+        self.archive_rel_change,
+        self.archive_abs_change,
+        self.archive_period,
+        StdStringVector_2_seq(self.extensions))
 
 
 def __ArchiveEventInfo__setstate__(self, state):
@@ -247,9 +251,10 @@ def __AttributeEventInfo__getinitargs__(self):
 
 
 def __AttributeEventInfo__getstate__(self):
-    return self.ch_event, \
-           self.per_event, \
-           self.arch_event
+    return (
+        self.ch_event,
+        self.per_event,
+        self.arch_event)
 
 
 def __AttributeEventInfo__setstate__(self, state):
@@ -282,11 +287,12 @@ def __AttributeInfoEx__setstate__(self, state):
 
 
 def __init_base_types():
-    v_klasses = (StdStringVector, StdLongVector, StdDoubleVector, CommandInfoList, \
-                 AttributeInfoList, AttributeInfoListEx, DbData, DbDevInfos, \
-                 DbDevExportInfos, DbDevImportInfos, DbHistoryList, \
-                 DeviceDataHistoryList, StdGroupReplyVector, \
-                 StdGroupCmdReplyVector, StdGroupAttrReplyVector)
+    v_klasses = (
+        StdStringVector, StdLongVector, StdDoubleVector, CommandInfoList,
+        AttributeInfoList, AttributeInfoListEx, DbData, DbDevInfos,
+        DbDevExportInfos, DbDevImportInfos, DbHistoryList,
+        DeviceDataHistoryList, StdGroupReplyVector,
+        StdGroupCmdReplyVector, StdGroupAttrReplyVector)
 
     for v_klass in v_klasses:
         __fillVectorClass(v_klass)

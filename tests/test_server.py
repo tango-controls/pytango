@@ -13,7 +13,7 @@ from tango.test_utils import DeviceTestContext, assert_close
 try:
     import asyncio
 except ImportError:
-    import trollius as asyncio
+    import trollius as asyncio  # noqa: F401
 
 # Pytest fixtures
 from tango.test_utils import state, typed_values, server_green_mode

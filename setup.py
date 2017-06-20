@@ -64,8 +64,7 @@ def get_readme(name='README.rst'):
     with open(name) as f:
         return '\n'.join(
             line for line in f.read().splitlines()
-            if not line.startswith('|')
-            or not line.endswith('|'))
+            if not line.startswith('|') or not line.endswith('|'))
 
 
 def pkg_config(*packages, **config):
@@ -346,7 +345,7 @@ def setup_args():
     directories = {
         'include_dirs': [],
         'library_dirs': [],
-        'libraries':    [],
+        'libraries': [],
     }
     sys_libs = []
 
@@ -562,6 +561,7 @@ def setup_args():
 
 def main():
     return setup(**setup_args())
+
 
 if __name__ == "__main__":
     main()

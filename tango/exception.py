@@ -28,19 +28,19 @@ def __to_dev_failed(exc_type=None, exc_value=None, traceback=None):
             The exception is created with a single :class:`~tango.DevError`
             object. A default value *tango.ErrSeverity.ERR* is defined for
             the :class:`~tango.DevError` severity field.
-            
+
             The parameters are the same as the ones generates by a call to
             :func:`sys.exc_info`.
-            
+
         Parameters :
             - type : (class)  the exception type of the exception being handled
             - value : (object) exception parameter (its associated value or the
                       second argument to raise, which is always a class instance
                       if the exception type is a class object)
             - traceback : (traceback) traceback object
-        
+
         Return     : (tango.DevFailed) a tango exception object
-        
+
         New in PyTango 7.2.1"""
     try:
         Except.throw_python_exception(exc_type, exc_value, traceback)
@@ -83,7 +83,7 @@ def __doc_Except():
 
     Except.__doc__ = """
     A containner for the static methods:
-    
+
         - throw_exception
         - re_throw_exception
         - print_exception
@@ -93,10 +93,10 @@ def __doc_Except():
     throw_exception(reason, desc, origin, sever=tango.ErrSeverity.ERR) -> None
 
             Generate and throw a TANGO DevFailed exception.
-            The exception is created with a single :class:`~tango.DevError` 
-            object. A default value *tango.ErrSeverity.ERR* is defined for 
+            The exception is created with a single :class:`~tango.DevError`
+            object. A default value *tango.ErrSeverity.ERR* is defined for
             the :class:`~tango.DevError` severity field.
-        
+
         Parameters :
             - reason : (str) The exception :class:`~tango.DevError` object reason field
             - desc   : (str) The exception :class:`~tango.DevError` object desc field
@@ -113,7 +113,7 @@ def __doc_Except():
             The exception is re-thrown with one more :class:`~tango.DevError` object.
             A default value *tango.ErrSeverity.ERR* is defined for the new
             :class:`~tango.DevError` severity field.
-        
+
         Parameters :
             - ex     : (tango.DevFailed) The :class:`~tango.DevFailed` exception
             - reason : (str) The exception :class:`~tango.DevError` object reason field
@@ -128,7 +128,7 @@ def __doc_Except():
     print_error_stack(ex) -> None
 
             Print all the details of a TANGO error stack.
-        
+
         Parameters :
             - ex     : (tango.DevErrorList) The error stack reference
     """)
@@ -137,7 +137,7 @@ def __doc_Except():
     print_exception(ex) -> None
 
             Print all the details of a TANGO exception.
-        
+
         Parameters :
             - ex     : (tango.DevFailed) The :class:`~tango.DevFailed` exception
     """)
@@ -149,10 +149,10 @@ def __doc_Except():
             The exception is created with a single :class:`~tango.DevError`
             object. A default value *tango.ErrSeverity.ERR* is defined for
             the :class:`~tango.DevError` severity field.
-            
+
             The parameters are the same as the ones generates by a call to
             :func:`sys.exc_info`.
-            
+
         Parameters :
             - type : (class)  the exception type of the exception being handled
             - value : (object) exception parameter (its associated value or the
@@ -161,7 +161,7 @@ def __doc_Except():
             - traceback : (traceback) traceback object
 
         Throws     : DevFailed
-        
+
         New in PyTango 7.2.1
     """)
 
@@ -170,7 +170,7 @@ def __doc_DevError():
     DevError.__doc__ = """
     Structure describing any error resulting from a command execution,
     or an attribute query, with following members:
-    
+
         - reason : (str) reason
         - severity : (ErrSeverity) error severty (WARN, ERR, PANIC)
         - desc : (str) error description

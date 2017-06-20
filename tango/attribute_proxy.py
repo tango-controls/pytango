@@ -134,7 +134,8 @@ def __AttributeProxy__get_property(self, propname, value=None):
 
         if is_pure_str(propname[0]):
             new_propname = StdStringVector()
-            for i in propname: new_propname.append(i)
+            for i in propname:
+                new_propname.append(i)
             new_value = value
             if new_value is None:
                 new_value = DbData()
@@ -142,7 +143,8 @@ def __AttributeProxy__get_property(self, propname, value=None):
             return DbData_2_dict(new_value)
         elif isinstance(propname[0], DbDatum):
             new_value = DbData()
-            for i in propname: new_value.append(i)
+            for i in propname:
+                new_value.append(i)
             self._get_property(new_value)
             return DbData_2_dict(new_value)
 
@@ -196,8 +198,9 @@ def __AttributeProxy__put_property(self, value):
             new_value.append(db_datum)
         value = new_value
     else:
-        raise TypeError('value must be a tango.DbDatum, tango.DbData,' \
-                        'a sequence<DbDatum> or a dictionary')
+        raise TypeError(
+            'Value must be a tango.DbDatum, tango.DbData, '
+            'a sequence<DbDatum> or a dictionary')
     return self._put_property(value)
 
 
@@ -257,8 +260,9 @@ def __AttributeProxy__delete_property(self, value):
             else:
                 new_value.append(DbDatum(k))
     else:
-        raise TypeError('value must be a string, tango.DbDatum, ' \
-                        'tango.DbData, a sequence or a dictionary')
+        raise TypeError(
+            'Value must be a string, tango.DbDatum, '
+            'tango.DbData, a sequence or a dictionary')
 
     return self._delete_property(new_value)
 

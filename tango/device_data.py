@@ -54,7 +54,7 @@ def __doc_DeviceData():
             Inserts a value in the DeviceData.
 
         Parameters :
-                - data_type : 
+                - data_type :
                 - value     : (any) The value to insert
         Return     : Whatever is stored there, or None.
     """)

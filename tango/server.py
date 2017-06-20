@@ -785,8 +785,10 @@ class attribute(AttrData):
         class_name = kwargs.pop("class_name", None)
         forward = kwargs.get("forwarded", False)
         if forward:
-            if "label" in kwargs and len(kwargs) > 2:
-                raise
+            expected = 2 if "label" in kwargs else 1
+            if len(kwargs) > expected:
+                raise TypeError(
+                    "Forwarded attributes only support label argument")
         else:
             green_mode = kwargs.pop("green_mode", True)
             self.read_green_mode = kwargs.pop("read_green_mode", green_mode)
@@ -1307,10 +1309,7 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
     if green_mode is None:
         green_mode = get_green_mode()
 
-    if msg_stream is None:
-        write = lambda msg: None
-    else:
-        write = msg_stream.write
+    write = msg_stream.write if msg_stream else lambda msg: None
 
     if args is None:
         args = sys.argv
@@ -1526,4 +1525,4 @@ Device = DeviceMeta("Device", (BaseDevice,), {'__doc__': """\
     """})
 
 # Avoid circular imports
-from .tango_object import Server
+from .tango_object import Server  # noqa: E402

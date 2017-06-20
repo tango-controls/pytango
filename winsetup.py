@@ -21,6 +21,7 @@ import sys
 import os
 import os.path as osp
 
+
 def main():
     executable = sys.executable
 
@@ -44,7 +45,7 @@ def main():
         plat_name = 'win-amd64'
 
     try:
-        cmd_line =  '%s %s ' % (executable, setup_name)
+        cmd_line = '%s %s ' % (executable, setup_name)
         cmd_line += 'build_py --force --no-compile ' \
                     '--build-lib=%s ' \
                     % (build_dir,)
@@ -72,6 +73,7 @@ def main():
         os.chdir(curr_dir)
 
     return 0
+
 
 if __name__ == "__main__":
     ret = main()

@@ -20,7 +20,7 @@ from ._tango import StdStringVector, DbData, DbDatum, AttributeInfo
 from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
 from ._tango import DeviceProxy, __CallBackAutoDie, __CallBackPushEvent
 from ._tango import EventType, DevFailed, Except, ExtractAs, GreenMode
-from ._tango import constants
+from ._tango import PipeInfo, PipeInfoList, constants
 
 from .utils import is_pure_str, is_non_str_seq, is_integer
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
@@ -357,13 +357,6 @@ def __DeviceProxy__read_attribute(self, value, extract_as=ExtractAs.Numpy):
     return __check_read_attribute(self._read_attribute(value, extract_as))
 
 
-# def __DeviceProxy__read_attribute(self, value, extract_as=ExtractAs.Numpy,
-#                                   green_mode=None, wait=True, timeout=None):
-#     green_mode, submit = submitable(green_mode)
-#     result = submit(__DeviceProxy__read_attribute_raw, self, value, extract_as=extract_as)
-#     return get_result(result, green_mode, wait=wait, timeout=timeout)
-
-
 def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None,
                                           extract_as=ExtractAs.Numpy):
     """
@@ -561,7 +554,8 @@ def __DeviceProxy__get_property(self, propname, value=None):
 
         if is_pure_str(propname[0]):
             new_propname = StdStringVector()
-            for i in propname: new_propname.append(i)
+            for i in propname:
+                new_propname.append(i)
             new_value = value
             if new_value is None:
                 new_value = DbData()
@@ -569,7 +563,8 @@ def __DeviceProxy__get_property(self, propname, value=None):
             return DbData_2_dict(new_value)
         elif isinstance(propname[0], DbDatum):
             new_value = DbData()
-            for i in propname: new_value.append(i)
+            for i in propname:
+                new_value.append(i)
             self._get_property(new_value)
             return DbData_2_dict(new_value)
 
@@ -623,8 +618,9 @@ def __DeviceProxy__put_property(self, value):
             new_value.append(db_datum)
         value = new_value
     else:
-        raise TypeError('value must be a tango.DbDatum, tango.DbData,' \
-                        'a sequence<DbDatum> or a dictionary')
+        raise TypeError(
+            'Value must be a tango.DbDatum, tango.DbData, '
+            'a sequence<DbDatum> or a dictionary')
     return self._put_property(value)
 
 
@@ -680,8 +676,9 @@ def __DeviceProxy__delete_property(self, value):
             else:
                 new_value.append(DbDatum(k))
     else:
-        raise TypeError('value must be a string, tango.DbDatum, ' \
-                        'tango.DbData, a sequence or a dictionary')
+        raise TypeError(
+            'Value must be a string, tango.DbDatum, '
+            'tango.DbData, a sequence or a dictionary')
 
     return self._delete_property(new_value)
 
@@ -966,18 +963,22 @@ def __DeviceProxy__set_attribute_config(self, value):
     elif isinstance(value, AttributeInfoListEx):
         v = value
     elif isinstance(value, collections.Sequence):
-        if not len(value): return
+        if not len(value):
+            return
         if isinstance(value[0], AttributeInfoEx):
             v = AttributeInfoListEx()
         elif isinstance(value[0], AttributeInfo):
             v = AttributeInfoList()
         else:
-            raise TypeError('value must be a AttributeInfo, AttributeInfoEx, ' \
-                            'sequence<AttributeInfo> or sequence<AttributeInfoEx')
-        for i in value: v.append(i)
+            raise TypeError(
+                'Value must be a AttributeInfo, AttributeInfoEx, '
+                'sequence<AttributeInfo> or sequence<AttributeInfoEx')
+        for i in value:
+            v.append(i)
     else:
-        raise TypeError('value must be a AttributeInfo, AttributeInfoEx, ' \
-                        'sequence<AttributeInfo> or sequence<AttributeInfoEx')
+        raise TypeError(
+            'Value must be a AttributeInfo, AttributeInfoEx, '
+            'sequence<AttributeInfo> or sequence<AttributeInfoEx')
 
     return self._set_attribute_config(v)
 
@@ -1017,13 +1018,13 @@ def __DeviceProxy__set_pipe_config(self, value):
         if isinstance(value[0], PipeInfo):
             v = PipeInfoList()
         else:
-            raise TypeError('value must be a PipeInfo or a ' \
-                            'sequence<PipeInfo>')
+            raise TypeError(
+                'Value must be a PipeInfo or a sequence<PipeInfo>')
         for i in value:
             v.append(i)
     else:
-        raise TypeError('value must be a PipeInfo or a ' \
-                        'sequence<PipeInfo>')
+        raise TypeError(
+            'Value must be a PipeInfo or a sequence<PipeInfo>')
 
     return self._set_pipe_config(v)
 

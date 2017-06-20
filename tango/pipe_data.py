@@ -22,8 +22,7 @@ __docformat__ = "restructuredtext"
 
 import inspect
 
-from ._tango import Except, CmdArgType, DispLevel, AttrDataFormat, \
-    Pipe, PipeWriteType, PipeSerialModel, UserDefaultPipeProp
+from ._tango import Except, DispLevel, Pipe, PipeWriteType, UserDefaultPipeProp
 from .utils import is_non_str_seq, is_pure_str
 
 
