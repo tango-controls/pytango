@@ -26,7 +26,7 @@ import collections
 from ._tango import StdStringVector, StdDoubleVector, \
     DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
     EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
-    DevState, CommunicationFailed, PipeEventData
+    DevState, CommunicationFailed, PipeEventData, DevIntrChangeEventData
 
 from . import _tango
 from .constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
@@ -1503,6 +1503,7 @@ class EventCallBack(object):
         elif isinstance(evt, DevIntrChangeEventData):
             print ("utils::_get_value()")
             return
+
 
 def get_home():
     """

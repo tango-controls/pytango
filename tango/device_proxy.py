@@ -269,7 +269,7 @@ def __DeviceProxy__getattr(self, name):
 
     try:
         self.__refresh_pipe_cache()
-    except Exception as e:
+    except Exception:
         pass
 
     if name_l in self.__get_pipe_cache():
@@ -1048,15 +1048,16 @@ def __DeviceProxy__get_event_map(self):
         self.__dict__['_subscribed_events'] = dict()
     return self._subscribed_events
 
-def __DeviceProxy__subscribe_event (self, *args, **kwargs):
+
+def __DeviceProxy__subscribe_event(self, *args, **kwargs):
     """
         subscribe_event(event_type, cb, stateless=False, green_mode=None) -> int
-        
+
             The client call to subscribe for event reception in the push model.
             The client implements a callback method which is triggered when the
             event is received.
             This method is currently used device interface change events only.
- 
+
         Parameters :
             - event_type: (EventType) Is the event reason and must be on the enumerated values:
                             * EventType.INTERFACE_CHANGE_EVENT
@@ -1074,7 +1075,7 @@ def __DeviceProxy__subscribe_event (self, *args, **kwargs):
 
         Return     : An event id which has to be specified when unsubscribing
                      from this event.
- 
+
         Throws     : EventSystemFailed
 
 
@@ -1144,16 +1145,16 @@ def __DeviceProxy__subscribe_event (self, *args, **kwargs):
             stateless = args[2]
         if nargs == 4:
             green_mode = args[3]
-        __DeviceProxy__subscribe_event_global (
+        __DeviceProxy__subscribe_event_global(
             self, event_type, cb, stateless, green_mode)
     else:
         attr_name = args[0]
-        event_type= args[1]
+        event_type = args[1]
         cb_or_queuesize = args[2]
-        filters=[]
-        stateless=False
+        filters = []
+        stateless = False
         green_mode = None
-        extract_as=ExtractAs.Numpy
+        extract_as = ExtractAs.Numpy
         if nargs == 4:
             filters = args[3]
         if nargs == 5:
@@ -1162,13 +1163,14 @@ def __DeviceProxy__subscribe_event (self, *args, **kwargs):
             extract_as = args[5]
         if nargs == 7:
             green_mode = args[6]
-        __DeviceProxy__subscribe_event_attrib (self, attr_name, event_type,
-                                               cb_or_queuesize, filters,
-                                               stateless, extract_as,
-                                               green_mode)
+        __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
+                                              cb_or_queuesize, filters,
+                                              stateless, extract_as,
+                                              green_mode)
 
-def __DeviceProxy__subscribe_event_global (self, event_type, cb,
-                                           stateless=False, green_mode=None):
+
+def __DeviceProxy__subscribe_event_global(self, event_type, cb,
+                                          stateless=False, green_mode=None):
 
     if event_type != EventType.INTERFACE_CHANGE_EVENT:
         raise TypeError("This method is only for Interface Change Events")
@@ -1194,12 +1196,13 @@ def __DeviceProxy__subscribe_event_global (self, event_type, cb,
             evt_data = se.get(event_id)
             if evt_data is not None:
                 desc = "Internal PyTango error:\n" \
-                   "%s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)\n" \
-                   "Please report error to PyTango" % \
-                   (self, event_type, event_id, evt_data[2], evt_data[1])
+                       "%s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)\n" \
+                       "Please report error to PyTango" % \
+                       (self, event_type, event_id, evt_data[2], evt_data[1])
                 Except.throw_exception("Py_InternalError", desc, "DeviceProxy.subscribe_event")
         se[event_id] = (cbfn, event_type, "dummy")
         return event_id
+
 
 def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
                                           cb_or_queuesize,
@@ -1240,6 +1243,7 @@ def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
         desc %= self, attr_name, event_type, event_id, evt_data[2], evt_data[1]
         Except.throw_exception(
             "Py_InternalError", desc, "DeviceProxy.subscribe_event")
+
 
 def __DeviceProxy__unsubscribe_event(self, event_id):
     """
