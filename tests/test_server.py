@@ -4,7 +4,7 @@ import sys
 import textwrap
 import pytest
 
-from tango import DevState, AttrWriteType, GreenMode
+from tango import DevState, AttrWriteType, GreenMode, DevFailed
 from tango.server import Device
 from tango.server import command, attribute, device_property
 from tango.test_utils import DeviceTestContext, assert_close
@@ -89,28 +89,31 @@ def test_identity_command(typed_values, server_green_mode):
         for value in values:
             assert_close(proxy.identity(value), value)
 
+
 def test_polled_command(server_green_mode):
 
-    dct = {'Polling1':100, 'Polling2': 100000, 'Polling3': 500}
+    dct = {'Polling1': 100,
+           'Polling2': 100000,
+           'Polling3': 500}
 
     class TestDevice(Device):
         green_mode = server_green_mode
 
-        @command(polling_period = dct["Polling1"])
+        @command(polling_period=dct["Polling1"])
         def Polling1(self):
             pass
 
-        @command(polling_period = dct["Polling2"])
+        @command(polling_period=dct["Polling2"])
         def Polling2(self):
             pass
 
-        @command(polling_period = dct["Polling3"])
+        @command(polling_period=dct["Polling3"])
         def Polling3(self):
             pass
 
-
     with DeviceTestContext(TestDevice) as proxy:
         ans = proxy.polling_status()
+
     for info in ans:
         lines = info.split('\n')
         comm = lines[0].split('= ')[1]
@@ -253,7 +256,9 @@ def test_inheritance(server_green_mode):
 
 def test_polled_attribute(server_green_mode):
 
-    dct = {'PolledAttribute1': 100, 'PolledAttribute2': 100000, 'PolledAttribute3': 500}
+    dct = {'PolledAttribute1': 100,
+           'PolledAttribute2': 100000,
+           'PolledAttribute3': 500}
 
     class TestDevice(Device):
         green_mode = server_green_mode
@@ -278,6 +283,7 @@ def test_polled_attribute(server_green_mode):
             poll_period = int(lines[1].split('= ')[1])
             assert dct[attr] == poll_period
 
+
 def test_mandatory_device_property(typed_values, server_green_mode):
     dtype, values = typed_values
     patched_dtype = dtype if dtype != (bool,) else (int,)
@@ -292,11 +298,12 @@ def test_mandatory_device_property(typed_values, server_green_mode):
         def get_prop(self):
             return self.prop
 
-
     with DeviceTestContext(TestDevice,
                            properties={'prop': value},
                            process=True) as proxy:
         assert_close(proxy.get_prop(), value)
 
-#    with DeviceTestContext(TestDevice, process=True) as proxy:
-#        pass # What do we expect to happen here?
+    with pytest.raises(DevFailed) as context:
+        with DeviceTestContext(TestDevice, process=True) as proxy:
+            pass
+    assert 'Device property prop is mandatory' in str(context.value)
