@@ -1292,10 +1292,7 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
     if green_mode is None:
         green_mode = get_green_mode()
 
-    if msg_stream is None:
-        write = lambda msg: None
-    else:
-        write = msg_stream.write
+    write = msg_stream.write if msg_stream else lambda msg: None
 
     if args is None:
         args = sys.argv
@@ -1511,4 +1508,4 @@ Device = DeviceMeta("Device", (BaseDevice,), {'__doc__': """\
     """})
 
 # Avoid circular imports
-from .tango_object import Server
+from .tango_object import Server  # noqa: E402

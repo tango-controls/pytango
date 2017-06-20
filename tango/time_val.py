@@ -19,7 +19,6 @@ __docformat__ = "restructuredtext"
 
 import time
 import datetime
-import operator
 
 from ._tango import TimeVal
 import numbers

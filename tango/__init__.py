@@ -57,7 +57,7 @@ __all__ = [
     'LogIt', 'LogLevel', 'LogTarget', 'Logger', 'Logging', 'MessBoxType',
     'MultiAttribute', 'MultiAttrProp', 'MultiClassAttribute', 'NamedDevFailed',
     'NamedDevFailedList', 'NonDbDevice', 'NonSupportedFeature',
-    'NotAllowed', 'NumpyType', 'PeriodicEventInfo', 'PeriodicEventProp',
+    'NotAllowed', 'PeriodicEventInfo', 'PeriodicEventProp',
     'PollCmdCode', 'PollDevice',
     'PollObjType', 'READ', 'READ_WITH_WRITE', 'READ_WRITE', 'Release', 'SCALAR',
     'SPECTRUM', 'SerialModel', 'SpectrumAttr', 'StdDoubleVector',
@@ -70,19 +70,31 @@ __all__ = [
     'class_factory', 'class_list', 'constants', 'constructed_class',
     'cpp_class_list', 'delete_class_list', 'get_class', 'get_classes',
     'get_constructed_class', 'get_constructed_classes', 'get_cpp_class',
-    'get_cpp_classes', 'is_array_type', 'is_float_type',
-    'is_int_type', 'is_numerical_type', 'is_scalar_type', 'numpy_image',
-    'numpy_spectrum', 'numpy_type', 'obj_2_str', 'raise_asynch_exception',
-    'seqStr_2_obj', 'AutoTangoMonitor', 'AutoTangoAllowThreads',
-    'LatestDeviceImpl']
+    'get_cpp_classes', 'raise_asynch_exception', 'AutoTangoMonitor',
+    'AutoTangoAllowThreads', 'LatestDeviceImpl', 'Interceptors',
+    'get_attribute_proxy', 'requires_tango', 'requires_pytango',
+    'set_green_mode', 'get_green_mode', 'get_device_proxy']
 
 __docformat__ = "restructuredtext"
 
-import os
-import sys
+
+# Prepare windows import
 
 def __prepare_nt():
+    import os
+    import sys
     import struct
+
+    if os.name != 'nt':
+        return
+
+    try:
+        from . import _tango  # noqa: F401
+    except ImportError as ie:
+        pass
+    else:
+        return
+
     PATH = os.environ.get('PATH')
     if PATH is None:
         os.environ["PATH"] = PATH = ""
@@ -113,15 +125,11 @@ def __prepare_nt():
         if os.path.exists(tango_dll_path):
             os.environ['PATH'] += ";" + tango_dll_path
 
-if os.name == 'nt':
-    try:
-        from . import _tango
-    except ImportError as ie:
-        # in windows try to find the location for tango
-        __prepare_nt()
-        from . import _tango
-else:
-    from . import _tango
+
+__prepare_nt()
+
+
+# Boost imports
 
 from ._tango import (
     AccessControlType, ApiUtil, ArchiveEventInfo,
@@ -163,7 +171,13 @@ from ._tango import (
     raise_asynch_exception, Interceptors,
     AutoTangoMonitor, AutoTangoAllowThreads)
 
+
+# Aliases
+
 ArgType = CmdArgType
+
+
+# Release
 
 from .release import Release
 
@@ -175,27 +189,41 @@ __version_number__ = Release.version_number
 __version_description__ = Release.version_description
 __doc__ = Release.long_description
 
+# Pytango imports
+
 from .attr_data import AttrData
-from .log4tango import TangoStream, LogIt, DebugIt, InfoIt, WarnIt, \
-    ErrorIt, FatalIt
-from .device_server import ChangeEventProp, PeriodicEventProp, \
-    ArchiveEventProp, AttributeAlarm, EventProperties, AttributeConfig, \
-    AttributeConfig_2, AttributeConfig_3, MultiAttrProp, LatestDeviceImpl
+
+from .log4tango import (
+    TangoStream, LogIt, DebugIt, InfoIt, WarnIt, ErrorIt, FatalIt)
+
+from .device_server import (
+    ChangeEventProp, PeriodicEventProp, ArchiveEventProp, AttributeAlarm,
+    EventProperties, AttributeConfig, AttributeConfig_2, AttributeConfig_3,
+    MultiAttrProp, LatestDeviceImpl)
+
 from .pipe import PipeConfig
+
 from .attribute_proxy import AttributeProxy, get_attribute_proxy
+
 from .group import Group
+
 from .pyutil import Util
+
 from .device_class import DeviceClass
-from .globals import get_class, get_classes, get_cpp_class, get_cpp_classes, \
-    get_constructed_class, get_constructed_classes, class_factory, \
-    delete_class_list, class_list, cpp_class_list, constructed_class
-from .utils import is_scalar_type, is_array_type, is_numerical_type, \
-    is_int_type, is_float_type, is_bool_type, is_str_type, \
-    obj_2_str, str_2_obj, seqStr_2_obj, \
-    requires_pytango, requires_tango
+
+from .globals import (
+    get_class, get_classes, get_cpp_class, get_cpp_classes,
+    get_constructed_class, get_constructed_classes, class_factory,
+    delete_class_list, class_list, cpp_class_list, constructed_class)
+
+from .utils import requires_pytango, requires_tango
+
 from .green import set_green_mode, get_green_mode
+
 from .device_proxy import get_device_proxy
-from .tango_numpy import NumpyType, numpy_type, numpy_spectrum, numpy_image
+
+
+# Pytango initialization
 
 from .pytango_init import init as __init
 __init()

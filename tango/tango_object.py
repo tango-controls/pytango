@@ -200,9 +200,7 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
 
             pars = dict(name=name, dtype=dtype, dformat=fmt,
                         max_dim_x=x, max_dim_y=y, fget=read)
-            if read_only:
-                write = None
-            else:
+            if not read_only:
                 write.__name__ = "_write_" + name
                 pars['fset'] = write
                 setattr(DeviceDispatcher, write.__name__, write)
@@ -319,9 +317,9 @@ class Server:
                 except:
                     self.log.info("Last time server was not properly "
                                   "shutdown!")
-            db_class_map, db_device_map = self.get_devices()
+            _, db_device_map = self.get_devices()
         else:
-            db_class_map, db_device_map = {}, {}
+            db_device_map = {}
 
         db_devices_add = {}
 

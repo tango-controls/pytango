@@ -172,7 +172,7 @@ class AttrData(object):
                     method(str(v))
             elif k == 'delta_time':
                 p.set_delta_t(str(v))
-            elif not k_lower in ('display level', 'polling period', 'memorized'):
+            elif k_lower not in ('display level', 'polling period', 'memorized'):
                 msg = "Wrong definition of attribute. " \
                       "The object extra information '%s' " \
                       "is not recognized!" % (k,)
@@ -209,7 +209,7 @@ class AttrData(object):
         attr_info_len = len(attr_info)
         # check parameter
         if not is_non_str_seq(attr_info) or \
-                        attr_info_len < 3 or attr_info_len > 5:
+           attr_info_len < 3 or attr_info_len > 5:
             throw_ex("Wrong data type for describing mandatory information for "
                      "attribute %s in class %s\nMust be a sequence with 3, 4 "
                      "or 5 elements" % (attr_name, name))
@@ -310,8 +310,8 @@ class AttrData(object):
             self.memorized = False
 
         if self.attr_type == CmdArgType.DevEnum:
-            if not 'enum_labels' in extra_info:
-                throw_ex("Missing 'enum_labels' key in attr_list definition " \
+            if 'enum_labels' not in extra_info:
+                throw_ex("Missing 'enum_labels' key in attr_list definition "
                          "for enum attribute %s in class %s" % (attr_name, name))
             self.enum_labels = extra_info["enum_labels"]
 

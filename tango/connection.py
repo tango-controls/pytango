@@ -17,7 +17,6 @@ __all__ = ["connection_init"]
 
 __docformat__ = "restructuredtext"
 
-import operator
 import collections
 
 from ._tango import Connection, DeviceData, __CallBackAutoDie, CmdArgType, \

@@ -17,8 +17,6 @@ __all__ = ["encoded_attribute_init"]
 
 __docformat__ = "restructuredtext"
 
-import collections
-
 from ._tango import EncodedAttribute, ExtractAs, _ImageFormat
 from ._tango import constants
 
@@ -34,8 +32,8 @@ if constants.NUMPY_SUPPORT:
 else:
     np = None
 
-_allowed_extract = ExtractAs.Numpy, ExtractAs.String, ExtractAs.Tuple, \
-                   ExtractAs.List
+_allowed_extract = (
+    ExtractAs.Numpy, ExtractAs.String, ExtractAs.Tuple, ExtractAs.List)
 
 
 def __EncodedAttribute_encode_jpeg_gray8(self, gray8, width=0, height=0, quality=100.0):

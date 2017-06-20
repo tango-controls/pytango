@@ -12,7 +12,7 @@
 __all__ = ['PipeConfig']
 
 from ._tango import Pipe, PipeWriteType, UserDefaultPipeProp, \
-    AttrDataFormat, CmdArgType, DevState, DispLevel, constants
+    CmdArgType, DevState, DispLevel, constants
 
 from .utils import scalar_to_array_type, TO_TANGO_TYPE, \
     is_non_str_seq, is_pure_str, is_integer, is_number
@@ -58,7 +58,6 @@ def __get_pipe_type_simple(obj):
 
 
 def __get_pipe_type_numpy_support(obj):
-    import numpy
     try:
         ndim, dtype = obj.ndim, str(obj.dtype)
     except AttributeError:

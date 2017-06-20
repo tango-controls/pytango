@@ -1,8 +1,7 @@
 """Test utilities"""
 
 # Local imports
-from . import utils
-from . import DevState, CmdArgType, GreenMode
+from . import DevState, GreenMode
 from .server import Device
 from .test_context import DeviceTestContext
 
@@ -59,10 +58,10 @@ if numpy and pytest:
 # Pytest fixtures
 
 if pytest:
+
     @pytest.fixture(params=DevState.values.values())
     def state(request):
         return request.param
-
 
     @pytest.fixture(
         params=list(TYPED_VALUES.items()),
@@ -70,11 +69,9 @@ if pytest:
     def typed_values(request):
         return request.param
 
-
     @pytest.fixture(params=GreenMode.values.values())
     def green_mode(request):
         return request.param
-
 
     @pytest.fixture(params=[
         GreenMode.Synchronous,

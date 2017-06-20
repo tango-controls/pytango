@@ -4,7 +4,6 @@
 import sys
 import tango
 import pkgutil
-import warnings
 
 
 def alias_package(package, alias, extra_modules={}):

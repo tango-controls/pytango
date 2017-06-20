@@ -383,7 +383,6 @@ __seq_klasses = tuple(__seq_klasses)
 
 
 def __get_tango_type(obj):
-    from .device_server import DataElement
     if is_non_str_seq(obj):
         tg_type, tg_format = get_tango_type(obj[0])
         tg_format = AttrDataFormat(int(tg_format) + 1)
@@ -402,7 +401,6 @@ def __get_tango_type(obj):
 
 
 def __get_tango_type_numpy_support(obj):
-    import numpy
     try:
         ndim, dtype = obj.ndim, str(obj.dtype)
         if ndim > 2:
@@ -703,7 +701,8 @@ def StdStringVector_2_seq(vec, seq=None):
         :return: a python sequence filled with the same contents as seq
         :rtype: sequence<str>
     """
-    if seq is None: seq = []
+    if seq is None:
+        seq = []
     if not isinstance(vec, StdStringVector):
         raise TypeError('vec must be a tango.StdStringVector')
     for e in vec:
@@ -808,11 +807,13 @@ def seq_2_DbData(seq, vec=None):
         :rtype: :class:`tango.DbData`
     """
     if vec is None:
-        if isinstance(seq, DbData): return seq
+        if isinstance(seq, DbData):
+            return seq
         vec = DbData()
     if not isinstance(vec, DbData):
         raise TypeError('vec must be a tango.DbData')
-    for e in seq: vec.append(e)
+    for e in seq:
+        vec.append(e)
     return vec
 
 

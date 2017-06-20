@@ -23,13 +23,14 @@ from tango.attribute_proxy import get_attribute_proxy
 
 def check_requirements():
     try:
-        import concurrent.futures
+        import concurrent.futures  # noqa: F401
     except ImportError:
         import sys
         if sys.version_info[0] < 3:
-            raise ImportError("No module named concurrent. You need to " \
-                              "install the futures backport module to have " \
-                              "access to PyTango futures green mode")
+            raise ImportError(
+                "No module named concurrent. You need to "
+                "install the futures backport module to have "
+                "access to PyTango futures green mode")
 
 
 check_requirements()

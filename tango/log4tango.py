@@ -53,7 +53,8 @@ class TangoStream:
         if b is None or len(self._accum) == 0:
             return
         # take the '\n' because the log adds it
-        if b[-1] == '\n': b = b[:-1]
+        if b[-1] == '\n':
+            b = b[:-1]
         self._fn(b)
         self._accum = ""
 
