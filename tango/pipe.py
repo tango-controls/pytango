@@ -132,9 +132,9 @@ def __doc_UserDefaultPipeProp():
 
     UserDefaultPipeProp.__doc__ = """
     User class to set pipe default properties.
-    This class is used to set pipe default properties. 
-    Three levels of pipe properties setting are implemented within Tango. 
-    The highest property setting level is the database. 
+    This class is used to set pipe default properties.
+    Three levels of pipe properties setting are implemented within Tango.
+    The highest property setting level is the database.
     Then the user default (set using this UserDefaultPipeProp class) and finally
     a Tango library default value
     """
@@ -142,20 +142,20 @@ def __doc_UserDefaultPipeProp():
     document_method("set_label", """
     set_label(self, def_label) -> None
 
-            Set default label property. 
+            Set default label property.
 
         Parameters :
-            - def_label : (str) the user default label property 
+            - def_label : (str) the user default label property
         Return     : None
     """)
 
     document_method("set_description", """
     set_description(self, def_description) -> None
 
-            Set default description property. 
+            Set default description property.
 
-        Parameters : 
-            - def_description : (str) the user default description property 
+        Parameters :
+            - def_description : (str) the user default description property
         Return     : None
     """)
 

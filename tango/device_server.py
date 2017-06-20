@@ -1269,7 +1269,7 @@ def __doc_DeviceImpl():
 
         Parameters :  the blob which pipe event will be send.
         Return     : None
-        
+
         New in PyTango 9.2.2
     """ )
 

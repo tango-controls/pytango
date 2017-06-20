@@ -58,13 +58,13 @@ def __doc_DeviceAttribute():
 
         It contains several fields. The most important ones depend on the
         ExtractAs method used to get the value. Normally they are:
-        
+
             - value   : Normal scalar value or numpy array of values.
             - w_value : The write part of the attribute.
-            
+
         See other ExtractAs for different possibilities. There are some more
         fields, these really fixed:
-        
+
             - name        : (str)
             - data_format : (AttrDataFormat) Attribute format
             - quality     : (AttrQuality)
@@ -77,7 +77,7 @@ def __doc_DeviceAttribute():
             - w_dimension : (tuple<int,int>) Attribute written dimensions.
             - nb_read     : (int) attribute read total length
             - nb_written  : (int) attribute written total length
-            
+
 
         And two methods:
             - get_date
@@ -88,9 +88,9 @@ def __doc_DeviceAttribute():
     get_date(self) -> TimeVal
 
             Get the time at which the attribute was read by the server.
-            
+
             Note: It's the same as reading the "time" attribute.
-        
+
         Parameters : None
         Return     : (TimeVal) The attribute read timestamp.
     """)
@@ -110,11 +110,11 @@ def __doc_DeviceAttribute():
 
             Sets the write value dim x.
 
-        Parameters : 
+        Parameters :
             - val : (int) new write dim x
-            
+
         Return     : None
-        
+
         New in PyTango 8.0.0
     """)
 
@@ -123,11 +123,11 @@ def __doc_DeviceAttribute():
 
             Sets the write value dim y.
 
-        Parameters : 
+        Parameters :
             - val : (int) new write dim y
-            
+
         Return     : None
-        
+
         New in PyTango 8.0.0
     """)
 

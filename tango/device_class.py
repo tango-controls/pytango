@@ -586,7 +586,7 @@ def __DeviceClass__create_device(self, device_name, alias=None, cb=None):
             DeviceImpl for it and calls init_device (just like it is done for
             existing devices when the DS starts up)
 
-            An optional parameter callback is called AFTER the device is 
+            An optional parameter callback is called AFTER the device is
             registered in the database and BEFORE the init_device for the
             newly created device is called
 
@@ -743,10 +743,10 @@ def __doc_DeviceClass():
             - signo : (int) signal identifier
             - own_handler : (bool) true if you want the device signal handler
                             to be executed in its own handler instead of being
-                            executed by the signal thread. If this parameter 
+                            executed by the signal thread. If this parameter
                             is set to true, care should be taken on how the
                             handler is written. A default false value is provided
-        
+
         Return     : None
     """)
 
@@ -847,7 +847,7 @@ def __doc_DeviceClass():
 
         Parameters : None
         Return     : (sequence<tango.Command>) list of tango.Command objects for this class
-        
+
         New in PyTango 8.0.0
     """)
 
@@ -859,7 +859,7 @@ def __doc_DeviceClass():
         Parameters :
             - cmd_name : (str) command name
         Return     : (tango.Command) tango.Command object
-        
+
         New in PyTango 8.0.0
     """)
 
