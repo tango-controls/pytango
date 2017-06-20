@@ -1,10 +1,8 @@
 from __future__ import print_function
 
 import time
-import numpy
 
 import tango
-from tango import DevState
 
 
 class EventManager():
@@ -51,10 +49,12 @@ class EventManager():
 
             print("Device started ", ev.dev_started)
 
+
 def main():
-    dev=tango.DeviceProxy('ifchangeServer/tango/1')
-    em = EventManager(dev)
+    dev = tango.DeviceProxy('ifchangeServer/tango/1')
+    EventManager(dev)
     time.sleep(3000.0)
+
 
 if __name__ == '__main__':
     main()
