@@ -90,7 +90,7 @@ def __prepare_nt():
 
     try:
         from . import _tango  # noqa: F401
-    except ImportError as ie:
+    except ImportError:
         pass
     else:
         return
@@ -116,7 +116,7 @@ def __prepare_nt():
     tango_dll_path = tango_dll_path.lower()
     if os.path.exists(tango_dll_path) and \
        tango_dll_path not in PATH.lower():
-            os.environ['PATH'] += ";" + tango_dll_path
+        os.environ['PATH'] += ";" + tango_dll_path
     else:
         # Tango C++ could not be found on the system...
         # ... use PyTango's private Tango C++ library
