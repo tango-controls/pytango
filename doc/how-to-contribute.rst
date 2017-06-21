@@ -32,8 +32,19 @@ Theme is not important, a theme prepared for Tango Community can be also used.
 Source code standard
 --------------------
 
-All code should be PEP8_ compatible. Flake8_ combines PEP8_ and PyFlakes_.
-There should be plugins_ for IDEs.
+All code should be PEP8_ compatible. We have set up checking code quality with
+Codacy_ which uses PyLint_ under the hood. You can see how well your code is
+rated on your PR's page.
+
+.. note:: The accepted policy is that your code **cannot** introduce more
+          issues than it solves!
+
+You can also use other tools for checking PEP8_ compliance for your
+personal use. One good example of such a tool is Flake8_ which combines PEP8_
+and PyFlakes_. There are plugins_ for various IDEs so that you can use your
+favourite tool easily.
+
+
 
 .. _example: http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow
 .. _autodoc: https://pypi.python.org/pypi/autodoc
@@ -43,3 +54,5 @@ There should be plugins_ for IDEs.
 .. _plugins: https://gitlab.com/pycqa/flake8/issues/286
 .. _reStructuredText: http://docutils.sourceforge.net/rst.html
 .. _Sphinx: http://www.sphinx-doc.org/en/stable
+.. _PyLint: https://www.pylint.org
+.. _Codacy: https://www.codacy.com/app/tango-controls/pytango/dashboard

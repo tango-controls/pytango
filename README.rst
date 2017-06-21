@@ -1,15 +1,14 @@
 PyTango
 =======
 
-
 |Doc Status|
 |Build Status|
-|Quality Status|
 |Pypi Version|
 |Python Versions|
 |Anaconda Cloud|
+|Codacy|
 
-Main website: http://pytango.rtfd.io
+Main website: http://pytango.readthedocs.io
 
 Python binding for Tango_, a library dedicated to distributed control systems.
 
@@ -105,10 +104,6 @@ All contributions,  `PR and bug reports`_ are welcome, please see: `How to Contr
                   :target: https://travis-ci.org/tango-controls/pytango
                   :alt:
 
-.. |Quality Status| image:: https://api.codacy.com/project/badge/Grade/c8f2b9fbdcd74f44b41bb4babcb4c8f3
-		    :target: https://www.codacy.com/app/tango-controls/pytango?utm_source=github.com&utm_medium=referral&utm_content=tango-controls/pytango&utm_campaign=badger
-		    :alt:
-
 .. |Pypi Version| image:: https://img.shields.io/pypi/v/PyTango.svg
                   :target: https://pypi.python.org/pypi/PyTango
                   :alt:
@@ -120,6 +115,10 @@ All contributions,  `PR and bug reports`_ are welcome, please see: `How to Contr
 .. |Anaconda Cloud| image:: https://anaconda.org/tango-controls/pytango/badges/version.svg
                     :target: https://anaconda.org/tango-controls/pytango
                     :alt:
+
+.. |Codacy| image:: https://api.codacy.com/project/badge/Grade/c8f2b9fbdcd74f44b41bb4babcb4c8f3
+            :target: https://www.codacy.com/app/tango-controls/pytango?utm_source=github.com&utm_medium=referral&utm_content=tango-controls/pytango&utm_campaign=badger
+            :alt: Codacy Badge
 
 .. _Tango: http://tango-controls.org
 .. _Tango C++ API: http://esrf.eu/computing/cs/tango/tango_doc/kernel_doc/cpp_doc
@@ -142,4 +141,4 @@ All contributions,  `PR and bug reports`_ are welcome, please see: `How to Contr
 .. _Tango forums: http://tango-controls.org/community/forum
 .. _PR and bug reports: PyTango_
 .. _sources: PyTango_
-.. _How to Contribute: http://pytango.readthedocs.io/en/latest/howto.html
+.. _How to Contribute: http://pytango.readthedocs.io/en/latest/how-to-contribute.html#how-to-contribute
