@@ -1,12 +1,10 @@
 PyTango
 =======
 
-.. image:: https://api.codacy.com/project/badge/Grade/c8f2b9fbdcd74f44b41bb4babcb4c8f3
-   :alt: Codacy Badge
-   :target: https://www.codacy.com/app/tango-controls/pytango?utm_source=github.com&utm_medium=referral&utm_content=tango-controls/pytango&utm_campaign=badger
 
 |Doc Status|
 |Build Status|
+|Quality Status|
 |Pypi Version|
 |Python Versions|
 |Anaconda Cloud|
@@ -106,6 +104,10 @@ All contributions,  `PR and bug reports`_ are welcome, please see: `How to Contr
 .. |Build Status| image:: https://travis-ci.org/tango-controls/pytango.svg
                   :target: https://travis-ci.org/tango-controls/pytango
                   :alt:
+
+.. |Quality Status| image:: https://api.codacy.com/project/badge/Grade/c8f2b9fbdcd74f44b41bb4babcb4c8f3
+		    :target: https://www.codacy.com/app/tango-controls/pytango?utm_source=github.com&utm_medium=referral&utm_content=tango-controls/pytango&utm_campaign=badger
+		    :alt:
 
 .. |Pypi Version| image:: https://img.shields.io/pypi/v/PyTango.svg
                   :target: https://pypi.python.org/pypi/PyTango
