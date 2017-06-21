@@ -141,4 +141,4 @@ All contributions,  `PR and bug reports`_ are welcome, please see: `How to Contr
 .. _Tango forums: http://tango-controls.org/community/forum
 .. _PR and bug reports: PyTango_
 .. _sources: PyTango_
-.. _How to Contribute: http://pytango.readthedocs.io/en/latest/howto.html
+.. _How to Contribute: http://pytango.readthedocs.io/en/latest/how-to-contribute.html#how-to-contribute
