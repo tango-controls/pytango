@@ -269,7 +269,7 @@ def __DeviceProxy__getattr(self, name):
 
     try:
         self.__refresh_pipe_cache()
-    except Exception as e:
+    except Exception:
         pass
 
     if name_l in self.__get_pipe_cache():

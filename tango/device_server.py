@@ -428,7 +428,6 @@ def __DeviceImpl__add_command(self, cmd, device_level=True):
         Return     : Command
         Throws     : DevFailed
     """
-    add_name = cmd.__name__
     add_name_in_list = False      # This flag is always False, what use is it?
     try:
         config = dict(cmd.__tango_command__[1][2])
@@ -440,14 +439,15 @@ def __DeviceImpl__add_command(self, cmd, device_level=True):
                           device_level)
         if add_name_in_list:
             cl = self.get_device_class()
-            cl.dyn_cmd_added_methods.append(name)
+            cl.dyn_cmd_added_methods.append(cmd.__name__)
     except:
         if add_name_in_list:
-            self._remove_cmd(cmd_name)
+            self._remove_cmd(cmd.__name__)
         raise
     return cmd
 
-def __DeviceImpl__remove_command(self, cmd_name, free_it = False, clean_db = True):
+
+def __DeviceImpl__remove_command(self, cmd_name, free_it=False, clean_db=True):
     """
         remove_command(self, attr_name) -> None
 
@@ -456,7 +456,7 @@ def __DeviceImpl__remove_command(self, cmd_name, free_it = False, clean_db = Tru
         Parameters :
             - cmd_name : (str) command name to be removed from the list
             - free_it  : Boolean set to true if the command object must be freed.
-            - clean_db : Clean command related information (included polling info 
+            - clean_db : Clean command related information (included polling info
                          if the command is polled) from database.
          Return     : None
 
@@ -469,8 +469,8 @@ def __DeviceImpl__remove_command(self, cmd_name, free_it = False, clean_db = Tru
     except:
         return
 
-    if cl.dyn_cmd_added_methods.count(attr_name) != 0:
-        cl.dyn_cmd_added_methods.remove(attr_name)
+    if cl.dyn_cmd_added_methods.count(cmd_name) != 0:
+        cl.dyn_cmd_added_methods.remove(cmd_name)
 
     self._remove_command(cmd_name, free_it, clean_db)
 
