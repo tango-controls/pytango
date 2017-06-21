@@ -37,7 +37,7 @@ Codacy_ which uses PyLint_ under the hood. You can see how well your code is
 rated on your PR's page.
 
 .. warning:: The accepted policy is that your code **cannot** introduce more
-issues than it solves!
+             issues than it solves!
 
 You can also use other tools for checking PEP8_ compliance for your
 personal use. One good example of such a tool is Flake8_ which combines PEP8_
