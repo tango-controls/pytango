@@ -1187,9 +1187,9 @@ class device_property(_BaseProperty):
     .. versionadded:: 8.1.7
         added update_db option
     """
-    def __init__(self, dtype, doc='', mandatory=False, 
+    def __init__(self, dtype, doc='', mandatory=False,
                  default_value=None, update_db=False):
-        super(device_property, self).__init__(dtype, doc,default_value,
+        super(device_property, self).__init__(dtype, doc, default_value,
                                               update_db)
         self.mandatory = mandatory
         if mandatory and default_value is not None:

@@ -21,7 +21,7 @@ from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
 from ._tango import DeviceProxy, __CallBackAutoDie, __CallBackPushEvent
 from ._tango import EventType, DevFailed, Except, ExtractAs, GreenMode
 from ._tango import PipeInfo, PipeInfoList, constants
-from ._tango import constants, DevicePipe, CmdArgType, DevState
+from ._tango import CmdArgType, DevState
 
 from .utils import TO_TANGO_TYPE, scalar_to_array_type
 from .utils import is_pure_str, is_non_str_seq, is_integer, is_number
@@ -271,7 +271,7 @@ def __DeviceProxy__getattr(self, name):
 
     try:
         self.__refresh_pipe_cache()
-    except Exception as e:
+    except Exception:
         pass
 
     if name_l in self.__get_pipe_cache():
@@ -1287,7 +1287,7 @@ def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
     r = self.__read_pipe(pipe_name)
     return r.extract(extract_as)
 
-#-------------duplicate code from pipe.py--------------------------
+
 def __get_pipe_type_simple(obj):
     if is_non_str_seq(obj):
         if len(obj) == 2 and \
@@ -1311,9 +1311,8 @@ def __get_pipe_type_simple(obj):
         raise ValueError('Cannot determine object tango type')
     return tg_type
 
-    
+
 def __get_pipe_type_numpy_support(obj):
-    import numpy
     try:
         ndim, dtype = obj.ndim, str(obj.dtype)
     except AttributeError:
@@ -1346,6 +1345,7 @@ def __get_pipe_type(obj, dtype=None):
         return __get_pipe_type_numpy_support(obj)
     return __get_pipe_type_simple(obj)
 
+
 def __sanatize_pipe_element(elem):
     if isinstance(elem, dict):
         result = dict(elem)
@@ -1359,13 +1359,11 @@ def __sanatize_pipe_element(elem):
 
 
 def __sanatize_pipe_blob(blob):
-    result = []
     if isinstance(blob, dict):
         return [__sanatize_pipe_element((k, v)) for k, v in blob.items()]
     else:
         return [__sanatize_pipe_element(elem) for elem in blob]
 
-#--------------------end duplicate code ---------------------------------------
 
 def __DeviceProxy__write_pipe(self, *args, **kwargs):
     pipe_name, (blob_name, blob_data) = args
