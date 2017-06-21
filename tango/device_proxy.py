@@ -1195,11 +1195,14 @@ def __DeviceProxy__subscribe_event_global(self, event_type, cb,
             se = self.__get_event_map()
             evt_data = se.get(event_id)
             if evt_data is not None:
-                desc = "Internal PyTango error:\n" \
-                       "%s.subscribe_event(%s, %s) already has key %d assigned to (%s, %s)\n" \
-                       "Please report error to PyTango" % \
-                       (self, event_type, event_id, evt_data[2], evt_data[1])
-                Except.throw_exception("Py_InternalError", desc, "DeviceProxy.subscribe_event")
+                # Raise exception
+                desc = textwrap.dedent("""\
+                    Internal PyTango error:
+                    %s.subscribe_event(%s) already has key %d assigned to (%s, %s)
+                    Please report error to PyTango""")
+                desc %= self, event_type, event_id, evt_data[2], evt_data[1]
+                Except.throw_exception(
+                    "Py_InternalError", desc, "DeviceProxy.subscribe_event")
         se[event_id] = (cbfn, event_type, "dummy")
         return event_id
 
