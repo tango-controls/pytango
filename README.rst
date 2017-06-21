@@ -8,7 +8,7 @@ PyTango
 |Anaconda Cloud|
 |Codacy|
 
-Main website: http://pytango.rtfd.io
+Main website: http://pytango.readthedocs.io
 
 Python binding for Tango_, a library dedicated to distributed control systems.
 
