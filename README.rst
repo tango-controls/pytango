@@ -1,6 +1,10 @@
 PyTango
 =======
 
+.. image:: https://api.codacy.com/project/badge/Grade/c8f2b9fbdcd74f44b41bb4babcb4c8f3
+   :alt: Codacy Badge
+   :target: https://www.codacy.com/app/tango-controls/pytango?utm_source=github.com&utm_medium=referral&utm_content=tango-controls/pytango&utm_campaign=badger
+
 |Doc Status|
 |Build Status|
 |Pypi Version|
