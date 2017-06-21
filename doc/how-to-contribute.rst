@@ -36,8 +36,7 @@ All code should be PEP8_ compatible. We have set up checking code quality with
 Codacy_ which uses PyLint_ under the hood. You can see how well your code is
 rated on your PR's page.
 
-.. warning::
-The accepted policy is that your code **cannot** introduce more
+.. warning:: The accepted policy is that your code **cannot** introduce more
 issues than it solves!
 
 You can also use other tools for checking PEP8_ compliance for your
