@@ -673,7 +673,7 @@ namespace PyDeviceImpl
     void add_command(Tango::DeviceImpl &self, boost::python::object cmd_name, boost::python::object cmd_data,
     		boost::python::object disp_level, bool device_level = false)
     {
-        PyCmd *py_cmd_ptr = nullptr;
+//        PyCmd *py_cmd_ptr = nullptr;
         Tango::Command *cmd_ptr = nullptr;
         std::string name = boost::python::extract<std::string>(cmd_name);
 
@@ -684,8 +684,9 @@ namespace PyDeviceImpl
         Tango::CmdArgType argtype_out = boost::python::extract<Tango::CmdArgType>(cmd_data[1][0]);
         Tango::DispLevel display_level = boost::python::extract<Tango::DispLevel>(disp_level);
 
-        py_cmd_ptr = new PyCmd(name, argtype_in, argtype_out, in_desc, out_desc, display_level);
-        cmd_ptr = py_cmd_ptr;
+        cmd_ptr = new PyCmd(name, argtype_in, argtype_out, in_desc, out_desc, display_level);
+//        py_cmd_ptr = new PyCmd(name, argtype_in, argtype_out, in_desc, out_desc, display_level);
+//        cmd_ptr = py_cmd_ptr;
         //
         // Install the command in Tango.
         //
