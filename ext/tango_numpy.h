@@ -15,6 +15,7 @@
 
 #include <Python.h>
 
+//#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 // See "Importing the API" for the why of these weird defines before
 // the inclusion of numpy. They are needed so that you can do import_array
 // in just one file while using numpy in all the project files.
