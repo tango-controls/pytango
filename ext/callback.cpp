@@ -219,8 +219,8 @@ namespace {
         // finishes then discard the event
         if (!Py_IsInitialized())
         {
-            cout4 << "Tango event (" << ev->event << " for " 
-//                  << ev->attr_name << ") received for after python shutdown. "
+            cout4 << "Tango event (" << ev->event <<
+                  ") received for after python shutdown. "
                   << "Event will be ignored" << std::endl;
             return;
         }
@@ -314,6 +314,14 @@ void PyCallBackPushEvent::fill_py_event(Tango::PipeEventData* ev, object & py_ev
     }
 }
 
+void PyCallBackPushEvent::fill_py_event(Tango::DevIntrChangeEventData* ev, object & py_ev, object py_device, PyTango::ExtractAs extract_as) {
+
+	copy_device(ev, py_ev, py_device);
+
+	py_ev.attr("cmd_list") = ev->cmd_list;
+	py_ev.attr("att_list") = ev->att_list;
+}
+
 /*virtual*/ void PyCallBackPushEvent::push_event(Tango::EventData *ev)
 {
     _push_event(this, ev);
@@ -330,6 +338,11 @@ void PyCallBackPushEvent::fill_py_event(Tango::PipeEventData* ev, object & py_ev
 }
 
 /*virtual*/ void PyCallBackPushEvent::push_event(Tango::PipeEventData *ev)
+{
+    _push_event(this, ev);
+}
+
+/*virtual*/ void PyCallBackPushEvent::push_event(Tango::DevIntrChangeEventData *ev)
 {
     _push_event(this, ev);
 }
@@ -398,7 +411,9 @@ void export_callback()
             "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send attribute configuration change event(s) to the client. ")
         .def("push_event", (void (PyCallBackAutoDie::*)(Tango::DataReadyEventData*))&PyCallBackAutoDie::push_event,
             "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send attribute data ready event(s) to the client. ")
-	    .def("push_event", (void (PyCallBackAutoDie::*)(Tango::PipeEventData*))&PyCallBackAutoDie::push_event,
-	        "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send pipe event(s) to the client. ")
+        .def("push_event", (void (PyCallBackAutoDie::*)(Tango::PipeEventData*))&PyCallBackAutoDie::push_event,
+            "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send pipe event(s) to the client. ")
+        .def("push_event", (void (PyCallBackAutoDie::*)(Tango::DevIntrChangeEventData*))&PyCallBackAutoDie::push_event,
+            "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send device interface change event(s) to the client. ")
     ;
 }

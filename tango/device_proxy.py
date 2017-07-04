@@ -1051,12 +1051,37 @@ def __DeviceProxy__get_event_map(self):
     return self._subscribed_events
 
 
-def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
-                                   filters=[], stateless=False, extract_as=ExtractAs.Numpy,
-                                   green_mode=None):
+def __DeviceProxy__subscribe_event(self, *args, **kwargs):
     """
-    subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy) -> int
+        subscribe_event(event_type, cb, stateless=False, green_mode=None) -> int
 
+            The client call to subscribe for event reception in the push model.
+            The client implements a callback method which is triggered when the
+            event is received.
+            This method is currently used device interface change events only.
+
+        Parameters :
+            - event_type: (EventType) Is the event reason and must be on the enumerated values:
+                            * EventType.INTERFACE_CHANGE_EVENT
+            - callback  : (callable) Is any callable object or an object with a
+                          callable "push_event" method.
+            - stateless : (bool) When the this flag is set to false, an exception will
+                          be thrown when the event subscription encounters a problem.
+                          With the stateless flag set to true, the event subscription
+                          will always succeed, even if the corresponding device server
+                          is not running. The keep alive thread will try every 10
+                          seconds to subscribe for the specified event. At every
+                          subscription retry, a callback is executed which contains
+                          the corresponding exception
+            - green_mode :
+
+        Return     : An event id which has to be specified when unsubscribing
+                     from this event.
+
+        Throws     : EventSystemFailed
+
+
+        subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy, green_mode=None) -> int
             The client call to subscribe for event reception in the push model.
             The client implements a callback method which is triggered when the
             event is received. Filtering is done based on the reason specified and
@@ -1065,7 +1090,6 @@ def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
             changes. Events consist of an attribute name and the event reason.
             A standard set of reasons are implemented by the system, additional
             device specific reasons can be implemented by device servers programmers.
-
         Parameters :
             - attr_name : (str) The device attribute name which will be sent
                           as an event e.g. "current".
@@ -1076,8 +1100,6 @@ def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
                             * EventType.ATTR_CONF_EVENT
                             * EventType.DATA_READY_EVENT
                             * EventType.USER_EVENT
-                            * EventType.INTERFACE_CHANGE_EVENT
-                            * EventType.PIPE_EVENT
             - callback  : (callable) Is any callable object or an object with a
                           callable "push_event" method.
             - filters   : (sequence<str>) A variable list of name,value pairs
@@ -1091,21 +1113,17 @@ def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
                           subscription retry, a callback is executed which contains
                           the corresponding exception
             - extract_as : (ExtractAs)
-
+            - green_mode :
         Return     : An event id which has to be specified when unsubscribing
                      from this event.
-
         Throws     : EventSystemFailed
 
-
-    subscribe_event(self, attr_name, event, queuesize, filters=[], stateless=False ) -> int
-
+        subscribe_event(self, attr_name, event, queuesize, filters=[], stateless=False, green_mode=None) -> int
             The client call to subscribe for event reception in the pull model.
             Instead of a callback method the client has to specify the size of the
             event reception buffer.
             The event reception buffer is implemented as a round robin buffer. This
             way the client can set-up different ways to receive events:
-
                 * Event reception buffer size = 1 : The client is interested only
                   in the value of the last event received. All other events that
                   have been received since the last reading are discarded.
@@ -1115,10 +1133,87 @@ def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
                 * Event reception buffer size = ALL_EVENTS : The client buffers all
                   received events. The buffer size is unlimited and only restricted
                   by the available memory for the client.
-
             All other parameters are similar to the descriptions given in the
             other subscribe_event() version.
     """
+
+    nargs = len(args)
+    if is_integer(args[0]) and args[0] == EventType.INTERFACE_CHANGE_EVENT:
+        event_type = args[0]
+        cb = args[1]
+        stateless = False
+        green_mode = None
+        if nargs == 3:
+            stateless = args[2]
+        if nargs == 4:
+            green_mode = args[3]
+        __DeviceProxy__subscribe_event_global(
+            self, event_type, cb, stateless, green_mode)
+    else:
+        attr_name = args[0]
+        event_type = args[1]
+        cb_or_queuesize = args[2]
+        filters = []
+        stateless = False
+        green_mode = None
+        extract_as = ExtractAs.Numpy
+        if nargs == 4:
+            filters = args[3]
+        if nargs == 5:
+            stateless = args[4]
+        if nargs == 6:
+            extract_as = args[5]
+        if nargs == 7:
+            green_mode = args[6]
+        __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
+                                              cb_or_queuesize, filters,
+                                              stateless, extract_as,
+                                              green_mode)
+
+
+def __DeviceProxy__subscribe_event_global(self, event_type, cb,
+                                          stateless=False, green_mode=None):
+
+    if event_type != EventType.INTERFACE_CHANGE_EVENT:
+        raise TypeError("This method is only for Interface Change Events")
+    else:
+        if isinstance(cb, collections.Callable):
+            cbfn = __CallBackPushEvent()
+            cbfn.push_event = green_callback(
+                cb, obj=self, green_mode=green_mode)
+        elif hasattr(cb, "push_event") and isinstance(
+                cb.push_event, collections.Callable):
+            cbfn = __CallBackPushEvent()
+            cbfn.push_event = green_callback(
+                cb.push_event, obj=self, green_mode=green_mode)
+        else:
+            raise TypeError(
+                "Parameter cb should be a callable object or "
+                "an object with a 'push_event' method.")
+
+        event_id = self.__subscribe_event(event_type, cbfn, stateless)
+
+        with self.__get_event_map_lock():
+            se = self.__get_event_map()
+            evt_data = se.get(event_id)
+            if evt_data is not None:
+                # Raise exception
+                desc = textwrap.dedent("""\
+                    Internal PyTango error:
+                    %s.subscribe_event(%s) already has key %d assigned to (%s, %s)
+                    Please report error to PyTango""")
+                desc %= self, event_type, event_id, evt_data[2], evt_data[1]
+                Except.throw_exception(
+                    "Py_InternalError", desc, "DeviceProxy.subscribe_event")
+        se[event_id] = (cbfn, event_type, "dummy")
+        return event_id
+
+
+def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
+                                          cb_or_queuesize,
+                                          filters=[], stateless=False,
+                                          extract_as=ExtractAs.Numpy,
+                                          green_mode=None):
 
     if isinstance(cb_or_queuesize, collections.Callable):
         cb = __CallBackPushEvent()

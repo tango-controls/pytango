@@ -567,7 +567,25 @@ namespace PyDeviceProxy
         }
     }
 
-    static int subscribe_event(
+    static int subscribe_event_global(
+            bopy::object py_self,
+            Tango::EventType event,
+            bopy::object py_cb,
+            bool stateless)
+    {
+        Tango::DeviceProxy& self = bopy::extract<Tango::DeviceProxy&>(py_self);
+
+        PyCallBackPushEvent* cb = 0;
+        if (bopy::extract<PyCallBackPushEvent&>(py_cb).check()) {
+            cb = bopy::extract<PyCallBackPushEvent*>(py_cb);
+            cb->set_device(py_self);
+
+            AutoPythonAllowThreads guard;
+            return self.subscribe_event(event, cb, stateless);
+        }
+    }
+
+    static int subscribe_event_attrib(
             bopy::object py_self,
             const string &attr_name,
             Tango::EventType event,
@@ -673,6 +691,12 @@ namespace PyDeviceProxy
     get_events__pipe_data(bopy::object py_self, int event_id, PyTango::ExtractAs extract_as)
     {
         return get_events__aux<Tango::PipeEventData, Tango::PipeEventDataList>(py_self, event_id, extract_as);
+    }
+
+    static bopy::object
+    get_events__devintr_change_data(bopy::object py_self, int event_id, PyTango::ExtractAs extract_as)
+    {
+        return get_events__aux<Tango::DevIntrChangeEventData, Tango::DevIntrChangeEventDataList>(py_self, event_id, extract_as);
     }
 
     static boost::shared_ptr<Tango::DeviceProxy> makeDeviceProxy1(const std::string& name)
@@ -1065,7 +1089,10 @@ void export_device_proxy()
         // Event methods
         //
 
-        .def("__subscribe_event", &PyDeviceProxy::subscribe_event,
+        .def("__subscribe_event", &PyDeviceProxy::subscribe_event_global,
+            ( arg_("self"), arg_("event"), arg_("cb_or_queuesize") ))
+
+        .def("__subscribe_event", &PyDeviceProxy::subscribe_event_attrib,
             (   arg_("self"),
                 arg_("attr_name"),
                 arg_("event"),
@@ -1091,6 +1118,9 @@ void export_device_proxy()
 
         .def("__get_pipe_events", PyDeviceProxy::get_events__pipe_data,
             ( arg_("self"), arg_("event_id"), arg_("extract_as")=PyTango::ExtractAsNumpy ))
+
+        .def("__get_devintr_change_events", PyDeviceProxy::get_events__devintr_change_data,
+            ( arg_("self"), arg_("event_id")) )
 
         // methods to access data in event queues
         .def("event_queue_size", &Tango::DeviceProxy::event_queue_size,
