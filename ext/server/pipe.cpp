@@ -15,6 +15,7 @@
 #include "pipe.h"
 #include "fast_from_py.h"
 #include <boost/python.hpp>
+#include "device_pipe.h"
 
 #define __AUX_DECL_CALL_PIPE_METHOD \
     PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev); \
@@ -72,13 +73,19 @@ namespace PyTango { namespace Pipe {
     void _Pipe::write(Tango::DeviceImpl *dev, Tango::WPipe &pipe)
     {
         if (!_is_method(dev, write_name))
-	{
-	    TangoSys_OMemStream o;
-	    o << write_name << " method not found for " << pipe.get_name();
-	    Tango::Except::throw_exception("PyTango_WritePipeMethodNotFound",
-					   o.str(), "PyTango::Pipe::write");
-	}
-	CALL_PIPE_METHOD_VARGS(dev, write_name.c_str(), boost::ref(pipe))
+        {
+            TangoSys_OMemStream o;
+            o << write_name << " method not found for " << pipe.get_name();
+            Tango::Except::throw_exception("PyTango_WritePipeMethodNotFound",
+                   o.str(), "PyTango::Pipe::write");
+        }
+        PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev);
+        AutoPythonGIL __py_lock;
+        try {
+        	bopy::call_method<bopy::object>(__dev_ptr->the_self, write_name.c_str(), boost::ref(pipe));
+        } catch(bopy::error_already_set &eas) {
+        	handle_python_exception(eas);
+        }
     }
 
     bool _Pipe::is_allowed(Tango::DeviceImpl *dev, Tango::PipeReqType ty)
@@ -410,8 +417,16 @@ namespace PyTango { namespace Pipe {
 	__set_value<Tango::Pipe>(pipe, py_value);
     }
 
-}} // namespace PyTango::Pipe
+    bopy::object  get_value(Tango::WPipe& pipe)
+    {
+        bopy::object py_value;
 
+        Tango::DevicePipeBlob blob = pipe.get_blob();
+        py_value = PyTango::DevicePipe::extract(blob);
+        return py_value;
+    }
+
+}} // namespace PyTango::Pipe
 
 void export_pipe()
 {
@@ -423,7 +438,7 @@ void export_pipe()
         .def("get_name", &Tango::Pipe::get_name,
             bopy::return_value_policy<bopy::copy_non_const_reference>())
         .def("set_name", &Tango::Pipe::set_name)
-	.def("set_default_properties", &Tango::Pipe::set_default_properties)
+        .def("set_default_properties", &Tango::Pipe::set_default_properties)
         .def("get_root_blob_name", &Tango::Pipe::get_root_blob_name,
             bopy::return_value_policy<bopy::copy_const_reference>())
         .def("set_root_blob_name", &Tango::Pipe::set_root_blob_name)
@@ -435,16 +450,19 @@ void export_pipe()
         .def("get_writable", &Tango::Pipe::get_writable)
         .def("get_pipe_serial_model", &Tango::Pipe::get_pipe_serial_model)
         .def("set_pipe_serial_model", &Tango::Pipe::set_pipe_serial_model)
-	.def("has_failed", &Tango::Pipe::has_failed)
+        .def("has_failed", &Tango::Pipe::has_failed)
 
-        .def("_set_value", 
-	     (void (*) (Tango::Pipe &, bopy::object &))
-	     &PyTango::Pipe::set_value)
+        .def("_set_value", (void (*) (Tango::Pipe &, bopy::object &))
+             &PyTango::Pipe::set_value)
 
-//        .def("_get_value",
-//	     (bopy::object (*) (Tango::Pipe &))
-//	     &PyTango::Pipe::get_value)
+        .def("get_value", (bopy::object (*) (Tango::WPipe &))
+             &PyTango::Pipe::get_value)
 	;
+
+    bopy::class_<Tango::WPipe, bopy::bases<Tango::Pipe>, boost::noncopyable >("WPipe",
+            bopy::init<const std::string &, const Tango::DispLevel>())
+    ;
+
 
 }
 namespace PyDevicePipe

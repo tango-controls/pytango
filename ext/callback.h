@@ -88,9 +88,11 @@ public:
     virtual void push_event(Tango::AttrConfEventData *ev);
     virtual void push_event(Tango::DataReadyEventData *ev);
     virtual void push_event(Tango::PipeEventData *ev);
+    virtual void push_event(Tango::DevIntrChangeEventData *ev);
 
     static void fill_py_event(Tango::EventData* ev, boost::python::object & py_ev, boost::python::object py_device, PyTango::ExtractAs extract_as);
     static void fill_py_event(Tango::AttrConfEventData* ev, boost::python::object & py_ev, boost::python::object py_device, PyTango::ExtractAs extract_as);
     static void fill_py_event(Tango::DataReadyEventData* ev, boost::python::object & py_ev, boost::python::object py_device, PyTango::ExtractAs extract_as);
     static void fill_py_event(Tango::PipeEventData* ev, boost::python::object & py_ev, boost::python::object py_device, PyTango::ExtractAs extract_as);
+    static void fill_py_event(Tango::DevIntrChangeEventData* ev, boost::python::object & py_ev, boost::python::object py_device, PyTango::ExtractAs extract_as);
 };

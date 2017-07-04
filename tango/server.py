@@ -298,17 +298,13 @@ def _get_wrapped_pipe_write_method(pipe, write_method):
     if green_mode == GreenMode.Synchronous:
         @functools.wraps(write_method)
         def write_pipe(self, pipe):
-            # TODO
-            raise NotImplementedError
-            # value = pipe.get_write_value()
-            # return write_method(self, value)
+            value = pipe.get_value()
+            return write_method(self, value)
     else:
         @functools.wraps(write_method)
         def write_pipe(self, pipe):
-            # TODO
-            raise NotImplementedError
-            # value = pipe.get_write_value()
-            # return get_worker().execute(write_method, self, value)
+            value = pipe.get_value()
+            return get_worker().execute(write_method, self, value)
     return write_pipe
 
 
@@ -704,7 +700,7 @@ class attribute(AttrData):
     access                 :obj:`~tango.AttrWriteType`      :obj:`~tango.AttrWriteType.READ`        read only/ read write / write only access
     fget (or fread)        :obj:`str` or :obj:`callable`    'read_<attr_name>'                      read method name or method object
     fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<attr_name>'                     write method name or method object
-    is_allowed             :obj:`str` or :obj:`callable`    'is_<attr_name>_allowed'                is allowed method name or method object
+    fisallowed             :obj:`str` or :obj:`callable`    'is_<attr_name>_allowed'                is allowed method name or method object
     label                  :obj:`str`                       '<attr_name>'                           attribute label
     enum_labels            sequence                         None                                    the list of enumeration labels (enum data type)
     doc (or description)   :obj:`str`                       ''                                      attribute description
@@ -896,7 +892,7 @@ class pipe(PipeData):
     access                 :obj:`~tango.PipeWriteType`      :obj:`~tango.PipeWriteType.READ`        read only/ read write access
     fget (or fread)        :obj:`str` or :obj:`callable`    'read_<pipe_name>'                      read method name or method object
     fset (or fwrite)       :obj:`str` or :obj:`callable`    'write_<pipe_name>'                     write method name or method object
-    is_allowed             :obj:`str` or :obj:`callable`    'is_<pipe_name>_allowed'                is allowed method name or method object
+    fisallowed             :obj:`str` or :obj:`callable`    'is_<pipe_name>_allowed'                is allowed method name or method object
     label                  :obj:`str`                       '<pipe_name>'                           pipe label
     doc (or description)   :obj:`str`                       ''                                      pipe description
     green_mode             :obj:`~tango.GreenMode`          None                                    green mode for read and write. None means use server green mode.
@@ -965,9 +961,6 @@ class pipe(PipeData):
         self.__doc__ = kwargs.get('doc', kwargs.get('description',
                                                     'TANGO pipe'))
         self.build_from_dict(kwargs)
-        if self.pipe_write == PipeWriteType.PIPE_READ_WRITE:
-            raise NotImplementedError(
-                'writtable pipes not implemented in 9.2.0a')
 
     def get_pipe(self, obj):
         dclass = obj.get_device_class()
@@ -991,7 +984,6 @@ class pipe(PipeData):
         To be used as a decorator. Will define the decorated method
         as a write pipe method to be called when client writes to the pipe
         """
-        raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
         self.fset = fset
         self.pipe_write = PipeWriteType.PIPE_READ_WRITE
         return self

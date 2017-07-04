@@ -36,6 +36,7 @@ void export_exceptions();
 void export_api_util();
 void export_connection();
 void export_device_proxy();
+void export_devintr_change_event_data();
 void export_attribute_proxy();
 void export_db();
 void export_callback(); /// @todo not sure were to put it...
@@ -97,6 +98,7 @@ BOOST_PYTHON_MODULE(_tango)
     export_attr_conf_event_data();
     export_data_ready_event_data();
     export_pipe_event_data();
+    export_devintr_change_event_data();
     export_exceptions();
     export_api_util();
     export_connection();

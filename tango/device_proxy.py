@@ -21,8 +21,10 @@ from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
 from ._tango import DeviceProxy, __CallBackAutoDie, __CallBackPushEvent
 from ._tango import EventType, DevFailed, Except, ExtractAs, GreenMode
 from ._tango import PipeInfo, PipeInfoList, constants
+from ._tango import CmdArgType, DevState
 
-from .utils import is_pure_str, is_non_str_seq, is_integer
+from .utils import TO_TANGO_TYPE, scalar_to_array_type
+from .utils import is_pure_str, is_non_str_seq, is_integer, is_number
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
 from .utils import seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
@@ -1049,12 +1051,37 @@ def __DeviceProxy__get_event_map(self):
     return self._subscribed_events
 
 
-def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
-                                   filters=[], stateless=False, extract_as=ExtractAs.Numpy,
-                                   green_mode=None):
+def __DeviceProxy__subscribe_event(self, *args, **kwargs):
     """
-    subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy) -> int
+        subscribe_event(event_type, cb, stateless=False, green_mode=None) -> int
 
+            The client call to subscribe for event reception in the push model.
+            The client implements a callback method which is triggered when the
+            event is received.
+            This method is currently used device interface change events only.
+
+        Parameters :
+            - event_type: (EventType) Is the event reason and must be on the enumerated values:
+                            * EventType.INTERFACE_CHANGE_EVENT
+            - callback  : (callable) Is any callable object or an object with a
+                          callable "push_event" method.
+            - stateless : (bool) When the this flag is set to false, an exception will
+                          be thrown when the event subscription encounters a problem.
+                          With the stateless flag set to true, the event subscription
+                          will always succeed, even if the corresponding device server
+                          is not running. The keep alive thread will try every 10
+                          seconds to subscribe for the specified event. At every
+                          subscription retry, a callback is executed which contains
+                          the corresponding exception
+            - green_mode :
+
+        Return     : An event id which has to be specified when unsubscribing
+                     from this event.
+
+        Throws     : EventSystemFailed
+
+
+        subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy, green_mode=None) -> int
             The client call to subscribe for event reception in the push model.
             The client implements a callback method which is triggered when the
             event is received. Filtering is done based on the reason specified and
@@ -1063,7 +1090,6 @@ def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
             changes. Events consist of an attribute name and the event reason.
             A standard set of reasons are implemented by the system, additional
             device specific reasons can be implemented by device servers programmers.
-
         Parameters :
             - attr_name : (str) The device attribute name which will be sent
                           as an event e.g. "current".
@@ -1074,8 +1100,6 @@ def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
                             * EventType.ATTR_CONF_EVENT
                             * EventType.DATA_READY_EVENT
                             * EventType.USER_EVENT
-                            * EventType.INTERFACE_CHANGE_EVENT
-                            * EventType.PIPE_EVENT
             - callback  : (callable) Is any callable object or an object with a
                           callable "push_event" method.
             - filters   : (sequence<str>) A variable list of name,value pairs
@@ -1089,21 +1113,17 @@ def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
                           subscription retry, a callback is executed which contains
                           the corresponding exception
             - extract_as : (ExtractAs)
-
+            - green_mode :
         Return     : An event id which has to be specified when unsubscribing
                      from this event.
-
         Throws     : EventSystemFailed
 
-
-    subscribe_event(self, attr_name, event, queuesize, filters=[], stateless=False ) -> int
-
+        subscribe_event(self, attr_name, event, queuesize, filters=[], stateless=False, green_mode=None) -> int
             The client call to subscribe for event reception in the pull model.
             Instead of a callback method the client has to specify the size of the
             event reception buffer.
             The event reception buffer is implemented as a round robin buffer. This
             way the client can set-up different ways to receive events:
-
                 * Event reception buffer size = 1 : The client is interested only
                   in the value of the last event received. All other events that
                   have been received since the last reading are discarded.
@@ -1113,10 +1133,87 @@ def __DeviceProxy__subscribe_event(self, attr_name, event_type, cb_or_queuesize,
                 * Event reception buffer size = ALL_EVENTS : The client buffers all
                   received events. The buffer size is unlimited and only restricted
                   by the available memory for the client.
-
             All other parameters are similar to the descriptions given in the
             other subscribe_event() version.
     """
+
+    nargs = len(args)
+    if is_integer(args[0]) and args[0] == EventType.INTERFACE_CHANGE_EVENT:
+        event_type = args[0]
+        cb = args[1]
+        stateless = False
+        green_mode = None
+        if nargs == 3:
+            stateless = args[2]
+        if nargs == 4:
+            green_mode = args[3]
+        __DeviceProxy__subscribe_event_global(
+            self, event_type, cb, stateless, green_mode)
+    else:
+        attr_name = args[0]
+        event_type = args[1]
+        cb_or_queuesize = args[2]
+        filters = []
+        stateless = False
+        green_mode = None
+        extract_as = ExtractAs.Numpy
+        if nargs == 4:
+            filters = args[3]
+        if nargs == 5:
+            stateless = args[4]
+        if nargs == 6:
+            extract_as = args[5]
+        if nargs == 7:
+            green_mode = args[6]
+        __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
+                                              cb_or_queuesize, filters,
+                                              stateless, extract_as,
+                                              green_mode)
+
+
+def __DeviceProxy__subscribe_event_global(self, event_type, cb,
+                                          stateless=False, green_mode=None):
+
+    if event_type != EventType.INTERFACE_CHANGE_EVENT:
+        raise TypeError("This method is only for Interface Change Events")
+    else:
+        if isinstance(cb, collections.Callable):
+            cbfn = __CallBackPushEvent()
+            cbfn.push_event = green_callback(
+                cb, obj=self, green_mode=green_mode)
+        elif hasattr(cb, "push_event") and isinstance(
+                cb.push_event, collections.Callable):
+            cbfn = __CallBackPushEvent()
+            cbfn.push_event = green_callback(
+                cb.push_event, obj=self, green_mode=green_mode)
+        else:
+            raise TypeError(
+                "Parameter cb should be a callable object or "
+                "an object with a 'push_event' method.")
+
+        event_id = self.__subscribe_event(event_type, cbfn, stateless)
+
+        with self.__get_event_map_lock():
+            se = self.__get_event_map()
+            evt_data = se.get(event_id)
+            if evt_data is not None:
+                # Raise exception
+                desc = textwrap.dedent("""\
+                    Internal PyTango error:
+                    %s.subscribe_event(%s) already has key %d assigned to (%s, %s)
+                    Please report error to PyTango""")
+                desc %= self, event_type, event_id, evt_data[2], evt_data[1]
+                Except.throw_exception(
+                    "Py_InternalError", desc, "DeviceProxy.subscribe_event")
+        se[event_id] = (cbfn, event_type, "dummy")
+        return event_id
+
+
+def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
+                                          cb_or_queuesize,
+                                          filters=[], stateless=False,
+                                          extract_as=ExtractAs.Numpy,
+                                          green_mode=None):
 
     if isinstance(cb_or_queuesize, collections.Callable):
         cb = __CallBackPushEvent()
@@ -1286,8 +1383,87 @@ def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
     return r.extract(extract_as)
 
 
-def __DeviceProxy__write_pipe(*args, **kwargs):
-    raise NotImplementedError('writtable pipes not implemented in 9.2.0a')
+def __get_pipe_type_simple(obj):
+    if is_non_str_seq(obj):
+        if len(obj) == 2 and \
+           is_pure_str(obj[0]) and \
+           (is_non_str_seq(obj[1]) or isinstance(obj[1], dict)):
+            tg_type = CmdArgType.DevPipeBlob
+        else:
+            tg_type = __get_pipe_type(obj[0])
+            tg_type = scalar_to_array_type(tg_type)
+    elif is_pure_str(obj):
+        tg_type = CmdArgType.DevString
+    elif isinstance(obj, DevState):
+        tg_type = CmdArgType.DevState
+    elif isinstance(obj, bool):
+        tg_type = CmdArgType.DevBoolean
+    elif is_integer(obj):
+        tg_type = CmdArgType.DevLong64
+    elif is_number(obj):
+        tg_type = CmdArgType.DevDouble
+    else:
+        raise ValueError('Cannot determine object tango type')
+    return tg_type
+
+
+def __get_pipe_type_numpy_support(obj):
+    try:
+        ndim, dtype = obj.ndim, str(obj.dtype)
+    except AttributeError:
+        return __get_pipe_type_simple(obj)
+    if ndim > 1:
+        raise TypeError('cannot translate numpy array with {0} '
+                        'dimensions to tango type'.format(obj.ndim))
+    tg_type = TO_TANGO_TYPE[dtype]
+    if ndim > 0:
+        tg_type = scalar_to_array_type(dtype)
+    return tg_type
+
+
+def __get_tango_type(dtype):
+    if is_non_str_seq(dtype):
+        tg_type = dtype[0]
+        if is_non_str_seq(tg_type):
+            raise TypeError("Pipe doesn't support 2D data")
+        tg_type = TO_TANGO_TYPE[tg_type]
+        tg_type = scalar_to_array_type(tg_type)
+    else:
+        tg_type = TO_TANGO_TYPE[dtype]
+    return tg_type
+
+
+def __get_pipe_type(obj, dtype=None):
+    if dtype is not None:
+        return __get_tango_type(dtype)
+    if constants.NUMPY_SUPPORT:
+        return __get_pipe_type_numpy_support(obj)
+    return __get_pipe_type_simple(obj)
+
+
+def __sanatize_pipe_element(elem):
+    if isinstance(elem, dict):
+        result = dict(elem)
+    else:
+        result = dict(name=elem[0], value=elem[1])
+    result['value'] = value = result.get('value', result.pop('blob', None))
+    result['dtype'] = dtype = __get_pipe_type(value, dtype=result.get('dtype'))
+    if dtype == CmdArgType.DevPipeBlob:
+        result['value'] = value[0], __sanatize_pipe_blob(value[1])
+    return result
+
+
+def __sanatize_pipe_blob(blob):
+    if isinstance(blob, dict):
+        return [__sanatize_pipe_element((k, v)) for k, v in blob.items()]
+    else:
+        return [__sanatize_pipe_element(elem) for elem in blob]
+
+
+def __DeviceProxy__write_pipe(self, *args, **kwargs):
+    pipe_name, (blob_name, blob_data) = args
+    sani_blob_data = __sanatize_pipe_blob(blob_data)
+    self.__write_pipe(pipe_name, blob_name, sani_blob_data)
 
 
 def __DeviceProxy__read_attributes(self, *args, **kwargs):
@@ -1978,7 +2154,39 @@ def __doc_DeviceProxy():
         New in PyTango 9.2.0
     """)
 
-    document_method("write_pipe", """TODO""")
+    document_method("write_pipe", """
+    write_pipe(self, blob, green_mode=None, wait=True, timeout=None)
+
+            Write a *blob* to a single pipe. The *blob* comprises: a tuple with two elements: blob name (string) and blob
+            data (sequence). The blob data consists of a sequence where each element is a dictionary with the
+            following keys:
+
+            - name: blob element name
+            - dtype: tango data type
+            - value: blob element data (str for DevString, etc)
+
+        In case dtype is ``DevPipeBlob``, value is also a *blob*.
+
+        Parameters :
+            - blob       : a tuple with two elements: blob name (string) and blob
+                           data (sequence).
+            - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
+                           (see :meth:`~tango.DeviceProxy.get_green_mode` and
+                           :meth:`~tango.DeviceProxy.set_green_mode`).
+            - wait       : (bool) whether or not to wait for result. If green_mode
+                           is *Synchronous*, this parameter is ignored as it always
+                           waits for the result.
+                           Ignored when green_mode is Synchronous (always waits).
+            - timeout    : (float) The number of seconds to wait for the result.
+                           If None, then there is no limit on the wait time.
+                           Ignored when green_mode is Synchronous or wait is False.
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device
+                     TimeoutError (green_mode == Futures) If the future didn't finish executing before the given timeout.
+                     Timeout (green_mode == Gevent) If the async result didn't finish executing before the given timeout.
+
+        New in PyTango 9.2.1
+    """)
 
     # -------------------------------------
     #   History methods
