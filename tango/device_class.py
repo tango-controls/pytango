@@ -265,6 +265,7 @@ class PropUtil:
 def __DeviceClass__init__(self, name):
     DeviceClass.__init_orig__(self, name)
     self.dyn_att_added_methods = []
+    self.dyn_cmd_added_methods = []
     try:
         pu = self.prop_util = PropUtil()
         self.py_dev_list = []
