@@ -100,7 +100,7 @@ class DeviceTestContext(object):
     disconnect_timeout = connect_timeout
 
     def __init__(self, device, device_cls=None, server_name=None,
-                 instance_name=None, device_name=None, properties={},
+                 instance_name=None, device_name=None, properties=None,
                  db=None, host=None, port=0, debug=3,
                  process=False, daemon=False):
         """Inititalize the context to run a given device."""
@@ -116,6 +116,8 @@ class DeviceTestContext(object):
             _, db = tempfile.mkstemp()
         if host is None:
             host = get_hostname()
+        if properties is None:
+            properties = {}
         # Patch bug #819
         if process:
             os.environ['ORBscanGranularity'] = '0'
@@ -151,7 +153,7 @@ class DeviceTestContext(object):
     def target(self, runserver, process=False):
         try:
             runserver(post_init_callback=self.post_init, raises=True)
-        except:
+        except Exception:
             etype, value, tb = sys.exc_info()
             # Traceback objects can't be pickled
             if process:
