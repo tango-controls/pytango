@@ -1338,7 +1338,8 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
 
 def run(classes, args=None, msg_stream=sys.stdout,
         verbose=False, util=None, event_loop=None,
-        post_init_callback=None, green_mode=None):
+        post_init_callback=None, green_mode=None,
+        raises=False):
     """
     Provides a simple way to run a tango server. It handles exceptions
     by writting a message to the msg_stream.
@@ -1447,6 +1448,10 @@ def run(classes, args=None, msg_stream=sys.stdout,
     :type post_init_callback:
         callable or tuple (see description above)
 
+    :param raises:
+        Disable error handling and propagate exceptions from the server
+    :type raises: bool
+
     :return: The Util singleton object
     :rtype: :class:`~tango.Util`
 
@@ -1455,13 +1460,23 @@ def run(classes, args=None, msg_stream=sys.stdout,
     .. versionchanged:: 8.1.4
         when classes argument is a sequence, the items can also be
         a sequence <TangoClass, TangoClassClass>[, tango class name]
+
+    .. versionchanged:: 9.2.2
+        `raises` argument has been added
     """
+    server_run = functools.partial(
+        __server_run, classes,
+        args=args, msg_stream=msg_stream,
+        util=util, event_loop=event_loop,
+        post_init_callback=post_init_callback,
+        green_mode=green_mode)
+    # Run the server without error handling
+    if raises:
+        return server_run()
+    # Run the server with error handling
     write = msg_stream.write if msg_stream else lambda msg: None
     try:
-        return __server_run(classes, args=args, msg_stream=msg_stream,
-                            util=util, event_loop=event_loop,
-                            post_init_callback=post_init_callback,
-                            green_mode=green_mode)
+        return server_run()
     except KeyboardInterrupt:
         write("Exiting: Keyboard interrupt\n")
     except DevFailed as df:

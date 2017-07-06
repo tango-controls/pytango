@@ -4,11 +4,13 @@ from __future__ import absolute_import
 
 # Imports
 import os
+import sys
 import six
 import struct
 import socket
 import tempfile
 import collections
+from functools import partial
 
 # Concurrency imports
 import threading
@@ -98,7 +100,7 @@ class DeviceTestContext(object):
     disconnect_timeout = connect_timeout
 
     def __init__(self, device, device_cls=None, server_name=None,
-                 instance_name=None, device_name=None, properties={},
+                 instance_name=None, device_name=None, properties=None,
                  db=None, host=None, port=0, debug=3,
                  process=False, daemon=False):
         """Inititalize the context to run a given device."""
@@ -114,6 +116,8 @@ class DeviceTestContext(object):
             _, db = tempfile.mkstemp()
         if host is None:
             host = get_hostname()
+        if properties is None:
+            properties = {}
         # Patch bug #819
         if process:
             os.environ['ORBscanGranularity'] = '0'
@@ -135,19 +139,27 @@ class DeviceTestContext(object):
         cmd_args = string.split()
         # Target and arguments
         if device_cls:
-            target = run
-            args = ({tangoclass: (device_cls, device)}, cmd_args)
+            class_dct = {tangoclass: (device_cls, device)}
+            runserver = partial(run, class_dct, cmd_args)
         elif not hasattr(device, 'run_server'):
-            target = run
-            args = ((device,), cmd_args)
+            runserver = partial(run, (device,), cmd_args)
         else:
-            target = device.run_server
-            args = (cmd_args,)
+            runserver = partial(device.run_server, cmd_args)
         # Thread
-        kwargs = {'post_init_callback': self.post_init}
         cls = multiprocessing.Process if process else threading.Thread
-        self.thread = cls(target=target, args=args, kwargs=kwargs)
+        self.thread = cls(target=self.target, args=(runserver, process))
         self.thread.daemon = daemon
+
+    def target(self, runserver, process=False):
+        try:
+            runserver(post_init_callback=self.post_init, raises=True)
+        except Exception:
+            etype, value, tb = sys.exc_info()
+            # Traceback objects can't be pickled
+            if process:
+                tb = None
+            # Put exception in the queue
+            self.queue.put((etype, value, tb))
 
     def post_init(self):
         host, port = get_server_host_port()
@@ -189,12 +201,16 @@ class DeviceTestContext(object):
 
     def connect(self):
         try:
-            self.host, self.port = self.queue.get(
+            args = self.queue.get(
                 timeout=self.connect_timeout)
         except queue.Empty:
             raise RuntimeError(
                 'The server did not start. '
                 'Check stdout/stderr for more information.')
+        try:
+            self.host, self.port = args
+        except ValueError:
+            six.reraise(*args)
         # Get server proxy
         self.server = DeviceProxy(self.get_server_access())
         self.server.ping()
@@ -204,10 +220,12 @@ class DeviceTestContext(object):
 
     def stop(self):
         """Kill the server."""
-        if self.server:
-            self.server.command_inout('Kill')
-        self.join(self.disconnect_timeout)
-        os.unlink(self.db)
+        try:
+            if self.server:
+                self.server.command_inout('Kill')
+            self.join(self.disconnect_timeout)
+        finally:
+            os.unlink(self.db)
 
     def join(self, timeout=None):
         self.thread.join(timeout)
