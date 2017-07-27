@@ -172,8 +172,11 @@ def green(fn=None, consume_green_mode=True):
 
     def decorator(fn):
         @wraps(fn)
-        def greener(obj, *args, **kwargs):
-            args = (obj,) + args
+        def greener(*args, **kwargs):
+            try:
+                obj = args[0]
+            except IndexError:
+                obj = None
             wait = kwargs.pop('wait', None)
             timeout = kwargs.pop('timeout', None)
             access = kwargs.pop if consume_green_mode else kwargs.get
