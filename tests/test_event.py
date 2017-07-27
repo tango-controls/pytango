@@ -63,6 +63,8 @@ class EventDevice(Device):
 
     def read(self, attr):
         attr.set_value(1.23)
+
+
 # Device fixture
 
 @pytest.fixture(params=[GreenMode.Synchronous,
@@ -87,8 +89,11 @@ def test_subscribe_change_event(event_device):
     def callback(evt):
         results.append(evt.attr_value.value)
 
-    event_device.subscribe_event(
+    # Subscribe
+    eid = event_device.subscribe_event(
         "attr", EventType.CHANGE_EVENT, callback, wait=True)
+    assert eid == 1
+    # Trigger an event
     event_device.command_inout("send_event", wait=True)
     # Wait for tango event
     retries = 20
@@ -99,6 +104,8 @@ def test_subscribe_change_event(event_device):
         time.sleep(0.05)
     # Test the event values
     assert results == [0., 1.]
+    # Unsubscribe
+    event_device.unsubscribe_event(eid)
 
 
 def test_subscribe_interface_event(event_device):
@@ -107,8 +114,11 @@ def test_subscribe_interface_event(event_device):
     def callback(evt):
         results.append(evt)
 
-    event_device.subscribe_event(
+    # Subscribe
+    eid = event_device.subscribe_event(
         "attr", EventType.INTERFACE_CHANGE_EVENT, callback, wait=True)
+    assert eid == 1
+    # Trigger an event
     event_device.command_inout("add_dyn_attr", 'bla', wait=True)
     event_device.read_attribute('bla', wait=True) == 1.23
     # Wait for tango event
@@ -141,3 +151,5 @@ def test_subscribe_interface_event(event_device):
         {'Init', 'State', 'Status', 'add_dyn_attr', 'delete_dyn_attr', 'send_event'}
     assert set(att.name for att in results[2].att_list) == \
         {'attr', 'State', 'Status'}
+    # Unsubscribe
+    event_device.unsubscribe_event(eid)
