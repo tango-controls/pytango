@@ -1136,39 +1136,12 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
             All other parameters are similar to the descriptions given in the
             other subscribe_event() version.
     """
-
-    nargs = len(args)
-    if is_integer(args[0]) and args[0] == EventType.INTERFACE_CHANGE_EVENT:
-        event_type = args[0]
-        cb = args[1]
-        stateless = False
-        green_mode = None
-        if nargs == 3:
-            stateless = args[2]
-        if nargs == 4:
-            green_mode = args[3]
-        __DeviceProxy__subscribe_event_global(
-            self, event_type, cb, stateless, green_mode)
+    # First argument is the event type
+    if args and isinstance(args[0], int):
+        return __DeviceProxy__subscribe_event_global(self, *args, **kwargs)
+    # First argument is the attribute name
     else:
-        attr_name = args[0]
-        event_type = args[1]
-        cb_or_queuesize = args[2]
-        filters = []
-        stateless = False
-        green_mode = None
-        extract_as = ExtractAs.Numpy
-        if nargs == 4:
-            filters = args[3]
-        if nargs == 5:
-            stateless = args[4]
-        if nargs == 6:
-            extract_as = args[5]
-        if nargs == 7:
-            green_mode = args[6]
-        __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
-                                              cb_or_queuesize, filters,
-                                              stateless, extract_as,
-                                              green_mode)
+        return __DeviceProxy__subscribe_event_attrib(self, *args, **kwargs)
 
 
 def __DeviceProxy__subscribe_event_global(self, event_type, cb,
