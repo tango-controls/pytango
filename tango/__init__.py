@@ -28,7 +28,7 @@ __all__ = [
     'AttributeConfig_3', 'AttributeDimension', 'AttributeEventInfo',
     'AttributeInfo', 'AttributeInfoEx', 'AttributeInfoList', 'AttributeInfoListEx',
     'AttributeList', 'AttributeProxy', 'ChangeEventInfo', 'ChangeEventProp',
-    'Pipe', 'PipeConfig', 'PipeWriteType','PipeEventData', 'DevIntrChangeEvent'
+    'Pipe', 'PipeConfig', 'PipeWriteType', 'PipeEventData', 'DevIntrChangeEventData',
     'CmdArgType', 'CmdDoneEvent', 'CommandInfo', 'CommandInfoList',
     'CommunicationFailed', 'Connection', 'ConnectionFailed',
     'ConstDevString', 'DServer', 'DataReadyEventData', 'Database', 'DbData',
@@ -73,7 +73,10 @@ __all__ = [
     'get_cpp_classes', 'raise_asynch_exception', 'AutoTangoMonitor',
     'AutoTangoAllowThreads', 'LatestDeviceImpl', 'Interceptors',
     'get_attribute_proxy', 'requires_tango', 'requires_pytango',
-    'set_green_mode', 'get_green_mode', 'get_device_proxy']
+    'set_green_mode', 'get_green_mode', 'get_device_proxy',
+    'is_scalar_type', 'is_array_type', 'is_numerical_type',
+    'is_int_type', 'is_float_type', 'is_bool_type', 'is_str_type',
+    'obj_2_str', 'str_2_obj', 'seqStr_2_obj']
 
 __docformat__ = "restructuredtext"
 
@@ -216,7 +219,11 @@ from .globals import (
     get_constructed_class, get_constructed_classes, class_factory,
     delete_class_list, class_list, cpp_class_list, constructed_class)
 
-from .utils import requires_pytango, requires_tango
+from .utils import (
+    requires_pytango, requires_tango,
+    is_scalar_type, is_array_type, is_numerical_type,
+    is_int_type, is_float_type, is_bool_type, is_str_type,
+    obj_2_str, str_2_obj, seqStr_2_obj)
 
 from .green import set_green_mode, get_green_mode
 
