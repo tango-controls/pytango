@@ -11,7 +11,7 @@
 
 """
 This is an internal PyTango module.
-"""
+, """
 
 __all__ = ["db_init"]
 
@@ -21,16 +21,19 @@ import collections
 
 from ._tango import StdStringVector, Database, DbDatum, DbData, \
     DbDevInfo, DbDevInfos, DbDevImportInfo, DbDevExportInfo, DbDevExportInfos, \
-    DbHistory, DbServerInfo, DbServerData
+    DbHistory, DbServerInfo, DbServerData, GreenMode
 
 from .utils import is_pure_str, is_non_str_seq, seq_2_StdStringVector, \
     seq_2_DbDevInfos, seq_2_DbDevExportInfos, seq_2_DbData, DbData_2_dict
 from .utils import document_method as __document_method
 
+from .green import green, get_green_mode
+
 
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 # DbDatum extension
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+
 
 def __DbDatum___setitem(self, k, v):
     self.value_string[k] = v
@@ -72,6 +75,26 @@ def __init_DbDatum():
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 # Database extension
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+
+
+@green(consume_green_mode=False)
+def get_database(*args, **kwargs):
+    return Database(*args, **kwargs)
+
+
+def __Database__get_green_mode(self):
+    try:
+        gm = self._green_mode
+    except AttributeError:
+        gm = None
+    if gm is None:
+        gm = get_green_mode()
+    return gm
+
+
+def __Database_set_green_mode(self, green_mode=None):
+    self._green_mode = green_mode
+
 
 def __Database__add_server(self, servname, dev_info, with_dserver=False):
     """
@@ -901,7 +924,30 @@ def __Database__str(self):
     return "Database(%s, %s)" % (self.get_db_host(), self.get_db_port())
 
 
+def __init_database_internals(proxy):
+    executors = dict((key, None) for key in GreenMode.names)
+    proxy.__dict__['_green_mode'] = None
+    proxy.__dict__['_initialized'] = True
+    proxy.__dict__['_executors'] = executors
+    proxy.__dict__['_pending_unsubscribe'] = {}
+
+
+def __Database__init__(self, *args, **kwargs):
+    __init_database_internals(self)
+    self._green_mode = kwargs.pop('green_mode', None)
+    self._executors[GreenMode.Futures] = kwargs.pop('executor', None)
+    self._executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
+    self._executors[GreenMode.Asyncio] = kwargs.pop('asyncio_executor', None)
+    return Database.__init_orig__(self, *args, **kwargs)
+
+
 def __init_Database():
+    Database.__init_orig__ = Database.__init__
+    Database.__init__ = __Database__init__
+
+    Database.get_green_mode = __Database__get_green_mode
+    Database.set_green_mode = __Database_set_green_mode
+
     Database.add_server = __Database__add_server
     Database.export_server = __Database__export_server
     Database.put_property = __Database__put_property
@@ -922,6 +968,10 @@ def __init_Database():
     Database.put_class_attribute_property = __Database__put_class_attribute_property
     Database.delete_class_attribute_property = __Database__delete_class_attribute_property
     Database.get_service_list = __Database__get_service_list
+    for method in dir(Database):
+        if (method.startswith("put") or method.startswith("get")) \
+                and "green_mode" not in method:
+            setattr(Database, method, green(getattr(Database, method)))
     Database.__str__ = __Database__str
     Database.__repr__ = __Database__str
 

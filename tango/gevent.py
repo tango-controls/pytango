@@ -18,8 +18,9 @@ from functools import partial
 from ._tango import GreenMode
 from .device_proxy import get_device_proxy
 from .attribute_proxy import get_attribute_proxy
+from .db import get_database
 
-__all__ = ["DeviceProxy", "AttributeProxy", "check_requirements"]
+__all__ = ["Database", "DeviceProxy", "AttributeProxy", "check_requirements"]
 
 
 def check_requirements():
@@ -40,6 +41,8 @@ def check_requirements():
 
 
 check_requirements()
+
+Database = partial(get_database, green_mode=GreenMode.Gevent)
 
 DeviceProxy = partial(get_device_proxy, green_mode=GreenMode.Gevent)
 DeviceProxy.__doc__ = """
@@ -125,5 +128,6 @@ Device = DeviceProxy
 Attribute = AttributeProxy
 
 del GreenMode
+del get_database
 del get_device_proxy
 del get_attribute_proxy
