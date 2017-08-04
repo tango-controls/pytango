@@ -145,7 +145,7 @@ IF(WIN32)
   include_directories(${PROJECT_NAME} PUBLIC "$ENV{PYTHONPATH}/Lib/site-packages/numpy/core/include")
   link_directories("$ENV{TANGO_PATH}/bin")
   link_directories("$ENV{TANGO_PATH}/lib")
-  link_directories("$ENV{PYTHONPATH}/lib")
+  link_directories("$ENV{PYTHONPATH}/libs")
   message("$ENV{TANGO_PATH}/include")
   
   add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
