@@ -126,7 +126,7 @@ set(HEADERS
         ext/fast_from_py.h
         ext/fast_from_py_numpy.hpp
         ext/from_py.h
-        ext/pipe.h
+        ext/server/pipe.h
         ext/precompiled_header.hpp
         ext/pytgutils.h
         ext/pyutils.h
