@@ -533,13 +533,13 @@ namespace PyDevicePipe
 	void __set_value(Tango::DevicePipeBlob& dpb, bopy::dict& dict) {
 		int nitems = len(dict);
 		std::vector<std::string> elem_names;
-		for (auto i=0; i<nitems; i++) {
+		for (unsigned int i=0; i<nitems; i++) {
 			elem_names.push_back(bopy::extract<std::string>(dict.keys()[i]));
 		}
 		dpb.set_data_elt_names(elem_names);
 
 		bopy::list values = dict.values();
-		for (auto i=0; i <nitems; ++i) {
+		for (unsigned int i=0; i <nitems; ++i) {
 			bopy::object item = values[i];
 			// Check if the value is an inner blob
 			bopy::tuple ptuple;
