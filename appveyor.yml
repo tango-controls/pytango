@@ -18,6 +18,7 @@ environment:
       PYTHONPATH: c:\Python35-x64\
       PYTHONPATHOMNI: "/cygdrive/c/Python35-x64/python"
       BOOST_ROOT: C:\Libraries\boost_1_63_0
+      BOOST_LIBS: C:\Libraries\boost_1_63_0\lib64-msvc-14.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files\tangoidl
@@ -32,6 +33,7 @@ environment:
       VC_VER: 9.0
       PYTHONPATHOMNI: "/cygdrive/c/Python27/python"
       BOOST_ROOT: C:\Libraries\boost_1_63_0
+      BOOST_LIBS: C:\Libraries\boost_1_63_0\lib32-msvc-9.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files (x86)\tangoidl
@@ -46,6 +48,7 @@ environment:
       VC_VER: 9.0
       PYTHONPATHOMNI: "/cygdrive/c/Python27/python"
       BOOST_ROOT: C:\Libraries\boost_1_63_0
+      BOOST_LIBS: C:\Libraries\boost_1_63_0\lib64-msvc-9.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files\tangoidl
@@ -61,6 +64,7 @@ environment:
       PYTHONPATH: c:\Python33\
       PYTHONPATHOMNI: "/cygdrive/c/Python33/python"
       BOOST_ROOT: C:\Libraries\boost_1_63_0
+      BOOST_LIBS: C:\Libraries\boost_1_63_0\lib32-msvc-10.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files (x86)\tangoidl
@@ -76,6 +80,7 @@ environment:
       PYTHONPATH: c:\Python33-x64\
       PYTHONPATHOMNI: "/cygdrive/c/Python33-x64/python"
       BOOST_ROOT: C:\Libraries\boost_1_63_0
+      BOOST_LIBS: C:\Libraries\boost_1_63_0\lib64-msvc-10.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files\tangoidl
@@ -90,6 +95,7 @@ environment:
       VC_VER: 13.0
       PYTHONPATHOMNI: "/cygdrive/c/Python33-x64/python"
       BOOST_ROOT: C:\Libraries\boost_1_63_0
+      BOOST_LIBS: C:\Libraries\boost_1_63_0\lib64-msvc-12.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files\tangoidl
