@@ -139,7 +139,7 @@ set(HEADERS
 IF(WIN32)
 
   set(${PROJECT_NAME} INCLUDE_DIRS "$ENV{TANGO_PATH}/include")
-  include_directories(${PROJECT_NAME} PUBLIC "$ENV{BOOST_ROOT}/include")
+  include_directories(${PROJECT_NAME} PUBLIC "$ENV{BOOST_ROOT}")
   include_directories(${PROJECT_NAME} PUBLIC "$ENV{PYTHONPATH}/include")
   include_directories(${PROJECT_NAME} PUBLIC "$ENV{TANGO_PATH}/include")
   link_directories("$ENV{TANGO_PATH}/bin")
