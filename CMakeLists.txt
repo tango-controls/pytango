@@ -38,6 +38,7 @@ add_definitions(-DSTRUCT_TIMESPEC_HAS_TV_NSEC)
 add_definitions(-D_WINSOCKAPI_)
 add_definitions(-DNPY_NO_DEPRECATED_API)
 add_definitions(-DNPY_1_7_API_VERSION)
+add_compile_options(/bigobj)
 IF(CMAKE_CL_64)
 add_definitions(-D_64BITS)
 IF (MSVC14)
@@ -165,8 +166,14 @@ install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin)
 endif()
+  set_property(TARGET ${PROJECT_NAME} PROPERTY COMPILE_OPTIONS "/bigobj")
   set_property(TARGET ${PROJECT_NAME} PROPERTY LINK_FLAGS "/force:multiple")
   target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+  if(CMAKE_CL_64)
+  link_directories("$ENV{BOOST_ROOT}/lib32-msvc$ENV{MSVCABR}.0")
+  else(CMAKE_CL_64)
+  link_directories("$ENV{BOOST_ROOT}/lib64-msvc$ENV{MSVCABR}.0")
+  endif(CMAKE_CL_64)
   if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(${PROJECT_NAME} PUBLIC $ENV{TANGO_PATH}/lib/tangod.lib
                                                 $ENV{TANGO_PATH}/bin/omniORB4_rtd.lib
