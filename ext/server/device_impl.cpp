@@ -696,7 +696,12 @@ namespace PyDeviceImpl
     		boost::python::object disp_level, bool device_level = false)
     {
 //        PyCmd *py_cmd_ptr = nullptr;
-        Tango::Command *cmd_ptr = nullptr;
+	    #if _MSC_VER < 1600 //MSVC version <8
+	    	#define NULL ((void *)0)
+        	Tango::Command *cmd_ptr = NULL;
+	    #else
+        	Tango::Command *cmd_ptr = nullptr;
+	    #endif
         std::string name = boost::python::extract<std::string>(cmd_name);
 
         std::string in_desc = boost::python::extract<std::string>(cmd_data[0][1]);
