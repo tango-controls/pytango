@@ -111,30 +111,30 @@ set(SOURCES
         ext/server/wattribute.cpp)
 
 set(HEADERS
+        ext/precompiled_header.hpp
+        ext/base_types_numpy.hpp
+        ext/fast_from_py_numpy.hpp
+        ext/server/wattribute_numpy.hpp
+        ext/device_attribute_numpy.hpp
+        ext/to_py_numpy.hpp
         ext/server/attr.h
         ext/server/attribute.h
-        ext/base_types_numpy.hpp
         ext/callback.h
         ext/server/command.h
         ext/defs.h
         ext/device_attribute.h
-        ext/device_attribute_numpy.hpp
         ext/server/device_class.h
         ext/server/device_impl.h
         ext/device_pipe.h
         ext/exception.h
         ext/fast_from_py.h
-        ext/fast_from_py_numpy.hpp
         ext/from_py.h
         ext/server/pipe.h
-        ext/precompiled_header.hpp
         ext/pytgutils.h
         ext/pyutils.h
         ext/tango_numpy.h
         ext/tgutils.h
-        ext/to_py.h
-        ext/to_py_numpy.hpp
-        ext/server/wattribute_numpy.hpp)
+        ext/to_py.h)
 
 IF(WIN32)
 
