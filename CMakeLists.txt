@@ -148,7 +148,6 @@ IF(WIN32)
   message("$ENV{TANGO_PATH}/include")
   
   add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-  
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 add_definitions(-D_DEBUG)
 install(TARGETS ${PROJECT_NAME}
