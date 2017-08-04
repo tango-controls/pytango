@@ -172,6 +172,7 @@ install:
   - "%PYTHONPATH%/Scripts/pip.exe install nose wheel numpy"
   # Tango Server
   - cmd: cd "C:\projects\pytango"
+  - cmd: set BOOST_LIBS=%BOOST_LIBS%
   - cmd: if %ARCH%==win32-msvc9 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v90_x86/
   - cmd: if %ARCH%==x64-msvc9 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v90_x64/
   - cmd: if %ARCH%==win32-msvc10 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v100_x86/
@@ -230,7 +231,7 @@ after_build:
 
 on_finish:
   #RDP for finish
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - #ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 artifacts:
   - path: ./*.exe
