@@ -1,0 +1,227 @@
+version: 1.0.{build}
+branches:
+  only:
+    - NexeyaSGara-windows-ci
+
+image: Visual Studio 2015
+
+environment:
+  matrix:
+    - platform: x64
+      ARCH: x64-msvc14
+      configuration: Release
+      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
+      MSVCVERSION: v140
+      MSVCYEAR: "vs2015"
+      MSVCABR: "14"
+      VC_VER: 14.0
+      PYTHONPATH: c:\Python35-x64\
+      PYTHONPATHOMNI: "/cygdrive/c/Python35-x64/python"
+      BOOST_ROOT: C:\Libraries\boost_1_63_0
+      ZMQ_BASE: C:\projects\libzmq
+      IDL_BASE: C:\projects\tangoidl
+      IDL_BIN: C:\Program Files\tangoidl
+      OMNI_BASE: C:\projects\omniORB-4.2.1
+    - platform: win32
+      ARCH: win32-msvc9
+      configuration: Release
+      CMAKE_GENERATOR: "Visual Studio 9 2008"
+      MSVCVERSION: v90
+      MSVCYEAR: "vs2008"
+      MSVCABR: "9"
+      VC_VER: 9.0
+      PYTHONPATHOMNI: "/cygdrive/c/Python27/python"
+      BOOST_ROOT: C:\Libraries\boost_1_63_0
+      ZMQ_BASE: C:\projects\libzmq
+      IDL_BASE: C:\projects\tangoidl
+      IDL_BIN: C:\Program Files (x86)\tangoidl
+      OMNI_BASE: C:\projects\omniORB-4.2.1
+    - platform: x64
+      ARCH: x64-msvc9
+      configuration: Release
+      CMAKE_GENERATOR: "Visual Studio 9 2008 Win64"
+      MSVCVERSION: v90
+      MSVCYEAR: "vs2008"
+      MSVCABR: "9"
+      VC_VER: 9.0
+      PYTHONPATHOMNI: "/cygdrive/c/Python27/python"
+      BOOST_ROOT: C:\Libraries\boost_1_63_0
+      ZMQ_BASE: C:\projects\libzmq
+      IDL_BASE: C:\projects\tangoidl
+      IDL_BIN: C:\Program Files\tangoidl
+      OMNI_BASE: C:\projects\omniORB-4.2.1
+    - platform: win32
+      ARCH: win32-msvc10
+      configuration: Release
+      CMAKE_GENERATOR: "Visual Studio 10 2010"
+      MSVCVERSION: v100
+      MSVCYEAR: "vs2010"
+      MSVCABR: "10"
+      VC_VER: 10.0
+      PYTHONPATH: c:\Python33\
+      PYTHONPATHOMNI: "/cygdrive/c/Python33/python"
+      BOOST_ROOT: C:\Libraries\boost_1_63_0
+      ZMQ_BASE: C:\projects\libzmq
+      IDL_BASE: C:\projects\tangoidl
+      IDL_BIN: C:\Program Files (x86)\tangoidl
+      OMNI_BASE: C:\projects\omniORB-4.2.1
+    - platform: x64
+      ARCH: x64-msvc10
+      configuration: Release
+      CMAKE_GENERATOR: "Visual Studio 10 2010 Win64"
+      MSVCVERSION: v100
+      MSVCYEAR: "vs2010"
+      MSVCABR: "10"
+      VC_VER: 10.0
+      PYTHONPATH: c:\Python33-x64\
+      PYTHONPATHOMNI: "/cygdrive/c/Python33-x64/python"
+      BOOST_ROOT: C:\Libraries\boost_1_63_0
+      ZMQ_BASE: C:\projects\libzmq
+      IDL_BASE: C:\projects\tangoidl
+      IDL_BIN: C:\Program Files\tangoidl
+      OMNI_BASE: C:\projects\omniORB-4.2.1
+    - platform: x64
+      ARCH: x64-msvc12
+      configuration: Release
+      CMAKE_GENERATOR: "Visual Studio 12 2013 Win64"
+      MSVCVERSION: v120
+      MSVCYEAR: "vs2013"
+      MSVCABR: "13"
+      VC_VER: 13.0
+      PYTHONPATHOMNI: "/cygdrive/c/Python33-x64/python"
+      BOOST_ROOT: C:\Libraries\boost_1_63_0
+      ZMQ_BASE: C:\projects\libzmq
+      IDL_BASE: C:\projects\tangoidl
+      IDL_BIN: C:\Program Files\tangoidl
+      OMNI_BASE: C:\projects\omniORB-4.2.1
+init:
+  # go to hell Xamarin (see http://help.appveyor.com/discussions/problems/4569)
+  - del "C:\Program Files (x86)\MSBuild\4.0\Microsoft.Common.Targets\ImportAfter\Xamarin.Common.targets"
+  - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+  - del "C:\Program Files (x86)\MSBuild\12.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+  #RDP from start
+  #- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  # Tango
+  - cmd: cd "C:\projects\"
+  - cmd: md libtango
+  - cmd: cd "C:\projects\"
+  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/xl4u9htxao8r75e7/artifacts/libtango_9.2.5_v90_x86.zip
+  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/o4jq7hyme3gqyqta/artifacts/libtango_9.2.5_v90_x64.zip
+  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/d6hpoppyv6ygrao6/artifacts/libtango_9.2.5_v100_x86.zip
+  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/3tgpw50u64i8k8s0/artifacts/libtango_9.2.5_v100_x64.zip
+  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/pdhj8iui1qrn50ca/artifacts/libtango_9.2.5_v120_x64.zip
+  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/prtq4sjdbeuum15y/artifacts/libtango_9.2.5_v140_x64.zip
+  - cmd: if %platform%==x64 7z -y x libtango_9.2.5_%MSVCVERSION%_x64.zip -oC:\projects\libtango\
+  - cmd: if %platform%==win32 7z -y x libtango_9.2.5_%MSVCVERSION%_x86.zip -oC:\projects\libtango\
+  #tango debug
+  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/xl4u9htxao8r75e7/artifacts/libtango_9.2.5_v90_x86_debug.zip
+  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/o4jq7hyme3gqyqta/artifacts/libtango_9.2.5_v90_x64_debug.zip
+  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/d6hpoppyv6ygrao6/artifacts/libtango_9.2.5_v100_x86_debug.zip
+  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/3tgpw50u64i8k8s0/artifacts/libtango_9.2.5_v100_x64_debug.zip
+  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/pdhj8iui1qrn50ca/artifacts/libtango_9.2.5_v120_x64_debug.zip
+  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/prtq4sjdbeuum15y/artifacts/libtango_9.2.5_v140_x64_debug.zip
+  - cmd: if %platform%==x64 7z -y x libtango_9.2.5_%MSVCVERSION%_x64_debug.zip -oC:\projects\libtango\
+  - cmd: if %platform%==win32 7z -y x libtango_9.2.5_%MSVCVERSION%_x86_debug.zip -oC:\projects\libtango\
+  - cmd: if %ARCH%==x64-msvc10 cd C:/projects/libtango/
+  - cmd: if %ARCH%==x64-msvc10 rename libtango_9.2.5_Windows7.1SDK_x64 libtango_9.2.5_v100_x64
+  - cmd: if %ARCH%==x64-msvc10 rename libtango_9.2.5_Windows7.1SDK_x64_debug libtango_9.2.5_v100_x64_debug
+  - cmd: if %platform%==x64 xcopy "C:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x64_debug" "c:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x64" /c /g /d /i /e /r /h /y
+  - cmd: if %platform%==win32 xcopy "C:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x86_debug" "c:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x86" /c /g /d /i /e /r /h /y
+  #Pthread-Win32
+  - cmd: cd "C:\projects\"
+  - cmd: md pthreads-win32
+  - cmd: cd "C:\projects\"
+  - appveyor DownloadFile "http://www.mirrorservice.org/sites/sources.redhat.com/pub/pthreads-win32/pthreads-w32-2-9-1-release.zip"
+  - cmd: 7z -y x pthreads-w32-2-9-1-release.zip -oC:\projects\pthreads-win32\
+  #VS2008 patch
+  - cmd: cd "C:\projects\"
+  - cmd: appveyor DownloadFile https://github.com/menpo/condaci/raw/master/vs2008_patch.zip
+  - cmd: 7z -y x vs2008_patch.zip -oC:\projects\vs2008_patch\
+  - cmd: if %ARCH%==x64-msvc9 call C:\projects\vs2008_patch\setup_x64.bat
+  - cmd: if %ARCH%==x32-msvc9 call C:\projects\vs2008_patch\setup_x86.bat
+  - cmd: copy "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat" "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\amd64\vcvarsamd64.bat"
+  
+  - cmd: cd "C:\projects\pytango"
+install:
+  #copy tree for debug build
+  - cmd: cd c:/projects/
+  - cmd: md debug_build
+  - cmd: xcopy "C:/projects/pytango" "c:/projects/debug_build" /c /g /d /i /e /r /h /y
+  # Setting Visual Compiler
+  - cmd: cd "C:\projects\"
+  - cmd: if %ARCH%==win32-msvc9 call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat"
+  - cmd: if %ARCH%==win32-msvc9 set path=C:\Windows\Microsoft.NET\Framework\v4.0.30319;%path%
+  - cmd: if %ARCH%==x64-msvc9 call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat"
+  - cmd: if %ARCH%==win32-msvc10 call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
+  - cmd: if %ARCH%==win32-msvc10 set path=C:\Windows\Microsoft.NET\Framework\v4.0.30319;%path%
+  - cmd: if %ARCH%==x64-msvc10 call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 
+  - cmd: if %ARCH%==x64-msvc12 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
+  - cmd: if %ARCH%==x64-msvc14 call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+  - cmd: echo "Generator='%CMAKE_GENERATOR%'"
+  - cmd: echo "Platform='%Platform%'"
+  - cmd: set PYTHONPATH=%PYTHONPATH%
+  # Tango Server
+  - cmd: cd "C:\projects\pytango"
+  - cmd: if %ARCH%==win32-msvc9 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v90_x86/
+  - cmd: if %ARCH%==x64-msvc9 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v90_x64/
+  - cmd: if %ARCH%==win32-msvc10 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v100_x86/
+  - cmd: if %ARCH%==x64-msvc10 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v100_x64/
+  - cmd: if %ARCH%==x64-msvc12 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v120_x64/
+  - cmd: if %ARCH%==x64-msvc14 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v140_x64/
+  - cmd: cmake -G "%CMAKE_GENERATOR%" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE 
+  - cmd: cd c:/projects/debug_build
+  - cmd: cmake -G "%CMAKE_GENERATOR%" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DCMAKE_BUILD_TYPE=Debug
+
+clone_folder: C:\projects\pytango
+
+build:
+  parallel: true
+  verbosity: minimal
+  
+build_script:
+  - cmd: cd C:/projects/pytango 
+  - cmake --build ./ --config Release
+  - cmd: if %ARCH%==x64-msvc10 call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
+  - cmd: cd c:/projects/debug_build
+  - cmake --build ./ --config Debug
+  ##- cmake --build ./ --target install  --config Debug
+
+
+after_build:
+  - cmd: cd C:/projects/pytango 
+  # Generating installer
+  - cmd: cpack -G NSIS
+  - cmd: cpack -G ZIP
+  - cmd: cd c:/projects/debug_build
+  # Generating installer
+  - cmd: cpack -G NSIS
+  - cmd: cpack -G ZIP
+  #rename x64-msvc10
+  - cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_Windows7.1SDK_x64_debug.exe PyTango_9.2.5_v100_x64_debug.exe
+  - cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_Windows7.1SDK_x64_debug.zip PyTango_9.2.5_v100_x64_debug.zip
+  - cmd: cd C:/projects/TangoTest 
+  - cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_Windows7.1SDK_x64.exe PyTango_9.2.5_v100_x64.exe
+  - cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_Windows7.1SDK_x64.zip PyTango_9.2.5_v100_x64.zip
+  # copying debug versions for upload
+  - cmd: cd c:/projects/debug_build
+  - cmd: if %ARCH%==win32-msvc9 move PyTango_9.2.5_v90_x86_debug.exe C:/projects/pytango
+  - cmd: if %ARCH%==win32-msvc9 move PyTango_9.2.5_v90_x86_debug.zip C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc9 move PyTango_9.2.5_v90_x64_debug.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc9 move PyTango_9.2.5_v90_x64_debug.zip C:/projects/pytango
+  - cmd: if %ARCH%==win32-msvc10 move PyTango_9.2.5_v100_x86_debug.exe C:/projects/pytango
+  - cmd: if %ARCH%==win32-msvc10 move PyTango_9.2.5_v100_x86_debug.zip C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_v100_x64_debug.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_v100_x64_debug.zip C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc12 move PyTango_9.2.5_v120_x64_debug.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc12 move PyTango_9.2.5_v120_x64_debug.zip C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc14 move PyTango_9.2.5_v140_x64_debug.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc14 move PyTango_9.2.5_v140_x64_debug.zip C:/projects/pytango
+
+
+on_finish:
+  #RDP for finish
+  #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+artifacts:
+  - path: ./*.exe
+  - path: ./*.zip
