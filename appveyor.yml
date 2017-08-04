@@ -160,6 +160,8 @@ install:
   - cmd: echo "Generator='%CMAKE_GENERATOR%'"
   - cmd: echo "Platform='%Platform%'"
   - cmd: set PYTHONPATH=%PYTHONPATH%
+  - "pip install --disable-pip-version-check --user --upgrade pip"
+  - "pip install -r nose wheel numpy"
   # Tango Server
   - cmd: cd "C:\projects\pytango"
   - cmd: if %ARCH%==win32-msvc9 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v90_x86/
