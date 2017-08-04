@@ -18,7 +18,7 @@
 #include <boost/python/stl_iterator.hpp>
 
 
-#include "pipe.h"
+#include "server/pipe.h"
 #include "fast_from_py.h"
 
 extern const char *param_must_be_seq;
