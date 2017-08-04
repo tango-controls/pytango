@@ -169,6 +169,7 @@ endif()
   set_property(TARGET ${PROJECT_NAME} PROPERTY LINK_FLAGS "/force:multiple")
   target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
   link_directories("$ENV{BOOST_LIBS}/")
+  message("$ENV{BOOST_LIBS}/")
   if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(${PROJECT_NAME} PUBLIC $ENV{TANGO_PATH}/lib/tangod.lib
                                                 $ENV{TANGO_PATH}/bin/omniORB4_rtd.lib
