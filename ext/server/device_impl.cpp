@@ -675,7 +675,7 @@ namespace PyDeviceImpl
 //        PyCmd *py_cmd_ptr = nullptr;
 	    #if _MSC_VER < 1600 //MSVC version <8
 	    	#define NULL ((void *)0)
-        	Tango::Command *cmd_ptr = NULL;
+        	Tango::Command *cmd_ptr = (struct Tango::Command *) malloc(sizeof(struct Tango::Command));
 	    #else
         	Tango::Command *cmd_ptr = nullptr;
 	    #endif
