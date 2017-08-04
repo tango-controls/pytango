@@ -139,7 +139,7 @@ init:
   - cmd: 7z -y x vs2008_patch.zip -oC:\projects\vs2008_patch\
   - cmd: if %ARCH%==x64-msvc9 call C:\projects\vs2008_patch\setup_x64.bat
   - cmd: if %ARCH%==x32-msvc9 call C:\projects\vs2008_patch\setup_x86.bat
-  - cmd: copy "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat" "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\amd64\vcvarsamd64.bat"
+  - cmd: if %ARCH%==x64-msvc9 copy "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat" "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\amd64\vcvarsamd64.bat"
   
   - cmd: cd "C:\projects\pytango"
 install:
@@ -160,8 +160,7 @@ install:
   - cmd: echo "Generator='%CMAKE_GENERATOR%'"
   - cmd: echo "Platform='%Platform%'"
   - cmd: set PYTHONPATH=%PYTHONPATH%
-  - "pip install --disable-pip-version-check --user --upgrade pip"
-  - "pip install nose wheel numpy"
+  - "%PYTHONPATH%/Scripts/pip.exe install nose wheel numpy"
   # Tango Server
   - cmd: cd "C:\projects\pytango"
   - cmd: if %ARCH%==win32-msvc9 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v90_x86/
