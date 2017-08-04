@@ -139,7 +139,7 @@ set(HEADERS
 IF(WIN32)
 
   set(${PROJECT_NAME} INCLUDE_DIRS "$ENV{TANGO_PATH}/include")
-  set(${PROJECT_NAME} INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/ext")
+  include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/ext")
   include_directories(${PROJECT_NAME} PUBLIC "$ENV{BOOST_ROOT}")
   include_directories(${PROJECT_NAME} PUBLIC "$ENV{PYTHONPATH}/include")
   include_directories(${PROJECT_NAME} PUBLIC "$ENV{TANGO_PATH}/include")
