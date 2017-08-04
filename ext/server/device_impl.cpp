@@ -18,7 +18,7 @@
 #include "server/attribute.h"
 #include "server/command.h"
 #include "to_py.h"
-#include "pipe.h"
+#include "server/pipe.h"
 
 
 extern const char *param_must_be_seq;
