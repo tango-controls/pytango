@@ -536,7 +536,6 @@ namespace PyDeviceImpl
 	#else
 	self.push_pipe_event(__pipe_name, &dpb, tv, reuse);
 	#endif
-    	self.push_pipe_event(__pipe_name, &dpb, tv, reuse);
     }
 
     void check_attribute_method_defined(PyObject *self,
