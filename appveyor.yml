@@ -144,12 +144,12 @@ init:
   - cmd: 7z -y x pthreads-w32-2-9-1-release.zip -oC:\projects\pthreads-win32\
   # boost
   - cmd: cd "C:\projects\"
-  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-9.0-32.exe/download
-  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-9.0-64.exe/download
-  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-10.0-32.exe/download
-  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-10.0-64.exe/download
-  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-12.0-64.exe/download
-  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.0-64.exe/download
+  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-9.0-32.exe/download -FileName boost_1_64_0-msvc-9.0-32.exe
+  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-9.0-64.exe/download -FileName boost_1_64_0-msvc-9.0-64.exe
+  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-10.0-32.exe/download -FileName boost_1_64_0-msvc-10.0-32.exe
+  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-10.0-64.exe/download -FileName boost_1_64_0-msvc-10.0-64.exe
+  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-12.0-64.exe/download -FileName boost_1_64_0-msvc-12.0-64.exe
+  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.0-64.exe/download -FileName boost_1_64_0-msvc-14.0-64.exe
   - if %ARCH%==win32-msvc9 boost_1_64_0-msvc-9.0-32.exe /silent /suppressmsgboxes
   - if %ARCH%==x64-msvc9 boost_1_64_0-msvc-9.0-64.exe /silent /suppressmsgboxes
   - if %ARCH%==win32-msvc10 boost_1_64_0-msvc-10.0-32.exe /silent /suppressmsgboxes
