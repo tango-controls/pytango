@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.0.2)
 set(CMP0048 NEW)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        project(_PyTango_d LANGUAGES CXX
+        project(_tango_d LANGUAGES CXX
                 VERSION 1.0)
 else()
-        project(_PyTango LANGUAGES CXX
+        project(_tango LANGUAGES CXX
                 VERSION 1.0)
 endif()
 #need to define the version of the library
@@ -148,6 +148,10 @@ IF(WIN32)
   SET_TARGET_PROPERTIES( ${PROJECT_NAME}
          PROPERTIES
          SUFFIX ".pyd" )
+ add_custom_command(TARGET ${PROJECT_NAME}
+           POST_BUILD
+           COMMAND $ENV{PYTHONPATH}/python.exe  ARGS "winsetup.py"
+           COMMENT "Building msi and exe")
          
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 add_definitions(-D_DEBUG)
