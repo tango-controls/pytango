@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.0.2)
 set(CMP0048 NEW)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        project(PyTango_d LANGUAGES CXX
+        project(_PyTango_d LANGUAGES CXX
                 VERSION 1.0)
 else()
-        project(PyTango LANGUAGES CXX
+        project(_PyTango LANGUAGES CXX
                 VERSION 1.0)
 endif()
 #need to define the version of the library
@@ -155,7 +155,7 @@ install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         CONFIGURATIONS Debug)
-install(FILES Debug/${PROJECT_NAME}.lib DESTINATION bin)
+install(FILES Debug/${PROJECT_NAME}.pyd DESTINATION bin)
 else()
 install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION lib
