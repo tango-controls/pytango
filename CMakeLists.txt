@@ -144,7 +144,7 @@ IF(WIN32)
   link_directories("$ENV{BOOST_LIBS}")
   message("$ENV{BOOST_LIBS}")
   
-  add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+  add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 add_definitions(-D_DEBUG)
 install(TARGETS ${PROJECT_NAME}
