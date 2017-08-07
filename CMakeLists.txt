@@ -27,7 +27,7 @@ add_definitions(-DLOG4TANGO_HAS_DLL)
 add_definitions(-D_WINSOCKAPI_)
 add_definitions(-DNPY_NO_DEPRECATED_API)
 add_definitions(-DBOOST_PYTHON_STATIC_LIB)
-add_compile_options(/bigobj)
+add_compile_options(-Zm200 /MP8 /bigobj)
 IF(CMAKE_CL_64)
 add_definitions(-D_64BITS)
 IF (MSVC14)
@@ -150,7 +150,7 @@ IF(WIN32)
          SUFFIX ".pyd" )
  add_custom_command(TARGET ${PROJECT_NAME}
            POST_BUILD
-           COMMAND $ENV{PYTHONPATH}/python.exe  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py $(BaseBuildLibDir)/$(RelPrefixDir) $(BaseBuildLibDir)/$(RelPrefixDir) $(BaseBDistDir)/$(RelPrefixDir) $(ConfigurationName) $(PlatformName)
+           COMMAND $ENV{PYTHONPATH}/python.exe  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py build dist temp_dist $(ConfigurationName) $(PlatformName)
            COMMENT "Building msi and exe")
          
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
