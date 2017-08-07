@@ -144,13 +144,13 @@ IF(WIN32)
   link_directories("$ENV{BOOST_LIBS}")
   message("$ENV{BOOST_LIBS}")
   
-  add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS}) 
-  SET_TARGET_PROPERTIES( ${PROJECT_NAME}
-         PROPERTIES
-         SUFFIX ".pyd" )
+  add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS}) 
+  ####SET_TARGET_PROPERTIES( ${PROJECT_NAME}
+     ##    PROPERTIES
+     ##    SUFFIX ".pyd" )
  add_custom_command(TARGET ${PROJECT_NAME}
            POST_BUILD
-           COMMAND $ENV{PYTHONPATH}/python.exe  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py build dist temp_dist $(ConfigurationName) $(PlatformName)
+           COMMAND $ENV{PYTHONPATH}/python.exe  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py Release dist temp_dist $(ConfigurationName) $(PlatformName)
            COMMENT "Building msi and exe")
          
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
