@@ -215,12 +215,12 @@ build_script:
 after_build:
   - cmd: cd C:/projects/pytango 
   # Generating installer
-  - cmd: if %ARCH%==win32-msvc9 %PYTHONPATH%python.exe winsetup.py build dist tmp release win32
-  - cmd: if %ARCH%==x64-msvc9 %PYTHONPATH%python.exe winsetup.py build dist tmp release x64
-  - cmd: if %ARCH%==win32-msvc10 %PYTHONPATH%python.exe winsetup.py build dist tmp release win32
-  - cmd: if %ARCH%==x64-msvc10 %PYTHONPATH%python.exe winsetup.py build dist tmp release x64
-  - cmd: if %ARCH%==x64-msvc12 %PYTHONPATH%python.exe winsetup.py build dist tmp release x64
-  - cmd: if %ARCH%==x64-msvc14 %PYTHONPATH%python.exe winsetup.py build dist tmp release x64
+  #- cmd: if %ARCH%==win32-msvc9 %PYTHONPATH%python.exe winsetup.py build dist tmp release win32
+  #- cmd: if %ARCH%==x64-msvc9 %PYTHONPATH%python.exe winsetup.py build dist tmp release x64
+  #- cmd: if %ARCH%==win32-msvc10 %PYTHONPATH%python.exe winsetup.py build dist tmp release win32
+  #- cmd: if %ARCH%==x64-msvc10 %PYTHONPATH%python.exe winsetup.py build dist tmp release x64
+  #- cmd: if %ARCH%==x64-msvc12 %PYTHONPATH%python.exe winsetup.py build dist tmp release x64
+  #- cmd: if %ARCH%==x64-msvc14 %PYTHONPATH%python.exe winsetup.py build dist tmp release x64
   #copying artifacts
   - cmd: if %ARCH%==win32-msvc9 move .\dist\pytango-9.2.5.win32-py2.7.exe C:/projects/pytango
   - cmd: if %ARCH%==win32-msvc9 move .\dist\pytango-9.2.5.win32-py2.7.msi C:/projects/pytango
