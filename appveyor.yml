@@ -17,8 +17,8 @@ environment:
       VC_VER: 9.0
       PYTHONPATH: c:\Python27\
       PYTHONPATHOMNI: "/cygdrive/c/Python27/python"
-      BOOST_ROOT: C:/Libraries/boost_1_63_0
-      BOOST_LIBS: C:/Libraries/boost_1_63_0/lib32-msvc-9.0
+      BOOST_ROOT: C:/local/boost_1_64_0
+      BOOST_LIBS: C:/local/boost_1_64_0/lib32-msvc-9.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files (x86)\tangoidl
@@ -33,8 +33,8 @@ environment:
       VC_VER: 9.0
       PYTHONPATH: c:\Python27-x64\
       PYTHONPATHOMNI: "/cygdrive/c/Python27-x64/python"
-      BOOST_ROOT: C:/Libraries/boost_1_63_0
-      BOOST_LIBS: C:/Libraries/boost_1_63_0\lib64-msvc-9.0
+      BOOST_ROOT: C:/local/boost_1_64_0
+      BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-9.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files\tangoidl
@@ -49,8 +49,8 @@ environment:
       VC_VER: 10.0
       PYTHONPATH: c:\Python33\
       PYTHONPATHOMNI: "/cygdrive/c/Python33/python"
-      BOOST_ROOT: C:/Libraries/boost_1_63_0
-      BOOST_LIBS: C:/Libraries/boost_1_63_0\lib32-msvc-10.0
+      BOOST_ROOT: C:/local/boost_1_64_0
+      BOOST_LIBS: C:/local/boost_1_64_0/lib32-msvc-10.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files (x86)\tangoidl
@@ -65,8 +65,8 @@ environment:
       VC_VER: 10.0
       PYTHONPATH: c:\Python33-x64\
       PYTHONPATHOMNI: "/cygdrive/c/Python33-x64/python"
-      BOOST_ROOT: C:/Libraries/boost_1_63_0
-      BOOST_LIBS: C:/Libraries/boost_1_63_0\lib64-msvc-10.0
+      BOOST_ROOT: C:/local/boost_1_64_0
+      BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-10.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files\tangoidl
@@ -81,8 +81,8 @@ environment:
       VC_VER: 13.0
       PYTHONPATH: c:\Python34-x64\
       PYTHONPATHOMNI: "/cygdrive/c/Python33-x64/python"
-      BOOST_ROOT: C:/Libraries/boost_1_63_0
-      BOOST_LIBS: C:/Libraries/boost_1_63_0\lib64-msvc-12.0
+      BOOST_ROOT: C:/local/boost_1_64_0
+      BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-12.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files\tangoidl
@@ -97,8 +97,8 @@ environment:
       VC_VER: 14.0
       PYTHONPATH: c:\Python35-x64\
       PYTHONPATHOMNI: "/cygdrive/c/Python35-x64/python"
-      BOOST_ROOT: C:/Libraries/boost_1_63_0
-      BOOST_LIBS: C:/Libraries/boost_1_63_0\lib64-msvc-14.0
+      BOOST_ROOT: C:/local/boost_1_64_0
+      BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-14.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files\tangoidl
@@ -142,6 +142,20 @@ init:
   - cmd: cd "C:\projects\"
   - appveyor DownloadFile "http://www.mirrorservice.org/sites/sources.redhat.com/pub/pthreads-win32/pthreads-w32-2-9-1-release.zip"
   - cmd: 7z -y x pthreads-w32-2-9-1-release.zip -oC:\projects\pthreads-win32\
+  # boost
+  - cmd: cd "C:\projects\"
+  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-9.0-32.exe/download
+  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-9.0-64.exe/download
+  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-10.0-32.exe/download
+  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-10.0-64.exe/download
+  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-12.0-64.exe/download
+  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.0-64.exe/download
+  - if %ARCH%==win32-msvc9 boost_1_64_0-msvc-9.0-32.exe /silent /suppressmsgboxes
+  - if %ARCH%==x64-msvc9 boost_1_64_0-msvc-9.0-64.exe /silent /suppressmsgboxes
+  - if %ARCH%==win32-msvc10 boost_1_64_0-msvc-10.0-32.exe /silent /suppressmsgboxes
+  - if %ARCH%==x64-msvc10 boost_1_64_0-msvc-10.0-64.exe /silent /suppressmsgboxes
+  - if %ARCH%==x64-msvc12 boost_1_64_0-msvc-12.0-64.exe /silent /suppressmsgboxes
+  - if %ARCH%==x64-msvc14 boost_1_64_0-msvc-14.0-64.exe /silent /suppressmsgboxes
   #VS2008 patch
   - cmd: cd "C:\projects\"
   - cmd: appveyor DownloadFile https://github.com/menpo/condaci/raw/master/vs2008_patch.zip
