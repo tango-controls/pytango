@@ -144,14 +144,18 @@ IF(WIN32)
   link_directories("$ENV{BOOST_LIBS}")
   message("$ENV{BOOST_LIBS}")
   
-  add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+  add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS}) 
+  SET_TARGET_PROPERTIES( ${PROJECT_NAME}
+         PROPERTIES
+         SUFFIX ".pyd" )
+         
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 add_definitions(-D_DEBUG)
 install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         CONFIGURATIONS Debug)
-install(FILES Debug/${PROJECT_NAME}.exe DESTINATION bin)
+install(FILES Debug/${PROJECT_NAME}.lib DESTINATION bin)
 else()
 install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION lib
@@ -258,4 +262,4 @@ IF(MSVC90)
   set(CPACK_NSIS_MENU_LINKS
       "http://tango-controls.readthedocs.io/en/latest/" "Tango Doc")
 ENDIF()
-include(CPack)
+#include(CPack)
