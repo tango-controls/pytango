@@ -150,7 +150,7 @@ IF(WIN32)
          SUFFIX ".pyd" )
  add_custom_command(TARGET ${PROJECT_NAME}
            POST_BUILD
-           COMMAND $ENV{PYTHONPATH}/python.exe  ARGS "winsetup.py $(BaseBuildLibDir)\$(RelPrefixDir) $(BaseBuildLibDir)\$(RelPrefixDir) $(BaseBDistDir)\$(RelPrefixDir) $(ConfigurationName) $(PlatformName)"
+           COMMAND $ENV{PYTHONPATH}/python.exe  ARGS "$(BaseDir)\winsetup.py $(BaseBuildLibDir)\$(RelPrefixDir) $(BaseBuildLibDir)\$(RelPrefixDir) $(BaseBDistDir)\$(RelPrefixDir) $(ConfigurationName) $(PlatformName)"
            COMMENT "Building msi and exe")
          
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
