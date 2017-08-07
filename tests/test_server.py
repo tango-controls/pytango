@@ -144,6 +144,45 @@ def test_read_write_attribute(typed_values, server_green_mode):
             assert_close(proxy.attr, value)
 
 
+def test_partial_attributes(server_green_mode):
+    from functools import partial
+
+    class TestDevice(Device):
+        array = [-1337, -42, 42, 1337]
+
+        green_mode = server_green_mode
+
+        def read_an_array(self, index):
+            return self.array[index]
+
+        read_first_index = partial(read_an_array, index=0)
+        read_second_index = partial(read_an_array, index=1)
+
+        first_attr = attribute(dtype=int, access=AttrWriteType.READ,
+                               fget="read_first_index")
+
+        second_attr = attribute(dtype=int, access=AttrWriteType.READ,
+                                fget="read_second_index")
+
+        def read_an_array_2(self, attribute, index):
+            attribute.set_value(self.array[index])
+
+        read_third_index = partial(read_an_array_2, index=2)
+        read_fourth_index = partial(read_an_array_2, index=3)
+
+        third_attr = attribute(dtype=int, access=AttrWriteType.READ,
+                               fget="read_third_index")
+
+        fourth_attr = attribute(dtype=int, access=AttrWriteType.READ,
+                                fget="read_fourth_index")
+
+    with DeviceTestContext(TestDevice) as proxy:
+        assert proxy.first_attr == TestDevice.array[0]
+        assert proxy.second_attr == TestDevice.array[1]
+        assert proxy.third_attr == TestDevice.array[2]
+        assert proxy.fourth_attr == TestDevice.array[3]
+
+
 # Test properties
 
 def test_device_property_no_default(typed_values, server_green_mode):
