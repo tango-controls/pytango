@@ -47,8 +47,8 @@ environment:
       MSVCYEAR: "vs2010"
       MSVCABR: "10"
       VC_VER: 10.0
-      PYTHONPATH: c:\Python33\
-      PYTHONPATHOMNI: "/cygdrive/c/Python33/python"
+      PYTHONPATH: c:\Python34\
+      PYTHONPATHOMNI: "/cygdrive/c/Python34/python"
       BOOST_ROOT: C:/local/boost_1_64_0
       BOOST_LIBS: C:/local/boost_1_64_0/lib32-msvc-10.0
       ZMQ_BASE: C:\projects\libzmq
@@ -63,8 +63,8 @@ environment:
       MSVCYEAR: "vs2010"
       MSVCABR: "10"
       VC_VER: 10.0
-      PYTHONPATH: c:\Python33-x64\
-      PYTHONPATHOMNI: "/cygdrive/c/Python33-x64/python"
+      PYTHONPATH: c:\Python34-x64\
+      PYTHONPATHOMNI: "/cygdrive/c/Python34-x64/python"
       BOOST_ROOT: C:/local/boost_1_64_0
       BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-10.0
       ZMQ_BASE: C:\projects\libzmq
@@ -80,7 +80,7 @@ environment:
       MSVCABR: "13"
       VC_VER: 13.0
       PYTHONPATH: c:\Python34-x64\
-      PYTHONPATHOMNI: "/cygdrive/c/Python33-x64/python"
+      PYTHONPATHOMNI: "/cygdrive/c/Python34-x64/python"
       BOOST_ROOT: C:/local/boost_1_64_0
       BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-12.0
       ZMQ_BASE: C:\projects\libzmq
@@ -224,16 +224,16 @@ after_build:
   #copying artifacts
   - cmd: if %ARCH%==win32-msvc9 move .\dist\pytango-9.2.5.win32-py2.7.exe C:/projects/pytango
   - cmd: if %ARCH%==win32-msvc9 move .\dist\pytango-9.2.5.win32-py2.7.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc9 .\dist\pytango-9.2.5.amd64-py2.7.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc9 .\dist\pytango-9.2.5.amd64-py2.7.msi C:/projects/pytango
-  - cmd: if %ARCH%==win32-msvc10 .\dist\pytango-9.2.5.win32-py3.3.exe C:/projects/pytango
-  - cmd: if %ARCH%==win32-msvc10 .\dist\pytango-9.2.5.win32-py3.3.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc10 .\dist\pytango-9.2.5.amd64-py3.3.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc10 .\dist\pytango-9.2.5.amd64-py3.3.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc12 .\dist\pytango-9.2.5.amd64-py3.3.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc12 .\dist\pytango-9.2.5.amd64-py3.3.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc14 .\dist\pytango-9.2.5.amd64-py3.5.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc14 .\dist\pytango-9.2.5.amd64-py3.5.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc9 .\dist\pytango-9.2.5.win-amd64-py2.7.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc9 .\dist\pytango-9.2.5.win-amd64-py2.7.msi C:/projects/pytango
+  - cmd: if %ARCH%==win32-msvc10 .\dist\pytango-9.2.5.win32-py3.4.exe C:/projects/pytango
+  - cmd: if %ARCH%==win32-msvc10 .\dist\pytango-9.2.5.win32-py3.4.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc10 .\dist\pytango-9.2.5.win-amd64-py3.4.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc10 .\dist\pytango-9.2.5.win-amd64-py3.4.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc12 .\dist\pytango-9.2.5.win-amd64-py3.4.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc12 .\dist\pytango-9.2.5.win-amd64-py3.4.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc14 .\dist\pytango-9.2.5.win-amd64-py3.5.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc14 .\dist\pytango-9.2.5.win-amd64-py3.5.msi C:/projects/pytango
   #rename x64-msvc10
   #- cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_Windows7.1SDK_x64_debug.exe PyTango_9.2.5_v100_x64_debug.exe
   #- cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_Windows7.1SDK_x64_debug.zip PyTango_9.2.5_v100_x64_debug.zip
