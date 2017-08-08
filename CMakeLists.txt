@@ -145,9 +145,9 @@ IF(WIN32)
   message("$ENV{BOOST_LIBS}")
   
   add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS}) 
-  ####SET_TARGET_PROPERTIES( ${PROJECT_NAME}
-     ##    PROPERTIES
-     ##    SUFFIX ".pyd" )
+  SET_TARGET_PROPERTIES( ${PROJECT_NAME}
+         PROPERTIES
+         SUFFIX ".pyd" )
  add_custom_command(TARGET ${PROJECT_NAME}
            POST_BUILD
            COMMAND $ENV{PYTHONPATH}/python.exe  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py Release dist temp_dist $(ConfigurationName) $(PlatformName)
