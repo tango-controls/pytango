@@ -7,38 +7,6 @@ image: Visual Studio 2015
 
 environment:
   matrix:
-    - platform: x64
-      ARCH: x64-msvc9
-      configuration: Release
-      CMAKE_GENERATOR: "Visual Studio 9 2008 Win64"
-      MSVCVERSION: v90
-      MSVCYEAR: "vs2008"
-      MSVCABR: "9"
-      VC_VER: 9.0
-      PYTHONPATH: c:\Python27-x64\
-      PYTHONPATHOMNI: "/cygdrive/c/Python27-x64/python"
-      BOOST_ROOT: C:/local/boost_1_64_0
-      BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-9.0
-      ZMQ_BASE: C:\projects\libzmq
-      IDL_BASE: C:\projects\tangoidl
-      IDL_BIN: C:\Program Files\tangoidl
-      OMNI_BASE: C:\projects\omniORB-4.2.1
-    - platform: win32
-      ARCH: win32-msvc9
-      configuration: Release
-      CMAKE_GENERATOR: "Visual Studio 9 2008"
-      MSVCVERSION: v90
-      MSVCYEAR: "vs2008"
-      MSVCABR: "9"
-      VC_VER: 9.0
-      PYTHONPATH: c:\Python27\
-      PYTHONPATHOMNI: "/cygdrive/c/Python27/python"
-      BOOST_ROOT: C:/local/boost_1_64_0
-      BOOST_LIBS: C:/local/boost_1_64_0/lib32-msvc-9.0
-      ZMQ_BASE: C:\projects\libzmq
-      IDL_BASE: C:\projects\tangoidl
-      IDL_BIN: C:\Program Files (x86)\tangoidl
-      OMNI_BASE: C:\projects\omniORB-4.2.1
     - platform: win32
       ARCH: win32-msvc10
       configuration: Release
@@ -99,6 +67,38 @@ environment:
       PYTHONPATHOMNI: "/cygdrive/c/Python35-x64/python"
       BOOST_ROOT: C:/local/boost_1_64_0
       BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-14.0
+      ZMQ_BASE: C:\projects\libzmq
+      IDL_BASE: C:\projects\tangoidl
+      IDL_BIN: C:\Program Files\tangoidl
+      OMNI_BASE: C:\projects\omniORB-4.2.1
+    - platform: win32
+      ARCH: win32-msvc9
+      configuration: Release
+      CMAKE_GENERATOR: "Visual Studio 9 2008"
+      MSVCVERSION: v90
+      MSVCYEAR: "vs2008"
+      MSVCABR: "9"
+      VC_VER: 9.0
+      PYTHONPATH: c:\Python27\
+      PYTHONPATHOMNI: "/cygdrive/c/Python27/python"
+      BOOST_ROOT: C:/local/boost_1_64_0
+      BOOST_LIBS: C:/local/boost_1_64_0/lib32-msvc-9.0
+      ZMQ_BASE: C:\projects\libzmq
+      IDL_BASE: C:\projects\tangoidl
+      IDL_BIN: C:\Program Files (x86)\tangoidl
+      OMNI_BASE: C:\projects\omniORB-4.2.1
+    - platform: x64
+      ARCH: x64-msvc9
+      configuration: Release
+      CMAKE_GENERATOR: "Visual Studio 9 2008 Win64"
+      MSVCVERSION: v90
+      MSVCYEAR: "vs2008"
+      MSVCABR: "9"
+      VC_VER: 9.0
+      PYTHONPATH: c:\Python27-x64\
+      PYTHONPATHOMNI: "/cygdrive/c/Python27-x64/python"
+      BOOST_ROOT: C:/local/boost_1_64_0
+      BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-9.0
       ZMQ_BASE: C:\projects\libzmq
       IDL_BASE: C:\projects\tangoidl
       IDL_BIN: C:\Program Files\tangoidl
@@ -226,16 +226,16 @@ after_build:
   #copying artifacts
   - cmd: if %ARCH%==win32-msvc9 move .\dist\pytango-9.2.5.win32-py2.7.exe C:/projects/pytango
   - cmd: if %ARCH%==win32-msvc9 move .\dist\pytango-9.2.5.win32-py2.7.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc9 .\dist\pytango-9.2.5.win-amd64-py2.7.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc9 .\dist\pytango-9.2.5.win-amd64-py2.7.msi C:/projects/pytango
-  - cmd: if %ARCH%==win32-msvc10 .\dist\pytango-9.2.5.win32-py3.4.exe C:/projects/pytango
-  - cmd: if %ARCH%==win32-msvc10 .\dist\pytango-9.2.5.win32-py3.4.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc10 .\dist\pytango-9.2.5.win-amd64-py3.4.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc10 .\dist\pytango-9.2.5.win-amd64-py3.4.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc12 .\dist\pytango-9.2.5.win-amd64-py3.4.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc12 .\dist\pytango-9.2.5.win-amd64-py3.4.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc14 .\dist\pytango-9.2.5.win-amd64-py3.5.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc14 .\dist\pytango-9.2.5.win-amd64-py3.5.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc9 move .\dist\pytango-9.2.5.win-amd64-py2.7.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc9 move .\dist\pytango-9.2.5.win-amd64-py2.7.msi C:/projects/pytango
+  - cmd: if %ARCH%==win32-msvc10 move .\dist\pytango-9.2.5.win32-py3.4.exe C:/projects/pytango
+  - cmd: if %ARCH%==win32-msvc10 move .\dist\pytango-9.2.5.win32-py3.4.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc10 move .\dist\pytango-9.2.5.win-amd64-py3.4.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc10 move .\dist\pytango-9.2.5.win-amd64-py3.4.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc12 move .\dist\pytango-9.2.5.win-amd64-py3.4.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc12 move .\dist\pytango-9.2.5.win-amd64-py3.4.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc14 move .\dist\pytango-9.2.5.win-amd64-py3.5.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc14 move .\dist\pytango-9.2.5.win-amd64-py3.5.msi C:/projects/pytango
   #rename x64-msvc10
   #- cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_Windows7.1SDK_x64_debug.exe PyTango_9.2.5_v100_x64_debug.exe
   #- cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_Windows7.1SDK_x64_debug.zip PyTango_9.2.5_v100_x64_debug.zip
