@@ -1082,7 +1082,7 @@ Tango::ConstDevString Device_3ImplWrap::dev_status()
     {
         if (override dev_status = this->get_override("dev_status") )
 	{
-            std::string status = this->get_override("dev_status");
+            std::string status = boost::python::call<std::string>(this->get_override("dev_status")());
             this->the_status = status;
 	}
         else
@@ -1258,7 +1258,7 @@ Tango::ConstDevString Device_4ImplWrap::dev_status()
     {
         if (override dev_status = this->get_override("dev_status") )
 	{
-            std::string status = this->get_override("dev_status");
+            std::string status = boost::python::call<std::string>(this->get_override("dev_status")());
             this->the_status = status;
 	}
         else
@@ -1427,7 +1427,7 @@ Tango::ConstDevString Device_5ImplWrap::dev_status()
     {
         if (override dev_status = this->get_override("dev_status") )
 	{
-            std::string status = this->get_override("dev_status");
+            std::string status = boost::python::call<std::string>(this->get_override("dev_status")());
             this->the_status = status;
 	}
         else
