@@ -193,7 +193,7 @@ install:
   - cmd: if %ARCH%==x64-msvc10 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v100_x64/
   - cmd: if %ARCH%==x64-msvc12 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v120_x64/
   - cmd: if %ARCH%==x64-msvc14 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v140_x64/
-  - cmd: cmake -G "%CMAKE_GENERATOR%
+  - cmd: cmake -G "%CMAKE_GENERATOR% -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DBUILD_SHARED_LIBS=TRUE
   - cmd: cd c:/projects/debug_build
   #- cmd: cmake -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Debug
 
