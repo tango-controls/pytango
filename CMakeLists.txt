@@ -146,7 +146,7 @@ if(WIN32)
   link_directories("$ENV{BOOST_LIBS}")
   message("$ENV{BOOST_LIBS}")
   
-  add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS}) 
+  add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS}) 
   
   SET_TARGET_PROPERTIES( ${PROJECT_NAME}
          PROPERTIES
