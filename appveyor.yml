@@ -197,7 +197,7 @@ install:
   - cmd: set PYTHONPATH=%PYTHONPATH%
   - "%PYTHONPATH%/Scripts/pip.exe install nose wheel numpy"
   # adding a boost-config.jam file
-  - cmd: if true @echo %BOOST_CFG% >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
+  - cmd: echo %BOOST_CFG% >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
   #- cmd: @echo using python : %PYTHONABR% : %PYTHONPATH%/python.exe : %PYTHONPATH%/include : %PYTHONPATH%/libs; >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
   # Tango Server
   - cmd: cd "C:\projects\pytango"
@@ -221,7 +221,6 @@ build:
 build_script:
   - cmd: cd C:/projects/pytango 
   - cmake --build ./ --config Release
-  - cmd: if %ARCH%==x64-msvc10 call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
   #- cmd: cd c:/projects/debug_build
   #- cmake --build ./ --config Debug
   ##- cmake --build ./ --target install  --config Debug
