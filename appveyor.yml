@@ -17,6 +17,7 @@ environment:
       VC_VER: 13.0
       PYTHONPATH: c:\Python34-x64\
       PYTHONPATHOMNI: "/cygdrive/c/Python34-x64/python"
+      PYTHONABR: 3.4
       BOOST_ROOT: C:/local/boost_1_64_0
       BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-12.0
       ZMQ_BASE: C:\projects\libzmq
@@ -33,6 +34,7 @@ environment:
       VC_VER: 14.0
       PYTHONPATH: c:\Python35-x64\
       PYTHONPATHOMNI: "/cygdrive/c/Python35-x64/python"
+      PYTHONABR: 3.5
       BOOST_ROOT: C:/local/boost_1_64_0
       BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-14.0
       ZMQ_BASE: C:\projects\libzmq
@@ -49,6 +51,7 @@ environment:
       VC_VER: 9.0
       PYTHONPATH: c:\Python27\
       PYTHONPATHOMNI: "/cygdrive/c/Python27/python"
+      PYTHONABR: 2.7
       BOOST_ROOT: C:/local/boost_1_64_0
       BOOST_LIBS: C:/local/boost_1_64_0/lib32-msvc-9.0
       ZMQ_BASE: C:\projects\libzmq
@@ -65,6 +68,7 @@ environment:
       VC_VER: 9.0
       PYTHONPATH: c:\Python27-x64\
       PYTHONPATHOMNI: "/cygdrive/c/Python27-x64/python"
+      PYTHONABR: 2.7
       BOOST_ROOT: C:/local/boost_1_64_0
       BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-9.0
       ZMQ_BASE: C:\projects\libzmq
@@ -81,6 +85,7 @@ environment:
       VC_VER: 10.0
       PYTHONPATH: c:\Python34\
       PYTHONPATHOMNI: "/cygdrive/c/Python34/python"
+      PYTHONABR: 3.4
       BOOST_ROOT: C:/local/boost_1_64_0
       BOOST_LIBS: C:/local/boost_1_64_0/lib32-msvc-10.0
       ZMQ_BASE: C:\projects\libzmq
@@ -97,6 +102,7 @@ environment:
       VC_VER: 10.0
       PYTHONPATH: c:\Python34-x64\
       PYTHONPATHOMNI: "/cygdrive/c/Python34-x64/python"
+      PYTHONABR: 3.4
       BOOST_ROOT: C:/local/boost_1_64_0
       BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-10.0
       ZMQ_BASE: C:\projects\libzmq
@@ -184,6 +190,8 @@ install:
   - cmd: echo "Platform='%Platform%'"
   - cmd: set PYTHONPATH=%PYTHONPATH%
   - "%PYTHONPATH%/Scripts/pip.exe install nose wheel numpy"
+  # adding a boost-config.jam file
+  - cmd: @echo using python : %PYTHONABR% : %PYTHONPATH%/python.exe : %PYTHONPATH%/include : %PYTHONPATH%/libs; >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
   # Tango Server
   - cmd: cd "C:\projects\pytango"
   - cmd: set BOOST_LIBS=%BOOST_LIBS%
