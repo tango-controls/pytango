@@ -191,7 +191,13 @@ install:
   - cmd: set PYTHONPATH=%PYTHONPATH%
   - "%PYTHONPATH%/Scripts/pip.exe install nose wheel numpy"
   # adding a boost-config.jam file
-  - cmd: @echo using python : %PYTHONABR% : %PYTHONPATH%/python.exe : %PYTHONPATH%/include : %PYTHONPATH%/libs; >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
+  - cmd: if %ARCH%==win32-msvc9 @echo using python : 2.7 : c:/python27/python.exe : c:/python27/include : c:/python27/libs; >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
+  - cmd: if %ARCH%==x64-msvc9 @echo using python : 2.7 : c:/python27-x64/python.exe : c:/python27-x64/include : c:/python27-x64/libs; >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
+  - cmd: if %ARCH%==win32-msvc10 @echo using python : 3.4 : c:/python34/python.exe : c:/python34/include : c:/python34/libs; >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
+  - cmd: if %ARCH%==x64-msvc10 @echo using python : 3.4 : c:/python34-x64/python.exe : c:/python34-x64/include : c:/python34-x64/libs; >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
+  - cmd: if %ARCH%==x64-msvc12 @echo using python : 3.4 : c:/python34-x64/python.exe : c:/python34-x64/include : c:/python34-x64/libs; >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
+  - cmd: if %ARCH%==x64-msvc14 @echo using python : 3.5 : c:/python35-x64/python.exe : c:/python35-x64/include : c:/python35-x64/libs; >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
+  #- cmd: @echo using python : %PYTHONABR% : %PYTHONPATH%/python.exe : %PYTHONPATH%/include : %PYTHONPATH%/libs; >> %HOMEDRIVE%%HOMEPATH%\user-config.jam
   # Tango Server
   - cmd: cd "C:\projects\pytango"
   - cmd: set BOOST_LIBS=%BOOST_LIBS%
