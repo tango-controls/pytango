@@ -129,19 +129,19 @@ init:
   - cmd: if %platform%==x64 7z -y x libtango_9.2.5_%MSVCVERSION%_x64.zip -oC:\projects\libtango\
   - cmd: if %platform%==win32 7z -y x libtango_9.2.5_%MSVCVERSION%_x86.zip -oC:\projects\libtango\
   #tango debug
-  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/27e2x8cp3ksb3k4w/artifacts/libtango_9.2.5_v90_x86_debug.zip
-  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/xj47a6v211doudww/artifacts/libtango_9.2.5_v90_x64_debug.zip
-  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/whd2l7d9c1i8g14w/artifacts/libtango_9.2.5_v100_x86_debug.zip
-  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/71s874itvni76rid/artifacts/libtango_9.2.5_v100_x64_debug.zip
-  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/77blmh7ougglu0lm/artifacts/libtango_9.2.5_v120_x64_debug.zip
-  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/n8x4y5969s72nj3m/artifacts/libtango_9.2.5_v140_x64_debug.zip
-  - cmd: if %platform%==x64 7z -y x libtango_9.2.5_%MSVCVERSION%_x64_debug.zip -oC:\projects\libtango\
-  - cmd: if %platform%==win32 7z -y x libtango_9.2.5_%MSVCVERSION%_x86_debug.zip -oC:\projects\libtango\
-  - cmd: if %ARCH%==x64-msvc10 cd C:/projects/libtango/
-  - cmd: if %ARCH%==x64-msvc10 rename libtango_9.2.5_Windows7.1SDK_x64 libtango_9.2.5_v100_x64
-  - cmd: if %ARCH%==x64-msvc10 rename libtango_9.2.5_Windows7.1SDK_x64_debug libtango_9.2.5_v100_x64_debug
-  - cmd: if %platform%==x64 xcopy "C:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x64_debug" "c:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x64" /c /g /d /i /e /r /h /y
-  - cmd: if %platform%==win32 xcopy "C:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x86_debug" "c:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x86" /c /g /d /i /e /r /h /y
+  #- if %ARCH%==win32-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/27e2x8cp3ksb3k4w/artifacts/libtango_9.2.5_v90_x86_debug.zip
+  #- if %ARCH%==x64-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/xj47a6v211doudww/artifacts/libtango_9.2.5_v90_x64_debug.zip
+  #- if %ARCH%==win32-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/whd2l7d9c1i8g14w/artifacts/libtango_9.2.5_v100_x86_debug.zip
+  #- if %ARCH%==x64-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/71s874itvni76rid/artifacts/libtango_9.2.5_v100_x64_debug.zip
+  #- if %ARCH%==x64-msvc12 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/77blmh7ougglu0lm/artifacts/libtango_9.2.5_v120_x64_debug.zip
+  #- if %ARCH%==x64-msvc14 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/n8x4y5969s72nj3m/artifacts/libtango_9.2.5_v140_x64_debug.zip
+  #- cmd: if %platform%==x64 7z -y x libtango_9.2.5_%MSVCVERSION%_x64_debug.zip -oC:\projects\libtango\
+  #- cmd: if %platform%==win32 7z -y x libtango_9.2.5_%MSVCVERSION%_x86_debug.zip -oC:\projects\libtango\
+  #- cmd: if %ARCH%==x64-msvc10 cd C:/projects/libtango/
+  #- cmd: if %ARCH%==x64-msvc10 rename libtango_9.2.5_Windows7.1SDK_x64 libtango_9.2.5_v100_x64
+  #- cmd: if %ARCH%==x64-msvc10 rename libtango_9.2.5_Windows7.1SDK_x64_debug libtango_9.2.5_v100_x64_debug
+  #- cmd: if %platform%==x64 xcopy "C:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x64_debug" "c:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x64" /c /g /d /i /e /r /h /y
+  #- cmd: if %platform%==win32 xcopy "C:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x86_debug" "c:/projects/libtango/libtango_9.2.5_%MSVCVERSION%_x86" /c /g /d /i /e /r /h /y
   #Pthread-Win32
   - cmd: cd "C:\projects\"
   - cmd: md pthreads-win32
@@ -174,8 +174,8 @@ init:
 install:
   #copy tree for debug build
   - cmd: cd c:/projects/
-  - cmd: md debug_build
-  - cmd: xcopy "C:/projects/pytango" "c:/projects/debug_build" /c /g /d /i /e /r /h /y
+  #- cmd: md debug_build
+  #- cmd: xcopy "C:/projects/pytango" "c:/projects/debug_build" /c /g /d /i /e /r /h /y
   # Setting Visual Compiler
   - cmd: cd "C:\projects\"
   - cmd: if %ARCH%==win32-msvc9 call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat"
@@ -208,7 +208,7 @@ install:
   - cmd: if %ARCH%==x64-msvc12 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v120_x64/
   - cmd: if %ARCH%==x64-msvc14 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v140_x64/
   - cmd: cmake -G "%CMAKE_GENERATOR%" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DBUILD_SHARED_LIBS=TRUE
-  - cmd: cd c:/projects/debug_build
+  #- cmd: cd c:/projects/debug_build
   #- cmd: cmake -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Debug
 
 clone_folder: C:\projects\pytango
@@ -221,7 +221,7 @@ build_script:
   - cmd: cd C:/projects/pytango 
   - cmake --build ./ --config Release
   - cmd: if %ARCH%==x64-msvc10 call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
-  - cmd: cd c:/projects/debug_build
+  #- cmd: cd c:/projects/debug_build
   #- cmake --build ./ --config Debug
   ##- cmake --build ./ --target install  --config Debug
 
