@@ -156,18 +156,13 @@ init:
   - cmd: 7z -y x pthreads-w32-2-9-1-release.zip -oC:\projects\pthreads-win32\
   # boost
   - cmd: cd "C:\projects\"
-  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-9.0-32.exe/download -FileName boost_1_64_0-msvc-9.0-32.exe
-  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-9.0-64.exe/download -FileName boost_1_64_0-msvc-9.0-64.exe
-  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-10.0-32.exe/download -FileName boost_1_64_0-msvc-10.0-32.exe
-  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-10.0-64.exe/download -FileName boost_1_64_0-msvc-10.0-64.exe
-  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-12.0-64.exe/download -FileName boost_1_64_0-msvc-12.0-64.exe
-  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost-binaries/1.64.0/boost_1_64_0-msvc-14.0-64.exe/download -FileName boost_1_64_0-msvc-14.0-64.exe
-  - if %ARCH%==win32-msvc9 boost_1_64_0-msvc-9.0-32.exe /silent /suppressmsgboxes
-  - if %ARCH%==x64-msvc9 boost_1_64_0-msvc-9.0-64.exe /silent /suppressmsgboxes
-  - if %ARCH%==win32-msvc10 boost_1_64_0-msvc-10.0-32.exe /silent /suppressmsgboxes
-  - if %ARCH%==x64-msvc10 boost_1_64_0-msvc-10.0-64.exe /silent /suppressmsgboxes
-  - if %ARCH%==x64-msvc12 boost_1_64_0-msvc-12.0-64.exe /silent /suppressmsgboxes
-  - if %ARCH%==x64-msvc14 boost_1_64_0-msvc-14.0-64.exe /silent /suppressmsgboxes
+  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/lefg2qg4seyiuwqw/artifacts/boost-1.64_win32-msvc9.zip
+  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/6w8mbccdtjqra7pq/artifacts/boost-1.64_x64-msvc9.zip
+  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/cr7gxn5m7b3t4dxm/artifacts/boost-1.64_win32-msvc10.zip
+  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/9hnlv1jrt9h3dx4j/artifacts/boost-1.64_x64-msvc10.zip
+  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/n3nxng0llovbq0xy/artifacts/boost-1.64_x64-msvc12.zip
+  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/6y1j3r5uaku5p7u9/artifacts/boost-1.64_x64-msvc14.zip
+  - cmd: 7z -y x /boost-1.64_%ARCH%.zip -oC:\projects\
   #VS2008 patch
   - cmd: cd "C:\projects\"
   - cmd: appveyor DownloadFile https://github.com/menpo/condaci/raw/master/vs2008_patch.zip
@@ -201,7 +196,8 @@ install:
   - cmd: type %HOMEDRIVE%%HOMEPATH%\user-config.jam
   # Tango Server
   - cmd: cd "C:\projects\pytango"
-  - cmd: set BOOST_LIBS=%BOOST_LIBS%
+  - cmd: set BOOST_ROOT=c:/projects/Boost
+  - cmd: set BOOST_LIBS=c:/projects/Boost/lib
   - cmd: if %ARCH%==win32-msvc9 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v90_x86/
   - cmd: if %ARCH%==x64-msvc9 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v90_x64/
   - cmd: if %ARCH%==win32-msvc10 set TANGO_PATH=C:/projects/libtango/libtango_9.2.5_v100_x86/
