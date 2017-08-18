@@ -24,7 +24,7 @@ environment:
       IDL_BIN: C:\Program Files\tangoidl
       OMNI_BASE: C:\projects\omniORB-4.2.1
       BOOST_CFG: >-
-          using python : 3.4 : c:/python34-x64/python.exe : c:/python34-x64/include : c:/python34-x64/libs;
+          using python : 3.4 : c:/python34-x64/python.exe : c:/python34-x64/include : c:/python34-x64/libs : <address-model>64;
     - platform: x64
       ARCH: x64-msvc14
       configuration: Release
@@ -42,7 +42,7 @@ environment:
       IDL_BIN: C:\Program Files\tangoidl
       OMNI_BASE: C:\projects\omniORB-4.2.1    
       BOOST_CFG: >-
-          using python : 3.5 : c:/python35-x64/python.exe : c:/python35-x64/include : c:/python35-x64/libs;
+          using python : 3.5 : c:/python35-x64/python.exe : c:/python35-x64/include : c:/python35-x64/libs : <address-model>64;
     - platform: win32
       ARCH: win32-msvc9
       configuration: Release
@@ -78,7 +78,7 @@ environment:
       IDL_BIN: C:\Program Files\tangoidl
       OMNI_BASE: C:\projects\omniORB-4.2.1
       BOOST_CFG: >-
-          using python : 2.7 : c:/python27-x64/python.exe : c:/python27-x64/include : c:/python27-x64/libs;
+          using python : 2.7 : c:/python27-x64/python.exe : c:/python27-x64/include : c:/python27-x64/libs : <address-model>64;
     - platform: win32
       ARCH: win32-msvc10
       configuration: Release
@@ -114,7 +114,7 @@ environment:
       IDL_BIN: C:\Program Files\tangoidl
       OMNI_BASE: C:\projects\omniORB-4.2.1
       BOOST_CFG: >-
-          using python : 3.4 : c:/python34-x64/python.exe : c:/python34-x64/include : c:/python34-x64/libs;
+          using python : 3.4 : c:/python34-x64/python.exe : c:/python34-x64/include : c:/python34-x64/libs : <address-model>64;
 init:
   # go to hell Xamarin (see http://help.appveyor.com/discussions/problems/4569)
   - del "C:\Program Files (x86)\MSBuild\4.0\Microsoft.Common.Targets\ImportAfter\Xamarin.Common.targets"
