@@ -149,8 +149,9 @@ if(WIN32)
   message("$ENV{BOOST_LIBS}")
   
   add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS}) 
-  
-  SET_TARGET_PROPERTIES( ${PROJECT_NAME}
+  set_target_properties( ${PROJECT_NAME} PROPERTIES
+         LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Release/tango)
+  set_target_properties( ${PROJECT_NAME}
          PROPERTIES
          SUFFIX ".pyd" )
          
