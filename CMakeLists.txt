@@ -72,7 +72,7 @@ set(SOURCES
         ext/server/device_impl.cpp
         ext/device_info.cpp
         ext/device_pipe.cpp
-        ext/device_proxy.cppext
+        ext/device_proxy.cpp
         ext/devintr_change_event_data.cpp
         ext/server/dserver.cpp
         ext/server/encoded_attribute.cpp
