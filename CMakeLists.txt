@@ -72,13 +72,15 @@ set(SOURCES
         ext/server/device_impl.cpp
         ext/device_info.cpp
         ext/device_pipe.cpp
-        ext/device_proxy.cpp
+        ext/device_proxy.cppext
+        ext/devintr_change_event_data.cpp
         ext/server/dserver.cpp
         ext/server/encoded_attribute.cpp
         ext/enums.cpp
         ext/event_data.cpp
         ext/exception.cpp
         ext/from_py.cpp
+        ext/server/fwdAttr.cpp
         ext/group.cpp
         ext/group_reply.cpp
         ext/group_reply_list.cpp
@@ -89,6 +91,7 @@ set(SOURCES
         ext/server/multi_class_attribute.cpp
         ext/periodic_event_info.cpp
         ext/server/pipe.cpp
+        ext/pipe_event_data.cpp
         ext/pipe_info.cpp
         ext/poll_device.cpp
         ext/precompiled_header.cpp
