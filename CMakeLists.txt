@@ -152,10 +152,12 @@ if(WIN32)
   set_target_properties( ${PROJECT_NAME}
          PROPERTIES
          SUFFIX ".pyd" )
-         
-         set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE  ${CMAKE_CURRENT_SOURCE_DIR}/Release/tango )
-         set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/Release/tango )
-         set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/Release/tango )
+    set_target_properties( ${PROJECT_NAME}
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Release/tango"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Release/tango"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Release/tango"
+)
 
  add_custom_command(TARGET ${PROJECT_NAME}
            POST_BUILD
