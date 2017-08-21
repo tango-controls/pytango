@@ -149,12 +149,14 @@ if(WIN32)
   message("$ENV{BOOST_LIBS}")
   
   add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS}) 
-  set_target_properties( ${PROJECT_NAME} PROPERTIES
-         LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Release/tango)
   set_target_properties( ${PROJECT_NAME}
          PROPERTIES
          SUFFIX ".pyd" )
          
+install(TARGETS ${PROJECT_NAME}
+        ARCHIVE DESTINATION Release/tango
+        RUNTIME DESTINATION Release/tango)
+
  add_custom_command(TARGET ${PROJECT_NAME}
            POST_BUILD
            COMMAND $ENV{PYTHONPATH}/python.exe  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py Release dist temp_dist $(ConfigurationName) $(PlatformName)
