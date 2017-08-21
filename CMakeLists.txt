@@ -153,13 +153,11 @@ if(WIN32)
          PROPERTIES
          SUFFIX ".pyd" )
          
-install(TARGETS ${PROJECT_NAME}
-        ARCHIVE DESTINATION TempPack/tango
-        RUNTIME DESTINATION TempPack/tango)
+         set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Release/tango )
 
  add_custom_command(TARGET ${PROJECT_NAME}
            POST_BUILD
-           COMMAND $ENV{PYTHONPATH}/python.exe  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py TempPack dist temp_dist $(ConfigurationName) $(PlatformName)
+           COMMAND $ENV{PYTHONPATH}/python.exe  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py Release dist temp_dist $(ConfigurationName) $(PlatformName)
            COMMENT "Building msi and exe")
          
 
