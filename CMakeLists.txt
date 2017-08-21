@@ -154,6 +154,7 @@ if(WIN32)
          SUFFIX ".pyd" )
          
          set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Release/tango )
+         set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Release/tango )
 
  add_custom_command(TARGET ${PROJECT_NAME}
            POST_BUILD
