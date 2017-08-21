@@ -154,12 +154,12 @@ if(WIN32)
          SUFFIX ".pyd" )
          
 install(TARGETS ${PROJECT_NAME}
-        ARCHIVE DESTINATION Release/tango
-        RUNTIME DESTINATION Release/tango)
+        ARCHIVE DESTINATION TempPack/tango
+        RUNTIME DESTINATION TempPack/tango)
 
  add_custom_command(TARGET ${PROJECT_NAME}
            POST_BUILD
-           COMMAND $ENV{PYTHONPATH}/python.exe  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py Release dist temp_dist $(ConfigurationName) $(PlatformName)
+           COMMAND $ENV{PYTHONPATH}/python.exe  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py TempPack dist temp_dist $(ConfigurationName) $(PlatformName)
            COMMENT "Building msi and exe")
          
 
