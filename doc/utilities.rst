@@ -5,7 +5,7 @@ The Utilities API
 
 .. currentmodule:: tango.utils
 
-.. autoclass:: tango.utils.EventCallBack
+.. autoclass:: tango.utils.EventCallback
     :members:
     :undoc-members:
 
@@ -22,7 +22,7 @@ The Utilities API
 .. autofunction:: tango.utils.is_bool
 
 .. autofunction:: tango.utils.is_scalar_type
-    
+
 .. autofunction:: tango.utils.is_array_type
 
 .. autofunction:: tango.utils.is_numerical_type
@@ -33,7 +33,7 @@ The Utilities API
 
 .. autofunction:: tango.utils.is_bool_type
 
-.. autofunction:: tango.utils.is_bin_type
+.. autofunction:: tango.utils.is_binary_type
 
 .. autofunction:: tango.utils.is_str_type
 
