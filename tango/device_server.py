@@ -318,7 +318,8 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
 
         Return     : (Attr) the newly created attribute.
 
-        Throws     : DevFailed"""
+        Throws     : DevFailed
+    """
 
     attr_data = None
     if isinstance(attr, AttrData):
@@ -363,8 +364,7 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
 
 
 def __DeviceImpl__remove_attribute(self, attr_name):
-    """
-        remove_attribute(self, attr_name) -> None
+    """remove_attribute(self, attr_name) -> None
 
             Remove one attribute from the device attribute list.
 
@@ -373,7 +373,8 @@ def __DeviceImpl__remove_attribute(self, attr_name):
 
         Return     : None
 
-        Throws     : DevFailed"""
+        Throws     : DevFailed
+    """
     try:
         # Call this method in a try/except in case remove_attribute
         # is called during the DS shutdown sequence
@@ -416,8 +417,7 @@ def __DeviceImpl___remove_attr_meth(self, attr_name):
 
 
 def __DeviceImpl__add_command(self, cmd, device_level=True):
-    """
-        add_command(self, cmd, level=TANGO::OPERATOR) -> cmd
+    """add_command(self, cmd, level=TANGO::OPERATOR) -> cmd
 
         Add a new command to the device command list.
 
@@ -425,7 +425,9 @@ def __DeviceImpl__add_command(self, cmd, device_level=True):
             - cmd          : the new command to be added to the list
             - device_level : Set this flag to true if the command must be added
                              for only this device
+
         Return     : Command
+
         Throws     : DevFailed
     """
     add_name_in_list = False      # This flag is always False, what use is it?
@@ -449,7 +451,7 @@ def __DeviceImpl__add_command(self, cmd, device_level=True):
 
 def __DeviceImpl__remove_command(self, cmd_name, free_it=False, clean_db=True):
     """
-        remove_command(self, attr_name) -> None
+    remove_command(self, attr_name) -> None
 
             Remove one command from the device command list.
 
@@ -458,7 +460,7 @@ def __DeviceImpl__remove_command(self, cmd_name, free_it=False, clean_db=True):
             - free_it  : Boolean set to true if the command object must be freed.
             - clean_db : Clean command related information (included polling info
                          if the command is polled) from database.
-         Return     : None
+        Return     : None
 
         Throws     : DevFailed
     """
