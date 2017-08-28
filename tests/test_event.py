@@ -6,11 +6,13 @@ import socket
 from functools import partial
 
 import pytest
+from six import StringIO
 
-from tango import EventType, GreenMode, DeviceProxy
+from tango import EventType, GreenMode, DeviceProxy, AttrQuality
 from tango.server import Device
 from tango.server import command, attribute
 from tango.test_utils import DeviceTestContext
+from tango.utils import EventCallback
 
 from tango.gevent import DeviceProxy as gevent_DeviceProxy
 from tango.futures import DeviceProxy as futures_DeviceProxy
@@ -48,6 +50,10 @@ class EventDevice(Device):
     @command
     def send_event(self):
         self.push_change_event("attr", 1.)
+
+    @command
+    def send_event_with_timestamp(self):
+        self.push_change_event("attr", 2., 3., AttrQuality.ATTR_WARNING)
 
     @command(dtype_in=str)
     def add_dyn_attr(self, name):
@@ -138,18 +144,53 @@ def test_subscribe_interface_event(event_device):
         time.sleep(0.05)
     # Test the first event value
     assert set(cmd.cmd_name for cmd in results[0].cmd_list) == \
-        {'Init', 'State', 'Status', 'add_dyn_attr', 'delete_dyn_attr', 'send_event'}
+        {'Init', 'State', 'Status',
+         'add_dyn_attr', 'delete_dyn_attr',
+         'send_event', 'send_event_with_timestamp'}
     assert set(att.name for att in results[0].att_list) == \
         {'attr', 'State', 'Status'}
     # Test the second event value
     assert set(cmd.cmd_name for cmd in results[1].cmd_list) == \
-        {'Init', 'State', 'Status', 'add_dyn_attr', 'delete_dyn_attr', 'send_event'}
+        {'Init', 'State', 'Status',
+         'add_dyn_attr', 'delete_dyn_attr',
+         'send_event', 'send_event_with_timestamp'}
     assert set(att.name for att in results[1].att_list) == \
         {'attr', 'State', 'Status', 'bla'}
     # Test the third event value
     assert set(cmd.cmd_name for cmd in results[2].cmd_list) == \
-        {'Init', 'State', 'Status', 'add_dyn_attr', 'delete_dyn_attr', 'send_event'}
+        {'Init', 'State', 'Status',
+         'add_dyn_attr', 'delete_dyn_attr',
+         'send_event', 'send_event_with_timestamp'}
     assert set(att.name for att in results[2].att_list) == \
         {'attr', 'State', 'Status'}
+    # Unsubscribe
+    event_device.unsubscribe_event(eid)
+
+
+def test_push_event_with_timestamp(event_device):
+    string = StringIO()
+    ec = EventCallback(fd=string)
+    # Subscribe
+    eid = event_device.subscribe_event(
+        "attr", EventType.CHANGE_EVENT, ec, wait=True)
+    assert eid == 1
+    # Trigger an event
+    event_device.command_inout("send_event_with_timestamp", wait=True)
+    # Wait for tango event
+    retries = 20
+    for _ in range(retries):
+        event_device.read_attribute("state", wait=True)
+        if len(ec.get_events()) > 1:
+            break
+        time.sleep(0.05)
+    # Test the event values and timestamp
+    results = [evt.attr_value.value for evt in ec.get_events()]
+    assert results == [0., 2.]
+    assert ec.get_events()[-1].attr_value.time.totime() == 3.
+    # Check string
+    line1 = "TEST/NODB/EVENTDEVICE ATTR#DBASE=NO CHANGE [ATTR_VALID] 0.0"
+    line2 = "TEST/NODB/EVENTDEVICE ATTR#DBASE=NO CHANGE [ATTR_WARNING] 2.0"
+    assert line1 in string.getvalue()
+    assert line2 in string.getvalue()
     # Unsubscribe
     event_device.unsubscribe_event(eid)
