@@ -1396,14 +1396,14 @@ def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
               "to TANGO database", file=out)
 
 
-class EventCallBack(object):
+class EventCallback(object):
     """
     Useful event callback for test purposes
 
     Usage::
 
         >>> dev = tango.DeviceProxy(dev_name)
-        >>> cb = tango.utils.EventCallBack()
+        >>> cb = tango.utils.EventCallback()
         >>> id = dev.subscribe_event("state", tango.EventType.CHANGE_EVENT, cb, [])
         2011-04-06 15:33:18.910474 sys/tg_test/1 STATE CHANGE [ATTR_VALID] ON
 
@@ -1449,7 +1449,7 @@ class EventCallBack(object):
         import datetime
         now = datetime.datetime.now()
         try:
-            date = evt.get_date().todatetime()
+            date = self._get_date(evt)
         except:
             date = now
         try:
@@ -1484,6 +1484,14 @@ class EventCallBack(object):
             evts.pop(0)
         evts.append(evt)
 
+    def _get_date(self, evt):
+        if isinstance(evt, EventData):
+            return evt.attr_value.time.todatetime()
+        elif isinstance(evt, PipeEventData):
+            return evt.pipe_value.time.todatetime()
+        else:
+            return evt.get_date().todatetime()
+
     def _get_value(self, evt):
         """Internal usage only"""
         if evt.err:
@@ -1501,7 +1509,7 @@ class EventCallBack(object):
         elif isinstance(evt, PipeEventData):
             return evt.pipe_value
         elif isinstance(evt, DevIntrChangeEventData):
-            print ("utils::_get_value()")
+            print("utils::_get_value()")
             return
 
 
