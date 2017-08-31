@@ -171,14 +171,14 @@ def __patch_read_method(tango_device_klass, attribute):
 
 def _get_wrapped_write_method(attribute, write_method):
     green_mode = attribute.write_green_mode
-
-    if green_mode == GreenMode.Synchronous:
-        @functools.wraps(write_method)
+    if green_mode == GreenMode.Synchronous and \
+            not isinstance(write_method, functools.partial):
+        #@functools.wraps(write_method)
         def write_attr(self, attr):
             value = attr.get_write_value()
             return write_method(self, value)
     else:
-        @functools.wraps(write_method)
+        #@functools.wraps(write_method)
         def write_attr(self, attr):
             value = attr.get_write_value()
             return get_worker().execute(write_method, self, value)
