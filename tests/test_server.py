@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys
+        import sys
 import textwrap
 import pytest
 
@@ -152,6 +152,14 @@ def test_partial_attributes(server_green_mode):
 
         green_mode = server_green_mode
 
+        def write_to_array(self, value, index):
+            self.array[index] = value
+
+        write_first_index = partial(write_to_array, index=0)
+        write_second_index = partial(write_to_array, index=1)
+        write_third_index = partial(write_to_array, index=2)
+        write_fourth_index = partial(write_to_array, index=3)
+
         def read_an_array(self, index):
             return self.array[index]
 
@@ -159,10 +167,12 @@ def test_partial_attributes(server_green_mode):
         read_second_index = partial(read_an_array, index=1)
 
         first_attr = attribute(dtype=int, access=AttrWriteType.READ,
-                               fget="read_first_index")
+                               fget="read_first_index",
+                               fset="write_first_index")
 
         second_attr = attribute(dtype=int, access=AttrWriteType.READ,
-                                fget="read_second_index")
+                                fget="read_second_index",
+                                fset="write_second_index")
 
         def read_an_array_2(self, attribute, index):
             attribute.set_value(self.array[index])
@@ -171,16 +181,28 @@ def test_partial_attributes(server_green_mode):
         read_fourth_index = partial(read_an_array_2, index=3)
 
         third_attr = attribute(dtype=int, access=AttrWriteType.READ,
-                               fget="read_third_index")
+                               fget="read_third_index",
+                               fset="write_third_index")
 
         fourth_attr = attribute(dtype=int, access=AttrWriteType.READ,
-                                fget="read_fourth_index")
+                                fget="read_fourth_index",
+                                fset="write_fourth_index")
 
     with DeviceTestContext(TestDevice) as proxy:
         assert proxy.first_attr == TestDevice.array[0]
         assert proxy.second_attr == TestDevice.array[1]
         assert proxy.third_attr == TestDevice.array[2]
         assert proxy.fourth_attr == TestDevice.array[3]
+
+    with DeviceTestContext(TestDevice) as proxy1:
+        proxy1.first_attr = 3
+        proxy1.second_attr = -1524
+        proxy1.third_attr = 998
+        proxy1.fourth_attr = -34
+        assert proxy1.first_attr == TestDevice.array[0]  # 3
+        assert proxy1.second_attr == TestDevice.array[1]  # -1524
+        assert proxy1.third_attr == TestDevice.array[2]  # 998
+        assert proxy1.fourth_attr == TestDevice.array[3]  # -34
 
 
 # Test properties
