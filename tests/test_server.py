@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-        import sys
+import sys
 import textwrap
 import pytest
 
