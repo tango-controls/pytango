@@ -166,11 +166,11 @@ def test_partial_attributes(server_green_mode):
         read_first_index = partial(read_an_array, index=0)
         read_second_index = partial(read_an_array, index=1)
 
-        first_attr = attribute(dtype=int, access=AttrWriteType.READ,
+        first_attr = attribute(dtype=int, access=AttrWriteType.READ_WRITE,
                                fget="read_first_index",
                                fset="write_first_index")
 
-        second_attr = attribute(dtype=int, access=AttrWriteType.READ,
+        second_attr = attribute(dtype=int, access=AttrWriteType.READ_WRITE,
                                 fget="read_second_index",
                                 fset="write_second_index")
 
@@ -180,11 +180,11 @@ def test_partial_attributes(server_green_mode):
         read_third_index = partial(read_an_array_2, index=2)
         read_fourth_index = partial(read_an_array_2, index=3)
 
-        third_attr = attribute(dtype=int, access=AttrWriteType.READ,
+        third_attr = attribute(dtype=int, access=AttrWriteType.READ_WRITE,
                                fget="read_third_index",
                                fset="write_third_index")
 
-        fourth_attr = attribute(dtype=int, access=AttrWriteType.READ,
+        fourth_attr = attribute(dtype=int, access=AttrWriteType.READ_WRITE,
                                 fget="read_fourth_index",
                                 fset="write_fourth_index")
 
@@ -199,10 +199,10 @@ def test_partial_attributes(server_green_mode):
         proxy1.second_attr = -1524
         proxy1.third_attr = 998
         proxy1.fourth_attr = -34
-        assert proxy1.first_attr == TestDevice.array[0]  # 3
-        assert proxy1.second_attr == TestDevice.array[1]  # -1524
-        assert proxy1.third_attr == TestDevice.array[2]  # 998
-        assert proxy1.fourth_attr == TestDevice.array[3]  # -34
+        assert TestDevice.array[0] == 3
+        assert TestDevice.array[1] == -1524
+        assert TestDevice.array[2] == 998
+        assert TestDevice.array[3] == -34
 
 
 # Test properties
