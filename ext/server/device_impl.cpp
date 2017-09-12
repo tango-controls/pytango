@@ -510,11 +510,9 @@ namespace PyDeviceImpl
     		return;
     	}
     	Tango::DevicePipeBlob dpb;
-    	struct timeval tv;
-    	gettimeofday(&tv, NULL);
     	bool reuse = false;
 		PyDevicePipe::set_value(dpb, pipe_data);
-    	self.push_pipe_event(__pipe_name, &dpb, tv, reuse);
+    	self.push_pipe_event(__pipe_name, &dpb, reuse);
     }
 
     void check_attribute_method_defined(PyObject *self,
