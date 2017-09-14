@@ -1,8 +1,7 @@
 import time
-import numpy
 
 import tango
-from tango import DevState
+from tango import EventType
 
 
 class EventManager():
@@ -12,7 +11,7 @@ class EventManager():
         if dp is not None:
             print "Subscribed to TestPipe"
             self._event_id = dp.subscribe_event("TestPipe",
-                                                tango.EventType.PIPE_EVENT,
+                                                EventType.PIPE_EVENT,
                                                 self)
 
     def unsubscribe(self):
@@ -41,11 +40,13 @@ class EventManager():
             for i in range(nb_elt):
                 print "Elements:       ", ev.pipe_value.data[i]
 
+
 def main():
-    dev=tango.DeviceProxy('pipeServer/tango/1')
+    dev = tango.DeviceProxy('pipeServer/tango/1')
     print dev
-    em = EventManager(dev)
+    EventManager(dev)
     time.sleep(3000.0)
+
 
 if __name__ == '__main__':
     main()
