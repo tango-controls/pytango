@@ -6,6 +6,7 @@ from __future__ import absolute_import
 import os
 import sys
 import six
+import time
 import struct
 import socket
 import tempfile
@@ -76,7 +77,7 @@ def device(path):
 def get_hostname():
     """Get the hostname corresponding to the primary, external IP.
 
-    This is useful becauce an explicit hostname is required to get
+    This is useful because an explicit hostname is required to get
     tango events to work properly. Note that localhost does not work
     either.
     """
@@ -167,6 +168,11 @@ class DeviceTestContext(object):
             # Put something in the queue just in case
             exc = RuntimeError("The server failed to report anything")
             self.queue.put((None, exc, None))
+            # Make sure the process has enough time to send the items
+            # because the it might segfault while cleaning up the
+            # the tango resources
+            if process:
+                time.sleep(0.01)
 
     def post_init(self):
         try:
