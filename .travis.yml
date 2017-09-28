@@ -3,13 +3,25 @@ language: python
 os: linux
 branches:
   only:
-    - master
+    - stable
     - develop
 
 python:
   - 2.7
   - 3.4
   - 3.5
+  - 3.6
+
+env:
+  - TANGO_VERSION=9.2.2
+  - TANGO_VERSION=9.2.5
+
+matrix:
+  exclude:
+  - python: 3.4
+    env: TANGO_VERSION=9.2.5
+  - python: 3.6
+    env: TANGO_VERSION=9.2.2
 
 cache:
   directories:
@@ -33,8 +45,8 @@ before_install:
 
 install:
   # Install build dependencies
-  - conda install --yes boost
-  - conda install --yes -c tango-controls tango=9.2.2
+  - conda install --yes boost gcc
+  - conda install --yes -c tango-controls -c esrf-bcu tango=$TANGO_VERSION
   - conda install --yes numpy  # Not a strong requirement yet
   # Use conda prefix as root for the dependencies
   - export BOOST_ROOT=$CONDA_PREFIX TANGO_ROOT=$CONDA_PREFIX ZMQ_ROOT=$CONDA_PREFIX OMNI_ROOT=$CONDA_PREFIX
