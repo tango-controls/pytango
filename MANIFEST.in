@@ -1,12 +1,14 @@
 include LICENSE.txt
+include Makefile
+include winsetup.py
 
 graft ext
 graft doc
 graft tests
+graft examples
+graft win
 
 global-exclude *~
 global-exclude *.pyc
 global-exclude *.pyo
-exclude setup.cfg
-exclude images
 exclude src/precompiled_header.hpp.gch
