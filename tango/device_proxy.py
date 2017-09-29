@@ -1053,7 +1053,7 @@ def __DeviceProxy__get_event_map(self):
 
 def __DeviceProxy__subscribe_event(self, *args, **kwargs):
     """
-        subscribe_event(event_type, cb, stateless=False, green_mode=None) -> int
+    subscribe_event(event_type, cb, stateless=False, green_mode=None) -> int
 
             The client call to subscribe for event reception in the push model.
             The client implements a callback method which is triggered when the
@@ -1073,7 +1073,7 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
                           seconds to subscribe for the specified event. At every
                           subscription retry, a callback is executed which contains
                           the corresponding exception
-            - green_mode :
+            - green_mode : the corresponding green mode (default is GreenMode.Synchronous)
 
         Return     : An event id which has to be specified when unsubscribing
                      from this event.
@@ -1081,7 +1081,8 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
         Throws     : EventSystemFailed
 
 
-        subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy, green_mode=None) -> int
+    subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy, green_mode=None) -> int
+
             The client call to subscribe for event reception in the push model.
             The client implements a callback method which is triggered when the
             event is received. Filtering is done based on the reason specified and
@@ -1090,6 +1091,7 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
             changes. Events consist of an attribute name and the event reason.
             A standard set of reasons are implemented by the system, additional
             device specific reasons can be implemented by device servers programmers.
+
         Parameters :
             - attr_name : (str) The device attribute name which will be sent
                           as an event e.g. "current".
@@ -1113,17 +1115,23 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
                           subscription retry, a callback is executed which contains
                           the corresponding exception
             - extract_as : (ExtractAs)
-            - green_mode :
+            - green_mode : the corresponding green mode (default is GreenMode.Synchronous)
+
         Return     : An event id which has to be specified when unsubscribing
                      from this event.
+
         Throws     : EventSystemFailed
 
-        subscribe_event(self, attr_name, event, queuesize, filters=[], stateless=False, green_mode=None) -> int
+
+    subscribe_event(self, attr_name, event, queuesize, filters=[], stateless=False, green_mode=None) -> int
+
             The client call to subscribe for event reception in the pull model.
             Instead of a callback method the client has to specify the size of the
             event reception buffer.
+
             The event reception buffer is implemented as a round robin buffer. This
             way the client can set-up different ways to receive events:
+
                 * Event reception buffer size = 1 : The client is interested only
                   in the value of the last event received. All other events that
                   have been received since the last reading are discarded.
@@ -1133,6 +1141,7 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
                 * Event reception buffer size = ALL_EVENTS : The client buffers all
                   received events. The buffer size is unlimited and only restricted
                   by the available memory for the client.
+
             All other parameters are similar to the descriptions given in the
             other subscribe_event() version.
     """

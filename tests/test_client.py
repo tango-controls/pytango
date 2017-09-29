@@ -130,7 +130,7 @@ def get_proxy(host, port, device, green_mode):
     return device_proxy_map[green_mode](access)
 
 
-def wait_for_proxy(host, proc, device, green_mode, retries=100, delay=0.01):
+def wait_for_proxy(host, proc, device, green_mode, retries=200, delay=0.01):
     for i in range(retries):
         ports = get_ports(proc.pid)
         if ports:

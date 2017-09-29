@@ -6,6 +6,7 @@ from __future__ import absolute_import
 import os
 import sys
 import six
+import time
 import struct
 import socket
 import tempfile
@@ -76,7 +77,7 @@ def device(path):
 def get_hostname():
     """Get the hostname corresponding to the primary, external IP.
 
-    This is useful becauce an explicit hostname is required to get
+    This is useful because an explicit hostname is required to get
     tango events to work properly. Note that localhost does not work
     either.
     """
@@ -96,13 +97,14 @@ class DeviceTestContext(object):
 
     nodb = "dbase=no"
     command = "{0} {1} -ORBendPoint giop:tcp:{2}:{3} -file={4}"
-    connect_timeout = 3.
-    disconnect_timeout = connect_timeout
+
+    thread_timeout = 3.
+    process_timeout = 5.
 
     def __init__(self, device, device_cls=None, server_name=None,
                  instance_name=None, device_name=None, properties=None,
                  db=None, host=None, port=0, debug=3,
-                 process=False, daemon=False):
+                 process=False, daemon=False, timeout=None):
         """Inititalize the context to run a given device."""
         # Argument
         tangoclass = device.__name__
@@ -118,6 +120,8 @@ class DeviceTestContext(object):
             host = get_hostname()
         if properties is None:
             properties = {}
+        if timeout is None:
+            timeout = self.process_timeout if process else self.thread_timeout
         # Patch bug #819
         if process:
             os.environ['ORBscanGranularity'] = '0'
@@ -125,6 +129,7 @@ class DeviceTestContext(object):
         self.db = db
         self.host = host
         self.port = port
+        self.timeout = timeout
         self.device_name = device_name
         self.server_name = "/".join(("dserver", server_name, instance_name))
         self.device = self.server = None
@@ -154,16 +159,32 @@ class DeviceTestContext(object):
         try:
             runserver(post_init_callback=self.post_init, raises=True)
         except Exception:
-            etype, value, tb = sys.exc_info()
-            # Traceback objects can't be pickled
-            if process:
-                tb = None
             # Put exception in the queue
+            etype, value, tb = sys.exc_info()
+            if process:
+                tb = None  # Traceback objects can't be pickled
             self.queue.put((etype, value, tb))
+        finally:
+            # Put something in the queue just in case
+            exc = RuntimeError("The server failed to report anything")
+            self.queue.put((None, exc, None))
+            # Make sure the process has enough time to send the items
+            # because the it might segfault while cleaning up the
+            # the tango resources
+            if process:
+                time.sleep(0.01)
 
     def post_init(self):
-        host, port = get_server_host_port()
-        self.queue.put((host, port))
+        try:
+            host, port = get_server_host_port()
+            self.queue.put((host, port))
+        except Exception as exc:
+            self.queue.put((None, exc, None))
+        finally:
+            # Put something in the queue just in case
+            exc = RuntimeError(
+                "The post_init routine failed to report anything")
+            self.queue.put((None, exc, None))
 
     def generate_db_file(self, server, instance, device,
                          tangoclass=None, properties={}):
@@ -202,11 +223,21 @@ class DeviceTestContext(object):
     def connect(self):
         try:
             args = self.queue.get(
-                timeout=self.connect_timeout)
+                timeout=self.timeout)
         except queue.Empty:
-            raise RuntimeError(
-                'The server did not start. '
-                'Check stdout/stderr for more information.')
+            if self.thread.is_alive():
+                raise RuntimeError(
+                    'The server appears to be stuck at initialization. '
+                    'Check stdout/stderr for more information.')
+            elif hasattr(self.thread, 'exitcode'):
+                raise RuntimeError(
+                    'The server process stopped with exitcode {}. '
+                    'Check stdout/stderr for more information.'
+                    ''.format(self.thread.exitcode))
+            else:
+                raise RuntimeError(
+                    'The server stopped without reporting. '
+                    'Check stdout/stderr for more information.')
         try:
             self.host, self.port = args
         except ValueError:
@@ -223,7 +254,7 @@ class DeviceTestContext(object):
         try:
             if self.server:
                 self.server.command_inout('Kill')
-            self.join(self.disconnect_timeout)
+            self.join(self.timeout)
         finally:
             os.unlink(self.db)
 

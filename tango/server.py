@@ -725,7 +725,7 @@ class attribute(AttrData):
     green_mode             :obj:`~tango.GreenMode`          None                                    green mode for read and write. None means use server green mode.
     read_green_mode        :obj:`~tango.GreenMode`          None                                    green mode for read. None means use server green mode.
     write_green_mode       :obj:`~tango.GreenMode`          None                                    green mode for write. None means use server green mode.
-    forwarded              :obj:'bool'                      False                                   the attribute should be forwarded if True
+    forwarded              :obj:`bool`                      False                                   the attribute should be forwarded if True
     ===================== ================================ ======================================= =======================================================================================
 
     .. note::
