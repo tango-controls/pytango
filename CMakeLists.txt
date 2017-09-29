@@ -7,7 +7,7 @@ project(_tango LANGUAGES CXX
 #need to define the version of the library
 set(MAJOR_VERSION "9")
 set(MINOR_VERSION "2")
-set(PATCH_VERSION "5")
+set(PATCH_VERSION "3")
 
 #convenient versions
 set(LIBRARY_VERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
