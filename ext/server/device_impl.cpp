@@ -526,16 +526,8 @@ namespace PyDeviceImpl
     	struct timeval tv;
     	gettimeofday(&tv, NULL);
     	bool reuse = false;
-	PyDevicePipe::set_value(dpb, pipe_data);
-	#ifdef _WIN32
-	struct _timeb l_time;
-	_ftime64_s(&l_time);
-	l_time.time = tv.tv_sec;
-	l_time.millitm = tv.tv_usec;
-	self.push_pipe_event(__pipe_name, &dpb, l_time, reuse);
-	#else
-	self.push_pipe_event(__pipe_name, &dpb, tv, reuse);
-	#endif
+	    PyDevicePipe::set_value(dpb, pipe_data);
+    	self.push_pipe_event(__pipe_name, &dpb, reuse);
     }
 
     void check_attribute_method_defined(PyObject *self,
