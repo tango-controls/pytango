@@ -121,6 +121,12 @@ def __prepare_nt():
        tango_dll_path not in PATH.lower():
         os.environ['PATH'] += ";" + tango_dll_path
     else:
+        tango_dll_path = os.path.join(tango_root, arch, "lib", vc)
+        tango_dll_path = tango_dll_path.lower()
+        if os.path.exists(tango_dll_path) and \
+           tango_dll_path not in PATH.lower():
+            os.environ['PATH'] += ";" + tango_dll_path
+        else:
         # Tango C++ could not be found on the system...
         # ... use PyTango's private Tango C++ library
         tango_dll_path = os.path.dirname(os.path.abspath(__file__))
