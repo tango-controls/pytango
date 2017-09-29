@@ -121,7 +121,7 @@ def __prepare_nt():
        tango_dll_path not in PATH.lower():
         os.environ['PATH'] += ";" + tango_dll_path
     else:
-        tango_dll_path = os.path.join(tango_root, "bin", vc)
+        tango_dll_path = os.path.join(tango_root, "bin")
         tango_dll_path = tango_dll_path.lower()
         if os.path.exists(tango_dll_path) and \
            tango_dll_path not in PATH.lower():
