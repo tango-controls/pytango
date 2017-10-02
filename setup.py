@@ -52,7 +52,7 @@ PYTHON3 = ('3',) <= PYTHON_VERSION < ('4',)
 distribution = platform.linux_distribution()[0].lower() if POSIX else ""
 distribution_match = lambda names: any(x in distribution for x in names)
 DEBIAN = distribution_match(['debian', 'ubuntu', 'mint'])
-REDHAT = distribution_match(['redhat', 'fedora', 'centos'])
+REDHAT = distribution_match(['redhat', 'fedora', 'centos', 'opensuse'])
 GENTOO = distribution_match(['gentoo'])
 
 # Arguments
