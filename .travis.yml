@@ -47,7 +47,7 @@ before_install:
 install:
   # Install build dependencies
   - conda install --yes boost gcc
-  - conda install --yes -c tango-controls -c esrf-bcu tango=$TANGO_VERSION
+  - conda install --yes -c tango-controls tango=$TANGO_VERSION
   - conda install --yes numpy  # Not a strong requirement yet
   # Use conda prefix as root for the dependencies
   - export BOOST_ROOT=$CONDA_PREFIX TANGO_ROOT=$CONDA_PREFIX ZMQ_ROOT=$CONDA_PREFIX OMNI_ROOT=$CONDA_PREFIX
