@@ -135,7 +135,7 @@ html_context = {
         'extra_css_files': [
            # 'https://media.readthedocs.org/css/sphinx_rtd_theme.css',
            # 'https://media.readthedocs.org/css/readthedocs-doc-embed.css',
-           '_static/jssor.css',
+           # '_static/jssor.css',
            '_static/tango_cs_theme.css',
         ],
     }
