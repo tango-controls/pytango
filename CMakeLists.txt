@@ -7,7 +7,7 @@ project(_tango LANGUAGES CXX
 #need to define the version of the library
 set(MAJOR_VERSION "9")
 set(MINOR_VERSION "2")
-set(PATCH_VERSION "3")
+set(PATCH_VERSION "2")
 
 #convenient versions
 set(LIBRARY_VERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
@@ -148,7 +148,7 @@ if(WIN32)
   link_directories("$ENV{BOOST_LIBS}")
   message("$ENV{BOOST_LIBS}")
   
-  add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS}) 
+  add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS}) 
   set_target_properties( ${PROJECT_NAME}
          PROPERTIES
          SUFFIX ".pyd" )
