@@ -4,3 +4,7 @@ dependencies:
 - numpy
 - gevent
 - graphviz
+- mock
+- pillow
+- sphinx
+- sphinx_rtd_theme
