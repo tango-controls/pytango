@@ -129,7 +129,7 @@ html_theme = 'sphinx_rtd_theme'
 #html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = ['_theme']
+#html_theme_path = ['_theme']
 
 html_context = {
         'extra_css_files': [
