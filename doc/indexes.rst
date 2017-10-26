@@ -2,5 +2,5 @@
 Indexes
 =======
 
-* ref:`modindex`
-* reg:`genindex`
+* :ref:`modindex`
+* :ref:`genindex`
