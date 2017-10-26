@@ -1,12 +1,12 @@
 {% extends "breadcrumbs.html" %}
 
-{% block breadcrumbs}
+{% block breadcrumbs %}
     <li><a href="{{ pathto('index') }}">home</a>|&nbsp;</li>
     <li><a href="{{ pathto('start') }}">getting started</a>|&nbsp;</li>
     <li><a href="{{ pathto('quicktour') }}">quick tour</a>|&nbsp;</li>
     <li><a href="{{ pathto('howto') }}">how to</a>|&nbsp;</li>
     <li><a href="{{ pathto('faq') }}">FAQ</a>|&nbsp;</li>
-    <li><a href="{{ pathto('contents') }}">documentation (v{{ release }})</a> &raquo;</li>
+    <li><a href="{{ pathto('contents') }}">documentation (v{{ release }})</a> &raquo;</li>l
     {{ super() }}
 
-{% endblock}
+{% endblock %}
