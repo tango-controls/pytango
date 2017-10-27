@@ -21,6 +21,7 @@ Contents
     FAQ <faq>
     TEP <tep>
     History of changes <revision>
+    indexes
     
 **Last update:** |today|
 
