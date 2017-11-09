@@ -175,10 +175,10 @@ install(TARGETS ${PROJECT_NAME}
   target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
   
     target_link_libraries(${PROJECT_NAME} PUBLIC $ENV{TANGO_PATH}/lib/libtango.lib
-                                                $ENV{TANGO_PATH}/bin/omniORB4_rt.lib
-                                                $ENV{TANGO_PATH}/bin/omniDynamic4_rt.lib
-                                                $ENV{TANGO_PATH}/bin/COS4_rt.lib
-                                                $ENV{TANGO_PATH}/bin/omnithread_rt.lib
+                                                $ENV{TANGO_PATH}/bin/omniORB4.lib
+                                                $ENV{TANGO_PATH}/bin/omniDynamic4.lib
+                                                $ENV{TANGO_PATH}/bin/COS4.lib
+                                                $ENV{TANGO_PATH}/bin/omnithread.lib
                                                 $ENV{TANGO_PATH}/bin/msvcstub.lib)
     target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32 mswsock advapi32 comctl32 odbc32)
     target_link_libraries(${PROJECT_NAME} PUBLIC $ENV{TANGO_PATH}/lib/pthreadVC2.lib)
