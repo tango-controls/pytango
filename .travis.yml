@@ -3,13 +3,25 @@ language: python
 os: linux
 branches:
   only:
-    - master
+    - stable
     - develop
 
 python:
   - 2.7
   - 3.4
   - 3.5
+  - 3.6
+
+env:
+  - TANGO_VERSION=9.2.2
+  - TANGO_VERSION=9.2.5
+
+matrix:
+  exclude:
+  - python: 3.4
+    env: TANGO_VERSION=9.2.5
+  - python: 3.6
+    env: TANGO_VERSION=9.2.2
 
 cache:
   directories:
@@ -22,10 +34,11 @@ before_install:
   # Add conda to path
   - export PATH="$PWD/miniconda/bin:$PATH"
   # Install miniconda if not in cache
-  - conda -V || wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - conda -V || wget http://repo.continuum.io/miniconda/Miniconda3-4.3.21-Linux-x86_64.sh -O miniconda.sh
   - conda -V || bash miniconda.sh -b -p ./miniconda -f
-  # Update conda
-  - conda update --yes conda
+  # Pin conda version
+  - conda install --yes conda=4.3.25
+  - echo 'conda ==4.3.25' > ./miniconda/conda-meta/pinned
   # Create build environment if it doesn't exist
   - source activate buildenv || conda create --yes --name buildenv python=$TRAVIS_PYTHON_VERSION
   # Activate build environment
@@ -33,8 +46,8 @@ before_install:
 
 install:
   # Install build dependencies
-  - conda install --yes boost
-  - conda install --yes -c tango-controls tango=9.2.2
+  - conda install --yes boost gcc
+  - conda install --yes -c tango-controls tango=$TANGO_VERSION
   - conda install --yes numpy  # Not a strong requirement yet
   # Use conda prefix as root for the dependencies
   - export BOOST_ROOT=$CONDA_PREFIX TANGO_ROOT=$CONDA_PREFIX ZMQ_ROOT=$CONDA_PREFIX OMNI_ROOT=$CONDA_PREFIX

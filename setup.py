@@ -445,7 +445,7 @@ def setup_args():
         tests_require += ['trollius']
 
     package_data = {
-        'PyTango': [],
+        'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
     }
 
     data_files = []
