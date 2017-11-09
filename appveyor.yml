@@ -126,12 +126,12 @@ init:
   - cmd: cd "C:\projects\"
   - cmd: md libtango
   - cmd: cd "C:\projects\"
-  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/gvfkvr8966jeg9jj/artifacts/libtango_9.2.6_v90_x86.zip
-  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/wjwj6q1vdkhdes7f/artifacts/libtango_9.2.6_v90_x64.zip
-  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/q9mutp31vjd9gnpm/artifacts/libtango_9.2.6_v100_x86.zip
-  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/hf9gc2qni3bm0la5/artifacts/libtango_9.2.6_v100_x64.zip
-  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/2h1wbxv4ixn1vew5/artifacts/libtango_9.2.6_v120_x64.zip
-  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/jv5m8mll4v9lw7jk/artifacts/libtango_9.2.6_v140_x64.zip
+  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/g1n4eg350eg91rwt/artifacts/libtango_9.2.6_v90_x86.zip
+  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/f6u2d70h7yb1d8lq/artifacts/libtango_9.2.6_v90_x64.zip
+  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/r639mdla8vyvfyb7/artifacts/libtango_9.2.6_v100_x86.zip
+  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/u9hxqpciqkwxdg83/artifacts/libtango_9.2.6_v100_x64.zip
+  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/s0h6kku37n2ls57v/artifacts/libtango_9.2.6_v120_x64.zip
+  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/rk91uga6vbpwdeuy/artifacts/libtango_9.2.6_v140_x64.zip
   - cmd: if %platform%==x64 7z -y x libtango_9.2.6_%MSVCVERSION%_x64.zip -oC:\projects\libtango\
   - cmd: if %platform%==win32 7z -y x libtango_9.2.6_%MSVCVERSION%_x86.zip -oC:\projects\libtango\
   - cmd: cd C:\projects\libtango\
