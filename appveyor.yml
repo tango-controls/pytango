@@ -126,12 +126,12 @@ init:
   - cmd: cd "C:\projects\"
   - cmd: md libtango
   - cmd: cd "C:\projects\"
-  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/g1n4eg350eg91rwt/artifacts/libtango_9.2.6_v90_x86.zip
-  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/f6u2d70h7yb1d8lq/artifacts/libtango_9.2.6_v90_x64.zip
-  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/r639mdla8vyvfyb7/artifacts/libtango_9.2.6_v100_x86.zip
-  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/u9hxqpciqkwxdg83/artifacts/libtango_9.2.6_v100_x64.zip
-  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/s0h6kku37n2ls57v/artifacts/libtango_9.2.6_v120_x64.zip
-  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/rk91uga6vbpwdeuy/artifacts/libtango_9.2.6_v140_x64.zip
+  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/m3il5xg417hhut67/artifacts/libtango_9.2.6_v90_x86.zip
+  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/t5y3nbiyytxgsftp/artifacts/libtango_9.2.6_v90_x64.zip
+  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/ci2e4oq48rl70nct/artifacts/libtango_9.2.6_v100_x86.zip
+  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/iltars5fpwo7f024/artifacts/libtango_9.2.6_v100_x64.zip
+  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/b55ho5umrctapugv/artifacts/libtango_9.2.6_v120_x64.zip
+  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/43i1p9ol0amor0p0/artifacts/libtango_9.2.6_v140_x64.zip
   - cmd: if %platform%==x64 7z -y x libtango_9.2.6_%MSVCVERSION%_x64.zip -oC:\projects\libtango\
   - cmd: if %platform%==win32 7z -y x libtango_9.2.6_%MSVCVERSION%_x86.zip -oC:\projects\libtango\
   - cmd: cd C:\projects\libtango\
@@ -158,12 +158,12 @@ init:
   - cmd: 7z -y x pthreads-w32-2-9-1-release.zip -oC:\projects\pthreads-win32\
   # boost
   - cmd: cd "C:\projects\"
-  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/3goxfau8he0omt0j/artifacts/boost-1.64_win32-msvc9.zip
-  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/6i8ayg124u5d2s2r/artifacts/boost-1.64_x64-msvc9.zip
-  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/r3qu6jn33xjg5d7n/artifacts/boost-1.64_win32-msvc10.zip
-  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/kilde60nq0ny2aeu/artifacts/boost-1.64_x64-msvc10.zip
-  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/qouq3esmx9w70q16/artifacts/boost-1.64_x64-msvc12.zip
-  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/0ct8ay4ia5a3gp0c/artifacts/boost-1.64_x64-msvc14.zip
+  - if %ARCH%==win32-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/6jf7majo99biwttk/artifacts/boost-1.64_win32-msvc9.zip
+  - if %ARCH%==x64-msvc9 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/d70eqh6kgsab5b0b/artifacts/boost-1.64_x64-msvc9.zip
+  - if %ARCH%==win32-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/0e73obqg25h9kqo8/artifacts/boost-1.64_win32-msvc10.zip
+  - if %ARCH%==x64-msvc10 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/47nhyqtnbhrpqgyk/artifacts/boost-1.64_x64-msvc10.zip
+  - if %ARCH%==x64-msvc12 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/b3fiytu4recb2qib/artifacts/boost-1.64_x64-msvc12.zip
+  - if %ARCH%==x64-msvc14 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/wj4640et8st1fe3e/artifacts/boost-1.64_x64-msvc14.zip
   - cmd: 7z -y x boost-1.64_%ARCH%.zip -oC:\projects\
   #VS2008 patch
   - cmd: cd "C:\projects\"
