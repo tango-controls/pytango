@@ -179,7 +179,7 @@ install(TARGETS ${PROJECT_NAME}
                                                 $ENV{TANGO_PATH}/lib/omniDynamic4.lib
                                                 $ENV{TANGO_PATH}/lib/COS4.lib
                                                 $ENV{TANGO_PATH}/lib/omnithread.lib
-                                                $ENV{TANGO_PATH}/lib/msvcstub.lib)
+                                                $ENV{TANGO_PATH}/bin/msvcstub.lib)
     target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32 mswsock advapi32 comctl32 odbc32)
     target_link_libraries(${PROJECT_NAME} PUBLIC $ENV{TANGO_PATH}/lib/pthreadVC2.lib)
   if(MSVC90)
