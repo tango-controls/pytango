@@ -149,7 +149,7 @@ if(WIN32)
   link_directories("$ENV{BOOST_LIBS}")
   message("$ENV{BOOST_LIBS}")
   
-  add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS}) 
+  add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS}) 
   set_target_properties( ${PROJECT_NAME}
          PROPERTIES
          SUFFIX ".pyd" )
