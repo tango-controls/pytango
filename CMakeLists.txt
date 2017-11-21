@@ -29,7 +29,6 @@ add_definitions(-DNPY_NO_DEPRECATED_API)
 add_definitions(-DBOOST_PYTHON_STATIC_LIB)
 add_definitions(-DBOOST_ALL_NO_LIB)
 add_definitions(-DZMQ_STATIC)
-add_definitions(-DMT)
 add_compile_options(-Zm200 /MP8 /bigobj /MT)
 if(CMAKE_CL_64)
 add_definitions(-D_64BITS)
@@ -149,7 +148,7 @@ if(WIN32)
   message("$ENV{TANGO_PATH}/include")
   link_directories("$ENV{BOOST_LIBS}")
   message("$ENV{BOOST_LIBS}")
-  
+  add_compile_options(/MT)
   add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS}) 
   set_target_properties( ${PROJECT_NAME}
          PROPERTIES
