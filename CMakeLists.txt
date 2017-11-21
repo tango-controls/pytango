@@ -19,7 +19,7 @@ endif(NOT WIN32)
 
 if(WIN32)
 add_definitions(-DWIN32)
-add_definitions(-D_WINDLL)
+#add_definitions(-D_WINDLL)
 add_definitions(-DNDEBUG)
 add_definitions(-D_WINSTATIC)
 #add_definitions(-DTANGO_HAS_DLL)
@@ -170,7 +170,7 @@ install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin)
 
-  set_property(TARGET ${PROJECT_NAME} PROPERTY COMPILE_OPTIONS "/bigobj")
+  set_property(TARGET ${PROJECT_NAME} PROPERTY COMPILE_OPTIONS "/bigobj /MT")
   set_property(TARGET ${PROJECT_NAME} PROPERTY LINK_FLAGS "/LTCG /force:multiple /DYNAMICBASE:NO /OPT:REF /OPT:ICF /SUBSYSTEM:WINDOWS")
   target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
   
