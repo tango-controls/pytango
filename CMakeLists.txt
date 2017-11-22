@@ -149,8 +149,8 @@ if(WIN32)
   link_directories("$ENV{BOOST_LIBS}")
   message("$ENV{BOOST_LIBS}")
   add_compile_options(/MT)
-  target_compile_options(${PROJECT_NAME} PUBLIC "/MT")
   add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS}) 
+  target_compile_options(${PROJECT_NAME} PUBLIC "/MT")
   set_target_properties( ${PROJECT_NAME}
          PROPERTIES
          SUFFIX ".pyd" )
