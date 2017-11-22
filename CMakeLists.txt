@@ -149,10 +149,14 @@ if(WIN32)
   link_directories("$ENV{BOOST_LIBS}")
   message("$ENV{BOOST_LIBS}")
   add_compile_options(/MT)
+  target_compile_options(${PROJECT_NAME} PUBLIC "/MT")
   add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS}) 
   set_target_properties( ${PROJECT_NAME}
          PROPERTIES
          SUFFIX ".pyd" )
+  set_target_properties( ${PROJECT_NAME}
+         PROPERTIES
+         COMPILE_OPTIONS "MT" )
     set_target_properties( ${PROJECT_NAME}
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/Release/tango"
