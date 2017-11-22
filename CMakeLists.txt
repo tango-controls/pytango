@@ -29,7 +29,6 @@ add_definitions(-DNPY_NO_DEPRECATED_API)
 add_definitions(-DBOOST_PYTHON_STATIC_LIB)
 add_definitions(-DBOOST_ALL_NO_LIB)
 add_definitions(-DZMQ_STATIC)
-add_compile_options(-Zm200 /MP8 /bigobj /MT)
 if(CMAKE_CL_64)
 add_definitions(-D_64BITS)
 if(MSVC14)
@@ -174,7 +173,8 @@ install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin)
 
-  set_property(TARGET ${PROJECT_NAME} PROPERTY COMPILE_OPTIONS "/bigobj /MT")
+  set_property(TARGET ${PROJECT_NAME} PROPERTY COMPILE_OPTIONS "/bigobj")
+  set_property(TARGET ${PROJECT_NAME} PROPERTY COMPILE_OPTIONS "/MT")
   set_property(TARGET ${PROJECT_NAME} PROPERTY LINK_FLAGS "/LTCG /force:multiple /DYNAMICBASE:NO /OPT:REF /OPT:ICF /SUBSYSTEM:WINDOWS")
   target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
   
