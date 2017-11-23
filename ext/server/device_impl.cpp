@@ -24,8 +24,8 @@
 namespace boost
 {
 	template <>
-	DeviceImpl const volatile * get_pointer<class DeviceImpl const volatile >(
-		class Attribute const volatile *c)
+	Tango::DeviceImpl const volatile * get_pointer<class Tango::DeviceImpl const volatile >(
+		class Tango::Attribute const volatile *c)
 	{
 		DeviceImpl c;
 	}
