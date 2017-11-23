@@ -25,8 +25,8 @@
 namespace boost
 {
 	template <>
-	DeviceProxy const volatile * get_pointer<class DeviceProxy const volatile >(
-		class DeviceProxy const volatile *c)
+	Tango::DeviceProxy const volatile * get_pointer<class Tango::DeviceProxy const volatile >(
+		class Tango::DeviceProxy const volatile *c)
 	{
 		return c;
 	}
