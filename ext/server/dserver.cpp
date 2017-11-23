@@ -16,6 +16,18 @@
 
 using namespace boost::python;
 
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	Tango::DServer const volatile * get_pointer<class Tango::DServer const volatile >(
+		class Tango::DServer const volatile *c)
+	{
+		return c;
+	}
+}
+#endif
+
 namespace PyDServer
 {
     PyObject* query_class(Tango::DServer &self)
