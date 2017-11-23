@@ -55,6 +55,18 @@
     try { return bopy::call_method<retType>(__dev_ptr->the_self, name, __VA_ARGS__); } \
     __AUX_CATCH_PY_EXCEPTION
 
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	Pipe const volatile * get_pointer<class Pipe const volatile >(
+		class Pipe const volatile *c)
+	{
+		return c;
+	}
+}
+#endif
+
 namespace PyTango { namespace Pipe {
 
     void _Pipe::read(Tango::DeviceImpl *dev, Tango::Pipe &pipe)
