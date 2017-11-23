@@ -21,6 +21,18 @@
 #include "server/pipe.h"
 #include "fast_from_py.h"
 
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	DeviceProxy const volatile * get_pointer<class DeviceProxy const volatile >(
+		class DeviceProxy const volatile *c)
+	{
+		return c;
+	}
+}
+#endif
+
 extern const char *param_must_be_seq;
 extern const char *unreachable_code;
 extern const char *non_string_seq;
