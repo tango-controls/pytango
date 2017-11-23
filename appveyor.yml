@@ -7,6 +7,24 @@ image: Visual Studio 2015
 
 environment:
   matrix:
+    - platform: x64
+      ARCH: x64-msvc14
+      configuration: Release
+      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
+      MSVCVERSION: v140
+      MSVCYEAR: "vs2015"
+      MSVCABR: "14"
+      VC_VER: 14.0
+      PYTHONPATH: c:\Python35-x64\
+      PYTHONPATHOMNI: "/cygdrive/c/Python35-x64/python"
+      BOOST_ROOT: C:/local/boost_1_64_0
+      BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-14.0
+      ZMQ_BASE: C:\projects\libzmq
+      IDL_BASE: C:\projects\tangoidl
+      IDL_BIN: C:\Program Files\tangoidl
+      OMNI_BASE: C:\projects\omniORB-4.2.1    
+      BOOST_CFG: >-
+          using python : 3.5 : c:/python35-x64/python.exe : c:/python35-x64/include : c:/python35-x64/libs : ^<address-model^>64;
     - platform: win32
       ARCH: win32-msvc9
       configuration: Release
@@ -97,24 +115,6 @@ environment:
       OMNI_BASE: C:\projects\omniORB-4.2.1
       BOOST_CFG: >-
           using python : 3.4 : c:/python34-x64/python.exe : c:/python34-x64/include : c:/python34-x64/libs : ^<address-model^>64;
-    - platform: x64
-      ARCH: x64-msvc14
-      configuration: Release
-      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
-      MSVCVERSION: v140
-      MSVCYEAR: "vs2015"
-      MSVCABR: "14"
-      VC_VER: 14.0
-      PYTHONPATH: c:\Python35-x64\
-      PYTHONPATHOMNI: "/cygdrive/c/Python35-x64/python"
-      BOOST_ROOT: C:/local/boost_1_64_0
-      BOOST_LIBS: C:/local/boost_1_64_0/lib64-msvc-14.0
-      ZMQ_BASE: C:\projects\libzmq
-      IDL_BASE: C:\projects\tangoidl
-      IDL_BIN: C:\Program Files\tangoidl
-      OMNI_BASE: C:\projects\omniORB-4.2.1    
-      BOOST_CFG: >-
-          using python : 3.5 : c:/python35-x64/python.exe : c:/python35-x64/include : c:/python35-x64/libs : ^<address-model^>64;
 init:
   # go to hell Xamarin (see http://help.appveyor.com/discussions/problems/4569)
   - del "C:\Program Files (x86)\MSBuild\4.0\Microsoft.Common.Targets\ImportAfter\Xamarin.Common.targets"
@@ -269,6 +269,9 @@ after_build:
   #- cmd: if %ARCH%==x64-msvc14 move PyTango_9.2.5_v140_x64_debug.exe C:/projects/pytango
   #- cmd: if %ARCH%==x64-msvc14 move PyTango_9.2.5_v140_x64_debug.zip C:/projects/pytango
 
+on_failure:
+  #RDP for failure
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 on_finish:
   #RDP for finish
