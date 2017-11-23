@@ -15,6 +15,18 @@
 
 using namespace boost::python;
 
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	ApiUtil const volatile * get_pointer<class ApiUtil const volatile >(
+		class ApiUtil const volatile *c)
+	{
+		return c;
+	}
+}
+#endif
+
 namespace PyApiUtil
 {
     inline object get_env_var(const char *name)
