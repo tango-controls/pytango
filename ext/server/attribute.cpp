@@ -17,6 +17,18 @@
 
 using namespace boost::python;
 
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	Attribute const volatile * get_pointer<class Attribute const volatile >(
+		class Attribute const volatile *c)
+	{
+		return c;
+	}
+}
+#endif
+
 # ifdef WIN32
 #   define PYTG_TIME_FROM_DOUBLE(dbl, tv) \
             if (true) { \
