@@ -34,8 +34,8 @@ static const char* has_failed_attr_name = "has_failed";
 namespace boost
 {
 	template <>
-	DeviceAttribute const volatile * get_pointer<class DeviceAttribute const volatile >(
-		class DeviceAttribute const volatile *c)
+	Tango::DeviceAttribute const volatile * get_pointer<class Tango::DeviceAttribute const volatile >(
+		class Tango::DeviceAttribute const volatile *c)
 	{
 		return c;
 	}
