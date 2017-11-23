@@ -16,6 +16,17 @@
 void export_group_reply_list();
 void export_group_reply();
 
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	Tango::Group const volatile * get_pointer<class Tango::Group const volatile >(
+		class Tango::Group const volatile *c)
+	{
+		return c;
+	}
+}
+#endif
 
 namespace PyGroup
 {
