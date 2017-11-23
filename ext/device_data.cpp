@@ -19,6 +19,18 @@ using namespace boost::python;
 #   include "to_py_numpy.hpp"
 #endif
 
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	Tango::DeviceData const volatile * get_pointer<class Tango::DeviceData const volatile >(
+		class Tango::DeviceData const volatile *c)
+	{
+		return c;
+	}
+}
+#endif
+
 namespace PyDeviceData {
 
     Tango::CmdArgType get_type(Tango::DeviceData &self)
