@@ -59,8 +59,14 @@
 namespace boost
 {
 	template <>
-	Pipe const volatile * get_pointer<class Pipe const volatile >(
-		class Pipe const volatile *c)
+	Tango::Pipe const volatile * get_pointer<class Tango::Pipe const volatile >(
+		class Tango::Pipe const volatile *c)
+	{
+		return c;
+	}
+	template <>
+	Tango::WPipe const volatile * get_pointer<class Tango::WPipe const volatile >(
+		class Tango::WPipe const volatile *c)
 	{
 		return c;
 	}
