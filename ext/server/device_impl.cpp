@@ -20,6 +20,18 @@
 #include "to_py.h"
 #include "server/pipe.h"
 
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	DeviceImpl const volatile * get_pointer<class DeviceImpl const volatile >(
+		class Attribute const volatile *c)
+	{
+		DeviceImpl c;
+	}
+}
+#endif
+
 #ifdef _WIN32
 
 #include <time.h>
