@@ -19,8 +19,8 @@ using namespace boost::python;
 namespace boost
 {
 	template <>
-	ApiUtil const volatile * get_pointer<class ApiUtil const volatile >(
-		class ApiUtil const volatile *c)
+	Tango::ApiUtil const volatile * get_pointer<class Tango::ApiUtil const volatile >(
+		class Tango::ApiUtil const volatile *c)
 	{
 		return c;
 	}
