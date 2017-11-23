@@ -14,6 +14,18 @@
 
 using namespace boost::python;
 
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	Tango::DeviceAttributeHistory const volatile * get_pointer<class Tango::DeviceAttributeHistory const volatile >(
+		class Tango::DeviceAttributeHistory const volatile *c)
+	{
+		return c;
+	}
+}
+#endif
+
 void export_device_attribute_history()
 {
 
