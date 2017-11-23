@@ -52,6 +52,17 @@ using namespace boost::python;
     try { return boost::python::call_method<retType>(__dev_ptr->the_self, name, __VA_ARGS__); } \
     __AUX_CATCH_PY_EXCEPTION
 
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	Attr const volatile * get_pointer<class Attr const volatile >(
+		class Attr const volatile *c)
+	{
+		return c;
+	}
+}
+#endif
 
 void PyAttr::read(Tango::DeviceImpl *dev, Tango::Attribute &att)
 {
