@@ -20,8 +20,8 @@ using namespace boost::python;
 namespace boost
 {
 	template <>
-	WAttribute const volatile * get_pointer<class WAttribute const volatile >(
-		class WAttribute const volatile *c)
+	Tango::WAttribute const volatile * get_pointer<class Tango::WAttribute const volatile >(
+		class Tango::WAttribute const volatile *c)
 	{
 		return c;
 	}
