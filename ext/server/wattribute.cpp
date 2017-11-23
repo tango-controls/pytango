@@ -16,6 +16,18 @@
 
 using namespace boost::python;
 
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	WAttribute const volatile * get_pointer<class WAttribute const volatile >(
+		class WAttribute const volatile *c)
+	{
+		return c;
+	}
+}
+#endif
+
 #ifndef TgLibVersNb
 #   define TgLibVersNb 80005
 #endif
