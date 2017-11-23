@@ -21,8 +21,8 @@ using namespace boost::python;
 namespace boost
 {
 	template <>
-	Attribute const volatile * get_pointer<class Attribute const volatile >(
-		class Attribute const volatile *c)
+	Tango::Attribute const volatile * get_pointer<class Tango::Attribute const volatile >(
+		class Tango::Attribute const volatile *c)
 	{
 		return c;
 	}
