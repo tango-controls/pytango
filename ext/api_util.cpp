@@ -26,10 +26,19 @@ namespace PyApiUtil
         }
         return object();
     }
-};
 
-void (Tango::ApiUtil::*get_asynch_replies1)() = &Tango::ApiUtil::get_asynch_replies;
-void (Tango::ApiUtil::*get_asynch_replies2)(long) = &Tango::ApiUtil::get_asynch_replies;
+    inline void get_asynch_replies1(Tango::ApiUtil& self)
+    {
+        AutoPythonAllowThreads guard;
+        self.get_asynch_replies();
+    }
+
+    inline void get_asynch_replies2(Tango::ApiUtil& self, long timeout)
+    {
+        AutoPythonAllowThreads guard;
+        self.get_asynch_replies(timeout);
+    }
+};
 
 bool (Tango::ApiUtil::*in_server1)() = &Tango::ApiUtil::in_server;
 void (Tango::ApiUtil::*in_server2)(bool) = &Tango::ApiUtil::in_server;
@@ -37,26 +46,26 @@ void (Tango::ApiUtil::*in_server2)(bool) = &Tango::ApiUtil::in_server;
 void export_api_util()
 {
     class_<Tango::ApiUtil, boost::noncopyable>("ApiUtil", no_init)
-        
+
         .def("instance", &Tango::ApiUtil::instance,
             return_value_policy<reference_existing_object>())
         .staticmethod("instance")
-        
+
         .def("pending_asynch_call", &Tango::ApiUtil::pending_asynch_call)
-        
-        .def("get_asynch_replies", get_asynch_replies1)
-        .def("get_asynch_replies", get_asynch_replies2)
-        
+
+        .def("get_asynch_replies", &PyApiUtil::get_asynch_replies1)
+        .def("get_asynch_replies", &PyApiUtil::get_asynch_replies2)
+
         .def("set_asynch_cb_sub_model", &Tango::ApiUtil::set_asynch_cb_sub_model)
         .def("get_asynch_cb_sub_model", &Tango::ApiUtil::get_asynch_cb_sub_model)
-        
+
         .def("get_env_var", &PyApiUtil::get_env_var)
         .staticmethod("get_env_var")
-        
+
         .def("is_notifd_event_consumer_created", &Tango::ApiUtil::is_notifd_event_consumer_created)
         .def("is_zmq_event_consumer_created", &Tango::ApiUtil::is_zmq_event_consumer_created)
         .def("get_user_connect_timeout", &Tango::ApiUtil::get_user_connect_timeout)
-        
+
         .def("get_ip_from_if", &Tango::ApiUtil::get_ip_from_if)
     ;
 }

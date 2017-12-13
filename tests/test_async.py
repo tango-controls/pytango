@@ -53,7 +53,6 @@ def test_async_command_with_polled_callback(typed_values):
         for value in values:
             future = Future()
             proxy.command_inout_asynch('identity', value, future.set_result)
-            time.sleep(0.01) # Bug!!
             api_util.get_asynch_replies(500)
             result = future.result()
             assert_array_equal(result.argout, value)
