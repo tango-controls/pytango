@@ -15,10 +15,6 @@ try:
 except ImportError:
     import trollius as asyncio  # noqa: F401
 
-# Pytest fixtures
-from tango.test_utils import state, typed_values, server_green_mode
-state, typed_values, server_green_mode
-
 # Constants
 PY3 = sys.version_info >= (3,)
 YIELD_FROM = "yield from" if PY3 else "yield asyncio.From"

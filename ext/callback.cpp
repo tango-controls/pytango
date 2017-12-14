@@ -224,7 +224,7 @@ namespace {
                   << "Event will be ignored" << std::endl;
             return;
         }
-        
+
         AutoPythonGIL gil;
 
         // Make a copy of ev in python
@@ -258,7 +258,7 @@ namespace {
 
 boost::python::object PyCallBackPushEvent::get_override(const char* name)
 {
-    return boost::python::wrapper<Tango::CallBack>::get_override(name); 
+    return boost::python::wrapper<Tango::CallBack>::get_override(name);
 }
 
 
@@ -274,7 +274,7 @@ void PyCallBackPushEvent::fill_py_event(Tango::EventData* ev, object & py_ev, ob
     // attr_value pointer but its own copy, so my efforts are useless.
     if (ev->attr_value)
     {
-#ifdef PYTANGO_HAS_UNIQUE_PTR	
+#ifdef PYTANGO_HAS_UNIQUE_PTR
         Tango::DeviceAttribute *attr = new Tango::DeviceAttribute;
 	(*attr) = std::move(*ev->attr_value);
 #else
@@ -358,10 +358,10 @@ void export_callback()
             .def_readonly("device", &PyCmdDoneEvent::device)
             .def_readonly("cmd_name", &PyCmdDoneEvent::cmd_name)
             .def_readonly("argout_raw", &PyCmdDoneEvent::argout_raw)
-            .def_readonly("argout", &PyCmdDoneEvent::argout)
             .def_readonly("err", &PyCmdDoneEvent::err)
             .def_readonly("errors", &PyCmdDoneEvent::errors)
             .def_readonly("ext", &PyCmdDoneEvent::ext)
+            .def_readwrite("argout", &PyCmdDoneEvent::argout)
     ;
 
     class_<PyAttrReadEvent> AttrReadEvent("AttrReadEvent", no_init);

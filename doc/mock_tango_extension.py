@@ -68,10 +68,13 @@ class ExtensionMock(MagicMock):
             import tango.utils
             import tango.base_types
             import tango.device_server
+            import tango.connection
             tango.utils.__dict__['document_enum'] = document_enum
             tango.utils.__dict__['document_method'] = document_method
             tango.base_types.__dict__['__document_enum'] = document_enum
             tango.device_server.__dict__['__document_method'] = document_method
+            tango.connection.__dict__['__document_method'] = document_method
+            tango.connection.__dict__['__document_static_method'] = document_method
         MagicMock.__setattr__(self, name, value)
 
 
@@ -97,11 +100,19 @@ def document_method(klass, name, doc, add=True):
 
 # Use empty classes for device impl inheritance scheme
 def set_device_implementations(module):
-    module.DeviceImpl = type('DeviceImpl', (object,), {})
-    module.Device_2Impl = type('Device_2Impl', (module.DeviceImpl,), {})
-    module.Device_3Impl = type('Device_3Impl', (module.Device_2Impl,), {})
-    module.Device_4Impl = type('Device_4Impl', (module.Device_3Impl,), {})
-    module.Device_5Impl = type('Device_5Impl', (module.Device_4Impl,), {})
+    attrs = {'__module__': module.__name__}
+    module.DeviceImpl = type('DeviceImpl', (object,), attrs)
+    module.Device_2Impl = type('Device_2Impl', (module.DeviceImpl,), attrs)
+    module.Device_3Impl = type('Device_3Impl', (module.Device_2Impl,), attrs)
+    module.Device_4Impl = type('Device_4Impl', (module.Device_3Impl,), attr)
+    module.Device_5Impl = type('Device_5Impl', (module.Device_4Impl,), attrs)
+
+
+# Use empty classes for device proxy inheritance scheme
+def set_device_proxy_implementations(module):
+    attrs = {'__module__': module.__name__}
+    module.Connection = type('Connection', (object,), attrs)
+    module.DeviceProxy = type('DeviceProxy', (module.Connection,), attrs)
 
 
 # Patch the extension module
@@ -109,6 +120,7 @@ _tango = ExtensionMock(name='_tango')
 _tango.constants.TgLibVers = TANGO_VERSION
 _tango._get_tango_lib_release.return_value = TANGO_VERSION_INT
 set_device_implementations(_tango)
+set_device_proxy_implementations(_tango)
 
 
 # Patch modules
