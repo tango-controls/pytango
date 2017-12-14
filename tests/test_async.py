@@ -1,7 +1,6 @@
 
 
 # Imports
-import time
 from concurrent.futures import Future
 
 import pytest
@@ -9,10 +8,7 @@ from numpy.testing import assert_array_equal
 
 import tango
 from tango.server import Device, command
-from tango.test_utils import DeviceTestContext, typed_values
-
-# Pytest fixtures
-typed_values
+from tango.test_utils import DeviceTestContext
 
 
 def test_async_command_polled(typed_values):
