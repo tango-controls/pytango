@@ -158,7 +158,7 @@ struct convert_PySequence_to_CORBA_Sequence
     static void construct(PyObject* obj,
                           boost::python::converter::rvalue_from_python_stage1_data* data)
     {
-            
+
         typedef boost::python::converter::rvalue_from_python_storage<CorbaSequence> CorbaSequence_storage;
 
         void* const storage = reinterpret_cast<CorbaSequence_storage*>(data)->storage.bytes;
@@ -167,13 +167,12 @@ struct convert_PySequence_to_CORBA_Sequence
         convert2array(object(handle<>(obj)), *ptr);
         data->convertible = storage;
     }
-    
+
 };
 
-#if PY_VERSION_HEX < 0x03000000
 bool is_str(PyObject* obj)
 {
-    return PyString_Check(obj) || PyUnicode_Check(obj);
+    return PyBytes_Check(obj) || PyUnicode_Check(obj);
 }
 
 struct StdString_from_python_str_unicode
@@ -185,7 +184,7 @@ struct StdString_from_python_str_unicode
           &construct,
           boost::python::type_id<std::string>());
     }
- 
+
     // Determine if obj_ptr can be converted in a std::string
     static void* convertible(PyObject* obj)
     {
@@ -195,7 +194,7 @@ struct StdString_from_python_str_unicode
         }
         return obj;
     }
- 
+
     // Convert obj_ptr into a std::string
     static void construct(PyObject* obj,
                           boost::python::converter::rvalue_from_python_stage1_data* data)
@@ -205,20 +204,20 @@ struct StdString_from_python_str_unicode
       if (PyUnicode_Check(obj))
       {
           decref = true;
-          obj = PyUnicode_AsLatin1String(obj);
+          obj = PyUnicode_AsUTF8String(obj);
       }
-      
+
       const char* value = PyBytes_AsString(obj);
- 
+
       // Grab pointer to memory into which to construct the new std::string
       void* storage = (
         (boost::python::converter::rvalue_from_python_storage<std::string>*)
         data)->storage.bytes;
- 
+
       // in-place construct the new std::string using the character data
       // extraced from the python object
       new (storage) std::string(value);
- 
+
       // Stash the memory chunk pointer for later use by boost.python
       data->convertible = storage;
 
@@ -226,8 +225,6 @@ struct StdString_from_python_str_unicode
           Py_DECREF(obj);
     }
 };
-
-#endif // PY_VERSION_HEX < 0x03000000
 
 int raise_asynch_exception(long thread_id, boost::python::object exp_klass)
 {
@@ -367,10 +364,10 @@ void export_base_types()
     to_python_converter<Tango::DevVarDoubleStringArray, CORBA_sequence_to_list<Tango::DevVarDoubleStringArray> >();
     to_python_converter<Tango::DevVarLong64Array, CORBA_sequence_to_list<Tango::DevVarLong64Array> >();
     to_python_converter<Tango::DevVarULong64Array, CORBA_sequence_to_list<Tango::DevVarULong64Array> >();
-    
+
     to_python_converter<Tango::DevEncoded, DevEncoded_to_tuple>();
     //to_python_converter<unsigned char, UChar_to_str>();
-    
+
     convert_PySequence_to_CORBA_Sequence<Tango::DevVarCharArray>();
     convert_PySequence_to_CORBA_Sequence<Tango::DevVarShortArray>();
     convert_PySequence_to_CORBA_Sequence<Tango::DevVarLongArray>();
@@ -394,9 +391,7 @@ void export_base_types()
     convert_numpy_to_integer<Tango::DEV_LONG64>();
     convert_numpy_to_integer<Tango::DEV_ULONG64>();
 
-#if PY_VERSION_HEX < 0x03000000
     StdString_from_python_str_unicode();
-#endif
 
     // from tango_const.h
     export_poll_device();
@@ -425,7 +420,7 @@ void export_base_types()
 
     export_dev_error();
     export_time_val();
-    
+
     def("raise_asynch_exception", &raise_asynch_exception);
 
     def("_get_tango_lib_release", &Tango::_convert_tango_lib_release);
