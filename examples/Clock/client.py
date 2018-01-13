@@ -20,7 +20,7 @@ import sys
 import PyTango
 
 if len(sys.argv) != 2:
-    print "must provide one and only one clock device name"
+    print("must provide one and only one clock device name")
     sys.exit(1)
 
 clock = PyTango.DeviceProxy(sys.argv[1])
