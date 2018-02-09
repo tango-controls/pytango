@@ -270,18 +270,20 @@ after_build:
   #- cmd: if %ARCH%==x64-msvc12 %PYTHONPATH%python.exe winsetup.py build dist tmp release x64
   #- cmd: if %ARCH%==x64-msvc14 %PYTHONPATH%python.exe winsetup.py build dist tmp release x64
   #copying artifacts
-  - cmd: if %ARCH%==win32-msvc9 move .\dist\pytango-9.2.3.win32-py2.7.exe C:/projects/pytango
-  - cmd: if %ARCH%==win32-msvc9 move .\dist\pytango-9.2.3.win32-py2.7.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc9 move .\dist\pytango-9.2.3.win-amd64-py2.7.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc9 move .\dist\pytango-9.2.3.win-amd64-py2.7.msi C:/projects/pytango
-  - cmd: if %ARCH%==win32-msvc10 move .\dist\pytango-9.2.3.win32-py3.4.exe C:/projects/pytango
-  - cmd: if %ARCH%==win32-msvc10 move .\dist\pytango-9.2.3.win32-py3.4.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc10 move .\dist\pytango-9.2.3.win-amd64-py3.4.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc10 move .\dist\pytango-9.2.3.win-amd64-py3.4.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc12 move .\dist\pytango-9.2.3.win-amd64-py3.4.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc12 move .\dist\pytango-9.2.3.win-amd64-py3.4.msi C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc14 move .\dist\pytango-9.2.3.win-amd64-py3.5.exe C:/projects/pytango
-  - cmd: if %ARCH%==x64-msvc14 move .\dist\pytango-9.2.3.win-amd64-py3.5.msi C:/projects/pytango
+  - cmd: if %ARCH_PY%==win32-msvc9-py27 move .\dist\pytango-9.2.3.win32-py2.7.exe C:/projects/pytango
+  - cmd: if %ARCH_PY%==win32-msvc9-py27 move .\dist\pytango-9.2.3.win32-py2.7.msi C:/projects/pytango
+  - cmd: if %ARCH_PY%==x64-msvc9-py27 move .\dist\pytango-9.2.3.win-amd64-py2.7.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc9-py27 move .\dist\pytango-9.2.3.win-amd64-py2.7.msi C:/projects/pytango
+  - cmd: if %ARCH%==win32-msvc10-py34 move .\dist\pytango-9.2.3.win32-py3.4.exe C:/projects/pytango
+  - cmd: if %ARCH%==win32-msvc10-py34 move .\dist\pytango-9.2.3.win32-py3.4.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc10-py34 move .\dist\pytango-9.2.3.win-amd64-py3.4.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc10-py34 move .\dist\pytango-9.2.3.win-amd64-py3.4.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc12-py34 move .\dist\pytango-9.2.3.win-amd64-py3.4.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc12-py34 move .\dist\pytango-9.2.3.win-amd64-py3.4.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc14-py35 move .\dist\pytango-9.2.3.win-amd64-py3.5.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc14-py35 move .\dist\pytango-9.2.3.win-amd64-py3.5.msi C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc14-py36 move .\dist\pytango-9.2.3.win-amd64-py3.6.exe C:/projects/pytango
+  - cmd: if %ARCH%==x64-msvc14-py36 move .\dist\pytango-9.2.3.win-amd64-py3.6.msi C:/projects/pytango
   #rename x64-msvc10
   #- cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_Windows7.1SDK_x64_debug.exe PyTango_9.2.5_v100_x64_debug.exe
   #- cmd: if %ARCH%==x64-msvc10 move PyTango_9.2.5_Windows7.1SDK_x64_debug.zip PyTango_9.2.5_v100_x64_debug.zip
