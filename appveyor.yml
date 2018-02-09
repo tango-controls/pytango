@@ -197,7 +197,7 @@ init:
   - if %ARCH_PY%==x64-msvc10-py34 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/47nhyqtnbhrpqgyk/artifacts/boost-1.64_x64-msvc10_34.zip
   - if %ARCH_PY%==x64-msvc12-py34 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/b3fiytu4recb2qib/artifacts/boost-1.64_x64-msvc12_34.zip
   - if %ARCH_PY%==x64-msvc14-py35 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/wj4640et8st1fe3e/artifacts/boost-1.64_x64-msvc14_35.zip
-  - if %ARCH_PY%==x64-msvc14-py36 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/wj4640et8st1fe3e/artifacts/boost-1.64_x64-msvc14_36.zip
+  - if %ARCH_PY%==x64-msvc14-py36 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/jwqtwxwo2vdl1voq/artifacts/boost-1.64_x64-msvc14_36.zip
   - cmd: 7z -y x boost-1.64_%ARCH%_%PY_VER%.zip -oC:\projects\
   #VS2008 patch
   - cmd: cd "C:\projects\"
