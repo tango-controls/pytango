@@ -191,12 +191,12 @@ init:
   - cmd: 7z -y x pthreads-w32-2-9-1-release.zip -oC:\projects\pthreads-win32\
   # boost
   - cmd: cd "C:\projects\"
-  - if %ARCH_PY%==win32-msvc9-py27 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/6jf7majo99biwttk/artifacts/boost-1.64_win32-msvc9_27.zip
+  - if %ARCH_PY%==win32-msvc9-py27 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/hqpap74h92jq4uyd/artifacts/boost-1.64_win32-msvc9_27.zip
   - if %ARCH_PY%==x64-msvc9-py27 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/si341sg6pfp24r3k/artifacts/boost-1.64_x64-msvc9_27.zip
-  - if %ARCH_PY%==win32-msvc10-py34 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/0e73obqg25h9kqo8/artifacts/boost-1.64_win32-msvc10_34.zip
-  - if %ARCH_PY%==x64-msvc10-py34 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/47nhyqtnbhrpqgyk/artifacts/boost-1.64_x64-msvc10_34.zip
-  - if %ARCH_PY%==x64-msvc12-py34 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/b3fiytu4recb2qib/artifacts/boost-1.64_x64-msvc12_34.zip
-  - if %ARCH_PY%==x64-msvc14-py35 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/wj4640et8st1fe3e/artifacts/boost-1.64_x64-msvc14_35.zip
+  - if %ARCH_PY%==win32-msvc10-py34 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/d0i7fdswhlxgh797/artifacts/boost-1.64_win32-msvc10_34.zip
+  - if %ARCH_PY%==x64-msvc10-py34 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/1bh040aa81rwneq2/artifacts/boost-1.64_x64-msvc10_34.zip
+  - if %ARCH_PY%==x64-msvc12-py34 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/0q5q5w2r5w7fo5vh/artifacts/boost-1.64_x64-msvc12_34.zip
+  - if %ARCH_PY%==x64-msvc14-py35 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/c3h7kyckeimsm0q9/artifacts/boost-1.64_x64-msvc14_35.zip
   - if %ARCH_PY%==x64-msvc14-py36 appveyor DownloadFile https://ci.appveyor.com/api/buildjobs/jwqtwxwo2vdl1voq/artifacts/boost-1.64_x64-msvc14_36.zip
   - cmd: 7z -y x boost-1.64_%ARCH%_%PY_VER%.zip -oC:\projects\
   #VS2008 patch
