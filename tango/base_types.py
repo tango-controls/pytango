@@ -53,18 +53,18 @@ def __StdVector__imul(self, n):
     return ret
 
 
-def __StdVector__getitem(self, key):
-    if is_integer(key) or key.step is None:
-        return self.__original_getitem(key)
-
-    res = self.__class__()
-    nb = len(self)
-    start = key.start or 0
-    stop = key.stop or nb
-    if start >= nb:
-        return res
-    if stop > nb:
-        stop = nb
+# def __StdVector__getitem(self, key):
+#     if is_integer(key) or key.step is None:
+#         return self.__original_getitem(key)
+# 
+#     res = self.__class__()
+#     nb = len(self)
+#     start = key.start or 0
+#     stop = key.stop or nb
+#     if start >= nb:
+#         return res
+#     if stop > nb:
+#         stop = nb
 
     for i in range(start, stop, key.step or 1):
         res.append(self[i])
@@ -72,12 +72,12 @@ def __StdVector__getitem(self, key):
     return res
 
 
-def __fillVectorClass(klass):
-    klass.__add__ = __StdVector__add
-    klass.__mul__ = __StdVector__mul
-    klass.__imul__ = __StdVector__imul
-    klass.__original_getitem = klass.__getitem__
-    klass.__getitem__ = __StdVector__getitem
+# def __fillVectorClass(klass):
+#     klass.__add__ = __StdVector__add
+#     klass.__mul__ = __StdVector__mul
+#     klass.__imul__ = __StdVector__imul
+#     klass.__original_getitem = klass.__getitem__
+#     klass.__getitem__ = __StdVector__getitem
 
 
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
@@ -294,8 +294,8 @@ def __init_base_types():
         DeviceDataHistoryList, StdGroupReplyVector,
         StdGroupCmdReplyVector, StdGroupAttrReplyVector)
 
-    for v_klass in v_klasses:
-        __fillVectorClass(v_klass)
+#     for v_klass in v_klasses:
+#         __fillVectorClass(v_klass)
 
     DeviceAttributeConfig.__getinitargs__ = __DeviceAttributeConfig__getinitargs__
     DeviceAttributeConfig.__getstate__ = __DeviceAttributeConfig__getstate__

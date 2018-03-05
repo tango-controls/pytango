@@ -32,19 +32,18 @@ struct from_py
 {
     typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
 
-    static inline void convert(const boost::python::object &o, TangoScalarType &tg)
+    static inline void convert(const py::object &o, TangoScalarType &tg)
     {
         convert(o.ptr(), tg);
     }
 
     static inline void convert(PyObject *o, TangoScalarType &tg)
     {
-        // boost::python::object tmp(boost::python::handle<>(o));
-        // tg = boost::python::extract<TangoScalartype>(tmp);
-        Tango::Except::throw_exception( \
-                        "PyDs_WrongPythonDataTypeForAttribute",
-                        "Unsupported attribute type translation",
-                        "from_py::convert()");
+        tg = o.cast<TangoScalartype>();
+//        Tango::Except::throw_exception( \
+//                        "PyDs_WrongPythonDataTypeForAttribute",
+//                        "Unsupported attribute type translation",
+//                        "from_py::convert()");
     }
 };
 

@@ -23,13 +23,15 @@ import types
 import numbers
 import collections
 
-from ._tango import StdStringVector, StdDoubleVector, \
-    DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
-    EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
-    DevState, CommunicationFailed, PipeEventData, DevIntrChangeEventData
+from ._tango import StdStringVector, StdDoubleVector
+from ._tango import DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat
+from ._tango import EventData, AttrConfEventData, DataReadyEventData, constants
+#from ._tango import DevFailed
+#from ._tango import DevState, PipeEventData, DevIntrChangeEventData
+#from ._tango import CommunicationFailed
 
 from . import _tango
-from .constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
+from ._tango.constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
 from .release import Release
 
 __all__ = [
@@ -809,9 +811,9 @@ def seq_2_DbData(seq, vec=None):
     if vec is None:
         if isinstance(seq, DbData):
             return seq
-        vec = DbData()
-    if not isinstance(vec, DbData):
-        raise TypeError('vec must be a tango.DbData')
+        vec = list()
+    if not isinstance(vec, list):
+        raise TypeError('vec must be a list')
     for e in seq:
         vec.append(e)
     return vec
@@ -820,9 +822,9 @@ def seq_2_DbData(seq, vec=None):
 def DbData_2_dict(db_data, d=None):
     if d is None:
         d = {}
-    if not isinstance(db_data, DbData):
+    if not isinstance(db_data, list):
         raise TypeError(
-            'db_data must be a tango.DbData. A %s found instead' %
+            'db_data must be a list. A %s found instead' %
             type(db_data))
     for db_datum in db_data:
         d[db_datum.name] = db_datum.value_string
@@ -1021,7 +1023,7 @@ def document_method(klass, method_name, d, add=True):
     if add:
         cpp_doc = meth.__doc__
         if cpp_doc:
-            func.__doc__ = "%s\n%s" % (d, cpp_doc)
+#             func.__doc__ = "%s\n%s" % (d, cpp_doc)
             return
     func.__doc__ = d
 

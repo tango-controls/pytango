@@ -9,25 +9,20 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-struct PyLockerInfo
-{
-    static inline boost::python::object get_locker_id(Tango::LockerInfo &li)
-    {
-        return (li.ll == Tango::CPP) ?
-            boost::python::object(li.li.LockerPid) :
-            boost::python::tuple(li.li.UUID);
-    }
-};
+namespace py = pybind11;
 
-void export_locker_info()
-{
-    boost::python::class_<Tango::LockerInfo>("LockerInfo")
+void export_locker_info(py::module &m) {
+    py::class_<Tango::LockerInfo>(m, "LockerInfo")
         .def_readonly("ll", &Tango::LockerInfo::ll)
-        .add_property("li", &PyLockerInfo::get_locker_id)
         .def_readonly("locker_host", &Tango::LockerInfo::locker_host)
         .def_readonly("locker_class", &Tango::LockerInfo::locker_class)
+        .def_property_readonly("li", [](Tango::LockerInfo &li) {
+            return (li.ll == Tango::CPP) ?
+                    py::object(py::cast(li.li.LockerPid)) :
+                    py::make_tuple(li.li.UUID);
+            })
     ;
 }

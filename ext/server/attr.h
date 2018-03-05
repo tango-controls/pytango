@@ -12,9 +12,7 @@
 #ifndef _ATTR_H_
 #define _ATTR_H_
 
-#include <boost/python.hpp>
 #include <tango.h>
-
 #include "exception.h"
 #include "pytgutils.h"
 #include "server/device_impl.h"
@@ -22,17 +20,8 @@
 class PyAttr
 {
 public:
-    /**
-     * Constructor
-     */
-    PyAttr()
-    {}
-
-    /**
-     * Desctructor
-     */
-    virtual ~PyAttr()
-    {}
+    PyAttr() {}
+    virtual ~PyAttr() {}
 
     /**
      * Read one attribute. This method forward the action to the python method.
@@ -40,7 +29,7 @@ public:
      * @param[in] dev The device on which the attribute has to be read
      * @param[in, out] att the attribute
      */
-    void read(Tango::DeviceImpl *dev,Tango::Attribute &att);
+    void read(Tango::DeviceImpl *dev, Tango::Attribute &att);
 
     /**
      * Write one attribute. This method forward the action to the python method.
@@ -48,7 +37,7 @@ public:
      * @param[in] dev The device on which the attribute has to be written
      * @param[in, out] att the attribute
      */
-    void write(Tango::DeviceImpl *dev,Tango::WAttribute &att);
+    void write(Tango::DeviceImpl *dev, Tango::WAttribute &att);
 
     /**
      * Decide if it is allowed to read/write the attribute
@@ -59,15 +48,14 @@ public:
      * @return a boolean set to true if it is allowed to execute
      *         the command. Otherwise, returns false
      */
-    bool is_allowed(Tango::DeviceImpl *dev,Tango::AttReqType ty);
+    bool is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType ty);
 
     /**
      * Sets the is_allowed method name for this attribute
      *
      * @param[in] name the is_allowed method name
      */
-    inline void set_allowed_name(const std::string &name)
-    {
+    inline void set_allowed_name(const std::string &name) {
         py_allowed_name = name;
     }
 
@@ -76,8 +64,7 @@ public:
      *
      * @param[in] name the read method name
      */
-    inline void set_read_name(const std::string &name)
-    {
+    inline void set_read_name(const std::string &name) {
         read_name = name;
     }
 
@@ -86,8 +73,7 @@ public:
      *
      * @param[in] name the write method name
      */
-    inline void set_write_name(const std::string &name)
-    {
+    inline void set_write_name(const std::string &name) {
         write_name = name;
     }
 
@@ -102,7 +88,7 @@ public:
                        Tango::UserDefaultAttrProp &def_prop);
 
     bool _is_method(Tango::DeviceImpl *dev, const std::string &name);
-    
+
 private:
 
     /** the name of the is allowed python method */
@@ -118,8 +104,7 @@ private:
 /**
  * The python class representing a scalar attribute
  */
-class PyScaAttr: public Tango::Attr,
-                 public PyAttr
+class PyScaAttr: public Tango::Attr, public PyAttr
 {
 public:
 
@@ -147,9 +132,9 @@ public:
                std::vector<Tango::AttrProperty> &user_prop)
         : Tango::Attr(na.c_str(), type, w)
     {
-        if (user_prop.size() == 0)
+        if (user_prop.size() == 0) {
             return;
-
+        }
         Tango::UserDefaultAttrProp def_prop;
         set_user_prop(user_prop,def_prop);
         set_default_properties(def_prop);
@@ -169,8 +154,7 @@ public:
      * @return a boolean set to true if it is allowed to execute
      *         the command. Otherwise, returns false
      */
-    inline virtual bool is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType ty)
-    {
+    inline virtual bool is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType ty) {
         return PyAttr::is_allowed(dev, ty);
     }
 
@@ -180,8 +164,7 @@ public:
      * @param[in] dev The device on which the attribute has to be read
      * @param[in, out] att the attribute
      */
-    inline virtual void read(Tango::DeviceImpl *dev, Tango::Attribute &att)
-    {
+    inline virtual void read(Tango::DeviceImpl *dev, Tango::Attribute &att) {
         return PyAttr::read(dev, att);
     }
 
@@ -191,8 +174,7 @@ public:
      * @param[in] dev The device on which the attribute has to be written
      * @param[in, out] att the attribute
      */
-    virtual void write(Tango::DeviceImpl *dev, Tango::WAttribute &att)
-    {
+    virtual void write(Tango::DeviceImpl *dev, Tango::WAttribute &att) {
         return PyAttr::write(dev, att);
     }
 };
@@ -200,8 +182,7 @@ public:
 //------------------------------------------------------------------------------------------------
 
 
-class PySpecAttr: public Tango::SpectrumAttr,
-                  public PyAttr
+class PySpecAttr: public Tango::SpectrumAttr, public PyAttr
 {
 public:
     /**
@@ -229,9 +210,9 @@ public:
                std::vector<Tango::AttrProperty> &user_prop)
         : Tango::SpectrumAttr(na.c_str(), type, w, xx)
     {
-        if (user_prop.size() == 0)
+        if (user_prop.size() == 0) {
             return;
-
+        }
         Tango::UserDefaultAttrProp def_prop;
         set_user_prop(user_prop,def_prop);
         set_default_properties(def_prop);
@@ -252,8 +233,7 @@ public:
      * @return a boolean set to true if it is allowed to execute
      *         the command. Otherwise, returns false
      */
-    inline virtual bool is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType ty)
-    {
+    inline virtual bool is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType ty) {
         return PyAttr::is_allowed(dev, ty);
     }
 
@@ -263,8 +243,7 @@ public:
      * @param[in] dev The device on which the attribute has to be read
      * @param[in, out] att the attribute
      */
-    inline virtual void read(Tango::DeviceImpl *dev, Tango::Attribute &att)
-    {
+    inline virtual void read(Tango::DeviceImpl *dev, Tango::Attribute &att) {
         return PyAttr::read(dev, att);
     }
 
@@ -274,16 +253,14 @@ public:
      * @param[in] dev The device on which the attribute has to be written
      * @param[in, out] att the attribute
      */
-    virtual void write(Tango::DeviceImpl *dev, Tango::WAttribute &att)
-    {
+    virtual void write(Tango::DeviceImpl *dev, Tango::WAttribute &att) {
         return PyAttr::write(dev, att);
     }
 };
 
 //------------------------------------------------------------------------------------------------
 
-class PyImaAttr: public Tango::ImageAttr,
-                 public PyAttr
+class PyImaAttr: public Tango::ImageAttr, public PyAttr
 {
 public:
     /**
@@ -313,9 +290,9 @@ public:
                std::vector<Tango::AttrProperty> &user_prop)
         : Tango::ImageAttr(na.c_str(), type, w, xx, yy)
     {
-        if (user_prop.size() == 0)
+        if (user_prop.size() == 0) {
             return;
-
+        }
         Tango::UserDefaultAttrProp def_prop;
         set_user_prop(user_prop,def_prop);
         set_default_properties(def_prop);
@@ -336,8 +313,7 @@ public:
      * @return a boolean set to true if it is allowed to execute
      *         the command. Otherwise, returns false
      */
-    inline virtual bool is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType ty)
-    {
+    inline virtual bool is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType ty) {
         return PyAttr::is_allowed(dev, ty);
     }
 
@@ -347,8 +323,7 @@ public:
      * @param[in] dev The device on which the attribute has to be read
      * @param[in, out] att the attribute
      */
-    inline virtual void read(Tango::DeviceImpl *dev, Tango::Attribute &att)
-    {
+    inline virtual void read(Tango::DeviceImpl *dev, Tango::Attribute &att) {
         return PyAttr::read(dev, att);
     }
 
@@ -358,8 +333,7 @@ public:
      * @param[in] dev The device on which the attribute has to be written
      * @param[in, out] att the attribute
      */
-    virtual void write(Tango::DeviceImpl *dev, Tango::WAttribute &att)
-    {
+    virtual void write(Tango::DeviceImpl *dev, Tango::WAttribute &att) {
         return PyAttr::write(dev, att);
     }
 };

@@ -11,8 +11,10 @@
 
 #pragma once
 
-#include <boost/python.hpp>
 #include <tango.h>
+#include <pybind11/pybind11.h>
+
+namespace py = pybind11;
 
 /**
  * Translates a seq<DevError> into a C++ DevErrorList
@@ -55,10 +57,10 @@ void throw_python_generic_exception(PyObject *type=NULL, PyObject *value=NULL,
  *
  * @param[in] eas the boost python exception description (currently not used)
  */
-void handle_python_exception(boost::python::error_already_set &eas);
+void handle_python_exception(py::error_already_set &eas);
 
 #define SAFE_CATCH_REPORT(meth_name) \
-    catch(boost::python::error_already_set &) \
+    catch(py::error_already_set &) \
     { \
         std::cerr << "PyTango generated an unexpected python exception in " \
                   << meth_name << "." << std::endl \
@@ -82,7 +84,7 @@ void handle_python_exception(boost::python::error_already_set &eas);
     }
 
 #define SAFE_CATCH_INFORM(meth_name) \
-    catch(boost::python::error_already_set &) \
+    catch(py::error_already_set &) \
     { \
         std::cerr << meth_name << " generated the following python exception:" << std::endl; \
         PyErr_Print(); \

@@ -12,16 +12,17 @@
 #ifndef _DEVICE_IMPL_H
 #define _DEVICE_IMPL_H
 
-#include <boost/python.hpp>
 #include <tango.h>
-
+#include <pybind11/pybind11.h>
 #include "server/device_class.h"
+
+namespace py = pybind11;
 
 /**
  * A wrapper around the Tango::DeviceImpl class
  */
-class DeviceImplWrap : public Tango::DeviceImpl,
-                       public boost::python::wrapper<Tango::DeviceImpl>
+class DeviceImplWrap : public Tango::DeviceImpl
+//                       public boost::python::wrapper<Tango::DeviceImpl>
 {
 public:
     /** a reference to itself */
@@ -75,8 +76,8 @@ public:
 /**
  * A wrapper around the Tango::Device_2Impl class
  */
-class Device_2ImplWrap : public Tango::Device_2Impl,
-                         public boost::python::wrapper<Tango::Device_2Impl>
+class Device_2ImplWrap : public Tango::Device_2Impl
+//                         public boost::python::wrapper<Tango::Device_2Impl>
 {
 public:
     /** a reference to itself */
@@ -137,8 +138,8 @@ public:
  * A wrapper around the Tango::Device_3Impl class
  */
 class Device_3ImplWrap : public Tango::Device_3Impl,
-                         public PyDeviceImplBase,
-                         public boost::python::wrapper<Tango::Device_3Impl>
+                         public PyDeviceImplBase
+//                         public boost::python::wrapper<Tango::Device_3Impl>
 {
 public:
     /**
@@ -264,8 +265,8 @@ protected:
  * Device_4ImplWrap is the class used to represent a Python Tango device.
  */
 class Device_4ImplWrap : public Tango::Device_4Impl,
-                         public PyDeviceImplBase,
-                         public boost::python::wrapper<Tango::Device_4Impl>
+                         public PyDeviceImplBase
+//                         public boost::python::wrapper<Tango::Device_4Impl>
 {
 public:
     /**
@@ -391,8 +392,8 @@ protected:
  * Device_5ImplWrap is the class used to represent a Python Tango device.
  */
 class Device_5ImplWrap : public Tango::Device_5Impl,
-                         public PyDeviceImplBase,
-                         public boost::python::wrapper<Tango::Device_5Impl>
+                         public PyDeviceImplBase
+//                         public boost::python::wrapper<Tango::Device_5Impl>
 {
 public:
     /**

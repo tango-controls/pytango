@@ -9,73 +9,73 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
+#include <pybind11/pybind11.h>
 #include "defs.h"
 #include "pyutils.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 
-bopy::object from_char_to_str2(const std::string& in, 
-                               const char* encoding /*=NULL defaults to latin-1 */,
-                               const char* errors /*="strict" */)
-{
-    return from_char_to_str2(in.c_str(), in.size(), encoding, errors);
-}
+//py::object from_char_to_str2(const std::string& in,
+//                               const char* encoding /*=NULL defaults to latin-1 */,
+//                               const char* errors /*="strict" */)
+//{
+//    return from_char_to_str2(in.c_str(), in.size(), encoding, errors);
+//}
+//
+//py::object from_char_to_str2(const char* in, Py_ssize_t size /* =-1 */,
+//                               const char* encoding /*=NULL defaults to latin-1 */,
+//                               const char* errors /*="strict" */)
+//{
+//    return py::object(bopy::handle<>(from_char_to_str(in, size, encoding, errors)));
+//}
+//
+//PyObject* from_char_to_str(const std::string& in,
+//                           const char* encoding /*=NULL defaults to latin-1 */,
+//                           const char* errors /*="strict" */)
+//{
+//    return from_char_to_str(in.c_str(), in.size(), encoding, errors);
+//}
+//
+//PyObject* from_char_to_str(const char* in, Py_ssize_t size /* =-1 */,
+//                           const char* encoding /*=NULL defaults to latin-1 */,
+//                           const char* errors /*="strict" */)
+//{
+//if (size < 0)
+//{
+//    size = strlen(in);
+//}
+//#ifdef PYTANGO_PY3K
+//    if (!encoding)
+//    {
+//        return PyUnicode_DecodeLatin1(in, size, errors);
+//    }
+//    else
+//    {
+//        return PyUnicode_Decode(in, size, encoding, errors);
+//    }
+//#else
+//    return PyString_FromStringAndSize(in, size);
+//#endif
+//}
+//
+//void from_str_to_char(PyObject* in, std::string& out)
+//{
+//    if (PyUnicode_Check(in))
+//    {
+//        PyObject *bytes_in = PyUnicode_AsLatin1String(in);
+//        out = PyBytes_AsString(bytes_in);
+//        Py_DECREF(bytes_in);
+//    }
+//    else
+//    {
+//        out = std::string(PyBytes_AsString(in), PyBytes_Size(in));
+//    }
+//}
 
-bopy::object from_char_to_str2(const char* in, Py_ssize_t size /* =-1 */, 
-                               const char* encoding /*=NULL defaults to latin-1 */,
-                               const char* errors /*="strict" */)
-{
-    return bopy::object(bopy::handle<>(from_char_to_str(in, size, encoding, errors)));
-}
-
-PyObject* from_char_to_str(const std::string& in, 
-                           const char* encoding /*=NULL defaults to latin-1 */,
-                           const char* errors /*="strict" */)
-{
-    return from_char_to_str(in.c_str(), in.size(), encoding, errors);
-}
-
-PyObject* from_char_to_str(const char* in, Py_ssize_t size /* =-1 */, 
-                           const char* encoding /*=NULL defaults to latin-1 */,
-                           const char* errors /*="strict" */)
-{
-if (size < 0)
-{
-    size = strlen(in);
-}
-#ifdef PYTANGO_PY3K
-    if (!encoding)
-    {
-        return PyUnicode_DecodeLatin1(in, size, errors);
-    }
-    else
-    {   
-        return PyUnicode_Decode(in, size, encoding, errors);
-    }
-#else
-    return PyString_FromStringAndSize(in, size);
-#endif
-}
-
-void from_str_to_char(PyObject* in, std::string& out)
-{
-    if (PyUnicode_Check(in))
-    {
-        PyObject *bytes_in = PyUnicode_AsLatin1String(in);
-        out = PyBytes_AsString(bytes_in);
-        Py_DECREF(bytes_in);
-    }
-    else 
-    {
-        out = std::string(PyBytes_AsString(in), PyBytes_Size(in));
-    }
-}
-
-bool is_method_defined(object &obj, const std::string &method_name)
-{
-    return is_method_defined(obj.ptr(), method_name);
-}
+//bool is_method_defined(object &obj, const std::string &method_name)
+//{
+//    return is_method_defined(obj.ptr(), method_name);
+//}
 
 bool is_method_defined(PyObject *obj, const std::string &method_name)
 {
@@ -84,11 +84,11 @@ bool is_method_defined(PyObject *obj, const std::string &method_name)
     return exists && is_method;
 }
 
-void is_method_defined(object &obj, const std::string &method_name,
-                       bool &exists, bool &is_method)
-{
-    is_method_defined(obj.ptr(), method_name, exists, is_method);
-}
+//void is_method_defined(object &obj, const std::string &method_name,
+//                       bool &exists, bool &is_method)
+//{
+//    is_method_defined(obj.ptr(), method_name, exists, is_method);
+//}
 
 void is_method_defined(PyObject *obj, const std::string &method_name,
                        bool &exists, bool &is_method)
@@ -182,7 +182,7 @@ EXIT:
 
 #endif
 
-bool hasattr(boost::python::object& obj, const std::string& name)
+bool hasattr(py::object& obj, const std::string& name)
 {
     return PyObject_HasAttrString(obj.ptr(), name.c_str());
 }

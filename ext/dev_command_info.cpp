@@ -9,22 +9,19 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_dev_command_info()
-{
+void export_dev_command_info(py::module &m) {
     typedef Tango::CmdArgType Tango::_DevCommandInfo::* MemCmdArgType;
 
-    class_<Tango::DevCommandInfo>("DevCommandInfo")
+    py::class_<Tango::DevCommandInfo>(m, "DevCommandInfo")
         .def_readonly("cmd_name", &Tango::DevCommandInfo::cmd_name)
         .def_readonly("cmd_tag", &Tango::DevCommandInfo::cmd_tag)
-        .def_readonly("in_type",
-                reinterpret_cast<MemCmdArgType>(&Tango::DevCommandInfo::in_type))
-        .def_readonly("out_type",
-                reinterpret_cast<MemCmdArgType>(&Tango::DevCommandInfo::out_type))
+        .def_readonly("in_type", reinterpret_cast<MemCmdArgType>(&Tango::DevCommandInfo::in_type))
+        .def_readonly("out_type", reinterpret_cast<MemCmdArgType>(&Tango::DevCommandInfo::out_type))
         .def_readonly("in_type_desc", &Tango::DevCommandInfo::in_type_desc)
         .def_readonly("out_type_desc", &Tango::DevCommandInfo::out_type_desc)
     ;

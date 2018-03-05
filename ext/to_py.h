@@ -11,24 +11,25 @@
 
 #pragma once
 
-#include <boost/python.hpp>
 #include <tango.h>
-
-#include "defs.h"
+#include <pybind11/pybind11.h>
+#include <defs.h>
 #include "pyutils.h"
+
+namespace py = pybind11;
 
 struct DevEncoded_to_tuple
 {
-    static inline PyObject* convert(Tango::DevEncoded const& a)
-    {
-        boost::python::str encoded_format(a.encoded_format);
-        bopy::object encoded_data = bopy::object(
-            bopy::handle<>(PyBytes_FromStringAndSize(
-                (const char*)a.encoded_data.get_buffer(),
-                (Py_ssize_t)a.encoded_data.length())));
-        boost::python::object result = boost::python::make_tuple(encoded_format, encoded_data);
-        return boost::python::incref(result.ptr());
-    }
+//    static inline PyObject* convert(Tango::DevEncoded const& a)
+//    {
+//        py::str encoded_format(a.encoded_format);
+//        py::object encoded_data = py::object(
+//            py::handle<>(PyBytes_FromStringAndSize(
+//                (const char*)a.encoded_data.get_buffer(),
+//                (Py_ssize_t)a.encoded_data.length())));
+//        py::object result = py::make_tuple(encoded_format, encoded_data);
+//        return resultinc_ref().ptr();
+//    }
 
     static const PyTypeObject* get_pytype() { return &PyTuple_Type; }
 };
@@ -38,13 +39,13 @@ struct to_list
 {
     static inline PyObject* convert(ContainerType const& a)
     {
-        boost::python::list result;
+        py::list result;
         typedef typename ContainerType::const_iterator const_iter;
         for(const_iter it = a.begin(); it != a.end(); it++)
         {
-            result.append(boost::python::object(*it));
+            result.append(py::object(*it));
         }
-        return boost::python::incref(result.ptr());
+        return result.inc_ref().ptr();
     }
 
     static const PyTypeObject* get_pytype() { return &PyList_Type; }
@@ -60,7 +61,7 @@ struct to_tuple
         int32_t i = 0;
         for(const_iter it = a.begin(); it != a.end(); ++it, ++i)
         {
-            PyTuple_SetItem(t, i, boost::python::incref(it->ptr()));
+            PyTuple_SetItem(t, i, it->ptr().inc_ref());
         }
         return t;
     }
@@ -77,8 +78,8 @@ struct CORBA_sequence_to_tuple
         PyObject *t = PyTuple_New(size);
         for(unsigned long i=0; i < size; ++i)
         {
-            boost::python::object x(a[i]);
-            PyTuple_SetItem(t, i, boost::python::incref(x.ptr()));
+            py::object x = py::cast(a[i]);
+            PyTuple_SetItem(t, i, x.inc_ref().ptr());
         }
         return t;
     }
@@ -96,8 +97,8 @@ struct CORBA_sequence_to_tuple<Tango::DevVarStringArray>
         for(unsigned long i=0; i < size; ++i)
         {
             
-            boost::python::str x(a[i].in());
-            PyTuple_SetItem(t, i, boost::python::incref(x.ptr()));
+            py::str x(a[i].in());
+            PyTuple_SetItem(t, i, x.inc_ref().ptr());
         }
         return t;
     }
@@ -117,14 +118,14 @@ struct CORBA_sequence_to_tuple<Tango::DevVarLongStringArray>
 
         for(unsigned long i=0; i < lsize; ++i)
         {
-            boost::python::object x(a.lvalue[i]);
-            PyTuple_SetItem(lt, i, boost::python::incref(x.ptr()));
+            py::object x = py::cast(a.lvalue[i]);
+            PyTuple_SetItem(lt, i, x.inc_ref().ptr());
         }
 
         for(unsigned long i=0; i < ssize; ++i)
         {
-            boost::python::str x(a.svalue[i].in());
-            PyTuple_SetItem(st, i, boost::python::incref(x.ptr()));
+            py::str x(a.svalue[i].in());
+            PyTuple_SetItem(st, i, x.inc_ref().ptr());
         }
         PyObject *t = PyTuple_New(2);
         PyTuple_SetItem(t, 0, lt);
@@ -147,14 +148,14 @@ struct CORBA_sequence_to_tuple<Tango::DevVarDoubleStringArray>
 
         for(unsigned long i=0; i < dsize; ++i)
         {
-            boost::python::object x(a.dvalue[i]);
-            PyTuple_SetItem(dt, i, boost::python::incref(x.ptr()));
+            py::object x = py::cast(a.dvalue[i]);
+            PyTuple_SetItem(dt, i, x.inc_ref().ptr());
         }
 
         for(unsigned long i=0; i < ssize; ++i)
         {
-            boost::python::str x(a.svalue[i].in());
-            PyTuple_SetItem(st, i, boost::python::incref(x.ptr()));
+            py::str x(a.svalue[i].in());
+            PyTuple_SetItem(st, i, x.inc_ref().ptr());
         }
         PyObject *t = PyTuple_New(2);
         PyTuple_SetItem(t, 0, dt);
@@ -171,12 +172,12 @@ struct CORBA_sequence_to_list
     static PyObject* convert(CorbaContainerType const& a)
     {
         unsigned long size = a.length();
-        boost::python::list ret;
+        py::list ret;
         for(unsigned long i=0; i < size; ++i)
         {
             ret.append(a[i]);
         }
-        return boost::python::incref(ret.ptr());
+        return ret.inc_ref().ptr();
     }
 
     static const PyTypeObject* get_pytype() { return &PyList_Type; }
@@ -185,10 +186,10 @@ struct CORBA_sequence_to_list
 template<>
 struct CORBA_sequence_to_list<Tango::DevVarStringArray>
 {
-    static boost::python::list to_list(Tango::DevVarStringArray const& a)
+    static py::list to_list(Tango::DevVarStringArray const& a)
     {
         unsigned long size = a.length();
-        boost::python::list ret;
+        py::list ret;
         for(unsigned long i=0; i < size; ++i)
         {
             ret.append(a[i].in());
@@ -198,7 +199,7 @@ struct CORBA_sequence_to_list<Tango::DevVarStringArray>
     
     static PyObject* convert(Tango::DevVarStringArray const& a)
     {
-        return boost::python::incref(to_list(a).ptr());
+        return to_list(a).inc_ref().ptr();
     }
 
     static const PyTypeObject* get_pytype() { return &PyList_Type; }
@@ -212,7 +213,7 @@ struct CORBA_sequence_to_list<Tango::DevVarLongStringArray>
         unsigned long lsize = a.lvalue.length();
         unsigned long ssize = a.svalue.length();
         
-        boost::python::list ret, lt, st;
+        py::list ret, lt, st;
         for(unsigned long i=0; i < lsize; ++i)
         {
             lt.append(a.lvalue[i]);
@@ -226,7 +227,7 @@ struct CORBA_sequence_to_list<Tango::DevVarLongStringArray>
         ret.append(lt);
         ret.append(st);
         
-        return boost::python::incref(ret.ptr());
+        return ret.inc_ref().ptr();
     }
 
     static const PyTypeObject* get_pytype() { return &PyList_Type; }
@@ -240,7 +241,7 @@ struct CORBA_sequence_to_list <Tango::DevVarDoubleStringArray>
         unsigned long dsize = a.dvalue.length();
         unsigned long ssize = a.svalue.length();
         
-        boost::python::list ret, dt, st;
+        py::list ret, dt, st;
         for(unsigned long i=0; i < dsize; ++i)
         {
             dt.append(a.dvalue[i]);
@@ -250,11 +251,11 @@ struct CORBA_sequence_to_list <Tango::DevVarDoubleStringArray>
         {
             st.append(a.svalue[i]);
         }
-        
+
         ret.append(dt);
         ret.append(st);
         
-        return boost::python::incref(ret.ptr());
+        return ret.inc_ref().ptr();
     }
 
     static const PyTypeObject* get_pytype() { return &PyList_Type; }
@@ -310,74 +311,71 @@ struct char_ptr_to_str
     //static const PyTypeObject* get_pytype() { return &PyBytes_Type; }
 };
 
-boost::python::object to_py(const Tango::AttributeAlarm &);
-boost::python::object to_py(const Tango::ChangeEventProp &);
-boost::python::object to_py(const Tango::PeriodicEventProp &);
-boost::python::object to_py(const Tango::ArchiveEventProp &);
-boost::python::object to_py(const Tango::EventProperties &);
+py::object to_py(const Tango::AttributeAlarm &);
+py::object to_py(const Tango::ChangeEventProp &);
+py::object to_py(const Tango::PeriodicEventProp &);
+py::object to_py(const Tango::ArchiveEventProp &);
+py::object to_py(const Tango::EventProperties &);
 
-template<typename T>
-void to_py(Tango::MultiAttrProp<T> &multi_attr_prop, boost::python::object &py_multi_attr_prop)
-{
-    if(py_multi_attr_prop.ptr() == Py_None)
-    {
-        PYTANGO_MOD
-        py_multi_attr_prop = pytango.attr("MultiAttrProp")();
-    }
+//template<typename T>
+//void to_py(Tango::MultiAttrProp<T> &multi_attr_prop, py::object &py_multi_attr_prop)
+//{
+//    if(py_multi_attr_prop.ptr() == Py_None)
+//    {
+////gm        PYTANGO_MOD
+//        py_multi_attr_prop = pytango.attr("MultiAttrProp")();
+//    }
+//
+//    py_multi_attr_prop.attr("label") = multi_attr_prop.label;
+//    py_multi_attr_prop.attr("description") = multi_attr_prop.description;
+//    py_multi_attr_prop.attr("unit") = multi_attr_prop.unit;
+//    py_multi_attr_prop.attr("standard_unit") = multi_attr_prop.standard_unit;
+//    py_multi_attr_prop.attr("display_unit") = multi_attr_prop.display_unit;
+//    py_multi_attr_prop.attr("format") = multi_attr_prop.format;
+//    py_multi_attr_prop.attr("min_value") = multi_attr_prop.min_value.get_str();
+//    py_multi_attr_prop.attr("max_value") = multi_attr_prop.max_value.get_str();
+//    py_multi_attr_prop.attr("min_alarm") = multi_attr_prop.min_alarm.get_str();
+//    py_multi_attr_prop.attr("max_alarm") = multi_attr_prop.max_alarm.get_str();
+//    py_multi_attr_prop.attr("min_warning") = multi_attr_prop.min_warning.get_str();
+//    py_multi_attr_prop.attr("max_warning") = multi_attr_prop.max_warning.get_str();
+//    py_multi_attr_prop.attr("delta_t") = multi_attr_prop.delta_t.get_str();
+//    py_multi_attr_prop.attr("delta_val") = multi_attr_prop.delta_val.get_str();
+//    py_multi_attr_prop.attr("event_period") = multi_attr_prop.event_period.get_str();
+//    py_multi_attr_prop.attr("archive_period") = multi_attr_prop.archive_period.get_str();
+//    py_multi_attr_prop.attr("rel_change") = multi_attr_prop.rel_change.get_str();
+//    py_multi_attr_prop.attr("abs_change") = multi_attr_prop.abs_change.get_str();
+//    py_multi_attr_prop.attr("archive_rel_change") = multi_attr_prop.archive_rel_change.get_str();
+//    py_multi_attr_prop.attr("archive_abs_change") = multi_attr_prop.archive_abs_change.get_str();
+//}
 
-    py_multi_attr_prop.attr("label") = multi_attr_prop.label;
-    py_multi_attr_prop.attr("description") = multi_attr_prop.description;
-    py_multi_attr_prop.attr("unit") = multi_attr_prop.unit;
-    py_multi_attr_prop.attr("standard_unit") = multi_attr_prop.standard_unit;
-    py_multi_attr_prop.attr("display_unit") = multi_attr_prop.display_unit;
-    py_multi_attr_prop.attr("format") = multi_attr_prop.format;
-    py_multi_attr_prop.attr("min_value") = multi_attr_prop.min_value.get_str();
-    py_multi_attr_prop.attr("max_value") = multi_attr_prop.max_value.get_str();
-    py_multi_attr_prop.attr("min_alarm") = multi_attr_prop.min_alarm.get_str();
-    py_multi_attr_prop.attr("max_alarm") = multi_attr_prop.max_alarm.get_str();
-    py_multi_attr_prop.attr("min_warning") = multi_attr_prop.min_warning.get_str();
-    py_multi_attr_prop.attr("max_warning") = multi_attr_prop.max_warning.get_str();
-    py_multi_attr_prop.attr("delta_t") = multi_attr_prop.delta_t.get_str();
-    py_multi_attr_prop.attr("delta_val") = multi_attr_prop.delta_val.get_str();
-    py_multi_attr_prop.attr("event_period") = multi_attr_prop.event_period.get_str();
-    py_multi_attr_prop.attr("archive_period") = multi_attr_prop.archive_period.get_str();
-    py_multi_attr_prop.attr("rel_change") = multi_attr_prop.rel_change.get_str();
-    py_multi_attr_prop.attr("abs_change") = multi_attr_prop.abs_change.get_str();
-    py_multi_attr_prop.attr("archive_rel_change") = multi_attr_prop.archive_rel_change.get_str();
-    py_multi_attr_prop.attr("archive_abs_change") = multi_attr_prop.archive_abs_change.get_str();
-}
+py::object to_py(const Tango::AttributeConfig &,
+                            py::object py_attr_conf);
+py::object to_py(const Tango::AttributeConfig_2 &,
+                            py::object py_attr_conf);
+py::object to_py(const Tango::AttributeConfig_3 &,
+                            py::object py_attr_conf);
+py::object to_py(const Tango::AttributeConfig_5 &,
+                            py::object py_attr_conf);
 
-boost::python::object to_py(const Tango::AttributeConfig &, 
-                            boost::python::object py_attr_conf);
-boost::python::object to_py(const Tango::AttributeConfig_2 &,
-                            boost::python::object py_attr_conf);
-boost::python::object to_py(const Tango::AttributeConfig_3 &,
-                            boost::python::object py_attr_conf);
-boost::python::object to_py(const Tango::AttributeConfig_5 &,
-                            boost::python::object py_attr_conf);
+py::list to_py(const Tango::AttributeConfigList &);
+py::list to_py(const Tango::AttributeConfigList_2 &);
+py::list to_py(const Tango::AttributeConfigList_3 &);
+py::list to_py(const Tango::AttributeConfigList_5 &);
 
-boost::python::list to_py(const Tango::AttributeConfigList &);
-boost::python::list to_py(const Tango::AttributeConfigList_2 &);
-boost::python::list to_py(const Tango::AttributeConfigList_3 &);
-boost::python::list to_py(const Tango::AttributeConfigList_5 &);
+py::object to_py(const Tango::PipeConfig &, py::object);
 
-boost::python::object to_py(const Tango::PipeConfig &,
-                            boost::python::object);
-
-boost::python::object to_py(const Tango::PipeConfigList &,
-                            boost::python::object);
+py::object to_py(const Tango::PipeConfigList &, py::object);
 
 template<class T>
-inline boost::python::object to_py_list(const T *seq)
+inline py::object to_py_list(const T *seq)
 {
-    using namespace boost::python;
-    return object(handle<>(CORBA_sequence_to_list<T>::convert(*seq)));
+//    return py::object(handle(CORBA_sequence_to_list<T>::convert(*seq)));
+    return py::cast(CORBA_sequence_to_list<T>::convert(*seq));
 }
 
 template<class T>
-inline boost::python::object to_py_tuple(const T *seq)
+inline py::object to_py_tuple(const T *seq)
 {
-    using namespace boost::python;
-    return object(handle<>(CORBA_sequence_to_tuple<T>::convert(*seq)));
+    return py::cast(CORBA_sequence_to_tuple<T>::convert(*seq));
 }
 

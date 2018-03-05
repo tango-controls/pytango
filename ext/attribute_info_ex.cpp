@@ -9,22 +9,62 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_attribute_info_ex()
-{
-    class_<Tango::AttributeInfoEx, bases<Tango::AttributeInfo> >
-        ("AttributeInfoEx")
-        .def(init<const Tango::AttributeInfoEx&>())
-        .enable_pickling()
-	.def_readwrite("root_attr_name",  &Tango::AttributeInfoEx::root_attr_name)
-	.def_readwrite("memorized",  &Tango::AttributeInfoEx::memorized)
-	.def_readwrite("enum_labels",  &Tango::AttributeInfoEx::enum_labels)
+void export_attribute_info_ex(py::module &m) {
+    py::class_<Tango::AttributeInfoEx, Tango::AttributeInfo>(m, "AttributeInfoEx")
+        .def(py::init<const Tango::AttributeInfoEx&>())
+        .def_readwrite("root_attr_name", &Tango::AttributeInfoEx::root_attr_name)
+        .def_readwrite("memorized", &Tango::AttributeInfoEx::memorized)
+        .def_readwrite("enum_labels", &Tango::AttributeInfoEx::enum_labels)
+
+        .def_property("enum_labels", [](Tango::AttributeInfoEx& self) -> py::list {
+            py::list py_list;
+            for(auto& item : self.enum_labels)
+                py_list.append(item);
+            return py_list;
+        },[](Tango::AttributeInfoEx& self, py::list py_list) -> void {
+            for(auto& item : py_list)
+                self.enum_labels.push_back(item.cast<std::string>());
+        })
+
         .def_readwrite("alarms", &Tango::AttributeInfoEx::alarms)
         .def_readwrite("events", &Tango::AttributeInfoEx::events)
-        .def_readwrite("sys_extensions", &Tango::AttributeInfoEx::sys_extensions)
+
+        .def_property("sys_extensions", [](Tango::AttributeInfoEx& self) -> py::list {
+            py::list py_list;
+            for(auto& item : self.sys_extensions)
+                py_list.append(item);
+            return py_list;
+        },[](Tango::AttributeInfoEx& self, py::list py_list) -> void {
+            for(auto& item : py_list)
+                self.sys_extensions.push_back(item.cast<std::string>());
+        })
+
+        .def(py::pickle(
+            [](const Tango::AttributeInfoEx &p) { //__getstate__
+                return py::make_tuple(p.root_attr_name,
+                    p.memorized,
+                    p.enum_labels,
+                    p.alarms,
+                    p.events,
+                    p.sys_extensions);
+            },
+            [](py::tuple t) { //__setstate__
+                if (t.size() != 6)
+                    throw std::runtime_error("Invalid state!");
+                Tango::AttributeInfoEx p = Tango::AttributeInfoEx();
+                p.root_attr_name = t[0].cast<std::string>();
+                p.memorized = t[1].cast<Tango::AttrMemorizedType>();
+                p.enum_labels = t[2].cast<std::vector<std::string>>();
+                p.alarms = t[3].cast<Tango::AttributeAlarmInfo>();
+                p.events = t[4].cast<Tango::AttributeEventInfo>();
+                p.sys_extensions = t[5].cast<std::vector<std::string>>();
+                return p;
+            }
+        ));
     ;
 }

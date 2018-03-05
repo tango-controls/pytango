@@ -9,23 +9,26 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
-#include "pytgutils.h"
+#include <tango.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_multi_class_attribute()
-{
-    Tango::Attr& (Tango::MultiClassAttribute::*get_attr_)(std::string &) =
-        &Tango::MultiClassAttribute::get_attr;
+void export_multi_class_attribute(py::module& m) {
+//, boost::noncopyable
+    py::class_<Tango::MultiClassAttribute>(m, "MultiClassAttribute")
 
-    class_<Tango::MultiClassAttribute, boost::noncopyable>("MultiClassAttribute", no_init)
-        .def("get_attr",
-            (Tango::Attr& (Tango::MultiClassAttribute::*) (const std::string &))
-            get_attr_,
-            return_value_policy<reference_existing_object>())
-	.def("remove_attr", &Tango::MultiClassAttribute::remove_attr)
-        .def("get_attr_list", &Tango::MultiClassAttribute::get_attr_list,
-            return_value_policy<reference_existing_object>())
+        .def("get_attr", [](Tango::MultiClassAttribute& self, std::string & attr_name) -> Tango::Attr& {
+            return self.get_attr(attr_name);
+        }, py::return_value_policy::reference)
+
+        .def("remove_attr", [](Tango::MultiClassAttribute& self, const string &attr_name, const string &cl_name) -> void {
+            self.remove_attr(attr_name, cl_name);
+        })
+
+        .def("get_attr_list", [](Tango::MultiClassAttribute& self) -> std::vector<Tango::Attr *>& {
+            return self.get_attr_list();
+        }, py::return_value_policy::reference)
     ;
 }

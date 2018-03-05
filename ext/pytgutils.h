@@ -9,16 +9,10 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#pragma once
-
-#include <boost/python.hpp>
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-#include "defs.h"
-#include "pyutils.h"
-#include "from_py.h"
-#include "to_py.h"
-#include "tgutils.h"
+namespace py = pybind11;
 
 /// Get the python Global Interpret Lock
 class AutoPythonGIL
@@ -45,10 +39,13 @@ public:
     inline AutoPythonGIL(bool safe=true) 
     { 
         if (safe) check_python();
-        m_gstate = PyGILState_Ensure(); 
+            // Acquire GIL before calling Python code
+            py::gil_scoped_acquire acquire;
     }
     
-    inline ~AutoPythonGIL() { PyGILState_Release(m_gstate); }
+    inline ~AutoPythonGIL() {
+        py::gil_scoped_release release;
+    }
     
 };
 

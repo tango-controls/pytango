@@ -9,23 +9,19 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_device_data_history()
-{
-    class_<Tango::DeviceDataHistory, bases<Tango::DeviceData> >
-            DeviceDataHistory("DeviceDataHistory", init<>());
-
-    DeviceDataHistory
-        .def(init<const Tango::DeviceDataHistory &>())
-
+void export_device_data_history(py::module &m) {
+    py::class_<Tango::DeviceDataHistory, Tango::DeviceData>(m, "DeviceDataHistory")
+        .def(py::init<>())
+        .def(py::init<const Tango::DeviceDataHistory &>())
         .def("has_failed", &Tango::DeviceDataHistory::has_failed)
         .def("get_date", &Tango::DeviceDataHistory::get_date,
-            return_internal_reference<>())
+            py::return_value_policy::reference)
         .def("get_err_stack", &Tango::DeviceDataHistory::get_err_stack,
-            return_value_policy<copy_const_reference>())
+            py::return_value_policy::copy)
     ;
 }

@@ -9,17 +9,16 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_user_default_pipe_prop()
-{
-    class_<Tango::UserDefaultPipeProp, boost::noncopyable>("UserDefaultPipeProp")
+void export_user_default_pipe_prop(py::module &m) {
+    // TODO boost::noncopyable
+    py::class_<Tango::UserDefaultPipeProp>(m, "UserDefaultPipeProp")
         .def("set_label", &Tango::UserDefaultPipeProp::set_label)
         .def("set_description", &Tango::UserDefaultPipeProp::set_description)
     ;
-
 }
 

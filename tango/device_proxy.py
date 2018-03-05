@@ -18,8 +18,9 @@ import collections
 
 from ._tango import StdStringVector, DbData, DbDatum, AttributeInfo
 from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
-from ._tango import DeviceProxy, __CallBackAutoDie, __CallBackPushEvent
-from ._tango import EventType, DevFailed, Except, ExtractAs, GreenMode
+from ._tango import DeviceProxy #, __CallBackAutoDie, __CallBackPushEvent
+#from ._tango import EventType, DevFailed, Except
+from ._tango import ExtractAs, GreenMode
 from ._tango import PipeInfo, PipeInfoList, constants
 from ._tango import CmdArgType, DevState
 
@@ -130,7 +131,7 @@ def __check_read_pipe(dev_pipe):
 def __init_device_proxy_internals(proxy):
     if proxy.__dict__.get('_initialized', False):
         return
-    executors = dict((key, None) for key in GreenMode.names)
+    executors = dict((key, None) for key in GreenMode.__members__)
     proxy.__dict__['_green_mode'] = None
     proxy.__dict__['_initialized'] = True
     proxy.__dict__['_executors'] = executors
@@ -499,10 +500,9 @@ def __DeviceProxy__write_read_attribute(self, attr_name, value,
 
 
 def __DeviceProxy__write_read_attributes(self, name_val,
-                                         attr_read_names,
+                                         attr_read_names=None,
                                          extract_as=ExtractAs.Numpy):
-    return self._write_read_attributes(name_val, attr_read_names,
-                                       extract_as)
+    return self._write_read_attributes(name_val, extract_as)
 
 
 def __DeviceProxy__get_property(self, propname, value=None):
@@ -538,37 +538,39 @@ def __DeviceProxy__get_property(self, propname, value=None):
                      DevFailed from database device
     """
 
-    if is_pure_str(propname) or isinstance(propname, StdStringVector):
-        new_value = value
-        if new_value is None:
-            new_value = DbData()
-        self._get_property(propname, new_value)
-        return DbData_2_dict(new_value)
+    if is_pure_str(propname): # or isinstance(propname, StdStringVector):
+#        new_value = value
+#        if new_value is None:
+#            new_value = DbData()
+        db_data = self._get_property(propname) #, new_value)
+        return DbData_2_dict(db_data)
     elif isinstance(propname, DbDatum):
-        new_value = DbData()
+        new_value = list()
         new_value.append(propname)
-        self._get_property(new_value)
-        return DbData_2_dict(new_value)
+        db_data = self._get_property(new_value)
+        return DbData_2_dict(db_data)
     elif isinstance(propname, collections.Sequence):
-        if isinstance(propname, DbData):
-            self._get_property(propname)
-            return DbData_2_dict(propname)
+        if isinstance(propname, list):
+            db_data = self._get_property(propname)
+            return DbData_2_dict(db_data)
 
         if is_pure_str(propname[0]):
-            new_propname = StdStringVector()
-            for i in propname:
-                new_propname.append(i)
-            new_value = value
-            if new_value is None:
-                new_value = DbData()
-            self._get_property(new_propname, new_value)
-            return DbData_2_dict(new_value)
-        elif isinstance(propname[0], DbDatum):
-            new_value = DbData()
-            for i in propname:
-                new_value.append(i)
-            self._get_property(new_value)
-            return DbData_2_dict(new_value)
+            db_data = self._get_property(propname) #, new_value)
+            return DbData_2_dict(db_data)
+#             new_propname = StdStringVector()
+#             for i in propname:
+#                 new_propname.append(i)
+#             new_value = value
+#             if new_value is None:
+#                 new_value = DbData()
+#             self._get_property(new_propname, new_value)
+#             return DbData_2_dict(new_value)
+#         elif isinstance(propname[0], DbDatum):
+#             new_value = list()
+#             for i in propname:
+#                 new_value.append(i)
+#             db_data = self._get_property(new_value)
+#             return DbData_2_dict(db_data)
 
 
 def __DeviceProxy__put_property(self, value):
@@ -601,20 +603,20 @@ def __DeviceProxy__put_property(self, value):
     if isinstance(value, DbData):
         pass
     elif isinstance(value, DbDatum):
-        new_value = DbData()
+        new_value = list()
         new_value.append(value)
         value = new_value
     elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
     elif isinstance(value, collections.Mapping):
-        new_value = DbData()
+        new_value = list()
         for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
                 continue
             db_datum = DbDatum(k)
             if is_non_str_seq(v):
-                seq_2_StdStringVector(v, db_datum.value_string)
+                db_datum.value_string = v
             else:
                 db_datum.value_string.append(str(v))
             new_value.append(db_datum)
@@ -657,21 +659,20 @@ def __DeviceProxy__delete_property(self, value):
         Throws     : ConnectionFailed, CommunicationFailed
                     DevFailed from device (DB_SQLError)
     """
-    if isinstance(value, DbData) or isinstance(value, StdStringVector) or \
-            is_pure_str(value):
+    if isinstance(value, DbData) or is_pure_str(value):  # or isinstance(value, StdStringVector)
         new_value = value
     elif isinstance(value, DbDatum):
-        new_value = DbData()
+        new_value = list()
         new_value.append(value)
     elif isinstance(value, collections.Sequence):
-        new_value = DbData()
+        new_value = list()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
     elif isinstance(value, collections.Mapping):
-        new_value = DbData()
+        new_value = list()
         for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
@@ -711,21 +712,25 @@ def __DeviceProxy__get_property_list(self, filter, array=None):
         New in PyTango 7.0.0
     """
 
+#     if array is None:
+#         new_array = StdStringVector()
+#         self._get_property_list(filter, new_array)
+#         return new_array
+# 
+#     if isinstance(array, StdStringVector):
+#         self._get_property_list(filter, array)
+#         return array
+#     elif isinstance(array, collections.Sequence):
+#         new_array = StdStringVector()
+#         self._get_property_list(filter, new_array)
+#         StdStringVector_2_seq(new_array, array)
+#         return array
     if array is None:
-        new_array = StdStringVector()
-        self._get_property_list(filter, new_array)
-        return new_array
+        array = list()
+    return self._get_property_list(filter, array)
+#    return array
 
-    if isinstance(array, StdStringVector):
-        self._get_property_list(filter, array)
-        return array
-    elif isinstance(array, collections.Sequence):
-        new_array = StdStringVector()
-        self._get_property_list(filter, new_array)
-        StdStringVector_2_seq(new_array, array)
-        return array
-
-    raise TypeError('array must be a mutable sequence<string>')
+#    raise TypeError('array must be a mutable sequence<string>')
 
 
 def __DeviceProxy__get_attribute_config(self, value):
@@ -759,11 +764,11 @@ def __DeviceProxy__get_attribute_config(self, value):
 
         Deprecated: use get_attribute_config_ex instead
     """
-    if isinstance(value, StdStringVector) or is_pure_str(value):
+    if is_pure_str(value):  # or isinstance(value, StdStringVector) 
         return self._get_attribute_config(value)
     elif isinstance(value, collections.Sequence):
-        v = seq_2_StdStringVector(value)
-        return self._get_attribute_config(v)
+#        v = seq_2_StdStringVector(value)
+        return self._get_attribute_config(value)
 
     raise TypeError('value must be a string or a sequence<string>')
 
@@ -796,15 +801,15 @@ def __DeviceProxy__get_attribute_config_ex(self, value):
         Throws     : ConnectionFailed, CommunicationFailed,
                         DevFailed from device
     """
-    if isinstance(value, StdStringVector):
-        return self._get_attribute_config_ex(value)
-    elif is_pure_str(value):
-        v = StdStringVector()
-        v.append(value)
-        return self._get_attribute_config_ex(v)
+#    if isinstance(value, StdStringVector):
+#        return self._get_attribute_config_ex(value)
+    if is_pure_str(value):
+#        v = StdStringVector()
+#        v.append(value)
+        return self._get_attribute_config_ex([value])
     elif isinstance(value, collections.Sequence):
-        v = seq_2_StdStringVector(value)
-        return self._get_attribute_config_ex(v)
+#        v = seq_2_StdStringVector(value)
+        return self._get_attribute_config_ex(value)
 
     raise TypeError('value must be a string or a sequence<string>')
 
@@ -845,16 +850,16 @@ def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
         Throws     : ConnectionFailed, CommunicationFailed,
                      DevFailed from device
     """
-    if isinstance(value, StdStringVector) or is_pure_str(value):
-        return self._get_command_config(value)
-    elif isinstance(value, collections.Sequence):
-        v = seq_2_StdStringVector(value)
-        return self._get_command_config(v)
+#    if isinstance(value, StdStringVector) or is_pure_str(value):
+    return self._get_command_config(value)
+#    elif isinstance(value, collections.Sequence):
+#        v = seq_2_StdStringVector(value)
+#        return self._get_command_config(v)
 
-    raise TypeError('value must be a string or a sequence<string>')
+#    raise TypeError('value must be a string or a sequence<string>')
 
 
-def __DeviceProxy__get_pipe_config(self, value=None):
+def __DeviceProxy__get_pipe_config(self, value=(constants.AllPipe,)):
     """
     get_pipe_config( self) -> PipeInfoList
 
@@ -895,15 +900,15 @@ def __DeviceProxy__get_pipe_config(self, value=None):
 
         New in PyTango 9.2.0
     """
-    if value is None:
-        value = [constants.AllPipe]
-    if isinstance(value, StdStringVector) or is_pure_str(value):
-        return self._get_pipe_config(value)
-    elif isinstance(value, collections.Sequence):
-        v = seq_2_StdStringVector(value)
-        return self._get_pipe_config(v)
+#    if value is None:
+#        value = [constants.AllPipe]
+#    if isinstance(value, StdStringVector) or is_pure_str(value):
+    return self._get_pipe_config(value)
+#    elif isinstance(value, collections.Sequence):
+#        v = seq_2_StdStringVector(value)
+#        return self._get_pipe_config(v)
 
-    raise TypeError('value must be a string or a sequence<string>')
+#    raise TypeError('value must be a string or a sequence<string>')
 
 
 def __DeviceProxy__set_attribute_config(self, value):
@@ -1538,8 +1543,8 @@ def __init_DeviceProxy():
     DeviceProxy.get_green_mode = __DeviceProxy__get_green_mode
     DeviceProxy.set_green_mode = __DeviceProxy__set_green_mode
 
-    DeviceProxy.__getattr__ = __DeviceProxy__getattr
-    DeviceProxy.__setattr__ = __DeviceProxy__setattr
+    #DeviceProxy.__getattr__ = __DeviceProxy__getattr
+    #DeviceProxy.__setattr__ = __DeviceProxy__setattr
     DeviceProxy.__getitem__ = __DeviceProxy__getitem
     DeviceProxy.__setitem__ = __DeviceProxy__setitem
     DeviceProxy.__contains__ = __DeviceProxy__contains
@@ -2062,7 +2067,7 @@ def __doc_DeviceProxy():
     """)
 
     document_method("write_read_attributes", """
-    write_read_attributes(self, name_val, attr_names, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
+    write_read_attributes(self, name_val, attr_names=None, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
 
             Write then read attribute(s) in a single network call. By
             default (serialisation by device), the execution of this
@@ -2073,7 +2078,7 @@ def __doc_DeviceProxy():
 
         Parameters :
                 - name_val: A list of pairs (attr_name, value). See write_attribute
-                - attr_names : (sequence<str>) A list of attributes to read.
+                - attr_names : (sequence<str>) A list of attributes to read.(Ignored as of PyTango 9.2.5
                 - extract_as : (ExtractAs) Defaults to numpy.
                 - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
                                (see :meth:`~tango.DeviceProxy.get_green_mode` and

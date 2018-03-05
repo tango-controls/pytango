@@ -9,19 +9,18 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_enums()
-{
-    enum_<Tango::LockerLanguage>("LockerLanguage")
+void export_enums(py::module &m) {
+    py::enum_<Tango::LockerLanguage>(m, "LockerLanguage")
         .value("CPP", Tango::CPP)
         .value("JAVA", Tango::JAVA)
     ;
 
-    enum_<Tango::CmdArgType>("CmdArgType")
+    py::enum_<Tango::CmdArgType>(m, "CmdArgType")
         .value(Tango::CmdArgTypeName[Tango::DEV_VOID], Tango::DEV_VOID)
         .value(Tango::CmdArgTypeName[Tango::DEV_BOOLEAN], Tango::DEV_BOOLEAN)
         .value(Tango::CmdArgTypeName[Tango::DEV_SHORT], Tango::DEV_SHORT)
@@ -54,22 +53,21 @@ void export_enums()
         .value(Tango::CmdArgTypeName[Tango::DEV_ENUM], Tango::DEV_ENUM)
         .value(Tango::CmdArgTypeName[Tango::DEV_PIPE_BLOB], Tango::DEV_PIPE_BLOB)
         .value(Tango::CmdArgTypeName[Tango::DEVVAR_STATEARRAY], Tango::DEVVAR_STATEARRAY)
-        .export_values()
     ;
 
-    enum_<Tango::MessBoxType>("MessBoxType")
+    py::enum_<Tango::MessBoxType>(m, "MessBoxType")
         .value("STOP", Tango::STOP)
         .value("INFO", Tango::INFO)
     ;
 
-    enum_<Tango::PollObjType>("PollObjType")
+    py::enum_<Tango::PollObjType>(m, "PollObjType")
         .value("POLL_CMD", Tango::POLL_CMD)
         .value("POLL_ATTR", Tango::POLL_ATTR)
         .value("EVENT_HEARTBEAT", Tango::EVENT_HEARTBEAT)
         .value("STORE_SUBDEV", Tango::STORE_SUBDEV)
     ;
 
-    enum_<Tango::PollCmdCode>("PollCmdCode")
+    py::enum_<Tango::PollCmdCode>(m, "PollCmdCode")
         .value("POLL_ADD_OBJ", Tango::POLL_ADD_OBJ)
         .value("POLL_REM_OBJ", Tango::POLL_REM_OBJ)
         .value("POLL_START", Tango::POLL_START)
@@ -82,19 +80,19 @@ void export_enums()
         .value("POLL_REM_HEARTBEAT", Tango::POLL_REM_HEARTBEAT)
     ;
 
-    enum_<Tango::SerialModel>("SerialModel")
+    py::enum_<Tango::SerialModel>(m, "SerialModel")
         .value("BY_DEVICE",Tango::BY_DEVICE)
         .value("BY_CLASS",Tango::BY_CLASS)
         .value("BY_PROCESS",Tango::BY_PROCESS)
         .value("NO_SYNC",Tango::NO_SYNC)
     ;
 
-    enum_<Tango::AttReqType>("AttReqType")
+    py::enum_<Tango::AttReqType>(m, "AttReqType")
         .value("READ_REQ",Tango::READ_REQ)
         .value("WRITE_REQ",Tango::WRITE_REQ)
     ;
 
-    enum_<Tango::LockCmdCode>("LockCmdCode")
+    py::enum_<Tango::LockCmdCode>(m, "LockCmdCode")
         .value("LOCK_ADD_DEV", Tango::LOCK_ADD_DEV)
         .value("LOCK_REM_DEV", Tango::LOCK_REM_DEV)
         .value("LOCK_UNLOCK_ALL_EXIT", Tango::LOCK_UNLOCK_ALL_EXIT)
@@ -103,7 +101,7 @@ void export_enums()
 
 #ifdef TANGO_HAS_LOG4TANGO
 
-    enum_<Tango::LogLevel>("LogLevel")
+    py::enum_<Tango::LogLevel>(m, "LogLevel")
         .value("LOG_OFF", Tango::LOG_OFF)
         .value("LOG_FATAL", Tango::LOG_FATAL)
         .value("LOG_ERROR", Tango::LOG_ERROR)
@@ -112,7 +110,7 @@ void export_enums()
         .value("LOG_DEBUG", Tango::LOG_DEBUG)
     ;
 
-    enum_<Tango::LogTarget>("LogTarget")
+    py::enum_<Tango::LogTarget>(m, "LogTarget")
         .value("LOG_CONSOLE", Tango::LOG_CONSOLE)
         .value("LOG_FILE", Tango::LOG_FILE)
         .value("LOG_DEVICE", Tango::LOG_DEVICE)
@@ -120,7 +118,7 @@ void export_enums()
 
 #endif // TANGO_HAS_LOG4TANGO
 
-    enum_<Tango::EventType>("EventType")
+    py::enum_<Tango::EventType>(m, "EventType")
         .value("CHANGE_EVENT", Tango::CHANGE_EVENT)
         .value("QUALITY_EVENT", Tango::QUALITY_EVENT)
         .value("PERIODIC_EVENT", Tango::PERIODIC_EVENT)
@@ -132,28 +130,28 @@ void export_enums()
         .value("PIPE_EVENT", Tango::PIPE_EVENT)
     ;
 
-    enum_<Tango::AttrSerialModel>("AttrSerialModel")
+    py::enum_<Tango::AttrSerialModel>(m, "AttrSerialModel")
         .value("ATTR_NO_SYNC", Tango::ATTR_NO_SYNC)
         .value("ATTR_BY_KERNEL", Tango::ATTR_BY_KERNEL)
         .value("ATTR_BY_USER", Tango::ATTR_BY_USER)
     ;
     
-    enum_<Tango::KeepAliveCmdCode>("KeepAliveCmdCode")
+    py::enum_<Tango::KeepAliveCmdCode>(m, "KeepAliveCmdCode")
         .value("EXIT_TH", Tango::EXIT_TH)
     ;
 
-    enum_<Tango::AccessControlType>("AccessControlType")
+    py::enum_<Tango::AccessControlType>(m, "AccessControlType")
         .value("ACCESS_READ", Tango::ACCESS_READ)
         .value("ACCESS_WRITE", Tango::ACCESS_WRITE)
     ;
 
-    enum_<Tango::asyn_req_type>("asyn_req_type")
+    py::enum_<Tango::asyn_req_type>(m, "asyn_req_type")
         .value("POLLING", Tango::POLLING)
         .value("CALLBACK", Tango::CALL_BACK)
         .value("ALL_ASYNCH", Tango::ALL_ASYNCH)
     ;
 
-    enum_<Tango::cb_sub_model>("cb_sub_model")
+    py::enum_<Tango::cb_sub_model>(m, "cb_sub_model")
         .value("PUSH_CALLBACK", Tango::PUSH_CALLBACK)
         .value("PULL_CALLBACK", Tango::PULL_CALLBACK)
     ;
@@ -162,7 +160,7 @@ void export_enums()
     // Tango IDL
     //
 
-    enum_<Tango::AttrQuality>("AttrQuality")
+    py::enum_<Tango::AttrQuality>(m, "AttrQuality")
         .value("ATTR_VALID", Tango::ATTR_VALID)
         .value("ATTR_INVALID", Tango::ATTR_INVALID)
         .value("ATTR_ALARM", Tango::ATTR_ALARM)
@@ -170,7 +168,7 @@ void export_enums()
         .value("ATTR_WARNING", Tango::ATTR_WARNING)
     ;
 
-    enum_<Tango::AttrWriteType>("AttrWriteType")
+    py::enum_<Tango::AttrWriteType>(m, "AttrWriteType")
         .value("READ", Tango::READ)
         .value("READ_WITH_WRITE", Tango::READ_WITH_WRITE)
         .value("WRITE", Tango::WRITE)
@@ -179,7 +177,7 @@ void export_enums()
         .export_values()
     ;
 
-    enum_<Tango::AttrDataFormat>("AttrDataFormat")
+    py::enum_<Tango::AttrDataFormat>(m, "AttrDataFormat")
         .value("SCALAR", Tango::SCALAR)
         .value("SPECTRUM", Tango::SPECTRUM)
         .value("IMAGE", Tango::IMAGE)
@@ -187,19 +185,19 @@ void export_enums()
         .export_values()
     ;
 
-    enum_<Tango::DevSource>("DevSource")
+    py::enum_<Tango::DevSource>(m, "DevSource")
         .value("DEV", Tango::DEV)
         .value("CACHE", Tango::CACHE)
         .value("CACHE_DEV", Tango::CACHE_DEV)
     ;
 
-    enum_<Tango::ErrSeverity>("ErrSeverity")
+    py::enum_<Tango::ErrSeverity>(m, "ErrSeverity")
         .value("WARN", Tango::WARN)
         .value("ERR", Tango::ERR)
         .value("PANIC", Tango::PANIC)
     ;
 
-    enum_<Tango::DevState>("DevState")
+    py::enum_<Tango::DevState>(m, "DevState")
         .value(Tango::DevStateName[Tango::ON], Tango::ON)
         .value(Tango::DevStateName[Tango::OFF], Tango::OFF)
         .value(Tango::DevStateName[Tango::CLOSE], Tango::CLOSE)
@@ -216,27 +214,27 @@ void export_enums()
         .value(Tango::DevStateName[Tango::UNKNOWN], Tango::UNKNOWN)
     ;
 
-    enum_<Tango::DispLevel>("DispLevel")
+    py::enum_<Tango::DispLevel>(m, "DispLevel")
         .value("OPERATOR", Tango::OPERATOR)
         .value("EXPERT", Tango::EXPERT)
         .value("DL_UNKNOWN", Tango::DL_UNKNOWN)
     ;
 
-    enum_<Tango::PipeWriteType>("PipeWriteType")
+    py::enum_<Tango::PipeWriteType>(m, "PipeWriteType")
         .value("PIPE_READ", Tango::PIPE_READ)
         .value("PIPE_READ_WRITE", Tango::PIPE_READ_WRITE)
         .value("PIPE_WT_UNKNOWN", Tango::PIPE_WT_UNKNOWN)
     ;
 
-    enum_<Tango::PipeSerialModel>("PipeSerialModel")
+    py::enum_<Tango::PipeSerialModel>(m, "PipeSerialModel")
         .value("PIPE_NO_SYNC", Tango::PIPE_NO_SYNC)
         .value("PIPE_BY_KERNEL", Tango::PIPE_BY_KERNEL)
         .value("PIPE_BY_USER", Tango::PIPE_BY_USER)
     ;
-  
-    scope().attr("PipeReqType") = scope().attr("AttReqType");
 
-    enum_<Tango::AttrMemorizedType>("AttrMemorizedType")
+//    m.attr("PipeReqType") = m.attr("AttrReqType");
+
+    py::enum_<Tango::AttrMemorizedType>(m, "AttrMemorizedType")
         .value("NOT_KNOWN", Tango::NOT_KNOWN)
         .value("NONE", Tango::NONE)
         .value("MEMORIZED", Tango::MEMORIZED)

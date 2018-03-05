@@ -21,8 +21,9 @@ __docformat__ = "restructuredtext"
 
 import collections
 
-from ._tango import Except, DevFailed, DeviceClass, CmdArgType, \
-    DispLevel, UserDefaultAttrProp
+#from ._tango import Except, DevFailed
+#from ._tango import DeviceClass
+from ._tango import CmdArgType, DispLevel, UserDefaultAttrProp
 from .pyutil import Util
 
 from .utils import is_pure_str, is_non_str_seq, seqStr_2_obj, obj_2_str, \
@@ -31,8 +32,8 @@ from .utils import document_method as __document_method
 
 from .globals import get_class, get_class_by_class, \
     get_constructed_class_by_class
-from .attr_data import AttrData
-from .pipe_data import PipeData
+#from .attr_data import AttrData
+#from .pipe_data import PipeData
 
 
 class PropUtil:

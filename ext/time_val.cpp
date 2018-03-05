@@ -9,14 +9,13 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_time_val()
-{
-    class_<Tango::TimeVal>("TimeVal")
+void export_time_val(py::module &m) {
+    py::class_<Tango::TimeVal>(m, "TimeVal")
         .def_readwrite("tv_sec", &Tango::TimeVal::tv_sec)
         .def_readwrite("tv_usec", &Tango::TimeVal::tv_usec)
         .def_readwrite("tv_nsec", &Tango::TimeVal::tv_nsec)

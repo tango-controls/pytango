@@ -9,38 +9,18 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-#include "exception.h"
+namespace py = pybind11;
 
-using namespace boost::python;
-
-extern boost::python::object PyTango_DevFailed;
-
-namespace PyAttrConfEventData
-{
-    static boost::shared_ptr<Tango::AttrConfEventData> makeAttrConfEventData()
-    {
-        Tango::AttrConfEventData *result = new Tango::AttrConfEventData;
-        return boost::shared_ptr<Tango::AttrConfEventData>(result);
-    }
-
-    static void set_errors(Tango::AttrConfEventData &event_data, 
-                           boost::python::object &dev_failed)
-    {
-        Tango::DevFailed df;
-        boost::python::object errors = dev_failed.attr("args");
-        sequencePyDevError_2_DevErrorList(errors.ptr(), event_data.errors);
-    }
-};
-
-void export_attr_conf_event_data()
-{
-    class_<Tango::AttrConfEventData>("AttrConfEventData",
-        init<const Tango::AttrConfEventData &>())
-
-        .def("__init__", boost::python::make_constructor(PyAttrConfEventData::makeAttrConfEventData))
+void export_attr_conf_event_data(py::module &m) {
+    py::class_<Tango::AttrConfEventData>(m, "AttrConfEventData")
+        .def(py::init<const Tango::AttrConfEventData &>())
+        .def("__init__", [](){
+            Tango::AttrConfEventData *result = new Tango::AttrConfEventData;
+            return std::shared_ptr<Tango::AttrConfEventData>(result);
+        })
 
         // The original Tango::AttrConfEventData structure has a 'device' field.
         // However, if we returned this directly we would get a different
@@ -48,20 +28,24 @@ void export_attr_conf_event_data()
         // sure the device returned is the same where the read action was
         // performed. So we don't return Tango::AttrConfEventData::device directly.
         // See callback.cpp
-        .setattr("device",object())
+//        .setattr("device",object())
+
         .def_readwrite("attr_name", &Tango::AttrConfEventData::attr_name)
         .def_readwrite("event", &Tango::AttrConfEventData::event)
 
-        .setattr("attr_conf",object())
+//        .setattr("attr_conf",object())
 
         .def_readwrite("err", &Tango::AttrConfEventData::err)
         .def_readwrite("reception_date", &Tango::AttrConfEventData::reception_date)
-        .add_property("errors", 
-		      make_getter(&Tango::AttrConfEventData::errors, 
-				  return_value_policy<copy_non_const_reference>()),
-		      &PyAttrConfEventData::set_errors)
+        .def_property("errors", [](){
+            return &Tango::DataReadyEventData::errors;
+        },[](Tango::AttrConfEventData &event_data, Tango::DevFailed &dev_failed) {
+//                py::object errors = dev_failed.attr("args");
+//                sequencePyDevError_2_DevErrorList(errors.ptr(), event_data.errors);
+        }, py::return_value_policy::copy)
 
         .def("get_date", &Tango::AttrConfEventData::get_date,
-            return_internal_reference<>())
+            py::return_value_policy::reference)
     ;
 }
+

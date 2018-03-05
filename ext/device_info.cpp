@@ -9,14 +9,13 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_device_info()
-{
-    class_<Tango::DeviceInfo>("DeviceInfo")
+void export_device_info(py::module &m) {
+    py::class_<Tango::DeviceInfo>(m, "DeviceInfo")
         .def_readonly("dev_class", &Tango::DeviceInfo::dev_class)
         .def_readonly("server_id", &Tango::DeviceInfo::server_id)
         .def_readonly("server_host", &Tango::DeviceInfo::server_host)

@@ -9,52 +9,22 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
-#include "server/attr.h"
+#include <tango.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/functional.h>
+#include <server/attr.h>
+#include <pyutils.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-#define __AUX_DECL_CALL_ATTR_METHOD \
-    PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev); \
-    AutoPythonGIL __py_lock;
-
-#define __AUX_CATCH_PY_EXCEPTION \
-    catch(boost::python::error_already_set &eas) \
-    { handle_python_exception(eas); }
-
-#define CALL_ATTR_METHOD(dev, name) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { boost::python::call_method<void>(__dev_ptr->the_self, name); } \
-    __AUX_CATCH_PY_EXCEPTION
-
-#define CALL_ATTR_METHOD_VARGS(dev, name, ...) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { boost::python::call_method<void>(__dev_ptr->the_self, name, __VA_ARGS__); } \
-    __AUX_CATCH_PY_EXCEPTION
-
-#define CALL_ATTR_METHOD_RET(retType, ret, dev, name) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { ret = boost::python::call_method<retType>(__dev_ptr->the_self, name); } \
-    __AUX_CATCH_PY_EXCEPTION
-
-#define CALL_ATTR_METHOD_VARGS_RET(retType, ret, dev, name, ...) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { ret = boost::python::call_method<retType>(__dev_ptr->the_self, name, __VA_ARGS__); } \
-    __AUX_CATCH_PY_EXCEPTION
-
-#define RET_CALL_ATTR_METHOD(retType, dev, name) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { return boost::python::call_method<retType>(__dev_ptr->the_self, name); } \
-    __AUX_CATCH_PY_EXCEPTION
-
-#define RET_CALL_ATTR_METHOD_VARGS(retType, dev, name, ...) \
-    __AUX_DECL_CALL_ATTR_METHOD \
-    try { return boost::python::call_method<retType>(__dev_ptr->the_self, name, __VA_ARGS__); } \
-    __AUX_CATCH_PY_EXCEPTION
-
+//
+//int func_arg(const std::function<int(int)> &f) {
+//    return f(10);
+//}
 
 void PyAttr::read(Tango::DeviceImpl *dev, Tango::Attribute &att)
 {
+    std::cout << "in read attr.cpp" << std::endl;
     if (!_is_method(dev, read_name))
     {
         TangoSys_OMemStream o;
@@ -62,7 +32,14 @@ void PyAttr::read(Tango::DeviceImpl *dev, Tango::Attribute &att)
         Tango::Except::throw_exception("PyTango_ReadAttributeMethodNotFound",
             o.str(), "PyTango::Attr::read");
     }
-    CALL_ATTR_METHOD_VARGS(dev, read_name.c_str(), boost::ref(att))
+//    CALL_ATTR_METHOD_VARGS(dev, read_name.c_str(), att);
+    PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev);
+    AutoPythonGIL __py_lock;
+    try {
+//gm        py::call_method<void>(__dev_ptr->the_self, read_name.c_str(), att);
+    } catch (py::error_already_set &eas) {
+        handle_python_exception(eas);
+    }
 }
 
 void PyAttr::write(Tango::DeviceImpl *dev, Tango::WAttribute &att)
@@ -74,14 +51,27 @@ void PyAttr::write(Tango::DeviceImpl *dev, Tango::WAttribute &att)
         Tango::Except::throw_exception("PyTango_WriteAttributeMethodNotFound",
             o.str(), "PyTango::Attr::write");
     }
-    CALL_ATTR_METHOD_VARGS(dev, write_name.c_str(), boost::ref(att))
+//    CALL_ATTR_METHOD_VARGS(dev, write_name.c_str(), att);
+    PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev);
+    AutoPythonGIL __py_lock;
+    try {
+//gm        py::call_method<void>(__dev_ptr->the_self, write_name.c_str(), att);
+    } catch (py::error_already_set &eas) {
+        handle_python_exception(eas);
+    }
 }
 
-bool PyAttr::is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType ty)
+bool PyAttr::is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType type)
 {
     if (_is_method(dev, py_allowed_name))
     {
-        RET_CALL_ATTR_METHOD_VARGS(bool, dev, py_allowed_name.c_str(), ty)
+        PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev);
+        AutoPythonGIL __py_lock;
+        try {
+    //gm        return py::call_method<bool>(__dev_ptr->the_self, py_allowed_name.c_str(), type);
+        } catch (py::error_already_set &eas) {
+            handle_python_exception(eas);
+        }
     }
     // keep compiler quiet
     return true;
@@ -95,7 +85,7 @@ bool PyAttr::_is_method(Tango::DeviceImpl *dev, const std::string &name)
     return is_method_defined(__dev_py, name);
 }
 
-void PyAttr::set_user_prop(vector<Tango::AttrProperty> &user_prop,
+void PyAttr::set_user_prop(std::vector<Tango::AttrProperty> &user_prop,
                            Tango::UserDefaultAttrProp &def_prop)
 {
 
@@ -110,7 +100,7 @@ void PyAttr::set_user_prop(vector<Tango::AttrProperty> &user_prop,
     for (size_t loop = 0;loop < nb_prop;loop++)
     {
         Tango::AttrProperty  prop = user_prop[loop];
-        string &prop_name = prop.get_name();
+        std::string &prop_name = prop.get_name();
         const char *prop_value = prop.get_value().c_str();
 
         if (prop_name == "label")
@@ -156,11 +146,10 @@ void PyAttr::set_user_prop(vector<Tango::AttrProperty> &user_prop,
     }
 }
 
-void export_attr()
-{
-    class_<Tango::Attr, boost::noncopyable>("Attr",
-        init<const char *, long, optional<Tango::AttrWriteType, const char *> >())
-
+void export_attr(py::module &m) {
+    py::class_<Tango::Attr>(m, "Attr")
+        .def(py::init<const char *, long>())
+//        .def(py::init<const char *, long, optional<Tango::AttrWriteType, const char *>>())
         .def("set_default_properties", &Tango::Attr::set_default_properties)
         .def("set_disp_level", &Tango::Attr::set_disp_level)
         .def("set_polling_period", &Tango::Attr::set_polling_period)
@@ -175,7 +164,7 @@ void export_attr()
         .def("set_data_ready_event", &Tango::Attr::set_data_ready_event)
         .def("is_data_ready_event", &Tango::Attr::is_data_ready_event)
         .def("get_name", &Tango::Attr::get_name,
-            return_value_policy<copy_non_const_reference>())
+                py::return_value_policy::copy)
         .def("get_format", &Tango::Attr::get_format)
         .def("get_writable", &Tango::Attr::get_writable)
         .def("get_type", &Tango::Attr::get_type)
@@ -184,15 +173,15 @@ void export_attr()
         .def("get_memorized", &Tango::Attr::get_memorized)
         .def("get_memorized_init", &Tango::Attr::get_memorized_init)
         .def("get_assoc", &Tango::Attr::get_assoc,
-            return_value_policy<copy_non_const_reference>())
+                py::return_value_policy::copy)
         .def("is_assoc", &Tango::Attr::is_assoc)
         .def("get_cl_name", &Tango::Attr::get_cl_name,
-            return_value_policy<copy_const_reference>())
+                py::return_value_policy::copy)
         .def("set_cl_name", &Tango::Attr::set_cl_name)
         .def("get_class_properties", &Tango::Attr::get_class_properties,
-            return_internal_reference<>())
+                py::return_value_policy::reference)
         .def("get_user_default_properties", &Tango::Attr::get_user_default_properties,
-            return_internal_reference<>())
+                py::return_value_policy::reference)
         .def("set_class_properties", &Tango::Attr::set_class_properties)
         .def("check_type", &Tango::Attr::check_type)
         .def("read", &Tango::Attr::read)
@@ -200,39 +189,21 @@ void export_attr()
         .def("is_allowed", &Tango::Attr::is_allowed)
     ;
 
-    class_<Tango::SpectrumAttr, bases<Tango::Attr>, boost::noncopyable>("SpectrumAttr",
-        init<const char *, long, Tango::AttrWriteType, long>())
+    py::class_<Tango::SpectrumAttr, Tango::Attr>(m, "SpectrumAttr")
+        .def(py::init<const char *, long, Tango::AttrWriteType, long>())
     ;
 
-    class_<Tango::ImageAttr, bases<Tango::SpectrumAttr>, boost::noncopyable>("ImageAttr",
-        init<const char *, long, Tango::AttrWriteType, long, long>())
+    py::class_<Tango::ImageAttr, Tango::SpectrumAttr>(m, "ImageAttr")
+        .def(py::init<const char *, long, Tango::AttrWriteType, long, long>())
     ;
 
-//    class_<PyAttr>("PyAttr", no_init)
-//        .def("set_allowed", &PyAttr::set_allowed)
-//        .def("set_read_name", &PyAttr::set_read_name)
-//        .def("set_write_name", &PyAttr::set_write_name)
-//    ;
-//
-//    class_<PyScaAttr, bases<Tango::Attr, PyAttr>, boost::noncopyable>("PyScaAttr",
-//        init<const std::string &, long , Tango::AttrWriteType>())
-//    ;
-//
-//    class_<PySpecAttr, bases<Tango::SpectrumAttr, PyAttr>, boost::noncopyable>("PySpecAttr",
-//        init<const std::string &, long , Tango::AttrWriteType, long>())
-//    ;
-//
-//    class_<PyImaAttr, bases<Tango::ImageAttr, PyAttr>, boost::noncopyable>("PyImaAttr",
-//        init<const std::string &, long , Tango::AttrWriteType, long, long>())
-//    ;
-
-    class_<Tango::AttrProperty>("AttrProperty",
-        init<const char *, const char *>())
-        .def(init<const char *, long>())
+    py::class_<Tango::AttrProperty>(m, "AttrProperty")
+        .def(py::init<const char *, const char *>())
+        .def(py::init<const char *, long>())
         .def("get_value", &Tango::AttrProperty::get_value,
-            return_value_policy<copy_non_const_reference>())
+                py::return_value_policy::copy)
         .def("get_lg_value", &Tango::AttrProperty::get_lg_value)
         .def("get_name", &Tango::AttrProperty::get_name,
-            return_value_policy<copy_non_const_reference>())
+                py::return_value_policy::copy)
     ;
 }

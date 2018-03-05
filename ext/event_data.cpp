@@ -9,46 +9,20 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
+#include <pyutils.h>
 
-#include "exception.h"
+namespace py = pybind11;
 
-using namespace boost::python;
-
-extern boost::python::object PyTango_DevFailed;
-
-namespace PyEventData
-{
-    static boost::shared_ptr<Tango::EventData> makeEventData()
-    {
-        Tango::EventData *result = new Tango::EventData;
-        result->attr_value = new Tango::DeviceAttribute();
-       return boost::shared_ptr<Tango::EventData>(result);
-    }
-
-    static void set_errors(Tango::EventData &event_data, boost::python::object &error)
-    {
-        PyObject* error_ptr = error.ptr();
-        if (PyObject_IsInstance(error_ptr, PyTango_DevFailed.ptr()))
-        {
-            Tango::DevFailed df;
-	    boost::python::object error_list = error.attr("args");
-	    sequencePyDevError_2_DevErrorList(error_list.ptr(), event_data.errors);
-        }
-        else
-        {
-            sequencePyDevError_2_DevErrorList(error_ptr, event_data.errors);
-        }
-    }
-};
-
-void export_event_data()
-{
-    class_<Tango::EventData>("EventData",
-        init<const Tango::EventData &>())
-    
-        .def("__init__", boost::python::make_constructor(PyEventData::makeEventData))
+void export_event_data(py::module &m) {
+    py::class_<Tango::EventData>(m, "EventData")
+        .def(py::init<const Tango::EventData &>())
+        .def("__init__", [](){
+            Tango::EventData *result = new Tango::EventData;
+            result->attr_value = new Tango::DeviceAttribute();
+            return std::shared_ptr<Tango::EventData>(result);
+        })
 
         // The original Tango::EventData structure has a 'device' field.
         // However, if we returned this directly we would get a different
@@ -56,25 +30,33 @@ void export_event_data()
         // sure the device returned is the same where the read action was
         // performed. So we don't return Tango::EventData::device directly.
         // See callback.cpp
-        .setattr("device", object())
-        
+//        .setattr("device",object())
+
         .def_readwrite("attr_name", &Tango::EventData::attr_name)
         .def_readwrite("event", &Tango::EventData::event)
-        
+
         // The original Tango::EventData structure has "get_attr_value" but
         // we can't refer it directly here because we have to extract value
         // and so on.
         // See callback.cpp
-        .setattr("attr_value", object())
-        
+//        .setattr("attr_value",object())
+
         .def_readwrite("err", &Tango::EventData::err)
         .def_readwrite("reception_date", &Tango::EventData::reception_date)
-        .add_property("errors", 
-		      make_getter(&Tango::EventData::errors, 
-				  return_value_policy<copy_non_const_reference>()),
-		      &PyEventData::set_errors)
-        
-        .def("get_date", &Tango::EventData::get_date, 
-            return_internal_reference<>())
+        .def_property("errors", [](){
+            return &Tango::EventData::errors;
+        },[](Tango::EventData &event_data, Tango::DevFailed &dev_failed) {
+//            PyObject* error_ptr = error.ptr();
+//            if (PyObject_IsInstance(error_ptr, PyTango_DevFailed.ptr())) {
+//                Tango::DevFailed df;
+//                py::object error_list = error.attr("args");
+//                sequencePyDevError_2_DevErrorList(error_list.ptr(), event_data.errors);
+//            } else {
+//                sequencePyDevError_2_DevErrorList(error_ptr, event_data.errors);
+//            }
+        }, py::return_value_policy::copy)
+
+        .def("get_date", &Tango::EventData::get_date,
+            py::return_value_policy::reference)
     ;
 }

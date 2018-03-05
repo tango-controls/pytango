@@ -9,39 +9,54 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_multi_attribute()
-{
-    class_<Tango::MultiAttribute, boost::noncopyable>("MultiAttribute", no_init)
-        .def("get_attr_by_name", &Tango::MultiAttribute::get_attr_by_name,
-            return_value_policy<reference_existing_object>())
-        .def("get_attr_by_ind", &Tango::MultiAttribute::get_attr_by_ind,
-            return_value_policy<reference_existing_object>())
-        .def("get_w_attr_by_name", &Tango::MultiAttribute::get_w_attr_by_name,
-            return_value_policy<reference_existing_object>())
-        .def("get_w_attr_by_ind", &Tango::MultiAttribute::get_w_attr_by_ind,
-            return_value_policy<reference_existing_object>())
-        .def("get_attr_ind_by_name", &Tango::MultiAttribute::get_attr_ind_by_name) // New in 7.0.0
-        .def("get_alarm_list", &Tango::MultiAttribute::get_alarm_list,
-            return_internal_reference<>()) // New in 7.0.0
-        .def("get_attr_nb", &Tango::MultiAttribute::get_attr_nb) // New in 7.0.0
-        .def("check_alarm",
-            (bool (Tango::MultiAttribute::*) ())
-            &Tango::MultiAttribute::check_alarm) // New in 7.0.0
-        .def("check_alarm",
-            (bool (Tango::MultiAttribute::*) (const long))
-            &Tango::MultiAttribute::check_alarm) // New in 7.0.0
-        .def("check_alarm",
-            (bool (Tango::MultiAttribute::*) (const char *))
-            &Tango::MultiAttribute::check_alarm) // New in 7.0.0
-        .def("read_alarm",
-            (void (Tango::MultiAttribute::*) (const std::string &))
-            &Tango::MultiAttribute::read_alarm) // New in 7.0.0
-        .def("get_attribute_list", &Tango::MultiAttribute::get_attribute_list,
-            return_value_policy<reference_existing_object>())
+void export_multi_attribute(py::module& m) {
+// TODO boost::noncopyable
+    py::class_<Tango::MultiAttribute>(m, "MultiAttribute")
+
+        .def("get_attr_by_name", [](Tango::MultiAttribute& self, const char *attr_name) -> Tango::Attribute& {
+                return self.get_attr_by_name(attr_name);
+            }, py::return_value_policy::reference)
+
+        .def("get_attr_by_ind", [](Tango::MultiAttribute& self, const long index) -> Tango::Attribute& {
+                return self.get_attr_by_ind(index);
+            }, py::return_value_policy::reference)
+
+        .def("get_w_attr_by_name", [](Tango::MultiAttribute& self, const char *attr_name) -> Tango::WAttribute& {
+                return self.get_w_attr_by_name(attr_name);
+            }, py::return_value_policy::reference)
+
+        .def("get_w_attr_by_ind", [](Tango::MultiAttribute& self, const long index) -> Tango::WAttribute& {
+                return self.get_w_attr_by_ind(index);
+            }, py::return_value_policy::reference)
+
+        .def("get_attr_ind_by_name", &Tango::MultiAttribute::get_attr_ind_by_name)
+
+        .def("get_alarm_list", [](Tango::MultiAttribute& self) -> std::vector<long>& {
+                return self.get_alarm_list();
+            }, py::return_value_policy::reference)
+
+        .def("get_attr_nb", &Tango::MultiAttribute::get_attr_nb)
+
+        .def("check_alarm", (bool (Tango::MultiAttribute::*) ())
+            &Tango::MultiAttribute::check_alarm)
+
+        .def("check_alarm", (bool (Tango::MultiAttribute::*) (const long))
+            &Tango::MultiAttribute::check_alarm)
+
+        .def("check_alarm", (bool (Tango::MultiAttribute::*) (const char *))
+            &Tango::MultiAttribute::check_alarm)
+
+        .def("read_alarm", (void (Tango::MultiAttribute::*) (const std::string &))
+            &Tango::MultiAttribute::read_alarm)
+
+        .def("get_attribute_list", [](Tango::MultiAttribute& self) -> std::vector<Tango::Attribute*>& {
+                return self.get_attribute_list();
+            }, py::return_value_policy::reference)
     ;
 }

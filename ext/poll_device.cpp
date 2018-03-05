@@ -9,19 +9,13 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_poll_device()
-{
-    class_<Tango::PollDevice>("PollDevice",
-        "A structure containing PollDevice information\n"
-        "the following members,\n"
-        " - dev_name : string\n"
-        " - ind_list : sequence<long>\n"
-        "\nNew in PyTango 7.0.0")
+void export_poll_device(py::module &m) {
+    py::class_<Tango::PollDevice>(m, "PollDevice")
         .def_readwrite("dev_name", &Tango::PollDevice::dev_name)
         .def_readwrite("ind_list", &Tango::PollDevice::ind_list)
     ;

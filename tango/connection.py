@@ -19,8 +19,9 @@ __docformat__ = "restructuredtext"
 
 import collections
 
-from ._tango import Connection, DeviceData, __CallBackAutoDie, CmdArgType, \
-    DeviceProxy, Database, ExtractAs
+from ._tango import Connection, DeviceData, CmdArgType
+# from ._tango import __CallBackAutoDie
+from ._tango import DeviceProxy, Database, ExtractAs
 from .utils import document_method as __document_method
 from .utils import document_static_method as __document_static_method
 from .green import green

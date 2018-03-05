@@ -17,16 +17,16 @@ from __future__ import print_function
 
 import copy
 
-from ._tango import (
-    DeviceImpl, Device_3Impl, Device_4Impl, Device_5Impl,
-    DevFailed, Attribute, WAttribute,
-    MultiAttribute, MultiClassAttribute,
-    Attr, Logger, AttrWriteType, AttrDataFormat,
-    DispLevel, UserDefaultAttrProp, StdStringVector)
+# from ._tango import (
+#     DeviceImpl, Device_3Impl, Device_4Impl, Device_5Impl,
+#     DevFailed, Attribute, WAttribute,
+#     MultiAttribute, MultiClassAttribute,
+#     Attr, Logger, AttrWriteType, AttrDataFormat,
+#     DispLevel, UserDefaultAttrProp, StdStringVector)
 
 from .utils import document_method as __document_method
 from .utils import copy_doc, get_latest_device_class
-from .attr_data import AttrData
+# from .attr_data import AttrData
 
 from .log4tango import TangoStream
 

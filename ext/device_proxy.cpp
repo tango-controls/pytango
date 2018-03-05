@@ -9,744 +9,417 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
-#include "device_attribute.h"
-#include "device_pipe.h"
-#include "callback.h"
-#include "defs.h"
-#include "pytgutils.h"
-#include <boost/python/stl_iterator.hpp>
+#include <memory>
+#include <tango.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <callback.h>
+#include <device_attribute.h>
+#include <from_py.h>
 
+namespace py = pybind11;
 
-#include "pipe.h"
-#include "fast_from_py.h"
-
-extern const char *param_must_be_seq;
-extern const char *unreachable_code;
-extern const char *non_string_seq;
-
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(lock_overloads, Tango::DeviceProxy::lock, 0, 1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(unlock_overloads, Tango::DeviceProxy::unlock, 0, 1);
+//extern const char *param_must_be_seq;
+//extern const char *unreachable_code;
+//extern const char *non_string_seq;
 
 namespace PyDeviceProxy
 {
-    struct PickleSuite : bopy::pickle_suite
-    {
-        static bopy::tuple getinitargs(Tango::DeviceProxy& self)
-        {
-            std::string ret = self.get_db_host() + ":" + self.get_db_port() +
-                              "/" + self.dev_name();
-            return bopy::make_tuple(ret);
-        }
-    };
+//    struct PickleSuite : py::pickle_suite
+//    {
+//        static py::tuple getinitargs(Tango::DeviceProxy& self)
+//        {
+//            std::string ret = self.get_db_host() + ":" + self.get_db_port() +
+//                              "/" + self.dev_name();
+//            return py::make_tuple(ret);
+//        }
+//    };
 
-    static inline Tango::DevState state(Tango::DeviceProxy& self)
+static inline void pylist_to_devattrs(Tango::DeviceProxy& self,
+    py::object &py_list, std::vector<Tango::DeviceAttribute> &dev_attrs)
+{
+    for (auto item : py_list) {
+        py::tuple tup = py::reinterpret_borrow<py::tuple>(item);
+        std::string name = tup[0].cast<std::string>();
+        py::object value = tup[1];
+        Tango::DeviceAttribute w_dev_attr;
+        PyDeviceAttribute::reset(w_dev_attr, name, self, value);
+        dev_attrs.push_back(w_dev_attr);
+    }
+}
+
+    static inline void read_attributes_asynch(py::object py_self, py::object py_attr_names, py::object py_cb, PyTango::ExtractAs extract_as)
     {
-        AutoPythonAllowThreads guard;
-        return self.state();
+//        Tango::DeviceProxy* self = py::extract<Tango::DeviceProxy*>(py_self);
+//        CSequenceFromPython<StdStringVector> attr_names(py_attr_names);
+//        PyCallBackAutoDie* cb = py::extract<PyCallBackAutoDie*>(py_cb);
+//        cb->set_autokill_references(py_cb, py_self);
+//        cb->set_extract_as(extract_as);
+//
+//        try {
+//            AutoPythonAllowThreads guard;
+//            self->read_attributes_asynch(*attr_names, *cb);
+//        } catch (...) {
+//            cb->unset_autokill_references();
+//            throw;
+//        }
     }
 
-    static inline std::string status(Tango::DeviceProxy& self)
+    static inline void write_attributes_asynch(py::object py_self, py::object py_list, py::object py_cb)
     {
-        AutoPythonAllowThreads guard;
-        return self.status();
+//        Tango::DeviceProxy* self = py::extract<Tango::DeviceProxy*>(py_self);
+//        std::vector<Tango::DeviceAttribute> dev_attrs;
+//        pylist_to_devattrs(*self, py_list, dev_attrs);
+//        PyCallBackAutoDie* cb = py::extract<PyCallBackAutoDie*>(py_cb);
+//        cb->set_autokill_references(py_cb, py_self);
+//
+//        try {
+//            AutoPythonAllowThreads guard;
+//            self->write_attributes_asynch(dev_attrs, *cb);
+//        } catch (...) {
+//            cb->unset_autokill_references();
+//            throw;
+//        }
     }
+//
+//    static int subscribe_event(
+//            py::object py_self,
+//            const string &attr_name,
+//            Tango::EventType event,
+//            py::object py_cb_or_queuesize,
+//            py::object &py_filters,
+//            bool stateless,
+//            PyTango::ExtractAs extract_as )
+//    {
+//        Tango::DeviceProxy& self = py::extract<Tango::DeviceProxy&>(py_self);
+//        CSequenceFromPython<StdStringVector> filters(py_filters);
+//
+//        PyCallBackPushEvent* cb = 0;
+//        int event_queue_size = 0;
+//        if (py::extract<PyCallBackPushEvent&>(py_cb_or_queuesize).check()) {
+//            cb = py::extract<PyCallBackPushEvent*>(py_cb_or_queuesize);
+//
+//            cb->set_device(py_self);
+//            cb->set_extract_as(extract_as);
+//
+//            AutoPythonAllowThreads guard;
+//            return self.subscribe_event(attr_name, event, cb, *filters, stateless);
+//        } else {
+//            event_queue_size = py::extract<int>(py_cb_or_queuesize);
+//            AutoPythonAllowThreads guard;
+//            return self.subscribe_event(attr_name, event, event_queue_size,
+//                                        *filters, stateless);
+//        }
+//    }
 
-    static inline int ping(Tango::DeviceProxy& self)
-    {
-        AutoPythonAllowThreads guard;
-        return self.ping();
-    }
 
-    static inline void pylist_to_devattrs(Tango::DeviceProxy& self,
-        bopy::object &py_list, std::vector<Tango::DeviceAttribute> &dev_attrs)
-    {
-        std::vector<std::string> attr_names;
-        std::vector<bopy::object> py_values;
-        Py_ssize_t size = len(py_list);
+//    template<typename ED, typename EDList>
+//    static py::object
+//    get_events__aux(py::object py_self, int event_id,
+//                    PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy)
+//    {
+//        Tango::DeviceProxy &self = py::extract<Tango::DeviceProxy&>(py_self);
+//
+//        EDList event_list;
+//        self.get_events(event_id, event_list);
+//
+//        py::list r;
+//
+//        for (size_t i=0; i < event_list.size(); ++i) {
+//            ED* event_data = event_list[i];
+//
+//            py::object py_ev(py::handle<>(
+//                py::to_python_indirect<
+//                    ED*, py::detail::make_owning_holder>()(event_data)));
+//
+//            // EventDataList deletes EventData's on destructor, so once
+//            // we are handling it somewhere else (as an py::object) we must
+//            // unset the reference
+//            event_list[i] = 0;
+//
+//            PyCallBackPushEvent::fill_py_event(event_data, py_ev, py_self, extract_as);
+//
+//            r.append(py_ev);
+//        }
+//        return r;
+//    }
 
-        // Fill attr_names and py_values
-        for (Py_ssize_t n = 0; n < size; ++n) {
-            bopy::object tup = py_list[n];
-            std::string attr_name = bopy::extract<std::string>(tup[0]);
-            attr_names.push_back(attr_name);
-            py_values.push_back(tup[1]);
-        }
-
-        // Get attr_info for all the attr_names
-        unique_pointer<Tango::AttributeInfoListEx> attr_infos;
-        {
-            AutoPythonAllowThreads guard;
-            attr_infos.reset(self.get_attribute_config_ex(attr_names));
-        }
-
-        // Now prepare dev_attrs with attr_infos and py_values
-        dev_attrs.resize(size);
-        for (long n = 0; n < size; ++n) {
-            PyDeviceAttribute::reset(dev_attrs[n], (*attr_infos)[n], py_values[n]);
-        }
-    }
-
-    Tango::DevicePipe
-    read_pipe(Tango::DeviceProxy& self, const std::string & pipe_name)
-    {
-        AutoPythonAllowThreads guard;
-        return self.read_pipe(pipe_name);
-    }
-//------------------------- copy from pipe.cpp -------------------------------------------------------
+    // This code also appears in pipe.cpp
     static void throw_wrong_python_data_type(const std::string &name,
-                         const char *method)
+                 const char *method)
     {
-        TangoSys_OMemStream o;
-        o << "Wrong Python type for pipe " << name << ends;
-        Tango::Except::throw_exception("PyDs_WrongPythonDataTypeForPipe",
-                       o.str(), method);
+        std::stringstream ss;
+        ss << "Wrong Python type for pipe " << name << ends;
+//gm        Tango::Except::throw_exception("PyDs_WrongPythonDataTypeForPipe", ss.str(), method);
     }
 
-    template<typename T>
-    void append_scalar_encoded(T& obj, const std::string &name,
-                       bopy::object& py_value)
+    template<typename T, typename U>
+    void __append_scalar_encoded(T& obj, const std::string &name, py::object& py_value)
     {
-        bopy::object p0 = py_value[0];
-        bopy::object p1 = py_value[1];
+//        py::object p0 = py_value[0];
+//        py::object p1 = py_value[1];
+//
+//        const char* encoded_format = py::extract<const char *> (p0.ptr());
+//
+//        PyObject* data_ptr = p1.ptr();
+//        Py_buffer view;
+//
+//        if (PyObject_GetBuffer(data_ptr, &view, PyBUF_FULL_RO) < 0)
+//        {
+//            throw_wrong_python_data_type(obj.get_name(), "append_scalar_encoded");
+//        }
+//        CORBA::ULong nb = static_cast<CORBA::ULong>(view.len);
+//        Tango::DevVarCharArray arr(nb, nb, (CORBA::Octet*)view.buf, false);
+//        Tango::DevEncoded value;
+//        value.encoded_format = CORBA::string_dup(encoded_format);
+//        value.encoded_data = arr;
+//        obj << value;
+//        PyBuffer_Release(&view);
+    }
 
-        const char* encoded_format = bopy::extract<const char *> (p0.ptr());
-
-        PyObject* data_ptr = p1.ptr();
-        Py_buffer view;
-
-        if (PyObject_GetBuffer(data_ptr, &view, PyBUF_FULL_RO) < 0)
-        {
-            throw_wrong_python_data_type(obj.get_name(), "append_scalar_encoded");
-        }
-        CORBA::ULong nb = static_cast<CORBA::ULong>(view.len);
-        Tango::DevVarCharArray arr(nb, nb, (CORBA::Octet*)view.buf, false);
-        Tango::DevEncoded value;
-        value.encoded_format = CORBA::string_dup(encoded_format);
-        value.encoded_data = arr;
+    template<typename T, typename U>
+    void __append_scalar(T &obj, const std::string &name, py::object& py_value)
+    {
+        U value = py_value.cast<U>();
         obj << value;
-        PyBuffer_Release(&view);
     }
 
-    template<typename T, long tangoTypeConst>
-    void __append_scalar(T &obj, const std::string &name, bopy::object& py_value)
+    template<typename U>
+    void append_scalar(Tango::DevicePipe& pipe, const std::string &name, py::object& py_value)
     {
-        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-        TangoScalarType tg_value;
-        from_py<tangoTypeConst>::convert(py_value, tg_value);
-// if you use this line of code you will get an unresolved
-// reference for T = <char> don't know why!
-//        obj << tg_value;
-        Tango::DataElement<TangoScalarType> data_elt(name, tg_value);
-        obj << data_elt;
+        __append_scalar<Tango::DevicePipe, U>(pipe, name, py_value);
     }
 
-    template<long tangoTypeConst>
-    void append_scalar(Tango::DevicePipe& pipe, const std::string &name,
-                   bopy::object& py_value)
+    template<typename U>
+    void append_scalar(Tango::DevicePipeBlob& blob, const std::string &name, py::object& py_value)
     {
-        __append_scalar<Tango::DevicePipe, tangoTypeConst>(pipe, name, py_value);
+        __append_scalar<Tango::DevicePipeBlob, U>(blob, name, py_value);
     }
 
-    template<>
-    void append_scalar<Tango::DEV_VOID>(Tango::DevicePipe& pipe,
-                        const std::string &name, bopy::object& py_value)
+    template<typename U>
+    void append_scalar_encoded(Tango::DevicePipe& pipe, const std::string &name, py::object& py_value)
     {
-        throw_wrong_python_data_type(pipe.get_name(), "append_scalar");
+        __append_scalar_encoded<Tango::DevicePipe, U>(pipe, name, py_value);
     }
 
-    template<>
-    void append_scalar<Tango::DEV_PIPE_BLOB>(Tango::DevicePipe& pipe,
-                             const std::string &name,
-                             bopy::object& py_value)
+    template<typename U>
+    void append_scalar_encoded(Tango::DevicePipeBlob& blob, const std::string &name, py::object& py_value)
     {
-        throw_wrong_python_data_type(pipe.get_name(), "append_scalar");
+        __append_scalar_encoded<Tango::DevicePipeBlob, U>(blob, name, py_value);
     }
-
-    template<>
-    void append_scalar<Tango::DEV_ENCODED>(Tango::DevicePipe& pipe,
-                           const std::string &name,
-                           bopy::object& py_value)
-    {
-        append_scalar_encoded<Tango::DevicePipe>(pipe, name, py_value);
-    }
-
-
-    template<long tangoTypeConst>
-    void append_scalar(Tango::DevicePipeBlob& blob, const std::string &name, bopy::object& py_value)
-    {
-        __append_scalar<Tango::DevicePipeBlob, tangoTypeConst>(blob, name, py_value);
-    }
-
-    template<>
-    void append_scalar<Tango::DEV_VOID>(Tango::DevicePipeBlob& blob,
-                        const std::string &name,
-                        bopy::object& py_value)
-    {
-        throw_wrong_python_data_type(blob.get_name(), "append_scalar");
-    }
-
-    template<>
-    void append_scalar<Tango::DEV_PIPE_BLOB>(Tango::DevicePipeBlob& blob,
-                             const std::string &name,
-                             bopy::object& py_value)
-    {
-        throw_wrong_python_data_type(blob.get_name(), "append_scalar");
-    }
-
-    template<>
-    void append_scalar<Tango::DEV_ENCODED>(Tango::DevicePipeBlob& blob,
-                           const std::string &name,
-                           bopy::object& py_value)
-    {
-        append_scalar_encoded<Tango::DevicePipeBlob>(blob, name, py_value);
-    }
-
     // -------------
     // Array version
     // -------------
 
-    template<typename T, long tangoArrayTypeConst>
-    void __append_array(T& obj, const std::string &name, bopy::object& py_value)
+    template<typename T, typename U>
+    void __append_array(T& obj, const std::string &name, py::object& py_value)
     {
-        typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
-        TangoArrayType* value = fast_convert2array<tangoArrayTypeConst>(py_value);
-        obj << value;
+        py::print(py_value);
+        py::list py_list = py_value;
+//        int len = py::len(py_list);
+        std::vector<U> values;
+        for (auto num : py_list) {
+            U value = num.cast<U>();
+            values.push_back(value);
+        }
+        for (auto val : values) {
+            std::cout << val << std::endl;
+        }
+//        obj << len;
+        obj << values;
     }
 
-    template<long tangoArrayTypeConst>
-    void append_array(Tango::DevicePipe& pipe, const std::string &name,
-                  bopy::object& py_value)
+    template<typename U>
+    void append_array(Tango::DevicePipe& pipe, const std::string &name, py::object& py_value)
     {
-        __append_array<Tango::DevicePipe, tangoArrayTypeConst>(pipe, name, py_value);
+        __append_array<Tango::DevicePipe, U>(pipe, name, py_value);
     }
 
-    template<>
-    void append_array<Tango::DEV_VOID>(Tango::DevicePipe& pipe,
-                       const std::string &name,
-                       bopy::object& py_value)
+    template<typename U>
+    void append_array(Tango::DevicePipeBlob& blob, const std::string &name, py::object& py_value)
     {
-        throw_wrong_python_data_type(pipe.get_name(), "append_array");
-    }
-
-    template<>
-    void append_array<Tango::DEV_PIPE_BLOB>(Tango::DevicePipe& pipe,
-                            const std::string &name,
-                            bopy::object& py_value)
-    {
-        throw_wrong_python_data_type(pipe.get_name(), "append_array");
-    }
-
-    template<>
-    void append_array<Tango::DEVVAR_LONGSTRINGARRAY>(Tango::DevicePipe& pipe,
-                                 const std::string &name,
-                                 bopy::object& py_value)
-    {
-        throw_wrong_python_data_type(pipe.get_name(), "append_array");
-    }
-
-    template<>
-    void append_array<Tango::DEVVAR_DOUBLESTRINGARRAY>(Tango::DevicePipe& pipe,
-                                   const std::string &name,
-                                   bopy::object& py_value)
-    {
-        throw_wrong_python_data_type(pipe.get_name(), "append_array");
-    }
-
-    template<long tangoArrayTypeConst>
-    void append_array(Tango::DevicePipeBlob& blob, const std::string &name,
-                  bopy::object& py_value)
-    {
-        __append_array<Tango::DevicePipeBlob, tangoArrayTypeConst>(blob, name, py_value);
-    }
-
-    template<>
-    void append_array<Tango::DEV_VOID>(Tango::DevicePipeBlob& blob,
-                           const std::string &name,
-                           bopy::object& py_value)
-    {
-        throw_wrong_python_data_type(blob.get_name(), "append_array");
-    }
-
-    template<>
-    void append_array<Tango::DEV_PIPE_BLOB>(Tango::DevicePipeBlob& blob,
-                            const std::string &name,
-                            bopy::object& py_value)
-    {
-        throw_wrong_python_data_type(blob.get_name(), "append_array");
-    }
-
-    template<>
-    void append_array<Tango::DEVVAR_LONGSTRINGARRAY>(Tango::DevicePipeBlob& blob,
-                                 const std::string &name,
-                                 bopy::object& py_value)
-    {
-        throw_wrong_python_data_type(blob.get_name(), "append_array");
-    }
-
-    template<>
-    void append_array<Tango::DEVVAR_DOUBLESTRINGARRAY>(Tango::DevicePipeBlob& blob,
-                                   const std::string &name,
-                                   bopy::object& py_value)
-    {
-        throw_wrong_python_data_type(blob.get_name(), "append_array");
+        __append_array<Tango::DevicePipeBlob, U>(blob, name, py_value);
     }
 
     template<typename T>
-    void __append(T& obj, const std::string& name,
-            bopy::object& py_value, const Tango::CmdArgType dtype)
+    void __append(T& obj, const std::string& name, py::object& py_value, const Tango::CmdArgType dtype)
     {
-        TANGO_DO_ON_DEVICE_DATA_TYPE_ID(dtype,
-                append_scalar<tangoTypeConst>(obj, name, py_value);
-            ,
-                append_array<tangoTypeConst>(obj, name, py_value);
-        );
+        // This might be a bit verbose but at least WYSIWYG
+        switch (dtype)
+        {
+        case Tango::DEV_BOOLEAN:
+            append_scalar<Tango::DevBoolean>(obj, name, py_value);
+            break;
+        case Tango::DEV_SHORT:
+            append_scalar<Tango::DevShort>(obj, name, py_value);
+            break;
+        case Tango::DEV_LONG:
+            append_scalar<Tango::DevLong>(obj, name, py_value);
+            break;
+        case Tango::DEV_FLOAT:
+            append_scalar<Tango::DevFloat>(obj, name, py_value);
+            break;
+        case Tango::DEV_DOUBLE:
+            append_scalar<Tango::DevDouble>(obj, name, py_value);
+            break;
+        case Tango::DEV_USHORT:
+            append_scalar<Tango::DevUShort>(obj, name, py_value);
+            break;
+        case Tango::DEV_ULONG:
+            append_scalar<Tango::DevULong>(obj, name, py_value);
+            break;
+        case Tango::DEV_STRING:
+            append_scalar<std::string>(obj, name, py_value);
+            break;
+        case Tango::DEV_STATE:
+            append_scalar<Tango::DevState>(obj, name, py_value);
+            break;
+//        case Tango::CONST_DEV_STRING:
+//            append_scalar<Tango::DevString>(obj, name, py_value);
+//            break;
+        case Tango::DEV_UCHAR:
+            append_scalar<Tango::DevUChar>(obj, name, py_value);
+            break;
+        case Tango::DEV_LONG64:
+            append_scalar<Tango::DevLong64>(obj, name, py_value);
+            break;
+        case Tango::DEV_ULONG64:
+            append_scalar<Tango::DevULong64>(obj, name, py_value);
+            break;
+//        case Tango::DEV_INT:
+//            append_scalar<Tango::DevInt>(obj, name, py_value);
+//            break;
+//        case Tango::DEV_ENUM:
+//            append_scalar<Tango::DevEnum>(obj, name, py_value);
+//            break;
+        case Tango::DEV_ENCODED:
+            append_scalar_encoded<Tango::DevEncoded>(obj, name, py_value);
+            break;
+//        case Tango::DEVVAR_CHARARRAY:
+//            append_array<Tango::DevVarCharArray>(obj, name, py_value);
+//            break;
+//        case Tango::DEVVAR_SHORTARRAY:
+//            append_array<Tango::DevVarShortArray>(obj, name, py_value);
+//            break;
+//        case Tango::DEVVAR_LONGARRAY:
+//            append_array<Tango::DevVarLongArray>(obj, name, py_value);
+//            break;
+//        case Tango::DEVVAR_FLOATARRAY:
+//            append_array<Tango::DevVarFloatArray>(obj, name, py_value);
+//            break;
+        case Tango::DEVVAR_DOUBLEARRAY:
+            append_array<Tango::DevDouble>(obj, name, py_value);
+            break;
+//        case Tango::DEVVAR_USHORTARRAY:
+//            append_array<Tango::DevVarUShortArray>(obj, name, py_value);
+//            break;
+//        case Tango::DEVVAR_ULONGARRAY:
+//            append_array<Tango::DevVarULongArray>(obj, name, py_value);
+//            break;
+//        case Tango::DEVVAR_STRINGARRAY:
+//            append_array<Tango::DevVarStringArray>(obj, name, py_value);
+//            break;
+//        case Tango::DEVVAR_BOOLEANARRAY:
+//            append_array<Tango::DevVarBooleanArray>(obj, name, py_value);
+//            break;
+//        case Tango::DEVVAR_LONG64ARRAY:
+//            append_array<Tango::DevVarLong64Array>(obj, name, py_value);
+//            break;
+//        case Tango::DEVVAR_ULONG64ARRAY:
+//            append_array<Tango::DevVarULong64Array>(obj, name, py_value);
+//            break;
+//        case Tango::DEVVAR_STATEARRAY:
+//            append_array<Tango::DevVarStateArray>(obj, name, py_value);
+//            break;
+        default:
+            throw;
+        }
     }
 
     template<typename T>
-    void __set_value(T& obj, bopy::object& py_value) {
+    void __set_value(T& obj, py::object& py_value)
+    {
         // need to fill item names first because in case it is a sub-blob,
         // the Tango C++ API doesnt't provide a way to do it
-        bopy::ssize_t n = bopy::len(py_value);
-        std::vector < std::string > elem_names;
-        for (size_t i = 0; i < n; ++i) {
-            string s = bopy::extract < std::string > (py_value[i]["name"]);
-            elem_names.push_back(bopy::extract<std::string>(py_value[i]["name"]));
+        std::vector<std::string> elem_names;
+        for (auto item : py_value) {
+            elem_names.push_back(item["name"].cast<std::string>());
         }
         obj.set_data_elt_names(elem_names);
-
-        for (size_t i = 0; i < n; ++i) {
-            bopy::object item = py_value[i];
-            std::string item_name = bopy::extract<std::string>(item["name"]);
-            bopy::object py_item_data = item["value"];
-            Tango::CmdArgType item_dtype = bopy::extract<Tango::CmdArgType>(item["dtype"]);
-            if (item_dtype == Tango::DEV_PIPE_BLOB) // a sub-blob
-            {
-                std::string blob_name = bopy::extract < std::string > (py_item_data[0]);
-                bopy::object py_blob_data = py_item_data[1];
-                Tango::DevicePipeBlob blob(blob_name);
-                __set_value(blob, py_blob_data);
-                obj << blob;
-            } else {
-                __append(obj, item_name, py_item_data, item_dtype);
-            }
+        for (auto item : py_value) {
+            py::print(item);
+            std::string item_name = item["name"].cast<std::string>();
+            py::object item_data = item["value"];
+            Tango::CmdArgType item_dtype;
+            item_dtype = item["dtype"].cast<Tango::CmdArgType>();
+            std::cout << item_dtype << std::endl;
+//            if (item_dtype == Tango::DEV_PIPE_BLOB) // a sub-blob
+//            {
+//                std::string blob_name = py::cast<std::string>(item_data[0]);
+//                py::object py_blob_data = item_data[1];
+//                Tango::DevicePipeBlob blob(blob_name);
+//                __set_value(blob, py_blob_data);
+//                obj << blob;
+//            } else {
+                __append(obj, item_name, item_data, item_dtype);
+//            }
         }
     }
 
-    void set_value(Tango::DevicePipe& pipe, bopy::object& py_value) {
+    void set_value(Tango::DevicePipe& pipe, py::object& py_value)
+    {
         __set_value<Tango::DevicePipe>(pipe, py_value);
     }
 
-//---------------------- end of copy from pipe.cpp -------------------------------------------------
-
-    static void
-    write_pipe(Tango::DeviceProxy& self, const std::string & pipe_name, const std::string & root_blob_name,
-            bopy::object py_value)
+    void set_value(Tango::DevicePipeBlob& blob, py::object& value)
     {
-        Tango::DevicePipe device_pipe(pipe_name, root_blob_name);
-        set_value(device_pipe, py_value);
-        // interface to c++ method
-        AutoPythonAllowThreads guard;
-        self.write_pipe(device_pipe);
+        __set_value<Tango::DevicePipeBlob>(blob, value);
     }
 
-    static bopy::object read_attribute(Tango::DeviceProxy& self, const std::string & attr_name, PyTango::ExtractAs extract_as)
+    template<typename T>
+    bool check_cast(py::handle obj)
     {
-        // Even if there's an exception in convert_to_python, the
-        // DeviceAttribute will be deleted there, so we don't need to worry.
-        Tango::DeviceAttribute* dev_attr = 0;
-        {
-            AutoPythonAllowThreads guard;
-            dev_attr = \
-                    new Tango::DeviceAttribute(self.read_attribute(attr_name.c_str()));
-        }
-        return PyDeviceAttribute::convert_to_python(dev_attr, self, extract_as);
-    }
-
-    static inline bopy::object read_attributes(Tango::DeviceProxy& self, bopy::object py_attr_names, PyTango::ExtractAs extract_as)
-    {
-        CSequenceFromPython<StdStringVector> attr_names(py_attr_names);
-
-        PyDeviceAttribute::AutoDevAttrVector dev_attr_vec;
-        {
-            AutoPythonAllowThreads guard;
-            dev_attr_vec.reset(self.read_attributes(*attr_names));
-        }
-
-        return PyDeviceAttribute::convert_to_python(dev_attr_vec, self, extract_as);
-    }
-
-    static inline void write_attribute(Tango::DeviceProxy& self, const Tango::AttributeInfo & attr_info, bopy::object py_value)
-    {
-        Tango::DeviceAttribute da;
-        PyDeviceAttribute::reset(da, attr_info, py_value);
-        AutoPythonAllowThreads guard;
-        self.write_attribute(da);
-    }
-
-    static inline void write_attribute(Tango::DeviceProxy& self, const string & attr_name, bopy::object py_value)
-    {
-        Tango::DeviceAttribute dev_attr;
-        PyDeviceAttribute::reset(dev_attr, attr_name, self, py_value);
-        {
-            AutoPythonAllowThreads guard;
-            self.write_attribute(dev_attr);
-        }
-    }
-
-    static inline void write_attributes(Tango::DeviceProxy& self, bopy::object py_list)
-    {
-        std::vector<Tango::DeviceAttribute> dev_attrs;
-        pylist_to_devattrs(self, py_list, dev_attrs);
-
-        AutoPythonAllowThreads guard;
-        self.write_attributes(dev_attrs);
-    }
-
-    static inline bopy::object write_read_attribute(Tango::DeviceProxy& self, const string & attr_name, bopy::object py_value, PyTango::ExtractAs extract_as)
-    {
-        Tango::DeviceAttribute w_dev_attr;
-        unique_pointer<Tango::DeviceAttribute> r_dev_attr;
-
-        // Prepare dev_attr structure
-        PyDeviceAttribute::reset(w_dev_attr, attr_name, self, py_value);
-
-        // Do the actual write_read_attribute thing...
-        {
-            AutoPythonAllowThreads guard;
-            Tango::DeviceAttribute da = self.write_read_attribute(w_dev_attr);
-            r_dev_attr.reset(new Tango::DeviceAttribute(da));
-        }
-
-        // Convert the result back to python
-        return PyDeviceAttribute::convert_to_python(r_dev_attr.release(), self, extract_as);
-    }
-
-    static bopy::object
-    write_read_attributes(Tango::DeviceProxy& self,
-                          bopy::object py_name_val_list,
-                          bopy::object py_attr_names,
-                          PyTango::ExtractAs extract_as)
-    {
-        // Convert write
-        std::vector<Tango::DeviceAttribute> dev_attrs;
-        pylist_to_devattrs(self, py_name_val_list, dev_attrs);
-
-        // Convert read
-        CSequenceFromPython<StdStringVector> attr_names(py_attr_names);
-        PyDeviceAttribute::AutoDevAttrVector dev_attr_vec;
-
-        // Do the actual write_read_attributes thing...
-        {
-            AutoPythonAllowThreads guard;
-            dev_attr_vec.reset(self.write_read_attributes(dev_attrs,
-                                                          *attr_names));
-        }
-
-        // Convert the result back to python
-        return PyDeviceAttribute::convert_to_python(dev_attr_vec, self,
-                                                    extract_as);
-    }
-
-    static bopy::object
-    command_history(Tango::DeviceProxy& self, const std::string& cmd_name, int depth)
-    {
-        std::vector<Tango::DeviceDataHistory>* device_data_hist = NULL;
-        bopy::list ret;
-        {
-            AutoPythonAllowThreads guard;
-            device_data_hist =
-                self.command_history(const_cast<std::string&>(cmd_name), depth);
-        }
-        vector<Tango::DeviceDataHistory>::iterator it = device_data_hist->begin();
-        for(;it != device_data_hist->end(); ++it)
-        {
-            Tango::DeviceDataHistory& hist = *it;
-            ret.append(hist);
-        }
-        delete device_data_hist;
-        return ret;
-    }
-
-    static inline bopy::object
-            attribute_history(Tango::DeviceProxy& self, const std::string & attr_name, int depth, PyTango::ExtractAs extract_as)
-    {
-        unique_pointer< vector<Tango::DeviceAttributeHistory> > att_hist;
-        {
-            AutoPythonAllowThreads guard;
-            att_hist.reset(self.attribute_history(const_cast<std::string&>(attr_name), depth));
-        }
-        return PyDeviceAttribute::convert_to_python(att_hist, self, extract_as);
-    }
-
-
-    static inline long read_attributes_asynch(Tango::DeviceProxy& self, bopy::object py_attr_names)
-    {
-        CSequenceFromPython<StdStringVector> attr_names(py_attr_names);
-
-        AutoPythonAllowThreads guard;
-        return self.read_attributes_asynch(*attr_names);
-    }
-
-
-
-    static inline bopy::object read_attributes_reply(Tango::DeviceProxy& self, long id, PyTango::ExtractAs extract_as)
-    {
-        PyDeviceAttribute::AutoDevAttrVector dev_attr_vec;
-        {
-            AutoPythonAllowThreads guard;
-            dev_attr_vec.reset(self.read_attributes_reply(id));
-        }
-        return PyDeviceAttribute::convert_to_python(dev_attr_vec, self, extract_as);
-    }
-
-    static inline bopy::object read_attributes_reply(Tango::DeviceProxy& self, long id, long timeout, PyTango::ExtractAs extract_as)
-    {
-        PyDeviceAttribute::AutoDevAttrVector dev_attr_vec;
-        {
-            AutoPythonAllowThreads guard;
-            dev_attr_vec.reset(self.read_attributes_reply(id, timeout));
-        }
-        return PyDeviceAttribute::convert_to_python(dev_attr_vec, self, extract_as);
-    }
-
-    static inline long write_attributes_asynch(Tango::DeviceProxy& self, bopy::object py_list)
-    {
-        std::vector<Tango::DeviceAttribute> dev_attrs;
-        pylist_to_devattrs(self, py_list, dev_attrs);
-
-        AutoPythonAllowThreads guard;
-        return self.write_attributes_asynch(dev_attrs);
-    }
-
-    static inline void write_attributes_reply(Tango::DeviceProxy& self, long id, long timestamp)
-    {
-        AutoPythonAllowThreads guard;
-        self.write_attributes_reply(id, timestamp);
-    }
-
-    static inline void write_attributes_reply(Tango::DeviceProxy& self, long id)
-    {
-        AutoPythonAllowThreads guard;
-        self.write_attributes_reply(id);
-    }
-
-    static inline void read_attributes_asynch(bopy::object py_self, bopy::object py_attr_names, bopy::object py_cb, PyTango::ExtractAs extract_as)
-    {
-        Tango::DeviceProxy* self = bopy::extract<Tango::DeviceProxy*>(py_self);
-        CSequenceFromPython<StdStringVector> attr_names(py_attr_names);
-
-        PyCallBackAutoDie* cb = bopy::extract<PyCallBackAutoDie*>(py_cb);
-        cb->set_autokill_references(py_cb, py_self);
-        cb->set_extract_as(extract_as);
-
         try {
-            AutoPythonAllowThreads guard;
-            self->read_attributes_asynch(*attr_names, *cb);
-        } catch (...) {
-            cb->unset_autokill_references();
-            throw;
+            obj.cast<T>();
+            return true;
+        } catch (py::cast_error &e) {
+            return false;
+        } catch (py::error_already_set &e) {
+            return false;
         }
-    }
-
-    static inline void write_attributes_asynch(bopy::object py_self, bopy::object py_list, bopy::object py_cb)
-    {
-        Tango::DeviceProxy* self = bopy::extract<Tango::DeviceProxy*>(py_self);
-        std::vector<Tango::DeviceAttribute> dev_attrs;
-        pylist_to_devattrs(*self, py_list, dev_attrs);
-
-        PyCallBackAutoDie* cb = bopy::extract<PyCallBackAutoDie*>(py_cb);
-        cb->set_autokill_references(py_cb, py_self);
-
-        try {
-            AutoPythonAllowThreads guard;
-            self->write_attributes_asynch(dev_attrs, *cb);
-        } catch (...) {
-            cb->unset_autokill_references();
-            throw;
-        }
-    }
-
-    static int subscribe_event_global(
-            bopy::object py_self,
-            Tango::EventType event,
-            bopy::object py_cb,
-            bool stateless)
-    {
-        Tango::DeviceProxy& self = bopy::extract<Tango::DeviceProxy&>(py_self);
-
-        PyCallBackPushEvent* cb = 0;
-        if (bopy::extract<PyCallBackPushEvent&>(py_cb).check()) {
-            cb = bopy::extract<PyCallBackPushEvent*>(py_cb);
-            cb->set_device(py_self);
-
-            AutoPythonAllowThreads guard;
-            return self.subscribe_event(event, cb, stateless);
-        }
-    }
-
-    static int subscribe_event_attrib(
-            bopy::object py_self,
-            const string &attr_name,
-            Tango::EventType event,
-            bopy::object py_cb_or_queuesize,
-            bopy::object &py_filters,
-            bool stateless,
-            PyTango::ExtractAs extract_as )
-    {
-        Tango::DeviceProxy& self = bopy::extract<Tango::DeviceProxy&>(py_self);
-        CSequenceFromPython<StdStringVector> filters(py_filters);
-
-        PyCallBackPushEvent* cb = 0;
-        int event_queue_size = 0;
-        if (bopy::extract<PyCallBackPushEvent&>(py_cb_or_queuesize).check()) {
-            cb = bopy::extract<PyCallBackPushEvent*>(py_cb_or_queuesize);
-
-            cb->set_device(py_self);
-            cb->set_extract_as(extract_as);
-
-            AutoPythonAllowThreads guard;
-            return self.subscribe_event(attr_name, event, cb, *filters, stateless);
-        } else {
-            event_queue_size = bopy::extract<int>(py_cb_or_queuesize);
-            AutoPythonAllowThreads guard;
-            return self.subscribe_event(attr_name, event, event_queue_size,
-                                        *filters, stateless);
-        }
-    }
-
-    static void unsubscribe_event(Tango::DeviceProxy& self, int event)
-    {
-        // If the callback is running, unsubscribe_event will lock
-        // until it finishes. So we MUST release GIL to avoid a deadlock
-        AutoPythonAllowThreads guard;
-        self.unsubscribe_event(event);
-    }
-
-    template<typename ED, typename EDList>
-    static bopy::object
-    get_events__aux(bopy::object py_self, int event_id,
-                    PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy)
-    {
-        Tango::DeviceProxy &self = bopy::extract<Tango::DeviceProxy&>(py_self);
-
-        EDList event_list;
-        self.get_events(event_id, event_list);
-
-        bopy::list r;
-
-        for (size_t i=0; i < event_list.size(); ++i) {
-            ED* event_data = event_list[i];
-
-            bopy::object py_ev(bopy::handle<>(
-                bopy::to_python_indirect<
-                    ED*, bopy::detail::make_owning_holder>()(event_data)));
-
-            // EventDataList deletes EventData's on destructor, so once
-            // we are handling it somewhere else (as an bopy::object) we must
-            // unset the reference
-            event_list[i] = 0;
-
-            PyCallBackPushEvent::fill_py_event(event_data, py_ev, py_self, extract_as);
-
-            r.append(py_ev);
-        }
-        return r;
-    }
-
-    static void
-    get_events__callback(bopy::object py_self, int event_id,
-                         PyCallBackPushEvent *cb, PyTango::ExtractAs extract_as)
-    {
-        Tango::DeviceProxy& self = bopy::extract<Tango::DeviceProxy&>(py_self);
-
-        cb->set_device(py_self);
-        cb->set_extract_as(extract_as);
-
-        self.get_events(event_id, cb);
-    }
-
-    static bopy::object
-    get_events__attr_conf(bopy::object py_self, int event_id)
-    {
-        return get_events__aux<Tango::AttrConfEventData, Tango::AttrConfEventDataList>
-                                                (py_self, event_id);
-    }
-
-    static bopy::object
-    get_events__data(bopy::object py_self, int event_id, PyTango::ExtractAs extract_as)
-    {
-        return get_events__aux<Tango::EventData, Tango::EventDataList>
-                                                (py_self, event_id, extract_as);
-    }
-
-    static bopy::object
-    get_events__data_ready(bopy::object py_self, int event_id)
-    {
-        return get_events__aux<Tango::DataReadyEventData, Tango::DataReadyEventDataList>
-                                                (py_self, event_id);
-    }
-
-    static bopy::object
-    get_events__pipe_data(bopy::object py_self, int event_id, PyTango::ExtractAs extract_as)
-    {
-        return get_events__aux<Tango::PipeEventData, Tango::PipeEventDataList>(py_self, event_id, extract_as);
-    }
-
-    static bopy::object
-    get_events__devintr_change_data(bopy::object py_self, int event_id, PyTango::ExtractAs extract_as)
-    {
-        return get_events__aux<Tango::DevIntrChangeEventData, Tango::DevIntrChangeEventDataList>(py_self, event_id, extract_as);
-    }
-
-    static boost::shared_ptr<Tango::DeviceProxy> makeDeviceProxy1(const std::string& name)
-    {
-    Tango::DeviceProxy* dp = NULL;
-    {
-        AutoPythonAllowThreads guard;
-        dp = new Tango::DeviceProxy(name.c_str());
-    }
-        return boost::shared_ptr<Tango::DeviceProxy>(dp);
-    }
-
-    static boost::shared_ptr<Tango::DeviceProxy> makeDeviceProxy2(const std::string& name, bool b)
-    {
-    Tango::DeviceProxy* dp = NULL;
-    {
-        AutoPythonAllowThreads guard;
-        dp = new Tango::DeviceProxy(name.c_str(), b);
-    }
-    return boost::shared_ptr<Tango::DeviceProxy>(dp);
     }
 };
 
-void export_device_proxy()
-{
-    // The following function declarations are necessary to be able to cast
-    // the function parameters from string& to const string&, otherwise python
-    // will not recognize the method calls
+void export_device_proxy(py::module &m) {
 
-    void (Tango::DeviceProxy::*get_property_)(std::string &, Tango::DbData &) =
-        &Tango::DeviceProxy::get_property;
+    py::class_<Tango::DeviceProxy, Tango::Connection>(m, "DeviceProxy", py::dynamic_attr())
+        .def(py::init<>())
+        .def(py::init<const Tango::DeviceProxy &>())
+        .def(py::init<std::string&>())
+        .def(py::init<std::string&, bool>())
 
-    void (Tango::DeviceProxy::*delete_property_)(std::string &) =
-        &Tango::DeviceProxy::delete_property;
+        .def("__init__", [](std::string& name) {
+            Tango::DeviceProxy* dp = nullptr;
+            std::cout << "executed? " << std::endl;
+            AutoPythonAllowThreads guard;
+            // C++ signature
+            dp = new Tango::DeviceProxy(name);
+            return std::shared_ptr<Tango::DeviceProxy>(dp);
+        })
 
-    bopy::class_<Tango::DeviceProxy, bopy::bases<Tango::Connection> >
-        DeviceProxy("DeviceProxy", bopy::init<>())
-    ;
-
-    DeviceProxy
-        .def(bopy::init<const char *>())
-        .def(bopy::init<const char *, bool>())
-        .def(bopy::init<const Tango::DeviceProxy &>())
-        .def("__init__", boost::python::make_constructor(PyDeviceProxy::makeDeviceProxy1))
-        .def("__init__", boost::python::make_constructor(PyDeviceProxy::makeDeviceProxy2))
+        .def("__init__", [](std::string& name, bool ch_access) {
+            Tango::DeviceProxy* dp = nullptr;
+            std::cout << "executed with bool?" << std::endl;
+            AutoPythonAllowThreads guard;
+            // C++ signature
+            dp = new Tango::DeviceProxy(name, ch_access);
+            return std::shared_ptr<Tango::DeviceProxy>(dp);
+        })
 
         //
         // Pickle
         //
-        .def_pickle(PyDeviceProxy::PickleSuite())
+//        .def_pickle(PyDeviceProxy::PickleSuite())
 
         //
         // general methods
@@ -754,406 +427,490 @@ void export_device_proxy()
         .def("dev_name", &Tango::DeviceProxy::dev_name)
 
         .def("info", &Tango::DeviceProxy::info,
-            ( arg_("self") ),
-            bopy::return_internal_reference<1>() )
+            py::return_value_policy::reference_internal)
 
         .def("get_device_db", &Tango::DeviceProxy::get_device_db,
-            bopy::return_value_policy<bopy::reference_existing_object>())
+            py::return_value_policy::reference)
 
-        .def("_status", &PyDeviceProxy::status,
-            ( arg_("self") ) )
+        .def("_status", [](Tango::DeviceProxy& self) {
+            AutoPythonAllowThreads guard;
+            return self.status();
+        })
+       .def("_state", [](Tango::DeviceProxy& self) {
+            AutoPythonAllowThreads guard;
+            return self.state();
+        })
+        .def("adm_name", &Tango::DeviceProxy::adm_name)
+        .def("description", &Tango::DeviceProxy::description)
+        .def("name", &Tango::DeviceProxy::name)
+        .def("alias", &Tango::DeviceProxy::alias)
 
-        .def("_state", &PyDeviceProxy::state,
-            ( arg_("self") ) )
+        .def("get_tango_lib_version", [](Tango::DeviceProxy& self) {
+            return self.get_tango_lib_version();
+        })
 
-        .def("adm_name", &Tango::DeviceProxy::adm_name,
-            ( arg_("self") ) )
+        .def("_ping", [](Tango::DeviceProxy& self) -> int {
+            AutoPythonAllowThreads guard;
+            return self.ping();
+        })
 
-        .def("description", &Tango::DeviceProxy::description,
-            ( arg_("self") ) )
-
-        .def("name", &Tango::DeviceProxy::name,
-            ( arg_("self") ) )
-
-        .def("alias", &Tango::DeviceProxy::alias,
-            ( arg_("self") ) )
-
-        .def("get_tango_lib_version", &Tango::DeviceProxy::get_tango_lib_version,
-            ( arg_("self") ) )
-
-        .def("_ping", &PyDeviceProxy::ping,
-            ( arg_("self") ) )
-
-
-        .def("black_box", &Tango::DeviceProxy::black_box,
-            ( arg_("self"), arg_("n") ),
-            bopy::return_value_policy<bopy::manage_new_object>() )
+        .def("black_box", [](Tango::DeviceProxy& self, int nb) -> std::vector<std::string>* {
+            return std::move(self.black_box(nb));
+        })
 
         //
         // command methods
         //
-        .def("get_command_list", &Tango::DeviceProxy::get_command_list,
-         ( arg_("self") ),
-            bopy::return_value_policy<bopy::manage_new_object>() )
+        .def("get_command_list", [](Tango::DeviceProxy& self) -> std::vector<std::string>* {
+            return std::move(self.get_command_list());
+        })
 
-        .def("_get_command_config",
-         (Tango::CommandInfoList* (Tango::DeviceProxy::*)(StdStringVector &))
-         &Tango::DeviceProxy::get_command_config,
-         ( arg_("self"), arg_("attr_names") ),
-         bopy::return_value_policy<bopy::manage_new_object>() )
+        .def("_get_command_config", [](Tango::DeviceProxy& self, const std::string& cmd_name) -> Tango::CommandInfo {
+            return self.get_command_config(cmd_name);
+        })
 
-        .def("_get_command_config",
-         (Tango::CommandInfo (Tango::DeviceProxy::*)(const std::string&))
-         &Tango::DeviceProxy::get_command_config,
-         ( arg_("self"), arg_("attr_name") ) )
+        .def("_get_command_config", [](Tango::DeviceProxy& self, std::vector<std::string>& cmd_names) -> Tango::CommandInfoList* {
+            return self.get_command_config(cmd_names);
+        })
 
-        .def("command_query", &Tango::DeviceProxy::command_query,
-            ( arg_("self"), arg_("command") ) )
+        .def("command_query", [](Tango::DeviceProxy& self, std::string cmd_name) -> Tango::CommandInfo {
+            return self.command_query(cmd_name);
+        })
 
-        .def("command_list_query", &Tango::DeviceProxy::command_list_query,
-            ( arg_("self") ),
-            bopy::return_value_policy<bopy::manage_new_object>() )
+        .def("command_list_query", [](Tango::DeviceProxy& self) -> Tango::CommandInfoList* {
+            return std::move(self.command_list_query());
+        })
 
-        .def("import_info", &Tango::DeviceProxy::import_info,
-            ( arg_("self") ) )
+        .def("import_info", [](Tango::DeviceProxy& self) -> Tango::DbDevImportInfo {
+            return self.import_info();
+        })
 
         //
         // property methods
         //
-        .def("_get_property",
-            (void (Tango::DeviceProxy::*) (const std::string &, Tango::DbData &))
-            get_property_,
-            ( arg_("self"), arg_("propname"), arg_("propdata") ) )
+        .def("_get_property", [](Tango::DeviceProxy& self, string& prop_name) -> Tango::DbData {
+            Tango::DbData dbData;
+            self.get_property(prop_name, dbData);
+            return dbData;
+        })
 
-        .def("_get_property",
-            (void (Tango::DeviceProxy::*) (std::vector<std::string>&, Tango::DbData &))
-            &Tango::DeviceProxy::get_property,
-            ( arg_("self"), arg_("propnames"), arg_("propdata") ) )
+        .def("_get_property", [](Tango::DeviceProxy& self, std::vector<std::string>& prop_names) -> Tango::DbData {
+            Tango::DbData dbData;
+            self.get_property(prop_names, dbData);
+            return dbData;
+        })
 
-        .def("_get_property",
-            (void (Tango::DeviceProxy::*) (Tango::DbData &))
-            &Tango::DeviceProxy::get_property,
-            ( arg_("self"), arg_("propdata") ) )
+        .def("_get_property", [](Tango::DeviceProxy& self, Tango::DbData dbData) -> Tango::DbData {
+            self.get_property(dbData);
+            return dbData;
+        })
 
-        .def("_put_property", &Tango::DeviceProxy::put_property,
-            ( arg_("self"), arg_("propdata") ) )
+        .def("_put_property", [](Tango::DeviceProxy& self, Tango::DbData& dbData) -> void {
+            self.put_property(dbData);
+        })
 
-        .def("_delete_property", (void (Tango::DeviceProxy::*) (const std::string &))
-            delete_property_,
-            ( arg_("self"), arg_("propname") ) )
+        .def("_delete_property", [](Tango::DeviceProxy& self, std::string& prop_name) -> void {
+            self.delete_property(prop_name);
+        })
 
-        .def("_delete_property", (void (Tango::DeviceProxy::*) (StdStringVector &))
-            &Tango::DeviceProxy::delete_property,
-            ( arg_("self"), arg_("propnames") ) )
+        .def("_delete_property", [](Tango::DeviceProxy& self, std::vector<std::string>& prop_names) -> void {
+            self.delete_property(prop_names);
+        })
 
-        .def("_delete_property", (void (Tango::DeviceProxy::*) (Tango::DbData &))
-            &Tango::DeviceProxy::delete_property,
-            ( arg_("self"), arg_("propdata") ) )
+        .def("_delete_property", [](Tango::DeviceProxy& self, Tango::DbData& dbData) -> void {
+            self.delete_property(dbData);
+        })
 
-        .def("_get_property_list", &Tango::DeviceProxy::get_property_list,
-            ( arg_("self"), arg_("filter"), arg_("array") ) )
+        .def("_get_property_list", [](Tango::DeviceProxy& self, const std::string& filter, std::vector<std::string>& prop_list) -> std::vector<std::string> {
+            self.get_property_list(filter, prop_list);
+            return prop_list;
+        })
 
         //
         // pipe methods
         //
+        .def("get_pipe_list", [](Tango::DeviceProxy& self) -> std::vector<std::string>* {
+            return self.get_pipe_list();
+        })
 
-        .def("get_pipe_list", &Tango::DeviceProxy::get_pipe_list,
-         ( arg_("self") ),
-         bopy::return_value_policy<bopy::manage_new_object>() )
+        .def("_get_pipe_config", [](Tango::DeviceProxy& self, const std::string& pipe_name) -> Tango::PipeInfo {
+            return self.get_pipe_config(pipe_name);
+        })
 
-        .def("_get_pipe_config",
-         (Tango::PipeInfoList* (Tango::DeviceProxy::*)(StdStringVector &))
-         &Tango::DeviceProxy::get_pipe_config,
-         bopy::return_value_policy<bopy::manage_new_object>() )
-
-        .def("_get_pipe_config",
-         (Tango::PipeInfo (Tango::DeviceProxy::*)(const std::string&))
-         &Tango::DeviceProxy::get_pipe_config,
-         ( arg_("self"), arg_("pipe_name") ) )
+        .def("_get_pipe_config", [](Tango::DeviceProxy& self, std::vector<std::string>& pipe_names) -> Tango::PipeInfoList* {
+            return std::move(self.get_pipe_config(pipe_names));
+        })
 
         .def("_set_pipe_config",
-         (void (Tango::DeviceProxy::*)(Tango::PipeInfoList &))
-         &Tango::DeviceProxy::set_pipe_config,
-         ( arg_("self"), arg_("seq") ) )
+            (void (Tango::DeviceProxy::*)(Tango::PipeInfoList &))
+            &Tango::DeviceProxy::set_pipe_config)
 
-//
-// this should define the c++ signature    Tango::DevicePipe read_pipe(Tango::DeviceProxy& self, const std::string & pipe_name)
-//
-        .def("__read_pipe", &PyDeviceProxy::read_pipe,
-         ( arg_("self"), arg_("pipe_name") ) )
-//
-// this should define the c++ signature   write_pipe(Tango::DeviceProxy& self, Tango::DevicePipe& pipe_data)
-//
-        .def("__write_pipe", &PyDeviceProxy::write_pipe,
-                ( arg_("self"), arg_("pipe_data") ) )
+        .def("__read_pipe", [](Tango::DeviceProxy& self, const std::string& pipe_name) {
+            AutoPythonAllowThreads guard;
+            return self.read_pipe(pipe_name);
+        })
+
+        .def("__write_pipe", [](Tango::DeviceProxy& self, const std::string& pipe_name,
+                              const std::string& root_blob_name, py::object py_value) {
+            Tango::DevicePipe device_pipe(pipe_name, root_blob_name);
+            PyDeviceProxy::set_value(device_pipe, py_value);
+            AutoPythonAllowThreads guard;
+            self.write_pipe(device_pipe);
+        })
 
         //
         // attribute methods
         //
+        .def("get_attribute_list", [](Tango::DeviceProxy& self) -> std::vector<std::string>* {
+            return std::move(self.get_attribute_list());
+        })
 
-        .def("get_attribute_list", &Tango::DeviceProxy::get_attribute_list,
-            ( arg_("self") ),
-            bopy::return_value_policy<bopy::manage_new_object>() )
+        .def("_get_attribute_config", [](Tango::DeviceProxy& self, std::string& attr_name) -> Tango::AttributeInfoEx {
+            return self.get_attribute_config(attr_name);
+        })
 
-        .def("_get_attribute_config",
-            (Tango::AttributeInfoList* (Tango::DeviceProxy::*)(StdStringVector &))
-            &Tango::DeviceProxy::get_attribute_config,
-            ( arg_("self"), arg_("attr_names") ),
-            bopy::return_value_policy<bopy::manage_new_object>() )
+        .def("_get_attribute_config", [](Tango::DeviceProxy& self, std::vector<std::string>& attr_names) -> Tango::AttributeInfoList* {
+            return std::move(self.get_attribute_config(attr_names));
+        })
+        .def("_get_attribute_config_ex", [](Tango::DeviceProxy& self, std::vector<std::string>& attr_names) -> Tango::AttributeInfoListEx* {
+            return std::move(self.get_attribute_config_ex(attr_names));
+        })
 
-        .def("_get_attribute_config",
-            (Tango::AttributeInfoEx (Tango::DeviceProxy::*)(const std::string&))
-            &Tango::DeviceProxy::get_attribute_config,
-            ( arg_("self"), arg_("attr_name") ) )
+        .def("attribute_query", [](Tango::DeviceProxy& self, std::string& attr_name) -> Tango::AttributeInfoEx {
+            return self.attribute_query(attr_name);
+        })
 
-        .def("_get_attribute_config_ex",
-            &Tango::DeviceProxy::get_attribute_config_ex,
-            ( arg_("self"), arg_("attr_names") ),
-            bopy::return_value_policy<bopy::manage_new_object>() )
+        .def("attribute_list_query", [](Tango::DeviceProxy& self) -> Tango::AttributeInfoList* {
+            return std::move(self.attribute_list_query());
+        })
 
-        .def("attribute_query", &Tango::DeviceProxy::attribute_query,
-            ( arg_("self"), arg_("attr_name") ) )
+        .def("attribute_list_query_ex", [](Tango::DeviceProxy& self) -> Tango::AttributeInfoListEx* {
+            return std::move(self.attribute_list_query_ex());
+        })
 
-        .def("attribute_list_query", &Tango::DeviceProxy::attribute_list_query,
-            ( arg_("self") ),
-            bopy::return_value_policy<bopy::manage_new_object>() )
+        .def("_set_attribute_config", [](Tango::DeviceProxy& self, Tango::AttributeInfoList &attrs) -> void {
+            self.set_attribute_config(attrs);
+        })
 
-        .def("attribute_list_query_ex",
-            &Tango::DeviceProxy::attribute_list_query_ex,
-            ( arg_("self") ),
-            bopy::return_value_policy<bopy::manage_new_object>() )
+        .def("_set_attribute_config", [](Tango::DeviceProxy& self, Tango::AttributeInfoListEx& attrs) -> void {
+            self.set_attribute_config(attrs);
+        })
 
-        .def("_set_attribute_config",
-            (void (Tango::DeviceProxy::*)(Tango::AttributeInfoList &))
-            &Tango::DeviceProxy::set_attribute_config,
-            ( arg_("self"), arg_("seq") ) )
+        .def("_read_attribute", [](Tango::DeviceProxy& self, std::string& attr_name,
+                PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy) -> py::object {
+            Tango::DeviceAttribute* dev_attr = nullptr;
+            {
+                AutoPythonAllowThreads guard;
+                dev_attr = new Tango::DeviceAttribute(self.read_attribute(attr_name));
+            }
+            return PyDeviceAttribute::convert_to_python(dev_attr, self, PyTango::ExtractAsNumpy);
+         }, py::arg("attr_name"), py::arg("extract_as")=PyTango::ExtractAsNumpy)
 
-        .def("_set_attribute_config",
-            (void (Tango::DeviceProxy::*)(Tango::AttributeInfoListEx &))
-            &Tango::DeviceProxy::set_attribute_config,
-            ( arg_("self"), arg_("seq") ) )
+        .def("_read_attributes", [](Tango::DeviceProxy& self, std::vector<std::string> &attr_names,
+                PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy) -> py::list {
+            std::unique_ptr<std::vector<Tango::DeviceAttribute>> dev_attr_vec;
+            {
+                AutoPythonAllowThreads guard;
+                dev_attr_vec.reset(self.read_attributes(attr_names));
+            }
+            return PyDeviceAttribute::convert_to_python(dev_attr_vec, self, extract_as);
+        }, py::arg("attr_names"), py::arg("extract_as")=PyTango::ExtractAsNumpy)
 
-        .def("_read_attribute",
-            &PyDeviceProxy::read_attribute,
-            ( arg_("self"), arg_("attr_name"), arg_("extract_as")=PyTango::ExtractAsNumpy ) )
+        .def("_write_attribute",[](Tango::DeviceProxy& self, const string & attr_name, py::object py_value) -> void {
+            Tango::DeviceAttribute dev_attr;
+            PyDeviceAttribute::reset(dev_attr, attr_name, self, py_value);
+            AutoPythonAllowThreads guard;
+            self.write_attribute(dev_attr);
+        })
 
-        .def("_read_attributes",
-            &PyDeviceProxy::read_attributes,
-            ( arg_("self"), arg_("attr_names"), arg_("extract_as")=PyTango::ExtractAsNumpy ) )
+        .def("_write_attribute", [](Tango::DeviceProxy& self, const Tango::AttributeInfo & attr_info, py::object py_value) -> void {
+            Tango::DeviceAttribute da;
+            PyDeviceAttribute::reset(da, attr_info, py_value);
+            AutoPythonAllowThreads guard;
+            self.write_attribute(da);
+        })
 
-        .def("_write_attribute",
-            (void (*)(Tango::DeviceProxy&, const string &, bopy::object ))
-            &PyDeviceProxy::write_attribute,
-            ( arg_("self"), arg_("attr_name"), arg_("value") ) )
+        .def("_write_attributes", [](Tango::DeviceProxy& self, py::object& py_list) -> void {
+            std::vector<Tango::DeviceAttribute> dev_attrs;
+            PyDeviceProxy::pylist_to_devattrs(self, py_list, dev_attrs);
+            AutoPythonAllowThreads guard;
+            self.write_attributes(dev_attrs);
+        })
 
-        .def("_write_attribute",
-            (void (*)(Tango::DeviceProxy&, const Tango::AttributeInfo &, bopy::object ))
-            &PyDeviceProxy::write_attribute,
-            ( arg_("self"), arg_("attr_info"), arg_("value") ) )
+        .def("_write_read_attribute", [](Tango::DeviceProxy& self, std::string& attr_name,
+                py::object py_value, PyTango::ExtractAs extract_as) -> py::object {
+            Tango::DeviceAttribute w_dev_attr;
+            Tango::DeviceAttribute* r_dev_attr;
+            PyDeviceAttribute::reset(w_dev_attr, attr_name, self, py_value);
+            {
+                AutoPythonAllowThreads guard;
+                // C++ signature
+                Tango::DeviceAttribute da = self.write_read_attribute(w_dev_attr);
+                r_dev_attr = new Tango::DeviceAttribute(da);
+            }
+            // Convert the result back to python
+            return PyDeviceAttribute::convert_to_python(r_dev_attr, self, extract_as);
+        })
 
-        .def("_write_attributes",
-            &PyDeviceProxy::write_attributes,
-            ( arg_("self"), arg_("name_val") ) )
-
-        .def("_write_read_attribute",
-            &PyDeviceProxy::write_read_attribute,
-         ( arg_("self"), arg_("attr_name"), arg_("value"), arg_("extract_as")=PyTango::ExtractAsNumpy ) )
-
-        .def("_write_read_attributes",
-         &PyDeviceProxy::write_read_attributes,
-         ( arg_("self"), arg_("attr_in"), arg_("attr_read_names"),
-           arg_("extract_as")=PyTango::ExtractAsNumpy ) )
+        .def("_write_read_attributes", [](Tango::DeviceProxy& self, py::object py_list, PyTango::ExtractAs extract_as)-> py::list {
+            std::vector<Tango::DeviceAttribute> dev_attrs;
+            std::vector<std::string> attr_names;
+            for (auto item : py_list) {
+                py::tuple tup = py::reinterpret_borrow<py::tuple>(item);
+                std::string name = tup[0].cast<std::string>();
+                attr_names.push_back(name);
+            }
+            PyDeviceProxy::pylist_to_devattrs(self, py_list, dev_attrs);
+            std::unique_ptr<std::vector<Tango::DeviceAttribute>> dev_attr_vec;
+            {
+                AutoPythonAllowThreads guard;
+                // C++ signature
+                dev_attr_vec.reset(self.write_read_attributes(dev_attrs, attr_names));
+            }
+            // Convert the result back to python
+            return PyDeviceAttribute::convert_to_python(dev_attr_vec, self, extract_as);
+        })
 
         //
         // history methods
         //
+        .def("command_history", [](Tango::DeviceProxy& self, std::string& cmd_name, int depth) -> std::vector<Tango::DeviceDataHistory>* {
+            AutoPythonAllowThreads guard;
+            return self.command_history(cmd_name, depth);
+        })
 
-        .def("command_history", &PyDeviceProxy::command_history,
-            (arg_("self"), arg_("cmd_name"), arg_("depth")))
-
-        .def("attribute_history", &PyDeviceProxy::attribute_history,
-            (   arg_("self"),
-                arg_("attr_name"),
-                arg_("depth"),
-                arg_("extract_as")=PyTango::ExtractAsNumpy ) )
-
+        .def("attribute_history", [](Tango::DeviceProxy& self, std::string& attr_name, int depth, PyTango::ExtractAs extract_as) -> py::list{
+            std::unique_ptr<std::vector<Tango::DeviceAttributeHistory>> attr_hist;
+            {
+                AutoPythonAllowThreads guard;
+                attr_hist.reset(self.attribute_history(attr_name, depth));
+            }
+            return PyDeviceAttribute::convert_to_python(attr_hist, self, extract_as);
+        }, py::arg("attr_name"), py::arg("depth"), py::arg("extract_as")=PyTango::ExtractAsNumpy)
         //
         // Polling administration methods
         //
+        .def("polling_status", [](Tango::DeviceProxy& self) -> std::vector<std::string>* {
+            return std::move(self.polling_status());
+        })
 
-        .def("polling_status", &Tango::DeviceProxy::polling_status,
-            ( arg_("self") ),
-            bopy::return_value_policy<bopy::manage_new_object>() )
+        .def("poll_command", [](Tango::DeviceProxy& self, std::string& cmd_name, int polling_period) -> void {
+            self.poll_command(cmd_name, polling_period);
+        })
 
-        .def("poll_command",
-            (void (Tango::DeviceProxy::*)(const char *, int)) &Tango::DeviceProxy::poll_command,
-            ( arg_("self"), arg_("cmd_name"), arg_("period") ) )
+        .def("poll_attribute", [](Tango::DeviceProxy& self, std::string &att_name, int polling_period) -> void {
+            self.poll_attribute(att_name, polling_period);
+        })
 
-        .def("poll_attribute",
-            (void (Tango::DeviceProxy::*)(const char *, int)) &Tango::DeviceProxy::poll_attribute,
-            ( arg_("self"), arg_("attr_name"), arg_("period") ) )
+        .def("get_command_poll_period", [](Tango::DeviceProxy& self, std::string& cmd_name) -> int {
+            return self.get_command_poll_period(cmd_name);
+        })
 
-        .def("get_command_poll_period",
-            (int (Tango::DeviceProxy::*)(const char *)) &Tango::DeviceProxy::get_command_poll_period,
-            ( arg_("self"), arg_("cmd_name") ) )
+        .def("get_attribute_poll_period", [](Tango::DeviceProxy& self, std::string& attr_name) -> int {
+            return self.get_attribute_poll_period(attr_name);
+        })
 
-        .def("get_attribute_poll_period",
-            (int (Tango::DeviceProxy::*)(const char *)) &Tango::DeviceProxy::get_attribute_poll_period,
-            ( arg_("self"), arg_("attr_name") ) )
+        .def("is_command_polled", [](Tango::DeviceProxy& self, std::string& cmd_name) -> bool {
+            return self.is_command_polled(cmd_name);
+        })
 
-        .def("is_command_polled",
-            (bool (Tango::DeviceProxy::*)(const char *)) &Tango::DeviceProxy::is_command_polled,
-            ( arg_("self"), arg_("cmd_name") ) )
+        .def("is_attribute_polled", [](Tango::DeviceProxy& self, std::string& attr_name) -> bool {
+            return self.is_attribute_polled(attr_name);
+        })
 
-        .def("is_attribute_polled",
-            (bool (Tango::DeviceProxy::*)(const char *)) &Tango::DeviceProxy::is_attribute_polled,
-            ( arg_("self"), arg_("attr_name") ) )
+        .def("stop_poll_command", [](Tango::DeviceProxy& self, std::string& cmd_name) -> void {
+            self.stop_poll_command(cmd_name);
+        })
 
-        .def("stop_poll_command",
-            (void (Tango::DeviceProxy::*)(const char *)) &Tango::DeviceProxy::stop_poll_command,
-            ( arg_("self"), arg_("cmd_name") ) )
-
-        .def("stop_poll_attribute",
-            (void (Tango::DeviceProxy::*)(const char *)) &Tango::DeviceProxy::stop_poll_attribute,
-            ( arg_("self"), arg_("attr_name") ) )
+        .def("stop_poll_attribute", [](Tango::DeviceProxy& self, std::string& attr_name) -> void {
+            self.stop_poll_attribute(attr_name);
+        })
 
         //
         // Asynchronous methods
         //
-        .def("__read_attributes_asynch",
-            (long (*) (Tango::DeviceProxy &, bopy::object))
-            &PyDeviceProxy::read_attributes_asynch,
-            ( arg_("self"), arg_("attr_names") ) )
+        .def("__read_attributes_asynch", [](Tango::DeviceProxy& self, std::vector<std::string> names /*py::object attr_names*/) -> long {
+            AutoPythonAllowThreads guard;
+            return self.read_attributes_asynch(names);
+        })
 
-        .def("read_attributes_reply",
-            (bopy::object (*) (Tango::DeviceProxy &, long, PyTango::ExtractAs))
-            &PyDeviceProxy::read_attributes_reply,
-            ( arg_("self"), arg_("id"), arg_("extract_as")=PyTango::ExtractAsNumpy ) )
+        .def("read_attributes_reply", [](Tango::DeviceProxy& self, long id, PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy) -> py::list {
+            std::unique_ptr<std::vector<Tango::DeviceAttribute>> dev_attr_vec;
+            {
+                AutoPythonAllowThreads guard;
+                dev_attr_vec.reset(self.read_attributes_reply(id));
+            }
+            return PyDeviceAttribute::convert_to_python(dev_attr_vec, self, extract_as);
+        }, py::arg("id"), py::arg("extract_as")=PyTango::ExtractAsNumpy)
 
-        .def("read_attributes_reply",
-            (bopy::object (*) (Tango::DeviceProxy &, long, long, PyTango::ExtractAs))
-            &PyDeviceProxy::read_attributes_reply,
-            ( arg_("self"), arg_("id"), arg_("timeout"), arg_("extract_as")=PyTango::ExtractAsNumpy ) )
+        .def("read_attributes_reply", [](Tango::DeviceProxy& self, long id, long timeout, PyTango::ExtractAs extract_as) -> py::list {
+            std::unique_ptr<std::vector<Tango::DeviceAttribute>> dev_attr_vec;
+            {
+                AutoPythonAllowThreads guard;
+                dev_attr_vec.reset(self.read_attributes_reply(id, timeout));
+            }
+            return PyDeviceAttribute::convert_to_python(dev_attr_vec, self, extract_as);
+        }, py::arg("id"), py::arg("timeout"), py::arg("extract_as")=PyTango::ExtractAsNumpy)
 
-        .def("pending_asynch_call",
-            &Tango::DeviceProxy::pending_asynch_call,
-            ( arg_("self"), arg_("req_type") ) )
+        .def("pending_asynch_call", [](Tango::DeviceProxy& self, Tango::asyn_req_type req_type)  -> long {
+            return self.pending_asynch_call(req_type);
+        })
 
-        .def("__write_attributes_asynch",
-            (long (*) (Tango::DeviceProxy &, bopy::object))
-            &PyDeviceProxy::write_attributes_asynch,
-            ( arg_("self"), arg_("values") ) )
+        .def("__write_attributes_asynch", [](Tango::DeviceProxy& self, py::object py_list) -> long {
+            std::vector<Tango::DeviceAttribute> dev_attrs;
+            PyDeviceProxy::pylist_to_devattrs(self, py_list, dev_attrs);
+            AutoPythonAllowThreads guard;
+            return self.write_attributes_asynch(dev_attrs);
+        })
 
-        .def("write_attributes_reply",
-            (void (*) (Tango::DeviceProxy &, long))
-            &PyDeviceProxy::write_attributes_reply,
-            ( arg_("self"), arg_("id") ) )
+        .def("write_attributes_reply", [](Tango::DeviceProxy& self, long id) {
+            AutoPythonAllowThreads guard;
+            self.write_attributes_reply(id);
+        })
 
-        .def("write_attributes_reply",
-            (void (*) (Tango::DeviceProxy &, long, long))
-            &PyDeviceProxy::write_attributes_reply,
-            ( arg_("self"), arg_("id"), arg_("timeout") ) )
+        .def("write_attributes_reply",[](Tango::DeviceProxy& self, long id, long timeout) {
+            AutoPythonAllowThreads guard;
+            self.write_attributes_reply(id, timeout);
+        })
 
-        .def("__read_attributes_asynch",
-            (void (*) (bopy::object, bopy::object, bopy::object, PyTango::ExtractAs))
-            &PyDeviceProxy::read_attributes_asynch,
-            ( arg_("self"), arg_("attr_names"), arg_("callback"), arg_("extract_as")=PyTango::ExtractAsNumpy ) )
+//        .def("__read_attributes_asynch",
+//            (void (*) (py::object, py::object, py::object, PyTango::ExtractAs))
+//            &PyDeviceProxy::read_attributes_asynch,
+//            py::arg("self"), py::arg("attr_names"), py::arg("callback"),
+//            py::arg("extract_as")=PyTango::ExtractAsNumpy))
 
-        .def("__write_attributes_asynch",
-            (void (*) (bopy::object, bopy::object, bopy::object))
-            &PyDeviceProxy::write_attributes_asynch,
-            ( arg_("self"), arg_("values"), arg_("callback") ) )
+//        .def("__write_attributes_asynch",
+//            (void (*) (py::object, py::object, py::object))
+//            &PyDeviceProxy::write_attributes_asynch,
+//            py::arg("self"), py::arg("values"), py::arg("callback"))
 
         //
         // Logging administration methods
         //
+        .def("add_logging_target", [](Tango::DeviceProxy& self, const string &target_type_name) -> void {
+            self.add_logging_target(target_type_name);
+        })
 
-        .def("add_logging_target",
-            (void (Tango::DeviceProxy::*)(const std::string &)) &Tango::DeviceProxy::add_logging_target,
-            ( arg_("self"), arg_("target_type_target_name") ) )
+        .def("remove_logging_target", [](Tango::DeviceProxy& self, const string &target_type_name) -> void {
+                self.remove_logging_target(target_type_name);
+        })
 
-        .def("remove_logging_target",
-            (void (Tango::DeviceProxy::*)(const std::string &)) &Tango::DeviceProxy::remove_logging_target,
-            ( arg_("self"), arg_("target_type_target_name") ) )
+        .def("get_logging_target", [](Tango::DeviceProxy& self) -> std::vector<std::string> {
+            return self.get_logging_target();
+        })
 
-        .def("get_logging_target", &Tango::DeviceProxy::get_logging_target,
-            ( arg_("self") ) )
+        .def("get_logging_level", [](Tango::DeviceProxy& self) -> int {
+            return self.get_logging_level();
+        })
 
-        .def("get_logging_level", &Tango::DeviceProxy::get_logging_level,
-            ( arg_("self") ) )
-
-        .def("set_logging_level", &Tango::DeviceProxy::set_logging_level,
-            ( arg_("self"), arg_("level") ))
+        .def("set_logging_level", [](Tango::DeviceProxy& self, int level) -> void {
+            self.set_logging_level(level);
+        })
 
         //
         // Event methods
         //
+        .def("__subscribe_event", [](Tango::DeviceProxy& self,
+                                     string& attr_name,
+                                     Tango::EventType event,
+                                     py::object py_cb_or_queuesize,
+                                     std::vector<std::string> filters,
+                                     bool stateless,
+                                     PyTango::ExtractAs extract_as) -> int {
+            py::print(py_cb_or_queuesize);
+            py::print(filters);
+            py::print(stateless);
+            py::object obj = py_cb_or_queuesize;
+            if (PyDeviceProxy::check_cast<int>(py_cb_or_queuesize)) {
+                std::cout << "falling to cast int " << std::endl;
+                int event_queue_size = py_cb_or_queuesize.cast<int>();
+                AutoPythonAllowThreads guard;
+                return self.subscribe_event(attr_name, event, event_queue_size, filters, stateless);
+            } else {
+                std::cout << "about to cast" << std::endl;
+                PyCallBackPushEvent* cb = nullptr;
+                cb = obj.cast<PyCallBackPushEvent*>();
+                py::print(cb);
+//                cb = py_cb_or_queuesize.cast<PyCallBackPushEvent*>();
+//                cb->set_device(self);
+//                cb->set_extract_as(extract_as);
+                AutoPythonAllowThreads guard;
+                return self.subscribe_event(attr_name, event, cb, filters, stateless);
+            }
+        }, py::arg("attr_name"),
+           py::arg("event"),
+           py::arg("cb_or_queuesize"),
+           py::arg("filters")=py::list(),
+           py::arg("stateless")=false,
+           py::arg("extract_as")=PyTango::ExtractAsNumpy)
 
-        .def("__subscribe_event", &PyDeviceProxy::subscribe_event_global,
-            ( arg_("self"), arg_("event"), arg_("cb_or_queuesize") ))
+        .def("__unsubscribe_event", [](Tango::DeviceProxy& self, int event_id) -> void {
+            // If the callback is running, unsubscribe_event will lock
+            // until it finishes. So we MUST release GIL to avoid a deadlock
+            AutoPythonAllowThreads guard;
+            self.unsubscribe_event(event_id);
+        })
 
-        .def("__subscribe_event", &PyDeviceProxy::subscribe_event_attrib,
-            (   arg_("self"),
-                arg_("attr_name"),
-                arg_("event"),
-                arg_("cb_or_queuesize"),
-                arg_("filters")=bopy::list(),
-                arg_("stateless")=false,
-                arg_("extract_as")=PyTango::ExtractAsNumpy )
-            )
+//         .def("__get_callback_events", [](py::object py_self, int event_id,
+//             PyCallBackPushEvent *cb, PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy) {
+//             Tango::DeviceProxy& self = py::extract<Tango::DeviceProxy&>(py_self);
+//             cb->set_device(py_self);
+//             cb->set_extract_as(extract_as);
+//             self.get_events(event_id, cb);
+//        })
+//        .def("__get_attr_conf_events", [](py::object py_self, int event_id) {
+//            return get_events__aux<Tango::AttrConfEventData, Tango::AttrConfEventDataList>(
+//                                                        py_self, event_id);
+//        })
+//        .def("__get_data_events", [](py::object py_self, int event_id, PyTango::ExtractAs extract_as) {
+//            return get_events__aux<Tango::EventData, Tango::EventDataList>(
+//                                                        py_self, event_id, extract_as);
+//        })
+//        .def("__get_data_ready_events", [](py::object py_self, int event_id) {
+//            return get_events__aux<Tango::DataReadyEventData, Tango::DataReadyEventDataList>(
+//                py_self, event_id);
+//        });
 
-        .def("__unsubscribe_event", &PyDeviceProxy::unsubscribe_event )
-
-        .def("__get_callback_events", PyDeviceProxy::get_events__callback,
-            ( arg_("self"), arg_("event_id"), arg_("callback"), arg_("extract_as")=PyTango::ExtractAsNumpy) )
-
-        .def("__get_attr_conf_events", PyDeviceProxy::get_events__attr_conf,
-            ( arg_("self"), arg_("event_id")) )
-
-        .def("__get_data_events", PyDeviceProxy::get_events__data,
-            ( arg_("self"), arg_("event_id"), arg_("extract_as")=PyTango::ExtractAsNumpy ))
-
-        .def("__get_data_ready_events", PyDeviceProxy::get_events__data_ready,
-            ( arg_("self"), arg_("event_id")) )
-
-        .def("__get_pipe_events", PyDeviceProxy::get_events__pipe_data,
-            ( arg_("self"), arg_("event_id"), arg_("extract_as")=PyTango::ExtractAsNumpy ))
-
-        .def("__get_devintr_change_events", PyDeviceProxy::get_events__devintr_change_data,
-            ( arg_("self"), arg_("event_id")) )
-
+        //
         // methods to access data in event queues
-        .def("event_queue_size", &Tango::DeviceProxy::event_queue_size,
-            ( arg_("self"), arg_("event_id") ) )
+        //
+        .def("event_queue_size", [](Tango::DeviceProxy& self, int event_id) -> int {
+            return self.event_queue_size(event_id);
+        })
 
-        .def("get_last_event_date", &Tango::DeviceProxy::get_last_event_date,
-            ( arg_("self"), arg_("event_id") ) )
+        .def("get_last_event_date", [](Tango::DeviceProxy& self, int event_id) -> Tango::TimeVal {
+            return self.get_last_event_date(event_id);
+        })
 
-        .def("is_event_queue_empty", &Tango::DeviceProxy::is_event_queue_empty,
-            ( arg_("self"), arg_("event_id") ) )
+        .def("is_event_queue_empty", [](Tango::DeviceProxy& self, int event_id) -> bool {
+            return self.is_event_queue_empty(event_id);
+        })
 
         //
         // Locking methods
         //
-        .def("lock", &Tango::DeviceProxy::lock,
-            lock_overloads( ( arg_("lock_validity") )))
+        .def("lock", [](Tango::DeviceProxy& self, int lock_validity) -> void {
+            return self.lock(lock_validity);
+        }, py::arg("lock_validity")=Tango::DEFAULT_LOCK_VALIDITY)
 
-        .def("unlock", &Tango::DeviceProxy::unlock,
-            unlock_overloads( arg_("force")))
+        .def("unlock", [](Tango::DeviceProxy& self, bool force) -> void {
+            return self.unlock(force);
+        }, py::arg("force")=false)
 
-        .def("locking_status", &Tango::DeviceProxy::locking_status,
-            ( arg_("self") ))
+        .def("locking_status", [](Tango::DeviceProxy& self) -> std::string {
+            return self.locking_status();
+        })
 
-        .def("is_locked", &Tango::DeviceProxy::is_locked,
-            ( arg_("self") ))
+        .def("is_locked", [](Tango::DeviceProxy& self) -> bool {
+            return self.is_locked();
+        })
 
-        .def("is_locked_by_me", &Tango::DeviceProxy::is_locked_by_me,
-            ( arg_("self") ))
+        .def("is_locked_by_me", [](Tango::DeviceProxy& self) -> bool {
+            return self.is_locked_by_me();
+        })
 
-        .def("get_locker", &Tango::DeviceProxy::get_locker,
-            ( arg_("self"), arg_("lockinfo") ))
-
-        /// This is to be used by the python layer of this api...
-        //.setattr("__subscribed_events", bopy::dict())
-        ;
+        .def("get_locker", [](Tango::DeviceProxy& self, Tango::LockerInfo& li) -> bool {
+            return self.get_locker(li);
+        })
+    ;
 }

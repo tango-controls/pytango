@@ -9,12 +9,12 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_version()
-{
-    scope().attr("__tangolib_version__") = Tango::TgLibVers;
+void export_version(py::module &m) {
+    m.attr("__tangolib_version__") = Tango::TgLibVers
+    ;
 }

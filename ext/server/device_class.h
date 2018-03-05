@@ -8,11 +8,9 @@
   either version 3 of the License, or (at your option) any later version.
   See LICENSE.txt for more info.
 ******************************************************************************/
-
 #ifndef _DEVICE_CLASS_H_
 #define _DEVICE_CLASS_H_
 
-#include <boost/python.hpp>
 #include <tango.h>
 
 class CppDeviceClass: public Tango::DeviceClass

@@ -9,20 +9,21 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-void export_user_default_fwdattr_prop()
-{
-    boost::python::class_<Tango::UserDefaultFwdAttrProp, boost::noncopyable>("UserDefaultFwdAttrProp")
+namespace py = pybind11;
+
+void export_user_default_fwdattr_prop(py::module &m) {
+    py::class_<Tango::UserDefaultFwdAttrProp>(m, "UserDefaultFwdAttrProp")
         .def("set_label", &Tango::UserDefaultFwdAttrProp::set_label)
     ;
 }
 
-void export_fwdattr()
-{
-    boost::python::class_<Tango::FwdAttr, boost::noncopyable>("FwdAttr",
-        boost::python::init<const std::string &, const std::string&>())
+void export_fwdattr(py::module &m) {
+    py::class_<Tango::FwdAttr>(m, "FwdAttr")
+        .def(py::init<const std::string&, const std::string&>())
         .def("set_default_properties", &Tango::FwdAttr::set_default_properties)
     ;
 }
+

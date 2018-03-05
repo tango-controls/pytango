@@ -9,47 +9,37 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
-#include "tango_numpy.h"
-#include "tgutils.h"
+#include <pybind11/pybind11.h>
+#include "defs.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 
 long TANGO_VERSION_HEX;
 
-void export_constants()
-{
-    object consts_module(handle<>(borrowed(PyImport_AddModule("tango.constants"))));
-    scope().attr("constants") = consts_module;
-    scope consts_scope = consts_module;
+void export_constants(py::module &m) {
+    py::module m2 = m.def_submodule("constants", "module containing several Tango constants.");
 
-    consts_scope.attr("__doc__") = "module containing several Tango constants.\n"
-        "\nNew in PyTango 7.0.0";
+    m2.attr("__doc__") = "module containing several Tango constants.\n"
+                         "\nNew in PyTango 7.0.0";
 
 #ifdef DISABLE_PYTANGO_NUMPY
-    consts_scope.attr("NUMPY_SUPPORT") = false;
-    consts_scope.attr("NUMPY_VERSION") = "0.0.0";
+    m2.attr("NUMPY_SUPPORT") = false;
+    m2.attr("NUMPY_VERSION") = "0.0.0";
 #else
-    consts_scope.attr("NUMPY_SUPPORT") = true;
+    m2.attr("NUMPY_SUPPORT") = true;
 #ifdef PYTANGO_NUMPY_VERSION
-    consts_scope.attr("NUMPY_VERSION") = PYTANGO_NUMPY_VERSION;
+    m2.attr("NUMPY_VERSION") = PYTANGO_NUMPY_VERSION;
 #else
-    consts_scope.attr("NUMPY_VERSION") = "0.0.0";
+    m2.attr("NUMPY_VERSION") = "0.0.0";
 #endif
 #endif
 
-    consts_scope.attr("PY_MAJOR_VERSION") = PY_MAJOR_VERSION;
-    consts_scope.attr("PY_MINOR_VERSION") = PY_MINOR_VERSION;
-    consts_scope.attr("PY_MICRO_VERSION") = PY_MICRO_VERSION;
-    consts_scope.attr("PY_VERSION") = PY_VERSION;
-    consts_scope.attr("PY_VERSION_HEX") = PY_VERSION_HEX;
-
-    consts_scope.attr("BOOST_MAJOR_VERSION") = BOOST_VERSION / 100000;
-    consts_scope.attr("BOOST_MINOR_VERSION") = BOOST_VERSION / 100 % 1000;
-    consts_scope.attr("BOOST_PATCH_VERSION") = BOOST_VERSION % 100;
-    // missing BOOST_VERSION => do it in python
-
+    m2.attr("PY_MAJOR_VERSION") = PY_MAJOR_VERSION;
+    m2.attr("PY_MINOR_VERSION") = PY_MINOR_VERSION;
+    m2.attr("PY_MICRO_VERSION") = PY_MICRO_VERSION;
+    m2.attr("PY_VERSION") = PY_VERSION;
+    m2.attr("PY_VERSION_HEX") = PY_VERSION_HEX;
 
     //
     // From tango_const.h
@@ -58,132 +48,132 @@ void export_constants()
     //
     // Some general interest define
     //
-    consts_scope.attr("TANGO_VERSION_MAJOR") = TANGO_VERSION_MAJOR;
-    consts_scope.attr("TANGO_VERSION_MINOR") = TANGO_VERSION_MINOR;
-    consts_scope.attr("TANGO_VERSION_PATCH") = TANGO_VERSION_PATCH;
-    consts_scope.attr("TANGO_VERSION_NB") = TANGO_VERSION_NB;
-    consts_scope.attr("TANGO_VERSION") = Tango::TgLibVers;
+    m2.attr("TANGO_VERSION_MAJOR") = TANGO_VERSION_MAJOR;
+    m2.attr("TANGO_VERSION_MINOR") = TANGO_VERSION_MINOR;
+    m2.attr("TANGO_VERSION_PATCH") = TANGO_VERSION_PATCH;
+//    m2.attr("TANGO_VERSION_NB") = TANGO_VERSION_NB;
+    m2.attr("TANGO_VERSION") = Tango::TgLibVers;
 
-    consts_scope.attr("TgLibVers") = Tango::TgLibVers;
-    consts_scope.attr("TgLibMajorVers") = Tango::TgLibMajorVers;
-    consts_scope.attr("TgLibVersNb") = Tango::TgLibVersNb;
-    consts_scope.attr("DevVersion") = Tango::DevVersion;
-    consts_scope.attr("DefaultMaxSeq") = Tango::DefaultMaxSeq;
-    consts_scope.attr("DefaultBlackBoxDepth") = Tango::DefaultBlackBoxDepth;
-    consts_scope.attr("DefaultPollRingDepth") = Tango::DefaultPollRingDepth;
+    m2.attr("TgLibVers") = Tango::TgLibVers;
+    m2.attr("TgLibMajorVers") = Tango::TgLibMajorVers;
+    m2.attr("TgLibVersNb") = Tango::TgLibVersNb;
+    m2.attr("DevVersion") = Tango::DevVersion;
+    m2.attr("DefaultMaxSeq") = Tango::DefaultMaxSeq;
+    m2.attr("DefaultBlackBoxDepth") = Tango::DefaultBlackBoxDepth;
+    m2.attr("DefaultPollRingDepth") = Tango::DefaultPollRingDepth;
 
-    consts_scope.attr("InitialOutput") =Tango:: InitialOutput;
-    consts_scope.attr("DSDeviceDomain") = Tango::DSDeviceDomain;
-    consts_scope.attr("DefaultDocUrl") = Tango::DefaultDocUrl;
-    consts_scope.attr("EnvVariable") = Tango::EnvVariable;
-    consts_scope.attr("WindowsEnvVariable") = Tango::WindowsEnvVariable;
-    consts_scope.attr("DbObjName") = Tango::DbObjName;
+    m2.attr("InitialOutput") =Tango:: InitialOutput;
+    m2.attr("DSDeviceDomain") = Tango::DSDeviceDomain;
+    m2.attr("DefaultDocUrl") = Tango::DefaultDocUrl;
+    m2.attr("EnvVariable") = Tango::EnvVariable;
+    m2.attr("WindowsEnvVariable") = Tango::WindowsEnvVariable;
+    m2.attr("DbObjName") = Tango::DbObjName;
 
     // Changed in tango 8 from DescNotSet to NotSet. We keep the old constant
     // to try to maintain backward compatibility
-    consts_scope.attr("DescNotSet") = Tango::NotSet;
-    consts_scope.attr("NotSet") = Tango::NotSet;
+    m2.attr("DescNotSet") = Tango::NotSet;
+    m2.attr("NotSet") = Tango::NotSet;
 
-    consts_scope.attr("ResNotDefined") = Tango::ResNotDefined;
-    consts_scope.attr("MessBoxTitle") = Tango::MessBoxTitle;
-    consts_scope.attr("StatusNotSet") = Tango::StatusNotSet;
-    consts_scope.attr("TangoHostNotSet") = Tango::TangoHostNotSet;
-    consts_scope.attr("RootAttNotDef") = Tango::RootAttNotDef;
+    m2.attr("ResNotDefined") = Tango::ResNotDefined;
+    m2.attr("MessBoxTitle") = Tango::MessBoxTitle;
+    m2.attr("StatusNotSet") = Tango::StatusNotSet;
+    m2.attr("TangoHostNotSet") = Tango::TangoHostNotSet;
+    m2.attr("RootAttNotDef") = Tango::RootAttNotDef;
 
-    consts_scope.attr("DefaultWritAttrProp") = Tango::DefaultWritAttrProp;
-    consts_scope.attr("AllAttr") = Tango::AllAttr;
-    consts_scope.attr("AllAttr_3") = Tango::AllAttr_3;
-    consts_scope.attr("AllPipe") = Tango::AllPipe;
-    consts_scope.attr("AllCmd") = Tango::AllCmd;
+    m2.attr("DefaultWritAttrProp") = Tango::DefaultWritAttrProp;
+    m2.attr("AllAttr") = Tango::AllAttr;
+    m2.attr("AllAttr_3") = Tango::AllAttr_3;
+    m2.attr("AllPipe") = Tango::AllPipe;
+    m2.attr("AllCmd") = Tango::AllCmd;
 
-    consts_scope.attr("PollCommand") = Tango::PollCommand;
-    consts_scope.attr("PollAttribute") = Tango::PollAttribute;
+    m2.attr("PollCommand") = Tango::PollCommand;
+    m2.attr("PollAttribute") = Tango::PollAttribute;
 
-    consts_scope.attr("LOCAL_POLL_REQUEST") = Tango::LOCAL_POLL_REQUEST;
-    consts_scope.attr("LOCAL_REQUEST_STR_SIZE") = Tango::LOCAL_REQUEST_STR_SIZE;
+    m2.attr("LOCAL_POLL_REQUEST") = Tango::LOCAL_POLL_REQUEST;
+    m2.attr("LOCAL_REQUEST_STR_SIZE") = Tango::LOCAL_REQUEST_STR_SIZE;
 
-    consts_scope.attr("MIN_POLL_PERIOD") = Tango::MIN_POLL_PERIOD;
-    consts_scope.attr("DELTA_T") = Tango::DELTA_T;
-    consts_scope.attr("MIN_DELTA_WORK") = Tango::MIN_DELTA_WORK;
-    consts_scope.attr("TIME_HEARTBEAT") = Tango::TIME_HEARTBEAT;
-    consts_scope.attr("POLL_LOOP_NB") = Tango::POLL_LOOP_NB;
-    consts_scope.attr("ONE_SECOND") = Tango::ONE_SECOND;
-    consts_scope.attr("DISCARD_THRESHOLD") = Tango::DISCARD_THRESHOLD;
+    m2.attr("MIN_POLL_PERIOD") = Tango::MIN_POLL_PERIOD;
+    m2.attr("DELTA_T") = Tango::DELTA_T;
+    m2.attr("MIN_DELTA_WORK") = Tango::MIN_DELTA_WORK;
+    m2.attr("TIME_HEARTBEAT") = Tango::TIME_HEARTBEAT;
+    m2.attr("POLL_LOOP_NB") = Tango::POLL_LOOP_NB;
+    m2.attr("ONE_SECOND") = Tango::ONE_SECOND;
+    m2.attr("DISCARD_THRESHOLD") = Tango::DISCARD_THRESHOLD;
 
-    consts_scope.attr("DEFAULT_TIMEOUT") = Tango::DEFAULT_TIMEOUT;
-    consts_scope.attr("DEFAULT_POLL_OLD_FACTOR") = Tango::DEFAULT_POLL_OLD_FACTOR;
+    m2.attr("DEFAULT_TIMEOUT") = Tango::DEFAULT_TIMEOUT;
+    m2.attr("DEFAULT_POLL_OLD_FACTOR") = Tango::DEFAULT_POLL_OLD_FACTOR;
 
-    consts_scope.attr("TG_IMP_MINOR_TO") = Tango::TG_IMP_MINOR_TO;
-    consts_scope.attr("TG_IMP_MINOR_DEVFAILED") = Tango::TG_IMP_MINOR_DEVFAILED;
-    consts_scope.attr("TG_IMP_MINOR_NON_DEVFAILED") = Tango::TG_IMP_MINOR_NON_DEVFAILED;
+    m2.attr("TG_IMP_MINOR_TO") = Tango::TG_IMP_MINOR_TO;
+    m2.attr("TG_IMP_MINOR_DEVFAILED") = Tango::TG_IMP_MINOR_DEVFAILED;
+    m2.attr("TG_IMP_MINOR_NON_DEVFAILED") = Tango::TG_IMP_MINOR_NON_DEVFAILED;
 
-    consts_scope.attr("TANGO_PY_MOD_NAME") = Tango::TANGO_PY_MOD_NAME;
-    consts_scope.attr("DATABASE_CLASS") = Tango::DATABASE_CLASS;
+    m2.attr("TANGO_PY_MOD_NAME") = Tango::TANGO_PY_MOD_NAME;
+    m2.attr("DATABASE_CLASS") = Tango::DATABASE_CLASS;
 
-    consts_scope.attr("TANGO_FLOAT_PRECISION") = Tango::TANGO_FLOAT_PRECISION;
-    consts_scope.attr("NoClass") = Tango::NoClass;
+    m2.attr("TANGO_FLOAT_PRECISION") = Tango::TANGO_FLOAT_PRECISION;
+    m2.attr("NoClass") = Tango::NoClass;
 
     //
     // Event related define
     //
 
-    consts_scope.attr("EVENT_HEARTBEAT_PERIOD") = Tango::EVENT_HEARTBEAT_PERIOD;
-    consts_scope.attr("EVENT_RESUBSCRIBE_PERIOD") = Tango::EVENT_RESUBSCRIBE_PERIOD;
-    consts_scope.attr("DEFAULT_EVENT_PERIOD") = Tango::DEFAULT_EVENT_PERIOD;
-    consts_scope.attr("DELTA_PERIODIC") = Tango::DELTA_PERIODIC;
-    consts_scope.attr("DELTA_PERIODIC_LONG") = Tango::DELTA_PERIODIC_LONG;
-    consts_scope.attr("HEARTBEAT") = Tango::HEARTBEAT;
+    m2.attr("EVENT_HEARTBEAT_PERIOD") = Tango::EVENT_HEARTBEAT_PERIOD;
+    m2.attr("EVENT_RESUBSCRIBE_PERIOD") = Tango::EVENT_RESUBSCRIBE_PERIOD;
+    m2.attr("DEFAULT_EVENT_PERIOD") = Tango::DEFAULT_EVENT_PERIOD;
+    m2.attr("DELTA_PERIODIC") = Tango::DELTA_PERIODIC;
+    m2.attr("DELTA_PERIODIC_LONG") = Tango::DELTA_PERIODIC_LONG;
+    m2.attr("HEARTBEAT") = Tango::HEARTBEAT;
 
     //
     // ZMQ event system related define
     //
-    consts_scope.attr("ZMQ_EVENT_PROT_VERSION") = Tango::ZMQ_EVENT_PROT_VERSION;
-    consts_scope.attr("HEARTBEAT_METHOD_NAME") = Tango::HEARTBEAT_METHOD_NAME;
-    consts_scope.attr("EVENT_METHOD_NAME") = Tango::EVENT_METHOD_NAME;
-    consts_scope.attr("HEARTBEAT_EVENT_NAME") = Tango::HEARTBEAT_EVENT_NAME;
-    consts_scope.attr("CTRL_SOCK_ENDPOINT") = Tango::CTRL_SOCK_ENDPOINT;
-    consts_scope.attr("MCAST_PROT") = Tango::MCAST_PROT;
-    consts_scope.attr("MCAST_HOPS") = Tango::MCAST_HOPS;
-    consts_scope.attr("PGM_RATE") = Tango::PGM_RATE;
-    consts_scope.attr("PGM_IVL") = Tango::PGM_IVL;
-    consts_scope.attr("MAX_SOCKET_SUB") = Tango::MAX_SOCKET_SUB;
-    consts_scope.attr("PUB_HWM") = Tango::PUB_HWM;
-    consts_scope.attr("SUB_HWM") = Tango::SUB_HWM;
-    consts_scope.attr("SUB_SEND_HWM") = Tango::SUB_SEND_HWM;
+    m2.attr("ZMQ_EVENT_PROT_VERSION") = Tango::ZMQ_EVENT_PROT_VERSION;
+    m2.attr("HEARTBEAT_METHOD_NAME") = Tango::HEARTBEAT_METHOD_NAME;
+    m2.attr("EVENT_METHOD_NAME") = Tango::EVENT_METHOD_NAME;
+    m2.attr("HEARTBEAT_EVENT_NAME") = Tango::HEARTBEAT_EVENT_NAME;
+    m2.attr("CTRL_SOCK_ENDPOINT") = Tango::CTRL_SOCK_ENDPOINT;
+    m2.attr("MCAST_PROT") = Tango::MCAST_PROT;
+    m2.attr("MCAST_HOPS") = Tango::MCAST_HOPS;
+    m2.attr("PGM_RATE") = Tango::PGM_RATE;
+    m2.attr("PGM_IVL") = Tango::PGM_IVL;
+    m2.attr("MAX_SOCKET_SUB") = Tango::MAX_SOCKET_SUB;
+    m2.attr("PUB_HWM") = Tango::PUB_HWM;
+    m2.attr("SUB_HWM") = Tango::SUB_HWM;
+    m2.attr("SUB_SEND_HWM") = Tango::SUB_SEND_HWM;
 
-    consts_scope.attr("NOTIFD_CHANNEL") = Tango::NOTIFD_CHANNEL;
+    m2.attr("NOTIFD_CHANNEL") = Tango::NOTIFD_CHANNEL;
 
     //
     // Locking feature related defines
     //
 
-    consts_scope.attr("DEFAULT_LOCK_VALIDITY") = Tango::DEFAULT_LOCK_VALIDITY;
-    consts_scope.attr("DEVICE_UNLOCKED_REASON") = Tango::DEVICE_UNLOCKED_REASON;
-    consts_scope.attr("MIN_LOCK_VALIDITY") = Tango::MIN_LOCK_VALIDITY;
-    consts_scope.attr("TG_LOCAL_HOST") = Tango::TG_LOCAL_HOST;
+    m2.attr("DEFAULT_LOCK_VALIDITY") = Tango::DEFAULT_LOCK_VALIDITY;
+    m2.attr("DEVICE_UNLOCKED_REASON") = Tango::DEVICE_UNLOCKED_REASON;
+    m2.attr("MIN_LOCK_VALIDITY") = Tango::MIN_LOCK_VALIDITY;
+    m2.attr("TG_LOCAL_HOST") = Tango::TG_LOCAL_HOST;
 
     //
     // Client timeout as defined by omniORB4.0.0
     //
 
-    consts_scope.attr("CLNT_TIMEOUT_STR") = Tango::CLNT_TIMEOUT_STR;
-    consts_scope.attr("CLNT_TIMEOUT") = Tango::CLNT_TIMEOUT;
-    consts_scope.attr("NARROW_CLNT_TIMEOUT") = Tango::NARROW_CLNT_TIMEOUT;
+    m2.attr("CLNT_TIMEOUT_STR") = Tango::CLNT_TIMEOUT_STR;
+    m2.attr("CLNT_TIMEOUT") = Tango::CLNT_TIMEOUT;
+    m2.attr("NARROW_CLNT_TIMEOUT") = Tango::NARROW_CLNT_TIMEOUT;
 
     //
     // Connection and call timeout for database device
     //
 
-    consts_scope.attr("DB_CONNECT_TIMEOUT") = Tango::DB_CONNECT_TIMEOUT;
-    consts_scope.attr("DB_RECONNECT_TIMEOUT") = Tango::DB_RECONNECT_TIMEOUT;
-    consts_scope.attr("DB_TIMEOUT") = Tango::DB_TIMEOUT;
-    consts_scope.attr("DB_START_PHASE_RETRIES") = Tango::DB_START_PHASE_RETRIES;
+    m2.attr("DB_CONNECT_TIMEOUT") = Tango::DB_CONNECT_TIMEOUT;
+    m2.attr("DB_RECONNECT_TIMEOUT") = Tango::DB_RECONNECT_TIMEOUT;
+    m2.attr("DB_TIMEOUT") = Tango::DB_TIMEOUT;
+    m2.attr("DB_START_PHASE_RETRIES") = Tango::DB_START_PHASE_RETRIES;
 
     //
     // Time to wait before trying to reconnect after
     // a connevtion failure
     //
-    consts_scope.attr("RECONNECTION_DELAY") = Tango::RECONNECTION_DELAY;
+    m2.attr("RECONNECTION_DELAY") = Tango::RECONNECTION_DELAY;
 
     //
     // Access Control related defines
@@ -192,41 +182,41 @@ void export_constants()
     // also update the stored procedure
     //
 
-    consts_scope.attr("CONTROL_SYSTEM") = Tango::CONTROL_SYSTEM;
-    consts_scope.attr("SERVICE_PROP_NAME") = Tango::SERVICE_PROP_NAME;
-    consts_scope.attr("ACCESS_SERVICE") = Tango::ACCESS_SERVICE;
+    m2.attr("CONTROL_SYSTEM") = Tango::CONTROL_SYSTEM;
+    m2.attr("SERVICE_PROP_NAME") = Tango::SERVICE_PROP_NAME;
+    m2.attr("ACCESS_SERVICE") = Tango::ACCESS_SERVICE;
 
     //
     // Polling threads pool related defines
     //
 
-    consts_scope.attr("DEFAULT_POLLING_THREADS_POOL_SIZE") = Tango::DEFAULT_POLLING_THREADS_POOL_SIZE;
+    m2.attr("DEFAULT_POLLING_THREADS_POOL_SIZE") = Tango::DEFAULT_POLLING_THREADS_POOL_SIZE;
 
     //
     // Max transfer size 256 MBytes (in byte). Needed by omniORB
     //
 
-    consts_scope.attr("MAX_TRANSFER_SIZE") = Tango::MAX_TRANSFER_SIZE;
+    m2.attr("MAX_TRANSFER_SIZE") = Tango::MAX_TRANSFER_SIZE;
 
     //
     // Max GIOP connection per server . Needed by omniORB
     //
 
-    consts_scope.attr("MAX_GIOP_PER_SERVER") = Tango::MAX_GIOP_PER_SERVER;
+    m2.attr("MAX_GIOP_PER_SERVER") = Tango::MAX_GIOP_PER_SERVER;
 
     //
     // Tango name length
     //
 
-    consts_scope.attr("MaxServerNameLength") = Tango::MaxServerNameLength;
-    consts_scope.attr("MaxDevPropLength") = Tango::MaxDevPropLength;
+    m2.attr("MaxServerNameLength") = Tango::MaxServerNameLength;
+    m2.attr("MaxDevPropLength") = Tango::MaxDevPropLength;
 
     //
     // For forwarded attribute implementation
     //
-    consts_scope.attr("MIN_IDL_CONF5") = Tango::MIN_IDL_CONF5;
-    consts_scope.attr("MIN_IDL_DEV_INTR") = Tango::MIN_IDL_DEV_INTR;
-    consts_scope.attr("ALL_EVENTS") = Tango::ALL_EVENTS;
+    m2.attr("MIN_IDL_CONF5") = Tango::MIN_IDL_CONF5;
+    m2.attr("MIN_IDL_DEV_INTR") = Tango::MIN_IDL_DEV_INTR;
+    m2.attr("ALL_EVENTS") = Tango::ALL_EVENTS;
 
     // --------------------------------------------------------
 
@@ -234,108 +224,108 @@ void export_constants()
     // Files used to retrieve env. variables
     //
 
-    consts_scope.attr("USER_ENV_VAR_FILE") = Tango::USER_ENV_VAR_FILE;
+    m2.attr("USER_ENV_VAR_FILE") = Tango::USER_ENV_VAR_FILE;
 
-    consts_scope.attr("kLogTargetConsole") = Tango::kLogTargetConsole;
-    consts_scope.attr("kLogTargetFile") = Tango::kLogTargetFile;
-    consts_scope.attr("kLogTargetDevice") = Tango::kLogTargetDevice;
-    consts_scope.attr("kLogTargetSep") = Tango::kLogTargetSep;
+    m2.attr("kLogTargetConsole") = Tango::kLogTargetConsole;
+    m2.attr("kLogTargetFile") = Tango::kLogTargetFile;
+    m2.attr("kLogTargetDevice") = Tango::kLogTargetDevice;
+    m2.attr("kLogTargetSep") = Tango::kLogTargetSep;
 
-    consts_scope.attr("AlrmValueNotSpec") = Tango::AlrmValueNotSpec;
-    consts_scope.attr("AssocWritNotSpec") = Tango::AssocWritNotSpec;
-    consts_scope.attr("LabelNotSpec") = Tango::LabelNotSpec;
-    consts_scope.attr("DescNotSpec") = Tango::DescNotSpec;
-    consts_scope.attr("UnitNotSpec") = Tango::UnitNotSpec;
-    consts_scope.attr("StdUnitNotSpec") = Tango::StdUnitNotSpec;
-    consts_scope.attr("DispUnitNotSpec") = Tango::DispUnitNotSpec;
+    m2.attr("AlrmValueNotSpec") = Tango::AlrmValueNotSpec;
+    m2.attr("AssocWritNotSpec") = Tango::AssocWritNotSpec;
+    m2.attr("LabelNotSpec") = Tango::LabelNotSpec;
+    m2.attr("DescNotSpec") = Tango::DescNotSpec;
+    m2.attr("UnitNotSpec") = Tango::UnitNotSpec;
+    m2.attr("StdUnitNotSpec") = Tango::StdUnitNotSpec;
+    m2.attr("DispUnitNotSpec") = Tango::DispUnitNotSpec;
 #ifdef FormatNotSpec
-    consts_scope.attr("FormatNotSpec") = Tango::FormatNotSpec;
+    m2.attr("FormatNotSpec") = Tango::FormatNotSpec;
 #else
-    consts_scope.attr("FormatNotSpec") = Tango::FormatNotSpec_FL;
+    m2.attr("FormatNotSpec") = Tango::FormatNotSpec_FL;
 #endif
-    consts_scope.attr("FormatNotSpec_FL") = Tango::FormatNotSpec_FL;
-    consts_scope.attr("FormatNotSpec_INT") = Tango::FormatNotSpec_INT;
-    consts_scope.attr("FormatNotSpec_STR") = Tango::FormatNotSpec_STR;
+    m2.attr("FormatNotSpec_FL") = Tango::FormatNotSpec_FL;
+    m2.attr("FormatNotSpec_INT") = Tango::FormatNotSpec_INT;
+    m2.attr("FormatNotSpec_STR") = Tango::FormatNotSpec_STR;
 
-    consts_scope.attr("NotANumber") = Tango::NotANumber;
-    consts_scope.attr("MemNotUsed") = Tango::MemNotUsed;
-    consts_scope.attr("MemAttrPropName") = Tango::MemAttrPropName;
+    m2.attr("NotANumber") = Tango::NotANumber;
+    m2.attr("MemNotUsed") = Tango::MemNotUsed;
+    m2.attr("MemAttrPropName") = Tango::MemAttrPropName;
 
 #ifdef TANGO_LONG64
-    consts_scope.attr("TANGO_LONG32") = false;
-    consts_scope.attr("TANGO_LONG64") = true;
+    m2.attr("TANGO_LONG32") = false;
+    m2.attr("TANGO_LONG64") = true;
 #else
-    consts_scope.attr("TANGO_LONG32") = true;
-    consts_scope.attr("TANGO_LONG64") = false;
+    m2.attr("TANGO_LONG32") = true;
+    m2.attr("TANGO_LONG64") = false;
 #endif
 
-    consts_scope.attr("API_AttrConfig") = Tango::API_AttrConfig;
-    consts_scope.attr("API_AttrEventProp") = Tango::API_AttrEventProp;
-    consts_scope.attr("API_AttrIncorrectDataNumber") = Tango::API_AttrIncorrectDataNumber;
-    consts_scope.attr("API_AttrNoAlarm") = Tango::API_AttrNoAlarm;
-    consts_scope.attr("API_AttrNotAllowed") = Tango::API_AttrNotAllowed;
-    consts_scope.attr("API_AttrNotFound") = Tango::API_AttrNotFound;
-    consts_scope.attr("API_AttrNotWritable") = Tango::API_AttrNotWritable;
-    consts_scope.attr("API_AttrOptProp") = Tango::API_AttrOptProp;
-    consts_scope.attr("API_AttrPropValueNotSet") = Tango::API_AttrPropValueNotSet;
-    consts_scope.attr("API_AttrValueNotSet") = Tango::API_AttrValueNotSet;
-    consts_scope.attr("API_AttrWrongDefined") = Tango::API_AttrWrongDefined;
-    consts_scope.attr("API_AttrWrongMemValue") = Tango::API_AttrWrongMemValue;
-    consts_scope.attr("API_BadConfigurationProperty") = Tango::API_BadConfigurationProperty;
-    consts_scope.attr("API_BlackBoxArgument") = Tango::API_BlackBoxArgument;
-    consts_scope.attr("API_BlackBoxEmpty") = Tango::API_BlackBoxEmpty;
-    consts_scope.attr("API_CannotCheckAccessControl") = Tango::API_CannotCheckAccessControl;
-    consts_scope.attr("API_CannotOpenFile") = Tango::API_CannotOpenFile;
-    consts_scope.attr("API_CantActivatePOAManager") = Tango::API_CantActivatePOAManager;
-    consts_scope.attr("API_CantCreateClassPoa") = Tango::API_CantCreateClassPoa;
-    consts_scope.attr("API_CantCreateLockingThread") = Tango::API_CantCreateLockingThread;
-    consts_scope.attr("API_CantFindLockingThread") = Tango::API_CantFindLockingThread;
-    consts_scope.attr("API_CantGetClientIdent") = Tango::API_CantGetClientIdent;
-    consts_scope.attr("API_CantGetDevObjectId") = Tango::API_CantGetDevObjectId;
-    consts_scope.attr("API_CantInstallSignal") = Tango::API_CantInstallSignal;
-    consts_scope.attr("API_CantRetrieveClass") = Tango::API_CantRetrieveClass;
-    consts_scope.attr("API_CantRetrieveClassList") = Tango::API_CantRetrieveClassList;
-    consts_scope.attr("API_CantStoreDeviceClass") = Tango::API_CantStoreDeviceClass;
-    consts_scope.attr("API_ClassNotFound") = Tango::API_ClassNotFound;
-    consts_scope.attr("API_CmdArgumentTypeNotSupported") = Tango::API_CmdArgumentTypeNotSupported;
-    consts_scope.attr("API_CommandNotAllowed") = Tango::API_CommandNotAllowed;
-    consts_scope.attr("API_CommandNotFound") = Tango::API_CommandNotFound;
-    consts_scope.attr("API_CorbaSysException") = Tango::API_CorbaSysException;
-    consts_scope.attr("API_CorruptedDatabase") = Tango::API_CorruptedDatabase;
-    consts_scope.attr("API_DatabaseAccess") = Tango::API_DatabaseAccess;
-    consts_scope.attr("API_DeviceLocked") = Tango::API_DeviceLocked;
-    consts_scope.attr("API_DeviceNotFound") = Tango::API_DeviceNotFound;
-    consts_scope.attr("API_DeviceNotLocked") = Tango::API_DeviceNotLocked;
-    consts_scope.attr("API_DeviceUnlockable") = Tango::API_DeviceUnlockable;
-    consts_scope.attr("API_DeviceUnlocked") = Tango::API_DeviceUnlocked;
-    consts_scope.attr("API_EventSupplierNotConstructed") = Tango::API_EventSupplierNotConstructed;
-    consts_scope.attr("API_IncoherentDbData") = Tango::API_IncoherentDbData;
-    consts_scope.attr("API_IncoherentDevData") = Tango::API_IncoherentDevData;
-    consts_scope.attr("API_IncoherentValues") = Tango::API_IncoherentValues;
-    consts_scope.attr("API_IncompatibleAttrDataType") = Tango::API_IncompatibleAttrDataType;
-    consts_scope.attr("API_IncompatibleCmdArgumentType") = Tango::API_IncompatibleCmdArgumentType;
-    consts_scope.attr("API_InitMethodNotFound") = Tango::API_InitMethodNotFound;
-    consts_scope.attr("API_InitNotPublic") = Tango::API_InitNotPublic;
-    consts_scope.attr("API_InitThrowsException") = Tango::API_InitThrowsException;
-    consts_scope.attr("API_JavaRuntimeSecurityException") = Tango::API_JavaRuntimeSecurityException;
-    consts_scope.attr("API_MemoryAllocation") = Tango::API_MemoryAllocation;
-    consts_scope.attr("API_MethodArgument") = Tango::API_MethodArgument;
-    consts_scope.attr("API_MethodNotFound") = Tango::API_MethodNotFound;
-    consts_scope.attr("API_MissedEvents") = Tango::API_MissedEvents;
-    consts_scope.attr("API_NotSupportedFeature") = Tango::API_NotSupportedFeature;
-    consts_scope.attr("API_NtDebugWindowError") = Tango::API_NtDebugWindowError;
-    consts_scope.attr("API_OverloadingNotSupported") = Tango::API_OverloadingNotSupported;
-    consts_scope.attr("API_PolledDeviceNotInPoolConf") = Tango::API_PolledDeviceNotInPoolConf;
-    consts_scope.attr("API_PolledDeviceNotInPoolMap") = Tango::API_PolledDeviceNotInPoolMap;
-    consts_scope.attr("API_PollingThreadNotFound") = Tango::API_PollingThreadNotFound;
-    consts_scope.attr("API_ReadOnlyMode") = Tango::API_ReadOnlyMode;
-    consts_scope.attr("API_SignalOutOfRange") = Tango::API_SignalOutOfRange;
-    consts_scope.attr("API_SystemCallFailed") = Tango::API_SystemCallFailed;
-    consts_scope.attr("API_WAttrOutsideLimit") = Tango::API_WAttrOutsideLimit;
-    consts_scope.attr("API_WizardConfError") = Tango::API_WizardConfError;
-    consts_scope.attr("API_WrongEventData") = Tango::API_WrongEventData;
-    consts_scope.attr("API_WrongHistoryDataBuffer") = Tango::API_WrongHistoryDataBuffer;
-    consts_scope.attr("API_WrongLockingStatus") = Tango::API_WrongLockingStatus;
-    consts_scope.attr("API_ZmqInitFailed") = Tango::API_ZmqInitFailed;
-
+    m2.attr("API_AttrConfig") = Tango::API_AttrConfig;
+    m2.attr("API_AttrEventProp") = Tango::API_AttrEventProp;
+    m2.attr("API_AttrIncorrectDataNumber") = Tango::API_AttrIncorrectDataNumber;
+    m2.attr("API_AttrNoAlarm") = Tango::API_AttrNoAlarm;
+    m2.attr("API_AttrNotAllowed") = Tango::API_AttrNotAllowed;
+    m2.attr("API_AttrNotFound") = Tango::API_AttrNotFound;
+    m2.attr("API_AttrNotWritable") = Tango::API_AttrNotWritable;
+    m2.attr("API_AttrOptProp") = Tango::API_AttrOptProp;
+    m2.attr("API_AttrPropValueNotSet") = Tango::API_AttrPropValueNotSet;
+    m2.attr("API_AttrValueNotSet") = Tango::API_AttrValueNotSet;
+    m2.attr("API_AttrWrongDefined") = Tango::API_AttrWrongDefined;
+    m2.attr("API_AttrWrongMemValue") = Tango::API_AttrWrongMemValue;
+    m2.attr("API_BadConfigurationProperty") = Tango::API_BadConfigurationProperty;
+    m2.attr("API_BlackBoxArgument") = Tango::API_BlackBoxArgument;
+    m2.attr("API_BlackBoxEmpty") = Tango::API_BlackBoxEmpty;
+    m2.attr("API_CannotCheckAccessControl") = Tango::API_CannotCheckAccessControl;
+    m2.attr("API_CannotOpenFile") = Tango::API_CannotOpenFile;
+    m2.attr("API_CantActivatePOAManager") = Tango::API_CantActivatePOAManager;
+    m2.attr("API_CantCreateClassPoa") = Tango::API_CantCreateClassPoa;
+    m2.attr("API_CantCreateLockingThread") = Tango::API_CantCreateLockingThread;
+    m2.attr("API_CantFindLockingThread") = Tango::API_CantFindLockingThread;
+    m2.attr("API_CantGetClientIdent") = Tango::API_CantGetClientIdent;
+    m2.attr("API_CantGetDevObjectId") = Tango::API_CantGetDevObjectId;
+    m2.attr("API_CantInstallSignal") = Tango::API_CantInstallSignal;
+    m2.attr("API_CantRetrieveClass") = Tango::API_CantRetrieveClass;
+    m2.attr("API_CantRetrieveClassList") = Tango::API_CantRetrieveClassList;
+    m2.attr("API_CantStoreDeviceClass") = Tango::API_CantStoreDeviceClass;
+    m2.attr("API_ClassNotFound") = Tango::API_ClassNotFound;
+    m2.attr("API_CmdArgumentTypeNotSupported") = Tango::API_CmdArgumentTypeNotSupported;
+    m2.attr("API_CommandNotAllowed") = Tango::API_CommandNotAllowed;
+    m2.attr("API_CommandNotFound") = Tango::API_CommandNotFound;
+    m2.attr("API_CorbaSysException") = Tango::API_CorbaSysException;
+    m2.attr("API_CorruptedDatabase") = Tango::API_CorruptedDatabase;
+    m2.attr("API_DatabaseAccess") = Tango::API_DatabaseAccess;
+    m2.attr("API_DeviceLocked") = Tango::API_DeviceLocked;
+    m2.attr("API_DeviceNotFound") = Tango::API_DeviceNotFound;
+    m2.attr("API_DeviceNotLocked") = Tango::API_DeviceNotLocked;
+    m2.attr("API_DeviceUnlockable") = Tango::API_DeviceUnlockable;
+    m2.attr("API_DeviceUnlocked") = Tango::API_DeviceUnlocked;
+    m2.attr("API_EventSupplierNotConstructed") = Tango::API_EventSupplierNotConstructed;
+    m2.attr("API_IncoherentDbData") = Tango::API_IncoherentDbData;
+    m2.attr("API_IncoherentDevData") = Tango::API_IncoherentDevData;
+    m2.attr("API_IncoherentValues") = Tango::API_IncoherentValues;
+    m2.attr("API_IncompatibleAttrDataType") = Tango::API_IncompatibleAttrDataType;
+    m2.attr("API_IncompatibleCmdArgumentType") = Tango::API_IncompatibleCmdArgumentType;
+    m2.attr("API_InitMethodNotFound") = Tango::API_InitMethodNotFound;
+    m2.attr("API_InitNotPublic") = Tango::API_InitNotPublic;
+    m2.attr("API_InitThrowsException") = Tango::API_InitThrowsException;
+    m2.attr("API_JavaRuntimeSecurityException") = Tango::API_JavaRuntimeSecurityException;
+    m2.attr("API_MemoryAllocation") = Tango::API_MemoryAllocation;
+    m2.attr("API_MethodArgument") = Tango::API_MethodArgument;
+    m2.attr("API_MethodNotFound") = Tango::API_MethodNotFound;
+    m2.attr("API_MissedEvents") = Tango::API_MissedEvents;
+    m2.attr("API_NotSupportedFeature") = Tango::API_NotSupportedFeature;
+    m2.attr("API_NtDebugWindowError") = Tango::API_NtDebugWindowError;
+    m2.attr("API_OverloadingNotSupported") = Tango::API_OverloadingNotSupported;
+    m2.attr("API_PolledDeviceNotInPoolConf") = Tango::API_PolledDeviceNotInPoolConf;
+    m2.attr("API_PolledDeviceNotInPoolMap") = Tango::API_PolledDeviceNotInPoolMap;
+    m2.attr("API_PollingThreadNotFound") = Tango::API_PollingThreadNotFound;
+    m2.attr("API_ReadOnlyMode") = Tango::API_ReadOnlyMode;
+    m2.attr("API_SignalOutOfRange") = Tango::API_SignalOutOfRange;
+    m2.attr("API_SystemCallFailed") = Tango::API_SystemCallFailed;
+    m2.attr("API_WAttrOutsideLimit") = Tango::API_WAttrOutsideLimit;
+    m2.attr("API_WizardConfError") = Tango::API_WizardConfError;
+    m2.attr("API_WrongEventData") = Tango::API_WrongEventData;
+    m2.attr("API_WrongHistoryDataBuffer") = Tango::API_WrongHistoryDataBuffer;
+    m2.attr("API_WrongLockingStatus") = Tango::API_WrongLockingStatus;
+    m2.attr("API_ZmqInitFailed") = Tango::API_ZmqInitFailed
+    ;
 }

@@ -9,109 +9,87 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
-#include "defs.h"
-#include "pytgutils.h"
+#include <tango.h>
+#include <pybind11/pybind11.h>
 
-namespace bopy = boost::python;
+namespace py = pybind11;
 
-extern const char *param_must_be_seq;
-extern const char *unreachable_code;
-extern const char *non_string_seq;
+//extern const char *param_must_be_seq;
+//extern const char *unreachable_code;
+//extern const char *non_string_seq;
+//
+//namespace PyAttributeProxy
+//{
+//    struct PickleSuite : bopy::pickle_suite
+//    {
+//        static bopy::tuple getinitargs(Tango::AttributeProxy& self)
+//        {
+//            Tango::DeviceProxy* dev = self.get_device_proxy();
+//
+//            std::string ret = dev->get_db_host() + ":" + dev->get_db_port() +
+//                             "/" + dev->dev_name() + "/" + self.name();
+//            return bopy::make_tuple(ret);
+//        }
+//    };
+//}
 
-namespace PyAttributeProxy
-{
-    struct PickleSuite : bopy::pickle_suite
-    {
-        static bopy::tuple getinitargs(Tango::AttributeProxy& self)
-        {
-            Tango::DeviceProxy* dev = self.get_device_proxy();
-            
-            std::string ret = dev->get_db_host() + ":" + dev->get_db_port() + 
-                             "/" + dev->dev_name() + "/" + self.name();
-            return bopy::make_tuple(ret);
-        }
-    };
-
-    static boost::shared_ptr<Tango::AttributeProxy> makeAttributeProxy1(const std::string& name)
-    {
-        return boost::shared_ptr<Tango::AttributeProxy>(new Tango::AttributeProxy(name.c_str()));
-    }
-
-    static boost::shared_ptr<Tango::AttributeProxy> makeAttributeProxy2(const Tango::DeviceProxy *dev, const std::string& name)
-    {
-      return boost::shared_ptr<Tango::AttributeProxy>(new Tango::AttributeProxy(dev, name.c_str()));
-    }
-}
-
-void export_attribute_proxy()
+void export_attribute_proxy(py::module& m)
 {
     // The following function declarations are necessary to be able to cast
     // the function parameters from string& to const string&, otherwise python
     // will not recognize the method calls
 
-    void (Tango::AttributeProxy::*get_property_)(std::string &, Tango::DbData &) =
-        &Tango::AttributeProxy::get_property;
+//    void (Tango::AttributeProxy::*get_property_)(std::string &, Tango::DbData &) =
+//        &Tango::AttributeProxy::get_property;
+//
+//    void (Tango::AttributeProxy::*delete_property_)(std::string &) =
+//        &Tango::AttributeProxy::delete_property;
 
-    void (Tango::AttributeProxy::*delete_property_)(std::string &) =
-        &Tango::AttributeProxy::delete_property;
-
-    bopy::class_<Tango::AttributeProxy> AttributeProxy("__AttributeProxy",
-        bopy::init<const Tango::AttributeProxy &>())
-    ;
-
-    AttributeProxy
-        .def("__init__", boost::python::make_constructor(PyAttributeProxy::makeAttributeProxy1))
-        .def("__init__", boost::python::make_constructor(PyAttributeProxy::makeAttributeProxy2))
+    py::class_<Tango::AttributeProxy>(m, "__AttributeProxy")
+        .def(py::init<const Tango::AttributeProxy &>())
+        .def("__init__", [](const std::string& name) {
+            return std::shared_ptr<Tango::AttributeProxy>(new Tango::AttributeProxy(name.c_str()));
+        })
+        .def("__init__", [](const Tango::DeviceProxy *dev, const std::string& name) {
+            return std::shared_ptr<Tango::AttributeProxy>(new Tango::AttributeProxy(dev, name.c_str()));
+        })
 
         //
         // Pickle
         //
-        .def_pickle(PyAttributeProxy::PickleSuite())
+//        .def_pickle(PyAttributeProxy::PickleSuite())
         
         //
         // general methods
         //
-
-        .def("name", &Tango::AttributeProxy::name,
-            ( arg_("self") ))
-
+        .def("name", &Tango::AttributeProxy::name)
         .def("get_device_proxy", &Tango::AttributeProxy::get_device_proxy,
-            ( arg_("self") ),
-            bopy::return_internal_reference<1>())
+            py::return_value_policy::reference_internal)
+//            py::return_internal_reference<1>())
 
         //
         // property methods
         //
         .def("_get_property",
-            (void (Tango::AttributeProxy::*) (const std::string &, Tango::DbData &))
-            get_property_,
-            ( arg_("self"), arg_("propname"), arg_("propdata") ) )
-
+            (void (Tango::AttributeProxy::*) (std::string &, Tango::DbData &))
+            &Tango::AttributeProxy::get_property)
         .def("_get_property",
             (void (Tango::AttributeProxy::*) (std::vector<std::string>&, Tango::DbData &))
-            &Tango::AttributeProxy::get_property,
-            ( arg_("self"), arg_("propnames"), arg_("propdata") ) )
-
+            &Tango::AttributeProxy::get_property)
         .def("_get_property",
             (void (Tango::AttributeProxy::*) (Tango::DbData &))
-            &Tango::AttributeProxy::get_property,
-            ( arg_("self"), arg_("propdata") ) )
-
+            &Tango::AttributeProxy::get_property)
         .def("_put_property", &Tango::AttributeProxy::put_property,
-            ( arg_("self"), arg_("propdata") ) )
-
-        .def("_delete_property", (void (Tango::AttributeProxy::*) (const std::string &))
-            delete_property_,
-            ( arg_("self"), arg_("propname") ) )
-
-        .def("_delete_property", (void (Tango::AttributeProxy::*) (StdStringVector &))
+            (py::arg("self"), py::arg("propdata")))
+        .def("_delete_property", (void (Tango::AttributeProxy::*) (std::string &))
             &Tango::AttributeProxy::delete_property,
-            ( arg_("self"), arg_("propnames") ) )
-
+            (py::arg("self"), py::arg("propname")))
+        .def("_delete_property", (void (Tango::AttributeProxy::*) (std::vector<std::string> &))
+            &Tango::AttributeProxy::delete_property,
+            (py::arg("self"), py::arg("propnames")))
         .def("_delete_property", (void (Tango::AttributeProxy::*) (Tango::DbData &))
             &Tango::AttributeProxy::delete_property,
-            ( arg_("self"), arg_("propdata") ) )
+            (py::arg("self"), py::arg("propdata")))
     ;
 }
 

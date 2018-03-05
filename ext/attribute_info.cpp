@@ -9,17 +9,26 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_attribute_info()
-{
-    class_<Tango::AttributeInfo, bases<Tango::DeviceAttributeConfig> >
-        ("AttributeInfo")
-        .def(init<const Tango::AttributeInfo&>())
-        .enable_pickling()
+void export_attribute_info(py::module &m) {
+    py::class_<Tango::AttributeInfo, Tango::DeviceAttributeConfig>(m, "AttributeInfo")
+        .def(py::init<const Tango::AttributeInfo&>())
         .def_readwrite("disp_level", &Tango::AttributeInfo::disp_level)
+        .def(py::pickle(
+            [](const Tango::AttributeInfo &p) { //__getstate__
+                return py::make_tuple(p.disp_level);
+            },
+            [](py::tuple t) { //__setstate__
+                if (t.size() != 1)
+                    throw std::runtime_error("Invalid state!");
+                Tango::AttributeInfo p = Tango::AttributeInfo();
+                p.disp_level = t[0].cast<Tango::DispLevel>();
+                return p;
+            }
+        ));
     ;
 }

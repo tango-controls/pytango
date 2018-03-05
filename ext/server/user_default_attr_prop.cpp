@@ -9,14 +9,14 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_user_default_attr_prop()
-{
-    class_<Tango::UserDefaultAttrProp, boost::noncopyable>("UserDefaultAttrProp")
+void export_user_default_attr_prop(py::module& m) {
+	// TODO boost::noncopyable
+    py::class_<Tango::UserDefaultAttrProp>(m, "UserDefaultAttrProp")
         .def("set_label", &Tango::UserDefaultAttrProp::set_label)
         .def("set_description", &Tango::UserDefaultAttrProp::set_description)
         .def("set_format", &Tango::UserDefaultAttrProp::set_format)
@@ -68,6 +68,5 @@ void export_user_default_attr_prop()
         .def_readwrite("archive_period", &Tango::UserDefaultAttrProp::archive_period)
         .def_readwrite("enum_labels", &Tango::UserDefaultAttrProp::enum_labels)
     ;
-
 }
 

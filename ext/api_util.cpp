@@ -9,61 +9,45 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
-#include "pyutils.h"
+#include <pybind11/pybind11.h>
+#include <pyutils.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-namespace PyApiUtil
-{
-    inline object get_env_var(const char *name)
-    {
-        std::string value;
-        if (Tango::ApiUtil::get_env_var(name, value) == 0)
-        {
-            return str(value);
-        }
-        return object();
-    }
+void export_api_util(py::module &m) {
+    py::class_<Tango::ApiUtil, std::unique_ptr<Tango::ApiUtil, py::nodelete>>(m, "ApiUtil")
 
-    inline void get_asynch_replies1(Tango::ApiUtil& self)
-    {
-        AutoPythonAllowThreads guard;
-        self.get_asynch_replies();
-    }
-
-    inline void get_asynch_replies2(Tango::ApiUtil& self, long timeout)
-    {
-        AutoPythonAllowThreads guard;
-        self.get_asynch_replies(timeout);
-    }
-};
-
-bool (Tango::ApiUtil::*in_server1)() = &Tango::ApiUtil::in_server;
-void (Tango::ApiUtil::*in_server2)(bool) = &Tango::ApiUtil::in_server;
-
-void export_api_util()
-{
-    class_<Tango::ApiUtil, boost::noncopyable>("ApiUtil", no_init)
-
-        .def("instance", &Tango::ApiUtil::instance,
-            return_value_policy<reference_existing_object>())
-        .staticmethod("instance")
+        .def_static("instance", &Tango::ApiUtil::instance, "Return an instance")
 
         .def("pending_asynch_call", &Tango::ApiUtil::pending_asynch_call)
 
-        .def("get_asynch_replies", &PyApiUtil::get_asynch_replies1)
-        .def("get_asynch_replies", &PyApiUtil::get_asynch_replies2)
+        .def("get_asynch_replies", [](Tango::ApiUtil& self) -> void {
+            AutoPythonAllowThreads guard;
+            self.get_asynch_replies();
+        })
+
+        .def("get_asynch_replies", [](Tango::ApiUtil& self, long timeout) -> void {
+            AutoPythonAllowThreads guard;
+            self.get_asynch_replies(timeout);
+        })
 
         .def("set_asynch_cb_sub_model", &Tango::ApiUtil::set_asynch_cb_sub_model)
         .def("get_asynch_cb_sub_model", &Tango::ApiUtil::get_asynch_cb_sub_model)
 
-        .def("get_env_var", &PyApiUtil::get_env_var)
-        .staticmethod("get_env_var")
+        .def_static("get_env_var", [](std::string& name) {
+            std::string value;
+            return (Tango::ApiUtil::get_env_var(name.c_str(), value) == 0) ? py::str(value) : py::object();
+        })
 
-        .def("is_notifd_event_consumer_created", &Tango::ApiUtil::is_notifd_event_consumer_created)
-        .def("is_zmq_event_consumer_created", &Tango::ApiUtil::is_zmq_event_consumer_created)
+        // As a binding we should not care whether the underlying event mechanism zmq or CORBA.
+        // Replace these methods with a generic method which is event mechanism agnostic.
+        // It can only be one or the other and not both.
+        .def("is_event_consumer_created", []() {
+            // notifd is removed in version 10
+            // return Tango::ApiUtil::instance()->is_notifd_event_consumer_created()
+            return Tango::ApiUtil::instance()->is_zmq_event_consumer_created();
+        })
         .def("get_user_connect_timeout", &Tango::ApiUtil::get_user_connect_timeout)
 
         .def("get_ip_from_if", &Tango::ApiUtil::get_ip_from_if)

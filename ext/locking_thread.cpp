@@ -9,13 +9,12 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_locking_thread()
-{
-    class_<Tango::LockingThread>("LockingThread")
+void export_locking_thread(py::module &m) {
+    py::class_<Tango::LockingThread>(m, "LockingThread")
     ;
 }

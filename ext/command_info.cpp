@@ -9,14 +9,13 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_command_info()
-{
-    class_<Tango::CommandInfo , bases<Tango::DevCommandInfo> >("CommandInfo")
+void export_command_info(py::module &m) {
+    py::class_<Tango::CommandInfo, Tango::DevCommandInfo>(m, "CommandInfo")
         .def_readonly("disp_level", &Tango::CommandInfo::disp_level)
-        ;
+    ;
 }

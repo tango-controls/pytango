@@ -11,11 +11,10 @@
 
 #pragma once
 
-#include <boost/python.hpp>
 #include <tango.h>
-#include "exception.h"
-#include "pytgutils.h"
-#include "server/device_impl.h"
+#include <pybind11/pybind11.h>
+
+namespace py = pybind11;
 
 namespace PyTango { namespace Pipe {
 
@@ -34,56 +33,54 @@ namespace PyTango { namespace Pipe {
         void set_read_name(const std::string &name)    { read_name = name; }
         void set_write_name(const std::string &name)   { write_name = name; }
         bool _is_method(Tango::DeviceImpl *, const std::string &);
-    
+
     private:
-  	std::string py_allowed_name;
-	std::string read_name;
-	std::string write_name;
-    };	
+        std::string py_allowed_name;
+        std::string read_name;
+        std::string write_name;
+    };
 
 
-    class PyPipe: public Tango::Pipe,
-                  public _Pipe
+    class PyPipe: public Tango::Pipe, public _Pipe
     {
     public:
-        PyPipe(const std::string &name, const Tango::DispLevel level, 
+        PyPipe(const std::string &name, const Tango::DispLevel level,
                const Tango::PipeWriteType write=Tango::PIPE_READ):
-	    Tango::Pipe(name, level, write)
-	{}
+               Tango::Pipe(name, level, write) {}
 
         ~PyPipe() {}
 
-        virtual void read(Tango::DeviceImpl *dev)
-	{ _Pipe::read(dev, *this); }
+        virtual void read(Tango::DeviceImpl *dev) { _Pipe::read(dev, *this); }
 
-	virtual bool is_allowed(Tango::DeviceImpl *dev, Tango::PipeReqType rt)
-        { return _Pipe::is_allowed(dev, rt); }
+        virtual bool is_allowed(Tango::DeviceImpl *dev, Tango::PipeReqType rt)
+            { return _Pipe::is_allowed(dev, rt); }
   };
 
-    class PyWPipe: public Tango::WPipe,
-                   public _Pipe 
+    class PyWPipe: public Tango::WPipe, public _Pipe
     {
     public:
         PyWPipe(const std::string &name, const Tango::DispLevel level):
-	    Tango::WPipe(name, level)
-	{}
+            Tango::WPipe(name, level) {}
 
         ~PyWPipe() {}
 
         virtual void read(Tango::DeviceImpl *dev)
-	{ _Pipe::read(dev, *this); }
+            { _Pipe::read(dev, *this); }
 
         virtual void write(Tango::DeviceImpl *dev)
-	{ _Pipe::write(dev, *this); }
+            { _Pipe::write(dev, *this); }
 
-	virtual bool is_allowed(Tango::DeviceImpl *dev, Tango::PipeReqType rt)
-        { return _Pipe::is_allowed(dev, rt); }
-  };
+        virtual bool is_allowed(Tango::DeviceImpl *dev, Tango::PipeReqType rt)
+            { return _Pipe::is_allowed(dev, rt); }
+    };
 
 }} // namespace PyTango::Pipe
 
 namespace PyDevicePipe
 {
-    void set_value(Tango::DevicePipeBlob &, boost::python::object &);
+    void set_value(Tango::DevicePipeBlob&, py::object&);
+
+    void set_value(Tango::DevicePipe& pipe, py::object& py_value);
+//        __set_value<Tango::DevicePipe>(pipe, py_value);
 
 } // namespace PyDevicePipe

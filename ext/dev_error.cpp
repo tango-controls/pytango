@@ -9,52 +9,50 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
-#include "pyutils.h"
 #include <tango.h>
+#include <pybind11/pybind11.h>
+#include <cstring>
 
-namespace PyDevError
+namespace py = pybind11;
+
+void export_dev_error(py::module &m)
 {
-    static void from_str_to_char(PyObject* in, CORBA::String_member& out)
-    {
-        if (PyUnicode_Check(in))
-        {
-            PyObject *bytes_in = PyUnicode_AsLatin1String(in);
-            out = CORBA::string_dup(PyBytes_AsString(bytes_in));
-            Py_DECREF(bytes_in);
-        }
-        else 
-        {
-            out = CORBA::string_dup(PyBytes_AsString(in));
-        }
-    }
-
-    static inline PyObject* get_reason(Tango::DevError &self)
-    { return from_char_to_str(self.reason); }
-
-    static inline void set_reason(Tango::DevError &self, PyObject *str)
-    { PyDevError::from_str_to_char(str, self.reason); }
-
-    static inline PyObject* get_desc(Tango::DevError &self)
-    { return from_char_to_str(self.desc); }
-
-    static inline void set_desc(Tango::DevError &self, PyObject *str)
-    { PyDevError::from_str_to_char(str, self.desc); }
-
-    static inline PyObject* get_origin(Tango::DevError &self)
-    { return from_char_to_str(self.origin); }
-
-    static inline void set_origin(Tango::DevError &self, PyObject *str)
-    { PyDevError::from_str_to_char(str, self.origin); }
-};
-
-void export_dev_error()
-{
-    bopy::class_<Tango::DevError>("DevError")
-        .enable_pickling()
-        .add_property("reason", &PyDevError::get_reason, &PyDevError::set_reason)
+    py::class_<Tango::DevError>(m, "DevError")
+        .def_property("reason", [](Tango::DevError &self) {
+                return py::str(self.reason);
+        }, [](Tango::DevError &self, std::string& res) {
+            // strdup here cos its a crappy corba string
+            self.reason = ::strdup(res.c_str());
+        })
         .def_readwrite("severity", &Tango::DevError::severity)
-        .add_property("desc", &PyDevError::get_desc, &PyDevError::set_desc)
-        .add_property("origin", &PyDevError::get_origin, &PyDevError::set_origin)
+        .def_property("desc", [](Tango::DevError &self) {
+                return py::str(self.desc);
+        }, [](Tango::DevError &self, std::string& des) {
+            self.desc = ::strdup(des.c_str());
+        })
+        .def_property("origin", [](Tango::DevError &self) {
+                return py::str(self.origin);
+        }, [](Tango::DevError &self, std::string& orig) {
+            self.origin = ::strdup(orig.c_str());
+        })
+        .def(py::pickle(
+            [](const Tango::DevError &p) { //__getstate__
+                // TODO check we may need to strdup here!!!
+                return py::make_tuple(p.reason,
+                        p.severity,
+                        p.desc,
+                        p.origin);
+            },
+            [](py::tuple t) { //__setstate__
+                if (t.size() != 4)
+                    throw std::runtime_error("Invalid state!");
+                Tango::DevError p = Tango::DevError();
+                p.reason = ::strdup(t[0].cast<std::string>().c_str());
+                p.severity = t[1].cast<Tango::ErrSeverity>();
+                p.desc = ::strdup(t[2].cast<std::string>().c_str());
+                p.origin = ::strdup(t[3].cast<std::string>().c_str());
+                return p;
+            }
+        ));
     ;
 }

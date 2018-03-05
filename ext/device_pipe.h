@@ -11,36 +11,42 @@
 
 #pragma once
 
-#include <boost/python.hpp>
+#include <pybind11/pybind11.h>
 #include <tango.h>
-
 #include "defs.h"
 #include "pyutils.h"
+
+namespace py = pybind11;
 
 namespace PyTango
 { 
     namespace DevicePipe 
     {
-        bopy::object
-        extract(Tango::DevicePipeBlob& blob,
+        py::object extract(Tango::DevicePipe& device_pipe,
+            PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy);
+
+        py::object extract(Tango::DevicePipeBlob& blob,
                 PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy);
 
-        void
-        update_values(Tango::DevicePipe& self, bopy::object& py_value,
+        void update_values(Tango::DevicePipe& self, py::object& py_value,
                       PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy);
 
+        /// @param self The DevicePipe instance that the new python object
+        /// will represent. It must be allocated with new. The new python object
+        /// will handle it's destruction. There's never any reason to delete it
+        /// manually after a call to this: Even if this function fails, the
+        /// responsibility of destroying it will already be in py_value side or
+        /// the object will already be destroyed.
         template<typename TDevicePipe>
-        bopy::object
-        convert_to_python(TDevicePipe* self, PyTango::ExtractAs extract_as)
+        py::object convert_to_python(TDevicePipe* self, PyTango::ExtractAs extract_as)
         {
-            bopy::object py_value;
+            py::object py_value;
             try 
             {
-                py_value = bopy::object(
-                               bopy::handle<>(
-                                   bopy::to_python_indirect<
-                                       TDevicePipe*, 
-                                       bopy::detail::make_owning_holder>() (self)));
+                py_value = py::cast(self, py::return_value_policy::move);
+
+//                py_value = py::object(
+//                    py::handle(py::to_python_indirect<TDevicePipe*, py::detail::make_owning_holder>() (self)));
             } 
             catch (...)
             {
@@ -49,7 +55,7 @@ namespace PyTango
             }
 
             update_values(*self, py_value, extract_as);
-            return py_value;            
+            return py_value;
         }
     } 
 }

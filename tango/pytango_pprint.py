@@ -17,25 +17,25 @@ __all__ = ["pytango_pprint_init"]
 
 __docformat__ = "restructuredtext"
 
-from ._tango import (StdStringVector, StdLongVector, CommandInfoList,
-                     AttributeInfoList, AttributeInfoListEx, PipeInfoList,
-                     DeviceDataHistoryList,
-                     GroupReplyList, GroupAttrReplyList, GroupCmdReplyList,
-                     DbData, DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList,
-                     LockerInfo, DevCommandInfo, AttributeDimension, CommandInfo, PipeInfo,
-                     DeviceInfo, DeviceAttributeConfig, AttributeInfo, AttributeAlarmInfo,
-                     ChangeEventInfo, PeriodicEventInfo, ArchiveEventInfo,
-                     AttributeEventInfo, AttributeInfoEx,
-                     DeviceAttribute, DeviceAttributeHistory, DeviceData, DeviceDataHistory,
-                     DevicePipe, DbDatum, DbDevInfo, DbDevImportInfo, DbDevExportInfo,
-                     DbServerInfo, GroupReply, GroupAttrReply, GroupCmdReply,
-                     DevError, EventData, AttrConfEventData, DataReadyEventData,
-                     TimeVal, DevFailed, CmdArgType)
-
-from .device_server import AttributeAlarm, EventProperties
-from .device_server import ChangeEventProp, PeriodicEventProp, ArchiveEventProp
-from .device_server import AttributeConfig, AttributeConfig_2
-from .device_server import AttributeConfig_3, AttributeConfig_5
+# from ._tango import (StdStringVector, StdLongVector,
+#                      AttributeInfoList, AttributeInfoListEx, PipeInfoList,
+#                      DeviceDataHistoryList, CommandInfoList,
+#                      GroupReplyList, GroupAttrReplyList, GroupCmdReplyList,
+#                      DbData, DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList,
+#                      LockerInfo, DevCommandInfo, AttributeDimension, CommandInfo, PipeInfo,
+#                      DeviceInfo, DeviceAttributeConfig, AttributeInfo, AttributeAlarmInfo,
+#                      ChangeEventInfo, PeriodicEventInfo, ArchiveEventInfo,
+#                      AttributeEventInfo, AttributeInfoEx,
+#                      DeviceAttribute, DeviceAttributeHistory, DeviceData, DeviceDataHistory,
+#                      DevicePipe, DbDatum, DbDevInfo, DbDevImportInfo, DbDevExportInfo,
+#                      DbServerInfo, GroupReply, GroupAttrReply, GroupCmdReply,
+#                      DevError, EventData, AttrConfEventData, DataReadyEventData,
+#                      TimeVal, DevFailed, CmdArgType)
+ 
+# from .device_server import AttributeAlarm, EventProperties
+# from .device_server import ChangeEventProp, PeriodicEventProp, ArchiveEventProp
+# from .device_server import AttributeConfig, AttributeConfig_2
+# from .device_server import AttributeConfig_3, AttributeConfig_5
 import collections
 
 
@@ -94,9 +94,9 @@ def __registerSeqStr():
     _SeqStr = lambda self: (self and "[%s]" % (", ".join(map(repr, self)))) or "[]"
     _SeqRepr = lambda self: (self and "[%s]" % (", ".join(map(repr, self)))) or "[]"
 
-    seqs = (StdStringVector, StdLongVector, CommandInfoList,
-            AttributeInfoList, AttributeInfoListEx, PipeInfoList,
-            DeviceDataHistoryList,
+#    seqs = (StdStringVector, StdLongVector,
+    seqs = (AttributeInfoList, AttributeInfoListEx, PipeInfoList,
+            DeviceDataHistoryList, CommandInfoList,
             GroupReplyList, GroupAttrReplyList, GroupCmdReplyList,
             DbData, DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList)
 

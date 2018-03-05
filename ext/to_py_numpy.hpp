@@ -11,20 +11,35 @@
 
 #pragma once
 
+#include <tango.h>
+#include <pybind11/pybind11.h>
+
+namespace py = pybind11;
+
 /// @name Array extraction
 /// @{
 
 template <long tangoArrayTypeConst>
-inline boost::python::object to_py_numpy(const typename TANGO_const2type(tangoArrayTypeConst)* tg_array, boost::python::object parent)
+inline py::object to_py_numpy(const typename TANGO_const2type(tangoArrayTypeConst)* tg_array, py::object parent)
 {
+// Can we use pybinds numpy??????
+//    return py::buffer_info(
+//        m.data(),                                /* Pointer to buffer */
+//        sizeof(Scalar),                          /* Size of one scalar */
+//        py::format_descriptor<Scalar>::format(), /* Python struct-style format descriptor */
+//        2,                                       /* Number of dimensions */
+//        { m.rows(), m.cols() },                  /* Buffer dimensions */
+//        { sizeof(Scalar) * (rowMajor ? m.cols() : 1),
+//          sizeof(Scalar) * (rowMajor ? 1 : m.rows()) }
+//                                                 /* Strides (in bytes) for each index */
     static const int typenum = TANGO_const2scalarnumpy(tangoArrayTypeConst);
 
     if (tg_array == 0) {
         // Empty
         PyObject* value = PyArray_SimpleNew(0, 0, typenum);
         if (!value)
-            boost::python::throw_error_already_set();
-        return boost::python::object(boost::python::handle<>(value));
+            py::error_already_set();
+        return py::cast(value); //py::object(py::handle(value));
     }
     
     // Create a new numpy.ndarray() object. It uses ch_ptr as the data,
@@ -35,7 +50,7 @@ inline boost::python::object to_py_numpy(const typename TANGO_const2type(tangoAr
     dims[0]= tg_array->length();
     PyObject* py_array = PyArray_SimpleNewFromData(nd, dims, typenum, const_cast<void*>(ch_ptr));
     if (!py_array) {
-        boost::python::throw_error_already_set();
+        py::error_already_set();
     }
 
     // numpy.ndarray() does not own it's memory, so we need to manage it.
@@ -46,25 +61,25 @@ inline boost::python::object to_py_numpy(const typename TANGO_const2type(tangoAr
     Py_INCREF(guard);
     PyArray_BASE(py_array) = guard;
     
-    return boost::python::object(boost::python::handle<>(py_array));
+    return py::cast(py_array); //py::object(py::handle(py_array));
 }
 
 template <>
-inline boost::python::object to_py_numpy<Tango::DEVVAR_STRINGARRAY>(const Tango::DevVarStringArray* tg_array, boost::python::object parent)
+inline py::object to_py_numpy<Tango::DEVVAR_STRINGARRAY>(const Tango::DevVarStringArray* tg_array, py::object parent)
 {
     return to_py_list(tg_array);
 }
 
 template <>
-inline boost::python::object to_py_numpy<Tango::DEVVAR_STATEARRAY>(const Tango::DevVarStateArray* tg_array, boost::python::object parent)
+inline py::object to_py_numpy<Tango::DEVVAR_STATEARRAY>(const Tango::DevVarStateArray* tg_array, py::object parent)
 {
     return to_py_list(tg_array);
 }
 
 template <>
-inline boost::python::object to_py_numpy<Tango::DEVVAR_LONGSTRINGARRAY>(const Tango::DevVarLongStringArray* tg_array, boost::python::object parent)
+inline py::object to_py_numpy<Tango::DEVVAR_LONGSTRINGARRAY>(const Tango::DevVarLongStringArray* tg_array, py::object parent)
 {
-    boost::python::list result;
+    py::list result;
     
     result.append(to_py_numpy<Tango::DEVVAR_LONGARRAY>(&tg_array->lvalue, parent));
     result.append(to_py_numpy<Tango::DEVVAR_STRINGARRAY>(&tg_array->svalue, parent));
@@ -73,9 +88,9 @@ inline boost::python::object to_py_numpy<Tango::DEVVAR_LONGSTRINGARRAY>(const Ta
 }
 
 template <>
-inline boost::python::object to_py_numpy<Tango::DEVVAR_DOUBLESTRINGARRAY>(const Tango::DevVarDoubleStringArray* tg_array, boost::python::object parent)
+inline py::object to_py_numpy<Tango::DEVVAR_DOUBLESTRINGARRAY>(const Tango::DevVarDoubleStringArray* tg_array, py::object parent)
 {
-    boost::python::list result;
+    py::list result;
     
     result.append(to_py_numpy<Tango::DEVVAR_DOUBLEARRAY>(&tg_array->dvalue, parent));
     result.append(to_py_numpy<Tango::DEVVAR_STRINGARRAY>(&tg_array->svalue, parent));
@@ -87,7 +102,7 @@ inline boost::python::object to_py_numpy<Tango::DEVVAR_DOUBLESTRINGARRAY>(const 
 // -----------------------------------------------------------------------
 
 template <long tangoArrayTypeConst>
-inline boost::python::object to_py_numpy(typename TANGO_const2type(tangoArrayTypeConst)* tg_array, int orphan)
+inline py::object to_py_numpy(typename TANGO_const2type(tangoArrayTypeConst)* tg_array, int orphan)
 {
     static const int typenum = TANGO_const2scalarnumpy(tangoArrayTypeConst);
 
@@ -95,8 +110,8 @@ inline boost::python::object to_py_numpy(typename TANGO_const2type(tangoArrayTyp
         // Empty
         PyObject* value = PyArray_SimpleNew(0, 0, typenum);
         if (!value)
-            boost::python::throw_error_already_set();
-        return boost::python::object(boost::python::handle<>(value));
+            py::error_already_set();
+        return py::cast(value); //py::object(py::handle(value));
     }
 
     // Create a new numpy.ndarray() object. It uses ch_ptr as the data,
@@ -108,31 +123,31 @@ inline boost::python::object to_py_numpy(typename TANGO_const2type(tangoArrayTyp
     PyObject* py_array = PyArray_New(&PyArray_Type, nd, dims, typenum, NULL,
 				     ch_ptr, -1, 0, NULL);
     if (!py_array) {
-        boost::python::throw_error_already_set();
+        py::error_already_set();
     }
 
-    return boost::python::object(boost::python::handle<>(py_array));
+    return py::cast(py_array); //py::object(py::handle(py_array));
 }
 
 template <>
-inline boost::python::object to_py_numpy<Tango::DEVVAR_STRINGARRAY>(Tango::DevVarStringArray* tg_array,
+inline py::object to_py_numpy<Tango::DEVVAR_STRINGARRAY>(Tango::DevVarStringArray* tg_array,
 								    int orphan)
 {
     return to_py_list(tg_array);
 }
 
 template <>
-inline boost::python::object to_py_numpy<Tango::DEVVAR_STATEARRAY>(Tango::DevVarStateArray* tg_array,
+inline py::object to_py_numpy<Tango::DEVVAR_STATEARRAY>(Tango::DevVarStateArray* tg_array,
 								   int orphan)
 {
     return to_py_list(tg_array);
 }
 
 template <>
-inline boost::python::object to_py_numpy<Tango::DEVVAR_LONGSTRINGARRAY>(Tango::DevVarLongStringArray* tg_array,
+inline py::object to_py_numpy<Tango::DEVVAR_LONGSTRINGARRAY>(Tango::DevVarLongStringArray* tg_array,
 									int orphan)
 {
-    boost::python::list result;
+    py::list result;
 
     result.append(to_py_numpy<Tango::DEVVAR_LONGARRAY>(&tg_array->lvalue, orphan));
     result.append(to_py_numpy<Tango::DEVVAR_STRINGARRAY>(&tg_array->svalue, orphan));
@@ -141,10 +156,10 @@ inline boost::python::object to_py_numpy<Tango::DEVVAR_LONGSTRINGARRAY>(Tango::D
 }
 
 template <>
-inline boost::python::object to_py_numpy<Tango::DEVVAR_DOUBLESTRINGARRAY>(Tango::DevVarDoubleStringArray* tg_array,
+inline py::object to_py_numpy<Tango::DEVVAR_DOUBLESTRINGARRAY>(Tango::DevVarDoubleStringArray* tg_array,
 									  int orphan)
 {
-    boost::python::list result;
+    py::list result;
 
     result.append(to_py_numpy<Tango::DEVVAR_DOUBLEARRAY>(&tg_array->dvalue, orphan));
     result.append(to_py_numpy<Tango::DEVVAR_STRINGARRAY>(&tg_array->svalue, orphan));

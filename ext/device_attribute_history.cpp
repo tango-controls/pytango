@@ -9,20 +9,17 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_device_attribute_history()
-{
+void export_device_attribute(py::module &m);
 
-    class_<Tango::DeviceAttributeHistory, bases<Tango::DeviceAttribute> >
-            DeviceAttributeHistory("DeviceAttributeHistory", init<>());
-
-    DeviceAttributeHistory
-        .def(init<const Tango::DeviceAttributeHistory &>())
-
+void export_device_attribute_history(py::module &m) {
+    py::class_<Tango::DeviceAttributeHistory, Tango::DeviceAttribute>(m, "DeviceAttributeHistory")
+        .def(py::init<>())
+        .def(py::init<const Tango::DeviceAttributeHistory &>())
         .def("has_failed", &Tango::DeviceAttributeHistory::has_failed)
     ;
 }

@@ -9,14 +9,13 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
 #include <tango.h>
+#include <pybind11/pybind11.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
-void export_attribute_dimension()
-{
-    class_<Tango::AttributeDimension>("AttributeDimension")
+void export_attribute_dimension(py::module &m) {
+    py::class_<Tango::AttributeDimension>(m, "AttributeDimension")
         .def_readonly("dim_x", &Tango::AttributeDimension::dim_x)
         .def_readonly("dim_y", &Tango::AttributeDimension::dim_y)
     ;

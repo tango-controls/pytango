@@ -9,17 +9,16 @@
   See LICENSE.txt for more info.
 ******************************************************************************/
 
-#include "precompiled_header.hpp"
-#include "defs.h"
+#include <tango.h>
+#include <pybind11/pybind11.h>
 #include "to_py.h"
-#include "pyutils.h"
 
-using namespace boost::python;
+namespace py = pybind11;
 
-object to_py(const Tango::AttributeAlarm &attr_alarm)
+py::object to_py(const Tango::AttributeAlarm &attr_alarm)
 {
     PYTANGO_MOD
-    object py_attr_alarm = pytango.attr("AttributeAlarm")();
+    py:object py_attr_alarm = pytango.attr("AttributeAlarm")();
     
     py_attr_alarm.attr("min_alarm") = str(attr_alarm.min_alarm.in());
     py_attr_alarm.attr("max_alarm") = str(attr_alarm.max_alarm.in());
@@ -33,7 +32,7 @@ object to_py(const Tango::AttributeAlarm &attr_alarm)
     return py_attr_alarm;
 }
 
-object to_py(const Tango::ChangeEventProp &change_event_prop)
+py::object to_py(const Tango::ChangeEventProp &change_event_prop)
 {
     PYTANGO_MOD
     object py_change_event_prop = pytango.attr("ChangeEventProp")();
@@ -46,7 +45,7 @@ object to_py(const Tango::ChangeEventProp &change_event_prop)
     return py_change_event_prop;
 }
 
-object to_py(const Tango::PeriodicEventProp &periodic_event_prop)
+py::object to_py(const Tango::PeriodicEventProp &periodic_event_prop)
 {
     PYTANGO_MOD
     object py_periodic_event_prop = pytango.attr("PeriodicEventProp")();
@@ -58,7 +57,7 @@ object to_py(const Tango::PeriodicEventProp &periodic_event_prop)
     return py_periodic_event_prop;
 }
 
-object to_py(const Tango::ArchiveEventProp &archive_event_prop)
+py::object to_py(const Tango::ArchiveEventProp &archive_event_prop)
 {
     PYTANGO_MOD
     object py_archive_event_prop = pytango.attr("ArchiveEventProp")();
@@ -72,7 +71,7 @@ object to_py(const Tango::ArchiveEventProp &archive_event_prop)
     return py_archive_event_prop;
 }
 
-object to_py(const Tango::EventProperties &event_props)
+py::object to_py(const Tango::EventProperties &event_props)
 {
     PYTANGO_MOD
     object py_event_props = pytango.attr("EventProperties")();
@@ -83,7 +82,7 @@ object to_py(const Tango::EventProperties &event_props)
     return py_event_props;
 }
 
-object to_py(const Tango::AttributeConfig &attr_conf, object py_attr_conf)
+py::object to_py(const Tango::AttributeConfig &attr_conf, object py_attr_conf)
 {
     if(py_attr_conf.ptr() == Py_None)
     {
@@ -114,7 +113,7 @@ object to_py(const Tango::AttributeConfig &attr_conf, object py_attr_conf)
     return py_attr_conf;
 }
 
-object to_py(const Tango::AttributeConfig_2 &attr_conf, object py_attr_conf)
+py::object to_py(const Tango::AttributeConfig_2 &attr_conf, object py_attr_conf)
 {
     if(py_attr_conf.ptr() == Py_None)
     {
@@ -145,7 +144,7 @@ object to_py(const Tango::AttributeConfig_2 &attr_conf, object py_attr_conf)
     return py_attr_conf;
 }
 
-object to_py(const Tango::AttributeConfig_3 &attr_conf, object py_attr_conf)
+py::object to_py(const Tango::AttributeConfig_3 &attr_conf, object py_attr_conf)
 {
     if(py_attr_conf.ptr() == Py_None)
     {
@@ -176,7 +175,7 @@ object to_py(const Tango::AttributeConfig_3 &attr_conf, object py_attr_conf)
     return py_attr_conf;
 }
 
-object to_py(const Tango::AttributeConfig_5 &attr_conf, object py_attr_conf)
+py::object to_py(const Tango::AttributeConfig_5 &attr_conf, object py_attr_conf)
 {
     if(py_attr_conf.ptr() == Py_None)
     {
@@ -210,10 +209,11 @@ object to_py(const Tango::AttributeConfig_5 &attr_conf, object py_attr_conf)
     py_attr_conf.attr("sys_extensions") = CORBA_sequence_to_list<Tango::DevVarStringArray>::to_list(attr_conf.sys_extensions);
     return py_attr_conf;
 }
-boost::python::list to_py(const Tango::AttributeConfigList &attr_conf_list)
+
+py::list to_py(const Tango::AttributeConfigList &attr_conf_list)
 {
-    boost::python::list py_attr_conf_list;
-    boost::python::object none;
+    py::list py_attr_conf_list;
+    py::object none;
     for(unsigned long index = 0; index < attr_conf_list.length(); ++index)
     {
         const Tango::AttributeConfig &attr_conf = attr_conf_list[index];
@@ -222,10 +222,10 @@ boost::python::list to_py(const Tango::AttributeConfigList &attr_conf_list)
     return py_attr_conf_list;
 }
 
-boost::python::list to_py(const Tango::AttributeConfigList_2 &attr_conf_list)
+py::list to_py(const Tango::AttributeConfigList_2 &attr_conf_list)
 {
-    boost::python::list py_attr_conf_list;
-    boost::python::object none;
+    py::list py_attr_conf_list;
+    py::object none;
     for(unsigned long index = 0; index < attr_conf_list.length(); ++index)
     {
         const Tango::AttributeConfig_2 &attr_conf = attr_conf_list[index];
@@ -234,10 +234,10 @@ boost::python::list to_py(const Tango::AttributeConfigList_2 &attr_conf_list)
     return py_attr_conf_list;
 }
 
-boost::python::list to_py(const Tango::AttributeConfigList_3 &attr_conf_list)
+py::list to_py(const Tango::AttributeConfigList_3 &attr_conf_list)
 {
-    boost::python::list py_attr_conf_list;
-    boost::python::object none;
+    py::list py_attr_conf_list;
+    py::object none;
     for(unsigned long index = 0; index < attr_conf_list.length(); ++index)
     {
         const Tango::AttributeConfig_3 &attr_conf = attr_conf_list[index];
@@ -246,10 +246,10 @@ boost::python::list to_py(const Tango::AttributeConfigList_3 &attr_conf_list)
     return py_attr_conf_list;
 }
 
-boost::python::list to_py(const Tango::AttributeConfigList_5 &attr_conf_list)
+py::list to_py(const Tango::AttributeConfigList_5 &attr_conf_list)
 {
-    boost::python::list py_attr_conf_list;
-    boost::python::object none;
+    py::list py_attr_conf_list;
+    py::object none;
     for(unsigned long index = 0; index < attr_conf_list.length(); ++index)
     {
         const Tango::AttributeConfig_5 &attr_conf = attr_conf_list[index];
@@ -258,7 +258,7 @@ boost::python::list to_py(const Tango::AttributeConfigList_5 &attr_conf_list)
     return py_attr_conf_list;
 }
 
-object to_py(const Tango::PipeConfig &pipe_conf, object py_pipe_conf)
+py::object to_py(const Tango::PipeConfig &pipe_conf, object py_pipe_conf)
 {
     if(py_pipe_conf.ptr() == Py_None)
     {
@@ -275,10 +275,10 @@ object to_py(const Tango::PipeConfig &pipe_conf, object py_pipe_conf)
     return py_pipe_conf;
 }
 
-boost::python::list to_py(const Tango::PipeConfigList &pipe_conf_list)
+py::list to_py(const Tango::PipeConfigList &pipe_conf_list)
 {
-    boost::python::list py_pipe_conf_list;
-    boost::python::object none;
+    py::list py_pipe_conf_list;
+    py::object none;
     for(unsigned long index = 0; index < pipe_conf_list.length(); ++index)
     {
         const Tango::PipeConfig &pipe_conf = pipe_conf_list[index];
