@@ -11,6 +11,7 @@
 
 #include <tango.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #include <pyutils.h>
 #include <device_attribute.h>
 
@@ -29,39 +30,39 @@ static const char* w_value_attr_name = "w_value";
 //static const std::string is_empty_attr_name = "is_empty";
 //static const std::string has_failed_attr_name = "has_failed";
 
-//
-//template<long tangoTypeConst>
-//struct python_tangocpp
-//{
-//    typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-//
-//    static inline void to_cpp(const py::object & py_value, TangoScalarType & result)
-//    {
-//        result = py::extract<TangoScalarType>(py_value);
-//    }
-//
-//    static inline py::object to_python(const TangoScalarType & value)
-//    {
-//        return py::object(value);
-//    }
-//};
-//
-//template<>
-//struct python_tangocpp<Tango::DEV_STRING>
-//{
-//    static const long tangoTypeConst = Tango::DEV_STRING;
-//    typedef TANGO_const2type(tangoTypeConst) TangoScalarType;
-//
-//    static inline void to_cpp(const py::object & py_value, TangoScalarType & result)
-//    {
-//        result = CORBA::string_dup(py::extract<TangoScalarType>(py_value));
-//    }
-//
+
+template<long tangoTypeConst>
+struct python_tangocpp
+{
+    typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+    static inline void to_cpp(const py::object & py_value, TangoScalarType & result)
+    {
+        result = py_value.cast<TangoScalarType>();
+    }
+
+    static inline py::object to_python(const TangoScalarType & value)
+    {
+        return py::cast(value);
+    }
+};
+
+template<>
+struct python_tangocpp<Tango::DEV_STRING>
+{
+    static const long tangoTypeConst = Tango::DEV_STRING;
+    typedef TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+    static inline void to_cpp(const py::object & py_value, TangoScalarType & result)
+    {
+//        result = py_value.cast<char*>();
+    }
+
 //    static inline py::object to_python(const TangoScalarType & value)
 //    {
 //        return py::object(std::string(value));
 //    }
-//};
+};
 //
 //#ifndef DISABLE_PYTANGO_NUMPY
 //#   include "device_attribute_numpy.hpp"
@@ -83,16 +84,16 @@ namespace PyDeviceAttribute {
     _update_value_as_bin(Tango::DeviceAttribute &self,
                          py::object py_value, bool read_only)
     {
-//        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-//        typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
-//
-//        // Extract the actual data from Tango::DeviceAttribute (self)
-//        TangoArrayType* value_ptr = 0;
-//        EXTRACT_VALUE(self, value_ptr)
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+        typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
+
+        // Extract the actual data from Tango::DeviceAttribute (self)
+        TangoArrayType* value_ptr = nullptr;
+        EXTRACT_VALUE(self, value_ptr)
 //        unique_pointer<TangoArrayType> guard_value_ptr(value_ptr);
-//
-//        py_value.attr(w_value_attr_name) = py::object();
-//
+
+        py_value.attr(w_value_attr_name) = Py_None;
+
 //        if (value_ptr == 0)
 //        {
 //            if (read_only)
@@ -108,7 +109,11 @@ namespace PyDeviceAttribute {
 //            return;
 //        }
 //
-//        TangoScalarType* buffer = value_ptr->get_buffer();
+        py::list py_list;
+        TangoScalarType* buffer = value_ptr->get_buffer();
+        for (int i=0; i<value_ptr->length(); i++) {
+            py_list.append(py::cast(buffer[i]));
+        }
 //
 //        const char *ch_ptr = reinterpret_cast<char *>(buffer);
 //        Py_ssize_t nb_bytes = (Py_ssize_t)value_ptr->length() * sizeof(TangoScalarType);
@@ -122,7 +127,7 @@ namespace PyDeviceAttribute {
 //        {
 //            data_ptr = PyByteArray_FromStringAndSize(ch_ptr, nb_bytes);
 //        }
-//        py_value.attr(value_attr_name) = py::object(py::handle<>(data_ptr));
+        py_value.attr(value_attr_name) = py_list;
     }
 
     template<> inline void
@@ -149,6 +154,10 @@ namespace PyDeviceAttribute {
 //            }
 //            else
 //            {
+//                py::list w_encoded_data;
+//                for(int i=0; i<dim_x; i++) {
+//                    r_encoded_data[i] = py::cast(data_ptr[i])
+//                }
 //                Tango::DevEncoded& w_buffer = buffer[1];
 //                py::str w_encoded_format(w_buffer.encoded_format);
 //
@@ -168,7 +177,7 @@ namespace PyDeviceAttribute {
 //                py::object w_encoded_data = py::object(py::handle<>(w_encoded_data_ptr));
 //
 //                py_value.attr(value_attr_name) =
-//                    py::make_tuple(w_encoded_format, w_encoded_data);
+//                    py::make_tuple(r_encoded_format, w_encoded_data);
 //            }
         }
         else
@@ -391,15 +400,14 @@ namespace PyDeviceAttribute {
 //            py_value.attr(it? value_attr_name : w_value_attr_name) = result;
 //        }
 //    }
-//
+
 //    template<> inline void
 //    _update_array_values_as_lists<Tango::DEV_PIPE_BLOB>(Tango::DeviceAttribute &self,
-//							bool isImage,
-//							py::object py_value)
+//                                                        bool isImage, py::object py_value)
 //    {
-//	assert(false);
+//        assert(false);
 //    }
-//
+
 //    template<long tangoTypeConst> static void
 //    _update_array_values_as_tuples(Tango::DeviceAttribute &self, bool isImage,
 //                                   py::object py_value)
@@ -483,15 +491,14 @@ namespace PyDeviceAttribute {
 //            py_value.attr(it? value_attr_name : w_value_attr_name) = result_guard;
 //        }
 //    }
-//
+
 //    template<> inline void
 //    _update_array_values_as_tuples<Tango::DEV_PIPE_BLOB>(Tango::DeviceAttribute &self,
-//                                                         bool isImage,
-//                                                         py::object py_value)
+//                                                         bool isImage, py::object py_value)
 //    {
-//	assert(false);
+//        assert(false);
 //    }
-//
+
     void
     update_values(Tango::DeviceAttribute &self, py::object& py_value,
                   PyTango::ExtractAs extract_as)
@@ -499,13 +506,9 @@ namespace PyDeviceAttribute {
         // We do not want is_empty to launch an exception!!
         self.reset_exceptions(Tango::DeviceAttribute::isempty_flag);
 
-        // self.get_type() already does self.is_empty()
         const int data_type = self.get_type();
-//        std::cout << "data type " << data_type << std::endl;
         const bool is_empty = data_type < 0;
-//        std::cout << "is_empty " << is_empty << std::endl;
         const bool has_failed = self.has_failed();
-//        std::cout << "has_failed " << has_failed << std::endl;
         Tango::AttrDataFormat data_format = self.get_data_format();
 
         py_value.attr("is_empty") = is_empty;
@@ -580,10 +583,10 @@ namespace PyDeviceAttribute {
 //                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
 //                            _update_value_as_bin, self, py_value, true);
 //                        break;
-//                    case PyTango::ExtractAsByteArray:
-//                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
-//                            _update_value_as_bin, self, py_value, false);
-//                        break;
+                    case PyTango::ExtractAsByteArray:
+                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
+                            _update_value_as_bin, self, py_value, false);
+                        break;
 //                    case PyTango::ExtractAsString:
 //                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
 //                            _update_value_as_string, self, py_value);
@@ -594,74 +597,71 @@ namespace PyDeviceAttribute {
                 break;
             case Tango::FMT_UNKNOWN:
                 default:
-//                raise_(PyExc_ValueError, "Can't extract data because: self.get_data_format()=FMT_UNKNOWN");
+                raise_(PyExc_ValueError, "Can't extract data because: self.get_data_format()=FMT_UNKNOWN");
                 assert(false);
         }
     }
 
-//    template<long tangoTypeConst> static inline void
-//    _fill_list_attribute(Tango::DeviceAttribute & dev_attr, const bool isImage,
-//                         const py::object & py_value)
-//    {
-//        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-//        typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
-//
-//		CORBA::ULong dim_x, dim_y, nelems;
-//
-//        // -- Check the dimensions
-//        if (isImage) {
-//			dim_y = static_cast<CORBA::ULong>(boost::python::len(py_value));
-//            dim_x = static_cast<CORBA::ULong>(boost::python::len(py_value[0]));
-//            nelems = dim_x * dim_y;
-//        } else {
-//            dim_x = static_cast<CORBA::ULong>(boost::python::len(py_value));
-//            dim_y = 0;
-//            nelems = dim_x;
-//        }
-//
-//        // -- Allocate memory
-//        unique_pointer<TangoArrayType> value;
-//        TangoScalarType* buffer = TangoArrayType::allocbuf(nelems);
-//        try {
-//            value.reset(new TangoArrayType(nelems, nelems, buffer, true));
-//        } catch(...) {
-//            TangoArrayType::freebuf(buffer);
-//            throw;
-//        }
-//
-//        // -- Copy the sequence to the newly created buffer
-//        if (isImage) {
-//            for(CORBA::ULong y = 0; y < dim_y; ++y) {
-//                object py_sub = py_value[y];
-//                CORBA::ULong len_py_sub = static_cast<CORBA::ULong>(boost::python::len(py_sub));
-//                if (len_py_sub != dim_x)
-//                    raise_(PyExc_TypeError, non_valid_image);
-//                for(CORBA::ULong x = 0; x < dim_x; ++x) {
-//                    python_tangocpp<tangoTypeConst>::to_cpp(py_sub[x], buffer[x + y*dim_x]);
-//                }
-//            }
-//        } else {
-//            for(CORBA::ULong x = 0; x < dim_x; ++x) {
-//                python_tangocpp<tangoTypeConst>::to_cpp(py_value[x], buffer[x]);
-//            }
-//        }
-//
-//        // -- Insert it into the dev_attr
-//        dev_attr.insert(value.get(), dim_x, dim_y);
-//
-//        // -- Final cleaning
-//        value.release(); // Do not delete value, it is handled by dev_attr now!
-//    }
-//
-//    template<> inline void
-//    _fill_list_attribute<Tango::DEV_ENCODED>(Tango::DeviceAttribute & dev_attr,
-//                                             const bool isImage,
-//                                             const py::object & py_value)
-//    {
-//        /// @todo really? This is really not gonna happen?
-//        // Unsupported
-//        assert(false);
-//    }
+    template<long tangoTypeConst> static inline void
+    _fill_list_attribute(Tango::DeviceAttribute & dev_attr, const bool isImage,
+                         py::object& py_value)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+        typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
+        unsigned long dim_x, dim_y, nelems;
+
+        // -- Check the dimensions
+        if (isImage) {
+            py::list py_list = py_value;
+            py::list py_sub = py_list[0];
+            dim_y = len(py_list);
+            dim_x = len(py_sub);
+            nelems = dim_x * dim_y;
+        } else {
+            dim_x = py::len(py_value);
+            dim_y = 0;
+            nelems = dim_x;
+        }
+
+        // -- Allocate memory
+        std::unique_ptr<TangoArrayType> value;
+        TangoScalarType* buffer = TangoArrayType::allocbuf(nelems);
+        try {
+            value.reset(new TangoArrayType(nelems, nelems, buffer, true));
+        } catch(...) {
+            TangoArrayType::freebuf(buffer);
+            throw;
+        }
+        // -- Copy the sequence to the newly created buffer
+        if (isImage) {
+            py::list py_list = py_value;
+            for(int y=0; y<dim_y; y++) {
+                py::list py_sub = py_list[y];
+                for(int x=0; x<dim_x; x++) {
+                    python_tangocpp<tangoTypeConst>::to_cpp(py_sub[x], buffer[x+y*dim_x]);
+                }
+            }
+        } else {
+            py::list py_list = py_value;
+            for(int i=0; i<dim_x; i++) {
+                python_tangocpp<tangoTypeConst>::to_cpp(py_list[i], buffer[i]);
+            }
+        }
+        // -- Insert it into the dev_attr
+        dev_attr.insert(value.get(), dim_x, dim_y);
+        // -- Final cleaning
+        value.release(); // Do not delete value, it is handled by dev_attr now!
+    }
+
+    template<> inline void
+    _fill_list_attribute<Tango::DEV_ENCODED>(Tango::DeviceAttribute & dev_attr,
+                                             const bool isImage,
+                                             py::object& py_value)
+    {
+        /// @todo really? This is really not gonna happen?
+        // Unsupported
+        assert(false);
+    }
 
     void reset_values(Tango::DeviceAttribute & self, int data_type,
                  Tango::AttrDataFormat data_format, py::object py_value)
@@ -672,9 +672,9 @@ namespace PyDeviceAttribute {
             case Tango::SCALAR:
                 TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_scalar_attribute, self, py_value );
                 break;
-//            case Tango::IMAGE:
-//                isImage = true;
-//            case Tango::SPECTRUM:
+            case Tango::IMAGE:
+                isImage = true;
+            case Tango::SPECTRUM:
 //                // Why on earth? Why do we define _fill_numpy_attribute instead
 //                // of just using _fill_list_attribute, if the latter accepts
 //                // anything with operators "[]" and "len" defined?
@@ -686,7 +686,7 @@ namespace PyDeviceAttribute {
 //                // standard types and C++ are.
 //#               ifdef DISABLE_PYTANGO_NUMPY
 //                {
-//                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_list_attribute, self, isImage, py_value );
+                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_list_attribute, self, isImage, py_value );
 //                }
 //#               else
 //                {
@@ -696,7 +696,7 @@ namespace PyDeviceAttribute {
 //                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_list_attribute, self, isImage, py_value );
 //                }
 //#               endif
-//                break;
+                break;
             default:
                 raise_(PyExc_TypeError, "unsupported data_format.");
         }
@@ -729,9 +729,6 @@ void export_device_attribute(py::module &m)
         .def_readwrite("name", &Tango::DeviceAttribute::name)
         .def_readwrite("quality", &Tango::DeviceAttribute::quality)
         .def_readwrite("time", &Tango::DeviceAttribute::time)
-//        .def_property_readonly("type", [](Tango::DeviceAttribute& self) {
-//            return static_cast<Tango::CmdArgType>(self.get_type());
-//        })
         .def_property_readonly("dim_x", &Tango::DeviceAttribute::get_dim_x)
         .def_property_readonly("dim_y", &Tango::DeviceAttribute::get_dim_y)
         .def_property_readonly("w_dim_x", &Tango::DeviceAttribute::get_written_dim_x)
@@ -747,16 +744,6 @@ void export_device_attribute(py::module &m)
             py::return_value_policy::copy)
         .def("set_w_dim_x", &Tango::DeviceAttribute::set_w_dim_x)
         .def("set_w_dim_y", &Tango::DeviceAttribute::set_w_dim_y)
-
-//        .def_property_readonly("has_failed", [](Tango::DeviceAttribute& self) -> bool {
-//            bool fail = self.has_failed();
-//            std::cout << "read attribute failed? " << fail << std::endl;
-//            return fail;
-//        })
-//        .def_property_readonly("is_empty", [](Tango::DeviceAttribute& self) -> bool {
-//            return self.is_empty();
-//        })
-//        .def("value", PyDeviceAttribute::set_value)
         ;
         py::enum_<Tango::DeviceAttribute::except_flags>(m, "except_flags")
             .value("isempty_flag", Tango::DeviceAttribute::isempty_flag)
