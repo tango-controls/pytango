@@ -4,10 +4,10 @@
 
 namespace py = pybind11;
 
-#ifndef DISABLE_PYTANGO_NUMPY
-#   define PY_ARRAY_UNIQUE_SYMBOL pytango_ARRAY_API
-#   include <numpy/arrayobject.h>
-#endif
+//#ifndef DISABLE_PYTANGO_NUMPY
+//#   define PY_ARRAY_UNIQUE_SYMBOL pytango_ARRAY_API
+//#   include <numpy/arrayobject.h>
+//#endif
 
 void export_api_util(py::module& m);
 void export_archive_event_info(py::module& m);
@@ -69,13 +69,13 @@ void export_user_default_attr_prop(py::module& m);
 void export_user_default_pipe_prop(py::module &m);
 void export_wattribute(py::module &m);
 
-#ifdef DISABLE_PYTANGO_NUMPY
-void init_numpy(void) {}
-#elif PY_MAJOR_VERSION >= 3
-void* init_numpy(void) { import_array(); return NULL; }
-#else
-void init_numpy(void) { import_array(); return; }
-#endif
+//#ifdef DISABLE_PYTANGO_NUMPY
+//void init_numpy(void) {}
+//#elif PY_MAJOR_VERSION >= 3
+//void* init_numpy(void) { import_array(); return nullptr; }
+//#else
+//void init_numpy(void) { import_array(); return; }
+//#endif
 
 PYBIND11_MODULE(_tango, m) {
     m.doc() = "This module implements the Python Tango Device API mapping.";
@@ -91,7 +91,7 @@ PYBIND11_MODULE(_tango, m) {
 //                               show_py_signatures);
 
     PyEval_InitThreads();
-    init_numpy();
+//    init_numpy();
 
     export_api_util(m);
     export_archive_event_info(m);
