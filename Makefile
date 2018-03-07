@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Use with the following conda environment:
+# $ conda create -n tangobind -c esrf-bcu -c conda-forge python=2 tango pybind11 numpy gxx_linux-64
+# In order to isolate the build from the system libraries
+
 objs_py27 = \
 	objs_py27/api_util.o \
 	objs_py27/archive_event_info.o \
@@ -29,7 +33,7 @@ objs_py27 = \
 	objs_py27/device_info.o \
 	objs_py27/device_pipe.o \
 	objs_py27/device_proxy.o \
-	objs_py27/devintr_change_event_data.o \
+	#objs_py27/devintr_change_event_data.o \
 	objs_py27/enums.o \
 	objs_py27/event_data.o \
 	objs_py27/group_reply_list.o \
@@ -67,23 +71,25 @@ objs_py27 = \
 #	objs_py27/from_py.o \
 #	objs_py27/to_py.o \
 
-CFLAGS = -g -std=c++11 -Iext/ -I/usr/local/include -I/usr/local/include/tango `python-config --cflags` -fPIC
-CFLAGS += -I/home/grm84/env/pybind11/lib/python2.7/site-packages/numpy/core/include
+CFLAGS += -g -std=c++11 `python-config --cflags` -fPIC -Iext/
+CFLAGS += -I$(CONDA_PREFIX)/include/tango
+CFLAGS += -I$(CONDA_PREFIX)/lib/python2.7/site-packages/numpy/core/include
+CFLAGS += -I$(CONDA_PREFIX)/include
 
-srcs = $(objs_py27:.o=.cpp) 
+srcs = $(objs_py27:.o=.cpp)
+
 
 all: pytest
 
 pytest: $(objs_py27)
-	g++ -shared  -L/usr/local/lib -ltango  ${objs_py27} -o tango/_tango.so
+	$(GXX) -shared  -L$(CONDA_PREFIX)/lib -ltango  ${objs_py27} -o tango/_tango.so
 
 objs_py27/%.o : ext/%.cpp
 	@echo -n "Compiling $(<F)... "
-	g++ -shared $(CFLAGS) -c $< -o objs_py27/$*.o 
+	$(GXX) -shared $(CFLAGS) -c $< -o objs_py27/$*.o
 	@echo Done!
 
 objs_py27/%.o : ext/server/%.cpp
 	@echo -n "Compiling $(<F)... "
-	g++ -shared $(CFLAGS) -c $< -o objs_py27/$*.o 
+	$(GXX) -shared $(CFLAGS) -c $< -o objs_py27/$*.o
 	@echo Done!
-	
