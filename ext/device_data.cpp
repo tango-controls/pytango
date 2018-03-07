@@ -67,8 +67,7 @@ namespace PyDeviceData {
     template <>
     void insert_scalar<Tango::DEV_VOID>(Tango::DeviceData &self, py::object py_value)
     {
-        assert(false);
-//        raise_(PyExc_TypeError, "Trying to insert a value in a DEV_VOID DeviceData!");
+        raise_(PyExc_TypeError, "Trying to insert a value in a DEV_VOID DeviceData!");
     }
 
     template <>
