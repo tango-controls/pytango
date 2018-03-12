@@ -29,14 +29,13 @@ static const char* w_value_attr_name = "w_value";
 //static const std::string type_attr_name = "type";
 //static const std::string is_empty_attr_name = "is_empty";
 //static const std::string has_failed_attr_name = "has_failed";
-const char *non_valid_image = "Parameter must be an IMAGE. This is a sequence"
-                              " of sequences (with all the sub-sequences having"
-                              " the same length) or a bidimensional numpy.array";
+const char *invalid_image = "Parameter must be an IMAGE. This is a sequence"
+                            " of sequences (with all the sub-sequences having"
+                            " the same length) or a bidimensional numpy.array";
 
-const char *non_valid_spectrum = "Parameter must be an SPECTRUM. This is a"
-                                 " sequence of scalar values or a unidimensional"
-                                 " numpy.array";
-
+const char *invalid_spectrum = "Parameter must be an SPECTRUM. This is a"
+                               " sequence of scalar values or a unidimensional"
+                               " numpy.array";
 
 template<long tangoTypeConst>
 struct python_tangocpp
@@ -60,9 +59,10 @@ struct python_tangocpp<Tango::DEV_STRING>
     static const long tangoTypeConst = Tango::DEV_STRING;
     typedef TANGO_const2type(tangoTypeConst) TangoScalarType;
 
-    static inline void to_cpp(const py::object & py_value, TangoScalarType & result)
+    static inline void to_cpp(const py::object& py_value, TangoScalarType& result)
     {
 //        result = py_value.cast<char*>();
+        std::cout << "to_cpp " << result << std::endl;
     }
 
 //    static inline py::object to_python(const TangoScalarType & value)
@@ -81,6 +81,67 @@ try { \
 
 
 namespace PyDeviceAttribute {
+
+    template<long tangoTypeConst> static inline void
+    _update_scalar_values(Tango::DeviceAttribute &self, py::object py_value)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+        if (self.get_written_dim_x() > 0)
+        {
+            std::vector<TangoScalarType> val;
+            self.extract_read(val);
+            // In the following lines, the cast is absolutely necessary because
+            // vector<TangoScalarType> may not be a vector<TangoScalarType> at
+            // compile time. For example, for vector<DevBoolean>, the compiler
+            // may create a std::_Bit_reference type.
+            py_value.attr(value_attr_name) = py::cast((TangoScalarType)val[0]);
+            self.extract_set(val);
+            py_value.attr(w_value_attr_name) = py::cast((TangoScalarType)val[0]);
+        }
+        else
+        {
+            TangoScalarType rvalue;
+            EXTRACT_VALUE(self, rvalue)
+            py_value.attr(value_attr_name) = rvalue;
+            py_value.attr(w_value_attr_name) = Py_None;
+        }
+    }
+
+    template<> inline void
+    _update_scalar_values<Tango::DEV_ENCODED>(Tango::DeviceAttribute &self,
+                                              py::object py_value)
+    {
+    //        _update_value_as_string<Tango::DEV_ENCODED>(self, py_value);
+    }
+
+    template<> inline void
+    _update_scalar_values<Tango::DEV_STRING>(Tango::DeviceAttribute &self,
+                                             py::object py_value)
+    {
+        if (self.get_written_dim_x() > 0)
+        {
+            std::vector<std::string> r_val, w_val;
+            self.extract_read(r_val);
+            py_value.attr(value_attr_name) = py::cast(r_val[0]);
+            self.extract_set(w_val);
+            py_value.attr(w_value_attr_name) = py::cast(w_val[0]);
+        }
+        else
+        {
+            std::string rvalue;
+            EXTRACT_VALUE(self, rvalue)
+            py_value.attr(value_attr_name) = rvalue;
+            py_value.attr(w_value_attr_name) = Py_None;
+        }
+    }
+
+    template<> inline void
+    _update_scalar_values<Tango::DEV_PIPE_BLOB>(Tango::DeviceAttribute &self,
+                        py::object py_value)
+    {
+        assert(false);
+    }
 
     template<long tangoTypeConst>
     static inline void _update_array_values(Tango::DeviceAttribute &self, bool isImage, py::object py_value)
@@ -175,8 +236,100 @@ namespace PyDeviceAttribute {
     template<>
     inline void _update_array_values<Tango::DEV_STRING>(Tango::DeviceAttribute &self, bool isImage, py::object py_value)
     {
-        assert(false);
-//        _update_array_values_as_tuples<Tango::DEV_STRING>(self, isImage, py_value);
+        static const long tangoTypeConst = Tango::DEV_STRING;
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+//        typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
+
+        // Extract the actual data from Tango::DeviceAttribute (self)
+        std::vector<std::string> value_ptr;
+        try {
+            self >> value_ptr;
+        } catch (Tango::DevFailed &e ) {
+            if (strcmp(e.errors[0].reason.in(),"API_EmptyDeviceAttribute") != 0)
+                throw;
+        }
+        if (value_ptr.size() == 0) {
+            //Empty device attribute
+            py::array value = py::array_t<TangoScalarType>(0, nullptr);
+            if (!value)
+                throw py::error_already_set();
+            py_value.attr(value_attr_name) = py::object(value);
+            py_value.attr(w_value_attr_name) = Py_None;
+            return;
+        }
+        // find the maximum length of string
+        int maxlen = 0;
+        for (std::string item : value_ptr) {
+            int l = item.length();
+            maxlen = (l > maxlen) ? l : maxlen;
+        }
+
+        TangoScalarType buffer = new char[maxlen*value_ptr.size()];
+        TangoScalarType bptr = buffer;
+        ::memset(buffer, 0, maxlen*value_ptr.size());
+
+        for (std::string item : value_ptr) {
+            ::memcpy(bptr, item.data(), item.length());
+            bptr+= maxlen;
+        }
+        std::cerr << "buffer is at @ " << buffer << "\n";
+        py::capsule free_when_done(reinterpret_cast<void*>(buffer), [](void* f) {
+            TangoScalarType ptr = reinterpret_cast<TangoScalarType>(f);
+            std::cerr << "freeing memory @ " << ptr << "\n";
+            delete[] ptr;
+        });
+
+        // Create a new numpy.ndarray() object.
+        // Unfortunately numpy string arrays require fixed length strings
+        // so we have to find the maximum string length, creating an appropriate
+        // size buffer and copy the strings.
+        py::array array;
+        const std::string* ptr = reinterpret_cast<const string*>(buffer);
+        std::stringstream ss;
+        ss << "|S" << maxlen;
+        std::string format_str = ss.str();
+        size_t write_part_offset = 0;
+        if (isImage) {
+            int dims[2];
+            dims[1] = self.get_dim_x();
+            dims[0] = self.get_dim_y();
+            write_part_offset = dims[1] * dims[0] * maxlen;
+            array = py::array(py::dtype(format_str), dims, ptr, free_when_done);
+        } else {
+            int dims[1];
+            dims[0] = self.get_dim_x();
+            write_part_offset = dims[0] * maxlen;
+            array = py::array(py::dtype(format_str), dims, ptr, free_when_done);
+        }
+        if (!array) {
+            delete buffer;
+            throw py::error_already_set();
+        }
+        py_value.attr(value_attr_name) = py::object(array);
+
+        // Create the numpy array for the write part. It will be stored in
+        // another place.
+        const std::string* wptr = reinterpret_cast<const string*>(buffer + write_part_offset);
+        if (self.get_written_dim_x() != 0) {
+            py::array warray;
+            if (isImage) {
+                int wdims[2];
+                wdims[1] = self.get_written_dim_x();
+                wdims[0] = self.get_written_dim_y();
+                warray = py::array(py::dtype(format_str), wdims, wptr, free_when_done);
+            } else {
+                int wdims[1];
+                wdims[0] = self.get_written_dim_x();
+                warray = py::array(py::dtype(format_str), wdims, wptr, free_when_done);
+            }
+            if (!warray) {
+                delete buffer;
+                throw py::error_already_set();
+            }
+            py_value.attr(w_value_attr_name) = py::object(warray);
+        } else {
+            py_value.attr(w_value_attr_name) = Py_None;
+        }
     }
 
     template<>
@@ -383,66 +536,6 @@ namespace PyDeviceAttribute {
 //	assert(false);
 //    }
 //
-    template<long tangoTypeConst> static inline void
-    _update_scalar_values(Tango::DeviceAttribute &self, py::object py_value)
-    {
-        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-
-        if (self.get_written_dim_x() > 0)
-        {
-            std::vector<TangoScalarType> val;
-            self.extract_read(val);
-            // In the following lines, the cast is absolutely necessary because
-            // vector<TangoScalarType> may not be a vector<TangoScalarType> at
-            // compile time. For example, for vector<DevBoolean>, the compiler
-            // may create a std::_Bit_reference type.
-            py_value.attr(value_attr_name) = py::cast((TangoScalarType)val[0]);
-            self.extract_set(val);
-            py_value.attr(w_value_attr_name) = py::cast((TangoScalarType)val[0]);
-        }
-        else
-        {
-            TangoScalarType rvalue;
-            EXTRACT_VALUE(self, rvalue)
-            py_value.attr(value_attr_name) = rvalue;
-            py_value.attr(w_value_attr_name) = Py_None;
-        }
-    }
-
-    template<> inline void
-    _update_scalar_values<Tango::DEV_ENCODED>(Tango::DeviceAttribute &self,
-                                              py::object py_value)
-    {
-//        _update_value_as_string<Tango::DEV_ENCODED>(self, py_value);
-    }
-
-    template<> inline void
-    _update_scalar_values<Tango::DEV_STRING>(Tango::DeviceAttribute &self,
-                                             py::object py_value)
-    {
-        if (self.get_written_dim_x() > 0)
-        {
-            std::vector<std::string> r_val, w_val;
-            self.extract_read(r_val);
-            py_value.attr(value_attr_name) = py::cast(r_val[0]);
-            self.extract_set(w_val);
-            py_value.attr(w_value_attr_name) = py::cast(w_val[0]);
-        }
-        else
-        {
-            std::string rvalue;
-            EXTRACT_VALUE(self, rvalue)
-            py_value.attr(value_attr_name) = rvalue;
-            py_value.attr(w_value_attr_name) = Py_None;
-        }
-    }
-
-    template<> inline void
-    _update_scalar_values<Tango::DEV_PIPE_BLOB>(Tango::DeviceAttribute &self,
-						py::object py_value)
-    {
-        assert(false);
-    }
 //
 //    template<long tangoTypeConst> static inline void
 //    _update_array_values_as_lists(Tango::DeviceAttribute &self, bool isImage,
@@ -778,30 +871,23 @@ namespace PyDeviceAttribute {
         // Check dimensions
         ssize_t dim_x=0, dim_y=0, nelems=0;
         py::array py_array = py::array(py_value);
-        bool ok;
-        switch (py_array.ndim()) {
-            py::print(py_array.ndim());
+        ssize_t ndim = py_array.ndim();
+        switch (ndim) {
             case 2: // -- Image
-                ok = isImage;
                 dim_x = py_array.shape()[1];
                 dim_y = py_array.shape()[0];
                 nelems = dim_x*dim_y;
                 break;
             case 1: // -- Spectrum
-                ok = !isImage;
                 dim_x = py_array.shape()[0];
                 dim_y = 0;
                 nelems = dim_x;
                 break;
             default: // -- WTF?!!?
-                ok = false;
-                break;
+                raise_(PyExc_TypeError, isImage ? invalid_image : invalid_spectrum);
         }
         const void* const_ptr = py_array.data();
         void* ptr = const_cast<void*>(const_ptr);
-
-        if (!ok)
-            raise_(PyExc_TypeError, isImage ? non_valid_image : non_valid_spectrum);
 
         // Allocate memory for the new data object
         std::unique_ptr<TangoArrayType> value;
@@ -818,12 +904,79 @@ namespace PyDeviceAttribute {
     }
 
     template<>
+    inline void _fill_numpy_attribute<Tango::DEV_STRING>(Tango::DeviceAttribute& dev_attr, const bool isImage, const py::object& py_value)
+    {
+        static const long tangoTypeConst = Tango::DEV_STRING;
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+        typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
+
+        // Check dimensions
+        ssize_t dim_x=0, dim_y=0, nelems=0;
+        py::array py_array = py::array(py_value);
+        ssize_t ndim = py_array.ndim();
+        ssize_t itemsize = py_array.itemsize();
+//        py::print(py_array.ndim());
+        switch (ndim) {
+            case 2: // -- Image
+                dim_x = py_array.shape()[1];
+                dim_y = py_array.shape()[0];
+                nelems = dim_x*dim_y;
+//                py::print(dim_x);
+//                py::print(dim_y);
+                break;
+            case 1: // -- Spectrum
+                dim_x = py_array.shape()[0];
+                dim_y = 0;
+                nelems = dim_x;
+                break;
+            default: // -- WTF?!!?
+                raise_(PyExc_TypeError, isImage ? invalid_image : invalid_spectrum);
+        }
+
+        // Allocate memory for the new data object
+        std::unique_ptr<TangoArrayType> value;
+        unsigned long unelems = static_cast<unsigned long>(nelems);
+        TangoScalarType* buffer = TangoArrayType::allocbuf(nelems);
+        try {
+            value.reset(new TangoArrayType(unelems, unelems, buffer, false));
+        } catch(...) {
+            TangoArrayType::freebuf(buffer);
+            throw;
+        }
+        if (ndim == 2) {
+            for(int y=0; y<dim_y; y++) {
+                for(int x=0; x<dim_x; x++) {
+//                    std::cout << "x " << x << " y " << y << std::endl;
+                    const void* const_ptr = py_array.data(y, x);
+//                    std::cout << "const_ptr" << const_ptr << std::endl;
+                    std::string str(static_cast<const char*>(const_ptr), itemsize);
+//                    std::cout << str << std::endl;
+                    buffer[x+y*dim_x] = ::strdup(str.c_str());
+//                    std::cout << buffer[x+y*dim_x] << std::endl;
+                }
+            }
+        } else {
+            for (int i=0; i<dim_x; i++) {
+                const void* const_ptr = py_array.data(i);
+//                std::cout << "const_ptr" << const_ptr << std::endl;
+                std::string str(static_cast<const char*>(const_ptr), itemsize);
+//                std::cout << str << std::endl;
+                buffer[i] = ::strdup(str.c_str());
+//                std::cout << buffer[i] << std::endl;
+            }
+        }
+        // -- Insert into device attribute
+        dev_attr.insert( value.get(), dim_x, dim_y);
+        // -- Final cleaning...
+        value.release(); // Do not delete value, it is handled by dev_attr now!
+    }
+
+    template<>
     inline void _fill_numpy_attribute<Tango::DEV_ENCODED>(Tango::DeviceAttribute& dev_attr, const bool isImage, const py::object& py_value)
     {
         // Unsupported
         assert(false);
     }
-
 
     void reset_values(Tango::DeviceAttribute & self, int data_type,
                  Tango::AttrDataFormat data_format, py::object py_value)
