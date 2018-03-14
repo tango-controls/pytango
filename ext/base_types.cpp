@@ -216,6 +216,10 @@ inline bool operator==(const Tango::PipeInfo& pi1, const Tango::PipeInfo& pi2) {
 //}
 
 void export_base_types(py::module &m) {
+
+    m.def("_get_tango_lib_release", &Tango::_convert_tango_lib_release);
+//    .def("raise_asynch_exception", &raise_asynch_exception);
+
     py::enum_<PyTango::ExtractAs>(m, "ExtractAs")
         .value("Numpy", PyTango::ExtractAsNumpy)
         .value("ByteArray", PyTango::ExtractAsByteArray)
@@ -238,6 +242,7 @@ void export_base_types(py::module &m) {
         .value("RawImage", PyTango::RawImage)
         .value("JpegImage", PyTango::JpegImage)
     ;
+
 
 //    // Export some std types
 //
@@ -384,7 +389,5 @@ void export_base_types(py::module &m) {
 //    export_dev_error();
 //    export_time_val();
 //
-//    .def("raise_asynch_exception", &raise_asynch_exception);
 //
-//    .def("_get_tango_lib_release", &Tango::_convert_tango_lib_release);
 }

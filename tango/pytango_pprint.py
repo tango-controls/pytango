@@ -17,20 +17,21 @@ __all__ = ["pytango_pprint_init"]
 
 __docformat__ = "restructuredtext"
 
-# from ._tango import (StdStringVector, StdLongVector,
-#                      AttributeInfoList, AttributeInfoListEx, PipeInfoList,
-#                      DeviceDataHistoryList, CommandInfoList,
+#from ._tango import (StdStringVector, StdLongVector,
+from ._tango import (AttributeInfoList, AttributeInfoListEx, PipeInfoList,
+                      DeviceDataHistoryList, CommandInfoList,
 #                      GroupReplyList, GroupAttrReplyList, GroupCmdReplyList,
-#                      DbData, DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList,
-#                      LockerInfo, DevCommandInfo, AttributeDimension, CommandInfo, PipeInfo,
-#                      DeviceInfo, DeviceAttributeConfig, AttributeInfo, AttributeAlarmInfo,
-#                      ChangeEventInfo, PeriodicEventInfo, ArchiveEventInfo,
-#                      AttributeEventInfo, AttributeInfoEx,
-#                      DeviceAttribute, DeviceAttributeHistory, DeviceData, DeviceDataHistory,
-#                      DevicePipe, DbDatum, DbDevInfo, DbDevImportInfo, DbDevExportInfo,
-#                      DbServerInfo, GroupReply, GroupAttrReply, GroupCmdReply,
-#                      DevError, EventData, AttrConfEventData, DataReadyEventData,
-#                      TimeVal, DevFailed, CmdArgType)
+                      DbData, DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList,
+                      LockerInfo, DevCommandInfo, AttributeDimension, CommandInfo, PipeInfo,
+                      DeviceInfo, DeviceAttributeConfig, AttributeInfo, AttributeAlarmInfo,
+                      ChangeEventInfo, PeriodicEventInfo, ArchiveEventInfo,
+                      AttributeEventInfo, AttributeInfoEx,
+                      DeviceAttribute, DeviceAttributeHistory, DeviceData, DeviceDataHistory,
+                      DevicePipe, DbDatum, DbDevInfo, DbDevImportInfo, DbDevExportInfo,
+                      DbServerInfo,
+#                     GroupReply, GroupAttrReply, GroupCmdReply,
+                      DevError, EventData, AttrConfEventData, DataReadyEventData,
+                      TimeVal, DevFailed, CmdArgType)
  
 # from .device_server import AttributeAlarm, EventProperties
 # from .device_server import ChangeEventProp, PeriodicEventProp, ArchiveEventProp
@@ -97,17 +98,16 @@ def __registerSeqStr():
 #    seqs = (StdStringVector, StdLongVector,
     seqs = (AttributeInfoList, AttributeInfoListEx, PipeInfoList,
             DeviceDataHistoryList, CommandInfoList,
-            GroupReplyList, GroupAttrReplyList, GroupCmdReplyList,
+#            GroupReplyList, GroupAttrReplyList, GroupCmdReplyList,
             DbData, DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList)
 
     for seq in seqs:
         seq.__str__ = _SeqStr
         seq.__repr__ = _SeqRepr
 
-
 def __str__DevFailed(self):
     if isinstance(self.args, collections.Sequence):
-        return 'DevFailed[\n%s]' % '\n'.join(map(str, self.args))
+        return 'DevFailed[\n%s]' % '\n'.join(map(str, self.args[0]))
     return 'DevFailed[%s]' % (self.args)
 
 
@@ -133,12 +133,14 @@ def __registerStructStr():
                AttributeEventInfo, AttributeInfoEx, PipeInfo,
                DeviceAttribute, DeviceAttributeHistory, DeviceData, DeviceDataHistory,
                DevicePipe, DbDatum, DbDevInfo, DbDevImportInfo, DbDevExportInfo,
-               DbServerInfo, GroupReply, GroupAttrReply, GroupCmdReply,
+               DbServerInfo, 
+#               GroupReply, GroupAttrReply, GroupCmdReply,
                DevError, EventData, AttrConfEventData, DataReadyEventData,
-               AttributeConfig, AttributeConfig_2, AttributeConfig_3,
-               AttributeConfig_5,
-               ChangeEventProp, PeriodicEventProp, ArchiveEventProp,
-               AttributeAlarm, EventProperties)
+#               AttributeConfig, AttributeConfig_2, AttributeConfig_3,
+#               AttributeConfig_5,
+#               ChangeEventProp, PeriodicEventProp, ArchiveEventProp,
+#               AttributeAlarm, EventProperties
+               )
 
     for struct in structs:
         struct.__str__ = __str__Struct

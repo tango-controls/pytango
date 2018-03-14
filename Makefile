@@ -33,9 +33,9 @@ objs_py27 = \
 	objs_py27/device_info.o \
 	objs_py27/device_pipe.o \
 	objs_py27/device_proxy.o \
-	#objs_py27/devintr_change_event_data.o \
 	objs_py27/enums.o \
 	objs_py27/event_data.o \
+	objs_py27/exception.o \
 	objs_py27/group_reply_list.o \
 	objs_py27/group_reply.o \
 	objs_py27/group.o \
@@ -66,8 +66,8 @@ objs_py27 = \
 	objs_py27/user_default_attr_prop.o \
 	objs_py27/user_default_pipe_prop.o \
 	objs_py27/wattribute.o \
+#	objs_py27/devintr_change_event_data.o \
 #	objs_py27/device_class.o \
-#	objs_py27/exception.o \
 #	objs_py27/from_py.o \
 #	objs_py27/to_py.o \
 

@@ -23,7 +23,7 @@ import functools
 import traceback
 
 from ._tango import AttrDataFormat, AttrWriteType, CmdArgType, PipeWriteType
-#from ._tango import DevFailed, GreenMode, SerialModel
+from ._tango import DevFailed, GreenMode, SerialModel
 from ._tango import GreenMode
 
 from .attr_data import AttrData

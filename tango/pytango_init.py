@@ -19,7 +19,7 @@ __docformat__ = "restructuredtext"
 
 from .attribute_proxy import attribute_proxy_init
 from .base_types import base_types_init
-# from .exception import exception_init
+from .exception import exception_init
 # from .callback import callback_init
 from .api_util import api_util_init
 # from .encoded_attribute import encoded_attribute_init
@@ -39,7 +39,7 @@ from .time_val import time_val_init
 from .auto_monitor import auto_monitor_init
 from .pipe import pipe_init
 from ._tango import constants
-# from ._tango import _get_tango_lib_release
+from ._tango import _get_tango_lib_release
 
 __INITIALIZED = False
 __DOC = False
@@ -53,15 +53,15 @@ def init_constants():
     tg_ver_str = "0x%02d%02d%02d00" % (tg_ver[0], tg_ver[1], tg_ver[2])
     constants.TANGO_VERSION_HEX = int(tg_ver_str, 16)
 
-#     BOOST_VERSION = ".".join(map(str, (constants.BOOST_MAJOR_VERSION,
-#                                        constants.BOOST_MINOR_VERSION,
-#                                        constants.BOOST_PATCH_VERSION)))
-#     constants.BOOST_VERSION = BOOST_VERSION
+#      PYBIND11_VERSION = ".".join(map(str, (constants.PYBIND11_MAJOR_VERSION,
+#                                         constants.PYBIND11_MINOR_VERSION,
+#                                         constants.PYBIND11_PATCH_VERSION)))
+#      constants.PYBIND11_VERSION = PYBIND11_VERSION
 
     class Compile(object):
         PY_VERSION = constants.PY_VERSION
         TANGO_VERSION = constants.TANGO_VERSION
-#         BOOST_VERSION = constants.BOOST_VERSION
+#         PYBIND11_VERSION = constants.PYBIND _VERSION
         NUMPY_VERSION = constants.NUMPY_VERSION
         # UNAME = tuple(map(str, json.loads(constants.UNAME)))
 
@@ -96,9 +96,9 @@ def init():
     doc = __DOC
     init_constants()
     base_types_init(doc=doc)
-#     exception_init(doc=doc)
+    exception_init(doc=doc)
 #     callback_init(doc=doc)
-#     api_util_init(doc=doc)
+    api_util_init(doc=doc)
 #     encoded_attribute_init(doc=doc)
     connection_init(doc=doc)
     db_init(doc=doc)
@@ -110,7 +110,7 @@ def init():
 #     group_init(doc=doc)
 #     group_reply_init(doc=doc)
 #     group_reply_list_init(doc=doc)
-#     pytango_pprint_init(doc=doc)
+    pytango_pprint_init(doc=doc)
     pyutil_init(doc=doc)
     time_val_init(doc=doc)
     auto_monitor_init(doc=doc)

@@ -95,7 +95,7 @@ StdDoubleVector, StdGroupAttrReplyVector, StdGroupCmdReplyVector, StdGroupReplyV
 StdStringVector, SubDevDiag, TimeVal, UserDefaultAttrProp, UserDefaultFwdAttrProp,
 UserDefaultPipeProp, Util, WAttribute, WPipe, WRITE, WT_UNKNOWN, _ImageFormat,
 __AttributeProxy, __tangolib_version__, alarm_flags,
-asyn_req_type, cb_sub_model, constants
+asyn_req_type, cb_sub_model, constants, DevFailed
 )
 
 # Aliases

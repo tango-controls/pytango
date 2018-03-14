@@ -20,7 +20,7 @@ __docformat__ = "restructuredtext"
 import os
 import copy
 
-from ._tango import Util #, Except, DevFailed, DbDevInfo
+from ._tango import Util, Except, DevFailed, DbDevInfo
 from .utils import document_method as __document_method
 # from utils import document_static_method as __document_static_method
 from .globals import class_list, cpp_class_list, get_constructed_classes

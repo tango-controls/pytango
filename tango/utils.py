@@ -26,8 +26,7 @@ import collections
 from ._tango import StdStringVector, StdDoubleVector
 from ._tango import DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat
 from ._tango import EventData, AttrConfEventData, DataReadyEventData, constants
-#from ._tango import DevFailed
-#from ._tango import DevState, PipeEventData, DevIntrChangeEventData
+#from ._tango import PipeEventData, DevIntrChangeEventData
 #from ._tango import CommunicationFailed
 
 from . import _tango

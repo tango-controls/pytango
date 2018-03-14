@@ -32,20 +32,20 @@ namespace py = pybind11;
 //                              " sequence of scalar values or a unidimensional"
 //                              " numpy.array";
 //
-//boost::python::object
-//    PyTango_DevFailed,
-//    PyTango_ConnectionFailed,
-//    PyTango_CommunicationFailed,
-//    PyTango_WrongNameSyntax,
-//    PyTango_NonDbDevice,
-//    PyTango_WrongData,
-//    PyTango_NonSupportedFeature,
-//    PyTango_AsynCall,
-//    PyTango_AsynReplyNotArrived,
-//    PyTango_EventSystemFailed,
-//    PyTango_DeviceUnlocked,
-//    PyTango_NotAllowed;
-//
+py::object
+    PyTango_DevFailed,
+    PyTango_ConnectionFailed,
+    PyTango_CommunicationFailed,
+    PyTango_WrongNameSyntax,
+    PyTango_NonDbDevice,
+    PyTango_WrongData,
+    PyTango_NonSupportedFeature,
+    PyTango_AsynCall,
+    PyTango_AsynReplyNotArrived,
+    PyTango_EventSystemFailed,
+    PyTango_DeviceUnlocked,
+    PyTango_NotAllowed;
+
 //namespace Tango
 //{
 //    inline bool operator==(const Tango::NamedDevFailed& df1, const Tango::NamedDevFailed& df2)
@@ -179,7 +179,7 @@ namespace py = pybind11;
 //                    (char *)"O",
 //                    traceback == NULL ? Py_None : traceback);
 //
-//            boost::python::object tbList = object(handle<>(tbList_ptr));
+//            py::object tbList = object(handle<>(tbList_ptr));
 //            boost::python::str origin = str("").join(tbList);
 //            char const* origin_ptr = boost::python::extract<char const*>(origin);
 //            dev_err[0].origin = CORBA::string_dup(origin_ptr);
@@ -281,156 +281,113 @@ namespace py = pybind11;
 //    }
 //};
 
-
-//void _translate_dev_failed(const Tango::DevFailed &dev_failed,
-//                           py::object py_dev_failed)
-//{
-//    py::object py_errors(dev_failed.errors);
-//    PyErr_SetObject(py_dev_failed.ptr(), py_errors.ptr());
-//}
-//
-//void translate_dev_failed(const Tango::DevFailed &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_DevFailed); }
-//
-//void translate_connection_failed(const Tango::ConnectionFailed &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_ConnectionFailed); }
-//
-//void translate_communication_failed(const Tango::CommunicationFailed &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_CommunicationFailed); }
-//
-//void translate_wrong_name_syntax(const Tango::WrongNameSyntax &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_WrongNameSyntax); }
-//
-//void translate_non_db_device(const Tango::NonDbDevice &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_NonDbDevice); }
-//
-//void translate_wrong_data(const Tango::WrongData &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_WrongData); }
-//
-//void translate_non_supported_feature(const Tango::NonSupportedFeature &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_NonSupportedFeature); }
-//
-//void translate_asyn_call(const Tango::AsynCall &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_AsynCall); }
-//
-//void translate_asyn_reply_not_arrived(const Tango::AsynReplyNotArrived &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_AsynReplyNotArrived); }
-//
-//void translate_event_system_failed(const Tango::EventSystemFailed &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_EventSystemFailed); }
-//
-//void translate_device_unlocked(const Tango::DeviceUnlocked &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_DeviceUnlocked); }
-//
-//void translate_not_allowed(const Tango::NotAllowed &dev_failed)
-//{ _translate_dev_failed(dev_failed, PyTango_NotAllowed); }
-
-
-//BOOST_PYTHON_FUNCTION_OVERLOADS(to_dev_failed_overloads, to_dev_failed, 0, 3)
-//BOOST_PYTHON_FUNCTION_OVERLOADS(throw_python_generic_exception_overloads,
-//                                throw_python_generic_exception, 0, 3)
+void _translate_dev_failed(const Tango::DevFailed &dev_failed, py::object py_dev_failed) {
+    py::list py_errors;
+    for(unsigned i=0; i<dev_failed.errors.length(); i++) {
+        py_errors.append(dev_failed.errors[i]);
+    }
+    PyErr_SetObject(py_dev_failed.ptr(), py_errors.ptr());
+}
 
 void export_exceptions(py::module& m) {
 //    bool (*compare_exception_) (Tango::DevFailed &, Tango::DevFailed &) = &Tango::Except::compare_exception;
-//
-//    PyTango_DevFailed = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            (char *)"PyTango.DevFailed", NULL, NULL)));
-//
-//    PyObject *df_ptr = PyTango_DevFailed.ptr();
-//
-//    PyTango_ConnectionFailed = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            const_cast<char *>("PyTango.ConnectionFailed"), df_ptr, NULL)));
-//    PyTango_CommunicationFailed = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            const_cast<char *>("PyTango.CommunicationFailed"), df_ptr, NULL)));
-//    PyTango_WrongNameSyntax = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            const_cast<char *>("PyTango.WrongNameSyntax"), df_ptr, NULL)));
-//    PyTango_NonDbDevice = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            const_cast<char *>("PyTango.NonDbDevice"), df_ptr, NULL)));
-//    PyTango_WrongData = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            const_cast<char *>("PyTango.WrongData"), df_ptr, NULL)));
-//    PyTango_NonSupportedFeature = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            const_cast<char *>("PyTango.NonSupportedFeature"), df_ptr, NULL)));
-//    PyTango_AsynCall = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            const_cast<char *>("PyTango.AsynCall"), df_ptr, NULL)));
-//    PyTango_AsynReplyNotArrived = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            const_cast<char *>("PyTango.AsynReplyNotArrived"), df_ptr, NULL)));
-//    PyTango_EventSystemFailed = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            const_cast<char *>("PyTango.EventSystemFailed"), df_ptr, NULL)));
-//    PyTango_DeviceUnlocked = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            const_cast<char *>("PyTango.DeviceUnlocked"), df_ptr, NULL)));
-//    PyTango_NotAllowed = boost::python::object(
-//        boost::python::handle<>(PyErr_NewException(
-//            const_cast<char *>("PyTango.NotAllowed"), df_ptr, NULL)));
-//
-//    scope().attr("DevFailed") = PyTango_DevFailed;
-//    scope().attr("ConnectionFailed") = PyTango_ConnectionFailed;
-//    scope().attr("CommunicationFailed") = PyTango_CommunicationFailed;
-//    scope().attr("WrongNameSyntax") = PyTango_WrongNameSyntax;
-//    scope().attr("NonDbDevice") = PyTango_NonDbDevice;
-//    scope().attr("WrongData") = PyTango_WrongData;
-//    scope().attr("NonSupportedFeature") = PyTango_NonSupportedFeature;
-//    scope().attr("AsynCall") = PyTango_AsynCall;
-//    scope().attr("AsynReplyNotArrived") = PyTango_AsynReplyNotArrived;
-//    scope().attr("EventSystemFailed") = PyTango_EventSystemFailed;
-//    scope().attr("DeviceUnlocked") = PyTango_DeviceUnlocked;
-//    scope().attr("NotAllowed") = PyTango_NotAllowed;
-//
-//    // make a new custom exception and use it as a translation target
-//    static py::exception<Tango::DevFailed> ex(m, "DevFailed");
-//    py::register_exception_translator([](std::exception_ptr p) {
-//        try {
-//            if (p) std::rethrow_exception(p);
-//        } catch (const Tango::DevFailed &e) {
-//            // Set DevFailed as the active python error
-//            ex(e.errors);
-//        }
-//    });
-//    py::register_exception_translator<Tango::DevFailed>(&translate_dev_failed);
-//    py::register_exception_translator<Tango::ConnectionFailed>(&translate_connection_failed);
-//    py::register_exception_translator<Tango::CommunicationFailed>(&translate_communication_failed);
-//    py::register_exception_translator<Tango::WrongNameSyntax>(&translate_wrong_name_syntax);
-//    py::register_exception_translator<Tango::NonDbDevice>(&translate_non_db_device);
-//    py::register_exception_translator<Tango::WrongData>(&translate_wrong_data);
-//    py::register_exception_translator<Tango::NonSupportedFeature>(&translate_non_supported_feature);
-//    py::register_exception_translator<Tango::AsynCall>(&translate_asyn_call);
-//    py::register_exception_translator<Tango::AsynReplyNotArrived>(&translate_asyn_reply_not_arrived);
-//    py::register_exception_translator<Tango::EventSystemFailed>(&translate_event_system_failed);
-//    py::register_exception_translator<Tango::DeviceUnlocked>(&translate_device_unlocked);
-//    py::register_exception_translator<Tango::NotAllowed>(&translate_not_allowed);
+
+    PyTango_DevFailed = py::reinterpret_steal<py::object>(PyErr_NewException(const_cast<char *>("PyTango.DevFailed"), nullptr, nullptr));
+    PyObject *df_ptr = PyTango_DevFailed.ptr();
+
+    PyTango_ConnectionFailed = py::reinterpret_steal<py::object>(
+        PyErr_NewException(const_cast<char *>("PyTango.ConnectionFailed"), df_ptr, nullptr));
+    PyTango_CommunicationFailed = py::reinterpret_steal<py::object>(
+        PyErr_NewException(const_cast<char *>("PyTango.CommunicationFailed"), df_ptr, nullptr));
+    PyTango_WrongNameSyntax = py::reinterpret_steal<py::object>(
+        PyErr_NewException(const_cast<char *>("PyTango.WrongNameSyntax"), df_ptr, nullptr));
+    PyTango_NonDbDevice = py::reinterpret_steal<py::object>(
+        PyErr_NewException(const_cast<char *>("PyTango.NonDbDevice"), df_ptr, nullptr));
+    PyTango_WrongData = py::reinterpret_steal<py::object>(
+        PyErr_NewException(const_cast<char *>("PyTango.WrongData"), df_ptr, nullptr));
+    PyTango_NonSupportedFeature = py::reinterpret_steal<py::object>(
+        PyErr_NewException(const_cast<char *>("PyTango.NonSupportedFeature"), df_ptr, nullptr));
+    PyTango_AsynCall = py::reinterpret_steal<py::object>(
+        PyErr_NewException(const_cast<char *>("PyTango.AsynCall"), df_ptr, nullptr));
+    PyTango_AsynReplyNotArrived = py::reinterpret_steal<py::object>(
+        PyErr_NewException(const_cast<char *>("PyTango.AsynReplyNotArrived"), df_ptr, nullptr));
+    PyTango_EventSystemFailed = py::reinterpret_steal<py::object>(
+        PyErr_NewException(const_cast<char *>("PyTango.EventSystemFailed"), df_ptr, nullptr));
+    PyTango_DeviceUnlocked = py::reinterpret_steal<py::object>(
+        PyErr_NewException(const_cast<char *>("PyTango.DeviceUnlocked"), df_ptr, nullptr));
+    PyTango_NotAllowed = py::reinterpret_steal<py::object>(
+        PyErr_NewException(const_cast<char *>("PyTango.NotAllowed"), df_ptr, nullptr));
+
+    m.attr("DevFailed") = PyTango_DevFailed;
+    m.attr("ConnectionFailed") = PyTango_ConnectionFailed;
+    m.attr("CommunicationFailed") = PyTango_CommunicationFailed;
+    m.attr("WrongNameSyntax") = PyTango_WrongNameSyntax;
+    m.attr("NonDbDevice") = PyTango_NonDbDevice;
+    m.attr("WrongData") = PyTango_WrongData;
+    m.attr("NonSupportedFeature") = PyTango_NonSupportedFeature;
+    m.attr("AsynCall") = PyTango_AsynCall;
+    m.attr("AsynReplyNotArrived") = PyTango_AsynReplyNotArrived;
+    m.attr("EventSystemFailed") = PyTango_EventSystemFailed;
+    m.attr("DeviceUnlocked") = PyTango_DeviceUnlocked;
+    m.attr("NotAllowed") = PyTango_NotAllowed;
+
+    // make a new custom exception and use it as a translation target
+    static py::exception<Tango::DevFailed> ex(m, "PyTango.DevFailed");
+    py::register_exception_translator([](std::exception_ptr p) {
+        try {
+            if (p) std::rethrow_exception(p);
+        } catch (const Tango::ConnectionFailed& e) {
+            _translate_dev_failed(e, PyTango_ConnectionFailed);
+        } catch (const Tango::CommunicationFailed& e) {
+            _translate_dev_failed(e, PyTango_CommunicationFailed);
+        } catch (const Tango::WrongNameSyntax& e) {
+            _translate_dev_failed(e, PyTango_WrongNameSyntax);
+        } catch (const Tango::NonDbDevice& e) {
+            _translate_dev_failed(e, PyTango_NonDbDevice);
+        } catch (const Tango::WrongData& e) {
+            _translate_dev_failed(e, PyTango_WrongData);
+        } catch (const Tango::NonSupportedFeature& e) {
+            _translate_dev_failed(e, PyTango_NonSupportedFeature);
+        } catch (const Tango::AsynCall& e) {
+            _translate_dev_failed(e, PyTango_AsynCall);
+        } catch (const Tango::AsynReplyNotArrived& e) {
+            _translate_dev_failed(e, PyTango_AsynReplyNotArrived);
+        } catch (const Tango::EventSystemFailed& e) {
+            _translate_dev_failed(e, PyTango_EventSystemFailed);
+        } catch (const Tango::DeviceUnlocked& e) {
+            _translate_dev_failed(e, PyTango_DeviceUnlocked);
+        } catch (const Tango::NotAllowed& e) {
+            _translate_dev_failed(e, PyTango_NotAllowed);
+        } catch (const Tango::DevFailed &e) {
+            _translate_dev_failed(e, PyTango_DevFailed);
+        }
+    });
 
     py::class_<Tango::Except>(m, "Except")
-        .def_static("throw_exception", [](const char *a, const char *b, const char *c) {
+        .def_static("throw_exception", [](const std::string& a, const std::string& b, const std::string& c) {
             Tango::Except::throw_exception(a, b, c);
         })
-        .def_static("throw_exception", [](const char *a, const char *b, const char *c, Tango::ErrSeverity d) {
+        .def_static("throw_exception", [](const std::string& a, const std::string& b,
+                const std::string& c, Tango::ErrSeverity d) {
             Tango::Except::throw_exception(a ,b, c, d);
         })
-        .def_static("re_throw_exception", [](const Tango::DevFailed &df, const char *a,
-                const char *b, const char *c) {
+        .def_static("re_throw_exception", [](const Tango::DevFailed &df, const std::string& a,
+                const std::string& b, const std::string& c) {
             Tango::Except::re_throw_exception(const_cast<Tango::DevFailed&>(df), a, b, c);
         })
-        .def_static("re_throw_exception", [](Tango::Except& self, const Tango::DevFailed &df, const char *a, const char *b,
-                const char *c, Tango::ErrSeverity d) {
+        .def_static("re_throw_exception", [](Tango::Except& self, const Tango::DevFailed &df,
+                const std::string& a, const std::string& b, const std::string& c, Tango::ErrSeverity d) {
             self.re_throw_exception(const_cast<Tango::DevFailed&>(df), a, b, c, d);
         })
-        .def("print_exception", [](const Tango::DevFailed &df) {
+        .def_static("print_exception", [](const Tango::DevFailed &df) {
             Tango::Except::print_exception(df);
         })
-        .def("print_error_stack", &Tango::Except::print_error_stack)
-//        .def("compare_exception",
-//            (bool (*) (const Tango::DevFailed &, const Tango::DevFailed &))
-//            compare_exception_)
+        .def_static("print_error_stack", [](const Tango::DevFailed &df) {
+            Tango::Except::print_exception(df);
+        })
+//        .def("compare_exception",[](const Tango::DevFailed &df, const Tango::DevFailed &df_other) -> bool {
+//            return &Tango::Except::compare_exception(const Tango::DevFailed &, const Tango::DevFailed &))
+//        })
         //.def("to_dev_failed", &to_dev_failed, to_dev_failed_overloads())
 //        .def_static("throw_python_exception", &throw_python_generic_exception,
 //            throw_python_generic_exception_overloads())

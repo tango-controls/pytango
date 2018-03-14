@@ -19,7 +19,7 @@ import collections
 from ._tango import StdStringVector, DbData, DbDatum, AttributeInfo
 from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
 from ._tango import DeviceProxy #, __CallBackAutoDie, __CallBackPushEvent
-#from ._tango import EventType, DevFailed, Except
+from ._tango import EventType, DevFailed, Except
 from ._tango import ExtractAs, GreenMode
 from ._tango import PipeInfo, PipeInfoList, constants
 from ._tango import CmdArgType, DevState

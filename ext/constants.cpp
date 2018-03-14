@@ -41,6 +41,10 @@ void export_constants(py::module &m) {
     m2.attr("PY_VERSION") = PY_VERSION;
     m2.attr("PY_VERSION_HEX") = PY_VERSION_HEX;
 
+//    m2.attr("PYBIND11_MAJOR_VERSION") = PYBIND11_VERSION / 100000;
+//    m2.attr("PYBIND11_MINOR_VERSION") = PYBIND11_VERSION / 100 % 1000;
+//    m2.attr("PYBIND11_PATCH_VERSION") = PYBIND11_VERSION % 100;
+
     //
     // From tango_const.h
     //
