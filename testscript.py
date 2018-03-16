@@ -182,30 +182,37 @@ assert blob == ('', [{'dtype': tango._tango.CmdArgType.DevString, 'name': 'First
                      {'dtype': tango._tango.CmdArgType.DevShort, 'name': 'ThirdDE', 'value': 12}])
 # dp.write_pipe()
 
-assert dp.get_attribute_list() == [u'ampli', u'boolean_scalar', u'double_scalar',
-                                   u'double_scalar_rww', u'double_scalar_w',
-                                   u'float_scalar', u'long64_scalar', u'long_scalar',
-                                   u'long_scalar_rww', u'long_scalar_w', u'no_value',
-                                   u'short_scalar', u'short_scalar_ro', u'short_scalar_rww',
-                                   u'short_scalar_w', u'string_scalar', u'throw_exception',
-                                   u'uchar_scalar', u'ulong64_scalar', u'ushort_scalar',
-                                   u'ulong_scalar', u'encoded_scalar', u'boolean_spectrum',
-                                   u'boolean_spectrum_ro', u'double_spectrum',
-                                   u'double_spectrum_ro', u'float_spectrum',
-                                   u'float_spectrum_ro', u'long64_spectrum_ro',
-                                   u'long_spectrum', u'long_spectrum_ro',
-                                   u'short_spectrum', u'short_spectrum_ro',
-                                   u'string_spectrum', u'string_spectrum_ro',
-                                   u'uchar_spectrum', u'uchar_spectrum_ro',
-                                   u'ulong64_spectrum_ro', u'ulong_spectrum_ro',
-                                   u'ushort_spectrum', u'ushort_spectrum_ro', u'wave',
-                                   u'boolean_image', u'boolean_image_ro', u'double_image',
-                                   u'double_image_ro', u'float_image', u'float_image_ro',
-                                   u'long64_image_ro', u'long_image', u'long_image_ro',
-                                   u'short_image', u'short_image_ro', u'string_image',
-                                   u'string_image_ro', u'uchar_image', u'uchar_image_ro',
-                                   u'ulong64_image_ro', u'ulong_image_ro', u'ushort_image',
-                                   u'ushort_image_ro', u'State', u'Status']
+#==================================================
+# uncomment when the new version of TangoTest is released
+#
+# assert dp.get_attribute_list() == [u'ampli', u'boolean_scalar', u'double_scalar',
+#                                    u'double_scalar_rww', u'double_scalar_w',
+#                                    u'float_scalar', u'long64_scalar', u'long_scalar',
+#                                    u'long_scalar_rww', u'long_scalar_w', u'no_value',
+#                                    u'short_scalar', u'short_scalar_ro', u'short_scalar_rww',
+#                                    u'short_scalar_w', u'string_scalar', u'throw_exception',
+#                                    u'uchar_scalar', u'ulong64_scalar', u'ushort_scalar',
+#                                    u'ulong_scalar', u'long64_scalar_w', u'float_scalar_w',
+#                                    u'ulong_scalar_w', u'ulong64_scalar_w', u'ushort_scalar_w',
+#                                    u'uchar_scalar_w', u'encoded_scalar_w', u'boolean_spectrum',
+#                                    u'boolean_spectrum_ro', u'double_spectrum',
+#                                    u'double_spectrum_ro', u'float_spectrum',
+#                                    u'float_spectrum_ro', u'long64_spectrum_ro',
+#                                    u'long_spectrum', u'long_spectrum_ro',
+#                                    u'short_spectrum', u'short_spectrum_ro',
+#                                    u'string_spectrum', u'string_spectrum_ro',
+#                                    u'uchar_spectrum', u'uchar_spectrum_ro',
+#                                    u'ulong64_spectrum_ro', u'ulong_spectrum_ro',
+#                                    u'ushort_spectrum', u'ushort_spectrum_ro', u'wave',
+#                                    u'long64_spectrum', u'ulong64_spectrum', u'ulong_spectrum',
+#                                    u'boolean_image', u'boolean_image_ro', u'double_image',
+#                                    u'double_image_ro', u'float_image', u'float_image_ro',
+#                                    u'long64_image_ro', u'long_image', u'long_image_ro',
+#                                    u'short_image', u'short_image_ro', u'string_image',
+#                                    u'string_image_ro', u'uchar_image', u'uchar_image_ro',
+#                                    u'ulong64_image_ro', u'ulong_image_ro', u'ushort_image',
+#                                    u'ushort_image_ro', u'State', u'Status']
+#==================================================
 
 reply = dp.get_attribute_config('float_scalar')
 assert type(reply) == tango._tango.AttributeInfoEx
@@ -314,12 +321,29 @@ assert attr.w_dimension.dim_x == 1
 assert attr.w_dimension.dim_y == 0
 assert attr.w_value == 23456
 
-assert dp.read_attribute('status').value == 'The device is in RUNNING state.'
-assert dp.read_attribute('state').value == DevState.RUNNING
-assert dp.read_attribute('string_scalar').value == "Default string"
-attr = dp.read_attribute('encoded_scalar')
-assert attr.value[0] == 'Array of Bytes'
-assert attr.value[1] == [0,1,2,3,4,5,6,7,8,9]
+#==================================================
+# uncomment when the new version of TangoTest is released
+#
+# dp.write_attribute('long64_scalar_w', -987654321)
+# assert dp.read_attribute('long64_scalar_w').value == -987654321
+# dp.write_attribute('float_scalar_w',45.67)
+# assert dp.read_attribute('float_scalar_w').value == pytest.approx(45.67, rel=1e-3)
+# dp.write_attribute('ulong_scalar_w',987654)
+# assert dp.read_attribute('ulong_scalar_w').value == 987654
+# dp.write_attribute('ulong64_scalar_w',987654321)
+# assert dp.read_attribute('ulong64_scalar_w').value == 987654321
+# dp.write_attribute('ushort_scalar_w',65535)
+# assert dp.read_attribute('ushort_scalar_w').value == 65535
+# dp.write_attribute('uchar_scalar_w',255)
+# assert dp.read_attribute('uchar_scalar_w').value == 255
+# 
+# assert dp.read_attribute('status').value == 'The device is in RUNNING state.'
+# assert dp.read_attribute('state').value == DevState.RUNNING
+# assert dp.read_attribute('string_scalar').value == "Default string"
+# attr = dp.read_attribute('encoded_scalar')
+# assert attr.value[0] == 'Array of Bytes'
+# assert attr.value[1] == [0,1,2,3,4,5,6,7,8,9]
+#==================================================
 
 dp.write_attribute('double_scalar_w', 3.142)
 dp.write_attribute('long_scalar_w', 1357)

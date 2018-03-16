@@ -14,6 +14,7 @@
 #include <pybind11/numpy.h>
 #include <pyutils.h>
 #include <device_attribute.h>
+#include <pybind11/numpy.h>
 
 namespace py = pybind11;
 
@@ -62,7 +63,6 @@ struct python_tangocpp<Tango::DEV_STRING>
     static inline void to_cpp(const py::object& py_value, TangoScalarType& result)
     {
 //        result = py_value.cast<char*>();
-        std::cout << "to_cpp " << result << std::endl;
     }
 
 //    static inline py::object to_python(const TangoScalarType & value)
@@ -166,7 +166,6 @@ namespace PyDeviceAttribute {
             py_value.attr(w_value_attr_name) = Py_None;
             return;
         }
-        std::cerr << "memory is at @ " << value_ptr << "\n";
         TangoScalarType* buffer = value_ptr->get_buffer();
 
         // numpy.ndarray() does not own it's memory, so we need to manage it.
@@ -177,7 +176,6 @@ namespace PyDeviceAttribute {
         // when it is deleted -> the function deletes the data.
         py::capsule free_when_done(reinterpret_cast<void*>(value_ptr), [](void* f) {
             TangoScalarType *ptr = reinterpret_cast<TangoScalarType *>(f);
-            std::cerr << "freeing memory @ " << ptr << "\n";
             delete[] ptr;
         });
 
@@ -272,10 +270,8 @@ namespace PyDeviceAttribute {
             ::memcpy(bptr, item.data(), item.length());
             bptr+= maxlen;
         }
-        std::cerr << "buffer is at @ " << buffer << "\n";
         py::capsule free_when_done(reinterpret_cast<void*>(buffer), [](void* f) {
             TangoScalarType ptr = reinterpret_cast<TangoScalarType>(f);
-            std::cerr << "freeing memory @ " << ptr << "\n";
             delete[] ptr;
         });
 
@@ -915,14 +911,11 @@ namespace PyDeviceAttribute {
         py::array py_array = py::array(py_value);
         ssize_t ndim = py_array.ndim();
         ssize_t itemsize = py_array.itemsize();
-//        py::print(py_array.ndim());
         switch (ndim) {
             case 2: // -- Image
                 dim_x = py_array.shape()[1];
                 dim_y = py_array.shape()[0];
                 nelems = dim_x*dim_y;
-//                py::print(dim_x);
-//                py::print(dim_y);
                 break;
             case 1: // -- Spectrum
                 dim_x = py_array.shape()[0];
@@ -946,23 +939,16 @@ namespace PyDeviceAttribute {
         if (ndim == 2) {
             for(int y=0; y<dim_y; y++) {
                 for(int x=0; x<dim_x; x++) {
-//                    std::cout << "x " << x << " y " << y << std::endl;
                     const void* const_ptr = py_array.data(y, x);
-//                    std::cout << "const_ptr" << const_ptr << std::endl;
                     std::string str(static_cast<const char*>(const_ptr), itemsize);
-//                    std::cout << str << std::endl;
                     buffer[x+y*dim_x] = ::strdup(str.c_str());
-//                    std::cout << buffer[x+y*dim_x] << std::endl;
                 }
             }
         } else {
             for (int i=0; i<dim_x; i++) {
                 const void* const_ptr = py_array.data(i);
-//                std::cout << "const_ptr" << const_ptr << std::endl;
                 std::string str(static_cast<const char*>(const_ptr), itemsize);
-//                std::cout << str << std::endl;
                 buffer[i] = ::strdup(str.c_str());
-//                std::cout << buffer[i] << std::endl;
             }
         }
         // -- Insert into device attribute

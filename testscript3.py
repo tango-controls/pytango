@@ -36,4 +36,9 @@ except tango.DevFailed as e:
             assert False
     assert True
 
+try:
+    dp.read_attribute('throw_exception')
+except tango.DevFailed as e:
+    print e
+
 print("passed")

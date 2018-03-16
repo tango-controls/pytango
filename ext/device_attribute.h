@@ -140,7 +140,6 @@ namespace PyDeviceAttribute {
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
 
         TangoScalarType value = py_value.cast<TangoScalarType>();
-//        from_py<tangoTypeConst>::convert(py_value.ptr(), value);
         dev_attr << const_cast<TangoScalarType&>(value);
     }
 

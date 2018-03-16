@@ -345,12 +345,21 @@ def __DeviceProxy__dir(self):
 
 
 def __DeviceProxy__getitem(self, key):
-    return self.read_attribute(key)
-
+    if isinstance(key, (str, unicode)):
+        return self.read_attribute(key)
+    elif isinstance(key, slice):
+        if key.start is None and key.stop is None and key.step is None:
+            key = self.get_attribute_list()
+        else:
+            raise ValueError('only accept empty slices')
+    return self.read_attributes(key)
 
 def __DeviceProxy__setitem(self, key, value):
-    return self.write_attribute(key, value)
-
+    if isinstance(key, (str, unicode)):
+        return self.write_attribute(key, value)
+    else:
+        args = zip(key, value)
+        return self.write_attributes(args)
 
 def __DeviceProxy__contains(self, key):
     return key.lower() in map(str.lower, self.get_attribute_list())
