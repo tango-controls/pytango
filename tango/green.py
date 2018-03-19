@@ -62,6 +62,10 @@ class AbstractExecutor(object):
     asynchronous = NotImplemented
     default_wait = NotImplemented
 
+    @property
+    def in_executor_context(self):
+        raise NotImplementedError
+
     def delegate(self, fn, *args, **kwargs):
         """Delegate an operation and return an accessor."""
         if not self.asynchronous:
@@ -89,10 +93,11 @@ class AbstractExecutor(object):
     def run(self, fn, args=(), kwargs={}, wait=None, timeout=None):
         if wait is None:
             wait = self.default_wait
+        # Wait and timeout are not supported in synchronous mode
+        if not self.asynchronous and (not wait or timeout):
+            raise ValueError('Not supported in synchronous mode')
         # Sychronous (no delegation)
-        if not self.asynchronous:
-            if not wait or timeout:
-                raise ValueError('Not supported in synchronous mode')
+        if not self.asynchronous or not self.in_executor_context:
             return fn(*args, **kwargs)
         # Asynchronous delegation
         accessor = self.delegate(fn, *args, **kwargs)

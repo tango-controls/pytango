@@ -64,6 +64,10 @@ class AsyncioExecutor(AbstractExecutor):
     asynchronous = True
     default_wait = False
 
+    @property
+    def in_executor_context(self):
+        return self.loop._thread_id == get_ident()
+
     def __init__(self, loop=None, subexecutor=None):
         if loop is None:
             try:
@@ -94,7 +98,7 @@ class AsyncioExecutor(AbstractExecutor):
 
     def execute(self, fn, *args, **kwargs):
         """Execute an operation and return the result."""
-        if self.loop._thread_id == get_ident():
+        if self.in_executor_context:
             corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
             return corofn()
         future = self.submit(fn, *args, **kwargs)

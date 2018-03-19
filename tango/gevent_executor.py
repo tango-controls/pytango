@@ -157,6 +157,10 @@ class GeventExecutor(AbstractExecutor):
     asynchronous = True
     default_wait = True
 
+    @property
+    def in_executor_context(self):
+        return self.loop.is_gevent_thread()
+
     def __init__(self, loop=None, subexecutor=None):
         if loop is None:
             loop = GeventLoop()
@@ -178,7 +182,7 @@ class GeventExecutor(AbstractExecutor):
 
     def execute(self, fn, *args, **kwargs):
         """Execute an operation and return the result."""
-        if self.loop.is_gevent_thread():
+        if self.in_executor_context:
             return fn(*args, **kwargs)
         task = self.submit(fn, *args, **kwargs)
         return task.result()
