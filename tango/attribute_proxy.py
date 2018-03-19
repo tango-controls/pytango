@@ -29,7 +29,7 @@ from .device_proxy import __init_device_proxy_internals as init_device_proxy
 __all__ = ["AttributeProxy", "attribute_proxy_init", "get_attribute_proxy"]
 
 
-@green(consume_green_mode=True)
+@green(consume_green_mode=False)
 def get_attribute_proxy(*args, **kwargs):
     """
     get_attribute_proxy(self, full_attr_name, green_mode=None, wait=True, timeout=True) -> AttributeProxy
