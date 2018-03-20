@@ -26,6 +26,7 @@ except:
 
 # Gevent imports
 import gevent.queue
+import gevent.monkey
 
 # Tango imports
 from .green import AbstractExecutor
@@ -142,7 +143,8 @@ class GeventLoop:
         return self.thread_id == get_ident()
 
     def submit(self, func, *args, **kwargs):
-        event = gevent._threading.Event()
+        Event = gevent.monkey.get_original('threading', 'Event')
+        event = Event()
         task = GeventTask(event, func, *args, **kwargs)
         self.tasks.put_nowait(task)
         self.tasks.hub.loop.async().send()
