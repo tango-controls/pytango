@@ -15,6 +15,7 @@
 #include <pyutils.h>
 #include <device_attribute.h>
 #include <pybind11/numpy.h>
+#include <typeinfo>
 
 namespace py = pybind11;
 
@@ -882,16 +883,96 @@ namespace PyDeviceAttribute {
             default: // -- WTF?!!?
                 raise_(PyExc_TypeError, isImage ? invalid_image : invalid_spectrum);
         }
-        const void* const_ptr = py_array.data();
-        void* ptr = const_cast<void*>(const_ptr);
-
         // Allocate memory for the new data object
         std::unique_ptr<TangoArrayType> value;
         unsigned long unelems = static_cast<unsigned long>(nelems);
-        try {
-            value.reset(new TangoArrayType(unelems, unelems, reinterpret_cast<TangoScalarType*>(ptr), false));
-        } catch(...) {
-            throw;
+        if (py_array.itemsize() == sizeof(TangoScalarType)) { // no need to convert
+            const void* const_ptr = py_array.data();
+            void* ptr = const_cast<void*>(const_ptr);
+            try {
+                value.reset(new TangoArrayType(unelems, unelems, reinterpret_cast<TangoScalarType*>(ptr), false));
+            } catch(...) {
+                throw;
+            }
+        } else {
+            TangoScalarType* buffer = TangoArrayType::allocbuf(nelems);
+            int item_size = py_array.itemsize();
+            // I can't think of a better way to do this yet!!!!!!!
+            if (ndim == 2) {
+                if (tangoTypeConst == Tango::DEV_FLOAT || tangoTypeConst == Tango::DEV_DOUBLE) { // floating_point
+                    if (item_size ==8 ) { // 64bit OS
+                        double* dptr = static_cast<double*>(py_array.mutable_data());
+                        for(auto y=0; y<dim_y; y++) {
+                            for(auto x=0; x<dim_x; x++) {
+                                buffer[x+y*dim_x] = static_cast<TangoScalarType>(*dptr++);
+//                                const char* cptr = static_cast<const char*>(py_array.data(y, x));
+//                                buffer[x+y*dim_x] = static_cast<TangoScalarType>(*cptr);
+                            }
+                        }
+                    } else { //32bit OS
+                        float* fptr = static_cast<float*>(py_array.mutable_data());
+                        for(auto y=0; y<dim_y; y++) {
+                            for(auto x=0; x<dim_x; x++) {
+                                buffer[x+y*dim_x] = static_cast<TangoScalarType>(*fptr++);
+//                                const char* cptr = static_cast<const char*>(py_array.data(y, x));
+//                                buffer[x+y*dim_x] = static_cast<TangoScalarType>(*cptr);
+                            }
+                        }
+                    }
+                } else { // it must be integer
+                    if (item_size == 8) { // 64 bit OS
+                        int64_t* iptr = static_cast<int64_t*>(py_array.mutable_data());
+                        for(auto y=0; y<dim_y; y++) {
+                            for(auto x=0; x<dim_x; x++) {
+                                buffer[x+y*dim_x] = static_cast<TangoScalarType>(*iptr++);
+//                                const char* cptr = static_cast<const char*>(py_array.data(y, x));
+//                                buffer[x+y*dim_x] = static_cast<TangoScalarType>(*cptr);
+                            }
+                        }
+                    } else { // 32 bit OS
+                        int32_t* iptr = static_cast<int32_t*>(py_array.mutable_data());
+                        for(auto y=0; y<dim_y; y++) {
+                            for(auto x=0; x<dim_x; x++) {
+                                buffer[x+y*dim_x] = static_cast<TangoScalarType>(*iptr++);
+//                                const char* cptr = static_cast<const char*>(py_array.data(y, x));
+//                                buffer[x+y*dim_x] = static_cast<TangoScalarType>(*cptr);
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (tangoTypeConst == Tango::DEV_FLOAT || tangoTypeConst == Tango::DEV_DOUBLE) { // floating_point
+                    if (item_size ==8 ) { // 64bit OS
+                        double* dptr = static_cast<double*>(py_array.mutable_data());
+                        for (auto i=0; i<dim_x; i++) {
+                            buffer[i] = static_cast<TangoScalarType>(*dptr++);
+                        }
+                    } else { //32bit OS
+                        float* fptr = static_cast<float*>(py_array.mutable_data());
+                        for (auto i=0; i<dim_x; i++) {
+                            buffer[i] = static_cast<TangoScalarType>(*fptr++);
+                        }
+                    }
+                } else { // it must be integer
+                    if (item_size == 8) { // 64 bit OS
+                        int64_t* iptr = static_cast<int64_t*>(py_array.mutable_data());
+                        for (auto i=0; i<dim_x; i++) {
+                            buffer[i] = static_cast<TangoScalarType>(*iptr++);
+                        }
+                    } else { // 32 bit OS
+                        int32_t* iptr = static_cast<int32_t*>(py_array.mutable_data());
+                        for (auto i=0; i<dim_x; i++) {
+                            buffer[i] = static_cast<TangoScalarType>(*iptr++);
+                        }
+                    }
+                }
+            }
+            try {
+                value.reset(new TangoArrayType(unelems, unelems, buffer, false));
+            } catch(...) {
+                TangoArrayType::freebuf(buffer);
+                throw;
+            }
         }
         // -- Insert into device attribute
         dev_attr.insert( value.get(), dim_x, dim_y);
@@ -937,15 +1018,15 @@ namespace PyDeviceAttribute {
             throw;
         }
         if (ndim == 2) {
-            for(int y=0; y<dim_y; y++) {
-                for(int x=0; x<dim_x; x++) {
+            for(auto y=0; y<dim_y; y++) {
+                for(auto x=0; x<dim_x; x++) {
                     const void* const_ptr = py_array.data(y, x);
                     std::string str(static_cast<const char*>(const_ptr), itemsize);
                     buffer[x+y*dim_x] = ::strdup(str.c_str());
                 }
             }
         } else {
-            for (int i=0; i<dim_x; i++) {
+            for (auto i=0; i<dim_x; i++) {
                 const void* const_ptr = py_array.data(i);
                 std::string str(static_cast<const char*>(const_ptr), itemsize);
                 buffer[i] = ::strdup(str.c_str());
@@ -976,27 +1057,7 @@ namespace PyDeviceAttribute {
             case Tango::IMAGE:
                 isImage = true;
             case Tango::SPECTRUM:
-//                // Why on earth? Why do we define _fill_numpy_attribute instead
-//                // of just using _fill_list_attribute, if the latter accepts
-//                // anything with operators "[]" and "len" defined?
-//                // Well it seems that PyArray_GETITEM does something diferent
-//                // and I get a value transformed into a python basic type,
-//                // while py_value[y][x] gives me a numpy type (ej: numpy.bool_).
-//                // Then the conversions between numpy types to c++ are not
-//                // defined by boost while the conversions between python
-//                // standard types and C++ are.
-//#               ifdef DISABLE_PYTANGO_NUMPY
-//                {
-//                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_list_attribute, self, isImage, py_value );
-//                }
-//#               else
-//                {
-//                    if (PyArray_Check(py_value.ptr()))
-                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_numpy_attribute, self, isImage, py_value );
-//                    else
-//                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_list_attribute, self, isImage, py_value );
-//                }
-//#               endif
+                TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID( data_type, _fill_numpy_attribute, self, isImage, py_value );
                 break;
             default:
                 raise_(PyExc_TypeError, "unsupported data_format.");
