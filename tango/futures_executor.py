@@ -12,12 +12,6 @@
 # Future imports
 from __future__ import absolute_import
 
-# Imports
-try:
-    from threading import get_ident
-except:
-    from threading import _get_ident as get_ident
-
 # Concurrent imports
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 
@@ -51,14 +45,10 @@ class FuturesExecutor(AbstractExecutor):
     asynchronous = True
     default_wait = True
 
-    @property
-    def in_executor_context(self):
-        return self._thread_id == get_ident()
-
     def __init__(self, process=False, max_workers=20):
+        super(FuturesExecutor, self).__init__()
         cls = ProcessPoolExecutor if process else ThreadPoolExecutor
         self.subexecutor = cls(max_workers=max_workers)
-        self._thread_id = get_ident()
 
     def delegate(self, fn, *args, **kwargs):
         """Return the given operation as a concurrent future."""

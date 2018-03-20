@@ -14,6 +14,12 @@
 import os
 from functools import wraps
 
+# Compatibility imports
+try:
+    from threading import get_ident
+except:
+    from threading import _get_ident as get_ident
+
 # Tango imports
 from ._tango import GreenMode
 
@@ -62,9 +68,12 @@ class AbstractExecutor(object):
     asynchronous = NotImplemented
     default_wait = NotImplemented
 
+    def __init__(self):
+        self.thread_id = get_ident()
+
     @property
     def in_executor_context(self):
-        raise NotImplementedError
+        return self.thread_id == get_ident()
 
     def delegate(self, fn, *args, **kwargs):
         """Delegate an operation and return an accessor."""

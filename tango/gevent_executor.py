@@ -18,12 +18,6 @@ import six
 import types
 import functools
 
-# Combatibility imports
-try:
-    from threading import get_ident
-except:
-    from threading import _get_ident as get_ident
-
 # Gevent imports
 import gevent.queue
 import gevent.monkey
@@ -131,16 +125,12 @@ class GeventTask:
 
 class GeventLoop:
     def __init__(self):
-        self.thread_id = get_ident()
         self.tasks = gevent.queue.Queue()
         self.loop = gevent.spawn(self.run)
 
     def run(self):
         while True:
             self.tasks.get().spawn()
-
-    def is_gevent_thread(self):
-        return self.thread_id == get_ident()
 
     def submit(self, func, *args, **kwargs):
         Event = gevent.monkey.get_original('threading', 'Event')
@@ -159,11 +149,8 @@ class GeventExecutor(AbstractExecutor):
     asynchronous = True
     default_wait = True
 
-    @property
-    def in_executor_context(self):
-        return self.loop.is_gevent_thread()
-
     def __init__(self, loop=None, subexecutor=None):
+        super(GeventExecutor, self).__init__()
         if loop is None:
             loop = GeventLoop()
         if subexecutor is None:
