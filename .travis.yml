@@ -8,7 +8,6 @@ branches:
 
 python:
   - 2.7
-  - 3.4
   - 3.5
   - 3.6
 
@@ -18,8 +17,6 @@ env:
 
 matrix:
   exclude:
-  - python: 3.4
-    env: TANGO_VERSION=9.2.5
   - python: 3.6
     env: TANGO_VERSION=9.2.2
 
