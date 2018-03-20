@@ -11,9 +11,10 @@ from tango import Release
 
 dp = DeviceProxy('sys/tg_test/1')
 
-# dp['encoded_scalar_w'] = ("String array", [1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19])
-# attr = dp['encoded_scalar_w']
-# print "result",attr.value
+dp['encoded_scalar_w'] = ("String array", np.array([1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19]))
+attr = dp['encoded_scalar_w']
+assert attr.value[0] == "String array"
+assert set(attr.value[1]) == set([1,2,3,4,5,6,7,8,9,0,11,12,13,14,15,16,17,18,19])
 
 dp['long_scalar_w','double_scalar_w', 'string_scalar', 'boolean_scalar'] = 1234, 6.284, 'ESRF', True
 attr = dp['long_scalar_w','double_scalar_w', 'string_scalar', 'boolean_scalar']

@@ -138,44 +138,32 @@ namespace PyDeviceAttribute {
     static inline void _fill_scalar_attribute(Tango::DeviceAttribute & dev_attr, const py::object & py_value)
     {
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-
         TangoScalarType value = py_value.cast<TangoScalarType>();
         dev_attr << const_cast<TangoScalarType&>(value);
     }
 
     template<>
-    inline void _fill_scalar_attribute<Tango::DEV_STRING>(Tango::DeviceAttribute & dev_attr, const py::object & py_value)
+    inline void _fill_scalar_attribute<Tango::DEV_STRING>(Tango::DeviceAttribute& dev_attr, const py::object& py_value)
     {
         std::string value = py_value.cast<std::string>();
         dev_attr << value;
     }
 
-//    template<>
-//    inline void _fill_scalar_attribute<Tango::DEV_ENCODED>(Tango::DeviceAttribute & dev_attr, const py::object & py_value)
-//    {
-//        /// @todo test it!!
-//
-//        /// @todo Now I am accepting 2 strings: encoded_format, encoded_data. This
-//        /// is far from a good solution, but its something...
-//
-//        if (py::len(py_value) != 2) {
-//            raise_(PyExc_TypeError, "Expecting a tuple of strings: encoded_format, encoded_data");
-//        }
-//
-//        py::object encoded_format_str = py_value[0];
-//        py::object encoded_data_str = py_value[1];
-//
-//        /// @todo not sure... second parameter of insert is a reference, does it
-//        /// mean anything? Does he pretend to take ownership of the pointer or
-//        /// is he making another copy? what should I do?
-//        char* encoded_format = const_cast<char*>((py::extract<const char*>(encoded_format_str)()));
-//        Py_ssize_t encoded_data_len = py::len(encoded_data_str);
-//        unsigned char* encoded_data = reinterpret_cast<unsigned char*>(const_cast<char*>((py::extract<const char*>(encoded_data_str)())));
-//        // void insert(char *&,unsigned char *&,unsigned int);
-//        dev_attr.insert(encoded_format, encoded_data, static_cast<unsigned int>(encoded_data_len));
-//
-//        //std::string value = py::extract<std::string>(py_value);
-//        //dev_attr << value;
-//    }
+    template<>
+    inline void _fill_scalar_attribute<Tango::DEV_ENCODED>(Tango::DeviceAttribute& dev_attr, const py::object& py_value)
+    {
+        if (py::len(py_value) != 2) {
+            raise_(PyExc_TypeError, "Expecting a tuple of: encoded_format, encoded_data");
+        }
+        py::tuple tup = py::tuple(py_value);
+        py::str encoded_format_str = tup[0];
+        py::list encoded_data_obj = tup[1];
+        std::string encoded_format = encoded_format_str.cast<std::string>();
+        Py_ssize_t encoded_data_len = py::len(encoded_data_obj);
+        std::vector<unsigned char> encoded_data;
+        for (auto i=0; i<encoded_data_len; i++)
+            encoded_data.push_back(encoded_data_obj[i].cast<unsigned char>());
+        dev_attr.insert(encoded_format, encoded_data);
+    }
 
 }
