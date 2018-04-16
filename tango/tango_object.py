@@ -13,7 +13,7 @@
 
 import os
 import sys
-import types
+import six
 import logging
 import weakref
 import inspect
@@ -155,7 +155,7 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
             if doc is None:
                 doc = ""
             cmd.__doc__ = doc
-            cmd = types.MethodType(cmd, None, DeviceDispatcher)
+            cmd = six.create_unbound_method(cmd, DeviceDispatcher)
             setattr(DeviceDispatcher, name, cmd)
             DeviceDispatcherClass.cmd_list[name] = \
                 [[in_type, doc], [out_type, ""]]

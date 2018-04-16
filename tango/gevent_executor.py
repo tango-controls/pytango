@@ -15,7 +15,6 @@ from __future__ import absolute_import
 # Imports
 import sys
 import six
-import types
 import functools
 
 # Combatibility imports
@@ -58,8 +57,7 @@ def get_global_threadpool():
     threadpool = gevent.get_hub().threadpool
     if gevent.version_info < (1, 1) and not hasattr(threadpool, '_spawn'):
         threadpool._spawn = threadpool.spawn
-        threadpool.spawn = types.MethodType(
-            spawn, threadpool, type(threadpool))
+        threadpool.spawn = six.create_bound_method(spawn, threadpool)
     return threadpool
 
 
@@ -95,7 +93,7 @@ def spawn(threadpool, fn, *args, **kwargs):
     fn = wrap_errors(fn)
     result = threadpool._spawn(fn, *args, **kwargs)
     result._get = result.get
-    result.get = types.MethodType(get_with_exception, result, type(result))
+    result.get = six.create_bound_method(get_with_exception, result)
     return result
 
 
