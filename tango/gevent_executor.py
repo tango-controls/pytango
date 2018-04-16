@@ -22,8 +22,12 @@ import functools
 import gevent.queue
 import gevent.monkey
 
+# Bypass gevent monkey patching
+ThreadSafeEvent = gevent.monkey.get_original('threading', 'Event')
+
 # Tango imports
 from .green import AbstractExecutor
+
 
 __all__ = ["get_global_executor", "set_global_executor", "GeventExecutor"]
 
@@ -97,13 +101,13 @@ def spawn(threadpool, fn, *args, **kwargs):
 # Gevent task and event loop
 
 class GeventTask:
-    def __init__(self, event, func, *args, **kwargs):
-        self.event = event
+    def __init__(self, func, *args, **kwargs):
         self.func = func
         self.args = args
         self.kwargs = kwargs
         self.value = None
         self.exception = None
+        self.event = ThreadSafeEvent()
 
     def run(self):
         try:
@@ -125,19 +129,13 @@ class GeventTask:
 
 class GeventLoop:
     def __init__(self):
-        self.tasks = gevent.queue.Queue()
-        self.loop = gevent.spawn(self.run)
-
-    def run(self):
-        while True:
-            self.tasks.get().spawn()
+        self.hub = gevent.get_hub()
 
     def submit(self, func, *args, **kwargs):
-        Event = gevent.monkey.get_original('threading', 'Event')
-        event = Event()
-        task = GeventTask(event, func, *args, **kwargs)
-        self.tasks.put_nowait(task)
-        self.tasks.hub.loop.async().send()
+        task = GeventTask(func, *args, **kwargs)
+        watcher = self.hub.loop.async()
+        watcher.start(task.spawn)
+        watcher.send()
         return task
 
 
