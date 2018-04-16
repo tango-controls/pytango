@@ -171,7 +171,7 @@ class GeventExecutor(AbstractExecutor):
 
     def execute(self, fn, *args, **kwargs):
         """Execute an operation and return the result."""
-        if self.in_executor_context:
+        if self.in_executor_context():
             return fn(*args, **kwargs)
         task = self.submit(fn, *args, **kwargs)
         return task.result()

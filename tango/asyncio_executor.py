@@ -90,7 +90,7 @@ class AsyncioExecutor(AbstractExecutor):
 
     def execute(self, fn, *args, **kwargs):
         """Execute an operation and return the result."""
-        if self.in_executor_context:
+        if self.in_executor_context():
             corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
             return corofn()
         future = self.submit(fn, *args, **kwargs)

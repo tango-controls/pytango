@@ -71,7 +71,6 @@ class AbstractExecutor(object):
     def __init__(self):
         self.thread_id = get_ident()
 
-    @property
     def in_executor_context(self):
         return self.thread_id == get_ident()
 
@@ -106,7 +105,7 @@ class AbstractExecutor(object):
         if not self.asynchronous and (not wait or timeout):
             raise ValueError('Not supported in synchronous mode')
         # Sychronous (no delegation)
-        if not self.asynchronous or not self.in_executor_context:
+        if not self.asynchronous or not self.in_executor_context():
             return fn(*args, **kwargs)
         # Asynchronous delegation
         accessor = self.delegate(fn, *args, **kwargs)
