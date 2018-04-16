@@ -23,7 +23,7 @@
 #include <tango.h>
 
 using namespace boost::python;
- 
+
 void export_version();
 void export_enums();
 void export_constants();
@@ -79,10 +79,6 @@ BOOST_PYTHON_MODULE(_tango)
     docstring_options doc_opts(show_user_defined,
                                show_py_signatures);
 #endif
-
-    // specify that this module is actually a package
-    boost::python::object package = boost::python::scope();
-    package.attr("__path__") = "PyTango";
 
     PyEval_InitThreads();
 
