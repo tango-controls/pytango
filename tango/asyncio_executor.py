@@ -15,11 +15,6 @@ from __future__ import absolute_import
 # Imports
 import functools
 
-try:
-    from threading import get_ident
-except:
-    from threading import _get_ident as get_ident
-
 # Asyncio imports
 try:
     import asyncio
@@ -65,6 +60,7 @@ class AsyncioExecutor(AbstractExecutor):
     default_wait = False
 
     def __init__(self, loop=None, subexecutor=None):
+        super(AsyncioExecutor, self).__init__()
         if loop is None:
             try:
                 loop = asyncio.get_event_loop()
@@ -94,7 +90,7 @@ class AsyncioExecutor(AbstractExecutor):
 
     def execute(self, fn, *args, **kwargs):
         """Execute an operation and return the result."""
-        if self.loop._thread_id == get_ident():
+        if self.in_executor_context():
             corofn = asyncio.coroutine(lambda: fn(*args, **kwargs))
             return corofn()
         future = self.submit(fn, *args, **kwargs)

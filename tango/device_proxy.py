@@ -1563,39 +1563,40 @@ def __init_DeviceProxy():
     DeviceProxy.write_read_attribute = green(__DeviceProxy__write_read_attribute)
     DeviceProxy.write_read_attributes = green(__DeviceProxy__write_read_attributes)
 
-    DeviceProxy.read_attributes_asynch = __DeviceProxy__read_attributes_asynch
-    DeviceProxy.read_attribute_asynch = __DeviceProxy__read_attribute_asynch
-    DeviceProxy.read_attribute_reply = __DeviceProxy__read_attribute_reply
-    DeviceProxy.write_attributes_asynch = __DeviceProxy__write_attributes_asynch
-    DeviceProxy.write_attribute_asynch = __DeviceProxy__write_attribute_asynch
-    DeviceProxy.write_attribute_reply = __DeviceProxy__write_attribute_reply
+    DeviceProxy.read_attributes_asynch = green(__DeviceProxy__read_attributes_asynch)
+    DeviceProxy.read_attribute_asynch = green(__DeviceProxy__read_attribute_asynch)
+    DeviceProxy.read_attribute_reply = green(__DeviceProxy__read_attribute_reply)
+    DeviceProxy.write_attributes_asynch = green(__DeviceProxy__write_attributes_asynch)
+    DeviceProxy.write_attribute_asynch = green(__DeviceProxy__write_attribute_asynch)
+    DeviceProxy.write_attribute_reply = green(__DeviceProxy__write_attribute_reply)
 
     DeviceProxy.read_pipe = green(__DeviceProxy__read_pipe)
     DeviceProxy.write_pipe = green(__DeviceProxy__write_pipe)
 
-    DeviceProxy.get_property = __DeviceProxy__get_property
-    DeviceProxy.put_property = __DeviceProxy__put_property
-    DeviceProxy.delete_property = __DeviceProxy__delete_property
-    DeviceProxy.get_property_list = __DeviceProxy__get_property_list
-    DeviceProxy.get_attribute_config = __DeviceProxy__get_attribute_config
-    DeviceProxy.get_attribute_config_ex = __DeviceProxy__get_attribute_config_ex
-    DeviceProxy.set_attribute_config = __DeviceProxy__set_attribute_config
+    DeviceProxy.get_property = green(__DeviceProxy__get_property)
+    DeviceProxy.put_property = green(__DeviceProxy__put_property)
+    DeviceProxy.delete_property = green(__DeviceProxy__delete_property)
+    DeviceProxy.get_property_list = green(__DeviceProxy__get_property_list)
+    DeviceProxy.get_attribute_config = green(__DeviceProxy__get_attribute_config)
+    DeviceProxy.get_attribute_config_ex = green(__DeviceProxy__get_attribute_config_ex)
+    DeviceProxy.set_attribute_config = green(__DeviceProxy__set_attribute_config)
 
-    DeviceProxy.get_command_config = __DeviceProxy__get_command_config
+    DeviceProxy.get_command_config = green(__DeviceProxy__get_command_config)
 
-    DeviceProxy.get_pipe_config = __DeviceProxy__get_pipe_config
-    DeviceProxy.set_pipe_config = __DeviceProxy__set_pipe_config
+    DeviceProxy.get_pipe_config = green(__DeviceProxy__get_pipe_config)
+    DeviceProxy.set_pipe_config = green(__DeviceProxy__set_pipe_config)
 
     DeviceProxy.__get_event_map = __DeviceProxy__get_event_map
     DeviceProxy.__get_event_map_lock = __DeviceProxy__get_event_map_lock
+
     DeviceProxy.subscribe_event = green(
         __DeviceProxy__subscribe_event, consume_green_mode=False)
     DeviceProxy.unsubscribe_event = green(__DeviceProxy__unsubscribe_event)
-    DeviceProxy.__unsubscribe_event_all = __DeviceProxy__unsubscribe_event_all
     DeviceProxy.get_events = __DeviceProxy__get_events
+    DeviceProxy.__unsubscribe_event_all = __DeviceProxy__unsubscribe_event_all
+
     DeviceProxy.__str__ = __DeviceProxy__str
     DeviceProxy.__repr__ = __DeviceProxy__str
-
     DeviceProxy._get_info_ = __DeviceProxy___get_info_
 
 

@@ -213,7 +213,7 @@ def test_read_attribute(tango_test, readable_attribute):
 def test_write_scalar_attribute(tango_test, writable_scalar_attribute):
     "Check that writable scalar attributes can be written"
     attr_name = writable_scalar_attribute
-    config = tango_test.get_attribute_config(writable_scalar_attribute)
+    config = tango_test.get_attribute_config(writable_scalar_attribute, wait=True)
     if is_bool_type(config.data_type):
         tango_test.write_attribute(attr_name, True, wait=True)
     elif is_int_type(config.data_type):

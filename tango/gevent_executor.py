@@ -17,17 +17,16 @@ import sys
 import six
 import functools
 
-# Combatibility imports
-try:
-    from threading import get_ident
-except:
-    from threading import _get_ident as get_ident
-
 # Gevent imports
 import gevent.queue
+import gevent.monkey
+
+# Bypass gevent monkey patching
+ThreadSafeEvent = gevent.monkey.get_original('threading', 'Event')
 
 # Tango imports
 from .green import AbstractExecutor
+
 
 __all__ = ["get_global_executor", "set_global_executor", "GeventExecutor"]
 
@@ -100,13 +99,13 @@ def spawn(threadpool, fn, *args, **kwargs):
 # Gevent task and event loop
 
 class GeventTask:
-    def __init__(self, event, func, *args, **kwargs):
-        self.event = event
+    def __init__(self, func, *args, **kwargs):
         self.func = func
         self.args = args
         self.kwargs = kwargs
         self.value = None
         self.exception = None
+        self.event = ThreadSafeEvent()
 
     def run(self):
         try:
@@ -128,22 +127,13 @@ class GeventTask:
 
 class GeventLoop:
     def __init__(self):
-        self.thread_id = get_ident()
-        self.tasks = gevent.queue.Queue()
-        self.loop = gevent.spawn(self.run)
-
-    def run(self):
-        while True:
-            self.tasks.get().spawn()
-
-    def is_gevent_thread(self):
-        return self.thread_id == get_ident()
+        self.hub = gevent.get_hub()
 
     def submit(self, func, *args, **kwargs):
-        event = gevent._threading.Event()
-        task = GeventTask(event, func, *args, **kwargs)
-        self.tasks.put_nowait(task)
-        self.tasks.hub.loop.async().send()
+        task = GeventTask(func, *args, **kwargs)
+        watcher = self.hub.loop.async()
+        watcher.start(task.spawn)
+        watcher.send()
         return task
 
 
@@ -156,6 +146,7 @@ class GeventExecutor(AbstractExecutor):
     default_wait = True
 
     def __init__(self, loop=None, subexecutor=None):
+        super(GeventExecutor, self).__init__()
         if loop is None:
             loop = GeventLoop()
         if subexecutor is None:
@@ -176,7 +167,7 @@ class GeventExecutor(AbstractExecutor):
 
     def execute(self, fn, *args, **kwargs):
         """Execute an operation and return the result."""
-        if self.loop.is_gevent_thread():
+        if self.in_executor_context():
             return fn(*args, **kwargs)
         task = self.submit(fn, *args, **kwargs)
         return task.result()

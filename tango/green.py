@@ -14,6 +14,12 @@
 import os
 from functools import wraps
 
+# Compatibility imports
+try:
+    from threading import get_ident
+except:
+    from threading import _get_ident as get_ident
+
 # Tango imports
 from ._tango import GreenMode
 
@@ -62,6 +68,12 @@ class AbstractExecutor(object):
     asynchronous = NotImplemented
     default_wait = NotImplemented
 
+    def __init__(self):
+        self.thread_id = get_ident()
+
+    def in_executor_context(self):
+        return self.thread_id == get_ident()
+
     def delegate(self, fn, *args, **kwargs):
         """Delegate an operation and return an accessor."""
         if not self.asynchronous:
@@ -89,10 +101,11 @@ class AbstractExecutor(object):
     def run(self, fn, args=(), kwargs={}, wait=None, timeout=None):
         if wait is None:
             wait = self.default_wait
+        # Wait and timeout are not supported in synchronous mode
+        if not self.asynchronous and (not wait or timeout):
+            raise ValueError('Not supported in synchronous mode')
         # Sychronous (no delegation)
-        if not self.asynchronous:
-            if not wait or timeout:
-                raise ValueError('Not supported in synchronous mode')
+        if not self.asynchronous or not self.in_executor_context():
             return fn(*args, **kwargs)
         # Asynchronous delegation
         accessor = self.delegate(fn, *args, **kwargs)
