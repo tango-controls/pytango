@@ -20,6 +20,7 @@ import functools
 # Gevent imports
 import gevent.queue
 import gevent.monkey
+import gevent.threadpool
 
 # Bypass gevent monkey patching
 ThreadSafeEvent = gevent.monkey.get_original('threading', 'Event')
@@ -33,7 +34,7 @@ __all__ = ["get_global_executor", "set_global_executor", "GeventExecutor"]
 # Global executor
 
 _EXECUTOR = None
-
+_THREAD_POOL = None
 
 def get_global_executor():
     global _EXECUTOR
@@ -47,17 +48,11 @@ def set_global_executor(executor):
     _EXECUTOR = executor
 
 
-# Patch for gevent threadpool
-
 def get_global_threadpool():
-    """Before gevent-1.1.0, patch the spawn method to propagate exception
-    raised in the loop to the AsyncResult.
-    """
-    threadpool = gevent.get_hub().threadpool
-    if gevent.version_info < (1, 1) and not hasattr(threadpool, '_spawn'):
-        threadpool._spawn = threadpool.spawn
-        threadpool.spawn = six.create_bound_method(spawn, threadpool)
-    return threadpool
+    global _THREAD_POOL
+    if _THREAD_POOL is None:
+        _THREAD_POOL = ThreadPool()
+    return _THREAD_POOL
 
 
 class ExceptionWrapper:
@@ -86,14 +81,14 @@ def get_with_exception(result, block=True, timeout=None):
     return result
 
 
-def spawn(threadpool, fn, *args, **kwargs):
-    # The gevent threadpool do not raise exception with async results,
-    # we have to wrap it
-    fn = wrap_errors(fn)
-    result = threadpool._spawn(fn, *args, **kwargs)
-    result._get = result.get
-    result.get = six.create_bound_method(get_with_exception, result)
-    return result
+class ThreadPool(gevent.threadpool.ThreadPool):
+
+    def spawn(self, fn, *args, **kwargs):
+        fn = wrap_errors(fn)
+        result = super(ThreadPool, self).spawn(fn, *args, **kwargs)
+        result._get = result.get
+        result.get = get_with_exception.__get__(result, type(result))
+        return result
 
 
 # Gevent task and event loop
