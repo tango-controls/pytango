@@ -62,7 +62,7 @@ class ExceptionWrapper:
         self.tb = tb
 
 
-def wrap_errors(func):
+def wrap_error(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
@@ -73,8 +73,8 @@ def wrap_errors(func):
     return wrapper
 
 
-def get_with_exception(result, block=True, timeout=None):
-    result = result._get(block, timeout)
+def unwrap_error(source):
+    result = source.get()
     if isinstance(result, ExceptionWrapper):
         # Raise the exception using the caller context
         six.reraise(result.exception, result.error_string, result.tb)
@@ -84,11 +84,9 @@ def get_with_exception(result, block=True, timeout=None):
 class ThreadPool(gevent.threadpool.ThreadPool):
 
     def spawn(self, fn, *args, **kwargs):
-        fn = wrap_errors(fn)
-        result = super(ThreadPool, self).spawn(fn, *args, **kwargs)
-        result._get = result.get
-        result.get = get_with_exception.__get__(result, type(result))
-        return result
+        fn = wrap_error(fn)
+        fn_result = super(ThreadPool, self).spawn(fn, *args, **kwargs)
+        return gevent.spawn(unwrap_error, fn_result)
 
 
 # Gevent task and event loop
