@@ -104,7 +104,7 @@ def set_device_implementations(module):
     module.DeviceImpl = type('DeviceImpl', (object,), attrs)
     module.Device_2Impl = type('Device_2Impl', (module.DeviceImpl,), attrs)
     module.Device_3Impl = type('Device_3Impl', (module.Device_2Impl,), attrs)
-    module.Device_4Impl = type('Device_4Impl', (module.Device_3Impl,), attr)
+    module.Device_4Impl = type('Device_4Impl', (module.Device_3Impl,), attrs)
     module.Device_5Impl = type('Device_5Impl', (module.Device_4Impl,), attrs)
 
 
