@@ -97,6 +97,8 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 | 27/09/17 | `9.2.2 <http://pytango.readthedocs.io/en/v9.2.2>`_                               | 9.2.2 Release                                       | G\. Cuni/V\. Michel/J\. Moldes |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
+| 30/05/18 | `9.2.3 <http://pytango.readthedocs.io/en/v9.2.3>`_                               | 9.2.3 Release                                       | V\. Michel                     |
++----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 
 .. _pytango-version-history:
 
@@ -106,6 +108,19 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
+| 9.2.3    | 9.2.3 release.                                                                                                                                                        |
+|          |                                                                                                                                                                       |
+|          | Changes:                                                                                                                                                              |
+|          |     - `Pull Request #169: Use tango-controls theme for the documentation <https://github.com/tango-controls/pytango/pull/169>`_                                       |
+|          |     - `Pull Request #170 (issue #171): Use a private gevent ThreadPool <https://github.com/tango-controls/pytango/pull/170>`_                                         |
+|          |     - `Pull Request #180: Use same default encoding for python2 and python3 (utf-8) <https://github.com/tango-controls/pytango/pull/180>`_                            |
+|          |                                                                                                                                                                       |
+|          | Bug fixes:                                                                                                                                                            |
+|          |     - `Pull Request #178 (issue #177): Make CmdDoneEvent.argout writable <https://github.com/tango-controls/pytango/pull/178>`_                                       |
+|          |     - `Pull Request #178: Add GIL control for ApiUtil.get_asynch_replies <https://github.com/tango-controls/pytango/pull/178>`_                                       |
+|          |     - `Pull Request #187 (issue #186): Fix and extend client green mode <https://github.com/tango-controls/pytango/pull/187>`_                                        |
+|          |                                                                                                                                                                       |
++----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 9.2.2    | 9.2.2 release.                                                                                                                                                        |
 |          |                                                                                                                                                                       |
 |          | Features:                                                                                                                                                             |
