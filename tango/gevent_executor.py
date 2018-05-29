@@ -51,7 +51,7 @@ def set_global_executor(executor):
 def get_global_threadpool():
     global _THREAD_POOL
     if _THREAD_POOL is None:
-        _THREAD_POOL = ThreadPool()
+        _THREAD_POOL = ThreadPool(maxsize=10**4)
     return _THREAD_POOL
 
 
