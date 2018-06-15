@@ -39,8 +39,7 @@ class Clock(Device):
     @attribute(dtype='DevEnum', enum_labels=get_enum_labels(Noon))
     def noon(self):
         time_struct = time.gmtime(time.time())
-        result = Noon.AM if time_struct.tm_hour < 12 else Noon.PM
-        return int(result)
+        return Noon.AM if time_struct.tm_hour < 12 else Noon.PM
 
     @command(dtype_in=float, dtype_out=str)
     def ctime(self, seconds):
