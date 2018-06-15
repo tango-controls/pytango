@@ -1,5 +1,7 @@
 """Test utilities"""
 
+import enum
+
 # Local imports
 from . import DevState, GreenMode
 from .server import Device
@@ -28,11 +30,36 @@ class SimpleDevice(Device):
 
 # Helpers
 
+class GoodEnum(enum.IntEnum):
+    START = 0
+    MIDDLE = 1
+    END = 2
+
+
+class BadEnumNonZero(enum.IntEnum):
+    START = 1
+    MIDDLE = 2
+    END = 3
+
+
+class BadEnumSkipValues(enum.IntEnum):
+    START = 0
+    MIDDLE = 2
+    END = 4
+
+
+class BadEnumDuplicates(enum.IntEnum):
+    START = 0
+    MIDDLE = 1
+    END = 1
+
+
 TYPED_VALUES = {
     int: (1, 2),
     float: (2.71, 3.14),
     str: ('hey hey', 'my my'),
     bool: (False, True),
+    'DevEnum': (GoodEnum.START, GoodEnum.MIDDLE, GoodEnum.END),
     (int,): ([1, 2, 3], [9, 8, 7]),
     (float,): ([0.1, 0.2, 0.3], [0.9, 0.8, 0.7]),
     (str,): (['ab', 'cd', 'ef'], ['gh', 'ij', 'kl']),

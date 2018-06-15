@@ -3,11 +3,15 @@
 import sys
 import textwrap
 import pytest
+import enum
 
 from tango import DevState, AttrWriteType, GreenMode, DevFailed
 from tango.server import Device
 from tango.server import command, attribute, device_property
-from tango.test_utils import DeviceTestContext, assert_close
+from tango.test_utils import DeviceTestContext, assert_close, \
+    GoodEnum, BadEnumNonZero, BadEnumSkipValues, BadEnumDuplicates
+from tango.utils import get_enum_labels, EnumTypeError
+
 
 # Asyncio imports
 try:
@@ -122,10 +126,17 @@ def test_polled_command(server_green_mode):
 def test_read_write_attribute(typed_values, server_green_mode):
     dtype, values = typed_values
 
+    if dtype == 'DevEnum':
+        enum_class = values[0].__class__
+        enum_labels = get_enum_labels(enum_class)
+    else:
+        enum_class = None
+        enum_labels = []
+
     class TestDevice(Device):
         green_mode = server_green_mode
 
-        @attribute(dtype=dtype, max_dim_x=10,
+        @attribute(dtype=dtype, max_dim_x=10, enum_labels=enum_labels,
                    access=AttrWriteType.READ_WRITE)
         def attr(self):
             return self.attr_value
@@ -138,6 +149,8 @@ def test_read_write_attribute(typed_values, server_green_mode):
         for value in values:
             proxy.attr = value
             assert_close(proxy.attr, value)
+            if enum_class:
+                assert isinstance(proxy.attr, enum.IntEnum)
 
 
 # Test properties
@@ -303,3 +316,27 @@ def test_mandatory_device_property(typed_values, server_green_mode):
         with DeviceTestContext(TestDevice, process=True) as proxy:
             pass
     assert 'Device property prop is mandatory' in str(context.value)
+
+
+# fixtures
+
+@pytest.fixture(params=[GoodEnum])
+def good_enum(request):
+    return request.param
+
+
+@pytest.fixture(params=[BadEnumNonZero, BadEnumSkipValues, BadEnumDuplicates])
+def bad_enum(request):
+    return request.param
+
+
+# test utilities for servers
+
+def test_get_enum_labels_success(good_enum):
+    expected_labels = ['START', 'MIDDLE', 'END']
+    assert get_enum_labels(good_enum) == expected_labels
+
+
+def test_get_enum_labels_fail(bad_enum):
+    with pytest.raises(EnumTypeError):
+        get_enum_labels(bad_enum)
