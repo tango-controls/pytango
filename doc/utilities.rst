@@ -9,6 +9,8 @@ The Utilities API
     :members:
     :undoc-members:
 
+.. autofunction:: tango.utils.get_enum_labels
+
 .. autofunction:: tango.utils.is_pure_str
 
 .. autofunction:: tango.utils.is_seq

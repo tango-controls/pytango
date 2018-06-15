@@ -6,6 +6,7 @@ which has attributes:
 
   - time: read-only scalar float
   - gmtime: read-only sequence (spectrum) of integers
+  - noon:  read-only enumerated type
 
 commands:
 
@@ -14,7 +15,14 @@ commands:
 """
 
 import time
-from PyTango.server import Device, attribute, command
+from enum import IntEnum
+from tango.server import Device, attribute, command
+from tango.utils import get_enum_labels
+
+
+class Noon(IntEnum):
+    AM = 0  # DevEnum's must start at 0
+    PM = 1  # and increment by 1
 
 
 class Clock(Device):
@@ -27,6 +35,12 @@ class Clock(Device):
 
     def read_gmtime(self):
         return time.gmtime()
+
+    @attribute(dtype='DevEnum', enum_labels=get_enum_labels(Noon))
+    def noon(self):
+        time_struct = time.gmtime(time.time())
+        result = Noon.AM if time_struct.tm_hour < 12 else Noon.PM
+        return int(result)
 
     @command(dtype_in=float, dtype_out=str)
     def ctime(self, seconds):

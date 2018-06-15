@@ -15,6 +15,7 @@ import time
 import textwrap
 import threading
 import collections
+import enum
 
 from ._tango import StdStringVector, DbData, DbDatum, AttributeInfo
 from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
@@ -149,7 +150,7 @@ def __DeviceProxy__get_attr_cache(self):
     try:
         ret = self.__dict__['__attr_cache']
     except KeyError:
-        self.__dict__['__attr_cache'] = ret = ()
+        self.__dict__['__attr_cache'] = ret = {}
     return ret
 
 
@@ -214,7 +215,15 @@ def __DeviceProxy__refresh_cmd_cache(self):
 
 
 def __DeviceProxy__refresh_attr_cache(self):
-    attr_cache = [attr_name.lower() for attr_name in self.get_attribute_list()]
+    attr_list = self.attribute_list_query_ex()
+    attr_cache = {}
+    for attr in attr_list:
+        name = attr.name.lower()
+        enum_class = None
+        if attr.data_type == CmdArgType.DevEnum and attr.enum_labels:
+            labels = StdStringVector_2_seq(attr.enum_labels)
+            enum_class = enum.IntEnum(attr.name, labels, start=0)
+        attr_cache[name] = (attr.name, enum_class, )
     self.__dict__['__attr_cache'] = attr_cache
 
 
@@ -233,6 +242,15 @@ def __get_command_func(dp, cmd_info, name):
     return f
 
 
+def __get_attribute_value(self, attr_info, name):
+    _, enum_class = attr_info
+    attr_value = self.read_attribute(name).value
+    if enum_class:
+        return enum_class(attr_value)
+    else:
+        return attr_value
+
+
 def __DeviceProxy__getattr(self, name):
     # trait_names is a feature of IPython. Hopefully they will solve
     # ticket http://ipython.scipy.org/ipython/ipython/ticket/229 someday
@@ -246,8 +264,9 @@ def __DeviceProxy__getattr(self, name):
     if cmd_info:
         return __get_command_func(self, cmd_info, name)
 
-    if name_l in self.__get_attr_cache():
-        return self.read_attribute(name).value
+    attr_info = self.__get_attr_cache().get(name_l)
+    if attr_info:
+        return __get_attribute_value(self, attr_info, name)
 
     if name_l in self.__get_pipe_cache():
         return self.read_pipe(name)
@@ -266,8 +285,9 @@ def __DeviceProxy__getattr(self, name):
     except:
         pass
 
-    if name_l in self.__get_attr_cache():
-        return self.read_attribute(name).value
+    attr_info = self.__get_attr_cache().get(name_l)
+    if attr_info:
+        return __get_attribute_value(self, attr_info, name)
 
     try:
         self.__refresh_pipe_cache()
