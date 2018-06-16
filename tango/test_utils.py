@@ -28,7 +28,7 @@ class SimpleDevice(Device):
         self.set_state(DevState.ON)
 
 
-# Helpers
+# Test enums
 
 class GoodEnum(enum.IntEnum):
     START = 0
@@ -54,12 +54,13 @@ class BadEnumDuplicates(enum.IntEnum):
     END = 1
 
 
+# Helpers
+
 TYPED_VALUES = {
     int: (1, 2),
     float: (2.71, 3.14),
     str: ('hey hey', 'my my'),
     bool: (False, True),
-    'DevEnum': (GoodEnum.START, GoodEnum.MIDDLE, GoodEnum.END),
     (int,): ([1, 2, 3], [9, 8, 7]),
     (float,): ([0.1, 0.2, 0.3], [0.9, 0.8, 0.7]),
     (str,): (['ab', 'cd', 'ef'], ['gh', 'ij', 'kl']),

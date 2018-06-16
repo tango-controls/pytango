@@ -126,17 +126,10 @@ def test_polled_command(server_green_mode):
 def test_read_write_attribute(typed_values, server_green_mode):
     dtype, values = typed_values
 
-    if dtype == 'DevEnum':
-        enum_class = values[0].__class__
-        enum_labels = get_enum_labels(enum_class)
-    else:
-        enum_class = None
-        enum_labels = []
-
     class TestDevice(Device):
         green_mode = server_green_mode
 
-        @attribute(dtype=dtype, max_dim_x=10, enum_labels=enum_labels,
+        @attribute(dtype=dtype, max_dim_x=10,
                    access=AttrWriteType.READ_WRITE)
         def attr(self):
             return self.attr_value
@@ -149,8 +142,33 @@ def test_read_write_attribute(typed_values, server_green_mode):
         for value in values:
             proxy.attr = value
             assert_close(proxy.attr, value)
-            if enum_class:
-                assert isinstance(proxy.attr, enum.IntEnum)
+
+
+def test_read_write_attribute_enum(server_green_mode):
+    dtype = 'DevEnum'
+    values = (member.value for member in GoodEnum)
+    enum_labels = get_enum_labels(GoodEnum)
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        @attribute(dtype=dtype, enum_labels=enum_labels,
+                   access=AttrWriteType.READ_WRITE)
+        def attr(self):
+            return self.attr_value
+
+        @attr.write
+        def attr(self, value):
+            self.attr_value = value
+
+    with DeviceTestContext(TestDevice) as proxy:
+        for value, label in zip(values, enum_labels):
+            proxy.attr = value
+            read_attr = proxy.attr
+            assert read_attr == value
+            assert isinstance(read_attr, enum.IntEnum)
+            assert read_attr.value == value
+            assert read_attr.name == label
 
 
 # Test properties
