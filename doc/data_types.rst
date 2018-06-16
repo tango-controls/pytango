@@ -50,6 +50,14 @@ much more efficient.
 |                         |                                                                           |    In this case it is :py:obj:`str` (decoded with default python          |
 |                         |                                                                           |    encoding *utf-8*))                                                     |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | * :py:obj:`int` (for value)                                               | * :py:obj:`int` (for value)                                               |
+|                         | * :py:class:`list` <:py:obj:`str`> (for enum_labels)                      | * :py:class:`list` <:py:obj:`str`>  (for enum_labels)                     |
+|        DEV_ENUM         |                                                                           |                                                                           |
+| (*New in PyTango 9.0*)  | Note:  direct attribute access via DeviceProxy will return enumerated     | Note:  direct attribute access via DeviceProxy will return enumerated     |
+|                         |        type :py:obj:`enum.IntEnum`.                                       |        type :py:obj:`enum.IntEnum`.                                       |
+|                         |        This type uses the package enum34.                                 |        Python < 3.4, uses the package enum34.                             |
+|                         |                                                                           |        Python >= 3.4, uses standard package enum.                         |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 
 **For array types (SPECTRUM/IMAGE)**
 
