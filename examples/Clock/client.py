@@ -26,11 +26,11 @@ if len(sys.argv) != 2:
 clock = PyTango.DeviceProxy(sys.argv[1])
 t = clock.time
 gmt = clock.gmtime
+noon = clock.noon
 print(t)
 print(gmt)
+print(noon, noon.name, noon.value)
+if noon == noon.AM:
+    print('Good morning!')
 print(clock.ctime(t))
 print(clock.mktime(gmt))
-
-
-
-

@@ -1,5 +1,7 @@
 """Test utilities"""
 
+import enum
+
 # Local imports
 from . import DevState, GreenMode
 from .server import Device
@@ -24,6 +26,32 @@ __all__ = ['DeviceTestContext', 'SimpleDevice']
 class SimpleDevice(Device):
     def init_device(self):
         self.set_state(DevState.ON)
+
+
+# Test enums
+
+class GoodEnum(enum.IntEnum):
+    START = 0
+    MIDDLE = 1
+    END = 2
+
+
+class BadEnumNonZero(enum.IntEnum):
+    START = 1
+    MIDDLE = 2
+    END = 3
+
+
+class BadEnumSkipValues(enum.IntEnum):
+    START = 0
+    MIDDLE = 2
+    END = 4
+
+
+class BadEnumDuplicates(enum.IntEnum):
+    START = 0
+    MIDDLE = 1
+    END = 1
 
 
 # Helpers

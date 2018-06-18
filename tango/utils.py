@@ -22,6 +22,7 @@ import six
 import types
 import numbers
 import collections
+import enum
 
 from ._tango import StdStringVector, StdDoubleVector, \
     DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
@@ -415,6 +416,53 @@ def get_tango_type(obj):
     if constants.NUMPY_SUPPORT:
         return __get_tango_type_numpy_support(obj)
     return __get_tango_type(obj)
+
+
+class EnumTypeError(Exception):
+    """Invalid Enum class for use with DEV_ENUM."""
+
+
+def get_enum_labels(enum_cls):
+    """
+    Return list of enumeration labels from Enum class.
+
+    The list is useful when creating an attribute, for the
+    `enum_labels` parameter.  The enumeration values are checked
+    to ensure they are unique, start at zero, and increment by one.
+
+    :param enum_cls: the Enum class to be inspected
+    :type enum_cls: :py:obj:`enum.Enum`
+
+    :return: List of label strings
+    :rtype: :py:obj:`list`
+
+    :raises EnumTypeError: in case the given class is invalid
+    """
+    if not issubclass(enum_cls, enum.Enum):
+        raise EnumTypeError("Input class '%s' must be derived from enum.Enum"
+                            % enum_cls)
+
+    # Check there are no duplicate labels
+    try:
+        enum.unique(enum_cls)
+    except ValueError as exc:
+        raise EnumTypeError("Input class '%s' must be unique - %s"
+                            % (enum_cls, exc))
+
+    # Check the values start at 0, and increment by 1, since that is
+    # assumed by tango's DEV_ENUM implementation.
+    values = [member.value for member in enum_cls]
+    if not values:
+        raise EnumTypeError("Input class '%s' has no members!" % enum_cls)
+    expected_value = 0
+    for value in values:
+        if value != expected_value:
+            raise EnumTypeError("Enum values for '%s' must start at 0 and "
+                                "increment by 1.  Values: %s"
+                                % (enum_cls, values))
+        expected_value += 1
+
+    return [member.name for member in enum_cls]
 
 
 def is_pure_str(obj):
