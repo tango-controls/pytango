@@ -17,7 +17,6 @@ commands:
 import time
 from enum import IntEnum
 from tango.server import Device, attribute, command
-from tango.utils import get_enum_labels
 
 
 class Noon(IntEnum):
