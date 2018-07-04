@@ -10,6 +10,7 @@ import time
 import struct
 import socket
 import tempfile
+import traceback
 import collections
 from functools import partial
 
@@ -21,7 +22,7 @@ from six.moves import queue
 # CLI imports
 from ast import literal_eval
 from importlib import import_module
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 
 # Local imports
 from .server import run
@@ -70,7 +71,12 @@ def literal_dict(arg):
 def device(path):
     """Get the device class from a given module."""
     module_name, device_name = path.rsplit(".", 1)
-    module = import_module(module_name)
+    try:
+        module = import_module(module_name)
+    except Exception:
+        raise ArgumentTypeError("Error importing {0}.{1}:\n{2}"
+                                .format(module_name, device_name,
+                                        traceback.format_exc()))
     return getattr(module, device_name)
 
 
