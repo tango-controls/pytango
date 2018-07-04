@@ -1,4 +1,4 @@
-__all__ = []
+__all__list__ = []
 def _init_module() :
     import os
     for root,dirs,files in os.walk(__path__[0]) :
@@ -9,6 +9,6 @@ def _init_module() :
                 subdir = root[len(__path__[0]) + 1:]
                 if subdir:
                     base = '%s.%s' % (subdir,base)
-                __all__.append(base)
+                __all__list__.append(base)
 _init_module()
-
+__all__ = tuple(__all__list__)

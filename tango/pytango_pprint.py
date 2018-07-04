@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["pytango_pprint_init"]
+__all__ = ("pytango_pprint_init",)
 
 __docformat__ = "restructuredtext"
 

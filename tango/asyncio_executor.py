@@ -28,7 +28,7 @@ except ImportError:
 # Tango imports
 from .green import AbstractExecutor
 
-__all__ = ["AsyncioExecutor", "get_global_executor", "set_global_executor"]
+__all__ = ("AsyncioExecutor", "get_global_executor", "set_global_executor")
 
 # Asyncio compatibility
 

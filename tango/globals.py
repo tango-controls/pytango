@@ -13,10 +13,10 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["get_class", "get_classes", "get_cpp_class", "get_cpp_classes",
+__all__ = ("get_class", "get_classes", "get_cpp_class", "get_cpp_classes",
            "get_constructed_class", "get_constructed_classes",
            "class_factory", "delete_class_list",
-           "class_list", "cpp_class_list", "constructed_class"]
+           "class_list", "cpp_class_list", "constructed_class")
 
 __docformat__ = "restructuredtext"
 

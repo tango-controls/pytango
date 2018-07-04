@@ -18,7 +18,7 @@ http://pytango.readthedocs.io
 
 from __future__ import print_function
 
-__all__ = [
+__all__ = (
     'AccessControlType', 'ApiUtil', 'ArchiveEventInfo',
     'ArchiveEventProp', 'ArgType', 'AsynCall', 'AsynReplyNotArrived', 'AttReqType',
     'Attr', 'AttrConfEventData', 'AttrData', 'AttrDataFormat', 'AttrList',
@@ -76,7 +76,7 @@ __all__ = [
     'set_green_mode', 'get_green_mode', 'get_device_proxy',
     'is_scalar_type', 'is_array_type', 'is_numerical_type',
     'is_int_type', 'is_float_type', 'is_bool_type', 'is_str_type',
-    'obj_2_str', 'str_2_obj', 'seqStr_2_obj']
+    'obj_2_str', 'str_2_obj', 'seqStr_2_obj')
 
 __docformat__ = "restructuredtext"
 

@@ -1,4 +1,4 @@
-__all__ = ["loads", "dumps"]
+__all__ = ("loads", "dumps")
 
 
 def loads(fmt, data):

@@ -26,8 +26,8 @@ Example::
             attr.set_value(self._current)
 """
 
-__all__ = ["TangoStream", "LogIt", "DebugIt", "InfoIt", "WarnIt",
-           "ErrorIt", "FatalIt"]
+__all__ = ("TangoStream", "LogIt", "DebugIt", "InfoIt", "WarnIt",
+           "ErrorIt", "FatalIt")
 
 __docformat__ = "restructuredtext"
 

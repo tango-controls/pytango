@@ -27,7 +27,7 @@ version older than 3.5 (failed with 2.7 and 3.4)
 import sys
 from mock import MagicMock
 
-__all__ = ['tango']
+__all__ = ('tango',)
 
 
 # Constants

@@ -9,7 +9,7 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-__all__ = ['PipeConfig']
+__all__ = ('PipeConfig',)
 
 from ._tango import Pipe, PipeWriteType, UserDefaultPipeProp, \
     CmdArgType, DevState, DispLevel, constants

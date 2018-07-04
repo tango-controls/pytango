@@ -26,7 +26,7 @@
 
 """This class manage the TANGO database."""
 
-__all__ = ["DataBase", "DataBaseClass", "main"]
+__all__ = ("DataBase", "DataBaseClass", "main")
 
 __docformat__ = 'restructuredtext'
 

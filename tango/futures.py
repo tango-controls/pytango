@@ -12,7 +12,7 @@
 """This module exposes a futures version of :class:`tango.DeviceProxy` and
 :class:`tango.AttributeProxy"""
 
-__all__ = ["DeviceProxy", "AttributeProxy", "check_requirements"]
+__all__ = ("DeviceProxy", "AttributeProxy", "check_requirements")
 
 from functools import partial
 

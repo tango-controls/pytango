@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["Release"]
+__all__ = ("Release",)
 
 __docformat__ = "restructuredtext"
 

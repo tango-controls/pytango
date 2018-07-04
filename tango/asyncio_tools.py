@@ -8,7 +8,7 @@ try:
 except ImportError:
     import trollius as asyncio
 
-__all__ = ["run_coroutine_threadsafe"]
+__all__ = ("run_coroutine_threadsafe",)
 
 
 def _set_concurrent_future_state(concurrent, source):

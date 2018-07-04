@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["api_util_init"]
+__all__ = ("api_util_init",)
 
 __docformat__ = "restructuredtext"
 

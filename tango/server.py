@@ -34,9 +34,9 @@ from .utils import scalar_to_array_type, TO_TANGO_TYPE
 from .green import get_green_mode, get_executor
 from .pyutil import Util
 
-__all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
+__all__ = ("DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
            "command", "pipe", "device_property", "class_property",
-           "run", "server_run", "Server"]
+           "run", "server_run", "Server")
 
 API_VERSION = 2
 

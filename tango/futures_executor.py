@@ -18,7 +18,7 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 # Tango imports
 from .green import AbstractExecutor
 
-__all__ = ["FuturesExecutor", "get_global_executor", "set_global_executor"]
+__all__ = ("FuturesExecutor", "get_global_executor", "set_global_executor")
 
 # Global executor
 
