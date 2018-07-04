@@ -33,7 +33,7 @@ from . import _tango
 from .constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
 from .release import Release
 
-__all__ = [
+__all__ = (
     "requires_pytango", "requires_tango",
     "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
     "is_number", "is_scalar_type", "is_array_type", "is_numerical_type",
@@ -44,7 +44,7 @@ __all__ = [
     "CaselessList", "CaselessDict", "EventCallBack", "get_home",
     "from_version_str_to_hex_str", "from_version_str_to_int",
     "seq_2_StdStringVector", "StdStringVector_2_seq",
-    "dir2", "TO_TANGO_TYPE"]
+    "dir2", "TO_TANGO_TYPE")
 
 __docformat__ = "restructuredtext"
 

@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["NumpyType", "numpy_type", "numpy_spectrum", "numpy_image"]
+__all__ = ("NumpyType", "numpy_type", "numpy_spectrum", "numpy_image")
 
 __docformat__ = "restructuredtext"
 

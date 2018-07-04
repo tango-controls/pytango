@@ -34,7 +34,7 @@ from .utils import dir2
 from .green import green, green_callback
 from .green import get_green_mode
 
-__all__ = ["device_proxy_init", "get_device_proxy"]
+__all__ = ("device_proxy_init", "get_device_proxy")
 
 __docformat__ = "restructuredtext"
 

@@ -29,7 +29,7 @@ ThreadSafeEvent = gevent.monkey.get_original('threading', 'Event')
 from .green import AbstractExecutor
 
 
-__all__ = ["get_global_executor", "set_global_executor", "GeventExecutor"]
+__all__ = ("get_global_executor", "set_global_executor", "GeventExecutor")
 
 # Global executor
 

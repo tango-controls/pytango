@@ -2,7 +2,7 @@ import tango
 from tango.server import Device
 from tango.server import attribute
 
-__all__ = ["FwdServer", "main"]
+__all__ = ("FwdServer", "main")
 
 
 class FwdServer(Device):

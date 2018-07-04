@@ -27,7 +27,7 @@ from argparse import ArgumentParser
 from .server import run
 from . import DeviceProxy, Database, Util
 
-__all__ = ["DeviceTestContext", "run_device_test_context"]
+__all__ = ("DeviceTestContext", "run_device_test_context")
 
 # Helpers
 

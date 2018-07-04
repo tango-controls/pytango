@@ -28,7 +28,7 @@ from .server import Device, _to_classes, _add_classes
 from .server import get_worker, set_worker
 from .green import get_executor
 
-__all__ = ['Server']
+__all__ = ('Server',)
 
 _CLEAN_UP_TEMPLATE = """
 import sys

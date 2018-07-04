@@ -26,7 +26,7 @@ from .utils import is_pure_str, is_non_str_seq
 from .green import green, get_green_mode
 from .device_proxy import __init_device_proxy_internals as init_device_proxy
 
-__all__ = ["AttributeProxy", "attribute_proxy_init", "get_attribute_proxy"]
+__all__ = ("AttributeProxy", "attribute_proxy_init", "get_attribute_proxy")
 
 
 @green(consume_green_mode=False)

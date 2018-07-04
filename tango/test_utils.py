@@ -18,7 +18,7 @@ try:
 except ImportError:
     numpy = None
 
-__all__ = ['DeviceTestContext', 'SimpleDevice']
+__all__ = ('DeviceTestContext', 'SimpleDevice')
 
 
 # Test devices

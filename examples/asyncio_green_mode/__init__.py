@@ -1,1 +1,1 @@
-__all__ = ['asyncio_device_example']
+__all__ = ('asyncio_device_example',)
