@@ -193,7 +193,7 @@ def test_read_write_attribute_enum(server_green_mode):
             green_mode = server_green_mode
 
             def __init__(self, *args, **kwargs):
-                super(TestDevice, self).__init__(*args, **kwargs)
+                super(BadTestDevice, self).__init__(*args, **kwargs)
                 self.attr_value = 0
 
             # enum_labels may not be specified if dtype is an enum.Enum
