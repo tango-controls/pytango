@@ -36,7 +36,7 @@ class Clock(Device):
     def read_gmtime(self):
         return time.gmtime()
 
-    @attribute(dtype='DevEnum', enum_labels=get_enum_labels(Noon))
+    @attribute(dtype=Noon)
     def noon(self):
         time_struct = time.gmtime(time.time())
         return Noon.AM if time_struct.tm_hour < 12 else Noon.PM

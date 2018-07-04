@@ -17,6 +17,7 @@ from __future__ import absolute_import
 
 import sys
 import copy
+import enum
 import inspect
 import logging
 import functools
@@ -29,6 +30,7 @@ from .attr_data import AttrData
 from .pipe_data import PipeData
 from .device_class import DeviceClass
 from .device_server import LatestDeviceImpl
+from .utils import get_enum_labels
 from .utils import is_seq, is_non_str_seq
 from .utils import scalar_to_array_type, TO_TANGO_TYPE
 from .green import get_green_mode, get_executor
@@ -801,8 +803,21 @@ class attribute(AttrData):
         self.__doc__ = kwargs.get('doc', kwargs.get('description',
                                                     'TANGO attribute'))
         if 'dtype' in kwargs:
+            dtype = kwargs['dtype']
+            dformat = kwargs.get('dformat')
+            if inspect.isclass(dtype) and issubclass(dtype, enum.Enum):
+                if dformat and dformat != AttrDataFormat.SCALAR:
+                    raise TypeError("DevEnum types can only be scalar, not {0}."
+                                    .format(dformat))
+                enum_labels = kwargs.get('enum_labels')
+                if enum_labels:
+                    raise TypeError("For dtype of enum.Enum the enum_labels must not "
+                                    "be specified - dtype: {0}, enum_labels: {1}."
+                                    .format(dtype, enum_labels))
+                kwargs['enum_labels'] = get_enum_labels(dtype)
+                dtype = CmdArgType.DevEnum
             kwargs['dtype'], kwargs['dformat'] = \
-                _get_tango_type_format(kwargs['dtype'], kwargs.get('dformat'))
+                _get_tango_type_format(dtype, dformat)
         self.build_from_dict(kwargs)
 
     def get_attribute(self, obj):
