@@ -151,6 +151,11 @@ def test_read_write_attribute_enum(server_green_mode):
     class TestDevice(Device):
         green_mode = server_green_mode
 
+        def __init__(self, *args, **kwargs):
+            super(TestDevice, self).__init__(*args, **kwargs)
+            self.attr_from_enum_value = 0
+            self.attr_from_labels_value = 0
+
         @attribute(dtype=GoodEnum, access=AttrWriteType.READ_WRITE)
         def attr_from_enum(self):
             return self.attr_from_enum_value
@@ -187,10 +192,16 @@ def test_read_write_attribute_enum(server_green_mode):
         class BadTestDevice(Device):
             green_mode = server_green_mode
 
+            def __init__(self, *args, **kwargs):
+                super(TestDevice, self).__init__(*args, **kwargs)
+                self.attr_value = 0
+
             # enum_labels may not be specified if dtype is an enum.Enum
             @attribute(dtype=GoodEnum, enum_labels=enum_labels)
             def bad_attr(self):
                 return self.attr_value
+
+        BadTestDevice()  # dummy instance for Codacy
     assert 'enum_labels' in str(context.value)
 
 
