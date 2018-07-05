@@ -145,30 +145,64 @@ def test_read_write_attribute(typed_values, server_green_mode):
 
 
 def test_read_write_attribute_enum(server_green_mode):
-    dtype = 'DevEnum'
     values = (member.value for member in GoodEnum)
     enum_labels = get_enum_labels(GoodEnum)
 
     class TestDevice(Device):
         green_mode = server_green_mode
 
-        @attribute(dtype=dtype, enum_labels=enum_labels,
-                   access=AttrWriteType.READ_WRITE)
-        def attr(self):
-            return self.attr_value
+        def __init__(self, *args, **kwargs):
+            super(TestDevice, self).__init__(*args, **kwargs)
+            self.attr_from_enum_value = 0
+            self.attr_from_labels_value = 0
 
-        @attr.write
-        def attr(self, value):
-            self.attr_value = value
+        @attribute(dtype=GoodEnum, access=AttrWriteType.READ_WRITE)
+        def attr_from_enum(self):
+            return self.attr_from_enum_value
+
+        @attr_from_enum.write
+        def attr_from_enum(self, value):
+            self.attr_from_enum_value = value
+
+        @attribute(dtype='DevEnum', enum_labels=enum_labels,
+                   access=AttrWriteType.READ_WRITE)
+        def attr_from_labels(self):
+            return self.attr_from_labels_value
+
+        @attr_from_labels.write
+        def attr_from_labels(self, value):
+            self.attr_from_labels_value = value
 
     with DeviceTestContext(TestDevice) as proxy:
         for value, label in zip(values, enum_labels):
-            proxy.attr = value
-            read_attr = proxy.attr
+            proxy.attr_from_enum = value
+            read_attr = proxy.attr_from_enum
             assert read_attr == value
             assert isinstance(read_attr, enum.IntEnum)
             assert read_attr.value == value
             assert read_attr.name == label
+            proxy.attr_from_labels = value
+            read_attr = proxy.attr_from_labels
+            assert read_attr == value
+            assert isinstance(read_attr, enum.IntEnum)
+            assert read_attr.value == value
+            assert read_attr.name == label
+
+    with pytest.raises(TypeError) as context:
+        class BadTestDevice(Device):
+            green_mode = server_green_mode
+
+            def __init__(self, *args, **kwargs):
+                super(BadTestDevice, self).__init__(*args, **kwargs)
+                self.attr_value = 0
+
+            # enum_labels may not be specified if dtype is an enum.Enum
+            @attribute(dtype=GoodEnum, enum_labels=enum_labels)
+            def bad_attr(self):
+                return self.attr_value
+
+        BadTestDevice()  # dummy instance for Codacy
+    assert 'enum_labels' in str(context.value)
 
 
 # Test properties
