@@ -36,6 +36,7 @@ __all__ = ("get_global_executor", "set_global_executor", "GeventExecutor")
 _EXECUTOR = None
 _THREAD_POOL = None
 
+
 def get_global_executor():
     global _EXECUTOR
     if _EXECUTOR is None:
@@ -98,36 +99,26 @@ class GeventTask:
         self.kwargs = kwargs
         self.value = None
         self.exception = None
-        self.event = ThreadSafeEvent()
+        self.done = ThreadSafeEvent()
+        self.started = ThreadSafeEvent()
 
     def run(self):
+        self.started.set()
         try:
             self.value = self.func(*self.args, **self.kwargs)
         except:
             self.exception = sys.exc_info()
         finally:
-            self.event.set()
+            self.done.set()
 
     def spawn(self):
         return gevent.spawn(self.run)
 
     def result(self):
-        self.event.wait()
+        self.done.wait()
         if self.exception:
             six.reraise(*self.exception)
         return self.value
-
-
-class GeventLoop:
-    def __init__(self):
-        self.hub = gevent.get_hub()
-
-    def submit(self, func, *args, **kwargs):
-        task = GeventTask(func, *args, **kwargs)
-        watcher = self.hub.loop.async()
-        watcher.start(task.spawn)
-        watcher.send()
-        return task
 
 
 # Gevent executor
@@ -141,7 +132,7 @@ class GeventExecutor(AbstractExecutor):
     def __init__(self, loop=None, subexecutor=None):
         super(GeventExecutor, self).__init__()
         if loop is None:
-            loop = GeventLoop()
+            loop = gevent.get_hub().loop
         if subexecutor is None:
             subexecutor = get_global_threadpool()
         self.loop = loop
@@ -156,7 +147,18 @@ class GeventExecutor(AbstractExecutor):
         return accessor.get(timeout=timeout)
 
     def submit(self, fn, *args, **kwargs):
-        return self.loop.submit(fn, *args, **kwargs)
+        task = GeventTask(fn, *args, **kwargs)
+        watcher = self.loop.async()
+        watcher.start(task.spawn)
+        watcher.send()
+        task.started.wait()
+        # The watcher has to be stopped in order to be garbage-collected.
+        # This step is crucial since the watcher holds a reference to the
+        # `task.spawn` method which itself holds a reference to the task.
+        # It's also important to wait for the task to be spawned before
+        # stopping the watcher, otherwise the task won't run.
+        watcher.stop()
+        return task
 
     def execute(self, fn, *args, **kwargs):
         """Execute an operation and return the result."""
