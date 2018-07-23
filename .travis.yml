@@ -30,10 +30,14 @@ before_install:
   - conda -V || bash miniconda.sh -b -p ./miniconda -f
   # Update conda
   - conda install --yes conda
+  # Enable conda
+  - source ./miniconda/etc/profile.d/conda.sh
   # Create build environment if it doesn't exist
-  - source activate buildenv || conda create --yes --name buildenv python=$PYTHON_VERSION
+  - conda activate buildenv || conda create --yes --name buildenv python=$PYTHON_VERSION
   # Activate build environment
-  - source activate buildenv
+  - conda activate buildenv
+  # Pin python version
+  - echo "python == $PYTHON_VERSION.*" > $CONDA_PREFIX/conda-meta/pinned
 
 install:
   # Install build dependencies
