@@ -146,9 +146,15 @@ class GeventExecutor(AbstractExecutor):
         """Return a result from an gevent future."""
         return accessor.get(timeout=timeout)
 
+    def create_watcher(self):
+        try:
+            return self.loop.async_()
+        except AttributeError:
+            return getattr(self.loop, 'async')()
+
     def submit(self, fn, *args, **kwargs):
         task = GeventTask(fn, *args, **kwargs)
-        watcher = self.loop.async()
+        watcher = self.create_watcher()
         watcher.start(task.spawn)
         watcher.send()
         task.started.wait()
