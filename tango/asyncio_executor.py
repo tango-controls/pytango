@@ -30,9 +30,6 @@ from .green import AbstractExecutor
 
 __all__ = ("AsyncioExecutor", "get_global_executor", "set_global_executor")
 
-# Asyncio compatibility
-
-ensure_future = getattr(asyncio, 'ensure_future', getattr(asyncio, 'async'))
 
 # Global executor
 
@@ -74,7 +71,7 @@ class AsyncioExecutor(AbstractExecutor):
         """Return the given operation as an asyncio future."""
         callback = functools.partial(fn, *args, **kwargs)
         coro = self.loop.run_in_executor(self.subexecutor, callback)
-        return ensure_future(coro)
+        return asyncio.ensure_future(coro)
 
     def access(self, accessor, timeout=None):
         """Return a result from an asyncio future."""

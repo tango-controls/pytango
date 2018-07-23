@@ -9,11 +9,12 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
+# pylint: disable=deprecated-method
+
 import os
-import imp
 import sys
+import runpy
 import struct
-import platform
 import subprocess
 
 from setuptools import setup, Extension
@@ -24,6 +25,12 @@ from setuptools.command.install import install as dftinstall
 from distutils.command.build import build as dftbuild
 from distutils.unixccompiler import UnixCCompiler
 from distutils.version import LooseVersion as V
+
+# Distro import
+try:
+    from pip._vendor import distro
+except ImportError:
+    import platform as distro
 
 # Sphinx imports
 try:
@@ -44,12 +51,12 @@ except ImportError:
 POSIX = 'posix' in os.name
 WINDOWS = 'nt' in os.name
 IS64 = 8 * struct.calcsize("P") == 64
-PYTHON_VERSION = platform.python_version_tuple()
-PYTHON2 = ('2',) <= PYTHON_VERSION < ('3',)
-PYTHON3 = ('3',) <= PYTHON_VERSION < ('4',)
+PYTHON_VERSION = sys.version_info
+PYTHON2 = (2,) <= PYTHON_VERSION < (3,)
+PYTHON3 = (3,) <= PYTHON_VERSION < (4,)
 
 # Linux distribution
-distribution = platform.linux_distribution()[0].lower() if POSIX else ""
+distribution = distro.linux_distribution()[0].lower() if POSIX else ""
 distribution_match = lambda names: any(x in distribution for x in names)
 DEBIAN = distribution_match(['debian', 'ubuntu', 'mint'])
 REDHAT = distribution_match(['redhat', 'fedora', 'centos', 'opensuse'])
@@ -94,11 +101,10 @@ def abspath(*path):
 
 
 def get_release_info():
-    name = "release"
-    release_dir = abspath('tango')
-    data = imp.find_module(name, [release_dir])
-    release = imp.load_module(name, *data)
-    return release.Release
+    namespace = runpy.run_path(
+        abspath('tango/release.py'),
+        run_name='tango.release')
+    return namespace['Release']
 
 
 def uniquify(seq):
@@ -465,9 +471,9 @@ def setup_args():
         'Programming Language :: C',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Scientific/Engineering',
         'Topic :: Software Development :: Libraries',
     ]

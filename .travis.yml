@@ -16,6 +16,7 @@ env:
     - PYTHON_VERSION=3.7
 
 cache:
+  timeout: 300
   directories:
     - ./miniconda  # Conda environment
     - ./.eggs      # pytest eggs
@@ -44,6 +45,7 @@ install:
   - conda install --yes boost gxx_linux-64
   - conda install --yes -c tango-controls tango=$TANGO_VERSION
   - conda install --yes numpy  # Not a strong requirement yet
+  - conda install --yes gevent  # Temporary fix for gevent issue #1260
   # Use conda prefix as root for the dependencies
   - export BOOST_ROOT=$CONDA_PREFIX TANGO_ROOT=$CONDA_PREFIX ZMQ_ROOT=$CONDA_PREFIX OMNI_ROOT=$CONDA_PREFIX
 
