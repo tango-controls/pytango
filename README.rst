@@ -76,7 +76,7 @@ To test the installation, import ``tango`` and check ``tango.__version__``::
 
     >>> import tango
     >>> tango.__version__
-    '9.2.4'
+    '9.2.5'
 
 For an interactive use, consider using ITango_, a tango IPython_ profile.
 
