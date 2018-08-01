@@ -266,8 +266,8 @@ intersphinx_mapping = {
     'http://docs.scipy.org/doc/numpy': None,
     'http://ipython.org/ipython-doc/stable': None,
     'http://api.mongodb.org/python/current': None,
-    'http://packages.python.org/CouchDB': None,
-    'http://pycassa.github.com/pycassa': None,
+    'http://couchdb-python.readthedocs.io/en/latest': None,
+    'http://pycassa.github.io/pycassa': None,
     'http://docs.sqlalchemy.org/en/latest': None,
 }
 
