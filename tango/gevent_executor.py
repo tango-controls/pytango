@@ -77,8 +77,12 @@ def unwrap_error(source):
 
     def link(source):
         if isinstance(source.value, ExceptionInfo):
-            destination.set_exception(
-                source.value.value, exc_info=source.value)
+            try:
+                destination.set_exception(
+                    source.value.value, exc_info=source.value)
+            # Gevent 1.0 compatibility
+            except TypeError:
+                destination.set_exception(source.value.value)
             return
         destination(source)
 
