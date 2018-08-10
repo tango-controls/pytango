@@ -449,7 +449,7 @@ def setup_args():
     ]
 
     if PYTHON2:
-        tests_require += ['trollius']
+        tests_require += ['trollius', 'futures']
 
     package_data = {
         'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
