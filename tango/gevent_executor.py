@@ -16,8 +16,10 @@ from __future__ import absolute_import
 import sys
 import six
 import functools
+from collections import namedtuple
 
 # Gevent imports
+import gevent.event
 import gevent.queue
 import gevent.monkey
 import gevent.threadpool
@@ -56,11 +58,7 @@ def get_global_threadpool():
     return _THREAD_POOL
 
 
-class ExceptionWrapper:
-    def __init__(self, exception, error_string, tb):
-        self.exception = exception
-        self.error_string = error_string
-        self.tb = tb
+ExceptionInfo = namedtuple('ExceptionInfo', 'type value traceback')
 
 
 def wrap_error(func):
@@ -69,25 +67,35 @@ def wrap_error(func):
         try:
             return func(*args, **kwargs)
         except:
-            return ExceptionWrapper(*sys.exc_info())
+            return ExceptionInfo(*sys.exc_info())
 
     return wrapper
 
 
 def unwrap_error(source):
-    result = source.get()
-    if isinstance(result, ExceptionWrapper):
-        # Raise the exception using the caller context
-        six.reraise(result.exception, result.error_string, result.tb)
-    return result
+    destination = gevent.event.AsyncResult()
+
+    def link(source):
+        if isinstance(source.value, ExceptionInfo):
+            try:
+                destination.set_exception(
+                    source.value.value, exc_info=source.value)
+            # Gevent 1.0 compatibility
+            except TypeError:
+                destination.set_exception(source.value.value)
+            return
+        destination(source)
+
+    source.rawlink(link)
+    return destination
 
 
 class ThreadPool(gevent.threadpool.ThreadPool):
 
     def spawn(self, fn, *args, **kwargs):
-        fn = wrap_error(fn)
-        fn_result = super(ThreadPool, self).spawn(fn, *args, **kwargs)
-        return gevent.spawn(unwrap_error, fn_result)
+        wrapped = wrap_error(fn)
+        raw = super(ThreadPool, self).spawn(wrapped, *args, **kwargs)
+        return unwrap_error(raw)
 
 
 # Gevent task and event loop

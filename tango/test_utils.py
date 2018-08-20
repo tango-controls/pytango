@@ -1,6 +1,8 @@
 """Test utilities"""
 
+import six
 import enum
+import collections
 
 # Local imports
 from . import DevState, GreenMode
@@ -78,6 +80,12 @@ def repr_type(x):
 if numpy and pytest:
 
     def assert_close(a, b):
+        if isinstance(a, six.string_types):
+            assert a == b
+            return
+        if isinstance(a, collections.Sequence) and len(a) and isinstance(a[0], six.string_types):
+            assert list(a) == list(b)
+            return
         try:
             assert a == pytest.approx(b)
         except ValueError:

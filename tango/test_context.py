@@ -178,7 +178,7 @@ class DeviceTestContext(object):
             # because the it might segfault while cleaning up the
             # the tango resources
             if process:
-                time.sleep(0.01)
+                time.sleep(0.1)
 
     def post_init(self):
         try:
@@ -228,8 +228,7 @@ class DeviceTestContext(object):
 
     def connect(self):
         try:
-            args = self.queue.get(
-                timeout=self.timeout)
+            args = self.queue.get(timeout=self.timeout)
         except queue.Empty:
             if self.thread.is_alive():
                 raise RuntimeError(
