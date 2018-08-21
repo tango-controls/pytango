@@ -15,7 +15,6 @@ and is even likely to crash the device (!)
 
 from distutils.spawn import find_executable
 from subprocess import Popen
-import platform
 from time import sleep
 
 import psutil
@@ -106,19 +105,15 @@ device_proxy_map = {
 def get_ports(pid):
     p = psutil.Process(pid)
     conns = p.connections(kind="tcp")
-    # Sorting by family in order to make any IPv6 address go first.
-    # Otherwise there's a 50% chance that the proxy will just
-    # hang (presumably because it's connecting on the wrong port)
-    # This works on my machine, not sure if it's a general
-    # solution though.
     conns = reversed(sorted(conns, key=lambda c: c.family))
-    return [c.laddr[1] for c in conns]
+    # For some reasons, a port on 0.0.0.0 is available, let's discard it
+    return [c.laddr[1] for c in conns if c.laddr[0] != '0.0.0.0']
 
 
-def start_server(server, inst, device):
+def start_server(host, server, inst, device):
     exe = find_executable(server)
-    cmd = ("{0} {1} -ORBendPoint giop:tcp::0 -nodb -dlist {2}"
-           .format(exe, inst, device))
+    cmd = ("{0} {1} -ORBendPoint giop:tcp:{2}:0 -nodb -dlist {3}"
+           .format(exe, inst, host, device))
     proc = Popen(cmd.split())
     proc.poll()
     return proc
@@ -157,8 +152,8 @@ def tango_test(request):
     server = "TangoTest"
     inst = "test"
     device = "sys/tg_test/17"
-    host = platform.node()
-    proc = start_server(server, inst, device)
+    host = 'localhost'
+    proc = start_server(host, server, inst, device)
     proxy = wait_for_proxy(host, proc, device, green_mode)
 
     yield proxy
