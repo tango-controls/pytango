@@ -246,7 +246,10 @@ namespace PyDeviceAttribute
 
         Tango::DevVarCharArray& r_encoded_data_array = r_buffer.encoded_data;
         char* r_ch_ptr = (char*)r_encoded_data_array.get_buffer();
-        bopy::str r_encoded_data(r_ch_ptr, r_encoded_data_array.length());
+
+        bopy::object r_encoded_data(
+            bopy::handle<>(PyBytes_FromStringAndSize(
+                r_ch_ptr, r_encoded_data_array.length())));
 
         py_value.attr(value_attr_name) =
             bopy::make_tuple(r_encoded_format, r_encoded_data);
@@ -268,7 +271,11 @@ namespace PyDeviceAttribute
 
                 Tango::DevVarCharArray& w_encoded_data_array = w_buffer.encoded_data;
                 char* w_ch_ptr = (char*)w_encoded_data_array.get_buffer();
-                bopy::str w_encoded_data(w_ch_ptr, w_encoded_data_array.length());
+
+                bopy::object w_encoded_data(
+                    bopy::handle<>(PyBytes_FromStringAndSize(
+                        w_ch_ptr, w_encoded_data_array.length())));
+
                 py_value.attr(w_value_attr_name) =
                     bopy::make_tuple(w_encoded_format, w_encoded_data);
             }

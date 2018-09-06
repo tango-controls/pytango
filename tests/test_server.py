@@ -5,7 +5,7 @@ import textwrap
 import pytest
 import enum
 
-from tango import DevState, AttrWriteType, GreenMode, DevFailed
+from tango import DevState, AttrWriteType, GreenMode, DevFailed, DevEncoded
 from tango.server import Device
 from tango.server import command, attribute, device_property
 from tango.test_utils import DeviceTestContext, assert_close, \
@@ -392,3 +392,19 @@ def test_get_enum_labels_success(good_enum):
 def test_get_enum_labels_fail(bad_enum):
     with pytest.raises(EnumTypeError):
         get_enum_labels(bad_enum)
+
+
+# DevEncoded
+
+def test_read_write_dev_encoded(server_green_mode):
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        @attribute(dtype=DevEncoded,
+                   access=AttrWriteType.READ)
+        def attr(self):
+            return ("uint8", b"\xd2\xd3")
+
+    with DeviceTestContext(TestDevice) as proxy:
+        assert proxy.attr == ("uint8", b"\xd2\xd3")
