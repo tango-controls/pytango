@@ -136,7 +136,7 @@ html_context = {
            # 'https://media.readthedocs.org/css/sphinx_rtd_theme.css',
            # 'https://media.readthedocs.org/css/readthedocs-doc-embed.css',
            # '_static/jssor.css',
-           '_static/tango_cs_theme.css',
+           '_static/css/tango_cs_theme.css',
         ],
     }
 
