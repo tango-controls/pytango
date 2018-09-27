@@ -94,7 +94,7 @@ def __Util__create_device(self, klass_name, device_name, alias=None, cb=None):
     try:
         db.import_device(device_name)
     except DevFailed as df:
-        device_exists = not df[0].reason == "DB_DeviceNotDefined"
+        device_exists = not df.args[0].reason == "DB_DeviceNotDefined"
 
     # 1 - Make sure device name doesn't exist already in the database
     if device_exists:
@@ -169,7 +169,7 @@ def __Util__delete_device(self, klass_name, device_name):
     try:
         db.import_device(device_name)
     except DevFailed as df:
-        device_exists = not df[0].reason == "DB_DeviceNotDefined"
+        device_exists = not df.args[0].reason == "DB_DeviceNotDefined"
 
     # 1 - Make sure device name exists in the database
     if not device_exists:
