@@ -323,3 +323,111 @@ examples of what you can return in a server as a read request from a pipe::
       {'name': '2DE', 'value': (3,4,5,6), 'dtype': ('int32',) },
      )
     )
+
+
+.. _pytango-devenum-data-types:
+
+DevEnum pythonic usage
+----------------------
+
+When using regular tango DeviceProxy and AttributeProxy DevEnum is treated just
+like in cpp tango (see `enumerated attributes
+<https://tango-controls.readthedocs.io/en/latest/development/device-api/enumerated-attribute.html>`_
+for more info). However, since PyTango >= 9.2.5 there is a more pythonic way of
+using DevEnum data types if you use the :ref:`high level API <pytango-hlapi>`,
+both in server and client side.
+
+In server side you can use python :py:obj:`enum.IntEnum` class to deal with
+DevEnum attributes::
+
+    import time
+    from enum import IntEnum
+    from tango import AttrWriteType
+    from tango.server import Device, attribute, command
+
+
+    class Noon(IntEnum):
+        AM = 0  # DevEnum's must start at 0
+        PM = 1  # and increment by 1
+
+
+    class DisplayType(IntEnum):
+        ANALOG = 0  # DevEnum's must start at 0
+        DIGITAL = 1  # and increment by 1
+
+
+    class Clock(Device):
+
+        display_type = DisplayType(0)
+
+        @attribute(dtype=float)
+        def time(self):
+            return time.time()
+
+        gmtime = attribute(dtype=(int,), max_dim_x=9)
+
+        def read_gmtime(self):
+            return time.gmtime()
+
+        @attribute(dtype=Noon)
+        def noon(self):
+            time_struct = time.gmtime(time.time())
+            return Noon.AM if time_struct.tm_hour < 12 else Noon.PM
+
+        display = attribute(dtype=DisplayType, access=AttrWriteType.READ_WRITE)
+
+        def read_display(self):
+            return self.display_type
+
+        def write_display(self, display_type):
+            self.display_type = display_type
+
+        @command(dtype_in=float, dtype_out=str)
+        def ctime(self, seconds):
+            """
+            Convert a time in seconds since the Epoch to a string in local time.
+            This is equivalent to asctime(localtime(seconds)). When the time tuple
+            is not present, current time as returned by localtime() is used.
+            """
+            return time.ctime(seconds)
+
+        @command(dtype_in=(int,), dtype_out=float)
+        def mktime(self, tupl):
+            return time.mktime(tupl)
+
+
+    if __name__ == "__main__":
+        Clock.run_server()
+
+
+On the client side you can also use a pythonic approach for using DevEnum attributes::
+
+    import sys
+    import PyTango
+
+    if len(sys.argv) != 2:
+        print("must provide one and only one clock device name")
+        sys.exit(1)
+
+    clock = PyTango.DeviceProxy(sys.argv[1])
+    t = clock.time
+    gmt = clock.gmtime
+    noon = clock.noon
+    display = clock.display
+    print(t)
+    print(gmt)
+    print(noon, noon.name, noon.value)
+    if noon == noon.AM:
+        print('Good morning!')
+    print(clock.ctime(t))
+    print(clock.mktime(gmt))
+    print(display, display.name, display.value)
+    clock.display = display.ANALOG
+    clock.display = 'DIGITAL'  # you can use a valid string to set the value
+    print(clock.display, clock.display.name, clock.display.value)
+    display_type = type(display)  # or even create your own IntEnum type
+    analog = display_type(0)
+    clock.display = analog
+    print(clock.display, clock.display.name, clock.display.value)
+    clock.display = clock.display.DIGITAL
+    print(clock.display, clock.display.name, clock.display.value)

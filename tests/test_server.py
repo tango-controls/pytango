@@ -187,6 +187,19 @@ def test_read_write_attribute_enum(server_green_mode):
             assert isinstance(read_attr, enum.IntEnum)
             assert read_attr.value == value
             assert read_attr.name == label
+        for value, label in zip(values, enum_labels):
+            proxy.attr_from_enum = label
+            read_attr = proxy.attr_from_enum
+            assert read_attr == value
+            assert isinstance(read_attr, enum.IntEnum)
+            assert read_attr.value == value
+            assert read_attr.name == label
+            proxy.attr_from_labels = label
+            read_attr = proxy.attr_from_labels
+            assert read_attr == value
+            assert isinstance(read_attr, enum.IntEnum)
+            assert read_attr.value == value
+            assert read_attr.name == label
 
     with pytest.raises(TypeError) as context:
         class BadTestDevice(Device):
