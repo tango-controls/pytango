@@ -408,3 +408,28 @@ def test_read_write_dev_encoded(server_green_mode):
 
     with DeviceTestContext(TestDevice) as proxy:
         assert proxy.attr == ("uint8", b"\xd2\xd3")
+
+# Test Exception propagation
+
+def test_exeption_propagation(server_green_mode):
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        @attribute
+        def attr(self):
+            1/0
+
+        @command
+        def cmd(self):
+            1/0
+
+    with DeviceTestContext(TestDevice) as proxy:
+        with pytest.raises(DevFailed) as record:
+            proxy.attr
+        assert "ZeroDivisionError" in record.value.args[0].desc
+
+        with pytest.raises(DevFailed) as record:
+            proxy.cmd()
+        assert "ZeroDivisionError" in record.value.args[0].desc
+
