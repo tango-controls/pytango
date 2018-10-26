@@ -400,14 +400,23 @@ def test_read_write_dev_encoded(server_green_mode):
 
     class TestDevice(Device):
         green_mode = server_green_mode
+        attr_value = ("uint8", b"\xd2\xd3")
 
         @attribute(dtype=DevEncoded,
-                   access=AttrWriteType.READ)
+                   access=AttrWriteType.READ_WRITE)
         def attr(self):
-            return ("uint8", b"\xd2\xd3")
+            return self.attr_value
+
+        @attr.write
+        def attr(self, value):
+            self.attr_value = value
 
     with DeviceTestContext(TestDevice) as proxy:
         assert proxy.attr == ("uint8", b"\xd2\xd3")
+
+        proxy.attr = ('uint8', b'\xde')
+        assert proxy.attr == ("uint8", b"\xde")
+
 
 # Test Exception propagation
 
@@ -418,18 +427,17 @@ def test_exeption_propagation(server_green_mode):
 
         @attribute
         def attr(self):
-            1/0 # pylint: disable=pointless-statement
+            1 / 0  # pylint: disable=pointless-statement
 
         @command
         def cmd(self):
-            1/0 # pylint: disable=pointless-statement
+            1 / 0  # pylint: disable=pointless-statement
 
     with DeviceTestContext(TestDevice) as proxy:
         with pytest.raises(DevFailed) as record:
-            proxy.attr # pylint: disable=pointless-statement
+            proxy.attr  # pylint: disable=pointless-statement
         assert "ZeroDivisionError" in record.value.args[0].desc
 
         with pytest.raises(DevFailed) as record:
             proxy.cmd()
         assert "ZeroDivisionError" in record.value.args[0].desc
-
