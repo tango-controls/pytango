@@ -418,15 +418,15 @@ def test_exeption_propagation(server_green_mode):
 
         @attribute
         def attr(self):
-            1/0
+            1/0 # pylint: disable=pointless-statement
 
         @command
         def cmd(self):
-            1/0
+            1/0 # pylint: disable=pointless-statement
 
     with DeviceTestContext(TestDevice) as proxy:
         with pytest.raises(DevFailed) as record:
-            proxy.attr
+            proxy.attr # pylint: disable=pointless-statement
         assert "ZeroDivisionError" in record.value.args[0].desc
 
         with pytest.raises(DevFailed) as record:
