@@ -226,6 +226,11 @@ struct StdString_from_python_str_unicode
     }
 };
 
+void* convert_to_cstring(PyObject* obj)
+{
+    return PyBytes_Check(obj) ? PyBytes_AsString(obj) : 0;
+}
+
 int raise_asynch_exception(long thread_id, boost::python::object exp_klass)
 {
     return PyThreadState_SetAsyncExc(thread_id, exp_klass.ptr());
@@ -233,6 +238,11 @@ int raise_asynch_exception(long thread_id, boost::python::object exp_klass)
 
 void export_base_types()
 {
+#if PY_VERSION_HEX > 0x03000000
+    // Add missing convert from python bytes to char *
+    converter::registry::insert(convert_to_cstring,type_id<char>(),&converter::wrap_pytype<&PyBytes_Type>::get_pytype);
+#endif
+
     enum_<PyTango::ExtractAs>("ExtractAs")
         .value("Numpy", PyTango::ExtractAsNumpy)
         .value("ByteArray", PyTango::ExtractAsByteArray)
