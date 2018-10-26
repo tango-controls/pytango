@@ -143,6 +143,7 @@ Tango::DevFailed to_dev_failed(PyObject *type, PyObject *value,
         (type == Py_None) || (value == Py_None) || (traceback == Py_None))
     {
         PyErr_Fetch(&type, &value, &traceback);
+        PyErr_NormalizeException(&type, &value, &traceback);
         from_fetch = true;
     }
 
