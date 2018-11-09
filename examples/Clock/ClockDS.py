@@ -16,6 +16,7 @@ commands:
 
 import time
 from enum import IntEnum
+from tango import AttrWriteType
 from tango.server import Device, attribute, command
 
 
@@ -24,7 +25,14 @@ class Noon(IntEnum):
     PM = 1  # and increment by 1
 
 
+class DisplayType(IntEnum):
+    ANALOG = 0  # DevEnum's must start at 0
+    DIGITAL = 1  # and increment by 1
+
+
 class Clock(Device):
+
+    display_type = DisplayType(0)
 
     @attribute(dtype=float)
     def time(self):
@@ -39,6 +47,14 @@ class Clock(Device):
     def noon(self):
         time_struct = time.gmtime(time.time())
         return Noon.AM if time_struct.tm_hour < 12 else Noon.PM
+
+    display = attribute(dtype=DisplayType, access=AttrWriteType.READ_WRITE)
+
+    def read_display(self):
+        return self.display_type
+
+    def write_display(self, display_type):
+        self.display_type = display_type
 
     @command(dtype_in=float, dtype_out=str)
     def ctime(self, seconds):

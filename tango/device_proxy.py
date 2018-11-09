@@ -251,6 +251,21 @@ def __get_attribute_value(self, attr_info, name):
         return attr_value
 
 
+def __set_attribute_value(self, name, value):
+    attr_info = self.__get_attr_cache().get(name.lower())
+    if attr_info:
+        # allow writing DevEnum attributes using string values
+        _, enum_class = attr_info
+        if enum_class and is_pure_str(value):
+            try:
+                value = enum_class[value]
+            except KeyError:
+                raise AttributeError(
+                    'Invalid enum value %s for attribute %s. Valid ones: %s' %
+                    (value, name, [m for m in enum_class.__members__.keys()]))
+    return self.write_attribute(name, value)
+
+
 def __DeviceProxy__getattr(self, name):
     # trait_names is a feature of IPython. Hopefully they will solve
     # ticket http://ipython.scipy.org/ipython/ipython/ticket/229 someday
@@ -307,7 +322,7 @@ def __DeviceProxy__setattr(self, name, value):
         raise TypeError('Cannot set the value of a command')
 
     if name_l in self.__get_attr_cache():
-        return self.write_attribute(name, value)
+        return __set_attribute_value(self, name, value)
 
     if name_l in self.__get_pipe_cache():
         return self.write_pipe(name, value)
@@ -326,7 +341,7 @@ def __DeviceProxy__setattr(self, name, value):
         pass
 
     if name_l in self.__get_attr_cache():
-        return self.write_attribute(name, value)
+        return __set_attribute_value(self, name, value)
 
     try:
         self.__refresh_pipe_cache()
