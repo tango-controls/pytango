@@ -74,9 +74,9 @@ def use_cursor(f):
     return wrap
 
 
-class Tango_dbapi2(object):
+class SqlDatabase(object):
 
-    DB_API_NAME = 'sqlite3'
+    DB_API_NAME = 'sqlite3'  # Default implementation
 
     def __init__(self, db_name="tango_database.db", history_depth=10, fire_to_starter=True):
         self._db_api = None
@@ -1558,18 +1558,21 @@ class Tango_dbapi2(object):
                 hosts.append(previous_host)
             self.send_starter_cmd(hosts)
 
-   
-class sqlite3(Tango_dbapi2):
+
+class Sqlite3Database(SqlDatabase):
 
     DB_API_NAME = 'sqlite3'
 
+
 def main():
-    db = Tango_sqlite3()
+    db = Sqlite3Database()
     db.add_device("MyServer/my1", ("a/b/c", ("a", "b", "c")), "MyClass")
     db.close_db()
 
+
 def get_db(**keys):
-    return Executor.submit(sqlite3).result()
+    return Executor.submit(Sqlite3Database).result()
+
 
 if __name__ == "__main__":
     main()
