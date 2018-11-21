@@ -3,18 +3,16 @@ from __future__ import print_function
 import os
 import logging
 import functools
-import threading
-import Queue
-
-import tango
-
-th_exc = tango.Except.throw_exception
-
-from db_errors import *
 
 from concurrent.futures import ThreadPoolExecutor
 
+import tango
+from tango.databaseds.db_errors import *
+
+
+th_exc = tango.Except.throw_exception
 Executor = ThreadPoolExecutor(1)
+
 
 def get_create_db_statements():
     statements = []
