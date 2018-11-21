@@ -40,6 +40,7 @@ def get_create_db_statements():
 
     return statements
 
+
 def replace_wildcard(text):
     # escape '%' with '\'
     text = text.replace("%", "\\%")
@@ -52,6 +53,7 @@ def replace_wildcard(text):
     # replace '*' with '%'
     text = text.replace("*", "%")
     return text
+
 
 def use_cursor(f):
     @functools.wraps(f)
@@ -184,8 +186,8 @@ class Tango_dbapi2(object):
                 name = name[0:pos]
             dev = tango.DeviceProxy(name)
             dev.UpdateServersInfo()
-            
-            
+
+
 
     # TANGO API
 
@@ -399,7 +401,7 @@ class Tango_dbapi2(object):
         cursor = self.cursor
         do_fire = False
         previous_host = None
-        
+
         if self.fire_to_starter:
             if dev_name[0:8] == "dserver/":
                 # Get database server name
@@ -503,7 +505,7 @@ class Tango_dbapi2(object):
         for attribute in attributes:
             cursor.execute(stmt, (class_name, attribute))
             rows = cursor.fetchall()
-            result.append(attribute) 
+            result.append(attribute)
             j = 0
             new_prop = True
             nb_props = 0
@@ -531,7 +533,7 @@ class Tango_dbapi2(object):
                     prop_size = 1
                 else:
                     prop_size = prop_size + 1
-                    
+
             result.append(str(nb_props))
             j = 0
             k = 0
@@ -548,20 +550,20 @@ class Tango_dbapi2(object):
     def get_class_attribute_property_hist(self, class_name, attribute, prop_name):
         cursor = self.cursor
         stmt = 'SELECT  DISTINCT id FROM property_attribute_class_hist WHERE class=? AND attribute LIKE ? AND name LIKE ? ORDER by date ASC'
-        
+
         result = []
-        
+
         cursor.execute(stmt, (class_name, attribute, prop_name))
-        
+
         for row in cursor.fetchall():
             idr = row[0]
-        
+
             stmt = 'SELECT DATE_FORMAT(date,\'%Y-%m-%d %H:%i:%s\'),value,attribute,name,count FROM property_attribute_class_hist WHERE id =? AND class =?'
-            
+
             cursor.execute(stmt, (idr, class_name))
-        
+
             rows = cursor.fetchall()
-        
+
             result.append(rows[2])
             result.append(rows[3])
             result.append(rows[0])
@@ -596,7 +598,7 @@ class Tango_dbapi2(object):
 
 
     @use_cursor
-    def get_class_property(self, class_name, properties):        
+    def get_class_property(self, class_name, properties):
         cursor = self.cursor
         stmt = 'SELECT count,value FROM property_class WHERE class=? AND name LIKE ? ORDER BY count'
         result.append(class_name)
@@ -609,33 +611,33 @@ class Tango_dbapi2(object):
             for row in rows:
                 result.append(row[1])
         return result
-        
+
     @use_cursor
     def get_class_property_hist(self, class_name, prop_name):
         cursor = self.cursor
         stmt = 'SELECT  DISTINCT id FROM property_class_hist WHERE class=? AND AND name LIKE ? ORDER by date ASC'
-        
+
         result = []
-        
+
         cursor.execute(stmt, (class_name, prop_name))
-        
+
         for row in cursor.fetchall():
             idr = row[0]
-        
+
             stmt = 'SELECT DATE_FORMAT(date,\'%Y-%m-%d %H:%i:%s\'),value,name,count FROM property_class_hist WHERE id =? AND class =?'
-            
+
             cursor.execute(stmt, (idr, class_name))
-        
+
             rows = cursor.fetchall()
-        
+
             result.append(rows[2])
             result.append(rows[0])
             result.append(str(rows[3]))
             for value in rows[1]:
                 result.append(value)
 
-        return result      
-        
+        return result
+
     @use_cursor
     def get_class_property_list(self, class_name):
         cursor = self.cursor
@@ -683,17 +685,17 @@ class Tango_dbapi2(object):
             for row in rows:
                 result.append(row[0])
                 result.append(row[1])
-        return result  
+        return result
 
     @use_cursor
     def get_device_attribute_property2(self, dev_name, attributes):
         cursor = self.cursor
-        stmt = 'SELECT name,value FROM property_attribute_device WHERE device=? AND attribute LIKE ? ORDER BY name,count' 
+        stmt = 'SELECT name,value FROM property_attribute_device WHERE device=? AND attribute LIKE ? ORDER BY name,count'
         result = [dev_name, str(len(attributes))]
         for attribute in attributes:
             cursor.execute(stmt, (dev_name, attribute))
             rows = cursor.fetchall()
-            result.append(attribute) 
+            result.append(attribute)
             j = 0
             new_prop = True
             nb_props = 0
@@ -721,7 +723,7 @@ class Tango_dbapi2(object):
                     prop_size = 1
                 else:
                     prop_size = prop_size + 1
-                    
+
             result.append(str(nb_props))
             j = 0
             k = 0
@@ -738,20 +740,20 @@ class Tango_dbapi2(object):
     def get_device_attribute_property_hist(self, dev_name, attribute, prop_name):
         cursor = self.cursor
         stmt = 'SELECT  DISTINCT id FROM property_attribute_device_hist WHERE device=? AND attribute LIKE ? AND name LIKE ? ORDER by date ASC'
-        
+
         result = []
-        
+
         cursor.execute(stmt, (dev_name, attribute, prop_name))
-        
+
         for row in cursor.fetchall():
             idr = row[0]
-        
+
             stmt = 'SELECT DATE_FORMAT(date,\'%Y-%m-%d %H:%i:%s\'),value,attribute,name,count FROM property_attribute_device_hist WHERE id =? AND device =? ORDER BY count ASC'
-            
+
             cursor.execute(stmt, (idr, class_name))
-        
+
             rows = cursor.fetchall()
-        
+
             result.append(rows[2])
             result.append(rows[3])
             result.append(rows[0])
@@ -761,7 +763,7 @@ class Tango_dbapi2(object):
 
         return result
 
-    
+
     @use_cursor
     def get_device_class_list(self, server_name):
         cursor = self.cursor
@@ -771,7 +773,7 @@ class Tango_dbapi2(object):
         for row in cursor.fetchall():
             result.append(row[0])
             result.append(row[1])
-        
+
         return result
 
     @use_cursor
@@ -781,21 +783,21 @@ class Tango_dbapi2(object):
                        (wildcard,wildcard))
         return [ row[0] for row in cursor.fetchall() ]
 
-   
+
     @use_cursor
     def get_device_exported_list(self, wildcard):
         cursor = self.cursor
         cursor.execute('SELECT DISTINCT name FROM device WHERE (name LIKE ? OR alias LIKE ?) AND exported=1 ORDER BY name',
                        (wildcard,wildcard))
-        return [ row[0] for row in cursor.fetchall() ]   
+        return [ row[0] for row in cursor.fetchall() ]
 
     @use_cursor
     def get_device_family_list(self, wildcard):
         cursor = self.cursor
         cursor.execute('SELECT DISTINCT family FROM device WHERE name LIKE ? OR alias LIKE ? ORDER BY family',
                        (wildcard,wildcard))
-        return [ row[0] for row in cursor.fetchall() ]   
-    
+        return [ row[0] for row in cursor.fetchall() ]
+
     @use_cursor
     def get_device_info(self, dev_name):
         cursor = self.cursor
@@ -816,13 +818,13 @@ class Tango_dbapi2(object):
             result_str.append(str(raw[2]))
             result_str.append(str(raw[4]))
             result_str.append(str(raw[5]))
-           
+
             for i in range(0,2):
                 cursor.execute('SELECT DATE_FORMAT(?,\'%D-%M-%Y at %H:%i:%s\')', raw[6 + i])
                 tmp_date = cursor.fetchone()
                 if tmp_date == None:
                     result_str.append("?")
-                else:               
+                else:
                     result_str.append(str(tmp_date))
 
             for i in range(0,2):
@@ -838,22 +840,22 @@ class Tango_dbapi2(object):
         cursor.execute('SELECT DISTINCT name FROM device WHERE server LIKE ? AND class LIKE ? ORDER BY name',
                        (server_name, class_name))
         return [ row[0] for row in cursor.fetchall() ]
-    
+
     @use_cursor
     def get_device_wide_list(self, wildcard):
         cursor = self.cursor
         cursor.execute('SELECT DISTINCT name FROM device WHERE name LIKE ? ORDER BY name',
                        (wildcard,))
         return [ row[0] for row in cursor.fetchall() ]
-    
+
     @use_cursor
     def get_device_member_list(self, wildcard):
         cursor = self.cursor
         cursor.execute('SELECT DISTINCT  member FROM device WHERE name LIKE ? ORDER BY member',
                        (wildcard,))
-        return [ row[0] for row in cursor.fetchall() ]    
+        return [ row[0] for row in cursor.fetchall() ]
 
-    
+
     @use_cursor
     def get_device_property(self, dev_name, properties):
         cursor = self.cursor
@@ -870,17 +872,17 @@ class Tango_dbapi2(object):
             result.append(str(len(rows)))
             for row in rows:
                 result.append(row[1])
-        return result    
+        return result
 
     @use_cursor
     def get_device_property_hist(self, device_name, prop_name):
         cursor = self.cursor
         stmt = 'SELECT  DISTINCT id FROM property_device_hist WHERE device=? AND name LIKE ? ORDER by date ASC'
-        
+
         result = []
-	
+
         tmp_name   = replace_wildcard(prop_name);
-        
+
         cursor.execute(stmt, (class_name, device_name, tmp_name))
 
         stmt = 'SELECT DATE_FORMAT(date,\'%Y-%m-%d %H:%i:%s\'),value,name,count FROM property_device_hist WHERE id =? AND device =? ORDER BY count ASC'
@@ -903,40 +905,40 @@ class Tango_dbapi2(object):
         cursor.execute('SELECT DISTINCT  class FROM device WHERE server LIKE ? ORDER BY class',
                        (sever_name,))
         return [ row[0] for row in cursor.fetchall() ]
-   
+
     @use_cursor
     def get_exported_device_list_for_class(self, class_name):
         cursor = self.cursor
         cursor.execute('SELECT  DISTINCT name FROM device WHERE class LIKE ? AND exported=1 ORDER BY name',
                        (class_name,))
-        return [ row[0] for row in cursor.fetchall() ]   
-    
+        return [ row[0] for row in cursor.fetchall() ]
+
     @use_cursor
     def get_host_list(self, host_name):
         cursor = self.cursor
         cursor.execute('SELECT DISTINCT host FROM device WHERE host LIKE ?  ORDER BY host',
                        (host_name,))
-        return [ row[0] for row in cursor.fetchall() ]       
-    
+        return [ row[0] for row in cursor.fetchall() ]
+
     @use_cursor
     def get_host_server_list(self, host_name):
         cursor = self.cursor
         cursor.execute('SELECT DISTINCT server FROM device WHERE host LIKE ?  ORDER BY server',
                        (host_name,))
-        return [ row[0] for row in cursor.fetchall() ]     
-     
-     
+        return [ row[0] for row in cursor.fetchall() ]
+
+
     def get_host_servers_info(self, host_name):
         servers = self.get_host_server_list(host_name)
         result = []
         for server in servers:
             result.append(server)
             info = self.get_server_info(server)
-            result.append(info[2]) 
+            result.append(info[2])
             result.append(info[3])
         return result
 
-     
+
     def get_instance_name_list(self, server_name):
         server_name = server_name + "\*"
         server_list = self.get_server_list(server_name)
@@ -958,7 +960,7 @@ class Tango_dbapi2(object):
         cursor = self.cursor
         result = []
         result.append(object_name)
-        result.append(str(len(properties))) 
+        result.append(str(len(properties)))
         stmt = 'SELECT count,value,name FROM property WHERE object LIKE ?  AND name LIKE ? ORDER BY count'
         for prop_name in properties:
             result.append(prop_name)
@@ -979,15 +981,15 @@ class Tango_dbapi2(object):
     def get_property_hist(self, object_name, prop_name):
         cursor = self.cursor
         result = []
-        
-        stmt = 'SELECT  DISTINCT id FROM property_hist WHERE object=? AND name LIKE ? ORDER by date'        
-        prop_name = replace_wildcard(prop_name)        
+
+        stmt = 'SELECT  DISTINCT id FROM property_hist WHERE object=? AND name LIKE ? ORDER by date'
+        prop_name = replace_wildcard(prop_name)
         cursor.execute(stmt, (object_name, prop_name))
 
         stmt = 'SELECT DATE_FORMAT(date,\'%Y-%m-%d %H:%i:%s\'),value,name,count FROM property_hist WHERE id =? AND object =?'
         for row in cursor.fetchall():
             idr = row[0]
-            
+
             cursor.execute(stmt, (idr, object_name))
             rows = cursor.fetchall()
             count = len(rows)
@@ -1024,9 +1026,9 @@ class Tango_dbapi2(object):
             result.append(row[0])
             result.append(row[1])
             result.append(row[2])
-            
+
         return result
-     
+
     @use_cursor
     def get_server_list(self, wildcard):
         cursor = self.cursor
@@ -1078,8 +1080,8 @@ class Tango_dbapi2(object):
             result_long.append(row[0])
             result_long.append(row[3])
         result = (result_long, result_str)
-        return result    
-     
+        return result
+
     @use_cursor
     def import_event(self, event_name):
         cursor = self.cursor
@@ -1105,7 +1107,7 @@ class Tango_dbapi2(object):
         result = (result_long, result_str)
         return result
 
-     
+
     @use_cursor
     def info(self):
         cursor = self.cursor
@@ -1185,9 +1187,9 @@ class Tango_dbapi2(object):
         row = cursor.fetchone()
         info_str = info_str + " [History lgth = " + str(row[0]) + "]"
         result.append(info_str)
-        
+
         return result
-         
+
     @use_cursor
     def put_attribute_alias(self, attribute_name, attribute_alias):
         cursor = self.cursor
@@ -1214,9 +1216,9 @@ class Tango_dbapi2(object):
         tmp_device = tmp_names[0] + "/" + tmp_names[1] + "/" + tmp_names[2]
         tmp_attribute = tmp_names[3]
         cursor.execute('INSERT attribute_alias SET alias=? ,name=?, device=?,updated=NOW()',
-                       (attribute_alias, tmp_device, tmp_attribute)) 
+                       (attribute_alias, tmp_device, tmp_attribute))
 
-         
+
     @use_cursor
     def put_class_attribute_property(self, class_name, nb_attributes, attr_prop_list):
         cursor = self.cursor
@@ -1265,7 +1267,7 @@ class Tango_dbapi2(object):
                     self.purge_att_property("property_attribute_class_hist", "class",
                                             class_name, tmp_attribute, tmp_name, cursor=cursor)
                 k = k + n_rows + 2
-            k = k + 2    
+            k = k + 2
 
     @use_cursor
     def put_class_property(self, class_name, nb_properties, attr_prop_list):
@@ -1305,7 +1307,7 @@ class Tango_dbapi2(object):
                    "DataBase::DbPutDeviceAlias()")
         # update the new value for this tuple
         cursor.execute('UPDATE device SET alias=? ,started=NOW() where name LIKE ?',
-                       (device_alias, device_name)) 
+                       (device_alias, device_name))
 
     @use_cursor
     def put_device_attribute_property(self, device_name, nb_attributes, attr_prop_list):
@@ -1327,7 +1329,7 @@ class Tango_dbapi2(object):
 
                 self.purge_att_property("property_attribute_device_hist", "device",
                                          device_name, tmp_attribute, tmp_name, cursor=cursor)
-            k = k + nb_properties*2+2         
+            k = k + nb_properties*2+2
 
 
     @use_cursor
@@ -1356,7 +1358,7 @@ class Tango_dbapi2(object):
                     self.purge_att_property("property_attribute_device_hist", "device",
                                             device_name, tmp_attribute, tmp_name, cursor=cursor)
                 k = k + n_rows + 2
-            k = k + 2    
+            k = k + 2
 
     @use_cursor
     def put_device_property(self, device_name, nb_properties, attr_prop_list):
@@ -1406,14 +1408,14 @@ class Tango_dbapi2(object):
 
     @use_cursor
     def put_server_info(self, tmp_server, tmp_host, tmp_mode, tmp_level, tmp_extra):
-        cursor = self.cursor         
+        cursor = self.cursor
          # If it is an empty host name -> get previous host where running
         previous_host = ""
         if self.fire_to_starter:
             if tmp_host == "":
                 adm_dev_name = "dserver/" + tmp_server
                 previous_host = self.get_device_host(adm_dev_name)
-        # first delete the server from the server table         
+        # first delete the server from the server table
         cursor.execute('DELETE FROM server WHERE name=?', (tmp_server,))
         # insert the new info for this server
         cursor.execute('INSERT INTO server SET name=? ,host=? ,mode=? ,level=?', ( tmp_server, tmp_host, tmp_mode, tmp_level))
@@ -1425,31 +1427,31 @@ class Tango_dbapi2(object):
             else:
                 hosts.append(previous_host)
             self.send_starter_cmd(hosts)
-                 
+
     @use_cursor
     def uexport_device(self, dev_name):
-        cursor = self.cursor         
+        cursor = self.cursor
         self._info("un-export device(dev_name=%s)", dev_name)
         cursor.execute('UPDATE device SET exported=0,stopped=NOW() WHERE name LIKE ?', (dev_name,))
-        
+
     @use_cursor
     def uexport_event(self, event_name):
-        cursor = self.cursor         
+        cursor = self.cursor
         self._info("un-export event (event_name=%s)", event_name)
         cursor.execute('UPDATE event SET exported=0,stopped=NOW() WHERE name LIKE ?', (event_name,))
-                               
+
     @use_cursor
     def uexport_server(self, server_name):
-        cursor = self.cursor         
+        cursor = self.cursor
         self._info("un-export all devices from server ", server_name)
         cursor.execute('UPDATE device SET exported=0,stopped=NOW() WHERE server LIKE ?', (server_name,))
-        
+
     @use_cursor
     def delete_all_device_attribute_property(self, dev_name, attr_list):
-        cursor = self.cursor  
+        cursor = self.cursor
         for attr_name in attr_list:
             self._info("_delete_all_device_attribute_property(): delete device %s attribute %s property(ies) from database", dev_name, attr_name)
-             #Is there something to delete ?   
+             #Is there something to delete ?
             cursor.execute('SELECT DISTINCT name FROM property_attribute_device WHERE device =? AND attribute = ?', (dev_name,attr_name))
             rows = cursor.fetchall()
             if len(rows) != 0:
@@ -1460,7 +1462,7 @@ class Tango_dbapi2(object):
                 cursor.execute('INSERT INTO property_attribute_device_hist SET device=?,attribute=?,name=?,id=?,count=\'0\',value=\'DELETED\'', (dev_name,attr_name,row[0], hist_id))
                 self.purge_att_property("property_attribute_device_hist", "device",
                                          dev_name, attr_name, row[0], cursor=cursor)
-                
+
     @use_cursor
     def my_sql_select(self, cmd):
         cursor = self.cursor
@@ -1479,12 +1481,12 @@ class Tango_dbapi2(object):
                     if field != None:
                         result_str.append(str(field))
                         result_long.append(1)
-                    else:                        
+                    else:
                         result_str.append("")
                         result_long.append(0)
         result_long.append(len(rows))
         result_long.append(nb_fields)
-                    
+
         result = (result_long, result_str)
         return result
 
@@ -1493,22 +1495,22 @@ class Tango_dbapi2(object):
     @use_cursor
     def get_csdb_server_list(self):
         cursor = self.cursor
-        
+
         cursor.execute('SELECT DISTINCT ior FROM device WHERE exported=1 AND domain=\'sys\' AND family=\'database\'')
         return [ row[0] for row in cursor.fetchall() ]
-     
+
     @use_cursor
     def get_attribute_alias2(self, attr_name):
         cursor = self.cursor
-        cursor.execute('SELECT alias from attribute_alias WHERE name LIKE ? ',(attr_name,))        
+        cursor.execute('SELECT alias from attribute_alias WHERE name LIKE ? ',(attr_name,))
         return [ row[0] for row in cursor.fetchall() ]
-    
+
     @use_cursor
     def get_alias_attribute(self, alias_name):
         cursor = self.cursor
-        cursor.execute('SELECT name from attribute_alias WHERE alias LIKE ? ',(alias_name,))        
-        return [ row[0] for row in cursor.fetchall() ]     
-    
+        cursor.execute('SELECT name from attribute_alias WHERE alias LIKE ? ',(alias_name,))
+        return [ row[0] for row in cursor.fetchall() ]
+
     @use_cursor
     def rename_server(self, old_name, new_name):
         cursor = self.cursor
@@ -1520,7 +1522,7 @@ class Tango_dbapi2(object):
             th_exc(DB_SQLError,
                    "Device server process name " + attribute_alias + "is already used !",
                    "DataBase::DbRenameServer()")
-            
+
         # get host where running
         previous_host = ""
         if self.fire_to_starter:
@@ -1536,19 +1538,19 @@ class Tango_dbapi2(object):
         #  2 - Change the ds admin device name
         #  3 - Change admin device property (if any)
         #  4 - Change admin device attribute property (if any)
-     
+
         old_adm_name = "dserver/" + old_name
         tmp_new = new_name.split('/')
         new_exec = tmp_new[0]
-        new_inst = tmp_new[1]    
+        new_inst = tmp_new[1]
         new_adm_name = "dserver/" + new_name
-        
+
         cursor.execute('UPDATE device SET name =?, family =?, mamber =? WHERE name =?', (new_adm_name, new_exec, new_inst, old_adm_name))
-        
+
         cursor.execute('UPDATE property_device set device=? WHERE device=?', (new_adm_name, old_adm_name))
-        
+
         cursor.execute('UPDATE property_attribute_device set device=? WHERE device=?', (new_adm_name, old_adm_name))
-              
+
         #  Update host's starter to update controlled servers list
         if self.fire_to_starter:
             hosts = []
