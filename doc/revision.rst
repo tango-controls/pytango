@@ -101,6 +101,8 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 | 30/07/18 | `9.2.4 <http://pytango.readthedocs.io/en/v9.2.4>`_                               | 9.2.4 Release                                       | V\. Michel                     |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
+| 28/11/18 | `9.2.5 <http://pytango.readthedocs.io/en/v9.2.5>`_                               | 9.2.5 Release                                       | A\. Joubert                    |
++----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 
 .. _pytango-version-history:
 
@@ -110,6 +112,26 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
+| 9.2.5    | 9.2.5 release.                                                                                                                                                        |
+|          |                                                                                                                                                                       |
+|          | Changes:                                                                                                                                                              |
+|          |     - `Pull Request #212: Skip databaseds backends in PyTango compatibility module  <https://github.com/tango-controls/pytango/pull/212>`_                            |
+|          |     - `Pull Request #221: DevEnum attributes can now be directly assigned labels <https://github.com/tango-controls/pytango/pull/221>`_                               |
+|          |     - `Pull Request #236: Cleanup db_access module  <https://github.com/tango-controls/pytango/pull/236>`_                                                            |
+|          |     - `Pull Request #237: Add info about how to release a new version  <https://github.com/tango-controls/pytango/pull/237>`_                                         |
+|          |                                                                                                                                                                       |
+|          | Bug fixes:                                                                                                                                                            |
+|          |     - `Pull Request #209 (issue #207): Fix documentation warnings  <https://github.com/tango-controls/pytango/pull/209>`_                                             |
+|          |     - `Pull Request #211: Yet another fix to the gevent threadpool error wrapping  <https://github.com/tango-controls/pytango/pull/211>`_                             |
+|          |     - `Pull Request #214 (issue #213): DevEncoded attribute should produce a bytes object in python 3  <https://github.com/tango-controls/pytango/pull/214>`_         |
+|          |     - `Pull Request #219: Fixing icons in documentation  <https://github.com/tango-controls/pytango/pull/219>`_                                                       |
+|          |     - `Pull Request #220: Fix 'DevFailed' object does not support indexing <https://github.com/tango-controls/pytango/pull/220>`_                                     |
+|          |     - `Pull Request #225 (issue #215): Fix exception propagation in python 3  <https://github.com/tango-controls/pytango/pull/225>`_                                  |
+|          |     - `Pull Request #226 (issue #216): Add missing converter from python bytes to char*  <https://github.com/tango-controls/pytango/pull/226>`_                       |
+|          |     - `Pull Request #227: Gevent issue #1260 should be fixed by now  <https://github.com/tango-controls/pytango/pull/227>`_                                           |
+|          |     - `Pull Request #232: use special case-insensitive weak values dictionary for Tango nodes <https://github.com/tango-controls/pytango/pull/232>`_                  |
+|          |                                                                                                                                                                       |
++----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 9.2.4    | 9.2.4 release.                                                                                                                                                        |
 |          |                                                                                                                                                                       |
 |          | Changes:                                                                                                                                                              |
