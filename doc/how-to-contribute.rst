@@ -71,9 +71,9 @@ Pick a version number
     number should correspond the current development number since each
     release process finishes with a version bump.
   * Patch release example:
-      - ``9.2.5.devN`` or ``9.2.5aN`` or ``9.2.5bN`` (current development branch)
-      - changes to ``9.2.5`` (the actual release)
-      - changes to ``9.2.6.dev0`` (bump the patch version at the end of the release process)
+      - ``9.2.6.devN`` or ``9.2.6aN`` or ``9.2.6bN`` (current development branch)
+      - changes to ``9.2.6`` (the actual release)
+      - changes to ``9.2.7.dev0`` (bump the patch version at the end of the release process)
 
 Create an issue in Github
   * This is to inform the community that a release is planned.
@@ -97,10 +97,10 @@ Create an issue in Github
   * A check list is this form on github can be ticked off as the work progresses.
 
 Make a branch from ``develop`` to prepare the release
-  * Example branch name: ``prepare-v9.2.5``.
+  * Example branch name: ``prepare-v9.2.6``.
   * Edit the changelog (in ``docs/revision.rst``).  Include *all* pull requests
     since the previous release.
-  * Bump the versions in (in ``tango/release.py``).  E.g. ``version_info`` to (9, 2, 5)
+  * Bump the versions in (in ``tango/release.py``).  E.g. ``version_info`` to (9, 2, 6)
   * Create a pull request to get these changes reviewed before proceeding.
 
 Merge ``stable`` into ``develop``
@@ -134,7 +134,7 @@ Make sure the documentation is updated
 
 Create a release tag on GitHub
   * On the Releases page, use "Draft a new release".
-  * Tag must match the format of previous tags, e.g. ``v9.2.5``.
+  * Tag must match the format of previous tags, e.g. ``v9.2.6``.
   * Target must be the ``stable`` branch.
 
 Upload the new version to PyPI
@@ -148,10 +148,10 @@ Upload the new version to PyPI
 
 Bump the version with "-dev" in the develop branch
   * Change all references to next version.  E.g. if releasing
-    v9.2.5, then update references to v9.2.6.
+    v9.2.6, then update references to v9.2.6.
   * This includes files like ``README.rst``, ``doc/howto.rst``, ``doc/start.rst``.
-  * In ``tango/release.py``, change ``version_info``, e.g. from ``(9, 2, 5)`` to
-    ``(9, 2, 6, 'dev', 0)``.
+  * In ``tango/release.py``, change ``version_info``, e.g. from ``(9, 2, 6)`` to
+    ``(9, 2, 7, 'dev', 0)``.
 
 Fill in the release description on GitHub
   * Content must be the same as the details in the changelog.  List all the
