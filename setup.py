@@ -434,8 +434,9 @@ def setup_args():
 
     install_requires = [
         'six',
-        'enum34;python_version<"3.4"',
     ]
+    if PYTHON_VERSION < (3, 4):
+        install_requires.append('enum34')
 
     setup_requires = []
 
