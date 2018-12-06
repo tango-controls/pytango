@@ -19,7 +19,10 @@ __all__ = ("DeviceClass", "device_class_init")
 
 __docformat__ = "restructuredtext"
 
-import collections
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 from ._tango import Except, DevFailed, DeviceClass, CmdArgType, \
     DispLevel, UserDefaultAttrProp
@@ -170,7 +173,7 @@ class PropUtil:
                     - v : (object) the object to be analysed
 
                 Return     : (bool) True if the object is a sequence or False otherwise"""
-        return isinstance(v, collections.Sequence)
+        return isinstance(v, collections_abc.Sequence)
 
     def is_empty_seq(self, v):
         """
@@ -233,7 +236,7 @@ class PropUtil:
         except:
             val = []
 
-        if is_array(tg_type) or (isinstance(val, collections.Sequence) and not len(val)):
+        if is_array(tg_type) or (isinstance(val, collections_abc.Sequence) and not len(val)):
             return val
         else:
             if is_non_str_seq(val):
@@ -393,7 +396,7 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
     # check for well defined command info
 
     # check parameter
-    if not isinstance(cmd_info, collections.Sequence):
+    if not isinstance(cmd_info, collections_abc.Sequence):
         msg = "Wrong data type for value for describing command %s in " \
               "class %s\nMust be a sequence with 2 or 3 elements" % (cmd_name, name)
         __throw_create_command_exception(msg)
@@ -405,7 +408,7 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
 
     param_info, result_info = cmd_info[0], cmd_info[1]
 
-    if not isinstance(param_info, collections.Sequence):
+    if not isinstance(param_info, collections_abc.Sequence):
         msg = "Wrong data type in command argument for command %s in " \
               "class %s\nCommand parameter (first element) must be a sequence" % (cmd_name, name)
         __throw_create_command_exception(msg)
@@ -435,7 +438,7 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
             __throw_create_command_exception(msg)
 
     # Check result
-    if not isinstance(result_info, collections.Sequence):
+    if not isinstance(result_info, collections_abc.Sequence):
         msg = "Wrong data type in command result for command %s in " \
               "class %s\nCommand result (second element) must be a sequence" % (cmd_name, name)
         __throw_create_command_exception(msg)
@@ -469,7 +472,7 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
 
     if len(cmd_info) == 3:
         extra_info = cmd_info[2]
-        if not isinstance(extra_info, collections.Mapping):
+        if not isinstance(extra_info, collections_abc.Mapping):
             msg = "Wrong data type in command information for command %s in " \
                   "class %s\nCommand information (third element in sequence), " \
                   "when given, must be a dictionary" % (cmd_name, name)
@@ -516,7 +519,7 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
     # check that the method to be executed exists
     try:
         cmd = getattr(deviceimpl_class, cmd_name)
-        if not isinstance(cmd, collections.Callable):
+        if not isinstance(cmd, collections_abc.Callable):
             msg = "Wrong definition of command %s in " \
                   "class %s\nThe object exists in class but is not " \
                   "a method!" % (cmd_name, name)
@@ -529,7 +532,7 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
     is_allowed_name = "is_%s_allowed" % cmd_name
     try:
         is_allowed = getattr(deviceimpl_class, is_allowed_name)
-        if not isinstance(is_allowed, collections.Callable):
+        if not isinstance(is_allowed, collections_abc.Callable):
             msg = "Wrong definition of command %s in " \
                   "class %s\nThe object '%s' exists in class but is " \
                   "not a method!" % (cmd_name, name, is_allowed_name)

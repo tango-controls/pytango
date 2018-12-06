@@ -17,7 +17,11 @@ __all__ = ("connection_init",)
 
 __docformat__ = "restructuredtext"
 
-import collections
+
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 from ._tango import Connection, DeviceData, __CallBackAutoDie, CmdArgType, \
     DeviceProxy, Database, ExtractAs
@@ -59,7 +63,7 @@ def __get_command_inout_param(self, cmd_name, cmd_param=None):
         if isinstance(cmd_param, str):
             param.insert(CmdArgType.DevString, cmd_param)
             return param
-        elif isinstance(cmd_param, collections.Sequence) and all([isinstance(x, str) for x in cmd_param]):
+        elif isinstance(cmd_param, collections_abc.Sequence) and all([isinstance(x, str) for x in cmd_param]):
             param.insert(CmdArgType.DevVarStringArray, cmd_param)
             return param
         else:
@@ -187,7 +191,7 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
         forget = False
         return self.__command_inout_asynch_id(cmd_name, argin, forget)
     elif len(args) == 1:
-        if isinstance(args[0], collections.Callable):  # command_inout_asynch(lambda)
+        if isinstance(args[0], collections_abc.Callable):  # command_inout_asynch(lambda)
             cb = __CallBackAutoDie()
             cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[0])
             argin = __get_command_inout_param(self, cmd_name)
@@ -202,7 +206,7 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
             forget = False
             return self.__command_inout_asynch_id(cmd_name, argin, forget)
     elif len(args) == 2:
-        if isinstance(args[1], collections.Callable):  # command_inout_asynch( value, lambda)
+        if isinstance(args[1], collections_abc.Callable):  # command_inout_asynch( value, lambda)
             cb = __CallBackAutoDie()
             cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[1])
             argin = __get_command_inout_param(self, cmd_name, args[0])

@@ -17,7 +17,10 @@ To access these members use directly :mod:`tango` module and NOT
 tango.attribute_proxy.
 """
 
-import collections
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 from ._tango import StdStringVector, DbData, DbDatum, DeviceProxy
 from ._tango import __AttributeProxy as _AttributeProxy
@@ -127,7 +130,7 @@ def __AttributeProxy__get_property(self, propname, value=None):
         new_value.append(propname)
         self._get_property(new_value)
         return DbData_2_dict(new_value)
-    elif isinstance(propname, collections.Sequence):
+    elif isinstance(propname, collections_abc.Sequence):
         if isinstance(propname, DbData):
             self._get_property(propname)
             return DbData_2_dict(propname)
@@ -184,7 +187,7 @@ def __AttributeProxy__put_property(self, value):
         value = new_value
     elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k, v in value.items():
             if isinstance(v, DbDatum):
@@ -245,14 +248,14 @@ def __AttributeProxy__delete_property(self, value):
     elif isinstance(value, DbDatum):
         new_value = DbData()
         new_value.append(value)
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
         new_value = DbData()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k, v in value.items():
             if isinstance(v, DbDatum):
