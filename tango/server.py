@@ -238,7 +238,7 @@ def __patch_attr_methods(tango_device_klass, attribute):
 
 
 def _get_wrapped_pipe_read_method(pipe, read_method):
-    read_args = inspect.getargspec(read_method)
+    read_args = inspect_getargspec(read_method)
     nb_args = len(read_args.args)
 
     green_mode = pipe.read_green_mode
