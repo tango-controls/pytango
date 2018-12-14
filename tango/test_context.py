@@ -80,10 +80,10 @@ def device(path):
     return getattr(module, device_name)
 
 
-def get_hostname():
-    """Get the hostname corresponding to the primary, external IP.
+def get_host_ip():
+    """Get the primary external host IP.
 
-    This is useful because an explicit hostname is required to get
+    This is useful because an explicit IP is required to get
     tango events to work properly. Note that localhost does not work
     either.
     """
@@ -92,8 +92,7 @@ def get_hostname():
     s.connect(('8.8.8.8', 0))
     # Get ip address
     ip = s.getsockname()[0]
-    # Return host name
-    return socket.gethostbyaddr(ip)[0].split('.')[0]
+    return ip
 
 
 # Device test context
@@ -123,7 +122,8 @@ class DeviceTestContext(object):
         if db is None:
             _, db = tempfile.mkstemp()
         if host is None:
-            host = get_hostname()
+            # IP address is used instead of the hostname on purpose (see #246)
+            host = get_host_ip()
         if properties is None:
             properties = {}
         if timeout is None:
