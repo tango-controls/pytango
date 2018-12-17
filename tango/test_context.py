@@ -147,6 +147,7 @@ class DeviceTestContext(object):
         string = self.command.format(
             server_name, instance_name, host, port, db)
         string += " -v{0}".format(debug) if debug else ""
+        print('i am groot: server command line: {}'.format(string))
         cmd_args = string.split()
         # Target and arguments
         if device_cls:
@@ -213,7 +214,9 @@ class DeviceTestContext(object):
     def get_device_access(self):
         """Return the full device name."""
         form = 'tango://{0}:{1}/{2}#{3}'
-        return form.format(self.host, self.port, self.device_name, self.nodb)
+        dev_name = form.format(self.host, self.port, self.device_name, self.nodb)
+        print('i am groot: get_device_access is {}'.format(dev_name))
+        return dev_name
 
     def get_server_access(self):
         """Return the full server name."""
