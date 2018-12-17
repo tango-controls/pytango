@@ -1,6 +1,5 @@
-sudo: false
+dist: xenial
 language: python
-os: linux
 branches:
   only:
     - stable
