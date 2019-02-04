@@ -125,7 +125,7 @@ All contributions,  `PR and bug reports`_ are welcome, please see: `How to Contr
 .. _PyTango: http://github.com/tango-cs/pytango
 .. _PyPI: http://pypi.python.org/pypi/pytango
 
-.. _libtango: http://tango-controls.org/downloads/source
+.. _libtango: http://tango-controls.org/downloads
 .. _Boost.Python: http://boost.org/doc/libs/1_61_0/libs/python/doc/html
 .. _numpy: http://pypi.python.org/pypi/numpy
 .. _six: http://pypi.python.org/pypi/six
