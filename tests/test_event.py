@@ -188,6 +188,8 @@ def test_subscribe_change_event(event_context):
     # Unsubscribe
     event_device.unsubscribe_event(eid)
 
+    assert 0
+
 
 def test_subscribe_interface_event(event_device):
     results = []
