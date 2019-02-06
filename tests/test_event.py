@@ -6,7 +6,6 @@ import socket
 from functools import partial
 
 import pytest
-import zmq
 from six import StringIO
 
 from tango import EventType, GreenMode, DeviceProxy, AttrQuality
@@ -18,11 +17,6 @@ from tango.utils import EventCallback
 from tango.gevent import DeviceProxy as gevent_DeviceProxy
 from tango.futures import DeviceProxy as futures_DeviceProxy
 from tango.asyncio import DeviceProxy as asyncio_DeviceProxy
-
-
-MAX_RETRIES = 60
-TIME_PER_RETRY = 0.2
-
 
 # Helpers
 
@@ -88,71 +82,32 @@ def event_device(request):
     green_mode = request.param
     # Hack: a port have to be specified explicitely for events to work
     port = get_open_port()
-    context = DeviceTestContext(EventDevice, port=port, process=True, debug=5)
+    context = DeviceTestContext(EventDevice, port=port, process=True)
     with context:
         yield device_proxy_map[green_mode](context.get_device_access())
 
 
-@pytest.fixture(scope="module")
-def event_context(request):
-    # Hack: a port have to be specified explicitely for events to work
-    port = get_open_port()
-    context = DeviceTestContext(EventDevice, port=port, process=True, debug=5)
-    with context:
-        yield context
-
-
 # Tests
 
-def test_subscribe_change_event(event_context):
+def test_subscribe_change_event(event_device):
     results = []
 
     def callback(evt):
-        if evt.attr_value:
-            results.append(evt.attr_value.value)
-        else:
-            print('bad event: %s' % evt)
+        results.append(evt.attr_value.value)
 
-    admin_device = DeviceProxy(event_context.get_server_access())
-    event_device = DeviceProxy(event_context.get_device_access())
     # Subscribe
     eid = event_device.subscribe_event(
         "attr", EventType.CHANGE_EVENT, callback, wait=True)
     assert eid == 1
-
-    zmq_info = admin_device.zmqeventsubscriptionchange(['info'])
-    # like [[925], ['Heartbeat: tcp://172.17.0.2:35807', 'Event: tcp://172.17.0.2:44033']]
-    print('ZMQ info: %s' % zmq_info)
-    heartbeat_addr = zmq_info[1][0].split(' ')[-1]
-    event_addr = zmq_info[1][1].split(' ')[-1]
-
-    ctx = zmq.Context()
-    heartbeat_sock = ctx.socket(zmq.SUB)
-    heartbeat_sock.connect(heartbeat_addr)
-    heartbeat_sock.setsockopt(zmq.SUBSCRIBE, '')
-    event_sock = ctx.socket(zmq.SUB)
-    event_sock.connect(event_addr)
-    event_sock.setsockopt(zmq.SUBSCRIBE, '')
-
+    # Trigger an event
+    event_device.command_inout("send_event", wait=True)
     # Wait for tango event
-    for count in range(MAX_RETRIES):
-        try:
-            msg = heartbeat_sock.recv(flags=zmq.NOBLOCK)
-            print('  heartbeat msg Rx: %r' % msg)
-        except Exception:
-            pass
-        try:
-            msg = event_sock.recv(flags=zmq.NOBLOCK)
-            print('  event msg Rx: %r' % msg)
-        except Exception:
-            pass
-        if count == 0:
-            # Trigger an event
-            event_device.command_inout("send_event", wait=True)
+    retries = 20
+    for _ in range(retries):
         event_device.read_attribute("state", wait=True)
-        # if len(results) > 1:
-        #    break
-        time.sleep(TIME_PER_RETRY)
+        if len(results) > 1:
+            break
+        time.sleep(0.05)
     # Test the event values
     assert results == [0., 1.]
     # Unsubscribe
@@ -173,18 +128,20 @@ def test_subscribe_interface_event(event_device):
     event_device.command_inout("add_dyn_attr", 'bla', wait=True)
     event_device.read_attribute('bla', wait=True) == 1.23
     # Wait for tango event
-    for _ in range(MAX_RETRIES):
+    retries = 30
+    for _ in range(retries):
         event_device.read_attribute("state", wait=True)
         if len(results) > 1:
             break
-        time.sleep(TIME_PER_RETRY)
+        time.sleep(0.05)
     event_device.command_inout("delete_dyn_attr", 'bla', wait=True)
     # Wait for tango event
-    for _ in range(MAX_RETRIES):
+    retries = 30
+    for _ in range(retries):
         event_device.read_attribute("state", wait=True)
         if len(results) > 2:
             break
-        time.sleep(TIME_PER_RETRY)
+        time.sleep(0.05)
     # Test the first event value
     assert set(cmd.cmd_name for cmd in results[0].cmd_list) == \
         {'Init', 'State', 'Status',
@@ -220,11 +177,12 @@ def test_push_event_with_timestamp(event_device):
     # Trigger an event
     event_device.command_inout("send_event_with_timestamp", wait=True)
     # Wait for tango event
-    for _ in range(MAX_RETRIES):
+    retries = 20
+    for _ in range(retries):
         event_device.read_attribute("state", wait=True)
         if len(ec.get_events()) > 1:
             break
-        time.sleep(TIME_PER_RETRY)
+        time.sleep(0.05)
     # Test the event values and timestamp
     results = [evt.attr_value.value for evt in ec.get_events()]
     assert results == [0., 2.]

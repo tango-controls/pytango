@@ -446,7 +446,6 @@ def setup_args():
         'pytest-xdist',
         'gevent',
         'psutil',
-        'zmq',
     ]
 
     if PYTHON2:
