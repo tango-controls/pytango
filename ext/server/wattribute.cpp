@@ -16,18 +16,6 @@
 
 using namespace boost::python;
 
-#if _MSC_VER > 1800
-namespace boost
-{
-	template <>
-	Tango::WAttribute const volatile * get_pointer<class Tango::WAttribute const volatile >(
-		class Tango::WAttribute const volatile *c)
-	{
-		return c;
-	}
-}
-#endif
-
 #ifndef TgLibVersNb
 #   define TgLibVersNb 80005
 #endif

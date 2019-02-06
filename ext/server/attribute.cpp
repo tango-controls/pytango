@@ -17,18 +17,6 @@
 
 using namespace boost::python;
 
-#if _MSC_VER > 1800
-namespace boost
-{
-	template <>
-	Tango::Attribute const volatile * get_pointer<class Tango::Attribute const volatile >(
-		class Tango::Attribute const volatile *c)
-	{
-		return c;
-	}
-}
-#endif
-
 # ifdef WIN32
 #   define PYTG_TIME_FROM_DOUBLE(dbl, tv) \
             if (true) { \

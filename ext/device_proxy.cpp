@@ -21,18 +21,6 @@
 #include "server/pipe.h"
 #include "fast_from_py.h"
 
-#if _MSC_VER > 1800
-namespace boost
-{
-	template <>
-	Tango::DeviceProxy const volatile * get_pointer<class Tango::DeviceProxy const volatile >(
-		class Tango::DeviceProxy const volatile *c)
-	{
-		return c;
-	}
-}
-#endif
-
 extern const char *param_must_be_seq;
 extern const char *unreachable_code;
 extern const char *non_string_seq;
