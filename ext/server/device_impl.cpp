@@ -20,18 +20,6 @@
 #include "to_py.h"
 #include "server/pipe.h"
 
-#if _MSC_VER > 1800
-namespace boost
-{
-	template <>
-	Tango::DeviceImpl const volatile * get_pointer<class Tango::DeviceImpl const volatile >(
-		class Tango::DeviceImpl const volatile *c)
-	{
-		return c;
-	}
-}
-#endif
-
 #ifdef _WIN32
 
 #include <time.h>

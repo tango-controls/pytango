@@ -19,17 +19,6 @@
 
 using namespace boost::python;
 
-#if _MSC_VER > 1800
-namespace boost
-{
-	template <>
-	Tango::DeviceClass const volatile * get_pointer<class Tango::DeviceClass const volatile >(
-		class Tango::DeviceClass const volatile *c)
-	{
-		return c;
-	}
-}
-#endif
 #define __AUX_DECL_CALL_DEVCLASS_METHOD \
     AutoPythonGIL __py_lock;
 

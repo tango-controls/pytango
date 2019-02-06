@@ -45,11 +45,11 @@ class Release:
         - license: (str) the license
     """
     name = 'pytango'
-    version_info = (9, 2, 3, 'dev', 0)
+    version_info = (9, 2, 3, 'alpha', 0)  # alpha for fixing windows build
     version = '.'.join(map(str, version_info[:3]))
     release = ''.join(map(str, version_info[3:]))
     separator = '.' if 'dev' in release or 'post' in release else ''
-    version_long = "9.2.3"
+    version_long = version + separator + release
 
     version_description = 'This version implements the C++ Tango 9.2 API.'
     version_number = int(version.replace('.', ''))

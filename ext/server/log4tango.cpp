@@ -15,18 +15,6 @@
 
 using namespace boost::python;
 
-#if _MSC_VER > 1800
-namespace boost
-{
-	template <>
-	log4tango::Logger const volatile * get_pointer<class log4tango::Logger const volatile >(
-		class log4tango::Logger const volatile *c)
-	{
-		return c;
-	}
-}
-#endif
-
 extern const char *param_must_be_seq;
 extern const char *non_string_seq;
 

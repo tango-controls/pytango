@@ -30,18 +30,6 @@ static const char* type_attr_name = "type";
 static const char* is_empty_attr_name = "is_empty";
 static const char* has_failed_attr_name = "has_failed";
 
-#if _MSC_VER > 1800
-namespace boost
-{
-	template <>
-	Tango::DeviceAttribute const volatile * get_pointer<class Tango::DeviceAttribute const volatile >(
-		class Tango::DeviceAttribute const volatile *c)
-	{
-		return c;
-	}
-}
-#endif
-
 template<long tangoTypeConst>
 struct python_tangocpp
 {

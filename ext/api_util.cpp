@@ -15,17 +15,6 @@
 
 using namespace boost::python;
 
-#if _MSC_VER > 1800
-namespace boost
-{
-	template <>
-	Tango::ApiUtil const volatile * get_pointer<class Tango::ApiUtil const volatile >(
-		class Tango::ApiUtil const volatile *c)
-	{
-		return c;
-	}
-}
-#endif
 
 namespace PyApiUtil
 {

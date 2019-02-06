@@ -24,17 +24,6 @@
 
 using namespace boost::python;
 
-#if _MSC_VER > 1800
-namespace boost
-{
-	template <>
-	Tango::Command const volatile * get_pointer<class Tango::Command const volatile >(
-		class Tango::Command const volatile *c)
-	{
-		return c;
-	}
-}
-#endif
 //+-------------------------------------------------------------------------
 //
 // method : 		PyCmd::is_allowed

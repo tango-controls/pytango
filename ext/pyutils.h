@@ -263,3 +263,33 @@ void is_method_defined(boost::python::object &obj, const std::string &method_nam
 
 
 bool hasattr(boost::python::object &, const std::string &);
+
+#if _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	Tango::ApiUtil const volatile * get_pointer<class Tango::ApiUtil const volatile >(
+		class Tango::ApiUtil const volatile *c)
+	{
+		return c;
+	}
+    template <>
+	Tango::Pipe const volatile * get_pointer<class Tango::Pipe const volatile >(
+		class Tango::Pipe const volatile *c)
+	{
+		return c;
+	}
+	template <>
+	Tango::WPipe const volatile * get_pointer<class Tango::WPipe const volatile >(
+		class Tango::WPipe const volatile *c)
+	{
+		return c;
+	}
+    template <>
+	Tango::WAttribute const volatile * get_pointer<class Tango::WAttribute const volatile >(
+		class Tango::WAttribute const volatile *c)
+	{
+		return c;
+	}
+}
+#endif
