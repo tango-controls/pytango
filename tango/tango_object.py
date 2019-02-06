@@ -16,6 +16,10 @@ import sys
 import six
 import logging
 import weakref
+try:
+    from inspect import getfullargspec as inspect_getargspec  # python 3.0+
+except ImportError:
+    from inspect import getargspec as inspect_getargspec
 import inspect
 import functools
 
@@ -130,7 +134,7 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
             in_type = CmdArgType.DevEncoded
             out_type = CmdArgType.DevEncoded
             try:
-                arg_spec = inspect.getargspec(member)
+                arg_spec = inspect_getargspec(member)
                 if not arg_spec.args:
                     in_type = CmdArgType.DevVoid
             except TypeError:

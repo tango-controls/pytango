@@ -2,7 +2,10 @@
 
 import six
 import enum
-import collections
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 # Local imports
 from . import DevState, GreenMode
@@ -83,7 +86,7 @@ if numpy and pytest:
         if isinstance(a, six.string_types):
             assert a == b
             return
-        if isinstance(a, collections.Sequence) and len(a) and isinstance(a[0], six.string_types):
+        if isinstance(a, collections_abc.Sequence) and len(a) and isinstance(a[0], six.string_types):
             assert list(a) == list(b)
             return
         try:
