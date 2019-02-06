@@ -104,36 +104,6 @@ def event_context(request):
 
 # Tests
 
-def test_get_hostnames():
-    # Try a few options for debugging
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8', 0))
-        ip = s.getsockname()[0]
-        print("ip via UDP connect 8.8.8.8", ip)
-        print("gethostbyaddr", socket.gethostbyaddr(ip))
-
-        s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s2.connect(('10.240.0.254', 0))
-        ip2 = s.getsockname()[0]
-        print("ip via UDP connect 10.240.0.254", ip2)
-        print("gethostbyaddr", socket.gethostbyaddr(ip2))
-
-        s3 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s3.connect(('172.17.0.254', 0))
-        ip3 = s.getsockname()[0]
-        print("ip via UDP connect 172.17.0.254", ip3)
-        print("gethostbyaddr", socket.gethostbyaddr(ip3))
-
-        hostname4 = socket.gethostname()
-        print("gethostname", hostname4)
-        ip4 = socket.gethostbyname(hostname4)
-        print("ip via gethostbyname", ip4)
-    except Exception as e:
-        print("Error with extra lookups", e)
-    assert False
-
-
 def test_subscribe_change_event(event_context):
     results = []
 
