@@ -175,7 +175,7 @@ void export_enums()
         .value("READ_WITH_WRITE", Tango::READ_WITH_WRITE)
         .value("WRITE", Tango::WRITE)
         .value("READ_WRITE", Tango::READ_WRITE)
-        .value("WT_UNKNOWN", Tango::READ_WRITE)
+        .value("WT_UNKNOWN", Tango::WT_UNKNOWN)
         .export_values()
     ;
 
