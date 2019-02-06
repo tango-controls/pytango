@@ -17,7 +17,10 @@ __all__ = ("Group", "group_init")
 
 __docformat__ = "restructuredtext"
 
-import collections
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 from ._tango import __Group as _RealGroup, StdStringVector
 from .utils import seq_2_StdStringVector, is_pure_str
 from .utils import document_method as __document_method
@@ -79,7 +82,7 @@ class Group:
             return self.__group._add(patterns_or_group, timeout_ms)
         elif isinstance(patterns_or_group, str):
             return self.__group._add(patterns_or_group, timeout_ms)
-        elif isinstance(patterns_or_group, collections.Sequence):
+        elif isinstance(patterns_or_group, collections_abc.Sequence):
             patterns = seq_2_StdStringVector(patterns_or_group)
             return self.__group._add(patterns, timeout_ms)
         else:
@@ -88,7 +91,7 @@ class Group:
     def remove(self, patterns, forward=True):
         if isinstance(patterns, str):
             return self.__group._remove(patterns, forward)
-        elif isinstance(patterns, collections.Sequence):
+        elif isinstance(patterns, collections_abc.Sequence):
             std_patterns = seq_2_StdStringVector(patterns)
             return self.__group._remove(std_patterns, forward)
         else:

@@ -21,8 +21,11 @@ import sys
 import six
 import types
 import numbers
-import collections
 import enum
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 from ._tango import StdStringVector, StdDoubleVector, \
     DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
@@ -352,7 +355,7 @@ except NameError:
 
 __int_klasses = int,
 __number_klasses = numbers.Number,
-__seq_klasses = collections.Sequence, bytearray, StdStringVector
+__seq_klasses = collections_abc.Sequence, bytearray, StdStringVector
 
 __use_unicode = False
 try:
