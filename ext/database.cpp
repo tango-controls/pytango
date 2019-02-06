@@ -18,18 +18,6 @@ extern const char *unreachable_code;
 extern const char *non_string_seq;
 
 const char *param_numb_or_str_numb = "Second parameter must be an int or a "
-                                     "string representing an int";
-#if _MSC_VER > 1800
-namespace boost
-{
-	template <>
-	Tango::Database const volatile * get_pointer<class Tango::Database const volatile >(
-		class Tango::Database const volatile *c)
-	{
-		return c;
-	}
-}
-#endif
 
 struct PyDatabase
 {
