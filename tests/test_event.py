@@ -180,8 +180,8 @@ def test_subscribe_change_event(event_context):
             # Trigger an event
             event_device.command_inout("send_event", wait=True)
         event_device.read_attribute("state", wait=True)
-        if len(results) > 1:
-            break
+        # if len(results) > 1:
+        #    break
         time.sleep(TIME_PER_RETRY)
     # Test the event values
     assert results == [0., 1.]
