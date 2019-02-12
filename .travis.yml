@@ -62,6 +62,8 @@ script:
   - python setup.py build
   # The build directory has been updated, cached_ext needs to be synchronized too
   - rsync -a --delete ext/ cached_ext/
+  # Show useful build information
+  - python -c "from tango.utils import info; print(info())"
   # Run the tests
   - python setup.py test
   # Kill all the hanging tango test processes
