@@ -72,11 +72,25 @@ extension has to compile.
 Usage
 -----
 
-To test the installation, import ``tango`` and check ``tango.__version__``::
+To test the installation, import ``tango`` and check ``tango.utils.info()``::
 
     >>> import tango
-    >>> tango.__version__
-    '9.2.6'
+    >>> print(tango.utils.info())
+    PyTango 9.2.6 (9, 2, 6, 'dev', 0)
+    PyTango compiled with:
+        Python : 2.7.15
+        Numpy  : 1.15.4
+        Tango  : 9.2.5
+        Boost  : 1.67.0
+
+    PyTango runtime is:
+        Python : 2.7.15
+        Numpy  : 1.15.4
+        Tango  : 9.2.5
+        Boost  : 0.0.0
+
+    PyTango running on:
+    ('Linux', 'hostname', '4.4.0-131-generic', '#157-Ubuntu SMP Thu Jul 12 15:51:36 UTC 2018', 'x86_64', 'x86_64')
 
 For an interactive use, consider using ITango_, a tango IPython_ profile.
 
