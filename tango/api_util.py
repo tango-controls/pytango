@@ -133,6 +133,18 @@ def __doc_api_util():
     """)
 
 
+    document_method(ApiUtil, "cleanup", """
+    cleanup(self) -> None
+
+            Destroy the ApiUtil singleton instance.
+
+        Parameters : None
+        Return     : None
+
+        New in PyTango 9.2.6
+    """)
+
+
 def api_util_init(doc=True):
     __init_api_util()
     if doc:
