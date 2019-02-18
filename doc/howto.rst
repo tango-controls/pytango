@@ -325,11 +325,11 @@ high level API
         def strftime(self, format):
             return time.strftime(format)
 
-	@pipe
-	def info(self):
+    @pipe
+    def info(self):
             return ('Information',
                     dict(manufacturer='Tango',
-	                     model='PS2000',
+                         model='PS2000',
                          version_number=123))
 
 
@@ -406,7 +406,7 @@ using the high level API. The example contains:
         host = device_property(dtype=str)
         port = class_property(dtype=int, default_value=9788)
 
-	    @attribute
+        @attribute
         def voltage(self):
             self.info_stream("get voltage(%s, %d)" % (self.host, self.port))
             return 10.0
@@ -469,8 +469,8 @@ Example::
 
     def read_voltage(self):
         self.info_stream("read voltage attribute")
-	# ...
-	return voltage_value
+    # ...
+    return voltage_value
 
 This will print a message like::
 
@@ -482,8 +482,8 @@ The logging methods support argument list feature (since PyTango 8.1). Example::
 
     def read_voltage(self):
         self.info_stream("read_voltage(%s, %d)", self.host, self.port)
-	# ...
-	return voltage_value
+    # ...
+    return voltage_value
 
 
 Logging with print statement
@@ -499,15 +499,15 @@ Same example as above, but now using *print chevron*::
 
     def read_voltage(self, the_att):
         print >>self.log_info, "read voltage attribute"
-	# ...
-	return voltage_value
+    # ...
+    return voltage_value
 
 Or using the python 3k print function::
 
     def read_Long_attr(self, the_att):
         print("read voltage attribute", file=self.log_info)
-	# ...
-	return voltage_value
+    # ...
+    return voltage_value
 
 
 Logging with decorators
@@ -673,17 +673,17 @@ point attribute with the specified name::
 
     class MyDevice(Device):
 
-	@command(dtype_in=str)
+    @command(dtype_in=str)
         def CreateFloatAttribute(self, attr_name):
-	    attr = Attr(attr_name, tango.DevDouble)
-	    self.add_attribute(attr, self.read_General, self.write_General)
+        attr = Attr(attr_name, tango.DevDouble)
+        self.add_attribute(attr, self.read_General, self.write_General)
 
-	def read_General(self, attr):
-	    self.info_stream("Reading attribute %s", attr.get_name())
-	    attr.set_value(99.99)
+    def read_General(self, attr):
+        self.info_stream("Reading attribute %s", attr.get_name())
+        attr.set_value(99.99)
 
-	def write_General(self, attr):
-	    self.info_stream("Writting attribute %s", attr.get_name())
+    def write_General(self, attr):
+        self.info_stream("Writting attribute %s", attr.get_name())
 
 
 Create/Delete devices dynamically
@@ -719,13 +719,13 @@ with two strings. No error processing was done on the code for simplicity sake):
 
     class MyDevice(Device):
 
-	@command(dtype_in=[str])
+    @command(dtype_in=[str])
         def CreateDevice(self, pars):
             klass_name, dev_name = pars
             util = Util.instance()
             util.create_device(klass_name, dev_name, alias=None, cb=None)
 
-	@command(dtype_in=[str])
+    @command(dtype_in=[str])
         def DeleteDevice(self, pars):
             klass_name, dev_name = pars
             util = Util.instance()
