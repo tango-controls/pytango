@@ -298,15 +298,15 @@ API should be accessed from Python::
 Using clients with multiprocessing
 ----------------------------------
 
-Since version 9.2.6 PyTango provides :func:`ApiUtil.cleanup()`
+Since version 9.2.6 PyTango provides :staticmethod:`~tango.ApiUtil.cleanup()`
 which resets CORBA connection.
 This static function is needed when you want to use :mod:`tango` with
 :mod:`multiprocessing` in your client code.
 
 In the case when both your parent process and your child process create
-:class:`tango.DeviceProxy`, :class:`tango.Database`
-or/and :class:`tango.AttributeProxy`
-your child process will inherit the context from your parent process,
+:class:`~tango.DeviceProxy`, :class:`~tango.Database`
+or/and :class:`~tango.AttributeProxy`
+your child process inherits the context from your parent process,
 i.e. open file descriptors, the TANGO and the CORBA state.
 Sharing the above objects between the processes may cause unpredictable
 errors, e.g. *TRANSIENT_CallTimedout*, *unidentifiable C++ exception*.
