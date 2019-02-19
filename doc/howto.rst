@@ -298,7 +298,7 @@ API should be accessed from Python::
 Using clients with multiprocessing
 ----------------------------------
 
-Since version 9.2.6 PyTango provides :staticmethod:`~tango.ApiUtil.cleanup()`
+Since version 9.2.6 PyTango provides :meth:`~tango.ApiUtil.cleanup()`
 which resets CORBA connection.
 This static function is needed when you want to use :mod:`tango` with
 :mod:`multiprocessing` in your client code.
