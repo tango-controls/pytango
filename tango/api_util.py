@@ -141,7 +141,7 @@ def __doc_api_util():
         Parameters : None
         Return     : None
 
-        New in PyTango 9.2.6
+        New in PyTango 9.3.0
     """)
 
 
