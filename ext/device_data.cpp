@@ -182,7 +182,7 @@ namespace PyDeviceData {
         template <>
         object extract_array<Tango::DEVVAR_STATEARRAY>(Tango::DeviceData &self, object &py_self, PyTango::ExtractAs extract_as)
         {
-            assert(False);
+            assert(false);
             return object();
         }
     /// @}
