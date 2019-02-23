@@ -299,7 +299,7 @@ Write a server
 Before reading this chapter you should be aware of the TANGO basic concepts.
 This chapter does not explain what a Tango device or a device server is.
 This is explained in detail in the
-`Tango control system manual <http://www.tango-controls.org/resources/documentation/kernel/>`_
+`Tango control system manual <http://www.tango-controls.org/documentation/kernel/>`_
 
 Since version 8.1, PyTango provides a helper module which simplifies the
 development of a Tango device server. This helper is provided through the
