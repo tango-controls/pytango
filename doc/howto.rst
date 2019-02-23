@@ -353,7 +353,11 @@ Therefore, when you start a new process you must reset CORBA connection::
     for i in range(4):
 	runworkers()
 
-
+After `cleanup()` all references to :class:`~tango.DeviceProxy`,
+:class:`~tango.AttributeProxy` or :class:`~tango.Database` objects
+in the current process become invalid
+and these objects need to be reconstructed.
+				       
 
 Write a server
 --------------
