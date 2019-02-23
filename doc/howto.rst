@@ -58,11 +58,9 @@ and the Tango C++ library version that PyTango was compiled with::
 Report a bug
 ------------
 
-Bugs can be reported as tickets in `TANGO Source forge <https://sourceforge.net/p/tango-cs/bugs/>`_.
+Bugs can be reported as issues in `PyTango Github <https://github.com/tango-controls/pytango/issues>`_.
 
-When making a bug report don't forget to select *PyTango* in **Category**.
-
-It is also helpfull if you can put in the ticket description the PyTango information.
+It is also helpful if you can put in the issue description the PyTango information.
 It can be a dump of:
 
 .. sourcecode:: console
@@ -104,7 +102,7 @@ Basic read/write attribute operations::
     print("Long_scalar value = {0}".format(scalar.value))
 
     # PyTango provides a shorter way:
-    scalar = tango_test.long_scalar.value
+    scalar = tango_test.long_scalar
     print("Long_scalar value = {0}".format(scalar))
 
     # Read a spectrum attribute
@@ -195,7 +193,7 @@ structures::
     # variable containing an array of longs and an array of strings
     argin = ([1,2,3], ["Hello", "TangoTest device"])
 
-    result = tango_test.DevVarLongArray(argin)
+    result = tango_test.DevVarLongStringArray(argin)
     print("Result of execution of DevVarLongArray command = {0}".format(result))
 
 Work with Groups
@@ -364,8 +362,8 @@ Write a server
 
 Before reading this chapter you should be aware of the TANGO basic concepts.
 This chapter does not explain what a Tango device or a device server is.
-This is explained in details in the
-`Tango control system manual <http://www.tango-controls.org/resources/documentation/kernel/>`_
+This is explained in detail in the
+`Tango control system manual <http://www.tango-controls.org/documentation/kernel/>`_
 
 Since version 8.1, PyTango provides a helper module which simplifies the
 development of a Tango device server. This helper is provided through the
@@ -391,11 +389,11 @@ high level API
         def strftime(self, format):
             return time.strftime(format)
 
-	@pipe
-	def info(self):
+        @pipe
+        def info(self):
             return ('Information',
                     dict(manufacturer='Tango',
-	                 model='PS2000',
+                         model='PS2000',
                          version_number=123))
 
 
@@ -426,9 +424,11 @@ high level API
     for the complete list of pipe options.
 
 **line 24**
-    start the Tango run loop. The mandatory argument is a list of python classes
-    that are to be exported as Tango classes. Check :func:`~tango.server.run`
-    for the complete list of options
+    start the Tango run loop.  This method automatically determines the Python
+    class name and exports it as a Tango class.  For more complicated cases,
+    check :func:`~tango.server.run` for the complete list of options
+
+There is a more detailed clock device server in the examples/Clock folder.
 
 Here is a more complete example on how to write a *PowerSupply* device server
 using the high level API. The example contains:
@@ -470,7 +470,7 @@ using the high level API. The example contains:
         host = device_property(dtype=str)
         port = class_property(dtype=int, default_value=9788)
 
-	@attribute
+        @attribute
         def voltage(self):
             self.info_stream("get voltage(%s, %d)" % (self.host, self.port))
             return 10.0
@@ -533,8 +533,8 @@ Example::
 
     def read_voltage(self):
         self.info_stream("read voltage attribute")
-	# ...
-	return voltage_value
+        # ...
+        return voltage_value
 
 This will print a message like::
 
@@ -546,8 +546,8 @@ The logging methods support argument list feature (since PyTango 8.1). Example::
 
     def read_voltage(self):
         self.info_stream("read_voltage(%s, %d)", self.host, self.port)
-	# ...
-	return voltage_value
+        # ...
+        return voltage_value
 
 
 Logging with print statement
@@ -563,15 +563,15 @@ Same example as above, but now using *print chevron*::
 
     def read_voltage(self, the_att):
         print >>self.log_info, "read voltage attribute"
-	# ...
-	return voltage_value
+        # ...
+        return voltage_value
 
 Or using the python 3k print function::
 
     def read_Long_attr(self, the_att):
         print("read voltage attribute", file=self.log_info)
-	# ...
-	return voltage_value
+        # ...
+        return voltage_value
 
 
 Logging with decorators
@@ -737,17 +737,17 @@ point attribute with the specified name::
 
     class MyDevice(Device):
 
-	@command(dtype_in=str)
+        @command(dtype_in=str)
         def CreateFloatAttribute(self, attr_name):
-	    attr = Attr(attr_name, tango.DevDouble)
-	    self.add_attribute(attr, self.read_General, self.write_General)
+            attr = Attr(attr_name, tango.DevDouble)
+            self.add_attribute(attr, self.read_General, self.write_General)
 
-	def read_General(self, attr):
-	    self.info_stream("Reading attribute %s", attr.get_name())
-	    attr.set_value(99.99)
+        def read_General(self, attr):
+            self.info_stream("Reading attribute %s", attr.get_name())
+            attr.set_value(99.99)
 
-	def write_General(self, attr):
-	    self.info_stream("Writting attribute %s", attr.get_name())
+        def write_General(self, attr):
+            self.info_stream("Writting attribute %s", attr.get_name())
 
 
 Create/Delete devices dynamically
@@ -783,13 +783,13 @@ with two strings. No error processing was done on the code for simplicity sake):
 
     class MyDevice(Device):
 
-	@command(dtype_in=[str])
+        @command(dtype_in=[str])
         def CreateDevice(self, pars):
             klass_name, dev_name = pars
             util = Util.instance()
             util.create_device(klass_name, dev_name, alias=None, cb=None)
 
-	@command(dtype_in=[str])
+        @command(dtype_in=[str])
         def DeleteDevice(self, pars):
             klass_name, dev_name = pars
             util = Util.instance()
@@ -809,7 +809,7 @@ the :meth:`~tango.DeviceClass.create_device` / :meth:`~tango.DeviceClass.delete_
 For example, if you wish to create a clone of your device, you can create a
 tango command called *Clone*::
 
-    class MyDevice(tango.Device_4Impl):
+    class MyDevice(tango.Device):
 
         def fill_new_device_properties(self, dev_name):
             prop_names = db.get_device_property_list(self.get_name(), "*")
@@ -1035,10 +1035,10 @@ The PyDsExp class in Python
 The rule of this class is to implement methods executed by commands and attributes.
 In our example, the code of this class looks like::
 
-    class PyDsExp(tango.Device_4Impl):
+    class PyDsExp(tango.Device):
 
         def __init__(self,cl,name):
-            tango.Device_4Impl.__init__(self, cl, name)
+            tango.Device.__init__(self, cl, name)
             self.info_stream('In PyDsExp.__init__')
             PyDsExp.init_device(self)
 
@@ -1112,7 +1112,8 @@ In our example, the code of this class looks like::
             return self.get_state() in (tango.DevState.ON,)
 
 **Line 1**
-    The PyDsExp class has to inherit from the tango.Device_4Impl
+    The PyDsExp class has to inherit from the tango.Device (this will used the latest
+    device implementation class available, e.g. Device_5Impl)
 **Line 3 to 6**
     PyDsExp class constructor. Note that at line 6, it calls the *init_device()*
     method

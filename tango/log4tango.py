@@ -21,7 +21,7 @@ Example::
 
     class MyDev(tango.Device_4Impl):
 
-        tango.InfoIt()
+        @tango.InfoIt()
         def read_Current(self, attr):
             attr.set_value(self._current)
 """
