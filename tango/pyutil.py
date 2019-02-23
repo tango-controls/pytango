@@ -210,6 +210,12 @@ def __Util__init__(self, args):
     Util.__init_orig__(self, args)
 
 
+def __Util__init(args):
+    args = list(args)
+    args[0] = os.path.splitext(args[0])[0]
+    return Util.__init_orig(args)
+
+
 def __Util__add_TgClass(self, klass_device_class, klass_device,
                         device_class_name=None):
     """Register a new python tango class. Example::
@@ -264,6 +270,8 @@ def __Util__add_class(self, *args, **kwargs):
 def __init_Util():
     Util.__init_orig__ = Util.__init__
     Util.__init__ = __Util__init__
+    Util.__init_orig = staticmethod(Util.init)
+    Util.init = staticmethod(__Util__init)
     Util.add_TgClass = __Util__add_TgClass
     Util.add_Cpp_TgClass = __Util__add_Cpp_TgClass
     Util.add_class = __Util__add_class
