@@ -295,6 +295,70 @@ API should be accessed from Python::
     axis_properties["AxisNumber"] = ["6"]
     axis1.put_property(axis_properties)
 
+Using clients with multiprocessing
+----------------------------------
+
+Since version 9.3.0 PyTango provides :meth:`~tango.ApiUtil.cleanup()`
+which resets CORBA connection.
+This static function is needed when you want to use :mod:`tango` with
+:mod:`multiprocessing` in your client code.
+
+In the case when both your parent process and your child process create
+:class:`~tango.DeviceProxy`, :class:`~tango.Database`
+or/and :class:`~tango.AttributeProxy`
+your child process inherits the context from your parent process,
+i.e. open file descriptors, the TANGO and the CORBA state.
+Sharing the above objects between the processes may cause unpredictable
+errors, e.g. *TRANSIENT_CallTimedout*, *unidentifiable C++ exception*.
+Therefore, when you start a new process you must reset CORBA connection::
+
+    import time
+    import tango
+
+    from multiprocessing import Process
+
+
+    class Worker(Process):
+
+	def __init__(self):
+	    Process.__init__(self)
+
+	def run(self):
+            # reset CORBA connection
+            tango.ApiUtil.cleanup()
+
+	    proxy = tango.DeviceProxy('test/tserver/1')
+
+	    stime = time.time()
+	    etime = stime
+	    while etime - stime < 1.:
+		try:
+		    proxy.read_attribute("Value")
+		except Exception as e:
+		    print(str(e))
+		etime = time.time()
+
+
+    def runworkers():
+	workers = [Worker() for _ in range(6)]
+	for wk in workers:
+	    wk.start()
+	for wk in workers:
+	    wk.join()
+
+
+    db = tango.Database()
+    dp = tango.DeviceProxy('test/tserver/1')
+
+    for i in range(4):
+	runworkers()
+
+After `cleanup()` all references to :class:`~tango.DeviceProxy`,
+:class:`~tango.AttributeProxy` or :class:`~tango.Database` objects
+in the current process become invalid
+and these objects need to be reconstructed.
+				       
+
 Write a server
 --------------
 

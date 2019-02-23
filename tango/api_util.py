@@ -133,6 +133,22 @@ def __doc_api_util():
     """)
 
 
+    document_static_method(ApiUtil, "cleanup", """
+    cleanup() -> None
+
+            Destroy the ApiUtil singleton instance.
+            After `cleanup()` all references to
+            `DeviceProxy`, `AttributeProxy` or `Database` objects
+            in the current process become invalid
+            and these objects need to be reconstructed.
+
+        Parameters : None
+        Return     : None
+
+        New in PyTango 9.3.0
+    """)
+
+
 def api_util_init(doc=True):
     __init_api_util()
     if doc:

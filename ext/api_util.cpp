@@ -67,5 +67,7 @@ void export_api_util()
         .def("get_user_connect_timeout", &Tango::ApiUtil::get_user_connect_timeout)
 
         .def("get_ip_from_if", &Tango::ApiUtil::get_ip_from_if)
+        .def("cleanup", &Tango::ApiUtil::cleanup)
+        .staticmethod("cleanup")
     ;
 }
