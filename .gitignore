@@ -25,6 +25,7 @@ var/
 *.egg
 *.eggs
 *.cfg
+!setup.cfg
 MANIFEST
 
 # Installer logs
