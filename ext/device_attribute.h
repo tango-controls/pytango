@@ -168,7 +168,8 @@ namespace PyDeviceAttribute {
     template<>
     inline void _fill_scalar_attribute<Tango::DEV_STRING>(Tango::DeviceAttribute & dev_attr, const boost::python::object & py_value)
     {
-        std::string value = boost::python::extract<std::string>(py_value);
+        std::string value;
+	from_str_to_char(py_value.ptr(), value);
         dev_attr << value;
     }
 

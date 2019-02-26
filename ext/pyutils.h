@@ -172,6 +172,7 @@ bopy::object from_char_to_str2(const std::string& in,
 
 
 void from_str_to_char(PyObject* in, std::string& out);
+char* from_str_to_char(PyObject* in);
 
 inline void raise_(PyObject *type, const char *message)
 {

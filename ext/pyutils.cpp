@@ -72,6 +72,22 @@ void from_str_to_char(PyObject* in, std::string& out)
     }
 }
 
+char* from_str_to_char(PyObject* in)
+{
+    char* out = NULL;
+    if (PyUnicode_Check(in))
+    {
+        PyObject *bytes_in = PyUnicode_AsLatin1String(in);
+	out = strndup(PyBytes_AsString(bytes_in), PyBytes_Size(bytes_in));
+        Py_DECREF(bytes_in);
+    }
+    else
+    {
+        out = strndup(PyBytes_AsString(in), PyBytes_Size(in));
+    }
+    return out;
+}
+
 bool is_method_defined(object &obj, const std::string &method_name)
 {
     return is_method_defined(obj.ptr(), method_name);

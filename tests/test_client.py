@@ -17,6 +17,7 @@ from distutils.spawn import find_executable
 from subprocess import Popen
 import platform
 from time import sleep
+import sys
 
 import psutil
 import pytest
@@ -93,6 +94,13 @@ ATTRIBUTES = [
     'State',
     'Status',
 ]
+
+PY3 = sys.version_info >= (3,)
+
+# char \x00 cannot be sent in a DevString. All other 1-255 chars can
+ints = tuple(range(1, 256))
+bytes_devstring = bytes(ints) if PY3 else ''.join(map(chr, ints))
+str_devstring = bytes_devstring.decode('latin-1')
 
 device_proxy_map = {
     GreenMode.Synchronous: DeviceProxy,
@@ -213,7 +221,7 @@ def test_read_attribute(tango_test, readable_attribute):
 def test_write_scalar_attribute(tango_test, writable_scalar_attribute):
     "Check that writable scalar attributes can be written"
     attr_name = writable_scalar_attribute
-    config = tango_test.get_attribute_config(writable_scalar_attribute, wait=True)
+    config = tango_test.get_attribute_config(attr_name, wait=True)
     if is_bool_type(config.data_type):
         tango_test.write_attribute(attr_name, True, wait=True)
     elif is_int_type(config.data_type):
@@ -224,6 +232,40 @@ def test_write_scalar_attribute(tango_test, writable_scalar_attribute):
         tango_test.write_attribute(attr_name, "hello", wait=True)
     else:
         pytest.xfail("Not currently testing this type")
+
+
+def test_write_read_string_attribute(tango_test):
+    attr_name = 'string_scalar'
+    bytes_big = 100000 * b'big data '
+    str_big = bytes_big.decode('latin-1')
+
+    values = [b'', '', 'Hello, World!', b'Hello, World!',
+              bytes_devstring, str_devstring, bytes_big, str_big]
+    if PY3:
+        expected_values = ['', '', 'Hello, World!', 'Hello, World!',
+                           str_devstring, str_devstring,
+                           str_big, str_big]
+    else:
+        expected_values = ['', '', 'Hello, World!', 'Hello, World!',
+                           bytes_devstring, bytes_devstring,
+                           bytes_big, bytes_big]
+
+    for value, expected_value in zip(values, expected_values):
+        tango_test.write_attribute(attr_name, value, wait=True)
+        result = tango_test.read_attribute(attr_name, wait=True)
+        assert result.value == expected_value
+
+    attr_name = 'string_spectrum'
+    for value, expected_value in zip(values, expected_values):
+        tango_test.write_attribute(attr_name, ['', value, ''], wait=True)
+        result = tango_test.read_attribute(attr_name, wait=True)
+        assert result.value[1] == expected_value
+
+    attr_name = 'string_image'
+    for value, expected_value in zip(values, expected_values):
+        tango_test.write_attribute(attr_name, [[value], [value]], wait=True)
+        result = tango_test.read_attribute(attr_name, wait=True)
+        assert result.value == ((expected_value,), (expected_value,))
 
 
 def test_read_attribute_config(tango_test, attribute):
@@ -292,3 +334,24 @@ def test_device_polling_attribute(tango_test):
         attr = lines[0].split('= ')[1]
         poll_period = int(lines[1].split('= ')[1])
         assert dct[attr] == poll_period
+
+
+def test_command_string(tango_test):
+    cmd_name = 'DevString'
+    bytes_big = 100000 * b'big data '
+    str_big = bytes_big.decode('latin-1')
+
+    values = [b'', '', 'Hello, World!', b'Hello, World!',
+              bytes_devstring, str_devstring, bytes_big, str_big]
+    if PY3:
+        expected_values = ['', '', 'Hello, World!', 'Hello, World!',
+                           str_devstring, str_devstring,
+                           str_big, str_big]
+    else:
+        expected_values = ['', '', 'Hello, World!', 'Hello, World!',
+                           bytes_devstring, bytes_devstring,
+                           bytes_big, bytes_big]
+
+    for value, expected_value in zip(values, expected_values):
+        result = tango_test.command_inout(cmd_name, value, wait=True)
+        assert result == expected_value

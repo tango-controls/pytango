@@ -204,10 +204,11 @@ struct StdString_from_python_str_unicode
       if (PyUnicode_Check(obj))
       {
           decref = true;
-          obj = PyUnicode_AsUTF8String(obj);
+          obj = PyUnicode_AsLatin1String(obj);
       }
 
       const char* value = PyBytes_AsString(obj);
+      Py_ssize_t size = PyBytes_Size(obj);
 
       // Grab pointer to memory into which to construct the new std::string
       void* storage = (
@@ -216,7 +217,7 @@ struct StdString_from_python_str_unicode
 
       // in-place construct the new std::string using the character data
       // extraced from the python object
-      new (storage) std::string(value);
+      new (storage) std::string(value, size);
 
       // Stash the memory chunk pointer for later use by boost.python
       data->convertible = storage;
