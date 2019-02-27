@@ -11,23 +11,14 @@
 
 #include "precompiled_header.hpp"
 #include "from_py.h"
+#include "pyutils.h"
 
 using namespace boost::python;
 
 char* obj_to_new_char(PyObject* obj_ptr)
 {
-    Tango::DevString ret = NULL;
-    if(PyUnicode_Check(obj_ptr))
-    {
-        PyObject* obj_bytes_ptr = PyUnicode_AsLatin1String(obj_ptr);
-        ret = CORBA::string_dup(PyBytes_AsString(obj_bytes_ptr));
-        Py_DECREF(obj_bytes_ptr);
-    }
-    else
-    {
-        ret = CORBA::string_dup(PyBytes_AsString(obj_ptr));
-    }
-    return ret;
+    // DRY!
+    return from_str_to_char(obj_ptr);
 }
 
 char* obj_to_new_char(bopy::object obj)
@@ -37,16 +28,7 @@ char* obj_to_new_char(bopy::object obj)
 
 void obj_to_string(PyObject* obj_ptr, std::string& result)
 {
-    if(PyUnicode_Check(obj_ptr))
-    {
-        PyObject* obj_bytes_ptr = PyUnicode_AsLatin1String(obj_ptr);
-        result = PyBytes_AsString(obj_bytes_ptr);
-        Py_DECREF(obj_bytes_ptr);
-    }
-    else
-    {
-        result = PyBytes_AsString(obj_ptr);
-    }
+    from_str_to_char(obj_ptr, result);
 }
 
 void obj_to_string(bopy::object obj, std::string& result)
