@@ -1,5 +1,6 @@
 """Test utilities"""
 
+import sys
 import six
 import enum
 try:
@@ -25,6 +26,12 @@ except ImportError:
 
 __all__ = ('DeviceTestContext', 'SimpleDevice')
 
+PY3 = sys.version_info >= (3,)
+
+# char \x00 cannot be sent in a DevString. All other 1-255 chars can
+ints = tuple(range(1, 256))
+bytes_devstring = bytes(ints) if PY3 else ''.join(map(chr, ints))
+str_devstring = bytes_devstring.decode('latin-1')
 
 # Test devices
 
@@ -64,11 +71,11 @@ class BadEnumDuplicates(enum.IntEnum):
 TYPED_VALUES = {
     int: (1, 2),
     float: (2.71, 3.14),
-    str: ('hey hey', 'my my'),
+    str: ('hey hey', 'my my', bytes_devstring, str_devstring),
     bool: (False, True),
     (int,): ([1, 2, 3], [9, 8, 7]),
     (float,): ([0.1, 0.2, 0.3], [0.9, 0.8, 0.7]),
-    (str,): (['ab', 'cd', 'ef'], ['gh', 'ij', 'kl']),
+    (str,): (['ab', 'cd', 'ef'], ['gh', 'ij', 'kl'], [bytes_devstring], [str_devstring]),
     (bool,): ([False, False, True], [True, False, False])}
 
 
@@ -98,6 +105,18 @@ if numpy and pytest:
 
 if pytest:
 
+    def create_result(dtype, value):
+        if dtype == str:
+            if PY3:
+                if isinstance(value, bytes):
+                    return value.decode('latin-1')
+            else:
+                if isinstance(value, unicode):
+                    return value.encode('latin-1')
+        elif dtype == (str,):
+            return [create_result(str, v) for v in value]
+        return value
+
     @pytest.fixture(params=DevState.values.values())
     def state(request):
         return request.param
@@ -106,7 +125,9 @@ if pytest:
         params=list(TYPED_VALUES.items()),
         ids=lambda x: repr_type(x[0]))
     def typed_values(request):
-        return request.param
+        dtype, values = request.param
+        return dtype, values, [create_result(dtype, value)
+                               for value in values]
 
     @pytest.fixture(params=GreenMode.values.values())
     def green_mode(request):
