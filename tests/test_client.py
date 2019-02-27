@@ -25,10 +25,12 @@ from functools import partial
 from tango import DeviceProxy, DevFailed, GreenMode
 from tango import DeviceInfo, AttributeInfo, AttributeInfoEx
 from tango.utils import is_str_type, is_int_type, is_float_type, is_bool_type
+from tango.test_utils import assert_close
 
 from tango.gevent import DeviceProxy as gevent_DeviceProxy
 from tango.futures import DeviceProxy as futures_DeviceProxy
 from tango.asyncio import DeviceProxy as asyncio_DeviceProxy
+
 
 ATTRIBUTES = [
     'ampli',
@@ -355,3 +357,17 @@ def test_command_string(tango_test):
     for value, expected_value in zip(values, expected_values):
         result = tango_test.command_inout(cmd_name, value, wait=True)
         assert result == expected_value
+
+    cmd_name = 'DevVarStringArray'
+    for value, expected_value in zip(values, expected_values):
+        result = tango_test.command_inout(cmd_name, [value, value], wait=True)
+        assert result == [expected_value, expected_value]
+
+    cmd_name = 'DevVarLongStringArray'
+    for value, expected_value in zip(values, expected_values):
+        result = tango_test.command_inout(cmd_name,
+                                          [[-10, 200], [value, value]],
+                                          wait=True)
+        assert len(result) == 2
+        assert_close(result[0], [-10, 200])
+        assert_close(result[1], [expected_value, expected_value])
