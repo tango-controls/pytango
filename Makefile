@@ -87,7 +87,7 @@ endif
 
 TANGO_CFLAGS=`pkg-config --cflags-only-other tango`
 TANGO_LIBS=`pkg-config --libs-only-l tango`
-BOOST_LIB = boost_python-py$(PY_VER_S)
+BOOST_LIB = boost_python
 
 PRE_C_H := precompiled_header.hpp
 PRE_C_H_O := $(OBJS_DIR)/$(PRE_C_H).gch
@@ -145,6 +145,7 @@ LIB_NAME := _tango.so
 LIB_SYMB_NAME := $(LIB_NAME).dbg
 
 OBJS := \
+$(OBJS_DIR)/device_attribute.o \
 $(OBJS_DIR)/api_util.o \
 $(OBJS_DIR)/archive_event_info.o \
 $(OBJS_DIR)/attr_conf_event_data.o \
@@ -168,7 +169,6 @@ $(OBJS_DIR)/db.o \
 $(OBJS_DIR)/dev_command_info.o \
 $(OBJS_DIR)/dev_error.o \
 $(OBJS_DIR)/device_attribute_config.o \
-$(OBJS_DIR)/device_attribute.o \
 $(OBJS_DIR)/device_attribute_history.o \
 $(OBJS_DIR)/device_data.o \
 $(OBJS_DIR)/device_data_history.o \
