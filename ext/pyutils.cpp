@@ -50,7 +50,7 @@ if (size < 0)
         return PyUnicode_DecodeLatin1(in, size, errors);
     }
     else
-    {   
+    {
         return PyUnicode_Decode(in, size, encoding, errors);
     }
 #else
@@ -63,10 +63,10 @@ void from_str_to_char(PyObject* in, std::string& out)
     if (PyUnicode_Check(in))
     {
         PyObject *bytes_in = PyUnicode_AsLatin1String(in);
-        out = PyBytes_AsString(bytes_in);
+        out = std::string(PyBytes_AsString(bytes_in), PyBytes_Size(bytes_in));
         Py_DECREF(bytes_in);
     }
-    else 
+    else
     {
         out = std::string(PyBytes_AsString(in), PyBytes_Size(in));
     }
@@ -78,12 +78,18 @@ char* from_str_to_char(PyObject* in)
     if (PyUnicode_Check(in))
     {
         PyObject *bytes_in = PyUnicode_AsLatin1String(in);
-	out = strndup(PyBytes_AsString(bytes_in), PyBytes_Size(bytes_in));
+	Py_ssize_t size = PyBytes_Size(bytes_in);
+	out = new char[size+1];
+	out[size] = '\0';
+	out = strncpy(out, PyBytes_AsString(bytes_in), size);
         Py_DECREF(bytes_in);
     }
     else
     {
-        out = strndup(PyBytes_AsString(in), PyBytes_Size(in));
+	Py_ssize_t size = PyBytes_Size(in);
+	out = new char[size+1];
+	out[size] = '\0';
+	out = strncpy(out, PyBytes_AsString(in), size);
     }
     return out;
 }
