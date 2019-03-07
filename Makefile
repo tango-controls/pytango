@@ -87,7 +87,12 @@ endif
 
 TANGO_CFLAGS=`pkg-config --cflags-only-other tango`
 TANGO_LIBS=`pkg-config --libs-only-l tango`
+
+ifdef CONDA_PREFIX
+BOOST_LIB = boost_python
+else
 BOOST_LIB = boost_python-py$(PY_VER_S)
+endif
 
 PRE_C_H := precompiled_header.hpp
 PRE_C_H_O := $(OBJS_DIR)/$(PRE_C_H).gch
