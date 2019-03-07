@@ -126,8 +126,8 @@ if pytest:
         ids=lambda x: repr_type(x[0]))
     def typed_values(request):
         dtype, values = request.param
-        return dtype, values, [create_result(dtype, value)
-                               for value in values]
+        expected = lambda v: create_result(dtype, v)
+        return dtype, values, expected
 
     @pytest.fixture(params=GreenMode.values.values())
     def green_mode(request):

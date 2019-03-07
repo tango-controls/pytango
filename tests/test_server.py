@@ -73,7 +73,7 @@ def test_set_status(server_green_mode):
 # Test commands
 
 def test_identity_command(typed_values, server_green_mode):
-    dtype, values, expected_values = typed_values
+    dtype, values, expected = typed_values
 
     if dtype == (bool,):
         pytest.xfail('Not supported for some reasons')
@@ -86,8 +86,8 @@ def test_identity_command(typed_values, server_green_mode):
             return arg
 
     with DeviceTestContext(TestDevice) as proxy:
-        for value, expected_value in zip(values, expected_values):
-            assert_close(proxy.identity(value), expected_value)
+        for value in values:
+            assert_close(proxy.identity(value), expected(value))
 
 
 def test_polled_command(server_green_mode):
@@ -124,7 +124,7 @@ def test_polled_command(server_green_mode):
 # Test attributes
 
 def test_read_write_attribute(typed_values, server_green_mode):
-    dtype, values, expected_values = typed_values
+    dtype, values, expected = typed_values
 
     class TestDevice(Device):
         green_mode = server_green_mode
@@ -139,9 +139,9 @@ def test_read_write_attribute(typed_values, server_green_mode):
             self.attr_value = value
 
     with DeviceTestContext(TestDevice) as proxy:
-        for value, expected_value in zip(values, expected_values):
+        for value in values:
             proxy.attr = value
-            assert_close(proxy.attr, expected_value)
+            assert_close(proxy.attr, expected(value))
 
 
 def test_read_write_attribute_enum(server_green_mode):
@@ -221,7 +221,7 @@ def test_read_write_attribute_enum(server_green_mode):
 # Test properties
 
 def test_device_property_no_default(typed_values, server_green_mode):
-    dtype, values, expected_values = typed_values
+    dtype, values, expected = typed_values
     patched_dtype = dtype if dtype != (bool,) else (int,)
     default = values[0]
     value = values[1]
@@ -236,17 +236,18 @@ def test_device_property_no_default(typed_values, server_green_mode):
             return default if self.prop is None else self.prop
 
     with DeviceTestContext(TestDevice, process=True) as proxy:
-        assert_close(proxy.get_prop(), default)
+        assert_close(proxy.get_prop(), expected(default))
 
     with DeviceTestContext(TestDevice,
                            properties={'prop': value},
                            process=True) as proxy:
-        assert_close(proxy.get_prop(), value)
+        assert_close(proxy.get_prop(), expected(value))
 
 
 def test_device_property_with_default_value(typed_values, server_green_mode):
-    dtype, values, expected_values = typed_values
+    dtype, values, expected = typed_values
     patched_dtype = dtype if dtype != (bool,) else (int,)
+
     default = values[0]
     value = values[1]
 
@@ -261,12 +262,12 @@ def test_device_property_with_default_value(typed_values, server_green_mode):
             return self.prop
 
     with DeviceTestContext(TestDevice, process=True) as proxy:
-        assert_close(proxy.get_prop(), default)
+        assert_close(proxy.get_prop(), expected(default))
 
     with DeviceTestContext(TestDevice,
                            properties={'prop': value},
                            process=True) as proxy:
-        assert_close(proxy.get_prop(), value)
+        assert_close(proxy.get_prop(), expected(value))
 
 
 # Test inheritance
@@ -359,7 +360,7 @@ def test_polled_attribute(server_green_mode):
 
 
 def test_mandatory_device_property(typed_values, server_green_mode):
-    dtype, values, expected_values = typed_values
+    dtype, values, expected = typed_values
     patched_dtype = dtype if dtype != (bool,) else (int,)
     default, value = values[:2]
 
@@ -375,7 +376,7 @@ def test_mandatory_device_property(typed_values, server_green_mode):
     with DeviceTestContext(TestDevice,
                            properties={'prop': value},
                            process=True) as proxy:
-        assert_close(proxy.get_prop(), value)
+        assert_close(proxy.get_prop(), expected(value))
 
     with pytest.raises(DevFailed) as context:
         with DeviceTestContext(TestDevice, process=True) as proxy:

@@ -12,7 +12,7 @@ from tango.test_utils import DeviceTestContext
 
 
 def test_async_command_polled(typed_values):
-    dtype, values, expected_values = typed_values
+    dtype, values, expected = typed_values
 
     if dtype == (bool,):
         pytest.xfail('Not supported for some reasons')
@@ -24,14 +24,14 @@ def test_async_command_polled(typed_values):
             return arg
 
     with DeviceTestContext(TestDevice) as proxy:
-        for value, expected_value in zip(values, expected_values):
+        for value in values:
             eid = proxy.command_inout_asynch('identity', value)
             result = proxy.command_inout_reply(eid, timeout=500)
-            assert_array_equal(result, expected_value)
+            assert_array_equal(result, expected(value))
 
 
 def test_async_command_with_polled_callback(typed_values):
-    dtype, values, expected_values = typed_values
+    dtype, values, expected = typed_values
 
     if dtype == (bool,):
         pytest.xfail('Not supported for some reasons')
@@ -46,16 +46,16 @@ def test_async_command_with_polled_callback(typed_values):
     api_util.set_asynch_cb_sub_model(tango.cb_sub_model.PULL_CALLBACK)
 
     with DeviceTestContext(TestDevice) as proxy:
-        for value, expected_value in zip(values, expected_values):
+        for value in values:
             future = Future()
             proxy.command_inout_asynch('identity', value, future.set_result)
             api_util.get_asynch_replies(500)
             result = future.result()
-            assert_array_equal(result.argout, expected_value)
+            assert_array_equal(result.argout, expected(value))
 
 
 def test_async_command_with_pushed_callback(typed_values):
-    dtype, values, expected_values = typed_values
+    dtype, values, expected = typed_values
 
     if dtype == (bool,):
         pytest.xfail('Not supported for some reasons')
@@ -70,8 +70,8 @@ def test_async_command_with_pushed_callback(typed_values):
     api_util.set_asynch_cb_sub_model(tango.cb_sub_model.PUSH_CALLBACK)
 
     with DeviceTestContext(TestDevice) as proxy:
-        for value, expected_value in zip(values, expected_values):
+        for value in values:
             future = Future()
             proxy.command_inout_asynch('identity', value, future.set_result)
             result = future.result(timeout=0.5)
-            assert_array_equal(result.argout, expected_value)
+            assert_array_equal(result.argout, expected(value))
