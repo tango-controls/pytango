@@ -98,7 +98,7 @@ LN_STATIC := g++ -pthread -static -Wl,$(OPTIMIZE_LN) -Wl,-Bsymbolic-functions
 
 LN_VER := -Wl,-h -Wl,--strip-all
 
-LN_LIBS := -l$(BOOST_LIB) -lpython$(PY_VER) -ltango
+LN_LIBS := -l$(BOOST_LIB) -ltango
 
 INCLUDE_DIRS =
 
