@@ -58,6 +58,11 @@ if (size < 0)
 #endif
 }
 
+void from_str_to_char(const bopy::object& in, std::string& out)
+{
+    from_str_to_char(in.ptr(), out);
+}
+
 void from_str_to_char(PyObject* in, std::string& out)
 {
     if (PyUnicode_Check(in))
@@ -72,6 +77,13 @@ void from_str_to_char(PyObject* in, std::string& out)
     }
 }
 
+char* from_str_to_char(const bopy::object& in)
+{
+    return from_str_to_char(in.ptr());
+}
+
+// The result is a newly allocated buffer. It is the responsibility
+// of the caller to manage the memory returned by this function
 char* from_str_to_char(PyObject* in)
 {
     char* out = NULL;
