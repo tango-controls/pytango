@@ -133,7 +133,7 @@ namespace PyDeviceData {
             typedef std::string TangoScalarType;
             TangoScalarType val;
             self >> val;
-            return from_char_to_str2(val);
+            return from_char_to_boost_str(val);
         }
 
         template <>

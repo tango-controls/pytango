@@ -200,7 +200,7 @@ void extract_scalar<Tango::DEV_STRING>(const CORBA::Any &any, boost::python::obj
     if ((any >>= data) == false)
         throw_bad_type(Tango::CmdArgTypeName[Tango::DEV_STRING]);
 
-    o = from_char_to_str2(data);
+    o = from_char_to_boost_str(data);
 }
 
 template<>

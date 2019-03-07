@@ -60,7 +60,7 @@ struct python_tangocpp<Tango::DEV_STRING>
 
     static inline bopy::object to_python(const TangoScalarType & value)
     {
-	return from_char_to_str2(value);
+	return from_char_to_boost_str(value);
     }
 };
 
@@ -334,15 +334,15 @@ namespace PyDeviceAttribute
         {
             std::vector<std::string> r_val, w_val;
             self.extract_read(r_val);
-            py_value.attr(value_attr_name) = from_char_to_str2(r_val[0]);
+            py_value.attr(value_attr_name) = from_char_to_boost_str(r_val[0]);
             self.extract_set(w_val);
-            py_value.attr(w_value_attr_name) = from_char_to_str2(w_val[0]);
+            py_value.attr(w_value_attr_name) = from_char_to_boost_str(w_val[0]);
         }
         else
         {
             std::string rvalue;
             EXTRACT_VALUE(self, rvalue)
-            py_value.attr(value_attr_name) = from_char_to_str2(rvalue);
+            py_value.attr(value_attr_name) = from_char_to_boost_str(rvalue);
             py_value.attr(w_value_attr_name) = object();
         }
     }

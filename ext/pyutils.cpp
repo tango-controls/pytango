@@ -15,30 +15,30 @@
 
 using namespace boost::python;
 
-bopy::object from_char_to_str2(const std::string& in, 
-                               const char* encoding /*=NULL defaults to latin-1 */,
-                               const char* errors /*="strict" */)
+bopy::object from_char_to_boost_str(const std::string& in,
+                                    const char* encoding /*=NULL defaults to latin-1 */,
+                                    const char* errors /*="strict" */)
 {
-    return from_char_to_str2(in.c_str(), in.size(), encoding, errors);
+    return from_char_to_boost_str(in.c_str(), in.size(), encoding, errors);
 }
 
-bopy::object from_char_to_str2(const char* in, Py_ssize_t size /* =-1 */, 
-                               const char* encoding /*=NULL defaults to latin-1 */,
-                               const char* errors /*="strict" */)
+bopy::object from_char_to_boost_str(const char* in, Py_ssize_t size /* =-1 */,
+                                    const char* encoding /*=NULL defaults to latin-1 */,
+                                    const char* errors /*="strict" */)
 {
-    return bopy::object(bopy::handle<>(from_char_to_str(in, size, encoding, errors)));
+    return bopy::object(bopy::handle<>(from_char_to_python_str(in, size, encoding, errors)));
 }
 
-PyObject* from_char_to_str(const std::string& in, 
-                           const char* encoding /*=NULL defaults to latin-1 */,
-                           const char* errors /*="strict" */)
+PyObject* from_char_to_python_str(const std::string& in,
+                                  const char* encoding /*=NULL defaults to latin-1 */,
+                                  const char* errors /*="strict" */)
 {
-    return from_char_to_str(in.c_str(), in.size(), encoding, errors);
+    return from_char_to_python_str(in.c_str(), in.size(), encoding, errors);
 }
 
-PyObject* from_char_to_str(const char* in, Py_ssize_t size /* =-1 */, 
-                           const char* encoding /*=NULL defaults to latin-1 */,
-                           const char* errors /*="strict" */)
+PyObject* from_char_to_python_str(const char* in, Py_ssize_t size /* =-1 */,
+                                  const char* encoding /*=NULL defaults to latin-1 */,
+                                  const char* errors /*="strict" */)
 {
 if (size < 0)
 {
