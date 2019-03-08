@@ -114,10 +114,10 @@ if pytest:
     def create_result(dtype, value):
         if dtype == str:
             if PY3:
-                if isinstance(value, bytes):
+                if isinstance(value, six.binary_type):
                     return value.decode('latin-1')
             else:
-                if isinstance(value, unicode):
+                if isinstance(value, six.text_type):
                     return value.encode('latin-1')
         elif dtype == (str,):
             return [create_result(str, v) for v in value]
