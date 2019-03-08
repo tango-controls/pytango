@@ -15,6 +15,7 @@ import time
 import textwrap
 import threading
 import enum
+import six
 try:
     import collections.abc as collections_abc  # python 3.3+
 except ImportError:
@@ -30,7 +31,7 @@ from ._tango import CmdArgType, DevState
 from .utils import TO_TANGO_TYPE, scalar_to_array_type
 from .utils import is_pure_str, is_non_str_seq, is_integer, is_number
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
-from .utils import seq_2_DbData, DbData_2_dict
+from .utils import DbData_2_dict, obj_2_property
 from .utils import document_method as __document_method
 from .utils import dir2
 
@@ -636,31 +637,7 @@ def __DeviceProxy__put_property(self, value):
         Throws     : ConnectionFailed, CommunicationFailed
                     DevFailed from device (DB_SQLError)
     """
-    if isinstance(value, DbData):
-        pass
-    elif isinstance(value, DbDatum):
-        new_value = DbData()
-        new_value.append(value)
-        value = new_value
-    elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k, v in value.items():
-            if isinstance(v, DbDatum):
-                new_value.append(v)
-                continue
-            db_datum = DbDatum(k)
-            if is_non_str_seq(v):
-                seq_2_StdStringVector(v, db_datum.value_string)
-            else:
-                db_datum.value_string.append(str(v))
-            new_value.append(db_datum)
-        value = new_value
-    else:
-        raise TypeError(
-            'Value must be a tango.DbDatum, tango.DbData, '
-            'a sequence<DbDatum> or a dictionary')
+    value = obj_2_property(value)
     return self._put_property(value)
 
 
@@ -707,7 +684,8 @@ def __DeviceProxy__delete_property(self, value):
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
-                new_value.append(DbDatum(str(e)))
+                e = six.ensure_binary(e, 'latin-1')
+                new_value.append(DbDatum(e))
     elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k, v in value.items():

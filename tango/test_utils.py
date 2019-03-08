@@ -68,15 +68,21 @@ class BadEnumDuplicates(enum.IntEnum):
 
 # Helpers
 
+# Note on Tango properties using the Tango File database:
+# Tango file database cannot handle properties with '\n'. It doesn't
+# handle '\' neither. And it cuts ASCII extended characters. That is
+# why you will find that all property related tests are truncated to
+# the first two values of the arrays below
+
 TYPED_VALUES = {
-    int: (1, 2),
-    float: (2.71, 3.14),
+    int: (1, 2, -65535, 23),
+    float: (2.71, 3.14, -34.678e-10, 12.678e+15),
     str: ('hey hey', 'my my', bytes_devstring, str_devstring),
-    bool: (False, True),
-    (int,): ([1, 2, 3], [9, 8, 7]),
-    (float,): ([0.1, 0.2, 0.3], [0.9, 0.8, 0.7]),
-    (str,): (['ab', 'cd', 'ef'], ['gh', 'ij', 'kl'], [bytes_devstring], [str_devstring]),
-    (bool,): ([False, False, True], [True, False, False])}
+    bool: (False, True, True, False),
+    (int,): ([1, 2, 3], [9, 8, 7], [-65535, 2224], [0, 0]),
+    (float,): ([0.1, 0.2, 0.3], [0.9, 0.8, 0.7], [-6.3232e-3], [0.0, 12.56e+12]),
+    (str,): (['ab', 'cd', 'ef'], ['gh', 'ij', 'kl'], 10*[bytes_devstring], 10*[str_devstring]),
+    (bool,): ([False, False, True], [True, False, False], [False], [True])}
 
 
 def repr_type(x):

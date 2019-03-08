@@ -227,6 +227,18 @@ struct StdString_from_python_str_unicode
     }
 };
 
+PyObject* vector_string_get_item(const StdStringVector &vec, int index)
+{
+    size_t pos = index < 0 ? index + vec.size() : (size_t)index;
+    if (pos >= vec.size()) {
+        PyErr_SetString(PyExc_IndexError, "Index out of range");
+        boost::python::throw_error_already_set();
+	return NULL;
+    }
+    return from_char_to_python_str(vec[pos]);
+}
+
+
 void* convert_to_cstring(PyObject* obj)
 {
     return PyBytes_Check(obj) ? PyBytes_AsString(obj) : 0;
@@ -293,7 +305,8 @@ void export_base_types()
     //              >> exception (unexisting is stored in the other obj)
 
     class_<StdStringVector>("StdStringVector")
-        .def(vector_indexing_suite<StdStringVector, true>());
+        .def(vector_indexing_suite<StdStringVector, true>())
+      .def("__getitem__", &vector_string_get_item);
 
     class_<StdLongVector>("StdLongVector")
         .def(vector_indexing_suite<StdLongVector, true>());

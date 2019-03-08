@@ -28,7 +28,7 @@ except ImportError:
     import collections as collections_abc
 
 from ._tango import StdStringVector, StdDoubleVector, \
-    DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
+    DbData, DbDatum, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
     EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
     DevState, CommunicationFailed, PipeEventData, DevIntrChangeEventData
 
@@ -1047,6 +1047,38 @@ def obj_2_str(obj, tg_type=None):
     if obj is None:
         return ''
     return '\n'.join([str(i) for i in obj])
+
+
+def obj_2_property(value):
+    if isinstance(value, DbData):
+        pass
+    elif isinstance(value, DbDatum):
+        new_value = DbData()
+        new_value.append(value)
+        value = new_value
+    elif is_non_str_seq(value):
+        value = seq_2_DbData(value)
+    elif isinstance(value, collections_abc.Mapping):
+        new_value = DbData()
+        for k, v in value.items():
+            if isinstance(v, DbDatum):
+                new_value.append(v)
+                continue
+            db_datum = DbDatum(k)
+            if is_non_str_seq(v):
+                seq_2_StdStringVector(v, db_datum.value_string)
+            else:
+                if not is_pure_str(v):
+                    v = str(v)
+                v = six.ensure_binary(v, encoding='latin-1')
+                db_datum.value_string.append(v)
+            new_value.append(db_datum)
+        value = new_value
+    else:
+        raise TypeError(
+            'Value must be a tango.DbDatum, tango.DbData, '
+            'a sequence<DbDatum> or a dictionary')
+    return value
 
 
 def __get_meth_func(klass, method_name):
