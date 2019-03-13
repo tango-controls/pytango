@@ -154,24 +154,27 @@ void * PyCapsule_Import(const char *name, int no_block);
 
 #endif /* #if PY_VERSION_HEX < 0x02070000 */
 
-PyObject* from_char_to_str(const char* in, Py_ssize_t size=-1,
-                           const char* encoding=NULL, /* defaults to latin-1 */
-                           const char* errors="strict");
+PyObject* from_char_to_python_str(const char* in, Py_ssize_t size=-1,
+                                  const char* encoding=NULL, /* defaults to latin-1 */
+                                  const char* errors="strict");
 
-PyObject* from_char_to_str(const std::string& in,
-                           const char* encoding=NULL, /* defaults to latin-1 */
-                           const char* errors="strict");
+PyObject* from_char_to_python_str(const std::string& in,
+                                  const char* encoding=NULL, /* defaults to latin-1 */
+                                  const char* errors="strict");
 
-bopy::object from_char_to_str2(const char* in, Py_ssize_t size=-1,
-                               const char* encoding=NULL, /* defaults to latin-1 */
-                               const char* errors="strict");
+bopy::object from_char_to_boost_str(const char* in, Py_ssize_t size=-1,
+                                    const char* encoding=NULL, /* defaults to latin-1 */
+                                    const char* errors="strict");
 
-bopy::object from_char_to_str2(const std::string& in,
-                               const char* encoding=NULL, /* defaults to latin-1 */
-                               const char* errors="strict");
+bopy::object from_char_to_boost_str(const std::string& in,
+                                    const char* encoding=NULL, /* defaults to latin-1 */
+                                    const char* errors="strict");
 
 
+void from_str_to_char(const bopy::object& in, std::string& out);
 void from_str_to_char(PyObject* in, std::string& out);
+char* from_str_to_char(PyObject* in);
+char* from_str_to_char(const bopy::object& in);
 
 inline void raise_(PyObject *type, const char *message)
 {

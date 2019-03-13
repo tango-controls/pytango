@@ -17,6 +17,7 @@ __all__ = ("db_init",)
 
 __docformat__ = "restructuredtext"
 
+import six
 try:
     import collections.abc as collections_abc  # python 3.3+
 except ImportError:
@@ -27,7 +28,8 @@ from ._tango import StdStringVector, Database, DbDatum, DbData, \
     DbHistory, DbServerInfo, DbServerData
 
 from .utils import is_pure_str, is_non_str_seq, seq_2_StdStringVector, \
-    seq_2_DbDevInfos, seq_2_DbDevExportInfos, seq_2_DbData, DbData_2_dict
+    seq_2_DbDevInfos, seq_2_DbDevExportInfos, seq_2_DbData, DbData_2_dict, \
+    obj_2_property
 from .utils import document_method as __document_method
 
 
@@ -200,7 +202,8 @@ def __Database__generic_get_property(self, obj_name, value, f):
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
-                new_value.append(DbDatum(str(e)))
+                e = six.ensure_binary(e, 'latin-1')
+                new_value.append(DbDatum(e))
     elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k, v in value.items():
@@ -222,31 +225,7 @@ def __Database__generic_get_property(self, obj_name, value, f):
 
 def __Database__generic_put_property(self, obj_name, value, f):
     """internal usage"""
-    if isinstance(value, DbData):
-        pass
-    elif isinstance(value, DbDatum):
-        new_value = DbData()
-        new_value.append(value)
-        value = new_value
-    elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k, v in value.items():
-            if isinstance(v, DbDatum):
-                new_value.append(v)
-                continue
-            db_datum = DbDatum(k)
-            if is_non_str_seq(v):
-                seq_2_StdStringVector(v, db_datum.value_string)
-            else:
-                db_datum.value_string.append(str(v))
-            new_value.append(db_datum)
-        value = new_value
-    else:
-        raise TypeError(
-            'Value must be a tango.DbDatum, tango.DbData, '
-            'a sequence<DbDatum> or a dictionary')
+    value = obj_2_property(value)
     return f(obj_name, value)
 
 
@@ -259,6 +238,7 @@ def __Database__generic_delete_property(self, obj_name, value, f):
         new_value.append(value)
     elif is_pure_str(value):
         new_value = DbData()
+        value = six.ensure_binary(value, 'latin-1')
         new_value.append(DbDatum(value))
     elif isinstance(value, collections_abc.Sequence):
         new_value = DbData()
@@ -266,7 +246,8 @@ def __Database__generic_delete_property(self, obj_name, value, f):
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
-                new_value.append(DbDatum(str(e)))
+                e = six.ensure_binary(e, 'latin-1')
+                new_value.append(DbDatum(e))
     elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k, v in value.items():

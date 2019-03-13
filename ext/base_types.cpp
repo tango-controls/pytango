@@ -204,10 +204,11 @@ struct StdString_from_python_str_unicode
       if (PyUnicode_Check(obj))
       {
           decref = true;
-          obj = PyUnicode_AsUTF8String(obj);
+          obj = PyUnicode_AsLatin1String(obj);
       }
 
       const char* value = PyBytes_AsString(obj);
+      Py_ssize_t size = PyBytes_Size(obj);
 
       // Grab pointer to memory into which to construct the new std::string
       void* storage = (
@@ -216,7 +217,7 @@ struct StdString_from_python_str_unicode
 
       // in-place construct the new std::string using the character data
       // extraced from the python object
-      new (storage) std::string(value);
+      new (storage) std::string(value, size);
 
       // Stash the memory chunk pointer for later use by boost.python
       data->convertible = storage;
@@ -225,6 +226,18 @@ struct StdString_from_python_str_unicode
           Py_DECREF(obj);
     }
 };
+
+PyObject* vector_string_get_item(const StdStringVector &vec, int index)
+{
+    size_t pos = index < 0 ? index + vec.size() : (size_t)index;
+    if (pos >= vec.size()) {
+        PyErr_SetString(PyExc_IndexError, "Index out of range");
+        boost::python::throw_error_already_set();
+	return NULL;
+    }
+    return from_char_to_python_str(vec[pos]);
+}
+
 
 void* convert_to_cstring(PyObject* obj)
 {
@@ -292,7 +305,8 @@ void export_base_types()
     //              >> exception (unexisting is stored in the other obj)
 
     class_<StdStringVector>("StdStringVector")
-        .def(vector_indexing_suite<StdStringVector, true>());
+        .def(vector_indexing_suite<StdStringVector, true>())
+      .def("__getitem__", &vector_string_get_item);
 
     class_<StdLongVector>("StdLongVector")
         .def(vector_indexing_suite<StdLongVector, true>());

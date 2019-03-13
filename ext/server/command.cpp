@@ -99,6 +99,22 @@ void insert_scalar(boost::python::object &o, CORBA::Any &any)
 }
 
 template<>
+void insert_scalar<Tango::DEV_STRING>(boost::python::object &o, CORBA::Any &any)
+{
+    PyObject *o_ptr = o.ptr();
+    if (PyUnicode_Check(o_ptr))
+    {
+        PyObject *bytes_o_ptr = PyUnicode_AsLatin1String(o_ptr);
+	any <<= PyBytes_AsString(bytes_o_ptr);
+        Py_DECREF(bytes_o_ptr);
+    }
+    else
+    {
+        any <<= PyBytes_AsString(o_ptr);
+    }
+}
+
+template<>
 void insert_scalar<Tango::DEV_VOID>(boost::python::object &o, CORBA::Any &any)
 {}
 
@@ -184,7 +200,7 @@ void extract_scalar<Tango::DEV_STRING>(const CORBA::Any &any, boost::python::obj
     if ((any >>= data) == false)
         throw_bad_type(Tango::CmdArgTypeName[Tango::DEV_STRING]);
 
-    o = object(data);
+    o = from_char_to_boost_str(data);
 }
 
 template<>

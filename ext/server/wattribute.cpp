@@ -510,7 +510,7 @@ namespace PyWAttribute
 
         long length = att.get_write_value_length();
         for (long l = 0; l < length; ++l) {
-            seq.append(ptr[l]);
+            seq.append(from_char_to_boost_str(ptr[l]));
         }
     }
 
@@ -541,7 +541,7 @@ namespace PyWAttribute
 	    *obj = boost::python::object();
 	}
 	else {
-	    *obj = boost::python::object((const char*)v);
+	  *obj = from_char_to_boost_str(v);
 	}
     }
 
@@ -581,7 +581,7 @@ namespace PyWAttribute
         att.get_write_value(ptr);
         boost::python::list o;
         for (long l = 0; l < length; ++l) {
-            o.append(ptr[l]);
+            o.append(from_char_to_boost_str(ptr[l]));
 	}
     }
 
@@ -637,13 +637,13 @@ namespace PyWAttribute
 
         if (att.get_data_format() == Tango::SPECTRUM) {
             for (size_t x=0; x<dim_x; ++x) {
-                result.append(buffer[x]);
+                result.append(from_char_to_boost_str(buffer[x]));
             }
         } else {
             for (size_t y=0; y<dim_y; ++y) {
                 boost::python::list row;
                 for (size_t x=0; x<dim_x; ++x) {
-                    row.append(buffer[x + y*dim_x]);
+                    row.append(from_char_to_boost_str(buffer[x + y*dim_x]));
                 }
                 result.append(row);
             }

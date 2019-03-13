@@ -26,14 +26,6 @@
 
 extern const char *param_must_be_seq;
 
-char* obj_to_new_char(PyObject* obj_ptr);
-
-char* obj_to_new_char(bopy::object obj);
-
-void obj_to_string(PyObject* obj_ptr, std::string& result);
-
-void obj_to_string(bopy::object obj, std::string& result);
-
 /// @bug Not a bug per se, but you should keep in mind: It returns a new
 /// string, so if you pass it to Tango with a release flag there will be
 /// no problems, but if you have to use it yourself then you must remember
