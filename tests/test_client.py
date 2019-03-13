@@ -17,7 +17,6 @@ from distutils.spawn import find_executable
 from subprocess import Popen
 import platform
 from time import sleep
-import sys
 
 import psutil
 import pytest
@@ -25,7 +24,7 @@ from functools import partial
 from tango import DeviceProxy, DevFailed, GreenMode
 from tango import DeviceInfo, AttributeInfo, AttributeInfoEx
 from tango.utils import is_str_type, is_int_type, is_float_type, is_bool_type
-from tango.test_utils import assert_close
+from tango.test_utils import PY3, assert_close, bytes_devstring, str_devstring
 
 from tango.gevent import DeviceProxy as gevent_DeviceProxy
 from tango.futures import DeviceProxy as futures_DeviceProxy
@@ -97,12 +96,6 @@ ATTRIBUTES = [
     'Status',
 ]
 
-PY3 = sys.version_info >= (3,)
-
-# char \x00 cannot be sent in a DevString. All other 1-255 chars can
-ints = tuple(range(1, 256))
-bytes_devstring = bytes(ints) if PY3 else ''.join(map(chr, ints))
-str_devstring = bytes_devstring.decode('latin-1')
 
 device_proxy_map = {
     GreenMode.Synchronous: DeviceProxy,
