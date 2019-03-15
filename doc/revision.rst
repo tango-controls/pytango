@@ -103,6 +103,8 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 | 28/11/18 | `9.2.5 <http://pytango.readthedocs.io/en/v9.2.5>`_                               | 9.2.5 Release                                       | A\. Joubert                    |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
+| 13/03/19 | `9.3.0 <http://pytango.readthedocs.io/en/v9.3.0>`_                               | 9.3.0 Release                                       | T\. Coutinho                   |
++----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 
 .. _pytango-version-history:
 
@@ -112,6 +114,24 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
+| 9.3.0    | 9.3.0 release.                                                                                                                                                        |
+|          |                                                                                                                                                                       |
+|          | Changes:                                                                                                                                                              |
+|          |     - `Pull Request #242: Improve Python version check for enum34 install <https://github.com/tango-controls/pytango/pull/242>`_                                      |
+|          |     - `Pull Request #250: Develop 9.3.0 <https://github.com/tango-controls/pytango/pull/250>`_                                                                        |
+|          |     - `Pull Request #258: Change Travis CI builds to xenial <https://github.com/tango-controls/pytango/pull/258>`_                                                    |
+|          |                                                                                                                                                                       |
+|          | Bug fixes:                                                                                                                                                            |
+|          |     - `Pull Request #245: Change for collections abstract base class <https://github.com/tango-controls/pytango/pull/245>`_                                           |
+|          |     - `Pull Request #247: Use IP address instead of hostname (fix #246) <https://github.com/tango-controls/pytango/pull/247>`_                                        |
+|          |     - `Pull Request #252: Fix wrong link to tango dependency (#235) <https://github.com/tango-controls/pytango/pull/252>`_                                            |
+|          |     - `Pull Request #254: Fix mapping of AttrWriteType WT_UNKNOWN <https://github.com/tango-controls/pytango/pull/254>`_                                              |
+|          |     - `Pull Request #257: Fix some docs and docstrings <https://github.com/tango-controls/pytango/pull/257>`_                                                         |
+|          |     - `Pull Request #260: add ApiUtil.cleanup() <https://github.com/tango-controls/pytango/pull/260>`_                                                                |
+|          |     - `Pull Request #262: Fix compile error under Linux <https://github.com/tango-controls/pytango/pull/262>`_                                                        |
+|          |     - `Pull Request #263: Fix #251: Python 2 vs Python 3: DevString with bytes <https://github.com/tango-controls/pytango/pull/263>`_                                 |
+|          |                                                                                                                                                                       |
++----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 9.2.5    | 9.2.5 release.                                                                                                                                                        |
 |          |                                                                                                                                                                       |
 |          | Changes:                                                                                                                                                              |
