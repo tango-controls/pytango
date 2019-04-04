@@ -429,11 +429,11 @@ def setup_args():
     requires = [
         'boost_python (>=1.33)',
         'numpy (>=1.1)',
-        'six',
+        'six (>=1.12)',
     ]
 
     install_requires = [
-        'six',
+        'six (>=1.12)',
     ]
     if PYTHON_VERSION < (3, 4):
         install_requires.append('enum34')
