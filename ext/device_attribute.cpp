@@ -526,7 +526,7 @@ namespace PyDeviceAttribute
 
         // self.get_type() already does self.is_empty()
         const int data_type = self.get_type();
-        const bool is_empty = data_type < 0;
+        const bool is_empty = ((data_type < 0) || (data_type == Tango::DATA_TYPE_UNKNOWN));
         const bool has_failed = self.has_failed();
         Tango::AttrDataFormat data_format = self.get_data_format();
 
