@@ -188,6 +188,13 @@ def writable_scalar_attribute(request):
     return request.param
 
 
+@pytest.fixture(params=[a for a in ATTRIBUTES
+                        if "spectrum" in a and
+                        a.split("_")[-1] not in ("ro", "rww")])
+def writable_spectrum_attribute(request):
+    return request.param
+
+
 # Tests
 
 def test_ping(tango_test):
@@ -227,6 +234,46 @@ def test_write_scalar_attribute(tango_test, writable_scalar_attribute):
         tango_test.write_attribute(attr_name, "hello", wait=True)
     else:
         pytest.xfail("Not currently testing this type")
+
+
+def test_write_read_spectrum_attribute(tango_test, writable_spectrum_attribute):
+    "Check that writable spectrum attributes can be written and read"
+    attr_name = writable_spectrum_attribute
+    config = tango_test.get_attribute_config(attr_name, wait=True)
+    use_all_elements = True
+    if is_bool_type(config.data_type):
+        write_values = [True, False]
+    elif is_int_type(config.data_type):
+        write_values = [76, 77]
+    elif is_float_type(config.data_type):
+        write_values = [-28.2, 44.3]
+    elif is_str_type(config.data_type):
+        # string spectrum attributes don't reduce their x dimension
+        # when written to, so we only compare the values written
+        use_all_elements = False
+        write_values = ["hello", "hola"]
+    else:
+        pytest.xfail("Not currently testing this type")
+
+    tango_test.write_attribute(attr_name, write_values, wait=True)
+    read_attr = tango_test.read_attribute(attr_name, wait=True)
+    if use_all_elements:
+        read_values = read_attr.value
+    else:
+        read_values = read_attr.value[0:len(write_values)]
+    assert_close(read_values, write_values)
+
+
+def test_write_read_empty_spectrum_attribute(tango_test, writable_spectrum_attribute):
+    "Check that writing empty list to spectrum attribute reads back as None."
+    attr_name = writable_spectrum_attribute
+    config = tango_test.get_attribute_config(attr_name, wait=True)
+    if is_str_type(config.data_type):
+        pytest.xfail("String spectrum x dimension does not reduce")
+
+    tango_test.write_attribute(attr_name, [], wait=True)
+    read_attr = tango_test.read_attribute(attr_name, wait=True)
+    assert read_attr.value is None
 
 
 def test_write_read_string_attribute(tango_test):
