@@ -64,6 +64,10 @@ def main():
                     '--title="PyTango 9" ' \
                     '--bitmap="%s" ' \
                     '--plat-name=%s ' % (ver, bdist_dir, dist_dir, bitmap, plat_name)
+        cmd_line += 'bdist_wheel --skip-build ' \
+                    '--bdist-dir=%s ' \
+                    '--dist-dir=%s ' \
+                    '--plat-name=%s ' % (bdist_dir, dist_dir, plat_name)
         os.system(cmd_line)
     except:
         print("Failed:")
