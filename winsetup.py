@@ -40,6 +40,8 @@ def main():
 
     build_dir, dist_dir, bdist_dir = map(osp.abspath, sys.argv[1:4])
     config_name, plat_name = sys.argv[4:6]
+    # Pypi is picky about platform name. Make sure we obey his/her majesty
+    plat_name = plat_name.lower()
 #    temp_base_dir = osp.abspath(os.environ["TEMP"])
 #    temp_dir = osp.join(temp_base_dir, "PyTango", config_name)
     if plat_name == 'x64':
