@@ -136,6 +136,19 @@ set(HEADERS
 if(WIN32)
 
   set(${PROJECT_NAME} INCLUDE_DIRS "$ENV{TANGO_PATH}/include")
+  if(PY_27)
+    set(PY_VER "27")
+  elseif(PY_36)
+    set(PY_VER "36")
+  elseif(PY_37)
+    set(PY_VER "37")
+  endif(PY_27)
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(PY_TARGET "64")
+  elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set(PY_TARGET "32")
+  endif()
+  set(RELEASE "Release_${PY_VER}_${PY_TARGET}")
   include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/ext")
   include_directories(${PROJECT_NAME} PUBLIC "$ENV{BOOST_ROOT}")
   include_directories(${PROJECT_NAME} PUBLIC "$ENV{PYTHONPATH}/include")
@@ -144,29 +157,29 @@ if(WIN32)
   link_directories("$ENV{TANGO_PATH}/bin")
   link_directories("$ENV{TANGO_PATH}/lib")
   link_directories("$ENV{PYTHONPATH}/libs")
-  message("$ENV{TANGO_PATH}/include")
+  message("TANGO at: $ENV{TANGO_PATH}/include")
   link_directories("$ENV{BOOST_LIBS}")
-  message("$ENV{BOOST_LIBS}")
+  message("BOOST at: $ENV{BOOST_LIBS}")
+  message("Release at: ${CMAKE_CURRENT_SOURCE_DIR}/${RELEASE}")
   add_compile_options(/MT)
   add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS}) 
   target_compile_options(${PROJECT_NAME} PUBLIC "/MT")
   set_target_properties( ${PROJECT_NAME}
          PROPERTIES
          SUFFIX ".pyd" )
-  set_target_properties( ${PROJECT_NAME}
+  set_target_properties(${PROJECT_NAME}
          PROPERTIES
          COMPILE_OPTIONS "MT" )
-    set_target_properties( ${PROJECT_NAME}
+  set_target_properties(${PROJECT_NAME}
     PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/Release/tango"
-    LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/Release/tango"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/Release/tango"
-)
+    ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/${RELEASE}/tango"
+    LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/${RELEASE}/tango"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/${RELEASE}/tango")
 
- add_custom_command(TARGET ${PROJECT_NAME}
-           POST_BUILD
-           COMMAND "$ENV{PYTHONPATH}/python.exe"  ARGS "${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py" Release dist temp_dist $(ConfigurationName) $(PlatformName)
-           COMMENT "Building installer")
+  add_custom_command(TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND "$ENV{PYTHONPATH}/python.exe"  ARGS "${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py" ${RELEASE} dist temp_dist $(ConfigurationName) $(PlatformName)
+    COMMENT "Building installer")
          
 
 install(TARGETS ${PROJECT_NAME}
