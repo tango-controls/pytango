@@ -176,6 +176,13 @@ if(WIN32)
     LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/${RELEASE}/tango"
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/${RELEASE}/tango")
 
+  if(MSVC90)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      # VC9 x64 complains about object size on base_types.cpp so we add /bigobj flag
+      set_source_files_properties(ext/base_types.cpp PROPERTIES COMPILE_FLAGS /bigobj)
+    endif()
+  endif()
+
   add_custom_command(TARGET ${PROJECT_NAME}
     POST_BUILD
     COMMAND "$ENV{PYTHONPATH}/python.exe"  ARGS "${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py" ${RELEASE} dist temp_dist $(ConfigurationName) $(PlatformName)
