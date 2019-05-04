@@ -33,8 +33,9 @@ def main():
     bitmap = osp.join(winsetup_dir, 'doc', 'logo-medium.bmp')
     ver = ".".join(map(str, sys.version_info[:2]))
 
+    print("winsetup: invoked with: " + ' '.join(sys.argv))
     if len(sys.argv) < 6:
-        print("Need to supply build directory, distribution directory, temporary binary install directory, configuration name and platform name")
+        print("winsetup: need to supply build directory, distribution directory, temporary binary install directory, configuration name and platform name")
         return 1
 
     build_dir, dist_dir, bdist_dir = map(osp.abspath, sys.argv[1:4])
