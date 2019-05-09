@@ -1,16 +1,11 @@
 cmake_minimum_required(VERSION 3.0.2)
 set(CMP0048 NEW)
 
-project(_tango LANGUAGES CXX
-        VERSION 1.0)
-        
-#need to define the version of the library
-set(MAJOR_VERSION "9")
-set(MINOR_VERSION "3")
-set(PATCH_VERSION "1")
+project(_tango LANGUAGES CXX)
 
-#convenient versions
-set(LIBRARY_VERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
+# Set PROJECT_VERSION and PACKAGE_VERSION from git tags
+include(cmake/project_version.cmake)
+
 if(NOT WIN32)
 include(FindPkgConfig)
 
