@@ -6,7 +6,6 @@ graft ext
 graft doc
 graft tests
 graft examples
-graft win
 
 global-exclude *~
 global-exclude *.pyc
