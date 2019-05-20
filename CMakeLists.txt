@@ -1,20 +1,14 @@
 cmake_minimum_required(VERSION 3.0.2)
 set(CMP0048 NEW)
 
-project(_tango LANGUAGES CXX
-        VERSION 1.0)
+project(_tango LANGUAGES CXX)
+
+# Set PROJECT_VERSION and PACKAGE_VERSION from git tags
+include(cmake/project_version.cmake)
 
 if(NOT WIN32)
   message(FATAL_ERROR "This file is only targeting Windows builds - aborting!")
 endif(NOT WIN32)
-
-#need to define the version of the library
-set(MAJOR_VERSION "9")
-set(MINOR_VERSION "3")
-set(PATCH_VERSION "1")
-
-#convenient versions
-set(LIBRARY_VERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
 
 add_definitions(-DWIN32)
 add_definitions(-DNDEBUG)
