@@ -1,4 +1,4 @@
-version: 1.0.{build}
+version: 9.3.1.{build}
 
 image: Visual Studio 2015
 
@@ -9,74 +9,61 @@ environment:
   boost_version: 1.70.0
   matrix:
     - platform: win32
+      configuration: Release
       ARCH: win32-msvc9
-      configuration: Release
-      CMAKE_GENERATOR: "Visual Studio 9 2008"
-      MSVCVERSION: v90
-      MSVCYEAR: "vs2008"
-      MSVCABR: "9"
-      VC_VER: 9.0
-      PYTHONPATH: c:\Python27\
       ARCH_PY: win32-msvc9-py27
-      PY_VER: 27
-    - platform: x64
-      ARCH: x64-msvc9
-      configuration: Release
-      CMAKE_GENERATOR: "Visual Studio 9 2008 Win64"
-      MSVCVERSION: v90
-      MSVCYEAR: "vs2008"
-      MSVCABR: "9"
       VC_VER: 9.0
-      PYTHONPATH: c:\Python27-x64\
+      MSVCVERSION: v90
+      PYTHON_VER: 27
+      PYTHON_ROOT: c:\Python27\
+      CMAKE_GENERATOR: "Visual Studio 9 2008"
+    - platform: x64
+      configuration: Release
+      ARCH: x64-msvc9
       ARCH_PY: x64-msvc9-py27
-      PY_VER: 27
+      VC_VER: 9.0
+      MSVCVERSION: v90
+      PYTHON_VER: 27
+      PYTHON_ROOT: c:\Python27-x64\
+      CMAKE_GENERATOR: "Visual Studio 9 2008 Win64"
 
     - platform: win32
-      ARCH: win32-msvc14
       configuration: Release
-      CMAKE_GENERATOR: "Visual Studio 14 2015"
-      MSVCVERSION: v140
-      MSVCYEAR: "vs2015"
-      MSVCABR: "14"
-      VC_VER: 14.0
-      PYTHONPATH: c:\Python36\
+      ARCH: win32-msvc14
       ARCH_PY: win32-msvc14-py36
-      PY_VER: 36
-    - platform: x64
-      ARCH: x64-msvc14
-      configuration: Release
-      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
-      MSVCVERSION: v140
-      MSVCYEAR: "vs2015"
-      MSVCABR: "14"
       VC_VER: 14.0
-      PYTHONPATH: c:\Python36-x64\
+      MSVCVERSION: v140
+      PYTHON_VER: 36
+      PYTHON_ROOT: c:\Python36\
+      CMAKE_GENERATOR: "Visual Studio 14 2015"
+    - platform: x64
+      configuration: Release
+      ARCH: x64-msvc14
       ARCH_PY: x64-msvc14-py36
-      PY_VER: 36
+      VC_VER: 14.0
+      MSVCVERSION: v140
+      PYTHON_VER: 36
+      PYTHON_ROOT: c:\Python36-x64\
+      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
 
     - platform: win32
+      configuration: Release
       ARCH: win32-msvc14
-      configuration: Release
-      CMAKE_GENERATOR: "Visual Studio 14 2015"
-      MSVCVERSION: v140
-      MSVCYEAR: "vs2015"
-      MSVCABR: "14"
-      VC_VER: 14.0
-      PYTHONPATH: c:\Python37\
       ARCH_PY: win32-msvc14-py37
-      PY_VER: 37
-
-    - platform: x64
-      ARCH: x64-msvc14
-      configuration: Release
-      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
-      MSVCVERSION: v140
-      MSVCYEAR: "vs2015"
-      MSVCABR: "14"
       VC_VER: 14.0
-      PYTHONPATH: c:\Python37-x64\
+      MSVCVERSION: v140
+      PYTHON_VER: 37
+      PYTHON_ROOT: c:\Python37\
+      CMAKE_GENERATOR: "Visual Studio 14 2015"
+    - platform: x64
+      configuration: Release
+      ARCH: x64-msvc14
       ARCH_PY: x64-msvc14-py37
-      PY_VER: 37
+      VC_VER: 14.0
+      MSVCVERSION: v140
+      PYTHON_VER: 37
+      PYTHON_ROOT: c:\Python37-x64\
+      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
 
 init:
   # go to hell Xamarin (see http://help.appveyor.com/discussions/problems/4569)
@@ -88,15 +75,15 @@ init:
   - cmd: cd "C:\projects\"
   - cmd: md libtango
   - cmd: cd "C:\projects\"
-  - if %platform%==win32 appveyor DownloadFile %cpptango_download_base%/%cpptango_version%/libtango_%cpptango_version%_%MSVCVERSION%_x86.zip
-  - if %platform%==x64 appveyor DownloadFile %cpptango_download_base%/%cpptango_version%/libtango_%cpptango_version%_%MSVCVERSION%_x64.zip
-  - cmd: if %platform%==win32 7z -y x libtango_%cpptango_version%_%MSVCVERSION%_x86.zip -oC:\projects\libtango\
-  - cmd: if %platform%==x64 7z -y x libtango_%cpptango_version%_%MSVCVERSION%_x64.zip -oC:\projects\libtango\
+  - if /I %platform%==win32 appveyor DownloadFile %cpptango_download_base%/%cpptango_version%/libtango_%cpptango_version%_%MSVCVERSION%_x86.zip
+  - if /I %platform%==x64 appveyor DownloadFile %cpptango_download_base%/%cpptango_version%/libtango_%cpptango_version%_%MSVCVERSION%_x64.zip
+  - cmd: if /I %platform%==win32 7z -y x libtango_%cpptango_version%_%MSVCVERSION%_x86.zip -oC:\projects\libtango\
+  - cmd: if /I %platform%==x64 7z -y x libtango_%cpptango_version%_%MSVCVERSION%_x64.zip -oC:\projects\libtango\
 
   # boost
   - cmd: cd "C:\projects\"
-  - appveyor DownloadFile %boost_download_base%/%boost_version%/boost-python-%boost_version%_%ARCH%_py%PY_VER%.zip
-  - cmd: 7z -y x boost-python-%boost_version%_%ARCH%_py%PY_VER%.zip -oC:\projects\
+  - appveyor DownloadFile %boost_download_base%/%boost_version%/boost-python-%boost_version%_%ARCH%_py%PYTHON_VER%.zip
+  - cmd: 7z -y x boost-python-%boost_version%_%ARCH%_py%PYTHON_VER%.zip -oC:\projects\
 
   #VS2008 patch
   - cmd: cd "C:\projects\"
@@ -115,41 +102,33 @@ install:
   - cmd: if %ARCH%==x64-msvc9 call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat"
   - cmd: if %ARCH%==win32-msvc14 call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
   - cmd: if %ARCH%==x64-msvc14 call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
-  - cmd: echo "Generator='%CMAKE_GENERATOR%'"
-  - cmd: echo "Platform='%Platform%'"
-  - cmd: set PYTHONPATH=%PYTHONPATH%
-  - "%PYTHONPATH%/Scripts/pip.exe install nose wheel numpy"
-  # Tango Server
+  - cmd: set PYTHON_ROOT=%PYTHON_ROOT%
+  - "%PYTHON_ROOT%/Scripts/pip.exe install nose wheel numpy"
+  # Prepare cmake
   - cmd: cd "C:\projects\pytango"
-  - cmd: dir
-  - cmd: set BOOST_ROOT=c:/projects/Boost/include/boost-1_70
-  - cmd: set BOOST_LIBS=c:/projects/Boost/lib
-  - cmd: if %ARCH%==win32-msvc9 set TANGO_PATH=C:/projects/libtango/libtango_%cpptango_version%_v90_x86/
-  - cmd: if %ARCH%==x64-msvc9 set TANGO_PATH=C:/projects/libtango/libtango_%cpptango_version%_v90_x64/
-  - cmd: if %ARCH%==win32-msvc14 set TANGO_PATH=C:/projects/libtango/libtango_%cpptango_version%_v140_x86/
-  - cmd: if %ARCH%==x64-msvc14 set TANGO_PATH=C:/projects/libtango/libtango_%cpptango_version%_v140_x64/
-  - cmd: if %ARCH_PY%==win32-msvc9-py27 cmake -G "%CMAKE_GENERATOR%" . -DPY_27=TRUE
-  - cmd: if %ARCH_PY%==x64-msvc9-py27 cmake -G "%CMAKE_GENERATOR%" . -DPY_27=TRUE
-  - cmd: if %ARCH_PY%==win32-msvc14-py36 cmake -G "%CMAKE_GENERATOR%" . -DPY_36=TRUE
-  - cmd: if %ARCH_PY%==x64-msvc14-py36 cmake -G "%CMAKE_GENERATOR%" . -DPY_36=TRUE
-  - cmd: if %ARCH_PY%==win32-msvc14-py37 cmake -G "%CMAKE_GENERATOR%" . -DPY_37=TRUE
-  - cmd: if %ARCH_PY%==x64-msvc14-py37 cmake -G "%CMAKE_GENERATOR%" . -DPY_37=TRUE
+  - cmd: set BOOST_ROOT=c:/projects/Boost
+  - cmd: if /I %platform%==win32 set TANGO_ROOT=C:/projects/libtango/libtango_%cpptango_version%_%MSVCVERSION%_x86
+  - cmd: if /I %platform%==x64 set TANGO_ROOT=C:/projects/libtango/libtango_%cpptango_version%_%MSVCVERSION%_x64
+  - cmd: echo TANGO_ROOT is "%TANGO_ROOT%"
+  - cmd: echo CMAKE_GENERATOR is '%CMAKE_GENERATOR%'
+  - cmd: echo PLATFORM is '%platform%'
+  - cmd: cmake -G "%CMAKE_GENERATOR%" .
 
 clone_folder: C:\projects\pytango
 
 build:
   parallel: true
   verbosity: minimal
-  
+
 build_script:
-  - cmd: cd C:/projects/pytango 
+  - cmd: cd C:/projects/pytango
   - cmake --build ./ -j 4 --config Release
 
 
 after_build:
   - cmd: cd C:/projects/pytango/dist
   - cmd: dir
-  - cmd: cd C:/projects/pytango 
+  - cmd: cd C:/projects/pytango
   #copying artifacts
   - cmd: move .\dist\pytango*.exe C:/projects/pytango
   - cmd: move .\dist\pytango*.whl C:/projects/pytango
