@@ -18,7 +18,7 @@
 #include "server/attribute.h"
 #include "server/command.h"
 #include "to_py.h"
-#include "pipe.h"
+#include "server/pipe.h"
 
 
 extern const char *param_must_be_seq;
@@ -511,8 +511,8 @@ namespace PyDeviceImpl
     	}
     	Tango::DevicePipeBlob dpb;
     	bool reuse = false;
-		PyDevicePipe::set_value(dpb, pipe_data);
-    	self.push_pipe_event(__pipe_name, &dpb, reuse);
+    	PyDevicePipe::set_value(dpb, pipe_data);
+    	self.push_pipe_event(__pipe_name, &dpb, reuse);        
     }
 
     void check_attribute_method_defined(PyObject *self,
@@ -672,8 +672,6 @@ namespace PyDeviceImpl
     void add_command(Tango::DeviceImpl &self, boost::python::object cmd_name, boost::python::object cmd_data,
     		boost::python::object disp_level, bool device_level = false)
     {
-//        PyCmd *py_cmd_ptr = nullptr;
-        Tango::Command *cmd_ptr = nullptr;
         std::string name = boost::python::extract<std::string>(cmd_name);
 
         std::string in_desc = boost::python::extract<std::string>(cmd_data[0][1]);
@@ -683,9 +681,7 @@ namespace PyDeviceImpl
         Tango::CmdArgType argtype_out = boost::python::extract<Tango::CmdArgType>(cmd_data[1][0]);
         Tango::DispLevel display_level = boost::python::extract<Tango::DispLevel>(disp_level);
 
-        cmd_ptr = new PyCmd(name, argtype_in, argtype_out, in_desc, out_desc, display_level);
-//        py_cmd_ptr = new PyCmd(name, argtype_in, argtype_out, in_desc, out_desc, display_level);
-//        cmd_ptr = py_cmd_ptr;
+        PyCmd *cmd_ptr = new PyCmd(name, argtype_in, argtype_out, in_desc, out_desc, display_level);
         //
         // Install the command in Tango.
         //
@@ -1054,8 +1050,7 @@ Tango::ConstDevString Device_3ImplWrap::dev_status()
     {
         if (override dev_status = this->get_override("dev_status") )
 	{
-            std::string status = dev_status();
-            this->the_status = status;
+            this->the_status = bopy::call<const std::string>(dev_status.ptr());
 	}
         else
 	{
@@ -1230,8 +1225,7 @@ Tango::ConstDevString Device_4ImplWrap::dev_status()
     {
         if (override dev_status = this->get_override("dev_status") )
 	{
-            std::string status = dev_status();
-            this->the_status = status;
+            this->the_status = bopy::call<const std::string>(dev_status.ptr());
 	}
         else
 	{
@@ -1399,8 +1393,7 @@ Tango::ConstDevString Device_5ImplWrap::dev_status()
     {
         if (override dev_status = this->get_override("dev_status") )
 	{
-            std::string status = dev_status();
-            this->the_status = status;
+            this->the_status = bopy::call<const std::string>(dev_status.ptr());
 	}
         else
 	{

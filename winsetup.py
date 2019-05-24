@@ -33,12 +33,15 @@ def main():
     bitmap = osp.join(winsetup_dir, 'doc', 'logo-medium.bmp')
     ver = ".".join(map(str, sys.version_info[:2]))
 
+    print("winsetup: invoked with: " + ' '.join(sys.argv))
     if len(sys.argv) < 6:
-        print("Need to supply build directory, distribution directory, temporary binary install directory, configuration name and platform name")
+        print("winsetup: need to supply build directory, distribution directory, temporary binary install directory, configuration name and platform name")
         return 1
 
     build_dir, dist_dir, bdist_dir = map(osp.abspath, sys.argv[1:4])
     config_name, plat_name = sys.argv[4:6]
+    # Pypi is picky about platform name. Make sure we obey his/her majesty
+    plat_name = plat_name.lower()
 #    temp_base_dir = osp.abspath(os.environ["TEMP"])
 #    temp_dir = osp.join(temp_base_dir, "PyTango", config_name)
     if plat_name == 'x64':
@@ -53,16 +56,20 @@ def main():
         cmd_line += 'install_lib --skip-build --no-compile ' \
                     '--build-dir=%s ' \
                     % (build_dir, )
-        cmd_line += 'bdist_msi --skip-build --target-version=%s ' \
-                    '--bdist-dir=%s ' \
-                    '--dist-dir=%s ' \
-                    '--plat-name=%s ' % (ver, bdist_dir, dist_dir, plat_name)
+#        cmd_line += 'bdist_msi --skip-build --target-version=%s ' \
+#                    '--bdist-dir=%s ' \
+#                    '--dist-dir=%s ' \
+#                    '--plat-name=%s ' % (ver, bdist_dir, dist_dir, plat_name)
         cmd_line += 'bdist_wininst --skip-build --target-version=%s ' \
                     '--bdist-dir=%s ' \
                     '--dist-dir=%s ' \
-                    '--title="PyTango 8" ' \
+                    '--title="PyTango 9" ' \
                     '--bitmap="%s" ' \
                     '--plat-name=%s ' % (ver, bdist_dir, dist_dir, bitmap, plat_name)
+        cmd_line += 'bdist_wheel --skip-build ' \
+                    '--bdist-dir=%s ' \
+                    '--dist-dir=%s ' \
+                    '--plat-name=%s ' % (bdist_dir, dist_dir, plat_name)
         os.system(cmd_line)
     except:
         print("Failed:")

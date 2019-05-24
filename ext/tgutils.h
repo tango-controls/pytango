@@ -468,3 +468,35 @@ DEF_TANGO_SCALAR_ARRAY_NAMES( DEV_STATE,   DEVVAR_STATEARRAY );
 
 #define TANGO_CALL_ON_NUMERICAL_ATTRIBUTE_DATA_TYPE_NAME(tid, fn, ...) \
     TANGO_DO_ON_NUMERICAL_ATTRIBUTE_DATA_TYPE_NAME(tid, fn<tangoTypeConst>(__VA_ARGS__))
+
+// On windows, for tango < 9.3 and python >= 3 the Visual Studio compiler
+// complains about the following missing definitions
+#if TANGO_VERSION_NB < 90300 && _MSC_VER > 1800
+namespace boost
+{
+	template <>
+	Tango::ApiUtil const volatile * get_pointer<class Tango::ApiUtil const volatile >(
+		class Tango::ApiUtil const volatile *c)
+	{
+		return c;
+	}
+    template <>
+	Tango::Pipe const volatile * get_pointer<class Tango::Pipe const volatile >(
+		class Tango::Pipe const volatile *c)
+	{
+		return c;
+	}
+	template <>
+	Tango::WPipe const volatile * get_pointer<class Tango::WPipe const volatile >(
+		class Tango::WPipe const volatile *c)
+	{
+		return c;
+	}
+    template <>
+	Tango::WAttribute const volatile * get_pointer<class Tango::WAttribute const volatile >(
+		class Tango::WAttribute const volatile *c)
+	{
+		return c;
+	}
+}
+#endif

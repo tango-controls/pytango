@@ -80,60 +80,6 @@ __all__ = (
 
 __docformat__ = "restructuredtext"
 
-
-# Prepare windows import
-
-def __prepare_nt():
-    import os
-    import sys
-    import struct
-
-    if os.name != 'nt':
-        return
-
-    try:
-        from . import _tango  # noqa: F401
-    except ImportError:
-        pass
-    else:
-        return
-
-    PATH = os.environ.get('PATH')
-    if PATH is None:
-        os.environ["PATH"] = PATH = ""
-    tango_root = os.environ.get("TANGO_ROOT")
-    if tango_root is None:
-        tango_root = os.path.join(os.environ["ProgramFiles"], "tango")
-    tango_root = tango_root.lower()
-
-    if sys.hexversion < 0x03030000:
-        vc = "vc9_dll"
-    else:
-        vc = "vc10_dll"
-    is64 = 8 * struct.calcsize("P") == 64
-    if is64:
-        arch = "win64"
-    else:
-        arch = "win32"
-    tango_dll_path = os.path.join(tango_root, arch, "lib", vc)
-    tango_dll_path = tango_dll_path.lower()
-    if os.path.exists(tango_dll_path) and \
-       tango_dll_path not in PATH.lower():
-        os.environ['PATH'] += ";" + tango_dll_path
-    else:
-        # Tango C++ could not be found on the system...
-        # ... use PyTango's private Tango C++ library
-        tango_dll_path = os.path.dirname(os.path.abspath(__file__))
-        tango_dll_path = os.path.join(tango_dll_path, "_tango_dll_")
-        if os.path.exists(tango_dll_path):
-            os.environ['PATH'] += ";" + tango_dll_path
-
-
-__prepare_nt()
-
-
-# Boost imports
-
 from ._tango import (
     AccessControlType, ApiUtil, ArchiveEventInfo,
     AsynCall, AsynReplyNotArrived, AttReqType, Attr, AttrConfEventData,

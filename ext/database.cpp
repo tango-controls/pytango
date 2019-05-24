@@ -17,8 +17,7 @@ extern const char *param_must_be_seq;
 extern const char *unreachable_code;
 extern const char *non_string_seq;
 
-const char *param_numb_or_str_numb = "Second parameter must be an int or a "
-                                     "string representing an int";
+const char *param_numb_or_str_numb = "Second parameter must be an int or a string representing an int";
 
 struct PyDatabase
 {

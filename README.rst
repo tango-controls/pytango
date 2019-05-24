@@ -2,7 +2,8 @@ PyTango
 =======
 
 |Doc Status|
-|Build Status|
+|Travis Build Status|
+|Appveyor Build Status|
 |Pypi Version|
 |Python Versions|
 |Anaconda Cloud|
@@ -114,9 +115,13 @@ All contributions,  `PR and bug reports`_ are welcome, please see: `How to Contr
                 :target: http://pytango.readthedocs.io/en/latest
                 :alt:
 
-.. |Build Status| image:: https://travis-ci.org/tango-controls/pytango.svg
-                  :target: https://travis-ci.org/tango-controls/pytango
-                  :alt:
+.. |Travis Build Status| image:: https://travis-ci.org/tango-controls/pytango.svg
+                         :target: https://travis-ci.org/tango-controls/pytango
+                         :alt:
+
+.. |Appveyor Build Status| image:: https://ci.appveyor.com/api/projects/status/v971w26kjdxmjopp?svg=true
+                           :target: https://ci.appveyor.com/project/tiagocoutinho/pytango
+                           :alt:
 
 .. |Pypi Version| image:: https://img.shields.io/pypi/v/PyTango.svg
                   :target: https://pypi.python.org/pypi/PyTango

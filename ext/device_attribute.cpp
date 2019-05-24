@@ -30,7 +30,6 @@ static const char* type_attr_name = "type";
 static const char* is_empty_attr_name = "is_empty";
 static const char* has_failed_attr_name = "has_failed";
 
-
 template<long tangoTypeConst>
 struct python_tangocpp
 {

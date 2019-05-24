@@ -16,7 +16,6 @@
 void export_group_reply_list();
 void export_group_reply();
 
-
 namespace PyGroup
 {
     using namespace boost::python;
