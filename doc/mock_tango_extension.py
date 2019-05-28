@@ -25,7 +25,10 @@ version older than 3.5 (failed with 2.7 and 3.4)
 
 # Imports
 import sys
-from unittest.mock import MagicMock
+try:
+    from unittest.mock import MagicMock
+except ImportError:
+    from mock import MagicMock
 
 __all__ = ('tango',)
 
