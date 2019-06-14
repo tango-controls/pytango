@@ -61,6 +61,7 @@ distribution_match = lambda names: any(x in distribution for x in names)
 DEBIAN = distribution_match(['debian', 'ubuntu', 'mint'])
 REDHAT = distribution_match(['redhat', 'fedora', 'centos', 'opensuse'])
 GENTOO = distribution_match(['gentoo'])
+CONDA = 'CONDA_PREFIX' in os.environ
 
 # Arguments
 TESTING = any(x in sys.argv for x in ['test', 'pytest'])
@@ -368,7 +369,9 @@ def setup_args():
     BOOST_ROOT = os.environ.get('BOOST_ROOT')
     boost_library_name = 'boost_python'
     if BOOST_ROOT is None:
-        if DEBIAN:
+        if CONDA:
+            suffix = ''
+        elif DEBIAN:
             suffix = "-py{v[0]}{v[1]}".format(v=PYTHON_VERSION)
             boost_library_name += suffix
         elif REDHAT:
