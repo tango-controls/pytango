@@ -425,11 +425,31 @@ def test_read_write_dev_encoded(server_green_mode):
         def attr(self, value):
             self.attr_value = value
 
+        @command(dtype_in=DevEncoded)
+        def cmd_in(self, value):
+            self.attr_value = value
+
+        @command(dtype_out=DevEncoded)
+        def cmd_out(self):
+            return self.attr_value
+
+        @command(dtype_in=DevEncoded, dtype_out=DevEncoded)
+        def cmd_in_out(self, value):
+            self.attr_value = value
+            return self.attr_value
+
     with DeviceTestContext(TestDevice) as proxy:
         assert proxy.attr == ("uint8", b"\xd2\xd3")
 
-        proxy.attr = ('uint8', b'\xde')
+        proxy.attr = ("uint8", b"\xde")
         assert proxy.attr == ("uint8", b"\xde")
+
+        proxy.cmd_in(("uint8", b"\xd4\xd5"))
+        assert proxy.cmd_out() == ("uint8", b"\xd4\xd5")
+
+        proxy.cmd_in_out(('uint8', b"\xd6\xd7"))
+        assert proxy.attr == ("uint8", b"\xd6\xd7")
+
 
 
 # Test Exception propagation
