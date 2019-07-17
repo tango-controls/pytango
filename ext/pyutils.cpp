@@ -105,8 +105,7 @@ char* from_str_to_char(PyObject* in)
     }
     else
     {
-        PyErr_SetString(PyExc_TypeError,
-            "can't translate python object to C char*");
+        raise_(PyExc_TypeError, "can't translate python object to C char*");
     }
     return out;
 }
