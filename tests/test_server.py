@@ -121,6 +121,33 @@ def test_polled_command(server_green_mode):
         assert dct[comm] == period
 
 
+def test_wrong_command_result(server_green_mode):
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        @command(dtype_out=str)
+        def cmd_str_err(self):
+            return 1.2345
+
+        @command(dtype_out=int)
+        def cmd_int_err(self):
+            return "bla"
+
+        @command(dtype_out=[str])
+        def cmd_str_list_err(self):
+            return ['hello', 55]
+
+    with DeviceTestContext(TestDevice) as proxy:
+        with pytest.raises(DevFailed):
+            proxy.cmd_str_err()
+        with pytest.raises(DevFailed):
+            proxy.cmd_int_err()
+        with pytest.raises(DevFailed):
+            proxy.cmd_str_list_err()
+
+
+
 # Test attributes
 
 def test_read_write_attribute(typed_values, server_green_mode):
@@ -217,6 +244,31 @@ def test_read_write_attribute_enum(server_green_mode):
         BadTestDevice()  # dummy instance for Codacy
     assert 'enum_labels' in str(context.value)
 
+
+def test_wrong_attribute_read(server_green_mode):
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        @attribute(dtype=str)
+        def attr_str_err(self):
+            return 1.2345
+
+        @attribute(dtype=int)
+        def attr_int_err(self):
+            return "bla"
+
+        @attribute(dtype=[str])
+        def attr_str_list_err(self):
+            return ['hello', 55]
+
+    with DeviceTestContext(TestDevice) as proxy:
+        with pytest.raises(DevFailed):
+            proxy.attr_str_err
+        with pytest.raises(DevFailed):
+            proxy.attr_int_err
+        with pytest.raises(DevFailed):
+            proxy.attr_str_list_err
 
 # Test properties
 
