@@ -125,11 +125,10 @@ attribute you have several possibilities:
 
 #. :obj:`int`
 #. 'int'
-#. 'int32'
-#. 'integer'
-#. :obj:`tango.CmdArgType.DevLong`
-#. 'DevLong'
-#. :obj:`numpy.int32`
+#. 'int64'
+#. :obj:`tango.CmdArgType.DevLong64`
+#. 'DevLong64'
+#. :obj:`numpy.int64`
 
 To define a *SPECTRUM* attribute simply wrap the scalar data type in any
 python sequence:
@@ -183,24 +182,24 @@ dtype argument                            converts to tango type
  ``'DevUShort'``                           ``DevUShort``
  :py:obj:`numpy.uint16`                    ``DevUShort``
 
- :py:obj:`int`                             ``DevLong``
- ``'int'``                                 ``DevLong``
  ``'int32'``                               ``DevLong``
  ``DevLong``                               ``DevLong``
  ``'DevLong'``                             ``DevLong``
  :py:obj:`numpy.int32`                     ``DevLong``
 
- ``'uint'``                                ``DevULong``
  ``'uint32'``                              ``DevULong``
  ``DevULong``                              ``DevULong``
  ``'DevULong'``                            ``DevULong``
  :py:obj:`numpy.uint32`                    ``DevULong``
 
+ :py:obj:`int`                             ``DevLong64``
+ ``'int'``                                 ``DevLong64``
  ``'int64'``                               ``DevLong64``
  ``DevLong64``                             ``DevLong64``
  ``'DevLong64'``                           ``DevLong64``
  :py:obj:`numpy.int64`                     ``DevLong64``
 
+ ``'uint'``                                ``DevULong64``
  ``'uint64'``                              ``DevULong64``
  ``DevULong64``                            ``DevULong64``
  ``'DevULong64'``                          ``DevULong64``
