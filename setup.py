@@ -61,6 +61,7 @@ distribution_match = lambda names: any(x in distribution for x in names)
 DEBIAN = distribution_match(['debian', 'ubuntu', 'mint'])
 REDHAT = distribution_match(['redhat', 'fedora', 'centos', 'opensuse'])
 GENTOO = distribution_match(['gentoo'])
+CONDA = 'CONDA_PREFIX' in os.environ
 
 # Arguments
 TESTING = any(x in sys.argv for x in ['test', 'pytest'])
@@ -268,6 +269,9 @@ class build_ext(dftbuild_ext):
         if self.use_cpp_0x:
             ext.extra_compile_args += ['-std=c++0x']
             ext.define_macros += [('PYTANGO_HAS_UNIQUE_PTR', '1')]
+        ext.extra_compile_args += ['-Wno-unused-variable',
+                                   '-Wno-deprecated-declarations',
+                                   '-Wno-maybe-uninitialized']
         dftbuild_ext.build_extension(self, ext)
 
 
@@ -368,7 +372,9 @@ def setup_args():
     BOOST_ROOT = os.environ.get('BOOST_ROOT')
     boost_library_name = 'boost_python'
     if BOOST_ROOT is None:
-        if DEBIAN:
+        if CONDA:
+            suffix = ''
+        elif DEBIAN:
             suffix = "-py{v[0]}{v[1]}".format(v=PYTHON_VERSION)
             boost_library_name += suffix
         elif REDHAT:
@@ -450,7 +456,9 @@ def setup_args():
     ]
 
     if PYTHON2:
-        tests_require += ['trollius', 'futures']
+        tests_require += ['trollius', 'futures', 'pytest < 5']
+    else:
+        tests_require += ['pytest']
 
     package_data = {
         'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
