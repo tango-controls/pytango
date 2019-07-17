@@ -108,9 +108,13 @@ void insert_scalar<Tango::DEV_STRING>(boost::python::object &o, CORBA::Any &any)
 	any <<= PyBytes_AsString(bytes_o_ptr);
         Py_DECREF(bytes_o_ptr);
     }
-    else
+    else if (PyBytes_Check(o_ptr))
     {
         any <<= PyBytes_AsString(o_ptr);
+    }
+    else
+    {
+        raise_(PyExc_TypeError, "can't translate python object to C char*");
     }
 }
 
