@@ -7,7 +7,7 @@ branches:
 
 env:
   global:
-    - TANGO_VERSION=9.3.2alpha.1
+    - TANGO_VERSION=9.2.5a
   matrix:
     - PYTHON_VERSION=2.7
     - PYTHON_VERSION=3.5

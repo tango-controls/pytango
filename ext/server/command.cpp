@@ -222,9 +222,21 @@ void extract_scalar<Tango::DEV_ENCODED>(const CORBA::Any &any, boost::python::ob
         throw_bad_type(Tango::CmdArgTypeName[Tango::DEV_ENCODED]);
     
     bopy::str encoded_format(data[0].encoded_format);
+
+#if PY_MAJOR_VERSION >= 3
+    boost::python::object encoded_data(
+        boost::python::handle<>(
+            PyBytes_FromStringAndSize(
+                (char*)data[0].encoded_data.get_buffer(),
+                data[0].encoded_data.length()
+            )
+        )
+    );
+#else
     bopy::str encoded_data((const char*)data[0].encoded_data.get_buffer(),
                            data[0].encoded_data.length());
-    
+#endif
+
     o = boost::python::make_tuple(encoded_format, encoded_data);
 }
 
