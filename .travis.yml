@@ -55,7 +55,7 @@ before_script:
   # Make sure old_ext exists
   - mkdir -p cached_ext
   # Touch the .so files if the extension hasn't changed
-  - diff cached_ext ext && find build -name _tango*.so -printf "touching %p\n" -exec touch {} + || true
+  - diff -r cached_ext ext && find build -name _tango*.so -printf "touching %p\n" -exec touch {} + || true
 
 script:
   # Build the package
