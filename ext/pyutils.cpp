@@ -96,12 +96,16 @@ char* from_str_to_char(PyObject* in)
 	out = strncpy(out, PyBytes_AsString(bytes_in), size);
         Py_DECREF(bytes_in);
     }
-    else
+    else if (PyBytes_Check(in))
     {
 	Py_ssize_t size = PyBytes_Size(in);
 	out = new char[size+1];
 	out[size] = '\0';
 	out = strncpy(out, PyBytes_AsString(in), size);
+    }
+    else
+    {
+        raise_(PyExc_TypeError, "can't translate python object to C char*");
     }
     return out;
 }
