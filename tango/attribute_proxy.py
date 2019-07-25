@@ -177,7 +177,8 @@ def __AttributeProxy__put_property(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed
-                     DevFailed from device (DB_SQLError)
+                     DevFailed from device (DB_SQLError),
+                     TypeError
     """
     if isinstance(value, DbData):
         pass
@@ -240,7 +241,8 @@ def __AttributeProxy__delete_property(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed
-                    DevFailed from device (DB_SQLError)
+                     DevFailed from device (DB_SQLError),
+                     TypeError
     """
     if isinstance(value, DbData) or isinstance(value, StdStringVector) or \
             is_pure_str(value):
