@@ -635,7 +635,7 @@ def __DeviceProxy__put_property(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed
-                    DevFailed from device (DB_SQLError)
+                     DevFailed from device (DB_SQLError)
     """
     value = obj_2_property(value)
     return self._put_property(value)
@@ -669,8 +669,9 @@ def __DeviceProxy__delete_property(self, value):
 
         Return     : None
 
-        Throws     : ConnectionFailed, CommunicationFailed
-                    DevFailed from device (DB_SQLError)
+        Throws     : ConnectionFailed, CommunicationFailed,
+                     DevFailed from device (DB_SQLError),
+                     TypeError
     """
     if isinstance(value, DbData) or isinstance(value, StdStringVector) or \
             is_pure_str(value):
@@ -720,9 +721,10 @@ def __DeviceProxy__get_property_list(self, filter, array=None):
                     if array is None)
 
         Throws     : NonDbDevice, WrongNameSyntax,
-                    ConnectionFailed (with database),
-                    CommunicationFailed (with database)
-                    DevFailed from database device
+                     ConnectionFailed (with database),
+                     CommunicationFailed (with database),
+                     DevFailed from database device,
+                     TypeError
 
         New in PyTango 7.0.0
     """
@@ -771,7 +773,8 @@ def __DeviceProxy__get_attribute_config(self, value):
                         information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                        DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
         Deprecated: use get_attribute_config_ex instead
     """
@@ -810,7 +813,8 @@ def __DeviceProxy__get_attribute_config_ex(self, value):
                         information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                        DevFailed from device
+                     DevFailed from device,
+                     TypeError
     """
     if isinstance(value, StdStringVector):
         return self._get_attribute_config_ex(value)
@@ -835,7 +839,8 @@ def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     get_command_config( self, name) -> CommandInfo
 
@@ -847,7 +852,8 @@ def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     get_command_config( self, names) -> CommandInfoList
 
@@ -859,7 +865,8 @@ def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
     """
     if isinstance(value, StdStringVector) or is_pure_str(value):
         return self._get_command_config(value)
@@ -880,7 +887,8 @@ def __DeviceProxy__get_pipe_config(self, value=None):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     get_pipe_config( self, name) -> PipeInfo
 
@@ -893,7 +901,8 @@ def __DeviceProxy__get_pipe_config(self, value=None):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     get_pipe_config( self, names) -> PipeInfoList
 
@@ -907,7 +916,8 @@ def __DeviceProxy__get_pipe_config(self, value=None):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
         New in PyTango 9.2.0
     """
@@ -933,7 +943,8 @@ def __DeviceProxy__set_attribute_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                        DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     set_attribute_config( self, attr_info_ex) -> None
 
@@ -944,7 +955,8 @@ def __DeviceProxy__set_attribute_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                        DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     set_attribute_config( self, attr_info) -> None
 
@@ -955,7 +967,8 @@ def __DeviceProxy__set_attribute_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                        DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     set_attribute_config( self, attr_info_ex) -> None
 
@@ -967,7 +980,8 @@ def __DeviceProxy__set_attribute_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                        DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     """
     if isinstance(value, AttributeInfoEx):
@@ -1012,7 +1026,8 @@ def __DeviceProxy__set_pipe_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     set_pipe_config( self, pipe_info) -> None
 
@@ -1023,7 +1038,8 @@ def __DeviceProxy__set_pipe_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
     """
     if isinstance(value, PipeInfo):
         v = PipeInfoList()
@@ -1094,7 +1110,8 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
         Return     : An event id which has to be specified when unsubscribing
                      from this event.
 
-        Throws     : EventSystemFailed
+        Throws     : EventSystemFailed,
+                     TypeError
 
 
     subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy, green_mode=None) -> int
@@ -1136,7 +1153,8 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
         Return     : An event id which has to be specified when unsubscribing
                      from this event.
 
-        Throws     : EventSystemFailed
+        Throws     : EventSystemFailed,
+                     TypeError
 
 
     subscribe_event(self, attr_name, event, queuesize, filters=[], stateless=False, green_mode=None) -> int
@@ -1262,7 +1280,8 @@ def __DeviceProxy__unsubscribe_event(self, event_id):
 
         Return     : None
 
-        Throws     : EventSystemFailed
+        Throws     : EventSystemFailed,
+                     KeyError
     """
     events_del = set()
     timestamp = time.time()
@@ -1323,7 +1342,9 @@ def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractA
 
         Return     : None
 
-        Throws     : EventSystemFailed
+        Throws     : EventSystemFailed,
+                     TypeError,
+                     ValueError
 
         See Also   : subscribe_event
 
