@@ -117,8 +117,10 @@ Merge ``stable`` into ``develop``
     ``stable`` and ``develop`` branches.
   * In general, the ``stable`` branch should point to the latest release.
 
-Make sure Travis is OK on ``stable`` branch
-  * All tests, on all versions of Python must be passing.
+Make sure Travis and AppVeyor are OK on ``stable`` branch
+  * On Travis, all tests, on all versions of Python must be passing.
+    If not, bad luck - you'll have to fix it first, and go back a few steps...
+  * On AppVeyor, all builds, on all versions of Python must be passing.
     If not, bad luck - you'll have to fix it first, and go back a few steps...
 
 Make sure the documentation is updated
@@ -154,6 +156,13 @@ Upload the new version to PyPI
       - ``$ pip install -i https://test.pypi.org/simple/ pytango``
   * Upload the source tarball to the real PyPI:
       - ``$ twine upload dist/pytango-9.3.1.tar.gz``
+  * Run build for the tag on AppVeyor, download artifacts, and upload wheels:
+      - ``$ twine upload dist/pytango-9.3.1-cp27-cp27m-win32.whl``
+      - ``$ twine upload dist/pytango-9.3.1-cp27-cp27m-win_amd64.whl``
+      - ``$ twine upload dist/pytango-9.3.1-cp36-cp36m-win32.whl``
+      - ``$ twine upload dist/pytango-9.3.1-cp36-cp36m-win_amd64.whl``
+      - ``$ twine upload dist/pytango-9.3.1-cp37-cp37m-win32.whl``
+      - ``$ twine upload dist/pytango-9.3.1-cp37-cp37m-win_amd64.whl``
 
 Bump the version with "-dev" in the develop branch
   * Change all references to next version.  E.g. if releasing
