@@ -61,5 +61,5 @@ class Release:
     author_lines = "\n".join(["%s <%s>" % x for x in authors.values()])
     url = 'http://github.com/tango-cs/pytango'
     download_url = 'http://pypi.python.org/pypi/pytango'
-    platform = ['Linux', 'Windows XP/Vista/7/8']
+    platform = ['Linux', 'Windows XP/Vista/7/8/10']
     keywords = ['Tango', 'CORBA', 'binding']

@@ -66,14 +66,14 @@ steps required are as follows:
 
 Pick a version number
   * Semantic version numbering is used:  <major>.<minor>.<patch>
-  * The major and minor version fields (9.2) track the TANGO C++ core version.
+  * The major and minor version fields (9.3) track the TANGO C++ core version.
   * Small changes are done as patch releases.  For these the version
     number should correspond the current development number since each
     release process finishes with a version bump.
   * Patch release example:
-      - ``9.2.6.devN`` or ``9.2.6aN`` or ``9.2.6bN`` (current development branch)
-      - changes to ``9.2.6`` (the actual release)
-      - changes to ``9.2.7.dev0`` (bump the patch version at the end of the release process)
+      - ``9.3.1.devN`` or ``9.3.1aN`` or ``9.3.1bN`` (current development branch)
+      - changes to ``9.3.1`` (the actual release)
+      - changes to ``9.3.2.dev0`` (bump the patch version at the end of the release process)
 
 Create an issue in Github
   * This is to inform the community that a release is planned.
@@ -81,12 +81,13 @@ Create an issue in Github
 
     | Task list:
     | - [ ] Read steps in the how-to-contribute docs for making a release
-    | - [ ] Edit the changelog
-    | - [ ] Bump the version
+    | - [ ] Pull request to update changelog and bump version
+    | - [ ] Merge PR (this is the last PR for the release)
     | - [ ] Merge develop into stable
-    | - [ ] Make sure Travis is OK on stable branch
-    | - [ ] Make sure the documentation is updated (readthedocs)
+    | - [ ] Make sure Travis and Appveyor are OK on stable branch
+    | - [ ] Make sure the documentation is updated for stable (readthedocs)
     | - [ ] Create a release tag on GitHub, from stable branch
+    | - [ ] Make sure the documentation is updated for release (readthedocs)
     | - [ ] Upload the new version to PyPI
     | - [ ] Bump the version with "-dev" in the develop branch
     | - [ ] Fill the release description on GitHub
@@ -94,13 +95,14 @@ Create an issue in Github
     | - [ ] Advertise the release on the mailing list
     | - [ ] Close this issue
 
-  * A check list is this form on github can be ticked off as the work progresses.
+  * A check list in this form on github can be ticked off as the work progresses.
 
 Make a branch from ``develop`` to prepare the release
-  * Example branch name: ``prepare-v9.2.6``.
+  * Example branch name: ``prepare-v9.3.1``.
   * Edit the changelog (in ``docs/revision.rst``).  Include *all* pull requests
     since the previous release.
-  * Bump the versions in (in ``tango/release.py``).  E.g. ``version_info`` to (9, 2, 6)
+  * Bump the versions (``tango/release.py`` and ``appveyor.yml``).
+    E.g. ``version_info = (9, 3, 1)``, and ``version: 9.3.1.{build}``
   * Create a pull request to get these changes reviewed before proceeding.
 
 Merge ``stable`` into ``develop``
@@ -126,7 +128,7 @@ Make sure the documentation is updated
   * Readthedocs *should* automatically build the docs for each:
       - push to develop (latest docs)
       - push to stable (stable docs)
-      - new tags (e.g v9.2.x)
+      - new tags (e.g v9.3.1)
   * *But*, the webhooks are somehow broken, so it probably won't work automatically!
       - Trigger the builds manually here:  https://readthedocs.org/projects/pytango/builds/
       - Set the new version to "active" here:
@@ -134,7 +136,7 @@ Make sure the documentation is updated
 
 Create a release tag on GitHub
   * On the Releases page, use "Draft a new release".
-  * Tag must match the format of previous tags, e.g. ``v9.2.6``.
+  * Tag must match the format of previous tags, e.g. ``v9.3.1``.
   * Target must be the ``stable`` branch.
 
 Upload the new version to PyPI
@@ -144,14 +146,22 @@ Upload the new version to PyPI
   * Build update and upload, from the the ``stable`` branch:
       - ``$ git clean -xfd  # Warning - remove all non-versioned files and directories``
       - ``$ python setup.py sdist``
-      - ``$ twine upload dist/pytango-9.2.N.tar.gz``
+      - ``$ twine upload dist/pytango-9.3.1.tar.gz``
+  * Optional:  Upload to https://test.pypi.org, and make sure all is well:
+      - ``$ twine upload -r testpypi dist/pytango-9.3.1.tar.gz``
+  * Optional:  Test installation (in a virtualenv):
+      - ``$ pip install -i https://test.pypi.org/simple/ pytango``
+  * Upload the source tarball to the real PyPI:
+      - ``$ twine upload dist/pytango-9.3.1.tar.gz``
 
 Bump the version with "-dev" in the develop branch
   * Change all references to next version.  E.g. if releasing
-    v9.2.6, then update references to v9.2.6.
+    v9.3.1, then update references to v9.3.2.
   * This includes files like ``README.rst``, ``doc/howto.rst``, ``doc/start.rst``.
-  * In ``tango/release.py``, change ``version_info``, e.g. from ``(9, 2, 6)`` to
-    ``(9, 2, 7, 'dev', 0)``.
+  * In ``tango/release.py``, change ``version_info``, e.g. from ``(9, 3, 1)`` to
+    ``(9, 3, 2, 'dev', 0)``.
+  * In ``appveyor.yml``, change ``version``, e.g. from ``9.3.1.{build}`` to
+    ``9.3.2.dev0.{build}``.
 
 Fill in the release description on GitHub
   * Content must be the same as the details in the changelog.  List all the
