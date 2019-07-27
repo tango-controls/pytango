@@ -143,10 +143,11 @@ Upload the new version to PyPI
   * Log in to https://pypi.org.
   * Get account permissions for PyTango from another contributor, if necessary.
   * If necessary, pip install twine: https://pypi.org/project/twine/)
-  * Build update and upload, from the the ``stable`` branch:
+  * Build release from the tagged commit:
       - ``$ git clean -xfd  # Warning - remove all non-versioned files and directories``
+      - ``$ git fetch``
+      - ``$ git checkout v9.3.1``
       - ``$ python setup.py sdist``
-      - ``$ twine upload dist/pytango-9.3.1.tar.gz``
   * Optional:  Upload to https://test.pypi.org, and make sure all is well:
       - ``$ twine upload -r testpypi dist/pytango-9.3.1.tar.gz``
   * Optional:  Test installation (in a virtualenv):

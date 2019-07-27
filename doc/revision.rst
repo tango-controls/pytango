@@ -105,6 +105,8 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 | 13/03/19 | `9.3.0 <http://pytango.readthedocs.io/en/v9.3.0>`_                               | 9.3.0 Release                                       | T\. Coutinho                   |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
+| 29/07/19 | `9.3.1 <http://pytango.readthedocs.io/en/v9.3.1>`_                               | 9.3.1 Release                                       | A\. Joubert                    |
++----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 
 .. _pytango-version-history:
 
@@ -114,6 +116,23 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
+| 9.3.1    | 9.3.1 release.                                                                                                                                                        |
+|          |                                                                                                                                                                       |
+|          | Changes:                                                                                                                                                              |
+|          |     - `Pull Request #277: Windows builds using AppVeyor (#176) <https://github.com/tango-controls/pytango/pull/277>`_                                                 |
+|          |     - `Pull Request #290: Update docs: int types maps to DevLong64 (#282) <https://github.com/tango-controls/pytango/pull/290>`_                                      |
+|          |     - `Pull Request #293: Update exception types in proxy docstrings <https://github.com/tango-controls/pytango/pull/293>`_                                           |
+|          |                                                                                                                                                                       |
+|          | Bug fixes:                                                                                                                                                            |
+|          |     - `Pull Request #270: Add six >= 1.12 requirement (#269) <https://github.com/tango-controls/pytango/pull/270>`_                                                   |
+|          |     - `Pull Request #273: DeviceAttribute.is_empty was not working correctly with latest cpp tango version (#271)                                                     |
+|          |        <https://github.com/tango-controls/pytango/pull/273>`_                                                                                                         |
+|          |     - `Pull Request #274: Add unit tests for spectrum attributes, including empty (#271) <https://github.com/tango-controls/pytango/pull/274>`_                       |
+|          |     - `Pull Request #281: Fix DevEncoded commands on Python 3 (#280) <https://github.com/tango-controls/pytango/pull/281>`_                                           |
+|          |     - `Pull Request #288: Make sure we only convert to string python unicode/str/bytes objects (#285) <https://github.com/tango-controls/pytango/pull/288>`_          |
+|          |     - `Pull Request #289: Fix compilation warnings and conda build (#286) <https://github.com/tango-controls/pytango/pull/289>`_                                      |
+|          |                                                                                                                                                                       |
++----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 9.3.0    | 9.3.0 release.                                                                                                                                                        |
 |          |                                                                                                                                                                       |
 |          | Changes:                                                                                                                                                              |
