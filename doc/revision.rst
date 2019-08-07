@@ -105,7 +105,7 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 | 13/03/19 | `9.3.0 <http://pytango.readthedocs.io/en/v9.3.0>`_                               | 9.3.0 Release                                       | T\. Coutinho                   |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
-| 29/07/19 | `9.3.1 <http://pytango.readthedocs.io/en/v9.3.1>`_                               | 9.3.1 Release                                       | A\. Joubert                    |
+| 07/08/19 | `9.3.1 <http://pytango.readthedocs.io/en/v9.3.1>`_                               | 9.3.1 Release                                       | A\. Joubert                    |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 
 .. _pytango-version-history:
@@ -125,8 +125,7 @@ Version history
 |          |                                                                                                                                                                       |
 |          | Bug fixes:                                                                                                                                                            |
 |          |     - `Pull Request #270: Add six >= 1.12 requirement (#269) <https://github.com/tango-controls/pytango/pull/270>`_                                                   |
-|          |     - `Pull Request #273: DeviceAttribute.is_empty was not working correctly with latest cpp tango version (#271)                                                     |
-|          |        <https://github.com/tango-controls/pytango/pull/273>`_                                                                                                         |
+|          |     - `Pull Request #273: DeviceAttribute.is_empty not working correctly with latest cpp tango version (#271)<https://github.com/tango-controls/pytango/pull/273>`_   |
 |          |     - `Pull Request #274: Add unit tests for spectrum attributes, including empty (#271) <https://github.com/tango-controls/pytango/pull/274>`_                       |
 |          |     - `Pull Request #281: Fix DevEncoded commands on Python 3 (#280) <https://github.com/tango-controls/pytango/pull/281>`_                                           |
 |          |     - `Pull Request #288: Make sure we only convert to string python unicode/str/bytes objects (#285) <https://github.com/tango-controls/pytango/pull/288>`_          |
