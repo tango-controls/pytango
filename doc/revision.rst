@@ -125,7 +125,7 @@ Version history
 |          |                                                                                                                                                                       |
 |          | Bug fixes:                                                                                                                                                            |
 |          |     - `Pull Request #270: Add six >= 1.12 requirement (#269) <https://github.com/tango-controls/pytango/pull/270>`_                                                   |
-|          |     - `Pull Request #273: DeviceAttribute.is_empty not working correctly with latest cpp tango version (#271)<https://github.com/tango-controls/pytango/pull/273>`_   |
+|          |     - `Pull Request #273: DeviceAttribute.is_empty not working correctly with latest cpp tango version (#271) <https://github.com/tango-controls/pytango/pull/273>`_  |
 |          |     - `Pull Request #274: Add unit tests for spectrum attributes, including empty (#271) <https://github.com/tango-controls/pytango/pull/274>`_                       |
 |          |     - `Pull Request #281: Fix DevEncoded commands on Python 3 (#280) <https://github.com/tango-controls/pytango/pull/281>`_                                           |
 |          |     - `Pull Request #288: Make sure we only convert to string python unicode/str/bytes objects (#285) <https://github.com/tango-controls/pytango/pull/288>`_          |
