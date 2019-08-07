@@ -44,15 +44,15 @@ The PyTango version::
 
     >>> import tango
     >>> tango.__version__
-    '9.2.6'
+    '9.3.1'
     >>> tango.__version_info__
-    (9, 2, 6)
+    (9, 3, 1)
 
 and the Tango C++ library version that PyTango was compiled with::
 
     >>> import tango
     >>> tango.constants.TgLibVers
-    '9.2.5'
+    '9.3.3'
 
 
 Report a bug
@@ -355,7 +355,7 @@ After `cleanup()` all references to :class:`~tango.DeviceProxy`,
 :class:`~tango.AttributeProxy` or :class:`~tango.Database` objects
 in the current process become invalid
 and these objects need to be reconstructed.
-				       
+
 
 Write a server
 --------------
