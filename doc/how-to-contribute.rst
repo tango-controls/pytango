@@ -86,11 +86,11 @@ Create an issue in Github
     | - [ ] Merge develop into stable
     | - [ ] Make sure Travis and Appveyor are OK on stable branch
     | - [ ] Make sure the documentation is updated for stable (readthedocs)
-    | - [ ] Create a release tag on GitHub, from stable branch
+    | - [ ] Create an annotated tag from stable branch
     | - [ ] Make sure the documentation is updated for release (readthedocs)
     | - [ ] Upload the new version to PyPI
     | - [ ] Bump the version with "-dev" in the develop branch
-    | - [ ] Fill the release description on GitHub
+    | - [ ] Create and fill in the release description on GitHub
     | - [ ] Build conda packages
     | - [ ] Advertise the release on the mailing list
     | - [ ] Close this issue
@@ -136,10 +136,13 @@ Make sure the documentation is updated
       - Set the new version to "active" here:
         https://readthedocs.org/dashboard/pytango/versions/
 
-Create a release tag on GitHub
-  * On the Releases page, use "Draft a new release".
-  * Tag must match the format of previous tags, e.g. ``v9.3.1``.
-  * Target must be the ``stable`` branch.
+Create an annotated tag for the release
+  * Note: Github's release page makes lightweight tags which we don't want
+  * Create tag:
+      - ``$ git checkout stable``
+      - ``$ git pull``
+      - ``$ git tag -a -m "tag v9.3.1"``
+      - ``$ git push -v origin refs/tags/v9.3.1``
 
 Upload the new version to PyPI
   * Log in to https://pypi.org.
@@ -173,7 +176,9 @@ Bump the version with "-dev" in the develop branch
   * In ``appveyor.yml``, change ``version``, e.g. from ``9.3.1.{build}`` to
     ``9.3.2.dev0.{build}``.
 
-Fill in the release description on GitHub
+Create and fill in the release description on GitHub
+  * Go to the Tags page: https://github.com/tango-controls/pytango/tags
+  * Find the tag created above and click "Create release".
   * Content must be the same as the details in the changelog.  List all the
     pull requests since the previous version.
 
