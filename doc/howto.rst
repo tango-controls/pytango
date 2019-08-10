@@ -44,9 +44,9 @@ The PyTango version::
 
     >>> import tango
     >>> tango.__version__
-    '9.3.1'
+    '9.3.2'
     >>> tango.__version_info__
-    (9, 3, 1)
+    (9, 3, 2)
 
 and the Tango C++ library version that PyTango was compiled with::
 
