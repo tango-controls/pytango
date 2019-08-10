@@ -141,7 +141,7 @@ Create an annotated tag for the release
   * Create tag:
       - ``$ git checkout stable``
       - ``$ git pull``
-      - ``$ git tag -a -m "tag v9.3.1"``
+      - ``$ git tag -a -m "tag v9.3.1" v9.3.1``
       - ``$ git push -v origin refs/tags/v9.3.1``
 
 Upload the new version to PyPI
