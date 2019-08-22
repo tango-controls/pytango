@@ -55,7 +55,7 @@ public:
      *
      * @param[in] name the is_allowed method name
      */
-    inline void set_allowed_name(const std::string &name) {
+    inline void set_allowed_name(const std::string& name) {
         py_allowed_name = name;
     }
 
@@ -64,7 +64,7 @@ public:
      *
      * @param[in] name the read method name
      */
-    inline void set_read_name(const std::string &name) {
+    inline void set_read_name(const std::string& name) {
         read_name = name;
     }
 
@@ -73,7 +73,7 @@ public:
      *
      * @param[in] name the write method name
      */
-    inline void set_write_name(const std::string &name) {
+    inline void set_write_name(const std::string& name) {
         write_name = name;
     }
 
@@ -87,7 +87,7 @@ public:
     void set_user_prop(std::vector<Tango::AttrProperty> &user_prop,
                        Tango::UserDefaultAttrProp &def_prop);
 
-    bool _is_method(Tango::DeviceImpl *dev, const std::string &name);
+    bool _is_method(Tango::DeviceImpl *dev, const std::string& name);
 
 private:
 
@@ -115,7 +115,7 @@ public:
      * @param[in] type  The attribute data type
      * @param[in] w The attribute writable type
      */
-    PyScaAttr(const std::string &na, long type, Tango::AttrWriteType w)
+    PyScaAttr(const std::string& na, long type, Tango::AttrWriteType w)
         : Tango::Attr(na.c_str(), type, w)
     {}
 
@@ -128,7 +128,7 @@ public:
      * @param[in] ww The attribute max dim x
      * @param[in] user_prop The attribute user default properties
      */
-    PyScaAttr(const std::string &na, long type, Tango::AttrWriteType w,
+    PyScaAttr(const std::string& na, long type, Tango::AttrWriteType w,
                std::vector<Tango::AttrProperty> &user_prop)
         : Tango::Attr(na.c_str(), type, w)
     {
@@ -193,7 +193,7 @@ public:
      * @param[in] w The attribute writable type
      * @param[in] xx The attribute max dim x
      */
-    PySpecAttr(const std::string &na, long type, Tango::AttrWriteType w, long xx)
+    PySpecAttr(const std::string& na, long type, Tango::AttrWriteType w, long xx)
         : Tango::SpectrumAttr(na.c_str(), type, w, xx)
     {}
 
@@ -206,7 +206,7 @@ public:
      * @param[in] xx The attribute max dim x
      * @param[in] user_prop The attribute user default properties
      */
-    PySpecAttr(const std::string &na, long type, Tango::AttrWriteType w, long xx,
+    PySpecAttr(const std::string& na, long type, Tango::AttrWriteType w, long xx,
                std::vector<Tango::AttrProperty> &user_prop)
         : Tango::SpectrumAttr(na.c_str(), type, w, xx)
     {
@@ -272,7 +272,7 @@ public:
      * @param[in] xx The attribute max dim x
      * @param[in] yy The attribute max dim y
      */
-    PyImaAttr(const std::string &na, long type, Tango::AttrWriteType w, long xx, long yy)
+    PyImaAttr(const std::string& na, long type, Tango::AttrWriteType w, long xx, long yy)
         : Tango::ImageAttr(na.c_str(), type, w, xx, yy)
     {}
 
@@ -286,7 +286,7 @@ public:
      * @param[in] yy The attribute max dim y
      * @param[in] user_prop The attribute user default properties
      */
-    PyImaAttr(const std::string &na, long type, Tango::AttrWriteType w, long xx, long yy,
+    PyImaAttr(const std::string& na, long type, Tango::AttrWriteType w, long xx, long yy,
                std::vector<Tango::AttrProperty> &user_prop)
         : Tango::ImageAttr(na.c_str(), type, w, xx, yy)
     {

@@ -329,15 +329,15 @@ def get_tango_device_classes():
     global __device_classes
     if __device_classes is None:
 
-        __device_classes = [_tango.DeviceImpl]
-        i = 2
-        while True:
-            dc = "Device_{0}Impl".format(i)
-            try:
-                __device_classes.append(getattr(_tango, dc))
-                i = i + 1
-            except AttributeError:
-                break
+        __device_classes = [_tango.Device_5Impl]
+#        i = 5  #2
+#        while True:
+#            dc = "Device_{0}Impl".format(i)
+#            try:
+#                __device_classes.append(getattr(_tango, dc))
+#                i = i + 1
+#            except AttributeError:
+#                break
     return __device_classes
 
 

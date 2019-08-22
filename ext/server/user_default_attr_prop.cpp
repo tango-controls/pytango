@@ -15,7 +15,7 @@
 namespace py = pybind11;
 
 void export_user_default_attr_prop(py::module& m) {
-	// TODO boost::noncopyable
+    // TODO boost::noncopyable
     py::class_<Tango::UserDefaultAttrProp>(m, "UserDefaultAttrProp")
         .def("set_label", &Tango::UserDefaultAttrProp::set_label)
         .def("set_description", &Tango::UserDefaultAttrProp::set_description)

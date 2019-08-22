@@ -18,7 +18,6 @@ objs_py27 = \
 	objs_py27/callback.o \
 	objs_py27/change_event_info.o \
 	objs_py27/command_info.o \
-	objs_py27/connection.o \
 	objs_py27/constants.o \
 	objs_py27/data_ready_event_data.o \
 	objs_py27/database.o \
@@ -53,36 +52,42 @@ objs_py27 = \
 	objs_py27/attribute.o \
 	objs_py27/auto_monitor.o \
 	objs_py27/command.o \
-	objs_py27/device_impl.o \
 	objs_py27/dserver.o \
+	objs_py27/device_impl.o \
 	objs_py27/encoded_attribute.o \
 	objs_py27/fwdAttr.o \
 	objs_py27/log4tango.o \
 	objs_py27/multi_attribute.o \
 	objs_py27/multi_class_attribute.o \
-	objs_py27/pipe.o \
 	objs_py27/subdev.o \
 	objs_py27/tango_util.o \
 	objs_py27/user_default_attr_prop.o \
 	objs_py27/user_default_pipe_prop.o \
 	objs_py27/wattribute.o \
-#	objs_py27/devintr_change_event_data.o \
-#	objs_py27/device_class.o \
-#	objs_py27/from_py.o \
-#	objs_py27/to_py.o \
+	objs_py27/devintr_change_event_data.o \
+	objs_py27/device_class.o \
+	objs_py27/pipe.o \
+	objs_py27/to_py.o \
+	objs_py27/from_py.o \
+#	objs_py27/connection.o \
 
-CFLAGS += -g -std=c++11 `python-config --cflags` -fPIC -Iext/
-CFLAGS += -I$(CONDA_PREFIX)/include/tango
+#CFLAGS += -g -std=c++11 `python-config --cflags` -fPIC -Iext/
+CFLAGS += -g -std=c++11 -fvisibility=hidden
+#CFLAGS += -fno-strict-aliasing -march=nocona -mtune=haswell -ftree-vectorize
+#CFLAGS += -fstack-protector-strong -fno-plt -pipe -DNDEBUG -fwrapv -fPIC 
+CFLAGS += -I$(CONDA_PREFIX)/include/python2.7
+CFLAGS += -I$(CONDA_PREFIX)/include/tango -Wno-deprecated
 CFLAGS += -I$(CONDA_PREFIX)/lib/python2.7/site-packages/numpy/core/include
 CFLAGS += -I$(CONDA_PREFIX)/include
+CFLAGS += -I/home/grm84/software/pybind11/include
+CFLAGS += -Iext
 
 srcs = $(objs_py27:.o=.cpp)
-
 
 all: pytest
 
 pytest: $(objs_py27)
-	$(GXX) -shared  -L$(CONDA_PREFIX)/lib -ltango  ${objs_py27} -o tango/_tango.so
+	$(GXX) -shared  -L$(CONDA_PREFIX)/lib -ltango ${objs_py27} -o tango/_tango.so
 
 objs_py27/%.o : ext/%.cpp
 	@echo -n "Compiling $(<F)... "

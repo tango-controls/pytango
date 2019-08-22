@@ -102,7 +102,7 @@ void export_db(py::module& m) {
              (void (Tango::DbServerData::*) ())
              &Tango::DbServerData::remove)
         .def("remove",
-             (void (Tango::DbServerData::*) (const std::string &))
+             (void (Tango::DbServerData::*) (const std::string& ))
              &Tango::DbServerData::remove)
     ;
 }

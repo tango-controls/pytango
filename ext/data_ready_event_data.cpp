@@ -11,16 +11,17 @@
 
 #include <tango.h>
 #include <pybind11/pybind11.h>
+#include <exception.h>
 
 namespace py = pybind11;
 
 void export_data_ready_event_data(py::module &m) {
-    py::class_<Tango::DataReadyEventData>(m, "DataReadyEventData")
+    py::class_<Tango::DataReadyEventData, std::shared_ptr<Tango::DataReadyEventData>>(m, "DataReadyEventData")
         .def(py::init<const Tango::DataReadyEventData &>())
-        .def("__init__", [](){
+        .def(py::init([](){
             Tango::DataReadyEventData *result = new Tango::DataReadyEventData;
             return std::shared_ptr<Tango::DataReadyEventData>(result);
-        })
+        }))
 
         // The original Tango::DataReadyEventData structure has a 'device' field.
         // However, if we returned this directly we would get a different
@@ -40,10 +41,10 @@ void export_data_ready_event_data(py::module &m) {
             [](){ //get
                 return &Tango::DataReadyEventData::errors;
             },
-            [](Tango::DataReadyEventData &event_data, Tango::DevFailed &dev_failed) { // set
-//                py::object errors = dev_failed.attr("args");
-//                sequencePyDevError_2_DevErrorList(errors.ptr(), event_data.errors);
-            }, py::return_value_policy::copy)
+            [](Tango::DataReadyEventData &event_data, py::object &dev_failed) { // set
+                py::object errors = dev_failed.attr("args");
+                sequencePyDevError_2_DevErrorList(errors, event_data.errors);
+            })
 
         .def("get_date", &Tango::DataReadyEventData::get_date,
             py::return_value_policy::reference)

@@ -11,16 +11,16 @@
 
 #include <tango.h>
 #include <pybind11/pybind11.h>
+#include <exception.h>
 
 namespace py = pybind11;
 
 void export_attr_conf_event_data(py::module &m) {
-    py::class_<Tango::AttrConfEventData>(m, "AttrConfEventData")
+    py::class_<Tango::AttrConfEventData, std::shared_ptr<Tango::AttrConfEventData>>(m, "AttrConfEventData")
         .def(py::init<const Tango::AttrConfEventData &>())
-        .def("__init__", [](){
-            Tango::AttrConfEventData *result = new Tango::AttrConfEventData;
-            return std::shared_ptr<Tango::AttrConfEventData>(result);
-        })
+        .def(py::init([](){
+            return std::shared_ptr<Tango::AttrConfEventData>(new Tango::AttrConfEventData);
+        }))
 
         // The original Tango::AttrConfEventData structure has a 'device' field.
         // However, if we returned this directly we would get a different
@@ -39,10 +39,10 @@ void export_attr_conf_event_data(py::module &m) {
         .def_readwrite("reception_date", &Tango::AttrConfEventData::reception_date)
         .def_property("errors", [](){
             return &Tango::DataReadyEventData::errors;
-        },[](Tango::AttrConfEventData &event_data, Tango::DevFailed &dev_failed) {
-//                py::object errors = dev_failed.attr("args");
-//                sequencePyDevError_2_DevErrorList(errors.ptr(), event_data.errors);
-        }, py::return_value_policy::copy)
+        },[](Tango::AttrConfEventData &event_data, py::object &dev_failed) {
+                py::object errors = dev_failed.attr("args");
+                sequencePyDevError_2_DevErrorList(errors, event_data.errors);
+        })
 
         .def("get_date", &Tango::AttrConfEventData::get_date,
             py::return_value_policy::reference)

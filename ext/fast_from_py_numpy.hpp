@@ -30,7 +30,7 @@
     
 template<long tangoScalarTypeConst>
 inline typename TANGO_const2type(tangoScalarTypeConst)*
-    fast_python_to_tango_buffer_numpy(PyObject* py_val, long* pdim_x, long* pdim_y, const std::string &fname, bool isImage, long& res_dim_x, long& res_dim_y)
+    fast_python_to_tango_buffer_numpy(PyObject* py_val, long* pdim_x, long* pdim_y, const std::string& fname, bool isImage, long& res_dim_x, long& res_dim_y)
 {
     typedef typename TANGO_const2type(tangoScalarTypeConst) TangoScalarType;
     static const int typenum = TANGO_const2numpy(tangoScalarTypeConst);
@@ -139,7 +139,7 @@ inline typename TANGO_const2type(tangoScalarTypeConst)*
 
 template<>
 inline TANGO_const2type(Tango::DEV_STRING)*
-    fast_python_to_tango_buffer_numpy<Tango::DEV_STRING>(PyObject* py_val, long* pdim_x, long* pdim_y, const std::string &fname, bool isImage, long& res_dim_x, long& res_dim_y)
+    fast_python_to_tango_buffer_numpy<Tango::DEV_STRING>(PyObject* py_val, long* pdim_x, long* pdim_y, const std::string& fname, bool isImage, long& res_dim_x, long& res_dim_y)
 {
     static const long tangoScalarTypeConst = Tango::DEV_STRING;
     return fast_python_to_tango_buffer_fallback__();
@@ -147,7 +147,7 @@ inline TANGO_const2type(Tango::DEV_STRING)*
 
 template<>
 inline TANGO_const2type(Tango::DEV_ENCODED)*
-    fast_python_to_tango_buffer_numpy<Tango::DEV_ENCODED>(PyObject* py_val, long* pdim_x, long* pdim_y, const std::string &fname, bool isImage, long& res_dim_x, long& res_dim_y)
+    fast_python_to_tango_buffer_numpy<Tango::DEV_ENCODED>(PyObject* py_val, long* pdim_x, long* pdim_y, const std::string& fname, bool isImage, long& res_dim_x, long& res_dim_y)
 {
     static const long tangoScalarTypeConst = Tango::DEV_ENCODED;
     return fast_python_to_tango_buffer_fallback__();
@@ -163,7 +163,7 @@ inline TANGO_const2type(Tango::DEV_ENCODED)*
     
 template<long tangoArrayTypeConst>
 inline typename TANGO_const2scalartype(tangoArrayTypeConst)*
-    fast_python_to_corba_buffer_numpy(PyObject* py_val, long* pdim_x, const std::string &fname, long& res_dim_x)
+    fast_python_to_corba_buffer_numpy(PyObject* py_val, long* pdim_x, const std::string& fname, long& res_dim_x)
 {
     typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
     typedef typename TANGO_const2scalartype(tangoArrayTypeConst) TangoScalarType;
@@ -245,7 +245,7 @@ inline typename TANGO_const2scalartype(tangoArrayTypeConst)*
 
 template<>
 inline TANGO_const2scalartype(Tango::DEVVAR_STRINGARRAY)*
-    fast_python_to_corba_buffer_numpy<Tango::DEVVAR_STRINGARRAY>(PyObject* py_val, long* pdim_x, const std::string &fname, long& res_dim_x)
+    fast_python_to_corba_buffer_numpy<Tango::DEVVAR_STRINGARRAY>(PyObject* py_val, long* pdim_x, const std::string& fname, long& res_dim_x)
 {
     static const long tangoArrayTypeConst = Tango::DEVVAR_STRINGARRAY;
     return fast_python_to_corba_buffer_fallback__();

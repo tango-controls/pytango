@@ -11,14 +11,16 @@
 
 #include <tango.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #include <defs.h>
 #include <tgutils.h>
 #include <to_py.h>
 #include <device_pipe.h>
 //#include <tango_numpy.h>
-//#ifndef DISABLE_PYTANGO_NUMPY
-//#   include "to_py_numpy.hpp"
-//#endif
+#include <typeinfo>
+#include <to_py_numpy.hpp>
+#include <pyutils.h>
+#include <memory>
 
 namespace py = pybind11;
 
@@ -81,11 +83,9 @@ namespace PyTango
             {
                 default:
                 case PyTango::ExtractAsNumpy:
-//#                 ifndef DISABLE_PYTANGO_NUMPY
 //                    data = to_py_numpy<tangoArrayTypeConst>(&tmp_arr, py_self);
 //                    tmp_arr.get_buffer(1);
 //                    break;
-//#                 endif
                 case PyTango::ExtractAsList:
                 case PyTango::ExtractAsPyTango3:
                     data = to_py_list(&tmp_arr);
@@ -153,11 +153,14 @@ namespace PyTango
             }
         }
 
-      ///////////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////////
 
         template<typename T, long tangoTypeConst>
         py::object __extract_scalar(T& obj, size_t elt_idx)
         {
+            py::print("scalar start");
+            py::print(obj);
+            py::print("scalar end");
             typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
             TangoScalarType val;
             obj >> val;
@@ -228,21 +231,23 @@ namespace PyTango
         template <typename T, long tangoArrayTypeConst>
         py::object __extract_array(T& obj, size_t elt_idx, PyTango::ExtractAs extract_as)
         {
+            py::print("__extract_array 0");
             typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
 
-            TangoArrayType tmp_arr;
+            py::print("$$$$$$$$$$$$$$$$$$$$$$+++===");
+            py::print(obj);
+            py::print("$$$$$$$$$$$$$$$$$$$$$$");
+            TangoArrayType tmp_arr = 0;
             obj >> (&tmp_arr);
             py::object data;
             switch (extract_as)
             {
                 default:
                 case PyTango::ExtractAsNumpy:
-
-//#                 ifndef DISABLE_PYTANGO_NUMPY
-//                    data = to_py_numpy<tangoArrayTypeConst>(&tmp_arr, 1);
-//                    break;
-//#                 endif
-
+                    py::print("££££££££££££££££££££££");
+                    data = to_py_numpy<tangoArrayTypeConst>(&tmp_arr);
+                    py::print(data);
+                    break;
                 case PyTango::ExtractAsList:
                 case PyTango::ExtractAsPyTango3:
                     data = to_py_list(&tmp_arr);
@@ -255,6 +260,7 @@ namespace PyTango
                     data = py::object();
                     break;
             }
+            py::print(data);
             return data;
         }
 
@@ -262,6 +268,7 @@ namespace PyTango
         py::object __extract_array<Tango::DevicePipe, Tango::DEVVAR_LONGSTRINGARRAY>
             (Tango::DevicePipe& pipe, size_t elt_idx, PyTango::ExtractAs extract_as)
         {
+            py::print("__extract_array 4");
             assert(false);
             return py::object();
         }
@@ -270,15 +277,16 @@ namespace PyTango
         py::object __extract_array<Tango::DevicePipe, Tango::DEVVAR_DOUBLESTRINGARRAY>
             (Tango::DevicePipe& pipe, size_t elt_idx, PyTango::ExtractAs extract_as)
         {
+            py::print("__extract_array 3");
             assert(false);
             return py::object();
         }
 
         template <>
-        py::object
-        __extract_array<Tango::DevicePipeBlob, Tango::DEVVAR_LONGSTRINGARRAY>
-	(Tango::DevicePipeBlob& blob, size_t elt_idx, PyTango::ExtractAs extract_as)
+        py::object __extract_array<Tango::DevicePipeBlob, Tango::DEVVAR_LONGSTRINGARRAY>
+            (Tango::DevicePipeBlob& blob, size_t elt_idx, PyTango::ExtractAs extract_as)
         {
+            py::print("__extract_array 1");
             assert(false);
             return py::object();
         }
@@ -287,6 +295,7 @@ namespace PyTango
         py::object __extract_array<Tango::DevicePipeBlob, Tango::DEVVAR_DOUBLESTRINGARRAY>
             (Tango::DevicePipeBlob& blob, size_t elt_idx, PyTango::ExtractAs extract_as)
         {
+            py::print("__extract_array 2");
             assert(false);
             return py::object();
         }
@@ -294,19 +303,24 @@ namespace PyTango
         template <long tangoArrayTypeConst>
         py::object extract_array(Tango::DevicePipe& self, size_t elt_idx, PyTango::ExtractAs extract_as)
         {
-            return __extract_array<Tango::DevicePipe, tangoArrayTypeConst>(self, elt_idx, extract_as);
+            py::print("extract_array 1");
+            py::object rc = __extract_array<Tango::DevicePipe, tangoArrayTypeConst>(self, elt_idx, extract_as);
+            py::print("ea1", rc);
+            return rc;
         }
 
         template <long tangoArrayTypeConst>
         py::object extract_array(Tango::DevicePipeBlob& self, size_t elt_idx,
                 PyTango::ExtractAs extract_as)
         {
+            py::print("extract_array 2");
             return __extract_array<Tango::DevicePipeBlob, tangoArrayTypeConst>(self, elt_idx, extract_as);
         }
 
         template<typename T>
         py::object __extract_item(T& obj, size_t elt_idx, PyTango::ExtractAs extract_as)
         {
+            py::print("__extract_item");
             const int elt_type = obj.get_data_elt_type(elt_idx);
             TANGO_DO_ON_DEVICE_DATA_TYPE_ID(elt_type,
                     return extract_scalar<tangoTypeConst>(obj, elt_idx); ,
@@ -318,6 +332,7 @@ namespace PyTango
         template<typename T>
         py::object __extract(T& obj, PyTango::ExtractAs extract_as)
         {
+            py::print("__extract");
             py::list data;
             size_t elt_nb = obj.get_data_elt_nb();
             for(size_t elt_idx = 0; elt_idx < elt_nb; ++elt_idx)
@@ -333,6 +348,7 @@ namespace PyTango
         py::object extract(Tango::DevicePipeBlob& blob,
                 PyTango::ExtractAs extract_as)
         {
+            py::print("extract 2");
             py::object name = py::str(blob.get_name());
             py::object value = __extract<Tango::DevicePipeBlob>(blob, extract_as);
             return py::make_tuple(name, value);
@@ -341,8 +357,10 @@ namespace PyTango
         py::object extract(Tango::DevicePipe& device_pipe,
                 PyTango::ExtractAs extract_as)
         {
+            py::print("extract 1");
             py::object name = py::str(device_pipe.get_root_blob_name());
             py::object value = __extract<Tango::DevicePipe>(device_pipe, extract_as);
+            py::print(">>> ", value);
             return py::make_tuple(name, value);
         }
     }
@@ -351,8 +369,8 @@ namespace PyTango
 void export_device_pipe(py::module &m) {
     py::class_<Tango::DevicePipe>(m, "DevicePipe")
         .def(py::init<>())
-        .def(py::init<const std::string &>())
-        .def(py::init<const std::string &, const std::string &>())
+        .def(py::init<const std::string& >())
+        .def(py::init<const std::string& , const std::string& >())
         .def(py::init<const Tango::DevicePipe &>())
         .def_property("name",
                       &Tango::DevicePipe::get_name,

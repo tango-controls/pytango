@@ -18,7 +18,7 @@ import collections
 
 from ._tango import StdStringVector, DbData, DbDatum, AttributeInfo
 from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
-from ._tango import DeviceProxy #, __CallBackAutoDie, __CallBackPushEvent
+from ._tango import DeviceProxy, __CallBackAutoDie, __CallBackPushEvent
 from ._tango import EventType, DevFailed, Except
 from ._tango import ExtractAs, GreenMode
 from ._tango import PipeInfo, PipeInfoList, constants
@@ -228,6 +228,7 @@ def __get_command_func(dp, cmd_info, name):
     _, doc = cmd_info
 
     def f(*args, **kwds):
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$")
         return dp.command_inout(name, *args, **kwds)
 
     f.__doc__ = doc
@@ -484,9 +485,10 @@ def __DeviceProxy__write_attributes_asynch(self, attr_values, cb=None):
 
     cb2 = __CallBackAutoDie()
     if isinstance(cb, collections.Callable):
-        cb2.attr_write = cb
+        cb2.attr_written = cb
+        print(cb2)
     else:
-        cb2.attr_write = cb.attr_write
+        cb2.attr_written = cb.attr_written
     return self.__write_attributes_asynch(attr_values, cb2)
 
 
@@ -1213,12 +1215,12 @@ def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
 
     if isinstance(cb_or_queuesize, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = green_callback(
+        cb.m_callback = green_callback(
             cb_or_queuesize, obj=self, green_mode=green_mode)
     elif hasattr(cb_or_queuesize, "push_event") and \
             isinstance(cb_or_queuesize.push_event, collections.Callable):
         cb = __CallBackPushEvent()
-        cb.push_event = green_callback(
+        cb.m_callback = green_callback(
             cb_or_queuesize.push_event, obj=self, green_mode=green_mode)
     elif is_integer(cb_or_queuesize):
         cb = cb_or_queuesize  # queuesize
@@ -1226,7 +1228,6 @@ def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
         raise TypeError(
             "Parameter cb_or_queuesize should be a number, a"
             " callable object or an object with a 'push_event' method.")
-
     event_id = self.__subscribe_event(
         attr_name, event_type, cb, filters, stateless, extract_as)
 

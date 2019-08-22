@@ -22,7 +22,7 @@ namespace py = pybind11;
  * @param [in] seq a python sequence of DevError
  * @param [out] err_list the object to be filled with the several DevError
  */
-void sequencePyDevError_2_DevErrorList(PyObject *seq, Tango::DevErrorList &err_list);
+void sequencePyDevError_2_DevErrorList(py::object seq, Tango::DevErrorList &err_list);
 
 /**
  * Translates a python DevFailed or a seq<DevError> into a C++ DevFailed

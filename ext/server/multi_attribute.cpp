@@ -16,7 +16,6 @@
 namespace py = pybind11;
 
 void export_multi_attribute(py::module& m) {
-// TODO boost::noncopyable
     py::class_<Tango::MultiAttribute>(m, "MultiAttribute")
 
         .def("get_attr_by_name", [](Tango::MultiAttribute& self, const char *attr_name) -> Tango::Attribute& {
@@ -52,7 +51,7 @@ void export_multi_attribute(py::module& m) {
         .def("check_alarm", (bool (Tango::MultiAttribute::*) (const char *))
             &Tango::MultiAttribute::check_alarm)
 
-        .def("read_alarm", (void (Tango::MultiAttribute::*) (const std::string &))
+        .def("read_alarm", (void (Tango::MultiAttribute::*) (const std::string& ))
             &Tango::MultiAttribute::read_alarm)
 
         .def("get_attribute_list", [](Tango::MultiAttribute& self) -> std::vector<Tango::Attribute*>& {

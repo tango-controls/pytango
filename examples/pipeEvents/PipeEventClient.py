@@ -18,6 +18,7 @@ class EventManager():
         self._deviceProxy.unsubscribe_event(self._event_id)
 
     def push_event(self, ev):
+        print type(ev)
         print "Event -----push_event-----------------"
         print "Timestamp:      ", ev.reception_date
         print "Pipe name:      ", ev.pipe_name

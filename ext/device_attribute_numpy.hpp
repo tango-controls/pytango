@@ -43,7 +43,7 @@
 //    template<> inline void
 //    _dev_var_x_array_deleter<Tango::DEV_PIPE_BLOB>(PyObject* obj)
 //    {
-//	// Unsupported
+//    // Unsupported
 //        assert(false);
 //    }
 //#endif
@@ -205,7 +205,7 @@
 //
 //        // -- Allocate memory for the new data object
 //        unique_pointer<TangoArrayType> value;
-//		CORBA::ULong unelems = static_cast<CORBA::ULong>(nelems);
+//        CORBA::ULong unelems = static_cast<CORBA::ULong>(nelems);
 //        TangoScalarType* buffer = TangoArrayType::allocbuf(unelems);
 //        try {
 //            value.reset(new TangoArrayType(unelems, unelems, buffer, true));

@@ -54,24 +54,33 @@ py::object
 //        return (df1.name == df2.name) && (df1.idx_in_call == df2.idx_in_call);
 //    }
 //}
-//
-//void sequencePyDevError_2_DevErrorList(PyObject *value, Tango::DevErrorList &del)
-//{
+
+void sequencePyDevError_2_DevErrorList(py::object value, Tango::DevErrorList &del)
+{
+    py::list py_list = value;
 //    long len = max((int)PySequence_Size(value), 0);
-//    del.length(len);
-//
+    long len = py::len(py_list);
+    del.length(len);
+
+    for (int i = 0; i < len; ++i) {
+        Tango::DevError dev_error = py_list[i].cast<Tango::DevError>();
+        del[i].desc = strdup(dev_error.desc);
+        del[i].reason = strdup(dev_error.reason);
+        del[i].origin = strdup(dev_error.origin);
+        del[i].severity = dev_error.severity;
+    }
 //    for (long loop = 0; loop < len; ++loop)
 //    {
 //        PyObject *item = PySequence_GetItem(value, loop);
 //        Tango::DevError &dev_error = extract<Tango::DevError &>(item);
-//        del[loop].desc = CORBA::string_dup(dev_error.desc);
-//        del[loop].reason = CORBA::string_dup(dev_error.reason);
-//        del[loop].origin = CORBA::string_dup(dev_error.origin);
+//        del[loop].desc = strdup(dev_error.desc);
+//        del[loop].reason = strdup(dev_error.reason);
+//        del[loop].origin = strdup(dev_error.origin);
 //        del[loop].severity = dev_error.severity;
 //        Py_XDECREF(item);
 //    }
-//}
-//
+}
+
 //void PyDevFailed_2_DevFailed(PyObject *value, Tango::DevFailed &df)
 //{
 //    if (PyObject_IsInstance(value, PyTango_DevFailed.ptr()))
@@ -234,8 +243,8 @@ py::object
 //    throw to_dev_failed(type, value, traceback);
 //}
 //
-//void handle_python_exception(boost::python::error_already_set &eas)
-//{
+void handle_python_exception(py::error_already_set &eas)
+{
 //    if (PyErr_ExceptionMatches(PyTango_DevFailed.ptr()))
 //    {
 //        throw_python_dev_failed();
@@ -244,8 +253,8 @@ py::object
 //    {
 //        throw_python_generic_exception();
 //    }
-//}
-//
+}
+
 //struct convert_PyDevFailed_to_DevFailed
 //{
 //    convert_PyDevFailed_to_DevFailed()

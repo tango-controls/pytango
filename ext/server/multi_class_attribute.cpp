@@ -16,14 +16,13 @@
 namespace py = pybind11;
 
 void export_multi_class_attribute(py::module& m) {
-//, boost::noncopyable
     py::class_<Tango::MultiClassAttribute>(m, "MultiClassAttribute")
 
-        .def("get_attr", [](Tango::MultiClassAttribute& self, std::string & attr_name) -> Tango::Attr& {
+        .def("get_attr", [](Tango::MultiClassAttribute& self, std::string&  attr_name) -> Tango::Attr& {
             return self.get_attr(attr_name);
         }, py::return_value_policy::reference)
 
-        .def("remove_attr", [](Tango::MultiClassAttribute& self, const string &attr_name, const string &cl_name) -> void {
+        .def("remove_attr", [](Tango::MultiClassAttribute& self, const std::string& attr_name, const std::string& cl_name) -> void {
             self.remove_attr(attr_name, cl_name);
         })
 

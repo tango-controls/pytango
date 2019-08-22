@@ -90,25 +90,25 @@ void export_log4tango(py::module &m) {
         .def("get_level", &log4tango::Logger::get_level)
         .def("is_level_enabled", &log4tango::Logger::is_level_enabled)
         .def("__log",
-            (void (log4tango::Logger::*)(log4tango::Level::Value, const std::string &))
+            (void (log4tango::Logger::*)(log4tango::Level::Value, const std::string& ))
             &log4tango::Logger::log)
         .def("__log_unconditionally",
-            (void (log4tango::Logger::*)(log4tango::Level::Value, const std::string &))
+            (void (log4tango::Logger::*)(log4tango::Level::Value, const std::string& ))
             &log4tango::Logger::log_unconditionally)
         .def("__debug",
-            (void (log4tango::Logger::*)(const std::string &))
+            (void (log4tango::Logger::*)(const std::string& ))
             &log4tango::Logger::debug)
         .def("__info",
-            (void (log4tango::Logger::*)(const std::string &))
+            (void (log4tango::Logger::*)(const std::string& ))
             &log4tango::Logger::info)
         .def("__warn",
-            (void (log4tango::Logger::*)(const std::string &))
+            (void (log4tango::Logger::*)(const std::string& ))
             &log4tango::Logger::warn)
         .def("__error",
-            (void (log4tango::Logger::*)(const std::string &))
+            (void (log4tango::Logger::*)(const std::string& ))
             &log4tango::Logger::error)
         .def("__fatal",
-            (void (log4tango::Logger::*)(const std::string &))
+            (void (log4tango::Logger::*)(const std::string& ))
             &log4tango::Logger::fatal)
         .def("is_debug_enabled", &log4tango::Logger::is_debug_enabled)
         .def("is_info_enabled", &log4tango::Logger::is_info_enabled)

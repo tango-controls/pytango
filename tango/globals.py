@@ -63,6 +63,7 @@ def get_cpp_class(name):
 
 def get_constructed_classes():
     global constructed_class
+    print("get_constructed_classes(): ", len(constructed_class), constructed_class)
     return constructed_class
 
 
@@ -113,5 +114,8 @@ def class_factory():
     for class_info in local_class_list:
         device_class_class = class_info[0]
         tango_device_class_name = class_info[2]
+        print("1", tango_device_class_name)
         device_class = device_class_class(tango_device_class_name)
+        print("2", device_class)
         local_constructed_class.append(device_class)
+    print("3", constructed_class)

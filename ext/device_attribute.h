@@ -27,7 +27,7 @@ namespace PyDeviceAttribute {
 
 //    /// Set the value of a DeviceAttribute from python (useful for write*)
     void reset(Tango::DeviceAttribute& self, const Tango::AttributeInfo &attr_info, py::object py_value);
-    void reset(Tango::DeviceAttribute & self, const std::string &attr_name, Tango::DeviceProxy &dev_proxy, py::object py_value);
+    void reset(Tango::DeviceAttribute & self, const std::string& attr_name, Tango::DeviceProxy &dev_proxy, py::object py_value);
 
     void update_values(Tango::DeviceAttribute &self, py::object& py_value, PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy);
 
@@ -135,7 +135,7 @@ namespace PyDeviceAttribute {
     }
 
     template<long tangoTypeConst>
-    static inline void _fill_scalar_attribute(Tango::DeviceAttribute & dev_attr, const py::object & py_value)
+    static inline void _fill_scalar_attribute(Tango::DeviceAttribute& dev_attr, const py::object& py_value)
     {
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
         TangoScalarType value = py_value.cast<TangoScalarType>();

@@ -41,6 +41,7 @@ public:
         if (safe) check_python();
             // Acquire GIL before calling Python code
             py::gil_scoped_acquire acquire;
+            std::cout << "Acquired GIL before calling Python code" << std::endl;
     }
     
     inline ~AutoPythonGIL() {

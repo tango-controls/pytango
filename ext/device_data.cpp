@@ -15,36 +15,24 @@
 #include <defs.h>
 #include <iostream>
 #include <tgutils.h>
-//#include <to_py_numpy.hpp>
 
 namespace py = pybind11;
 
 namespace PyDeviceData {
 
-    template <long tangoTypeConst>
+template <long tangoTypeConst>
     void insert_scalar(Tango::DeviceData &self, py::object py_value)
     {
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-        TangoScalarType value;
-//        from_py<tangoTypeConst>::convert(py_value.ptr(), value);
-        value = py_value.cast<TangoScalarType>();
+        TangoScalarType value = py_value.cast<TangoScalarType>();
         self << value;
     }
 
     template <>
     void insert_scalar<Tango::DEV_STRING>(Tango::DeviceData &self, py::object py_value)
     {
-        assert(false);
-//        PyObject* py_value_ptr = py_value.ptr();
-//        if(PyUnicode_Check(py_value_ptr)) {
-//            PyObject* obj_bytes_ptr = PyUnicode_AsLatin1String(py_value_ptr);
-//            Tango::DevString value = PyBytes_AsString(obj_bytes_ptr);
-//            self << value;
-//            Py_DECREF(obj_bytes_ptr);
-//        } else {
-//            Tango::DevString value = PyBytes_AsString(py_value_ptr);
-//            self << value;
-//        }
+        std::string val_str = py_value.cast<std::string>();
+        self << val_str;
     }
 
     template <>
@@ -135,7 +123,7 @@ namespace PyDeviceData {
         {
             default:
             case PyTango::ExtractAsNumpy:
-//              return to_py_numpy<tangoArrayTypeConst>(tmp_ptr, py_self);
+//                return to_py_numpy<tangoArrayTypeConst>(tmp_ptr, py_self);
             case PyTango::ExtractAsList:
             case PyTango::ExtractAsPyTango3:
 //            return to_py_list(tmp_ptr);
@@ -147,12 +135,12 @@ namespace PyDeviceData {
         }
     }
 
-        template <>
-        py::object extract_array<Tango::DEVVAR_STATEARRAY>(Tango::DeviceData &self, PyTango::ExtractAs extract_as)
-        {
-            assert(False);
-            return py::none();
-        }
+    template <>
+    py::object extract_array<Tango::DEVVAR_STATEARRAY>(Tango::DeviceData &self, PyTango::ExtractAs extract_as)
+    {
+        assert(false);
+        return py::none();
+    }
 }
 
 void export_device_data(py::module& m) {
@@ -162,7 +150,6 @@ void export_device_data(py::module& m) {
         .def(py::init<const Tango::DeviceData &>())
 
         .def("extract", [](Tango::DeviceData& self, PyTango::ExtractAs extract_as) -> py::object {
-//            Tango::DeviceData& self = py_self.cast<Tango::DeviceData>();
             TANGO_DO_ON_DEVICE_DATA_TYPE_ID(self.get_type(),
                     return PyDeviceData::extract_scalar<tangoTypeConst>(self);,
                     return PyDeviceData::extract_array<tangoTypeConst>(self, extract_as);
@@ -171,7 +158,7 @@ void export_device_data(py::module& m) {
         })
 
         .def("insert", [](Tango::DeviceData &self, const long data_type, py::object py_value) -> void {
-            TANGO_DO_ON_DEVICE_DATA_TYPE_ID(data_type,
+                TANGO_DO_ON_DEVICE_DATA_TYPE_ID(data_type,
                 PyDeviceData::insert_scalar<tangoTypeConst>(self, py_value);,
                 PyDeviceData::insert_array<tangoTypeConst>(self, py_value);
             );

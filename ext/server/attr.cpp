@@ -17,26 +17,19 @@
 
 namespace py = pybind11;
 
-//
-//int func_arg(const std::function<int(int)> &f) {
-//    return f(10);
-//}
-
 void PyAttr::read(Tango::DeviceImpl *dev, Tango::Attribute &att)
 {
-    std::cout << "in read attr.cpp" << std::endl;
     if (!_is_method(dev, read_name))
     {
-        TangoSys_OMemStream o;
+        std::stringstream o;
         o << read_name << " method not found for " << att.get_name();
         Tango::Except::throw_exception("PyTango_ReadAttributeMethodNotFound",
             o.str(), "PyTango::Attr::read");
     }
-//    CALL_ATTR_METHOD_VARGS(dev, read_name.c_str(), att);
-    PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev);
+    Device_5ImplWrap *__dev_ptr = (Device_5ImplWrap*) dev;
     AutoPythonGIL __py_lock;
     try {
-//gm        py::call_method<void>(__dev_ptr->the_self, read_name.c_str(), att);
+        __dev_ptr->py_self.attr(read_name.c_str())(att);
     } catch (py::error_already_set &eas) {
         handle_python_exception(eas);
     }
@@ -46,16 +39,15 @@ void PyAttr::write(Tango::DeviceImpl *dev, Tango::WAttribute &att)
 {
     if (!_is_method(dev, write_name))
     {
-        TangoSys_OMemStream o;
+        std::stringstream o;
         o << write_name << " method not found for " << att.get_name();
         Tango::Except::throw_exception("PyTango_WriteAttributeMethodNotFound",
             o.str(), "PyTango::Attr::write");
     }
-//    CALL_ATTR_METHOD_VARGS(dev, write_name.c_str(), att);
-    PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev);
+    Device_5ImplWrap *__dev_ptr = (Device_5ImplWrap*) dev;
     AutoPythonGIL __py_lock;
     try {
-//gm        py::call_method<void>(__dev_ptr->the_self, write_name.c_str(), att);
+        __dev_ptr->py_self.attr(write_name.c_str())(att);
     } catch (py::error_already_set &eas) {
         handle_python_exception(eas);
     }
@@ -65,10 +57,10 @@ bool PyAttr::is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType type)
 {
     if (_is_method(dev, py_allowed_name))
     {
-        PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev);
+        Device_5ImplWrap *__dev_ptr = (Device_5ImplWrap*) dev;
         AutoPythonGIL __py_lock;
         try {
-    //gm        return py::call_method<bool>(__dev_ptr->the_self, py_allowed_name.c_str(), type);
+      return py::cast<bool>(__dev_ptr->py_self.attr(py_allowed_name.c_str())(type));
         } catch (py::error_already_set &eas) {
             handle_python_exception(eas);
         }
@@ -77,11 +69,11 @@ bool PyAttr::is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType type)
     return true;
 }
 
-bool PyAttr::_is_method(Tango::DeviceImpl *dev, const std::string &name)
+bool PyAttr::_is_method(Tango::DeviceImpl *dev, const std::string& name)
 {
     AutoPythonGIL __py_lock;
-    PyDeviceImplBase *__dev_ptr = dynamic_cast<PyDeviceImplBase *>(dev);
-    PyObject *__dev_py = __dev_ptr->the_self;
+    Device_5ImplWrap *__dev_ptr = (Device_5ImplWrap*) dev;
+    py::object __dev_py = __dev_ptr->py_self;
     return is_method_defined(__dev_py, name);
 }
 
@@ -100,7 +92,7 @@ void PyAttr::set_user_prop(std::vector<Tango::AttrProperty> &user_prop,
     for (size_t loop = 0;loop < nb_prop;loop++)
     {
         Tango::AttrProperty  prop = user_prop[loop];
-        std::string &prop_name = prop.get_name();
+        std::string& prop_name = prop.get_name();
         const char *prop_value = prop.get_value().c_str();
 
         if (prop_name == "label")

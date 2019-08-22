@@ -2,7 +2,7 @@ import logging
 
 import tango
 from tango.server import Device
-from tango.server import DispLevel
+#from PyTango.server import DispLevel
 
 from tango.server import attribute, command
 
@@ -22,7 +22,7 @@ class IfchangeServer(Device):
 
     @attribute(label='Voltage', dtype='float',
                description="voltage")
-    def volts(self):
+    def voltage(self):
         return 3.142
 
     def read_current(self):
@@ -52,8 +52,8 @@ class IfchangeServer(Device):
         device_level = True
         cmd = command(f=self.start, dtype_in=str, dtype_out=int,
                       doc_in='description of input',
-                      doc_out='description of output',
-                      display_level=DispLevel.EXPERT, polling_period=5.1)
+                      doc_out='description of output')
+#                      display_level=DispLevel.EXPERT, polling_period=5.1)
         self.add_command(cmd, device_level)
 
     @command(dtype_in=str, doc_in='name of dynamic command to delete')

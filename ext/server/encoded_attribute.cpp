@@ -525,10 +525,10 @@ namespace py = pybind11;
 //#endif
 //        // It must be a py sequence
 //        // we are sure that w and h are given by python (see encoded_attribute.py)
-//		const int length = w*h;
+//        const int length = w*h;
 //        unsigned char *raw_b = new unsigned char[length];
 //        unique_pointer<unsigned char> b(raw_b);
-//		buffer = raw_b;
+//        buffer = raw_b;
 //        unsigned char *p = raw_b;
 //        int w_bytes = 3*w;
 //        for (long y=0; y<h; ++y)
@@ -639,10 +639,10 @@ namespace py = pybind11;
 //#endif
 //        // It must be a py sequence
 //        // we are sure that w and h are given by python (see encoded_attribute.py)
-//		const int length = w*h;
+//        const int length = w*h;
 //        unsigned char *raw_b = new unsigned char[length];
 //        unique_pointer<unsigned char> b(raw_b);
-//		buffer = raw_b;
+//        buffer = raw_b;
 //        unsigned char *p = raw_b;
 //        int w_bytes = 4*w;
 //        for (long y=0; y<h; ++y)
@@ -1100,7 +1100,7 @@ namespace py = pybind11;
 //                    {
 //                        long idx = 4*(y*width+x);
 //                        // data comes in in big endian format
-//						Tango::DevULong data;
+//                        Tango::DevULong data;
 //                        if (IS_BIGENDIAN())
 //                        {
 //                            char *p = reinterpret_cast<char *>(&data);
@@ -1149,7 +1149,7 @@ namespace py = pybind11;
 //                    {
 //                        long idx = 4*(y*width+x);
 //                        // data comes in in big endian format
-//						Tango::DevULong data;
+//                        Tango::DevULong data;
 //                        if (IS_BIGENDIAN())
 //                        {
 //                            char *p = reinterpret_cast<char *>(&data);

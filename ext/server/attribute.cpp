@@ -11,6 +11,8 @@
 
 #include <tango.h>
 #include <pybind11/pybind11.h>
+#include <memory.h>
+#include <tgutils.h>
 
 namespace py = pybind11;
 
@@ -30,21 +32,21 @@ namespace py = pybind11;
 #endif
 */
 
-inline static void throw_wrong_python_data_type(const std::string &att_name,
+inline static void throw_wrong_python_data_type(const std::string& att_name,
                                          const char *method)
 {
-    TangoSys_OMemStream o;
+    std::stringstream o;
     o << "Wrong Python type for attribute " << att_name << ends;
     Tango::Except::throw_exception(
             (const char *)"PyDs_WrongPythonDataTypeForAttribute",
             o.str(), method);
 }
 
-inline static void throw_wrong_python_data_type_in_array(const std::string &att_name,
+inline static void throw_wrong_python_data_type_in_array(const std::string& att_name,
                                                   long idx,
                                                   const char *method)
 {
-    TangoSys_OMemStream o;
+    std::stringstream o;
     o << "Wrong Python type for attribute " << att_name
       << ".\nElement with index " << idx << " in sequence does not "
       << "have a correct type." << ends;
@@ -56,17 +58,17 @@ inline static void throw_wrong_python_data_type_in_array(const std::string &att_
 
 extern long TANGO_VERSION_HEX;
 
-//namespace PyAttribute
-//{
-//    /**
-//     * Tango Attribute set_value wrapper for scalar attributes
-//     *
-//     * @param att attribute reference
-//     * @param value new attribute value
-//     */
+namespace PyAttribute
+{
+    /**
+     * Tango Attribute set_value wrapper for scalar attributes
+     *
+     * @param att attribute reference
+     * @param value new attribute value
+     */
 //    template<long tangoTypeConst>
 //    inline void __set_value_scalar(Tango::Attribute &att,
-//                                   bopy::object &value)
+//                                   py::object &value)
 //    {
 //        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
 //
@@ -78,7 +80,7 @@ extern long TANGO_VERSION_HEX;
 //           I prefer this one since it decouples TangoC++ from PyTango and creating
 //           a scalar is not so expensive after all
 //        */
-//        unique_pointer<TangoScalarType> cpp_val(new TangoScalarType);
+//        std::unique_ptr<TangoScalarType> cpp_val(new TangoScalarType);
 //
 //        from_py<tangoTypeConst>::convert(value.ptr(), *cpp_val);
 //        att.set_value(cpp_val.release(), 1, 0, true);
@@ -92,8 +94,8 @@ extern long TANGO_VERSION_HEX;
 //     * @param data new attribute data
 //     */
 //    inline void __set_value(Tango::Attribute &att,
-//                            bopy::str &data_str,
-//                            bopy::str &data)
+//                            py::str &data_str,
+//                            py::str &data)
 //    {
 //        extract<Tango::DevString> val_str(data_str.ptr());
 //        if (!val_str.check())
@@ -119,8 +121,8 @@ extern long TANGO_VERSION_HEX;
 //     * @param data new attribute data
 //     */
 //    inline void __set_value(Tango::Attribute &att,
-//                            bopy::str &data_str,
-//                            bopy::object &data)
+//                            py::str &data_str,
+//                            py::object &data)
 //    {
 //        extract<Tango::DevString> val_str(data_str.ptr());
 //        if (!val_str.check())
@@ -128,17 +130,17 @@ extern long TANGO_VERSION_HEX;
 //            throw_wrong_python_data_type(att.get_name(), "set_value()");
 //        }
 //
-//	PyObject* data_ptr = data.ptr();
-//	Py_buffer view;
+//    PyObject* data_ptr = data.ptr();
+//    Py_buffer view;
 //
-//	if (PyObject_GetBuffer(data_ptr, &view, PyBUF_FULL_RO) < 0)
-//	{
-//	    throw_wrong_python_data_type(att.get_name(), "set_value()");
-//	}
+//    if (PyObject_GetBuffer(data_ptr, &view, PyBUF_FULL_RO) < 0)
+//    {
+//        throw_wrong_python_data_type(att.get_name(), "set_value()");
+//    }
 //
-//	Tango::DevString val_str_real = val_str;
+//    Tango::DevString val_str_real = val_str;
 //        att.set_value(&val_str_real, (Tango::DevUChar*)view.buf, (long)view.len);
-//	PyBuffer_Release(&view);
+//    PyBuffer_Release(&view);
 //    }
 //
 //    /**
@@ -151,7 +153,7 @@ extern long TANGO_VERSION_HEX;
 //     */
 //    template<long tangoTypeConst>
 //    inline void __set_value_date_quality_scalar(Tango::Attribute &att,
-//                                                bopy::object &value,
+//                                                py::object &value,
 //                                                double t, Tango::AttrQuality quality)
 //    {
 //        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
@@ -182,8 +184,8 @@ extern long TANGO_VERSION_HEX;
 //     * @param quality attribute quality
 //     */
 //    inline void __set_value_date_quality(Tango::Attribute &att,
-//                                         bopy::str &data_str,
-//                                         bopy::str &data,
+//                                         py::str &data_str,
+//                                         py::str &data,
 //                                         double t, Tango::AttrQuality quality)
 //    {
 //        extract<Tango::DevString> val_str(data_str.ptr());
@@ -203,56 +205,56 @@ extern long TANGO_VERSION_HEX;
 //        att.set_value_date_quality(&val_str_real, (Tango::DevUChar*)val_real,
 //                                   (long)len(data), tv, quality);
 //    }
-//
-//    /**
-//     * Tango Attribute set_value_date_quality wrapper for DevEncoded attributes
-//     *
-//     * @param att attribute reference
-//     * @param data_str new attribute data string
-//     * @param data new attribute data
-//     * @param t timestamp
-//     * @param quality attribute quality
-//     */
-//    inline void __set_value_date_quality(Tango::Attribute &att,
-//                                         bopy::str &data_str,
-//                                         bopy::object &data,
-//                                         double t, Tango::AttrQuality quality)
-//    {
+
+    /**
+     * Tango Attribute set_value_date_quality wrapper for DevEncoded attributes
+     *
+     * @param att attribute reference
+     * @param data_str new attribute data string
+     * @param data new attribute data
+     * @param t timestamp
+     * @param quality attribute quality
+     */
+    inline void __set_value_date_quality(Tango::Attribute &att,
+                                         py::str &data_str,
+                                         py::object &data,
+                                         double t, Tango::AttrQuality quality)
+    {
 //        extract<Tango::DevString> val_str(data_str.ptr());
 //        if (!val_str.check())
 //        {
 //            throw_wrong_python_data_type(att.get_name(), "set_value1()");
 //        }
 //
-//	PyObject* data_ptr = data.ptr();
-//	Py_buffer view;
+//        PyObject* data_ptr = data.ptr();
+//        Py_buffer view;
 //
-//	if (PyObject_GetBuffer(data_ptr, &view, PyBUF_FULL_RO) < 0)
-//	{
-//	    throw_wrong_python_data_type(att.get_name(), "set_value()");
-//	}
+//        if (PyObject_GetBuffer(data_ptr, &view, PyBUF_FULL_RO) < 0)
+//        {
+//            throw_wrong_python_data_type(att.get_name(), "set_value()");
+//        }
 //
 //        PYTG_NEW_TIME_FROM_DOUBLE(t, tv);
-//	Tango::DevString val_str_real = val_str;
+//        Tango::DevString val_str_real = val_str;
 //        att.set_value(&val_str_real, (Tango::DevUChar*)view.buf, (long)view.len);
 //        att.set_value_date_quality(&val_str_real, (Tango::DevUChar*)view.buf,
 //                                   (long)view.len, tv, quality);
-//	PyBuffer_Release(&view);
-//    }
-//
-//    template<long tangoTypeConst>
-//    void __set_value_date_quality_array(
-//            Tango::Attribute& att,
-//            bopy::object &value,
-//            double time,
-//            Tango::AttrQuality* quality,
-//            long* x,
-//            long* y,
-//            const std::string &fname,
-//            bool isImage)
-//    {
-//        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-//
+//        PyBuffer_Release(&view);
+    }
+
+    template<long tangoTypeConst>
+    void __set_value_date_quality_array(
+            Tango::Attribute& att,
+            py::object &value,
+            double time,
+            Tango::AttrQuality* quality,
+            long* x,
+            long* y,
+            const std::string& fname,
+            bool isImage)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
 //        if (!PySequence_Check(value.ptr()))
 //        {
 //            // avoid bug in tango 7.0 to 7.1.1: DevEncoded is not defined in CmdArgTypeName
@@ -260,7 +262,7 @@ extern long TANGO_VERSION_HEX;
 //                "DevEncoded" :
 //                Tango::CmdArgTypeName[tangoTypeConst];
 //
-//            TangoSys_OMemStream o;
+//            std::stringstream o;
 //            o << "Wrong Python type for attribute " << att.get_name()
 //              << " of type " << arg_type << ". Expected a sequence." << ends;
 //
@@ -285,9 +287,9 @@ extern long TANGO_VERSION_HEX;
 //        } else {
 //            att.set_value(data_buffer, res_dim_x, res_dim_y, release);
 //        }
-//    }
+    }
 //
-//    inline void __set_value(const std::string & fname, Tango::Attribute &att, bopy::object &value, long* x, long *y, double t = 0.0, Tango::AttrQuality* quality = 0)
+//    inline void __set_value(const std::string&  fname, Tango::Attribute &att, py::object &value, long* x, long *y, double t = 0.0, Tango::AttrQuality* quality = 0)
 //    {
 //        long type = att.get_data_type();
 //        Tango::AttrDataFormat format = att.get_data_format();
@@ -297,7 +299,7 @@ extern long TANGO_VERSION_HEX;
 //
 //        if (isScalar) {
 //            if ((x && ((*x) > 1)) || (y && (*y) > 0)) {
-//                TangoSys_OMemStream o;
+//                std::stringstream o;
 //                o << "Cannot call " << fname;
 //                if (y)
 //                    o << "(data, dim_x, dim_y) on scalar attribute ";
@@ -326,7 +328,7 @@ extern long TANGO_VERSION_HEX;
 //        }
 //    }
 //
-//    inline void __set_value(const std::string & fname, Tango::Attribute &att, bopy::str &data_str, bopy::str &data, double t = 0.0, Tango::AttrQuality* quality = 0)
+//    inline void __set_value(const std::string&  fname, Tango::Attribute &att, py::str &data_str, py::str &data, double t = 0.0, Tango::AttrQuality* quality = 0)
 //    {
 //        if (quality)
 //            __set_value_date_quality(att, data_str, data, t, *quality);
@@ -334,7 +336,7 @@ extern long TANGO_VERSION_HEX;
 //            __set_value(att, data_str, data);
 //    }
 //
-//    inline void __set_value(const std::string & fname, Tango::Attribute &att, bopy::str &data_str, bopy::object &data, double t = 0.0, Tango::AttrQuality* quality = 0)
+//    inline void __set_value(const std::string&  fname, Tango::Attribute &att, py::str &data_str, py::object &data, double t = 0.0, Tango::AttrQuality* quality = 0)
 //    {
 //        if (quality)
 //            __set_value_date_quality(att, data_str, data, t, *quality);
@@ -342,99 +344,122 @@ extern long TANGO_VERSION_HEX;
 //            __set_value(att, data_str, data);
 //    }
 //
-//    inline void set_value(Tango::Attribute &att, bopy::object &value)
-//    { __set_value("set_value", att, value, 0, 0); }
-//
-//    inline void set_value(Tango::Attribute &att, Tango::EncodedAttribute *data)
-//    { att.set_value(data); }
-//
-//    inline void set_value(Tango::Attribute &att, bopy::str &data_str, bopy::str &data)
-//    { __set_value("set_value", att, data_str, data); }
-//
-//    inline void set_value(Tango::Attribute &att, bopy::str &data_str, bopy::object &data)
-//    { __set_value("set_value", att, data_str, data); }
-//
-//    inline void set_value(Tango::Attribute &att, bopy::object &value, long x)
-//    { __set_value("set_value", att, value, &x, 0); }
-//
-//    inline void set_value(Tango::Attribute &att, bopy::object &value, long x, long y)
-//    { __set_value("set_value", att, value, &x, &y); }
-//
-//    inline void set_value_date_quality(Tango::Attribute &att,
-//                                       bopy::object &value, double t,
-//                                       Tango::AttrQuality quality)
-//    { __set_value("set_value_date_quality", att, value, 0, 0, t, &quality); }
-//
-//    inline void set_value_date_quality(Tango::Attribute &att,
-//                                       bopy::str &data_str,
-//                                       bopy::str &data,
-//                                       double t,
-//                                       Tango::AttrQuality quality)
-//    { __set_value("set_value_date_quality", att, data_str, data, t, &quality); }
-//
-//    inline void set_value_date_quality(Tango::Attribute &att,
-//                                       bopy::str &data_str,
-//                                       bopy::object &data,
-//                                       double t,
-//                                       Tango::AttrQuality quality)
-//    { __set_value("set_value_date_quality", att, data_str, data, t, &quality); }
-//
-//    inline void set_value_date_quality(Tango::Attribute &att,
-//                                       bopy::object &value,
-//                                       double t, Tango::AttrQuality quality,
-//                                       long x)
-//    { __set_value("set_value_date_quality", att, value, &x, 0, t, &quality); }
-//
-//    inline void set_value_date_quality(Tango::Attribute &att,
-//                                       bopy::object &value,
-//                                       double t, Tango::AttrQuality quality,
-//                                       long x, long y)
-//    { __set_value("set_value_date_quality", att, value, &x, &y, t, &quality); }
-//
+    void set_value(Tango::Attribute &att, py::object &value)
+    {
+        py::print(value);
+        //__set_value("set_value", att, value, 0, 0);
+    }
+
+    void set_value(Tango::Attribute &att, Tango::EncodedAttribute *data)
+    {
+//        att.set_value(data);
+    }
+
+    void set_value(Tango::Attribute &att, const std::string& data_str, const std::string& data)
+    {
+//        __set_value("set_value", att, data_str, data);
+    }
+
+    void set_value(Tango::Attribute &att, const std::string& data_str, py::object &data)
+    {
+//        __set_value("set_value", att, data_str, data);
+    }
+
+    void set_value(Tango::Attribute &att, py::object &value, long x)
+    {
+//        __set_value("set_value", att, value, &x, 0);
+    }
+
+    void set_value(Tango::Attribute &att, py::object &value, long x, long y)
+    {
+//        __set_value("set_value", att, value, &x, &y);
+    }
+
+    void set_value_date_quality(Tango::Attribute &att,
+                                       py::object &value, double t,
+                                       Tango::AttrQuality quality)
+    {
+//        __set_value("set_value_date_quality", att, value, 0, 0, t, &quality);
+    }
+
+    void set_value_date_quality(Tango::Attribute &att,
+                                       const std::string& data_str,
+                                       const std::string& data,
+                                       double t,
+                                       Tango::AttrQuality quality)
+    {
+//        __set_value("set_value_date_quality", att, data_str, data, t, &quality);
+    }
+
+    void set_value_date_quality(Tango::Attribute &att,
+                                       const std::string& data_str,
+                                       py::object &data,
+                                       double t,
+                                       Tango::AttrQuality quality)
+    {
+//        __set_value("set_value_date_quality", att, data_str, data, t, &quality);
+    }
+
+    void set_value_date_quality(Tango::Attribute &att,
+                                       py::object &value,
+                                       double t, Tango::AttrQuality quality,
+                                       long x)
+    {
+//        __set_value("set_value_date_quality", att, value, &x, 0, t, &quality);
+    }
+
+    void set_value_date_quality(Tango::Attribute &att,
+                                       py::object &value,
+                                       double t, Tango::AttrQuality quality,
+                                       long x, long y)
+    {
+//        __set_value("set_value_date_quality", att, value, &x, &y, t, &quality);
+    }
+
 //    template<typename TangoScalarType>
-//    inline void _get_properties_multi_attr_prop(Tango::Attribute &att, bopy::object &multi_attr_prop)
+//    inline void _get_properties_multi_attr_prop(Tango::Attribute &att, py::object &multi_attr_prop)
 //    {
-//    	Tango::MultiAttrProp<TangoScalarType> tg_multi_attr_prop;
-//    	att.get_properties(tg_multi_attr_prop);
+//        Tango::MultiAttrProp<TangoScalarType> tg_multi_attr_prop;
+//        att.get_properties(tg_multi_attr_prop);
 //
-//    	to_py(tg_multi_attr_prop,multi_attr_prop);
+//        to_py(tg_multi_attr_prop,multi_attr_prop);
 //    }
 //
-//    inline bopy::object
+//    inline py::object
 //    get_properties_multi_attr_prop(Tango::Attribute &att,
-//                                                bopy::object &multi_attr_prop)
+//                                                py::object &multi_attr_prop)
 //    {
-//    	long tangoTypeConst = att.get_data_type();
-//		TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _get_properties_multi_attr_prop, att, multi_attr_prop);
-//		return multi_attr_prop;
+//        long tangoTypeConst = att.get_data_type();
+//        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _get_properties_multi_attr_prop, att, multi_attr_prop);
+//        return multi_attr_prop;
 //    }
 //
 //    template<typename TangoScalarType>
-//    inline void _set_properties_multi_attr_prop(Tango::Attribute &att, bopy::object &multi_attr_prop)
+//    inline void _set_properties_multi_attr_prop(Tango::Attribute &att, py::object &multi_attr_prop)
 //    {
-//    	Tango::MultiAttrProp<TangoScalarType> tg_multi_attr_prop;
-//    	from_py_object(multi_attr_prop,tg_multi_attr_prop);
-//    	att.set_properties(tg_multi_attr_prop);
+//        Tango::MultiAttrProp<TangoScalarType> tg_multi_attr_prop;
+//        from_py_object(multi_attr_prop,tg_multi_attr_prop);
+//        att.set_properties(tg_multi_attr_prop);
 //    }
 //
-//    void set_properties_multi_attr_prop(Tango::Attribute &att, bopy::object &multi_attr_prop)
+//    void set_properties_multi_attr_prop(Tango::Attribute &att, py::object &multi_attr_prop)
 //    {
-//    	long tangoTypeConst = att.get_data_type();
-//		TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_properties_multi_attr_prop, att, multi_attr_prop);
+//        long tangoTypeConst = att.get_data_type();
+//        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_properties_multi_attr_prop, att, multi_attr_prop);
 //    }
 //
-//    void set_upd_properties(Tango::Attribute &att, bopy::object &attr_cfg)
+//    void set_upd_properties(Tango::Attribute &att, py::object &attr_cfg)
 //    {
 //        Tango::AttributeConfig_3 tg_attr_cfg;
 //        from_py_object(attr_cfg, tg_attr_cfg);
 //        att.set_upd_properties(tg_attr_cfg);
 //    }
 //
-//    void set_upd_properties(Tango::Attribute &att, bopy::object &attr_cfg, bopy::object &dev_name)
+//    void set_upd_properties(Tango::Attribute &att, py::object &attr_cfg, py::object &dev_name)
 //    {
 //        Tango::AttributeConfig_3 tg_attr_cfg;
 //        from_py_object(attr_cfg, tg_attr_cfg);
-//        string tg_dev_name = bopy::extract<string>(dev_name);
+//        string tg_dev_name = py::extract<string>(dev_name);
 //        att.set_upd_properties(tg_attr_cfg,tg_dev_name);
 //    }
 //
@@ -445,13 +470,13 @@ extern long TANGO_VERSION_HEX;
 //
 //    inline void fire_change_event(Tango::Attribute &self, object &data)
 //    {
-//        bopy::extract<Tango::DevFailed> except_convert(data);
+//        py::extract<Tango::DevFailed> except_convert(data);
 //        if (except_convert.check()) {
 //            self.fire_change_event(
 //                           const_cast<Tango::DevFailed*>( &except_convert() ));
 //            return;
 //        }
-//        TangoSys_OMemStream o;
+//        std::stringstream o;
 //        o << "Wrong Python argument type for attribute " << self.get_name()
 //            << ". Expected a DevFailed." << ends;
 //        Tango::Except::throw_exception(
@@ -461,174 +486,174 @@ extern long TANGO_VERSION_HEX;
 //    }
 //
 //    template<typename TangoScalarType>
-//    inline void _set_min_alarm(Tango::Attribute &self, bopy::object value)
+//    inline void _set_min_alarm(Tango::Attribute &self, py::object value)
 //    {
-//		TangoScalarType c_value = bopy::extract<TangoScalarType>(value);
-//		self.set_min_alarm(c_value);
+//        TangoScalarType c_value = py::extract<TangoScalarType>(value);
+//        self.set_min_alarm(c_value);
 //    }
 //
 //#if TANGO_VERSION_NB < 80100 // set_min_alarm
 //
 //    template<>
-//    inline void _set_min_alarm<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
+//    inline void _set_min_alarm<Tango::DevEncoded>(Tango::Attribute &self, py::object value)
 //    {
-//    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
-//    	Tango::Except::throw_exception((const char *)"API_MethodArgument",
-//    				  (const char *)err_msg.c_str(),
-//    				  (const char *)"Attribute::set_min_alarm()");
+//        string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+//        Tango::Except::throw_exception((const char *)"API_MethodArgument",
+//                      (const char *)err_msg.c_str(),
+//                      (const char *)"Attribute::set_min_alarm()");
 //    }
 //
 //#endif // set_min_alarm
 //
-//    inline void set_min_alarm(Tango::Attribute &self, bopy::object value)
+//    inline void set_min_alarm(Tango::Attribute &self, py::object value)
 //    {
-//        bopy::extract<string> value_convert(value);
+//        py::extract<string> value_convert(value);
 //
-//    	if (value_convert.check())
-//    	{
-//			self.set_min_alarm(value_convert());
-//    	}
-//    	else
-//    	{
-//			long tangoTypeConst = self.get_data_type();
-//			// TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
-//			// for one of the forbidden attribute data types; code dependent on Tango C++ implementation
-//			if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
-//				tangoTypeConst = Tango::DEV_DOUBLE;
-//			else if(tangoTypeConst == Tango::DEV_ENCODED)
-//				tangoTypeConst = Tango::DEV_UCHAR;
+//        if (value_convert.check())
+//        {
+//            self.set_min_alarm(value_convert());
+//        }
+//        else
+//        {
+//            long tangoTypeConst = self.get_data_type();
+//            // TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
+//            // for one of the forbidden attribute data types; code dependent on Tango C++ implementation
+//            if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
+//                tangoTypeConst = Tango::DEV_DOUBLE;
+//            else if(tangoTypeConst == Tango::DEV_ENCODED)
+//                tangoTypeConst = Tango::DEV_UCHAR;
 //
-//			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_min_alarm, self, value);
-//    	}
+//            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_min_alarm, self, value);
+//        }
 //    }
 //
 //
 //    template<typename TangoScalarType>
-//    inline void _set_max_alarm(Tango::Attribute &self, bopy::object value)
+//    inline void _set_max_alarm(Tango::Attribute &self, py::object value)
 //    {
-//		TangoScalarType c_value = bopy::extract<TangoScalarType>(value);
-//		self.set_max_alarm(c_value);
+//        TangoScalarType c_value = py::extract<TangoScalarType>(value);
+//        self.set_max_alarm(c_value);
 //    }
 //
 //#if TANGO_VERSION_NB < 80100 // set_max_alarm
 //
 //    template<>
-//    inline void _set_max_alarm<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
+//    inline void _set_max_alarm<Tango::DevEncoded>(Tango::Attribute &self, py::object value)
 //    {
-//    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
-//    	Tango::Except::throw_exception((const char *)"API_MethodArgument",
-//    				  (const char *)err_msg.c_str(),
-//    				  (const char *)"Attribute::set_max_alarm()");
+//        string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+//        Tango::Except::throw_exception((const char *)"API_MethodArgument",
+//                      (const char *)err_msg.c_str(),
+//                      (const char *)"Attribute::set_max_alarm()");
 //    }
 //
 //#endif // set_max_alarm
 //
-//    inline void set_max_alarm(Tango::Attribute &self, bopy::object value)
+//    inline void set_max_alarm(Tango::Attribute &self, py::object value)
 //    {
-//        bopy::extract<string> value_convert(value);
+//        py::extract<string> value_convert(value);
 //
-//    	if (value_convert.check())
-//    	{
-//			self.set_max_alarm(value_convert());
-//    	}
-//    	else
-//    	{
-//			long tangoTypeConst = self.get_data_type();
-//			// TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
-//			// for one of the forbidden attribute data types; code dependent on Tango C++ implementation
-//			if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
-//				tangoTypeConst = Tango::DEV_DOUBLE;
-//			else if(tangoTypeConst == Tango::DEV_ENCODED)
-//				tangoTypeConst = Tango::DEV_UCHAR;
+//        if (value_convert.check())
+//        {
+//            self.set_max_alarm(value_convert());
+//        }
+//        else
+//        {
+//            long tangoTypeConst = self.get_data_type();
+//            // TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
+//            // for one of the forbidden attribute data types; code dependent on Tango C++ implementation
+//            if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
+//                tangoTypeConst = Tango::DEV_DOUBLE;
+//            else if(tangoTypeConst == Tango::DEV_ENCODED)
+//                tangoTypeConst = Tango::DEV_UCHAR;
 //
-//			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_max_alarm, self, value);
-//    	}
+//            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_max_alarm, self, value);
+//        }
 //    }
 //
 //
 //    template<typename TangoScalarType>
-//    inline void _set_min_warning(Tango::Attribute &self, bopy::object value)
+//    inline void _set_min_warning(Tango::Attribute &self, py::object value)
 //    {
-//		TangoScalarType c_value = bopy::extract<TangoScalarType>(value);
-//		self.set_min_warning(c_value);
+//        TangoScalarType c_value = py::extract<TangoScalarType>(value);
+//        self.set_min_warning(c_value);
 //    }
 //
 //#if TANGO_VERSION_NB < 80100 // set_min_warning
 //
 //    template<>
-//    inline void _set_min_warning<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
+//    inline void _set_min_warning<Tango::DevEncoded>(Tango::Attribute &self, py::object value)
 //    {
-//    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
-//    	Tango::Except::throw_exception((const char *)"API_MethodArgument",
-//    				  (const char *)err_msg.c_str(),
-//    				  (const char *)"Attribute::set_min_warning()");
+//        string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+//        Tango::Except::throw_exception((const char *)"API_MethodArgument",
+//                      (const char *)err_msg.c_str(),
+//                      (const char *)"Attribute::set_min_warning()");
 //    }
 //
 //#endif // set_min_warning
 //
-//    inline void set_min_warning(Tango::Attribute &self, bopy::object value)
+//    inline void set_min_warning(Tango::Attribute &self, py::object value)
 //    {
-//        bopy::extract<string> value_convert(value);
+//        py::extract<string> value_convert(value);
 //
-//    	if (value_convert.check())
-//    	{
-//			self.set_min_warning(value_convert());
-//    	}
-//    	else
-//    	{
-//			long tangoTypeConst = self.get_data_type();
-//			// TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
-//			// for one of the forbidden attribute data types; code dependent on Tango C++ implementation
-//			if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
-//				tangoTypeConst = Tango::DEV_DOUBLE;
-//			else if(tangoTypeConst == Tango::DEV_ENCODED)
-//				tangoTypeConst = Tango::DEV_UCHAR;
+//        if (value_convert.check())
+//        {
+//            self.set_min_warning(value_convert());
+//        }
+//        else
+//        {
+//            long tangoTypeConst = self.get_data_type();
+//            // TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
+//            // for one of the forbidden attribute data types; code dependent on Tango C++ implementation
+//            if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
+//                tangoTypeConst = Tango::DEV_DOUBLE;
+//            else if(tangoTypeConst == Tango::DEV_ENCODED)
+//                tangoTypeConst = Tango::DEV_UCHAR;
 //
-//			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_min_warning, self, value);
-//    	}
+//            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_min_warning, self, value);
+//        }
 //    }
 //
 //
 //    template<typename TangoScalarType>
-//    inline void _set_max_warning(Tango::Attribute &self, bopy::object value)
+//    inline void _set_max_warning(Tango::Attribute &self, py::object value)
 //    {
-//		TangoScalarType c_value = bopy::extract<TangoScalarType>(value);
-//		self.set_max_warning(c_value);
+//        TangoScalarType c_value = py::extract<TangoScalarType>(value);
+//        self.set_max_warning(c_value);
 //    }
 //
 //#if TANGO_VERSION_NB < 80100 // set_max_warning
 //
 //    template<>
-//    inline void _set_max_warning<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
+//    inline void _set_max_warning<Tango::DevEncoded>(Tango::Attribute &self, py::object value)
 //    {
-//    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
-//    	Tango::Except::throw_exception((const char *)"API_MethodArgument",
-//    				  (const char *)err_msg.c_str(),
-//    				  (const char *)"Attribute::set_max_warning()");
+//        string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+//        Tango::Except::throw_exception((const char *)"API_MethodArgument",
+//                      (const char *)err_msg.c_str(),
+//                      (const char *)"Attribute::set_max_warning()");
 //    }
 //
 //#endif // set_max_warning
 //
-//    inline void set_max_warning(Tango::Attribute &self, bopy::object value)
+//    inline void set_max_warning(Tango::Attribute &self, py::object value)
 //    {
-//        bopy::extract<string> value_convert(value);
+//        py::extract<string> value_convert(value);
 //
-//    	if (value_convert.check())
-//    	{
-//			self.set_max_warning(value_convert());
-//    	}
-//    	else
-//    	{
-//			long tangoTypeConst = self.get_data_type();
-//			// TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
-//			// for one of the forbidden attribute data types; code dependent on Tango C++ implementation
-//			if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
-//				tangoTypeConst = Tango::DEV_DOUBLE;
-//			else if(tangoTypeConst == Tango::DEV_ENCODED)
-//				tangoTypeConst = Tango::DEV_UCHAR;
+//        if (value_convert.check())
+//        {
+//            self.set_max_warning(value_convert());
+//        }
+//        else
+//        {
+//            long tangoTypeConst = self.get_data_type();
+//            // TODO: the below line is a neat trick to properly raise a Tango exception if a property is set
+//            // for one of the forbidden attribute data types; code dependent on Tango C++ implementation
+//            if(tangoTypeConst == Tango::DEV_STRING || tangoTypeConst == Tango::DEV_BOOLEAN || tangoTypeConst == Tango::DEV_STATE)
+//                tangoTypeConst = Tango::DEV_DOUBLE;
+//            else if(tangoTypeConst == Tango::DEV_ENCODED)
+//                tangoTypeConst = Tango::DEV_UCHAR;
 //
-//			TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_max_warning, self, value);
-//    	}
+//            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_max_warning, self, value);
+//        }
 //    }
 //
 //    template<long tangoTypeConst>
@@ -638,17 +663,17 @@ extern long TANGO_VERSION_HEX;
 //
 //        TangoScalarType tg_val;
 //        att.get_min_alarm(tg_val);
-//        bopy::object py_value(tg_val);
+//        py::object py_value(tg_val);
 //
-//        return bopy::incref(py_value.ptr());
+//        return py::incref(py_value.ptr());
 //    }
 //
 //    PyObject *get_min_alarm(Tango::Attribute &att)
 //    {
 //        long tangoTypeConst = att.get_data_type();
 //
-//		if(tangoTypeConst == Tango::DEV_ENCODED)
-//			tangoTypeConst = Tango::DEV_UCHAR;
+//        if(tangoTypeConst == Tango::DEV_ENCODED)
+//            tangoTypeConst = Tango::DEV_UCHAR;
 //
 //        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_min_alarm, att);
 //        return 0;
@@ -661,17 +686,17 @@ extern long TANGO_VERSION_HEX;
 //
 //        TangoScalarType tg_val;
 //        att.get_max_alarm(tg_val);
-//        bopy::object py_value(tg_val);
+//        py::object py_value(tg_val);
 //
-//        return bopy::incref(py_value.ptr());
+//        return py::incref(py_value.ptr());
 //    }
 //
 //    PyObject *get_max_alarm(Tango::Attribute &att)
 //    {
 //        long tangoTypeConst = att.get_data_type();
 //
-//		if(tangoTypeConst == Tango::DEV_ENCODED)
-//			tangoTypeConst = Tango::DEV_UCHAR;
+//        if(tangoTypeConst == Tango::DEV_ENCODED)
+//            tangoTypeConst = Tango::DEV_UCHAR;
 //
 //        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_max_alarm, att);
 //        return 0;
@@ -684,17 +709,17 @@ extern long TANGO_VERSION_HEX;
 //
 //        TangoScalarType tg_val;
 //        att.get_min_warning(tg_val);
-//        bopy::object py_value(tg_val);
+//        py::object py_value(tg_val);
 //
-//        return bopy::incref(py_value.ptr());
+//        return py::incref(py_value.ptr());
 //    }
 //
 //    PyObject *get_min_warning(Tango::Attribute &att)
 //    {
 //        long tangoTypeConst = att.get_data_type();
 //
-//		if(tangoTypeConst == Tango::DEV_ENCODED)
-//			tangoTypeConst = Tango::DEV_UCHAR;
+//        if(tangoTypeConst == Tango::DEV_ENCODED)
+//            tangoTypeConst = Tango::DEV_UCHAR;
 //
 //        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_min_warning, att);
 //        return 0;
@@ -707,23 +732,23 @@ extern long TANGO_VERSION_HEX;
 //
 //        TangoScalarType tg_val;
 //        att.get_max_warning(tg_val);
-//        bopy::object py_value(tg_val);
+//        py::object py_value(tg_val);
 //
-//        return bopy::incref(py_value.ptr());
+//        return py::incref(py_value.ptr());
 //    }
 //
 //    PyObject *get_max_warning(Tango::Attribute &att)
 //    {
 //        long tangoTypeConst = att.get_data_type();
 //
-//		if(tangoTypeConst == Tango::DEV_ENCODED)
-//			tangoTypeConst = Tango::DEV_UCHAR;
+//        if(tangoTypeConst == Tango::DEV_ENCODED)
+//            tangoTypeConst = Tango::DEV_UCHAR;
 //
 //        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_max_warning, att);
 //        return 0;
 //    }
 //
-//};
+};
 //
 //BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_quality_overloads,
 //                                       Tango::Attribute::set_quality, 1, 2);
@@ -812,8 +837,10 @@ void export_attribute(py::module &m)
 //        .def("get_max_warning", (PyObject* (*) (Tango::Attribute &))
 //                &PyAttribute::get_max_warning)
 
-//        .def("set_value", (void (*) (Tango::Attribute &, py::object &))
-//            &PyAttribute::set_value)
+        .def("set_value", [](Tango::Attribute& self, py::object &value) -> void {
+//            PyAttribute::set_value(self, value);
+            py::print(value);
+        })
 //        .def("set_value", (void (*) (Tango::Attribute &, py::str &, py::object &))
 //            &PyAttribute::set_value)
 //        .def("set_value", (void (*) (Tango::Attribute &, py::str &, py::str &))

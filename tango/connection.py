@@ -19,8 +19,8 @@ __docformat__ = "restructuredtext"
 
 import collections
 
-from ._tango import Connection, DeviceData, CmdArgType
-# from ._tango import __CallBackAutoDie
+from ._tango import DeviceData, CmdArgType
+from ._tango import __CallBackAutoDie
 from ._tango import DeviceProxy, Database, ExtractAs
 from .utils import document_method as __document_method
 from .utils import document_static_method as __document_static_method
@@ -30,6 +30,7 @@ from .green import green
 def __CallBackAutoDie__cmd_ended_aux(self, fn):
     def __new_fn(cmd_done_event):
         try:
+            print("python cmd_ended")
             cmd_done_event.argout = cmd_done_event.argout_raw.extract(
                 self.defaultCommandExtractAs)
         except Exception:
@@ -70,7 +71,7 @@ def __get_command_inout_param(self, cmd_name, cmd_param=None):
         raise TypeError("command_inout() parameter must be a DeviceData object.")
 
 
-def __Connection__command_inout(self, name, *args, **kwds):
+def __DeviceProxy__command_inout(self, name, *args, **kwds):
     """
     command_inout( self, cmd_name, cmd_param=None, green_mode=None, wait=True, timeout=None) -> any
 
@@ -102,7 +103,8 @@ def __Connection__command_inout(self, name, *args, **kwds):
         *wait* parameter.
         *timeout* parameter.
     """
-    r = Connection.command_inout_raw(self, name, *args, **kwds)
+    print("connection.command_inout")
+    r = DeviceProxy.command_inout_raw(self, name, *args, **kwds)
     if isinstance(r, DeviceData):
         try:
             return r.extract(self.defaultCommandExtractAs)
@@ -112,10 +114,10 @@ def __Connection__command_inout(self, name, *args, **kwds):
         return r
 
 
-__Connection__command_inout.__name__ = "command_inout"
+__DeviceProxy__command_inout.__name__ = "command_inout"
 
 
-def __Connection__command_inout_raw(self, cmd_name, cmd_param=None):
+def __DeviceProxy__command_inout_raw(self, cmd_name, cmd_param=None):
     """
     command_inout_raw( self, cmd_name, cmd_param=None) -> DeviceData
 
@@ -130,11 +132,13 @@ def __Connection__command_inout_raw(self, cmd_name, cmd_param=None):
 
         Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked, DevFailed from device
     """
+    print("connection.command_inout")
     param = __get_command_inout_param(self, cmd_name, cmd_param)
+    print("connection.command_inout - 2")
     return self.__command_inout(cmd_name, param)
 
 
-def __Connection__command_inout_asynch(self, cmd_name, *args):
+def __DeviceProxy__command_inout_asynch(self, cmd_name, *args):
     """
     command_inout_asynch(self, cmd_name) -> id
     command_inout_asynch(self, cmd_name, cmd_param) -> id
@@ -189,31 +193,46 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
         return self.__command_inout_asynch_id(cmd_name, argin, forget)
     elif len(args) == 1:
         if isinstance(args[0], collections.Callable):  # command_inout_asynch(lambda)
+            print("here1")
             cb = __CallBackAutoDie()
-            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[0])
+            cb.set_callback(__CallBackAutoDie__cmd_ended_aux(self, args[0]))
+#            print(type(cb.m_callback))
+#            cb.m_callback = args[0]
+#            cb.set_callback(args[0])
+            cb.set_weak_parent(self)
+            print("here also")
             argin = __get_command_inout_param(self, cmd_name)
-            return self.__command_inout_asynch_cb(cmd_name, argin, cb)
+            print("here again")
+            print(type(cb))
+            return self.__command_inout_asynch_cb(cmd_name, cb)
         elif hasattr(args[0], 'cmd_ended'):  # command_inout_asynch(Cbclass)
+            print("here2")
             cb = __CallBackAutoDie()
-            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[0].cmd_ended)
+            cb.m_callback = __CallBackAutoDie__cmd_ended_aux(self, args[0].cmd_ended)
             argin = __get_command_inout_param(self, cmd_name)
-            return self.__command_inout_asynch_cb(cmd_name, argin, cb)
+            return self.__command_inout_asynch_cb(cmd_name, cb)
         else:  # command_inout_asynch(value)
+            print("here3")
             argin = __get_command_inout_param(self, cmd_name, args[0])
             forget = False
             return self.__command_inout_asynch_id(cmd_name, argin, forget)
     elif len(args) == 2:
         if isinstance(args[1], collections.Callable):  # command_inout_asynch( value, lambda)
+            print("here4")
             cb = __CallBackAutoDie()
-            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[1])
+#            cb.m_callback = __CallBackAutoDie__cmd_ended_aux(self, args[1])
+            print(type(args[1]))
+            cb.m_callback = args[1]
             argin = __get_command_inout_param(self, cmd_name, args[0])
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
         elif hasattr(args[1], 'cmd_ended'):  # command_inout_asynch(value, cbClass)
+            print("here5")
             cb = __CallBackAutoDie()
-            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[1].cmd_ended)
+            cb.m_callback = __CallBackAutoDie__cmd_ended_aux(self, args[1].cmd_ended)
             argin = __get_command_inout_param(self, cmd_name, args[0])
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
         else:  # command_inout_asynch(value, forget)
+            print("here6")
             argin = __get_command_inout_param(self, cmd_name, args[0])
             forget = bool(args[1])
             return self.__command_inout_asynch_id(cmd_name, argin, forget)
@@ -221,10 +240,10 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
         raise TypeError("Wrong number of attributes!")
 
 
-__Connection__command_inout_asynch.__name__ = "command_inout_asynch"
+__DeviceProxy__command_inout_asynch.__name__ = "command_inout_asynch"
 
 
-def __Connection__command_inout_reply(self, idx, timeout=None):
+def __DeviceProxy__command_inout_reply(self, idx, timeout=None):
     """
     command_inout_reply(self, id) -> DeviceData
 
@@ -271,27 +290,24 @@ def __Connection__command_inout_reply(self, idx, timeout=None):
         return r
 
 
-__Connection__command_inout_reply.__name__ = "command_inout_reply"
+__DeviceProxy__command_inout_reply.__name__ = "command_inout_reply"
 
 
-def __init_Connection():
-    Connection.defaultCommandExtractAs = ExtractAs.Numpy
-    Connection.command_inout_raw = __Connection__command_inout_raw
-    Connection.command_inout = green(__Connection__command_inout)
-    Connection.command_inout_asynch = __Connection__command_inout_asynch
-    Connection.command_inout_reply = __Connection__command_inout_reply
+def __init_DeviceProxy():
+    DeviceProxy.defaultCommandExtractAs = ExtractAs.Numpy
+    DeviceProxy.command_inout_raw = __DeviceProxy__command_inout_raw
+    DeviceProxy.command_inout = green(__DeviceProxy__command_inout)
+    DeviceProxy.command_inout_asynch = __DeviceProxy__command_inout_asynch
+    DeviceProxy.command_inout_reply = __DeviceProxy__command_inout_reply
 
 
-def __doc_Connection():
+def __doc_DeviceProxy():
     def document_method(method_name, desc, append=True):
-        return __document_method(Connection, method_name, desc, append)
+        return __document_method(DeviceProxy, method_name, desc, append)
 
     def document_static_method(method_name, desc, append=True):
-        return __document_static_method(Connection, method_name, desc, append)
+        return __document_static_method(DeviceProxy, method_name, desc, append)
 
-    Connection.__doc__ = """
-        The abstract Connection class for DeviceProxy. Not to be initialized directly.
-    """
 
     document_method("dev_name", """
     dev_name(self) -> str
@@ -634,6 +650,6 @@ def __doc_Connection():
 
 
 def connection_init(doc=True):
-    __init_Connection()
+    __init_DeviceProxy()
     if doc:
-        __doc_Connection()
+        __doc_DeviceProxy()

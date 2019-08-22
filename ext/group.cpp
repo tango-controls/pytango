@@ -35,7 +35,7 @@ namespace PyGroup
 //            PyDeviceAttribute::update_data_format( *dev_proxy, &(i->get_data()), 1 );
         }
     }
-static long _write_attribute_asynch(Tango::Group &self, const std::string &attr_name, py::object py_value, bool forward = true,
+static long _write_attribute_asynch(Tango::Group &self, const std::string& attr_name, py::object py_value, bool forward = true,
         bool multi = false) {
     Tango::DeviceProxy* dev_proxy = self.get_device(1);
     // If !dev_proxy (no device added in self or his children) then we
@@ -105,7 +105,7 @@ void export_group(py::module &m) {
 // TODO noncopyable
     py::class_<Tango::Group, std::shared_ptr<Tango::Group> >(m, "Group")
         .def(py::init<const std::string&>())
-        .def("_add", [](Tango::Group& self, const std::string &pattern, int timeout_ms=-1) {
+        .def("_add", [](Tango::Group& self, const std::string& pattern, int timeout_ms=-1) {
             self.add(pattern, timeout_ms);
         })
         .def("_add", [](Tango::Group& self, std::vector<std::string> patterns, int timeout_ms=-1) {
@@ -126,7 +126,7 @@ void export_group(py::module &m) {
 //                    " already been inserted in another group." );
             }
         })
-        .def("_remove", [](Tango::Group& self, const std::string & pattern,
+        .def("_remove", [](Tango::Group& self, const std::string&  pattern,
                 bool forward = true) -> void {
             self.remove(pattern, forward);
         })
@@ -212,7 +212,7 @@ void export_group(py::module &m) {
             return r;
         })
         .def("write_attribute_asynch", [](Tango::Group &self, 
-                                          const std::string &attr_name,
+                                          const std::string& attr_name,
                                           py::object py_value,
                                           bool forward=true,
                                           bool multi=false) {
@@ -230,7 +230,7 @@ void export_group(py::module &m) {
             self.contains(pattern, forward);
         })
         .def("get_device",
-            (Tango::DeviceProxy* (Tango::Group::*) (const std::string &))
+            (Tango::DeviceProxy* (Tango::Group::*) (const std::string& ))
             &Tango::Group::get_device,
             (py::arg("self"), py::arg("dev_name")),
             py::return_value_policy::reference_internal)

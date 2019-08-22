@@ -12,6 +12,7 @@
 #pragma once
 
 #include <pybind11/pybind11.h>
+#include <iostream>
 
 namespace py = pybind11;
 
@@ -28,7 +29,7 @@ typedef int Py_ssize_t;
 // using char* to >=2.5 using const char*. Basically we defined them here using
 // const std::string
 
-inline PyObject *PyObject_GetAttrString_(PyObject *o, const std::string &attr_name)
+inline PyObject *PyObject_GetAttrString_(PyObject *o, const std::string& attr_name)
 {
 #if PY_VERSION_HEX < 0x02050000
     char *attr = const_cast<char *>(attr_name.c_str());
@@ -38,7 +39,7 @@ inline PyObject *PyObject_GetAttrString_(PyObject *o, const std::string &attr_na
     return PyObject_GetAttrString(o, attr);
 }
 
-//inline PyObject *PyImport_ImportModule_(const std::string &name)
+//inline PyObject *PyImport_ImportModule_(const std::string& name)
 //{
 //    return PyImport_ImportModule(name.c_str());
 //}
@@ -209,7 +210,7 @@ public:
  *
  * @return returns true is the method exists or false otherwise
  */
-bool is_method_defined(py::object &obj, const std::string &method_name);
+bool is_method_defined(py::object &obj, const std::string& method_name);
 
 /**
  * Determines if the given method name exists and is callable
@@ -220,7 +221,7 @@ bool is_method_defined(py::object &obj, const std::string &method_name);
  *
  * @return returns true is the method exists or false otherwise
  */
-bool is_method_defined(PyObject *obj, const std::string &method_name);
+bool is_method_defined(PyObject *obj, const std::string& method_name);
 
 /**
  * Determines if the given method name exists and is callable
@@ -232,7 +233,7 @@ bool is_method_defined(PyObject *obj, const std::string &method_name);
  * @param[out] is_method set to true if the symbol exists and is a method
  *             or false otherwise
  */
-void is_method_defined(PyObject *obj, const std::string &method_name,
+void is_method_defined(PyObject *obj, const std::string& method_name,
                        bool &exists, bool &is_method);
 
 /**
@@ -245,14 +246,34 @@ void is_method_defined(PyObject *obj, const std::string &method_name,
  * @param[out] is_method set to true if the symbol exists and is a method
  *             or false otherwise
  */
-void is_method_defined(py::object &obj, const std::string &method_name,
+void is_method_defined(py::object &obj, const std::string& method_name,
                        bool &exists, bool &is_method);
 
 #define PYTANGO_MOD \
-    py::object pytango((py::cast(py::borrowed(PyImport_AddModule("tango")))));
+    py::object pytango((py::cast(PyImport_AddModule("tango"))));
 
 #define CALL_METHOD(retType, self, name, ...) \
     py::call_method<retType>(self, name , __VA_ARGS__);
 
 
-bool hasattr(py::object &, const std::string &);
+//bool hasattr(py::object &, const std::string& );
+
+inline bool is_method_callable(py::object& obj, const std::string& method_name)
+{
+    bool ret = false;
+    std::cout << "is method_callable" << std::endl;
+    try {
+        ret = PyObject_HasAttrString(obj.ptr(), method_name.c_str());
+    } catch (...) {
+        // do nothing method does not exist
+    }
+    std::cout << ret << std::endl;
+//    if (hasattr(obj, method_name))
+//    {
+//        py::object meth = obj.attr(method_name.c_str());
+//        if (PyCallable_Check(meth.ptr()))
+//            return true;
+//    }
+    std::cout << "leaving is method_callable " << ret << std::endl;
+    return ret;
+}

@@ -281,7 +281,7 @@ namespace PyDeviceAttribute {
         // so we have to find the maximum string length, creating an appropriate
         // size buffer and copy the strings.
         py::array array;
-        const std::string* ptr = reinterpret_cast<const string*>(buffer);
+        const std::string* ptr = reinterpret_cast<const std::string*>(buffer);
         std::stringstream ss;
         ss << "|S" << maxlen;
         std::string format_str = ss.str();
@@ -306,7 +306,7 @@ namespace PyDeviceAttribute {
 
         // Create the numpy array for the write part. It will be stored in
         // another place.
-        const std::string* wptr = reinterpret_cast<const string*>(buffer + write_part_offset);
+        const std::string* wptr = reinterpret_cast<const std::string*>(buffer + write_part_offset);
         if (self.get_written_dim_x() != 0) {
             py::array warray;
             if (isImage) {
@@ -444,10 +444,10 @@ namespace PyDeviceAttribute {
 
 //    template<> inline void
 //    _update_value_as_bin<Tango::DEV_PIPE_BLOB>(Tango::DeviceAttribute &self,
-//					       py::object py_value,
-//					       bool read_only)
+//                           py::object py_value,
+//                           bool read_only)
 //    {
-//	assert(false);
+//    assert(false);
 //    }
 
 //    template<long tangoTypeConst> static inline void
@@ -528,9 +528,9 @@ namespace PyDeviceAttribute {
 //
 //    template<> inline void
 //    _update_value_as_string<Tango::DEV_PIPE_BLOB>(Tango::DeviceAttribute &self,
-//						  py::object py_value)
+//                          py::object py_value)
 //    {
-//	assert(false);
+//    assert(false);
 //    }
 //
 //
@@ -767,28 +767,6 @@ namespace PyDeviceAttribute {
                         TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
                             _update_array_values, self, is_image, py_value);
                         break;
-//                    case PyTango::ExtractAsTuple:
-//                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
-//                            _update_array_values_as_tuples, self, is_image, py_value);
-//                        break;
-//                    case PyTango::ExtractAsList:
-//                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
-//                            _update_array_values_as_lists, self, is_image, py_value);
-//                        break;
-//                    case PyTango::ExtractAsBytes:
-//                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
-//                            _update_value_as_bin, self, py_value, true);
-//                        break;
-//                    case PyTango::ExtractAsByteArray:
-//                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
-//                            _update_value_as_bin, self, py_value, false);
-//                        break;
-//                    case PyTango::ExtractAsString:
-//                        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(data_type,
-//                            _update_value_as_string, self, py_value);
-//                        break;
-//                    case PyTango::ExtractAsNothing:
-//                        break;
                 }
                 break;
             case Tango::FMT_UNKNOWN:
@@ -1069,7 +1047,7 @@ namespace PyDeviceAttribute {
         reset_values(self, attr_info.data_type, attr_info.data_format, py_value);
     }
 
-    void reset(Tango::DeviceAttribute & self, const std::string &attr_name, Tango::DeviceProxy &dev_proxy, py::object py_value) {
+    void reset(Tango::DeviceAttribute & self, const std::string& attr_name, Tango::DeviceProxy &dev_proxy, py::object py_value) {
         self.set_name(attr_name.c_str());
         Tango::AttributeInfoEx attr_info;
         {

@@ -90,16 +90,16 @@ struct from_py<tangoTypeConst> \
         { \
             cpy_type cpy_value = FN(o); \
             if(PyErr_Occurred()) { \
-	        PyErr_Clear(); \
+            PyErr_Clear(); \
                 PyErr_SetString(PyExc_TypeError, "Expecting a numeric type, it is not."); \
                 boost::python::throw_error_already_set();  \
             } \
             if (TangoScalarTypeLimits::is_integer) { \
-                if (cpy_value > TangoScalarTypeLimits::max()) {	\
+                if (cpy_value > TangoScalarTypeLimits::max()) {    \
                     PyErr_SetString(PyExc_OverflowError, "Value is too large."); \
                     boost::python::throw_error_already_set(); \
                 } \
-                if (cpy_value < TangoScalarTypeLimits::min()) {	\
+                if (cpy_value < TangoScalarTypeLimits::min()) {    \
                     PyErr_SetString(PyExc_OverflowError, "Value is too small."); \
                     boost::python::throw_error_already_set(); \
                 } \
@@ -124,7 +124,7 @@ struct from_py<tangoTypeConst> \
         { \
             cpy_type cpy_value = FN(o); \
             if(PyErr_Occurred()) { \
-	        PyErr_Clear(); \
+            PyErr_Clear(); \
                 if(PyArray_CheckScalar(o) && \
                 ( PyArray_DescrFromScalar(o) \
                     == PyArray_DescrFromType(TANGO_const2numpy(tangoTypeConst)))) \
@@ -137,7 +137,7 @@ struct from_py<tangoTypeConst> \
                         " python core types, then it must exactly match (ex:" \
                         " numpy.int32 for PyTango.DevLong)"); \
                     boost::python::throw_error_already_set();  \
-		} \
+        } \
             } \
             if (TangoScalarTypeLimits::is_integer) { \
                 if (cpy_value > (cpy_type)TangoScalarTypeLimits::max()) { \
@@ -229,7 +229,7 @@ struct array_element_from_py<Tango::DEVVAR_CHARARRAY>
     {
         long cpy_value = PyLong_AsLong(o);
         if(PyErr_Occurred()) {
-	    PyErr_Clear();
+        PyErr_Clear();
             if(PyArray_CheckScalar(o) &&
             ( PyArray_DescrFromScalar(o)
                 == PyArray_DescrFromType(TANGO_const2scalarnumpy(tangoArrayTypeConst))))
@@ -278,7 +278,7 @@ inline void fast_python_to_tango_buffer_deleter__<Tango::DEV_STRING>(Tango::DevS
 
 template<long tangoTypeConst>
 inline typename TANGO_const2type(tangoTypeConst)*
-    fast_python_to_tango_buffer_sequence(PyObject* py_val, long* pdim_x, long *pdim_y, const std::string &fname, bool isImage, long& res_dim_x, long& res_dim_y)
+    fast_python_to_tango_buffer_sequence(PyObject* py_val, long* pdim_x, long *pdim_y, const std::string& fname, bool isImage, long& res_dim_x, long& res_dim_y)
 {
     typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
  
@@ -413,7 +413,7 @@ inline typename TANGO_const2type(tangoTypeConst)*
 
 template<long tangoArrayTypeConst>
 inline typename TANGO_const2scalartype(tangoArrayTypeConst)*
-    fast_python_to_corba_buffer_sequence(PyObject* py_val, long* pdim_x, const std::string &fname, long& res_dim_x)
+    fast_python_to_corba_buffer_sequence(PyObject* py_val, long* pdim_x, const std::string& fname, long& res_dim_x)
 {
     typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
     typedef typename TANGO_const2scalartype(tangoArrayTypeConst) TangoScalarType;
@@ -439,7 +439,7 @@ inline typename TANGO_const2scalartype(tangoArrayTypeConst)*
             "Expecting a sequence!",
             fname + "()");
 
-	TangoScalarType* tg_ptr = TangoArrayType::allocbuf(static_cast<Tango::DevULong>(len));
+    TangoScalarType* tg_ptr = TangoArrayType::allocbuf(static_cast<Tango::DevULong>(len));
 
     // The boost extract could be used:
     // TangoScalarType val = boost::python::extract<TangoScalarType>(elt_ptr);
@@ -474,9 +474,9 @@ inline typename TANGO_const2scalartype(tangoArrayTypeConst)*
 
 template<>
 inline TANGO_const2type(Tango::DEV_ENCODED)*
-    fast_python_to_tango_buffer_sequence<Tango::DEV_ENCODED>(PyObject*, long*, long*, const std::string & fname, bool isImage, long& res_dim_x, long& res_dim_y)
+    fast_python_to_tango_buffer_sequence<Tango::DEV_ENCODED>(PyObject*, long*, long*, const std::string&  fname, bool isImage, long& res_dim_x, long& res_dim_y)
 {
-    TangoSys_OMemStream o;
+    std::stringstream o;
     o << "DevEncoded is only supported for SCALAR attributes." << ends;
     Tango::Except::throw_exception(
             "PyDs_WrongPythonDataTypeForAttribute",

@@ -15,10 +15,12 @@
 namespace py = pybind11;
 
 void export_user_default_pipe_prop(py::module &m) {
-    // TODO boost::noncopyable
     py::class_<Tango::UserDefaultPipeProp>(m, "UserDefaultPipeProp")
-        .def("set_label", &Tango::UserDefaultPipeProp::set_label)
-        .def("set_description", &Tango::UserDefaultPipeProp::set_description)
+        .def("set_label", [] (Tango::UserDefaultPipeProp& self,  std::string& def_label) -> void {
+            self.set_label(def_label);
+        })
+        .def("set_description", [] (Tango::UserDefaultPipeProp& self,  std::string& def_desc) -> void {
+            self.set_description(def_desc);
+        })
     ;
 }
-

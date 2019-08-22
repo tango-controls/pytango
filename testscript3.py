@@ -31,6 +31,9 @@ except tango.DevFailed as e:
              "  origin = MultiAttribute::get_attr_ind_by_name\n  reason = API_AttrNotFound\nseverity = ErrSeverity.ERR]\n\n"
              "DevError[\n    desc = Failed to write_attribute on device sys/tg_test/1, attribute long_scaler\n"
              "  origin = DeviceProxy::write_attribute()\n  reason = API_AttributeFailed\nseverity = ErrSeverity.ERR]\n]\n")
+    print result
+    print "------"
+    print strng
     for c1, c2 in zip(result,strng):
         if c1 != c2:
             assert False

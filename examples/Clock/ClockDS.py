@@ -14,7 +14,7 @@ commands:
 """
 
 import time
-from PyTango.server import Device, attribute, command
+from tango.server import Device, attribute #, command #, attribute
 
 
 class Clock(Device):
@@ -22,24 +22,24 @@ class Clock(Device):
     @attribute(dtype=float)
     def time(self):
         return time.time()
+# 
+#     gmtime = attribute(dtype=(int,), max_dim_x=9)
+# 
+#     def read_gmtime(self):
+#         return time.gmtime()
 
-    gmtime = attribute(dtype=(int,), max_dim_x=9)
-
-    def read_gmtime(self):
-        return time.gmtime()
-
-    @command(dtype_in=float, dtype_out=str)
-    def ctime(self, seconds):
-        """
-        Convert a time in seconds since the Epoch to a string in local time.
-        This is equivalent to asctime(localtime(seconds)). When the time tuple
-        is not present, current time as returned by localtime() is used.
-        """
-        return time.ctime(seconds)
-
-    @command(dtype_in=(int,), dtype_out=float)
-    def mktime(self, tupl):
-        return time.mktime(tupl)
+#     @command(dtype_in=float, dtype_out=str)
+#     def ctime(self, seconds):
+#         """
+#         Convert a time in seconds since the Epoch to a string in local time.
+#         This is equivalent to asctime(localtime(seconds)). When the time tuple
+#         is not present, current time as returned by localtime() is used.
+#         """
+#         return time.ctime(seconds)
+# 
+#     @command(dtype_in=(int,), dtype_out=float)
+#     def mktime(self, tupl):
+#         return time.mktime(tupl)
 
 
 if __name__ == "__main__":

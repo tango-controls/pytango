@@ -25,74 +25,65 @@ namespace py = pybind11;
 // So for this case, the callback should live forever. As we don't want it,
 // we implemented the deletion of the callback in the DeviceProxy destructor
 // itself, after performing an unsubscribe.
-// @todo this is for cmd_ended, attr_read and attr_written. push_event are not done!
-//class PyCallBackAutoDie : public Tango::CallBack //, public py::wrapper<Tango::CallBack>
-//{
-//public:
-//    PyCallBackAutoDie() : m_self(0), m_weak_parent(0), m_extract_as(PyTango::ExtractAsNumpy) {}
-//    virtual ~PyCallBackAutoDie();
-//
-//    //! It is the PyCallBackAutoDie object itself, as seen from python
-//    PyObject* m_self;
-//    //! The object that will call this callback, so we can
-//    //! monitor if it disappears, we are not needed anymore.
-//    PyObject* m_weak_parent;
-//
-//    PyTango::ExtractAs m_extract_as;
-//
-//    static std::map<PyObject*, PyObject*> s_weak2ob;
-//    static py::object py_on_callback_parent_fades;
-//
-//    static void on_callback_parent_fades(PyObject* weakobj);
-//    static void init();
-//
-//    void set_autokill_references(py::object &py_self, py::object &py_parent);
-//    void unset_autokill_references();
-//
-//    void set_extract_as(PyTango::ExtractAs extract_as)
-//    {   this->m_extract_as = extract_as; }
-//
-////    py::object get_override(const char* name)
-////    { return py::wrapper<Tango::CallBack>::get_override(name); }
-//
-//    virtual void cmd_ended(Tango::CmdDoneEvent * ev);
-//    virtual void attr_read(Tango::AttrReadEvent *ev);
-//    virtual void attr_written(Tango::AttrWrittenEvent *ev);
-//// TODO see comment above
-////     virtual void push_event(Tango::EventData *ev);
-////     virtual void push_event(Tango::AttrConfEventData *ev);
-////     virtual void push_event(Tango::DataReadyEventData *ev);
-//};
 
-
-class PyCallBackPushEvent : public Tango::CallBack //, public py::wrapper<Tango::CallBack>
+class __attribute__ ((visibility("hidden"))) CallBackAutoDie : public Tango::CallBack
 {
 public:
-    PyCallBackPushEvent() : m_weak_device(0), m_extract_as(PyTango::ExtractAsNumpy)
-    {}
-    virtual ~PyCallBackPushEvent();
+    CallBackAutoDie();
+    virtual ~CallBackAutoDie();
 
-    //! The object that will call this callback (DeviceProxy), so we can
+
+//    std::unique_ptr<PyObject> m_cbk;
+
+    //    void set_extract_as(PyTango::ExtractAs extract_as);
+    void set_callback(py::object callback);
+    void set_weak_parent(py::object parent);
+
+    //! It is the CallBackAutoDie object itself, as seen from python
+//    PyObject* m_self;
+    //! The object that will call this callback, so we can
     //! monitor if it disappears, we are not needed anymore.
-    PyObject* m_weak_device;
+    PyObject* m_weak_parent;
+
     PyTango::ExtractAs m_extract_as;
+    py::object m_callback;
 
-//    void set_device(py::object &py_device);
+    static std::map<int, CallBackAutoDie*> s_weak2ob;
+    static py::object py_on_callback_parent_fades;
+    static void on_callback_parent_fades(PyObject* weakobj);
+    static void init();
 
-    void set_extract_as(PyTango::ExtractAs extract_as)
-    {   this->m_extract_as = extract_as; }
+    void set_autokill_references(CallBackAutoDie* cb, Tango::Connection& py_parent);
+//    void unset_autokill_references();
 
-//    py::object get_override(const char* name);
-    
-//    virtual void push_event(Tango::EventData *ev);
-//    virtual void push_event(Tango::AttrConfEventData *ev);
-//    virtual void push_event(Tango::DataReadyEventData *ev);
-//    virtual void push_event(Tango::PipeEventData *ev);
-//    virtual void push_event(Tango::DevIntrChangeEventData *ev);
-
-//    static void fill_py_event(Tango::EventData* ev, py::object & py_ev, py::object py_device, PyTango::ExtractAs extract_as);
-//    static void fill_py_event(Tango::AttrConfEventData* ev, py::object & py_ev, py::object py_device, PyTango::ExtractAs extract_as);
-//    static void fill_py_event(Tango::DataReadyEventData* ev, py::object & py_ev, py::object py_device, PyTango::ExtractAs extract_as);
-//    static void fill_py_event(Tango::PipeEventData* ev, py::object & py_ev, py::object py_device, PyTango::ExtractAs extract_as);
-//    static void fill_py_event(Tango::DevIntrChangeEventData* ev, py::object & py_ev, py::object py_device, PyTango::ExtractAs extract_as);
+    virtual void cmd_ended(Tango::CmdDoneEvent* ev);
+    virtual void attr_read(Tango::AttrReadEvent* ev);
+    virtual void attr_written(Tango::AttrWrittenEvent* ev);
 };
+
+class __attribute__ ((visibility("hidden"))) CallBackPushEvent : public Tango::CallBack
+{
+public:
+    CallBackPushEvent();
+    virtual ~CallBackPushEvent();
+
+    void set_device(Tango::DeviceProxy& dp);
+    void set_extract_as(PyTango::ExtractAs extract_as);
+
+    virtual void push_event(Tango::EventData* ev);
+    virtual void push_event(Tango::AttrConfEventData* ev);
+    virtual void push_event(Tango::DataReadyEventData* ev);
+    virtual void push_event(Tango::PipeEventData* ev);
+    virtual void push_event(Tango::DevIntrChangeEventData* ev);
+
+    static void fill_py_event(Tango::EventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as);
+    static void fill_py_event(Tango::AttrConfEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as);
+    static void fill_py_event(Tango::DataReadyEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as);
+    static void fill_py_event(Tango::PipeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as);
+    static void fill_py_event(Tango::DevIntrChangeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as);
+
+    PyTango::ExtractAs m_extract_as;
+    Tango::DeviceProxy m_device;
+    py::object m_callback;
+};
+

@@ -21,8 +21,8 @@ __docformat__ = "restructuredtext"
 
 import collections
 
-#from ._tango import Except, DevFailed
-#from ._tango import DeviceClass
+from ._tango import Except, DevFailed
+from ._tango import DeviceClass
 from ._tango import CmdArgType, DispLevel, UserDefaultAttrProp
 from .pyutil import Util
 
@@ -264,7 +264,13 @@ class PropUtil:
 
 
 def __DeviceClass__init__(self, name):
-    DeviceClass.__init_orig__(self, name)
+    print("python device_class __init__")
+    print("python device_class __init__ ", hex(id(self)))
+    print("python device_class __init__ ", hex(id(self.device_factory)))
+    dc = DeviceClass.__init_orig__(self, name, self)
+    print("DeviceClass.__init__", self)
+    print("DeviceClass.__init__", hex(id(self)))
+    print(dc)
     self.dyn_att_added_methods = []
     self.dyn_cmd_added_methods = []
     try:
@@ -275,8 +281,7 @@ def __DeviceClass__init__(self, name):
         pu.get_class_properties(self, self.class_property_list)
         for prop_name in self.class_property_list:
             if not hasattr(self, prop_name):
-                setattr(self, prop_name, pu.get_property_values(prop_name,
-                                                                self.class_property_list))
+                setattr(self, prop_name, pu.get_property_values(prop_name,self.class_property_list))
     except DevFailed as df:
         print("PyDS: %s: A Tango error occured in the constructor:" % name)
         Except.print_exception(df)
@@ -289,8 +294,9 @@ def __DeviceClass__str__(self):
     return '%s(%s)' % (self.__class__.__name__, self.get_name())
 
 
-def __DeviceClass__repr__(self):
-    return '%s(%s)' % (self.__class__.__name__, self.get_name())
+# def __DeviceClass__repr__(self):
+# #    return '%s(%s)' % (self.__class__.__name__, self.get_name())
+#     return '%s' % (self.__class__.__name__)
 
 
 def __throw_create_attribute_exception(msg):
@@ -374,6 +380,7 @@ def __DeviceClass__pipe_factory(self, pipe_list):
 
 def __DeviceClass__command_factory(self):
     """for internal usage only"""
+    print("device_class.py: command_factory")
     name = self.get_name()
     class_info = get_class(name)
     deviceimpl_class = class_info[1]
@@ -538,6 +545,7 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
     except:
         is_allowed_name = ""
 
+    print("self._create_command")
     self._create_command(cmd_name, param_type, result_type,
                          param_desc, result_desc,
                          display_level, default_command,
@@ -545,12 +553,12 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
 
 
 def __DeviceClass__new_device(self, klass, dev_class, dev_name):
+    print("__deviceClass self:", self)
     return klass(dev_class, dev_name)
 
 
 def __DeviceClass__device_factory(self, device_list):
     """for internal usage only"""
-
     klass = self.__class__
     klass_name = klass.__name__
     info, klass = get_class_by_class(klass), get_constructed_class_by_class(klass)
@@ -566,8 +574,13 @@ def __DeviceClass__device_factory(self, device_list):
 
     tmp_dev_list = []
     for dev_name in device_list:
+        print("got here ready to export", dev_name, klass, klass_name)
+        import pdb
+        pdb.set_trace()
         device = self._new_device(deviceImplClass, klass, dev_name)
+        print("got here4 ready to export")
         self._add_device(device)
+        print("got here5 ready to export")
         tmp_dev_list.append(device)
 
     self.dyn_attr(tmp_dev_list)
@@ -691,7 +704,7 @@ def __init_DeviceClass():
     DeviceClass.__init_orig__ = DeviceClass.__init__
     DeviceClass.__init__ = __DeviceClass__init__
     DeviceClass.__str__ = __DeviceClass__str__
-    DeviceClass.__repr__ = __DeviceClass__repr__
+#    DeviceClass.__repr__ = __DeviceClass__repr__
     DeviceClass._create_user_default_attr_prop = __DeviceClass__create_user_default_attr_prop
     DeviceClass._attribute_factory = __DeviceClass__attribute_factory
     DeviceClass._pipe_factory = __DeviceClass__pipe_factory

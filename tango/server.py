@@ -23,7 +23,7 @@ import functools
 import traceback
 
 from ._tango import AttrDataFormat, AttrWriteType, CmdArgType, PipeWriteType
-from ._tango import DevFailed, GreenMode, SerialModel
+from ._tango import DevFailed, SerialModel
 from ._tango import GreenMode
 
 from .attr_data import AttrData
@@ -362,13 +362,13 @@ def __patch_standard_device_methods(klass):
 
     setattr(klass, "init_device", init_device)
 
-    delete_device_orig = klass.delete_device
-
-    @functools.wraps(delete_device_orig)
-    def delete_device(self):
-        return get_worker().execute(delete_device_orig, self)
-
-    setattr(klass, "delete_device", delete_device)
+#     delete_device_orig = klass.delete_device
+# 
+#     @functools.wraps(delete_device_orig)
+#     def delete_device(self):
+#         return get_worker().execute(delete_device_orig, self)
+# 
+#     setattr(klass, "delete_device", delete_device)
 
     dev_state_orig = klass.dev_state
 
@@ -405,6 +405,8 @@ def __patch_standard_device_methods(klass):
 
 class _DeviceClass(DeviceClass):
     def __init__(self, name):
+#        sys.setrecursionlimit(2500)
+        print("Python DeviceClass self ")
         DeviceClass.__init__(self, name)
         self.set_type(name)
 
@@ -577,10 +579,10 @@ class BaseDevice(LatestDeviceImpl):
         :meth:`get_device_properties`"""
         self.get_device_properties()
 
-    def delete_device(self):
-        pass
-
-    delete_device.__doc__ = LatestDeviceImpl.delete_device.__doc__
+#     def delete_device(self):
+#         pass
+# 
+#     delete_device.__doc__ = LatestDeviceImpl.delete_device.__doc__
 
     def read_attr_hardware(self, attr_list):
         return LatestDeviceImpl.read_attr_hardware(self, attr_list)
@@ -1116,7 +1118,7 @@ def command(f=None, dtype_in=None, dformat_in=None, doc_in="",
     if polling_period is not None:
         config_dict['Polling period'] = polling_period
 
-    if green_mode == GreenMode.Synchronous:
+    if green_mode is not None and green_mode == GreenMode.Synchronous:
         cmd = f
     else:
         @functools.wraps(f)

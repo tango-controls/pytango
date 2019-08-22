@@ -14,22 +14,6 @@
 
 namespace py = pybind11;
 
-//namespace PySubDevDiag
-//{
-//    PyObject *get_sub_devices(Tango::SubDevDiag &self)
-//    {
-//        Tango::DevVarStringArray *sub_devs = self.get_sub_devices();
-//
-//        boost::python::list py_sub_devs;
-//        for(unsigned long i = 0; i < sub_devs->length(); ++i)
-//        {
-//            py_sub_devs.append((*sub_devs)[i].in());
-//        }
-//        delete sub_devs;
-//        return boost::python::incref(py_sub_devs.ptr());
-//    }
-//}
-
 void export_sub_dev_diag(py::module &m) {
     py::class_<Tango::SubDevDiag>(m, "SubDevDiag")
         .def("set_associated_device", &Tango::SubDevDiag::set_associated_device)
@@ -39,6 +23,7 @@ void export_sub_dev_diag(py::module &m) {
             &Tango::SubDevDiag::remove_sub_devices)
         .def("remove_sub_devices", (void (Tango::SubDevDiag::*) (std::string))
             &Tango::SubDevDiag::remove_sub_devices)
+
         .def("get_sub_devices", [](Tango::SubDevDiag& self) {
             Tango::DevVarStringArray *sub_devs = self.get_sub_devices();
             py::list py_sub_devs;
@@ -46,7 +31,6 @@ void export_sub_dev_diag(py::module &m) {
                 py_sub_devs.append((*sub_devs)[i].in());
             }
             delete sub_devs;
-//TODO
             return py_sub_devs.ptr();//inc_ref();
         })
         .def("store_sub_devices", &Tango::SubDevDiag::store_sub_devices)

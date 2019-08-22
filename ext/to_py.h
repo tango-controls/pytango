@@ -163,13 +163,13 @@ struct CORBA_sequence_to_tuple<Tango::DevVarDoubleStringArray>
         return t;
     }
 
-    static const PyTypeObject* get_pytype() { return &PyTuple_Type; }
+//    static const PyTypeObject* get_pytype() { return &PyTuple_Type; }
 };
 
 template<typename CorbaContainerType>
 struct CORBA_sequence_to_list
 {
-    static PyObject* convert(CorbaContainerType const& a)
+    static py::list convert(CorbaContainerType const& a)
     {
         unsigned long size = a.length();
         py::list ret;
@@ -177,10 +177,10 @@ struct CORBA_sequence_to_list
         {
             ret.append(a[i]);
         }
-        return ret.inc_ref().ptr();
+        return ret;
     }
 
-    static const PyTypeObject* get_pytype() { return &PyList_Type; }
+//    static const PyTypeObject* get_pytype() { return &PyList_Type; }
 };
 
 template<>
@@ -197,18 +197,18 @@ struct CORBA_sequence_to_list<Tango::DevVarStringArray>
         return ret;
     }
     
-    static PyObject* convert(Tango::DevVarStringArray const& a)
+    static py::list convert(Tango::DevVarStringArray const& a)
     {
-        return to_list(a).inc_ref().ptr();
+        return to_list(a);
     }
 
-    static const PyTypeObject* get_pytype() { return &PyList_Type; }
+//    static const PyTypeObject* get_pytype() { return &PyList_Type; }
 };
 
 template<>
 struct CORBA_sequence_to_list<Tango::DevVarLongStringArray>
 {
-    static PyObject* convert(Tango::DevVarLongStringArray const& a)
+    static py::list convert(Tango::DevVarLongStringArray const& a)
     {
         unsigned long lsize = a.lvalue.length();
         unsigned long ssize = a.svalue.length();
@@ -227,16 +227,16 @@ struct CORBA_sequence_to_list<Tango::DevVarLongStringArray>
         ret.append(lt);
         ret.append(st);
         
-        return ret.inc_ref().ptr();
+        return ret;
     }
 
-    static const PyTypeObject* get_pytype() { return &PyList_Type; }
+//    static const PyTypeObject* get_pytype() { return &PyList_Type; }
 };
 
 template<>
 struct CORBA_sequence_to_list <Tango::DevVarDoubleStringArray>
 {
-    static PyObject* convert(Tango::DevVarDoubleStringArray const& a)
+    static py::list convert(Tango::DevVarDoubleStringArray const& a)
     {
         unsigned long dsize = a.dvalue.length();
         unsigned long ssize = a.svalue.length();
@@ -255,10 +255,10 @@ struct CORBA_sequence_to_list <Tango::DevVarDoubleStringArray>
         ret.append(dt);
         ret.append(st);
         
-        return ret.inc_ref().ptr();
+        return ret;
     }
 
-    static const PyTypeObject* get_pytype() { return &PyList_Type; }
+//    static const PyTypeObject* get_pytype() { return &PyList_Type; }
 };
 
 struct CORBA_String_member_to_str
@@ -370,12 +370,14 @@ template<class T>
 inline py::object to_py_list(const T *seq)
 {
 //    return py::object(handle(CORBA_sequence_to_list<T>::convert(*seq)));
-    return py::cast(CORBA_sequence_to_list<T>::convert(*seq));
+//    return py::cast(CORBA_sequence_to_list<T>::convert(*seq));
+    return py::none();
 }
 
 template<class T>
 inline py::object to_py_tuple(const T *seq)
 {
     return py::cast(CORBA_sequence_to_tuple<T>::convert(*seq));
+    return py::none();
 }
 
