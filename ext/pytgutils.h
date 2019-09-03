@@ -17,7 +17,7 @@ namespace py = pybind11;
 /// Get the python Global Interpret Lock
 class AutoPythonGIL
 {
-    PyGILState_STATE m_gstate;
+//    PyGILState_STATE m_gstate;
     
     /**
      * Check python. Before acquiring python GIL check if python as not been
@@ -26,7 +26,7 @@ class AutoPythonGIL
      **/
     inline void check_python()
     {
-        if(!Py_IsInitialized())
+        if (!Py_IsInitialized())
         {
             Tango::Except::throw_exception(
                 "AutoPythonGIL_PythonShutdown",

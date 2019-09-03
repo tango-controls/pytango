@@ -18,6 +18,7 @@
 #include <server/attribute.h>
 #include <memory>
 #include <exception.h>
+#include <thread>
 
 namespace py = pybind11;
 
@@ -627,16 +628,17 @@ Device_5ImplWrap::Device_5ImplWrap(py::object& pyself, DeviceClass *cl, std::str
   : Tango::Device_5Impl(cl, name) //PyDeviceImplBase(self)
 {
     py_self = pyself;
-    py::print(pyself);
     py::print(cl);
     py::print(name);
-    py::print(py_self);
     std::cout << "constructor 5implwrap " << &pyself << std::endl;
     std::cout << "constructor 5implwrap " << &py_self << std::endl;
     py::object obj = py_self.attr("rubbish");
     std::cout << "constructor 5implwrap " << &obj << std::endl;
-    py::print(py_self);
-    py_self.attr("rubbish")();
+    std::thread::id wrap_ctor_id = std::this_thread::get_id();
+    std::cout << "constructor 5implwrap thread id " << wrap_ctor_id << std::endl;
+    std::cout << obj.ptr() << std::endl;
+    obj();
+//    py_self.attr("rubbish")();
 }
 
 Device_5ImplWrap::Device_5ImplWrap(py::object& pyself, DeviceClass *cl, std::string& name, std::string& descr)
@@ -758,11 +760,15 @@ void Device_5ImplWrap::_stop_poll_command(const std::string& cmd_name)
 
 void Device_5ImplWrap::always_executed_hook()
 {
-    std::cout << "always_executed_hook called" << std::endl;
+    std::thread::id wrap_hook_id = std::this_thread::get_id();
+    std::cerr << "always executed thread id " << wrap_hook_id << std::endl;
+    std::cerr << PyEval_ThreadsInitialized() << std::endl;
+    std::cerr << "always_executed_hook called" << std::endl;
     AutoPythonGIL __py_lock;
-    std::cout << "here here always executed " << &py_self << std::endl;
     py::object obj = py_self.attr("rubbish");
-    std::cout << "here here got the attr ref " << &obj << std::endl;
+    std::cerr << obj.ptr() << std::endl;
+    obj();
+//    std::cout << "here here got the attr ref " << &obj << std::endl;
 //    py_self.attr("rubbish")();
     std::cout << "done" << std::endl;
     try {
@@ -900,80 +906,81 @@ void Device_5ImplWrap::signal_handler(long signo)
 //    }
 }
 
-//// Trampoline class define method for each virtual function
-//class PyDevice_5Impl : public Tango::Device_5Impl {
-//public:
-//    void init_device() override {
-//        PYBIND11_OVERLOAD_PURE(
-//            void,               // Return type
-//            Tango::Device_5Impl,  // Parent class
-//            init_device,        // Name of function in C++ (must match Python name)
-//        );
-//    }
-//    void delete_device() override {
-//        PYBIND11_OVERLOAD(
-//            void,               // Return type
-//            Tango::Device_5Impl,  // Parent class
-//            delete_device,      // Name of function in C++ (must match Python name)
-//        );
-//    }
-//    void always_executed_hook() override {
-//        PYBIND11_OVERLOAD(
-//            void,                  // Return type
-//            Tango::Device_5Impl,     // Parent class
-//            always_executed_hook,  // Name of function in C++ (must match Python name)
-//        );
-//    }
-//    void read_attr_hardware(std::vector<long> &attr_list) override {
-//        PYBIND11_OVERLOAD(
-//            void,                // Return type
-//            Tango::Device_5Impl,   // Parent class
-//            read_attr_hardware,  // Name of function in C++ (must match Python name)
-//            attr_list
-//        );
-//    }
-//    void write_attr_hardware(std::vector<long> &attr_list) override {
-//        PYBIND11_OVERLOAD(
-//            void,                 // Return type
-//            Tango::Device_5Impl,    // Parent class
-//            write_attr_hardware,  // Name of function in C++ (must match Python name)
-//            attr_list
-//        );
-//    }
-//    Tango::DevState dev_state() override {
-//        PYBIND11_OVERLOAD(
-//            Tango::DevState,     // Return type
-//            Tango::Device_5Impl,   // Parent class
-//            dev_state,           // Name of function in C++ (must match Python name)
-//        );
-//    }
-//    Tango::ConstDevString dev_status() override {
-//        PYBIND11_OVERLOAD(
-//            Tango::ConstDevString, // Return type
-//            Tango::Device_5Impl,     // Parent class
-//            dev_status,            // Name of function in C++ (must match Python name)
-//        );
-//    }
-//    void signal_handler(long signo) override {
-//        PYBIND11_OVERLOAD(
-//            void,                // Return type
-//            Tango::Device_5Impl,   // Parent class
-//            signal_handler,      // Name of function in C++ (must match Python name)
-//            signo                // first argument
-//        );
-//    }
-//};
+// Trampoline class define method for each virtual function
+class PyDevice_5Impl : public Tango::Device_5Impl {
+public:
+    void init_device() override {
+        PYBIND11_OVERLOAD_PURE(
+            void,               // Return type
+            Tango::Device_5Impl,  // Parent class
+            init_device,        // Name of function in C++ (must match Python name)
+        );
+    }
+    void delete_device() override {
+        PYBIND11_OVERLOAD(
+            void,               // Return type
+            Tango::Device_5Impl,  // Parent class
+            delete_device,      // Name of function in C++ (must match Python name)
+        );
+    }
+    void always_executed_hook() override {
+        PYBIND11_OVERLOAD(
+            void,                  // Return type
+            Tango::Device_5Impl,     // Parent class
+            always_executed_hook,  // Name of function in C++ (must match Python name)
+        );
+    }
+    void read_attr_hardware(std::vector<long> &attr_list) override {
+        PYBIND11_OVERLOAD(
+            void,                // Return type
+            Tango::Device_5Impl,   // Parent class
+            read_attr_hardware,  // Name of function in C++ (must match Python name)
+            attr_list
+        );
+    }
+    void write_attr_hardware(std::vector<long> &attr_list) override {
+        PYBIND11_OVERLOAD(
+            void,                 // Return type
+            Tango::Device_5Impl,    // Parent class
+            write_attr_hardware,  // Name of function in C++ (must match Python name)
+            attr_list
+        );
+    }
+    Tango::DevState dev_state() override {
+        PYBIND11_OVERLOAD(
+            Tango::DevState,     // Return type
+            Tango::Device_5Impl,   // Parent class
+            dev_state,           // Name of function in C++ (must match Python name)
+        );
+    }
+    Tango::ConstDevString dev_status() override {
+        PYBIND11_OVERLOAD(
+            Tango::ConstDevString, // Return type
+            Tango::Device_5Impl,     // Parent class
+            dev_status,            // Name of function in C++ (must match Python name)
+        );
+    }
+    void signal_handler(long signo) override {
+        PYBIND11_OVERLOAD(
+            void,                // Return type
+            Tango::Device_5Impl,   // Parent class
+            signal_handler,      // Name of function in C++ (must match Python name)
+            signo                // first argument
+        );
+    }
+};
 
 void export_device_impl(py::module &m) {
 
-//    py::class_<Tango::Device_5Impl, PyDevice_5Impl>(m, "BaseDevice_5Impl")
-//    ;
-    py::class_<Device_5ImplWrap/*, Tango::Device_5Impl, std::unique_ptr<Device_5ImplWrap, py::nodelete>*/>(m, "Device_5Impl")
-      .def(py::init([](py::object pyself, DeviceClass *cppdev, std::string& name) {
+    py::class_<Tango::Device_5Impl, PyDevice_5Impl>(m, "BaseDevice_5Impl")
+    ;
+    py::class_<Device_5ImplWrap, Tango::Device_5Impl /*, std::unique_ptr<Device_5ImplWrap, py::nodelete>*/>(m, "Device_5Impl")
+      .def(py::init([](DeviceClass *cppdev, std::string& name, py::object pyself) {
             std::cout << "c++/python Device_5ImplWrap" << std::endl;
-            py::print(pyself);
             std::cout << &pyself << std::endl;
             py::object obj = pyself.attr("rubbish");
+            std::thread::id impl_ctor_id = std::this_thread::get_id();
+            std::cout << "c++/python Device_5ImplWrap thread id " << impl_ctor_id << std::endl;
             obj();
             py::print(name);
             Device_5ImplWrap* cpp = new Device_5ImplWrap(pyself, cppdev, name);

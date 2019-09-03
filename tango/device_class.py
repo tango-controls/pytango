@@ -264,13 +264,11 @@ class PropUtil:
 
 
 def __DeviceClass__init__(self, name):
-    print("python device_class __init__")
     print("python device_class __init__ ", hex(id(self)))
     print("python device_class __init__ ", hex(id(self.device_factory)))
-    dc = DeviceClass.__init_orig__(self, name, self)
+    DeviceClass.__init_orig__(self, name, self)
     print("DeviceClass.__init__", self)
     print("DeviceClass.__init__", hex(id(self)))
-    print(dc)
     self.dyn_att_added_methods = []
     self.dyn_cmd_added_methods = []
     try:
@@ -295,8 +293,7 @@ def __DeviceClass__str__(self):
 
 
 # def __DeviceClass__repr__(self):
-# #    return '%s(%s)' % (self.__class__.__name__, self.get_name())
-#     return '%s' % (self.__class__.__name__)
+#     return '%s(%s)' % (self.__class__.__name__, self.get_name())
 
 
 def __throw_create_attribute_exception(msg):
@@ -339,6 +336,7 @@ def __DeviceClass__create_user_default_attr_prop(self, attr_name, extra_info):
 
 def __DeviceClass__attribute_factory(self, attr_list):
     """for internal usage only"""
+    print(attr_list)
     for attr_name, attr_info in self.attr_list.items():
         if isinstance(attr_info, AttrData):
             attr_data = attr_info
@@ -554,6 +552,9 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
 
 def __DeviceClass__new_device(self, klass, dev_class, dev_name):
     print("__deviceClass self:", self)
+    print("__deviceClass klass:", klass)
+    print("__deviceClass dev_class:", dev_class)
+    print("__deviceClass dev_name:", dev_name)
     return klass(dev_class, dev_name)
 
 
@@ -575,8 +576,8 @@ def __DeviceClass__device_factory(self, device_list):
     tmp_dev_list = []
     for dev_name in device_list:
         print("got here ready to export", dev_name, klass, klass_name)
-        import pdb
-        pdb.set_trace()
+#        import pdb
+#        pdb.set_trace()
         device = self._new_device(deviceImplClass, klass, dev_name)
         print("got here4 ready to export")
         self._add_device(device)

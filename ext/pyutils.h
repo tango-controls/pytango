@@ -176,6 +176,7 @@ inline void raise_(PyObject *type, const std::string& message)
 
 // You should run any I/O intensive operations (like requesting data through
 // the network) in the context of an object like this.
+
 class AutoPythonAllowThreads {
     PyThreadState *m_save;
 
@@ -192,7 +193,9 @@ public:
 
     inline AutoPythonAllowThreads()
     {
+        std::cerr << "In AutoPythonAllowThreads ctor" << std::endl;
         m_save = PyEval_SaveThread();
+        std::cerr << "Out AutoPythonAllowThreads ctor" << std::endl;
     }
 
     inline ~AutoPythonAllowThreads()

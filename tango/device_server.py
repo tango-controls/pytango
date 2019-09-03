@@ -607,16 +607,25 @@ def __Device_5Impl__fatal(self):
 def __Device_5Impl__str(self):
     return '%s(%s)' % (self.__class__.__name__, self.get_name())
 
-def __Device_5Impl__init__(self, *args, **kwargs):
-    print("__Device_5Impl python", self)
-    print("__Device_5Impl python", hex(id(self)))
-    print("__Device_5Impl python", hex(id(self.rubbish)))
-    self.rubbish()
-    Device_5Impl.__init_orig__(self, self, *args, **kwargs)
-    print("Device_5Impl__init__", self)
-    print("Device_5Impl__init__", hex(id(self)))
-    print("Device_5Impl__init__", hex(id(self.rubbish)))
-    self.rubbish()
+# def __Device_5Impl__init__(self, *args, **kwargs):
+#     print("__Device_5Impl python", args)
+#     print("__Device_5Impl python", kwargs)
+#     print(dir(args[0]))
+# #     print("__Device_5Impl python", self)
+# #     print("__Device_5Impl python", hex(id(self)))
+# #     print("__Device_5Impl python", hex(id(self.rubbish)))
+# #     self.rubbish()
+#     Device_5Impl.__init_orig__(self, *args, **kwargs)
+#     print("Device_5Impl__init__", self)
+#     print("Device_5Impl__init__", hex(id(self)))
+#     print("Device_5Impl__init__", hex(id(self.rubbish)))
+#     self.rubbish()
+
+def __Device_5Impl__init__(self, cppdev, name):
+    print("__Device_5Impl python", cppdev)
+    print("__Device_5Impl python", name)
+    Device_5Impl.__init_orig__(self, cppdev, name, self)
+
 
 def __init_Device_5Impl():
     Device_5Impl._device_class_instance = None
