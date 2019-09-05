@@ -732,14 +732,14 @@ Here is an example of a device which has a TANGO command called
 point attribute with the specified name::
 
 
-    from tango import Util, Attr
+    from tango import Util, Attr, AttrWriteType
     from tango.server import Device, command
 
     class MyDevice(Device):
 
         @command(dtype_in=str)
         def CreateFloatAttribute(self, attr_name):
-            attr = Attr(attr_name, tango.DevDouble)
+            attr = Attr(attr_name, tango.DevDouble, AttrWriteType.READ_WRITE)
             self.add_attribute(attr, self.read_General, self.write_General)
 
         def read_General(self, attr):
