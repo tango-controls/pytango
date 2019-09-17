@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -66,8 +66,7 @@ public:
      * This method is intended to be called by python to register a new
      * attribute.
      */
-    void create_attribute(vector<Tango::Attr *> &att_list,
-                          const std::string& attr_name,
+    Tango::Attr* create_attribute(const std::string& attr_name,
                           Tango::CmdArgType attr_type,
                           Tango::AttrDataFormat attr_format,
                           Tango::AttrWriteType attr_write,
@@ -80,8 +79,7 @@ public:
                           const std::string& is_allowed_name,
                           Tango::UserDefaultAttrProp *att_prop);
 
-    void create_fwd_attribute(vector<Tango::Attr *> &att_list,
-                              const std::string& attr_name,
+    Tango::Attr* create_fwd_attribute(const std::string& attr_name,
                               Tango::UserDefaultFwdAttrProp *att_prop);
 
     /**
@@ -89,7 +87,7 @@ public:
      * This method is intended to be called by python to register a new
      * pipe.
      */
-    void create_pipe(vector<Tango::Pipe *> &pipe_list,
+    Tango::Pipe* create_pipe(//std::vector<Tango::Pipe *>& pipe_list,
              const std::string& name,
              Tango::PipeWriteType access,
              Tango::DispLevel display_level,

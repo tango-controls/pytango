@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -47,7 +47,7 @@ public:
     /** a reference to itself */
     py::object py_self;
 
-//    std::string the_status;
+    std::string the_status;
 
     /**
      * Constructor
@@ -102,7 +102,7 @@ public:
     /**
      * Executes default delete_device implementation
      */
-//    void default_delete_device();
+    void default_delete_device();
     /**
      * called to ask Python to delete a device by decrementing the Python
      * reference count
@@ -117,7 +117,7 @@ public:
     /**
      * Executes default always_executed_hook implementation
      */
-//    void default_always_executed_hook();
+    void default_always_executed_hook();
     /**
      * Necessary read_attr_hardware implementation to call python
      */
@@ -126,7 +126,7 @@ public:
     /**
      * Executes default read_attr_hardware implementation
      */
-//    void default_read_attr_hardware(vector<long> &attr_list);
+    void default_read_attr_hardware(vector<long> &attr_list);
     /**
      * Necessary write_attr_hardware implementation to call python
      */
@@ -135,7 +135,7 @@ public:
     /**
      * Executes default write_attr_hardware implementation
      */
-//    void default_write_attr_hardware(vector<long> &attr_list);
+    void default_write_attr_hardware(vector<long> &attr_list);
     /**
      * Necessary dev_state implementation to call python
      */
@@ -144,7 +144,7 @@ public:
     /**
      * Executes default dev_state implementation
      */
-//    Tango::DevState default_dev_state();
+    Tango::DevState default_dev_state();
     /**
      * Necessary dev_status implementation to call python
      */
@@ -153,7 +153,7 @@ public:
     /**
      * Executes default dev_status implementation
      */
-//    Tango::ConstDevString default_dev_status();
+    Tango::ConstDevString default_dev_status();
     /**
      * Necessary signal_handler implementation to call python
      */
@@ -162,7 +162,8 @@ public:
     /**
      * Executes default signal_handler implementation
      */
-//    void default_signal_handler(long signo);
+    void default_signal_handler(long signo);
+
     void py_delete_dev();
 
     bool _is_attribute_polled(const std::string& att_name);

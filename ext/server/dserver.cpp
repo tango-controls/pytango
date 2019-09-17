@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -72,19 +72,19 @@ void export_dserver(py::module &m) {
             delete res;
             return py_res;
         })
-        .def("add_obj_polling", [](Tango::DServer& self, py::object &py_long_str_array, bool with_db_upd, int delta_ms) -> void {
+        .def("add_obj_polling", [](Tango::DServer& self, py::object& py_long_str_array, bool with_db_upd, int delta_ms) -> void {
             Tango::DevVarLongStringArray long_str_array;
             convert2array(py_long_str_array, long_str_array);
             self.add_obj_polling(&long_str_array, with_db_upd, delta_ms);
         }, py::arg("py_long_str_array"), py::arg("with_db_upd")=true, py::arg("delta_ms")=0)
 
-        .def("upd_obj_polling_period", [](Tango::DServer& self, py::object &py_long_str_array, bool with_db_upd = true) -> void {
+        .def("upd_obj_polling_period", [](Tango::DServer& self, py::object& py_long_str_array, bool with_db_upd = true) -> void {
             Tango::DevVarLongStringArray long_str_array;
             convert2array(py_long_str_array, long_str_array);
             self.upd_obj_polling_period(&long_str_array, with_db_upd);
         }, py::arg("py_long_str_array"), py::arg("with_db_upd")=true)
 
-        .def("rem_obj_polling", [](Tango::DServer& self, py::object &py_str_array, bool with_db_upd) -> void {
+        .def("rem_obj_polling", [](Tango::DServer& self, py::object& py_str_array, bool with_db_upd) -> void {
             Tango::DevVarStringArray str_array;
             convert2array(py_str_array, str_array);
             self.rem_obj_polling(&str_array, with_db_upd);
@@ -105,17 +105,17 @@ void export_dserver(py::module &m) {
         .def("rem_event_heartbeat", [](Tango::DServer& self) -> void {
             self.rem_event_heartbeat();
         })
-        .def("lock_device", [](Tango::DServer& self, py::object &py_long_str_array) -> void {
+        .def("lock_device", [](Tango::DServer& self, py::object& py_long_str_array) -> void {
             Tango::DevVarLongStringArray long_str_array;
             convert2array(py_long_str_array, long_str_array);
             self.lock_device(&long_str_array);
         })
-        .def("un_lock_device", [](Tango::DServer& self, py::object &py_long_str_array) -> void {
+        .def("un_lock_device", [](Tango::DServer& self, py::object& py_long_str_array) -> void {
             Tango::DevVarLongStringArray long_str_array;
             convert2array(py_long_str_array, long_str_array);
             self.un_lock_device(&long_str_array);
         })
-        .def("re_lock_devices", [](Tango::DServer& self, py::object &py_str_array) -> void {
+        .def("re_lock_devices", [](Tango::DServer& self, py::object& py_str_array) -> void {
             Tango::DevVarStringArray str_array;
             convert2array(py_str_array, str_array);
             self.re_lock_devices(&str_array);

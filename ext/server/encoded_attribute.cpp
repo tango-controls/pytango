@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -50,7 +50,7 @@ namespace py = pybind11;
 //         }
 //#    endif
 //
-//    void encode_gray8(Tango::EncodedAttribute &self, object py_value, int w, int h)
+//    void encode_gray8(Tango::EncodedAttribute& self, object py_value, int w, int h)
 //    {
 //        PyObject *py_value_ptr = py_value.ptr();
 //        unsigned char *buffer = NULL;
@@ -164,7 +164,7 @@ namespace py = pybind11;
 //        self.encode_gray8(buffer, w, h);
 //    }
 //
-//    void encode_jpeg_gray8(Tango::EncodedAttribute &self, object py_value, int w, int h, double quality)
+//    void encode_jpeg_gray8(Tango::EncodedAttribute& self, object py_value, int w, int h, double quality)
 //    {
 //        PyObject *py_value_ptr = py_value.ptr();
 //        unsigned char *buffer = NULL;
@@ -278,7 +278,7 @@ namespace py = pybind11;
 //        self.encode_jpeg_gray8(buffer, w, h, quality);
 //    }
 //
-//    void encode_gray16(Tango::EncodedAttribute &self, object py_value, int w, int h)
+//    void encode_gray16(Tango::EncodedAttribute& self, object py_value, int w, int h)
 //    {
 //        PyObject *py_value_ptr = py_value.ptr();
 //        unsigned short *buffer = NULL;
@@ -391,7 +391,7 @@ namespace py = pybind11;
 //        self.encode_gray16(buffer, w, h);
 //    }
 //
-//    void encode_rgb24(Tango::EncodedAttribute &self, object py_value, int w, int h)
+//    void encode_rgb24(Tango::EncodedAttribute& self, object py_value, int w, int h)
 //    {
 //        PyObject *py_value_ptr = py_value.ptr();
 //        unsigned char *buffer = NULL;
@@ -505,7 +505,7 @@ namespace py = pybind11;
 //        self.encode_rgb24(buffer, w, h);
 //    }
 //
-//    void encode_jpeg_rgb24(Tango::EncodedAttribute &self, object py_value, int w, int h, double quality)
+//    void encode_jpeg_rgb24(Tango::EncodedAttribute& self, object py_value, int w, int h, double quality)
 //    {
 //        PyObject *py_value_ptr = py_value.ptr();
 //        unsigned char *buffer = NULL;
@@ -619,7 +619,7 @@ namespace py = pybind11;
 //        self.encode_jpeg_rgb24(buffer, w, h, quality);
 //    }
 //
-//    void encode_jpeg_rgb32(Tango::EncodedAttribute &self, object py_value, int w, int h, double quality)
+//    void encode_jpeg_rgb32(Tango::EncodedAttribute& self, object py_value, int w, int h, double quality)
 //    {
 //        PyObject *py_value_ptr = py_value.ptr();
 //        unsigned char *buffer = NULL;
@@ -736,7 +736,7 @@ namespace py = pybind11;
 //        self.encode_jpeg_rgb32(buffer, w, h, quality);
 //    }
 //
-//    PyObject *decode_gray8(Tango::EncodedAttribute &self, Tango::DeviceAttribute *attr, PyTango::ExtractAs extract_as)
+//    PyObject *decode_gray8(Tango::EncodedAttribute& self, Tango::DeviceAttribute *attr)
 //    {
 //        unsigned char *buffer;
 //        int width, height;
@@ -871,7 +871,7 @@ namespace py = pybind11;
 //        return ret;
 //    }
 //
-//    PyObject *decode_gray16(Tango::EncodedAttribute &self, Tango::DeviceAttribute *attr, PyTango::ExtractAs extract_as)
+//    PyObject *decode_gray16(Tango::EncodedAttribute& self, Tango::DeviceAttribute *attr)
 //    {
 //        unsigned short *buffer;
 //        int width, height;
@@ -1009,7 +1009,7 @@ namespace py = pybind11;
 //        return ret;
 //    }
 //
-//    PyObject *decode_rgb32(Tango::EncodedAttribute &self, Tango::DeviceAttribute *attr, PyTango::ExtractAs extract_as)
+//    PyObject *decode_rgb32(Tango::EncodedAttribute& self, Tango::DeviceAttribute *attr, PyTango::ExtractAs extract_as)
 //    {
 //        unsigned char *buffer;
 //        int width, height;
