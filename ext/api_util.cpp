@@ -21,34 +21,27 @@ void export_api_util(py::module &m) {
         .def_static("instance", []() {
             return Tango::ApiUtil::instance();
         }, "Return a singleton instance")
-
         .def("pending_asynch_call", [](Tango::ApiUtil& self, Tango::asyn_req_type type) -> size_t {
             return self.pending_asynch_call(type);
         })
-
         .def("get_asynch_replies", [](Tango::ApiUtil& self) -> void {
             AutoPythonAllowThreads guard;
             self.get_asynch_replies();
         })
-
         .def("get_asynch_replies", [](Tango::ApiUtil& self, long timeout) -> void {
             AutoPythonAllowThreads guard;
             self.get_asynch_replies(timeout);
         })
-
         .def("set_asynch_cb_sub_model", [](Tango::ApiUtil& self, Tango::cb_sub_model mode) -> void {
             self.set_asynch_cb_sub_model(mode);
         })
-
         .def("get_asynch_cb_sub_model", [](Tango::ApiUtil& self) -> Tango::cb_sub_model  {
             return self.get_asynch_cb_sub_model();
         })
-
         .def_static("get_env_var", [](std::string& name) {
             std::string value;
             return (Tango::ApiUtil::get_env_var(name.c_str(), value) == 0) ? py::str(value) : py::object();
         })
-
         // As a binding we should not care whether the underlying event mechanism zmq or CORBA.
         // Replace these methods with a generic method which is event mechanism agnostic.
         // It can only be one or the other and not both.

@@ -2,7 +2,7 @@
    This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -245,6 +245,7 @@ void sequencePyDevError_2_DevErrorList(py::object value, Tango::DevErrorList &de
 //
 void handle_python_exception(py::error_already_set &eas)
 {
+    std::cerr << "in handle python exception" << std::endl;
 //    if (PyErr_ExceptionMatches(PyTango_DevFailed.ptr()))
 //    {
 //        throw_python_dev_failed();

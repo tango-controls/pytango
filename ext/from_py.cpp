@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -118,7 +118,7 @@
 //    }
 //}
 //
-void convert2array(const py::object &py_value, Tango::DevVarStringArray & result)
+void convert2array(const py::object& py_value, Tango::DevVarStringArray & result)
 {
 //    PyObject *py_value_ptr = py_value.ptr();
 //    if(PySequence_Check(py_value_ptr) == 0)
@@ -168,7 +168,7 @@ void convert2array(const py::object &py_value, Tango::DevVarStringArray & result
 //    convert2array(py_str, result.svalue);
 //}
 
-void convert2array(const py::object &py_value, Tango::DevVarLongStringArray & result)
+void convert2array(const py::object& py_value, Tango::DevVarLongStringArray & result)
 {
 //    if (!PySequence_Check(py_value.ptr()))
 //    {
@@ -189,7 +189,7 @@ void convert2array(const py::object &py_value, Tango::DevVarLongStringArray & re
 //    convert2array(py_val, result.svalue);
 }
 
-//void from_py_object(bopy::object &py_obj, Tango::AttributeAlarm &attr_alarm)
+//void from_py_object(bopy::object& py_obj, Tango::AttributeAlarm &attr_alarm)
 //{
 //    attr_alarm.min_alarm = obj_to_new_char(py_obj.attr("min_alarm"));
 //    attr_alarm.max_alarm = obj_to_new_char(py_obj.attr("max_alarm"));

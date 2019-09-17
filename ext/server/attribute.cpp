@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -66,37 +66,36 @@ namespace PyAttribute
      * @param att attribute reference
      * @param value new attribute value
      */
-//    template<long tangoTypeConst>
-//    inline void __set_value_scalar(Tango::Attribute &att,
-//                                   py::object &value)
-//    {
-//        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-//
-//        /*
-//           I hate doing this because tango inside is doing a new again when
-//           set_value_date_quality is invoked with the release flag to true
-//           the other option would be to use per thread tango data like it was
-//           done in v3.0.4
-//           I prefer this one since it decouples TangoC++ from PyTango and creating
-//           a scalar is not so expensive after all
-//        */
-//        std::unique_ptr<TangoScalarType> cpp_val(new TangoScalarType);
-//
+    template<long tangoTypeConst>
+    inline void __set_value_scalar(Tango::Attribute& att, py::object& value)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+        /*
+           I hate doing this because tango inside is doing a new again when
+           set_value_date_quality is invoked with the release flag to true
+           the other option would be to use per thread tango data like it was
+           done in v3.0.4
+           I prefer this one since it decouples TangoC++ from PyTango and creating
+           a scalar is not so expensive after all
+        */
+        std::unique_ptr<TangoScalarType> cpp_val(new TangoScalarType);
+
 //        from_py<tangoTypeConst>::convert(value.ptr(), *cpp_val);
-//        att.set_value(cpp_val.release(), 1, 0, true);
-//    }
-//
-//    /**
-//     * Tango Attribute set_value wrapper for DevEncoded attributes
-//     *
-//     * @param att attribute reference
-//     * @param data_str new attribute data string
-//     * @param data new attribute data
-//     */
-//    inline void __set_value(Tango::Attribute &att,
-//                            py::str &data_str,
-//                            py::str &data)
-//    {
+        att.set_value(cpp_val.release(), 1, 0, true);
+    }
+
+    /**
+     * Tango Attribute set_value wrapper for DevEncoded attributes
+     *
+     * @param att attribute reference
+     * @param data_str new attribute data string
+     * @param data new attribute data
+     */
+    inline void __set_value(Tango::Attribute &att,
+                            py::str &data_str,
+                            py::str &data)
+    {
 //        extract<Tango::DevString> val_str(data_str.ptr());
 //        if (!val_str.check())
 //        {
@@ -111,19 +110,19 @@ namespace PyAttribute
 //        Tango::DevString val_str_real = val_str;
 //        Tango::DevString val_real = val;
 //        att.set_value(&val_str_real, (Tango::DevUChar*)val_real, (long)len(data));
-//    }
-//
-//    /**
-//     * Tango Attribute set_value wrapper for DevEncoded attributes
-//     *
-//     * @param att attribute reference
-//     * @param data_str new attribute data string
-//     * @param data new attribute data
-//     */
-//    inline void __set_value(Tango::Attribute &att,
-//                            py::str &data_str,
-//                            py::object &data)
-//    {
+    }
+
+    /**
+     * Tango Attribute set_value wrapper for DevEncoded attributes
+     *
+     * @param att attribute reference
+     * @param data_str new attribute data string
+     * @param data new attribute data
+     */
+    inline void __set_value(Tango::Attribute &att,
+                            py::str &data_str,
+                            py::object& data)
+    {
 //        extract<Tango::DevString> val_str(data_str.ptr());
 //        if (!val_str.check())
 //        {
@@ -141,7 +140,7 @@ namespace PyAttribute
 //    Tango::DevString val_str_real = val_str;
 //        att.set_value(&val_str_real, (Tango::DevUChar*)view.buf, (long)view.len);
 //    PyBuffer_Release(&view);
-//    }
+    }
 //
 //    /**
 //     * Tango Attribute set_value_date_quality wrapper for scalar attributes
@@ -153,7 +152,7 @@ namespace PyAttribute
 //     */
 //    template<long tangoTypeConst>
 //    inline void __set_value_date_quality_scalar(Tango::Attribute &att,
-//                                                py::object &value,
+//                                                py::object& value,
 //                                                double t, Tango::AttrQuality quality)
 //    {
 //        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
@@ -217,7 +216,7 @@ namespace PyAttribute
      */
     inline void __set_value_date_quality(Tango::Attribute &att,
                                          py::str &data_str,
-                                         py::object &data,
+                                         py::object& data,
                                          double t, Tango::AttrQuality quality)
     {
 //        extract<Tango::DevString> val_str(data_str.ptr());
@@ -245,7 +244,7 @@ namespace PyAttribute
     template<long tangoTypeConst>
     void __set_value_date_quality_array(
             Tango::Attribute& att,
-            py::object &value,
+            py::object& value,
             double time,
             Tango::AttrQuality* quality,
             long* x,
@@ -289,7 +288,7 @@ namespace PyAttribute
 //        }
     }
 //
-//    inline void __set_value(const std::string&  fname, Tango::Attribute &att, py::object &value, long* x, long *y, double t = 0.0, Tango::AttrQuality* quality = 0)
+//    inline void __set_value(const std::string&  fname, Tango::Attribute &att, py::object& value, long* x, long *y, double t = 0.0, Tango::AttrQuality* quality = 0)
 //    {
 //        long type = att.get_data_type();
 //        Tango::AttrDataFormat format = att.get_data_format();
@@ -336,7 +335,7 @@ namespace PyAttribute
 //            __set_value(att, data_str, data);
 //    }
 //
-//    inline void __set_value(const std::string&  fname, Tango::Attribute &att, py::str &data_str, py::object &data, double t = 0.0, Tango::AttrQuality* quality = 0)
+//    inline void __set_value(const std::string&  fname, Tango::Attribute &att, py::str &data_str, py::object& data, double t = 0.0, Tango::AttrQuality* quality = 0)
 //    {
 //        if (quality)
 //            __set_value_date_quality(att, data_str, data, t, *quality);
@@ -344,7 +343,7 @@ namespace PyAttribute
 //            __set_value(att, data_str, data);
 //    }
 //
-    void set_value(Tango::Attribute &att, py::object &value)
+    void set_value(Tango::Attribute &att, py::object& value)
     {
         py::print(value);
         //__set_value("set_value", att, value, 0, 0);
@@ -360,23 +359,23 @@ namespace PyAttribute
 //        __set_value("set_value", att, data_str, data);
     }
 
-    void set_value(Tango::Attribute &att, const std::string& data_str, py::object &data)
+    void set_value(Tango::Attribute &att, const std::string& data_str, py::object& data)
     {
 //        __set_value("set_value", att, data_str, data);
     }
 
-    void set_value(Tango::Attribute &att, py::object &value, long x)
+    void set_value(Tango::Attribute &att, py::object& value, long x)
     {
 //        __set_value("set_value", att, value, &x, 0);
     }
 
-    void set_value(Tango::Attribute &att, py::object &value, long x, long y)
+    void set_value(Tango::Attribute &att, py::object& value, long x, long y)
     {
 //        __set_value("set_value", att, value, &x, &y);
     }
 
     void set_value_date_quality(Tango::Attribute &att,
-                                       py::object &value, double t,
+                                       py::object& value, double t,
                                        Tango::AttrQuality quality)
     {
 //        __set_value("set_value_date_quality", att, value, 0, 0, t, &quality);
@@ -393,7 +392,7 @@ namespace PyAttribute
 
     void set_value_date_quality(Tango::Attribute &att,
                                        const std::string& data_str,
-                                       py::object &data,
+                                       py::object& data,
                                        double t,
                                        Tango::AttrQuality quality)
     {
@@ -401,7 +400,7 @@ namespace PyAttribute
     }
 
     void set_value_date_quality(Tango::Attribute &att,
-                                       py::object &value,
+                                       py::object& value,
                                        double t, Tango::AttrQuality quality,
                                        long x)
     {
@@ -409,7 +408,7 @@ namespace PyAttribute
     }
 
     void set_value_date_quality(Tango::Attribute &att,
-                                       py::object &value,
+                                       py::object& value,
                                        double t, Tango::AttrQuality quality,
                                        long x, long y)
     {
@@ -417,59 +416,57 @@ namespace PyAttribute
     }
 
 //    template<typename TangoScalarType>
-//    inline void _get_properties_multi_attr_prop(Tango::Attribute &att, py::object &multi_attr_prop)
+//    inline void _get_properties_multi_attr_prop(Tango::Attribute &att, py::object& multi_attr_prop)
 //    {
 //        Tango::MultiAttrProp<TangoScalarType> tg_multi_attr_prop;
 //        att.get_properties(tg_multi_attr_prop);
 //
 //        to_py(tg_multi_attr_prop,multi_attr_prop);
 //    }
-//
-//    inline py::object
-//    get_properties_multi_attr_prop(Tango::Attribute &att,
-//                                                py::object &multi_attr_prop)
-//    {
+
+    inline py::object get_properties_multi_attr_prop(Tango::Attribute &att,
+                                                py::object& multi_attr_prop)
+    {
 //        long tangoTypeConst = att.get_data_type();
 //        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _get_properties_multi_attr_prop, att, multi_attr_prop);
 //        return multi_attr_prop;
-//    }
-//
+    }
+
 //    template<typename TangoScalarType>
-//    inline void _set_properties_multi_attr_prop(Tango::Attribute &att, py::object &multi_attr_prop)
+//    inline void _set_properties_multi_attr_prop(Tango::Attribute &att, py::object& multi_attr_prop)
 //    {
 //        Tango::MultiAttrProp<TangoScalarType> tg_multi_attr_prop;
 //        from_py_object(multi_attr_prop,tg_multi_attr_prop);
 //        att.set_properties(tg_multi_attr_prop);
 //    }
-//
-//    void set_properties_multi_attr_prop(Tango::Attribute &att, py::object &multi_attr_prop)
-//    {
-//        long tangoTypeConst = att.get_data_type();
-//        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_properties_multi_attr_prop, att, multi_attr_prop);
-//    }
-//
-//    void set_upd_properties(Tango::Attribute &att, py::object &attr_cfg)
-//    {
+
+    void set_properties_multi_attr_prop(Tango::Attribute& self, py::object& multi_attr_prop)
+    {
+//        long tangoTypeConst = self.get_data_type();
+//        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_properties_multi_attr_prop, self, multi_attr_prop);
+    }
+
+    void set_upd_properties(Tango::Attribute& self, py::object& attr_cfg)
+    {
 //        Tango::AttributeConfig_3 tg_attr_cfg;
 //        from_py_object(attr_cfg, tg_attr_cfg);
-//        att.set_upd_properties(tg_attr_cfg);
-//    }
-//
-//    void set_upd_properties(Tango::Attribute &att, py::object &attr_cfg, py::object &dev_name)
-//    {
+//        self.set_upd_properties(tg_attr_cfg);
+    }
+
+    void set_upd_properties(Tango::Attribute& self, py::object& attr_cfg, std::string& dev_name)
+    {
 //        Tango::AttributeConfig_3 tg_attr_cfg;
 //        from_py_object(attr_cfg, tg_attr_cfg);
-//        string tg_dev_name = py::extract<string>(dev_name);
-//        att.set_upd_properties(tg_attr_cfg,tg_dev_name);
-//    }
-//
-//    inline void fire_change_event(Tango::Attribute &self)
-//    {
-//        self.fire_change_event();
-//    }
-//
-//    inline void fire_change_event(Tango::Attribute &self, object &data)
-//    {
+//        self.set_upd_properties(tg_attr_cfg, dev_name);
+    }
+
+    inline void fire_change_event(Tango::Attribute& self)
+    {
+        self.fire_change_event();
+    }
+
+    inline void fire_change_event(Tango::Attribute& self, py::object& data)
+    {
 //        py::extract<Tango::DevFailed> except_convert(data);
 //        if (except_convert.check()) {
 //            self.fire_change_event(
@@ -483,30 +480,17 @@ namespace PyAttribute
 //                "PyDs_WrongPythonDataTypeForAttribute",
 //                o.str(),
 //                "fire_change_event()");
-//    }
-//
+    }
+
 //    template<typename TangoScalarType>
-//    inline void _set_min_alarm(Tango::Attribute &self, py::object value)
+//    inline void _set_min_alarm(Tango::Attribute& self, py::object value)
 //    {
 //        TangoScalarType c_value = py::extract<TangoScalarType>(value);
 //        self.set_min_alarm(c_value);
 //    }
-//
-//#if TANGO_VERSION_NB < 80100 // set_min_alarm
-//
-//    template<>
-//    inline void _set_min_alarm<Tango::DevEncoded>(Tango::Attribute &self, py::object value)
-//    {
-//        string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
-//        Tango::Except::throw_exception((const char *)"API_MethodArgument",
-//                      (const char *)err_msg.c_str(),
-//                      (const char *)"Attribute::set_min_alarm()");
-//    }
-//
-//#endif // set_min_alarm
-//
-//    inline void set_min_alarm(Tango::Attribute &self, py::object value)
-//    {
+
+    inline void set_min_alarm(Tango::Attribute& self, py::object& value)
+    {
 //        py::extract<string> value_convert(value);
 //
 //        if (value_convert.check())
@@ -525,31 +509,18 @@ namespace PyAttribute
 //
 //            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_min_alarm, self, value);
 //        }
-//    }
-//
-//
+    }
+
+
 //    template<typename TangoScalarType>
-//    inline void _set_max_alarm(Tango::Attribute &self, py::object value)
+//    inline void _set_max_alarm(Tango::Attribute& self, py::object value)
 //    {
 //        TangoScalarType c_value = py::extract<TangoScalarType>(value);
 //        self.set_max_alarm(c_value);
 //    }
-//
-//#if TANGO_VERSION_NB < 80100 // set_max_alarm
-//
-//    template<>
-//    inline void _set_max_alarm<Tango::DevEncoded>(Tango::Attribute &self, py::object value)
-//    {
-//        string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
-//        Tango::Except::throw_exception((const char *)"API_MethodArgument",
-//                      (const char *)err_msg.c_str(),
-//                      (const char *)"Attribute::set_max_alarm()");
-//    }
-//
-//#endif // set_max_alarm
-//
-//    inline void set_max_alarm(Tango::Attribute &self, py::object value)
-//    {
+
+    inline void set_max_alarm(Tango::Attribute& self, py::object& value)
+    {
 //        py::extract<string> value_convert(value);
 //
 //        if (value_convert.check())
@@ -568,31 +539,17 @@ namespace PyAttribute
 //
 //            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_max_alarm, self, value);
 //        }
-//    }
-//
-//
+    }
+
 //    template<typename TangoScalarType>
-//    inline void _set_min_warning(Tango::Attribute &self, py::object value)
+//    inline void _set_min_warning(Tango::Attribute& self, py::object value)
 //    {
 //        TangoScalarType c_value = py::extract<TangoScalarType>(value);
 //        self.set_min_warning(c_value);
 //    }
-//
-//#if TANGO_VERSION_NB < 80100 // set_min_warning
-//
-//    template<>
-//    inline void _set_min_warning<Tango::DevEncoded>(Tango::Attribute &self, py::object value)
-//    {
-//        string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
-//        Tango::Except::throw_exception((const char *)"API_MethodArgument",
-//                      (const char *)err_msg.c_str(),
-//                      (const char *)"Attribute::set_min_warning()");
-//    }
-//
-//#endif // set_min_warning
-//
-//    inline void set_min_warning(Tango::Attribute &self, py::object value)
-//    {
+
+    inline void set_min_warning(Tango::Attribute& self, py::object& value)
+    {
 //        py::extract<string> value_convert(value);
 //
 //        if (value_convert.check())
@@ -611,31 +568,17 @@ namespace PyAttribute
 //
 //            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_min_warning, self, value);
 //        }
-//    }
-//
-//
+    }
+
 //    template<typename TangoScalarType>
-//    inline void _set_max_warning(Tango::Attribute &self, py::object value)
+//    inline void _set_max_warning(Tango::Attribute& self, py::object value)
 //    {
 //        TangoScalarType c_value = py::extract<TangoScalarType>(value);
 //        self.set_max_warning(c_value);
 //    }
-//
-//#if TANGO_VERSION_NB < 80100 // set_max_warning
-//
-//    template<>
-//    inline void _set_max_warning<Tango::DevEncoded>(Tango::Attribute &self, py::object value)
-//    {
-//        string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
-//        Tango::Except::throw_exception((const char *)"API_MethodArgument",
-//                      (const char *)err_msg.c_str(),
-//                      (const char *)"Attribute::set_max_warning()");
-//    }
-//
-//#endif // set_max_warning
-//
-//    inline void set_max_warning(Tango::Attribute &self, py::object value)
-//    {
+
+    inline void set_max_warning(Tango::Attribute& self, py::object& value)
+    {
 //        py::extract<string> value_convert(value);
 //
 //        if (value_convert.check())
@@ -654,8 +597,8 @@ namespace PyAttribute
 //
 //            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_NAME(tangoTypeConst, _set_max_warning, self, value);
 //        }
-//    }
-//
+    }
+
 //    template<long tangoTypeConst>
 //    PyObject* __get_min_alarm(Tango::Attribute &att)
 //    {
@@ -667,9 +610,9 @@ namespace PyAttribute
 //
 //        return py::incref(py_value.ptr());
 //    }
-//
-//    PyObject *get_min_alarm(Tango::Attribute &att)
-//    {
+
+    py::object *get_min_alarm(Tango::Attribute& att)
+    {
 //        long tangoTypeConst = att.get_data_type();
 //
 //        if(tangoTypeConst == Tango::DEV_ENCODED)
@@ -677,8 +620,8 @@ namespace PyAttribute
 //
 //        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_min_alarm, att);
 //        return 0;
-//    }
-//
+    }
+
 //    template<long tangoTypeConst>
 //    PyObject* __get_max_alarm(Tango::Attribute &att)
 //    {
@@ -690,9 +633,9 @@ namespace PyAttribute
 //
 //        return py::incref(py_value.ptr());
 //    }
-//
-//    PyObject *get_max_alarm(Tango::Attribute &att)
-//    {
+
+    py::object* get_max_alarm(Tango::Attribute& att)
+    {
 //        long tangoTypeConst = att.get_data_type();
 //
 //        if(tangoTypeConst == Tango::DEV_ENCODED)
@@ -700,8 +643,8 @@ namespace PyAttribute
 //
 //        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_max_alarm, att);
 //        return 0;
-//    }
-//
+    }
+
 //    template<long tangoTypeConst>
 //    PyObject* __get_min_warning(Tango::Attribute &att)
 //    {
@@ -713,9 +656,9 @@ namespace PyAttribute
 //
 //        return py::incref(py_value.ptr());
 //    }
-//
-//    PyObject *get_min_warning(Tango::Attribute &att)
-//    {
+
+    py::object* get_min_warning(Tango::Attribute& att)
+    {
 //        long tangoTypeConst = att.get_data_type();
 //
 //        if(tangoTypeConst == Tango::DEV_ENCODED)
@@ -723,8 +666,8 @@ namespace PyAttribute
 //
 //        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_min_warning, att);
 //        return 0;
-//    }
-//
+    }
+
 //    template<long tangoTypeConst>
 //    PyObject* __get_max_warning(Tango::Attribute &att)
 //    {
@@ -736,9 +679,9 @@ namespace PyAttribute
 //
 //        return py::incref(py_value.ptr());
 //    }
-//
-//    PyObject *get_max_warning(Tango::Attribute &att)
-//    {
+
+    py::object* get_max_warning(Tango::Attribute& att)
+    {
 //        long tangoTypeConst = att.get_data_type();
 //
 //        if(tangoTypeConst == Tango::DEV_ENCODED)
@@ -746,18 +689,8 @@ namespace PyAttribute
 //
 //        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_max_warning, att);
 //        return 0;
-//    }
-//
+    }
 };
-//
-//BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_quality_overloads,
-//                                       Tango::Attribute::set_quality, 1, 2);
-//
-//BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_change_event_overloads,
-//                                       Tango::Attribute::set_change_event, 1, 2);
-//
-//BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_archive_event_overloads,
-//                                       Tango::Attribute::set_archive_event, 1, 2);
 
 void export_attribute(py::module &m)
 {
@@ -771,118 +704,222 @@ void export_attribute(py::module &m)
     ;
     
     py::class_<Tango::Attribute>(m, "Attribute")
-        .def("is_write_associated", &Tango::Attribute::is_writ_associated)
-        .def("is_min_alarm", &Tango::Attribute::is_min_alarm)
-        .def("is_max_alarm", &Tango::Attribute::is_max_alarm)
-        .def("is_min_warning", &Tango::Attribute::is_min_warning)
-        .def("is_max_warning", &Tango::Attribute::is_max_warning)
-        .def("is_rds_alarm", &Tango::Attribute::is_rds_alarm)
+        .def("is_write_associated", [](Tango::Attribute& self) -> bool {
+            return self.is_writ_associated();
+        })
+        .def("is_min_alarm", [](Tango::Attribute& self) -> bool {
+            return self.is_min_alarm();
+        })
+        .def("is_max_alarm", [](Tango::Attribute& self) -> bool {
+            return self.is_max_alarm();
+        })
+        .def("is_min_warning", [](Tango::Attribute& self) -> bool {
+            return self.is_min_warning();
+        })
+        .def("is_max_warning", [](Tango::Attribute& self) -> bool {
+            return self.is_max_warning();
+        })
+        .def("is_rds_alarm", [](Tango::Attribute& self) -> bool {
+            return self.is_rds_alarm();
+        })
         .def("is_polled", [](Tango::Attribute& self) -> bool {
-            return self.is_polled(); })
-        .def("check_alarm", &Tango::Attribute::check_alarm)
-        .def("get_writable", &Tango::Attribute::get_writable)
-        .def("get_name", &Tango::Attribute::get_name,
-            py::return_value_policy::copy)
-        .def("get_data_type", &Tango::Attribute::get_data_type)
-        .def("get_data_format", &Tango::Attribute::get_data_format)
-        .def("get_assoc_name", &Tango::Attribute::get_assoc_name, 
-            py::return_value_policy::copy)
-        .def("get_assoc_ind", &Tango::Attribute::get_assoc_ind)
-        .def("set_assoc_ind", &Tango::Attribute::set_assoc_ind)
-        .def("get_date", &Tango::Attribute::get_date, 
-                py::return_value_policy::reference)
-        .def("set_date",
-             (void (Tango::Attribute::*) (Tango::TimeVal &))
-             &Tango::Attribute::set_date)
-        .def("get_label", &Tango::Attribute::get_label, 
-                py::return_value_policy::copy)
-        .def("get_quality", &Tango::Attribute::get_quality, 
-                py::return_value_policy::copy)
-//        .def("set_quality", &Tango::Attribute::set_quality,
-//            set_quality_overloads())
-        .def("get_data_size", &Tango::Attribute::get_data_size)
-        .def("get_x", &Tango::Attribute::get_x)
-        .def("get_max_dim_x", &Tango::Attribute::get_max_dim_x)
-        .def("get_y", &Tango::Attribute::get_y)
-        .def("get_max_dim_y", &Tango::Attribute::get_max_dim_y)
-        .def("get_polling_period", &Tango::Attribute::get_polling_period)
-        .def("set_attr_serial_model", &Tango::Attribute::set_attr_serial_model)
-        .def("get_attr_serial_model", &Tango::Attribute::get_attr_serial_model)
-
-//        .def("set_min_alarm", &PyAttribute::set_min_alarm)
-//        .def("set_max_alarm", &PyAttribute::set_max_alarm)
-//        .def("set_min_warning", &PyAttribute::set_min_warning)
-//        .def("set_max_warning", &PyAttribute::set_max_warning)
-        
-        .def("get_value_flag", &Tango::Attribute::get_value_flag)
-        .def("set_value_flag", &Tango::Attribute::set_value_flag)
-
-        .def("get_disp_level", &Tango::Attribute::get_disp_level)
-
-        .def("change_event_subscribed", &Tango::Attribute::change_event_subscribed)
-        .def("periodic_event_subscribed", &Tango::Attribute::periodic_event_subscribed)
-        .def("archive_event_subscribed", &Tango::Attribute::archive_event_subscribed)
-        .def("quality_event_subscribed", &Tango::Attribute::quality_event_subscribed)
-        .def("user_event_subscribed", &Tango::Attribute::user_event_subscribed)
-        
-        .def("use_notifd_event", &Tango::Attribute::use_notifd_event)
-        .def("use_zmq_event", &Tango::Attribute::use_zmq_event)
-        
-//        .def("get_min_alarm", (PyObject* (*) (Tango::Attribute &))
-//                &PyAttribute::get_min_alarm)
-//        .def("get_max_alarm", (PyObject* (*) (Tango::Attribute &))
-//                &PyAttribute::get_max_alarm)
-//        .def("get_min_warning", (PyObject* (*) (Tango::Attribute &))
-//                &PyAttribute::get_min_warning)
-//        .def("get_max_warning", (PyObject* (*) (Tango::Attribute &))
-//                &PyAttribute::get_max_warning)
-
-        .def("set_value", [](Tango::Attribute& self, py::object &value) -> void {
-//            PyAttribute::set_value(self, value);
+            return self.is_polled();
+        })
+        .def("check_alarm", [](Tango::Attribute& self) -> bool {
+            return self.check_alarm();
+        })
+        .def("get_writable", [](Tango::Attribute& self) -> Tango::AttrWriteType {
+            return self.get_writable();
+        })
+        .def("get_name", [](Tango::Attribute& self) -> std::string& {
+            return self.get_name();
+        })
+        .def("get_data_type", [](Tango::Attribute& self) -> long {
+            return self.get_data_type();
+        })
+        .def("get_data_format", [](Tango::Attribute& self) -> Tango::AttrDataFormat {
+            return self.get_data_format();
+        })
+        .def("get_assoc_name", [](Tango::Attribute& self) -> std::string& {
+            return self.get_assoc_name();
+        })
+        .def("get_assoc_ind", [](Tango::Attribute& self) -> long {
+            return self.get_assoc_ind();
+        })
+        .def("set_assoc_ind", [](Tango::Attribute& self, long val) -> void {
+            self.set_assoc_ind(val);
+        })
+        .def("get_date", [](Tango::Attribute& self) -> Tango::TimeVal& {
+            return self.get_date();
+        })
+        .def("set_date",[](Tango::Attribute& self, Tango::TimeVal& new_date) -> void {
+            self.set_date(new_date);
+        })
+        .def("get_label", [](Tango::Attribute& self) -> std::string& {
+            return self.get_label();
+        })
+        .def("get_quality",[](Tango::Attribute& self) -> Tango::AttrQuality& {
+            return self.get_quality();
+        })
+        .def("set_quality", [](Tango::Attribute& self, Tango::AttrQuality& qual, bool send_event) -> void {
+            self.set_quality(qual, send_event);
+        }, py::arg("qual"), py::arg("send_event")=false)
+        .def("get_data_size", [](Tango::Attribute& self) -> long {
+            return self.get_data_size();
+        })
+        .def("get_x", [](Tango::Attribute& self) -> long {
+            return self.get_x();
+        })
+        .def("get_max_dim_x", [](Tango::Attribute& self) -> long {
+            return self.get_max_dim_x();
+        })
+        .def("get_y", [](Tango::Attribute& self) -> long {
+            return self.get_y();
+        })
+        .def("get_max_dim_y", [](Tango::Attribute& self) -> long {
+            return self.get_max_dim_y();
+        })
+        .def("get_polling_period", [](Tango::Attribute& self) -> long {
+            return self.get_polling_period();
+        })
+        .def("set_attr_serial_model", [](Tango::Attribute& self, Tango::AttrSerialModel ser_model) -> void {
+            self.set_attr_serial_model(ser_model);
+        })
+        .def("get_attr_serial_model", [](Tango::Attribute& self) -> Tango::AttrSerialModel {
+            return self.get_attr_serial_model();
+        })
+        .def("set_min_alarm", [](Tango::Attribute& self, py::object& min) -> void {
+            PyAttribute::set_min_alarm(self, min);
+        })
+        .def("set_max_alarm", [](Tango::Attribute& self, py::object& max) -> void {
+            PyAttribute::set_max_alarm(self, max);
+        })
+        .def("set_min_warning", [](Tango::Attribute& self, py::object& min) -> void {
+            PyAttribute::set_min_warning(self, min);
+        })
+        .def("set_max_warning", [](Tango::Attribute& self, py::object& max) -> void {
+            PyAttribute::set_max_warning(self, max);
+        })
+        .def("get_value_flag", [](Tango::Attribute& self) -> bool {
+            return self.get_value_flag();
+        })
+        .def("set_value_flag", [](Tango::Attribute& self, bool flag) -> void {
+            self.set_value_flag(flag);
+        })
+        .def("get_disp_level", [](Tango::Attribute& self) -> Tango::DispLevel {
+            return self.get_disp_level();
+        })
+        .def("change_event_subscribed", [](Tango::Attribute& self) -> bool {
+            return self.change_event_subscribed();
+        })
+        .def("periodic_event_subscribed", [](Tango::Attribute& self) -> bool {
+            return self.periodic_event_subscribed();
+        })
+        .def("archive_event_subscribed", [](Tango::Attribute& self) -> bool {
+            return self.archive_event_subscribed();
+        })
+        .def("quality_event_subscribed", [](Tango::Attribute& self) -> bool {
+            return self.quality_event_subscribed();
+        })
+        .def("user_event_subscribed", [](Tango::Attribute& self) -> bool {
+            return self.user_event_subscribed();
+        })
+        .def("use_notifd_event", [](Tango::Attribute& self) -> bool {
+            return self.use_notifd_event();
+        })
+        .def("use_zmq_event", [](Tango::Attribute& self) -> bool {
+            return self.use_zmq_event();
+        })
+        .def("get_min_alarm", [](Tango::Attribute& self) -> py::object {
+            PyAttribute::get_min_alarm(self);
+        })
+        .def("get_max_alarm", [](Tango::Attribute& self) -> py::object {
+            PyAttribute::get_max_alarm(self);
+        })
+        .def("get_min_warning", [](Tango::Attribute& self) -> py::object {
+            PyAttribute::get_min_warning(self);
+        })
+        .def("get_max_warning", [](Tango::Attribute& self) -> py::object {
+            PyAttribute::get_max_warning(self);
+        })
+        .def("set_value", [](Tango::Attribute& self, py::object& value) -> void {
+            PyAttribute::set_value(self, value);
             py::print(value);
         })
-//        .def("set_value", (void (*) (Tango::Attribute &, py::str &, py::object &))
-//            &PyAttribute::set_value)
-//        .def("set_value", (void (*) (Tango::Attribute &, py::str &, py::str &))
-//            &PyAttribute::set_value)
-//        .def("set_value", (void (*) (Tango::Attribute &, Tango::EncodedAttribute *))
-//            &PyAttribute::set_value)
-//        .def("set_value", (void (*) (Tango::Attribute &, py::object &, long))
-//            &PyAttribute::set_value)
-//        .def("set_value", (void (*) (Tango::Attribute &, py::object &, long, long))
-//            &PyAttribute::set_value)
-//        .def("set_value_date_quality", (void (*) (Tango::Attribute &, py::object &, double t, Tango::AttrQuality quality))
-//            &PyAttribute::set_value_date_quality)
-//        .def("set_value_date_quality", (void (*) (Tango::Attribute &, py::str &, py::str &, double t, Tango::AttrQuality quality))
-//            &PyAttribute::set_value_date_quality)
-//        .def("set_value_date_quality", (void (*) (Tango::Attribute &, py::str &, py::object &, double t, Tango::AttrQuality quality))
-//            &PyAttribute::set_value_date_quality)
-//        .def("set_value_date_quality", (void (*) (Tango::Attribute &, py::object &, double t, Tango::AttrQuality quality, long))
-//            &PyAttribute::set_value_date_quality)
-//        .def("set_value_date_quality", (void (*) (Tango::Attribute &, py::object &, double t, Tango::AttrQuality quality, long, long))
-//            &PyAttribute::set_value_date_quality)
-
-//        .def("set_change_event", &Tango::Attribute::set_change_event,
-//            set_change_event_overloads())
-//        .def("set_archive_event", &Tango::Attribute::set_archive_event,
-//            set_archive_event_overloads())
-        .def("is_change_event", &Tango::Attribute::is_change_event)
-        .def("is_check_change_criteria", &Tango::Attribute::is_check_change_criteria)
-        .def("is_archive_event", &Tango::Attribute::is_archive_event)
-        .def("is_check_archive_criteria", &Tango::Attribute::is_check_archive_criteria)
-        .def("set_data_ready_event", &Tango::Attribute::set_data_ready_event)
-        .def("is_data_ready_event", &Tango::Attribute::is_data_ready_event)
-        .def("remove_configuration", &Tango::Attribute::remove_configuration)
-        
-//        .def("_get_properties_multi_attr_prop",  &PyAttribute::get_properties_multi_attr_prop)
-//        .def("_set_properties_multi_attr_prop", &PyAttribute::set_properties_multi_attr_prop)
-//        .def("set_upd_properties", (void (*) (Tango::Attribute &, py::object &))
-//                &PyAttribute::set_upd_properties)
-//        .def("set_upd_properties", (void (*) (Tango::Attribute &, py::object &, py::object &))
-//                &PyAttribute::set_upd_properties)
-//        .def("fire_change_event", (void (*) (Tango::Attribute &))
-//            &PyAttribute::fire_change_event)
-//        .def("fire_change_event", (void (*) (Tango::Attribute &, py::object &))
-//            &PyAttribute::fire_change_event)
+        .def("set_value", [](Tango::Attribute& self, py::str& str1, py::object& value) -> void {
+            PyAttribute::set_value(self, str1, value);
+        })
+        .def("set_value", [](Tango::Attribute& self, py::str& str1, py::str& str2) -> void {
+            PyAttribute::set_value(self, str1, str2);
+        })
+        .def("set_value", [](Tango::Attribute& self, Tango::EncodedAttribute* value) -> void {
+            PyAttribute::set_value(self, value);
+        })
+        .def("set_value", [](Tango::Attribute& self, py::object& obj, long value) -> void {
+            PyAttribute::set_value(self, obj, value);
+        })
+        .def("set_value", [](Tango::Attribute& self, py::object& obj, long val1, long val2) -> void {
+            PyAttribute::set_value(self, obj, val1, val2);
+        })
+        .def("set_value_date_quality", [](Tango::Attribute& self, py::object& obj, double t, Tango::AttrQuality quality) -> void {
+            PyAttribute::set_value_date_quality(self, obj, t, quality);
+        })
+        .def("set_value_date_quality", [](Tango::Attribute& self, py::str& str1, py::str& str2, double t, Tango::AttrQuality quality) -> void {
+            PyAttribute::set_value_date_quality(self, str1, str2, t, quality);
+        })
+        .def("set_value_date_quality", [](Tango::Attribute& self, py::str& str1, py::object& obj, double t, Tango::AttrQuality quality) -> void {
+            PyAttribute::set_value_date_quality(self, str1, obj, t, quality);
+        })
+        .def("set_value_date_quality", [](Tango::Attribute& self, py::object& obj, double t, Tango::AttrQuality quality, long val) -> void {
+            PyAttribute::set_value_date_quality(self, obj, t, quality, val);
+        })
+        .def("set_value_date_quality", [](Tango::Attribute& self, py::object& obj, double t, Tango::AttrQuality quality, long val1, long val2) -> void {
+            PyAttribute::set_value_date_quality(self, obj, t, quality, val1, val2);
+        })
+        .def("set_change_event", [](Tango::Attribute& self, bool implemented, bool detect) -> void {
+            self.set_change_event(implemented, detect);
+        }, py::arg("implemented"), py::arg("detect")=true)
+        .def("set_archive_event", [](Tango::Attribute& self, bool implemented, bool detect) -> void {
+            self.set_archive_event(implemented, detect);
+        }, py::arg("implemented"), py::arg("detect")=true)
+        .def("is_change_event", [](Tango::Attribute& self) -> bool {
+            return self.is_change_event();
+        })
+        .def("is_check_change_criteria", [](Tango::Attribute& self) -> bool {
+            return self.is_check_change_criteria();
+        })
+        .def("is_archive_event", [](Tango::Attribute& self) -> bool {
+            return self.is_archive_event();
+        })
+        .def("is_check_archive_criteria", [](Tango::Attribute& self) -> bool {
+            return self.is_check_archive_criteria();
+        })
+        .def("set_data_ready_event", [](Tango::Attribute& self, bool implemented) -> void {
+            self.set_data_ready_event(implemented);
+        })
+        .def("is_data_ready_event", [](Tango::Attribute& self) -> bool {
+            return self.is_data_ready_event();
+        })
+        .def("remove_configuration", [](Tango::Attribute& self) -> void {
+            self.remove_configuration();
+        })
+        .def("_get_properties_multi_attr_prop", [](Tango::Attribute& self, py::object& multi_attr_prop) -> py::object {
+            return PyAttribute::get_properties_multi_attr_prop(self, multi_attr_prop);
+        })
+        .def("_set_properties_multi_attr_prop", [](Tango::Attribute& self, py::object& multi_attr_prop) -> void {
+            PyAttribute::set_properties_multi_attr_prop(self, multi_attr_prop);
+        })
+        .def("set_upd_properties", [](Tango::Attribute& self, py::object& attr_cfg) -> void {
+            PyAttribute::set_upd_properties(self, attr_cfg);
+        })
+        .def("set_upd_properties", [](Tango::Attribute& self, py::object& attr_cfg, std::string& dev_name) -> void {
+            PyAttribute::set_upd_properties(self, attr_cfg, dev_name);
+        })
+        .def("fire_change_event", [](Tango::Attribute& self) -> void {
+            PyAttribute::fire_change_event(self);
+        })
+        .def("fire_change_event", [](Tango::Attribute& self, py::object& obj) -> void {
+            PyAttribute::fire_change_event(self, obj);
+        })
         ;
 }

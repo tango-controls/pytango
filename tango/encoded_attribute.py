@@ -17,7 +17,7 @@ __all__ = ["encoded_attribute_init"]
 
 __docformat__ = "restructuredtext"
 
-from ._tango import EncodedAttribute, ExtractAs, _ImageFormat
+from ._tango import EncodedAttribute, _ImageFormat
 from ._tango import constants
 
 from .utils import is_pure_str, is_seq
@@ -31,9 +31,6 @@ if constants.NUMPY_SUPPORT:
         np = None
 else:
     np = None
-
-_allowed_extract = (
-    ExtractAs.Numpy, ExtractAs.String, ExtractAs.Tuple, ExtractAs.List)
 
 
 def __EncodedAttribute_encode_jpeg_gray8(self, gray8, width=0, height=0, quality=100.0):
@@ -430,13 +427,11 @@ def __EncodedAttribute_encode_jpeg_rgb32(self, rgb32, width=0, height=0, quality
     self._encode_jpeg_rgb32(rgb32, width, height, quality)
 
 
-def __EncodedAttribute_decode_gray8(self, da, extract_as=ExtractAs.Numpy):
+def __EncodedAttribute_decode_gray8(self, da):
     """Decode a 8 bits grayscale image (JPEG_GRAY8 or GRAY8) and returns a 8 bits gray scale image.
 
         :param da: :class:`DeviceAttribute` that contains the image
         :type da: :class:`DeviceAttribute`
-        :param extract_as: defaults to ExtractAs.Numpy
-        :type extract_as: ExtractAs
         :return: the decoded data
 
         - In case String string is choosen as extract method, a tuple is returned:
@@ -454,25 +449,21 @@ def __EncodedAttribute_decode_gray8(self, da, extract_as=ExtractAs.Numpy):
            call which **DOESN'T** extract the contents. Example::
 
                dev = tango.DeviceProxy("a/b/c")
-               da = dev.read_attribute("my_attr", extract_as=tango.ExtractAs.Nothing)
+               da = dev.read_attribute("my_attr")
                enc = tango.EncodedAttribute()
                data = enc.decode_gray8(da)
     """
     if hasattr(da, 'value'):
         raise TypeError("DeviceAttribute argument must have been obtained from "
                         "a call which doesn't extract the contents")
-    if extract_as not in _allowed_extract:
-        raise TypeError("extract_as must be one of Numpy, String, Tuple, List")
-    return self._decode_gray8(da, extract_as)
+    return self._decode_gray8(da)
 
 
-def __EncodedAttribute_decode_gray16(self, da, extract_as=ExtractAs.Numpy):
+def __EncodedAttribute_decode_gray16(self, da):
     """Decode a 16 bits grayscale image (GRAY16) and returns a 16 bits gray scale image.
 
         :param da: :class:`DeviceAttribute` that contains the image
         :type da: :class:`DeviceAttribute`
-        :param extract_as: defaults to ExtractAs.Numpy
-        :type extract_as: ExtractAs
         :return: the decoded data
 
         - In case String string is choosen as extract method, a tuple is returned:
@@ -490,33 +481,25 @@ def __EncodedAttribute_decode_gray16(self, da, extract_as=ExtractAs.Numpy):
            call which **DOESN'T** extract the contents. Example::
 
                dev = tango.DeviceProxy("a/b/c")
-               da = dev.read_attribute("my_attr", extract_as=tango.ExtractAs.Nothing)
+               da = dev.read_attribute("my_attr")
                enc = tango.EncodedAttribute()
                data = enc.decode_gray16(da)
     """
     if hasattr(da, 'value'):
         raise TypeError("DeviceAttribute argument must have been obtained from "
                         "a call which doesn't extract the contents")
-    if extract_as not in _allowed_extract:
-        raise TypeError("extract_as must be one of Numpy, String, Tuple, List")
-    return self._decode_gray16(da, extract_as)
+    return self._decode_gray16(da)
 
 
-def __EncodedAttribute_decode_rgb32(self, da, extract_as=ExtractAs.Numpy):
+def __EncodedAttribute_decode_rgb32(self, da):
     """Decode a color image (JPEG_RGB or RGB24) and returns a 32 bits RGB image.
 
         :param da: :class:`DeviceAttribute` that contains the image
         :type da: :class:`DeviceAttribute`
-        :param extract_as: defaults to ExtractAs.Numpy
-        :type extract_as: ExtractAs
         :return: the decoded data
 
-        - In case String string is choosen as extract method, a tuple is returned:
-            width<int>, height<int>, buffer<str>
         - In case Numpy is choosen as extract method, a :class:`numpy.ndarray` is
           returned with ndim=2, shape=(height, width) and dtype=numpy.uint32.
-        - In case Tuple or List are choosen, a tuple<tuple<int>> or list<list<int>>
-          is returned.
 
        .. warning::
            The PyTango calls that return a :class:`DeviceAttribute`
@@ -526,16 +509,14 @@ def __EncodedAttribute_decode_rgb32(self, da, extract_as=ExtractAs.Numpy):
            call which **DOESN'T** extract the contents. Example::
 
                dev = tango.DeviceProxy("a/b/c")
-               da = dev.read_attribute("my_attr", extract_as=tango.ExtractAs.Nothing)
+               da = dev.read_attribute("my_attr")
                enc = tango.EncodedAttribute()
                data = enc.decode_rgb32(da)
     """
     if hasattr(da, 'value'):
         raise TypeError("DeviceAttribute argument must have been obtained from "
                         "a call which doesn't extract the contents")
-    if extract_as not in _allowed_extract:
-        raise TypeError("extract_as must be one of Numpy, String, Tuple, List")
-    return self._decode_rgb32(da, extract_as)
+    return self._decode_rgb32(da)
 
 
 def __init_EncodedAttribute():

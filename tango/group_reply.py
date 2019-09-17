@@ -18,14 +18,14 @@ __all__ = ["group_reply_init"]
 __docformat__ = "restructuredtext"
 
 from .utils import document_method as __document_method
-from ._tango import GroupReply, GroupCmdReply, GroupAttrReply, ExtractAs
+from ._tango import GroupReply, GroupCmdReply, GroupAttrReply
 
 
 def __GroupCmdReply__get_data(self):
     return self.get_data_raw().extract()
 
 
-def __GroupAttrReply__get_data(self, extract_as=ExtractAs.Numpy):
+def __GroupAttrReply__get_data(self):
     # GroupAttrReply.__get_data() extracts the data from the object, so
     # two successive calls to get_data() result in the second one returning
     # an empty value, which is an unexpected behaviour.
@@ -88,12 +88,9 @@ def __doc_GroupReply():
     """)
 
     __document_method(GroupAttrReply, "get_data", """
-    get_data(self, extract_as=ExtractAs.Numpy) -> DeviceAttribute
+    get_data(self) -> DeviceAttribute
 
             Get the DeviceAttribute.
-
-        Parameters :
-            - extract_as : (ExtractAs)
 
         Return     : (DeviceAttribute) Whatever is stored there, or None.
     """)

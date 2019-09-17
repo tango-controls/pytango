@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -30,38 +30,38 @@ void export_attribute_proxy(py::module& m)
         .def("name", [](Tango::AttributeProxy& self) -> std::string {
             return self.name();
         })
-        .def("get_device_proxy", [] (Tango::AttributeProxy& self) -> Tango::DeviceProxy* {
+        .def("get_device_proxy", [](Tango::AttributeProxy& self) -> Tango::DeviceProxy* {
             return self.get_device_proxy();
         })
         //
         // property methods
         //
-        .def("_get_property", [] (Tango::AttributeProxy& self, std::string& prop_name, Tango::DbData& db) -> void {
+        .def("_get_property", [](Tango::AttributeProxy& self, std::string& prop_name, Tango::DbData& db) -> void {
             self.get_property(prop_name, db);
         })
-        .def("_get_property", [] (Tango::AttributeProxy& self, std::vector<std::string>& prop_names, Tango::DbData& db) -> void {
+        .def("_get_property", [](Tango::AttributeProxy& self, std::vector<std::string>& prop_names, Tango::DbData& db) -> void {
             self.get_property(prop_names, db);
         })
-        .def("_get_property", [] (Tango::AttributeProxy& self, Tango::DbData& db) -> void {
+        .def("_get_property", [](Tango::AttributeProxy& self, Tango::DbData& db) -> void {
             self.get_property(db);
         })
-        .def("_put_property", [] (Tango::AttributeProxy& self, Tango::DbData& db) -> void {
+        .def("_put_property", [](Tango::AttributeProxy& self, Tango::DbData& db) -> void {
             self.put_property(db);
         })
-        .def("_delete_property", [] (Tango::AttributeProxy& self, std::string& prop_name) -> void {
+        .def("_delete_property", [](Tango::AttributeProxy& self, std::string& prop_name) -> void {
             self.delete_property(prop_name);
         })
-        .def("_delete_property", [] (Tango::AttributeProxy& self, std::vector<std::string>& prop_names) -> void {
+        .def("_delete_property", [](Tango::AttributeProxy& self, std::vector<std::string>& prop_names) -> void {
             self.delete_property(prop_names);
         })
-        .def("_delete_property", [] (Tango::AttributeProxy& self, Tango::DbData& db) -> void {
+        .def("_delete_property", [](Tango::AttributeProxy& self, Tango::DbData& db) -> void {
             self.delete_property(db);
         })
         //
         // Pickle
         //
         .def(py::pickle(
-            [](Tango::AttributeProxy &self) { //__getstate__
+            [](Tango::AttributeProxy& self) { //__getstate__
                 Tango::DeviceProxy* dp = self.get_device_proxy();
                 return py::make_tuple(dp->get_db_host() + ":" + dp->get_db_port() +
                         "/" + dp->dev_name() + "/" + self.name());

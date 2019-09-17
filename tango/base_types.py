@@ -335,29 +335,6 @@ def __doc_base_types():
         import tango
         __document_enum(tango, enum_name, desc)
 
-    document_enum("ExtractAs", """
-    Defines what will go into value field of DeviceAttribute, or what will
-    Attribute.get_write_value() return... Not all the possible values are valid
-    in all the cases.
-
-    Valid possible values are:
-
-        - Numpy    : Value will be stored in [value, w_value]. If the
-          attribute is an scalar, they will contain a value. If it's
-          an SPECTRUM or IMAGE it will be exported as a numpy array.
-        - Tuple    : Value will be stored in [value, w_value]. If the
-          attribute is an scalar, they will contain a value. If it's
-          an SPECTRUM or IMAGE it will be exported as a tuple or
-          tuple of tuples.
-        - List     : Value will be stored in [value, w_value]. If the
-          attribute is an scalar, they will contain a value. If it's
-          an SPECTRUM or IMAGE it will be exported as a list or list
-          of lists
-        - String   : The data will be stored 'as is', the binary data
-          as it comes from TangoC++ in 'value'.
-        - Nothing  : The value will not be extracted from DeviceAttribute
-    """)
-
     document_enum("CmdArgType", """
     An enumeration representing the command argument type.
 

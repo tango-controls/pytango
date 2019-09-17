@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -220,15 +220,6 @@ void export_base_types(py::module &m) {
     m.def("_get_tango_lib_release", &Tango::_convert_tango_lib_release);
 //    .def("raise_asynch_exception", &raise_asynch_exception);
 
-    py::enum_<PyTango::ExtractAs>(m, "ExtractAs")
-        .value("Numpy", PyTango::ExtractAsNumpy)
-        .value("ByteArray", PyTango::ExtractAsByteArray)
-        .value("Bytes", PyTango::ExtractAsBytes)
-        .value("Tuple", PyTango::ExtractAsTuple)
-        .value("List", PyTango::ExtractAsList)
-        .value("String", PyTango::ExtractAsString)
-        .value("Nothing", PyTango::ExtractAsNothing)
-    ;
 
     py::enum_<PyTango::GreenMode>(m, "GreenMode")
         .value("Synchronous", PyTango::GreenModeSynchronous)

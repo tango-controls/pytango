@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -21,7 +21,7 @@ namespace py = pybind11;
 namespace PyDeviceData {
 
 template <long tangoTypeConst>
-    void insert_scalar(Tango::DeviceData &self, py::object py_value)
+    void insert_scalar(Tango::DeviceData& self, py::object py_value)
     {
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
         TangoScalarType value = py_value.cast<TangoScalarType>();
@@ -29,14 +29,14 @@ template <long tangoTypeConst>
     }
 
     template <>
-    void insert_scalar<Tango::DEV_STRING>(Tango::DeviceData &self, py::object py_value)
+    void insert_scalar<Tango::DEV_STRING>(Tango::DeviceData& self, py::object py_value)
     {
         std::string val_str = py_value.cast<std::string>();
         self << val_str;
     }
 
     template <>
-    void insert_scalar<Tango::DEV_ENCODED>(Tango::DeviceData &self, py::object py_value)
+    void insert_scalar<Tango::DEV_ENCODED>(Tango::DeviceData& self, py::object py_value)
     {
         assert(false);
 //        object p0 = py_value[0];
@@ -53,19 +53,19 @@ template <long tangoTypeConst>
     }
 
     template <>
-    void insert_scalar<Tango::DEV_VOID>(Tango::DeviceData &self, py::object py_value)
+    void insert_scalar<Tango::DEV_VOID>(Tango::DeviceData& self, py::object py_value)
     {
         raise_(PyExc_TypeError, "Trying to insert a value in a DEV_VOID DeviceData!");
     }
 
     template <>
-    void insert_scalar<Tango::DEV_PIPE_BLOB>(Tango::DeviceData &self, py::object py_value)
+    void insert_scalar<Tango::DEV_PIPE_BLOB>(Tango::DeviceData& self, py::object py_value)
     {
         assert(false);
     }
 
     template <long tangoArrayTypeConst>
-    void insert_array(Tango::DeviceData &self, py::object py_value)
+    void insert_array(Tango::DeviceData& self, py::object py_value)
     {
         typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
 
@@ -81,7 +81,7 @@ template <long tangoTypeConst>
     }
 
     template <long tangoTypeConst>
-    py::object extract_scalar(Tango::DeviceData &self)
+    py::object extract_scalar(Tango::DeviceData& self)
     {
         typedef typename TANGO_const2type(tangoTypeConst)TangoScalarType;
         /// @todo CONST_DEV_STRING ell el tracta com DEV_STRING
@@ -91,26 +91,26 @@ template <long tangoTypeConst>
     }
 
     template<>
-    py::object extract_scalar<Tango::DEV_VOID>(Tango::DeviceData &self) {
+    py::object extract_scalar<Tango::DEV_VOID>(Tango::DeviceData& self) {
         assert(false);
         return py::none();
     }
 
     template<>
-    py::object extract_scalar<Tango::DEV_STRING>(Tango::DeviceData &self) {
+    py::object extract_scalar<Tango::DEV_STRING>(Tango::DeviceData& self) {
         std::string val;
         self >> val;
         return py::str(val);
     }
 
     template<>
-    py::object extract_scalar<Tango::DEV_PIPE_BLOB>(Tango::DeviceData &self) {
+    py::object extract_scalar<Tango::DEV_PIPE_BLOB>(Tango::DeviceData& self) {
         assert(false);
         return py::none();
     }
 
     template<long tangoArrayTypeConst>
-    py::object extract_array(Tango::DeviceData &self, PyTango::ExtractAs extract_as) {
+    py::object extract_array(Tango::DeviceData& self) {
         typedef typename TANGO_const2type(tangoArrayTypeConst)TangoArrayType;
 
         // const is the pointed, not the pointer. So cannot modify the data.
@@ -118,25 +118,11 @@ template <long tangoTypeConst>
         // This also means that we are not supposed to "delete" tmp_ptr.
         const TangoArrayType* tmp_ptr;
         self >> tmp_ptr;
-
-        switch (extract_as)
-        {
-            default:
-            case PyTango::ExtractAsNumpy:
-//                return to_py_numpy<tangoArrayTypeConst>(tmp_ptr, py_self);
-            case PyTango::ExtractAsList:
-            case PyTango::ExtractAsPyTango3:
-//            return to_py_list(tmp_ptr);
-            case PyTango::ExtractAsTuple:
-//            return to_py_tuple(tmp_ptr);
-            case PyTango::ExtractAsString:/// @todo
-            case PyTango::ExtractAsNothing:
-            return py::none();
-        }
+//        return to_py_numpy<tangoArrayTypeConst>(tmp_ptr, py_self);
     }
 
     template <>
-    py::object extract_array<Tango::DEVVAR_STATEARRAY>(Tango::DeviceData &self, PyTango::ExtractAs extract_as)
+    py::object extract_array<Tango::DEVVAR_STATEARRAY>(Tango::DeviceData& self)
     {
         assert(false);
         return py::none();
@@ -149,15 +135,15 @@ void export_device_data(py::module& m) {
         .def(py::init<>())
         .def(py::init<const Tango::DeviceData &>())
 
-        .def("extract", [](Tango::DeviceData& self, PyTango::ExtractAs extract_as) -> py::object {
+        .def("extract", [](Tango::DeviceData& self) -> py::object {
             TANGO_DO_ON_DEVICE_DATA_TYPE_ID(self.get_type(),
                     return PyDeviceData::extract_scalar<tangoTypeConst>(self);,
-                    return PyDeviceData::extract_array<tangoTypeConst>(self, extract_as);
+                    return PyDeviceData::extract_array<tangoTypeConst>(self);
             );
             return py::none();
         })
 
-        .def("insert", [](Tango::DeviceData &self, const long data_type, py::object py_value) -> void {
+        .def("insert", [](Tango::DeviceData& self, const long data_type, py::object py_value) -> void {
                 TANGO_DO_ON_DEVICE_DATA_TYPE_ID(data_type,
                 PyDeviceData::insert_scalar<tangoTypeConst>(self, py_value);,
                 PyDeviceData::insert_array<tangoTypeConst>(self, py_value);
@@ -165,7 +151,7 @@ void export_device_data(py::module& m) {
         })
         /// @todo do not throw exceptions!!
         .def("is_empty", &Tango::DeviceData::is_empty)
-        .def("get_type", [](Tango::DeviceData &self) {
+        .def("get_type", [](Tango::DeviceData& self) {
             /// @todo This should change in Tango itself, get_type should not return int!!
             return static_cast<Tango::CmdArgType>(self.get_type());
         })

@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -12,6 +12,8 @@
 #include <tango.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include "tgutils.h"
+//#include "wattribute_numpy.hpp"
 
 namespace py = pybind11;
 
@@ -49,60 +51,52 @@ namespace py = pybind11;
 //            o.str(),
 //            method);
 //}
-//
-//namespace PyWAttribute
-//{
-///// @name Min/Max value
-///// @{
-//    template<long tangoTypeConst>
-//    PyObject* __get_min_value(Tango::WAttribute &att)
-//    {
-//        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-//
-//        TangoScalarType tg_val;
-//        att.get_min_value(tg_val);
-//        boost::python::object py_value(tg_val);
-//
-//        return boost::python::incref(py_value.ptr());
-//    }
-//
-//    PyObject *get_min_value(Tango::WAttribute &att)
-//    {
-//        long type = att.get_data_type();
-//
-//        if(type == Tango::DEV_ENCODED)
-//            type = Tango::DEV_UCHAR;
-//
-//        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_min_value, att);
-//        return 0;
-//    }
-//
-//    template<long tangoTypeConst>
-//    PyObject* __get_max_value(Tango::WAttribute &att)
-//    {
-//        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-//
-//        TangoScalarType tg_val;
-//        att.get_max_value(tg_val);
-//        boost::python::object py_value(tg_val);
-//        return boost::python::incref(py_value.ptr());
-//    }
-//
-//    PyObject *get_max_value(Tango::WAttribute &att)
-//    {
-//        long type = att.get_data_type();
-//
-//        if(type == Tango::DEV_ENCODED)
-//            type = Tango::DEV_UCHAR;
-//
-//        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_max_value, att);
-//        return 0;
-//    }
-//
+
+namespace PyWAttribute
+{
+    template<long tangoTypeConst>
+    py::object __get_min_value(Tango::WAttribute &self)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+        TangoScalarType tg_val;
+        self.get_min_value(tg_val);
+        py::object py_value = py::cast(tg_val);
+        return py_value;
+    }
+
+    py::object get_min_value(Tango::WAttribute& self)
+    {
+        long type = self.get_data_type();
+        if(type == Tango::DEV_ENCODED)
+            type = Tango::DEV_UCHAR;
+
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_min_value, self);
+    }
+
+    template<long tangoTypeConst>
+    py::object __get_max_value(Tango::WAttribute &self)
+    {
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+
+        TangoScalarType tg_val;
+        self.get_max_value(tg_val);
+        py::object py_value = py::cast(tg_val);
+        return py_value;
+    }
+
+    py::object get_max_value(Tango::WAttribute& self)
+    {
+        long type = self.get_data_type();
+        if(type == Tango::DEV_ENCODED)
+            type = Tango::DEV_UCHAR;
+
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_max_value, self);
+    }
+
 //#if TgLibVersNb >= 80100 // set_min_value
 //
 //    template<long tangoTypeConst>
-//    inline void _set_min_value(Tango::WAttribute &self, boost::python::object value)
+//    inline void _set_min_value(Tango::WAttribute& self, boost::python::object value)
 //    {
 //        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
 //        TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
@@ -112,14 +106,14 @@ namespace py = pybind11;
 //#else // set_min_value
 //
 //    template<typename TangoScalarType>
-//    inline void __set_min_value(Tango::WAttribute &self, boost::python::object value)
+//    inline void __set_min_value(Tango::WAttribute& self, boost::python::object value)
 //    {
 //        TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
 //        self.set_min_value(c_value);
 //    }
 //
 //    template<>
-//    inline void __set_min_value<Tango::DevEncoded>(Tango::WAttribute &self, boost::python::object value)
+//    inline void __set_min_value<Tango::DevEncoded>(Tango::WAttribute& self, boost::python::object value)
 //    {
 //        string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
 //        Tango::Except::throw_exception((const char *)"API_MethodArgument",
@@ -128,16 +122,16 @@ namespace py = pybind11;
 //    }
 //
 //    template<long tangoTypeConst>
-//    inline void _set_min_value(Tango::WAttribute &self, boost::python::object value)
+//    inline void _set_min_value(Tango::WAttribute& self, boost::python::object value)
 //    {
 //        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
 //        __set_min_value<TangoScalarType>(self,value);
 //    }
 //
 //#endif // set_min_value
-//
-//    inline void set_min_value(Tango::WAttribute &self, boost::python::object value)
-//    {
+
+    inline void set_min_value(Tango::WAttribute& self, py::object& value)
+    {
 //        bopy::extract<string> value_convert(value);
 //
 //        if (value_convert.check())
@@ -156,12 +150,12 @@ namespace py = pybind11;
 //
 //            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, _set_min_value, self, value);
 //        }
-//    }
-//
+    }
+
 //#if TgLibVersNb >= 80100 // set_max_value
 //
 //    template<long tangoTypeConst>
-//    inline void _set_max_value(Tango::WAttribute &self, boost::python::object value)
+//    inline void _set_max_value(Tango::WAttribute& self, boost::python::object value)
 //    {
 //        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
 //        TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
@@ -171,14 +165,14 @@ namespace py = pybind11;
 //#else // set_max_value
 //
 //    template<typename TangoScalarType>
-//    inline void __set_max_value(Tango::WAttribute &self, boost::python::object value)
+//    inline void __set_max_value(Tango::WAttribute& self, boost::python::object value)
 //    {
 //        TangoScalarType c_value = boost::python::extract<TangoScalarType>(value);
 //        self.set_max_value(c_value);
 //    }
 //
 //    template<>
-//    inline void __set_max_value<Tango::DevEncoded>(Tango::WAttribute &self, boost::python::object value)
+//    inline void __set_max_value<Tango::DevEncoded>(Tango::WAttribute& self, boost::python::object value)
 //    {
 //        string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
 //        Tango::Except::throw_exception((const char *)"API_MethodArgument",
@@ -187,16 +181,16 @@ namespace py = pybind11;
 //    }
 //
 //    template<long tangoTypeConst>
-//    inline void _set_max_value(Tango::WAttribute &self, boost::python::object value)
+//    inline void _set_max_value(Tango::WAttribute& self, boost::python::object value)
 //    {
 //        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
 //        __set_max_value<TangoScalarType>(self,value);
 //    }
 //
 //#endif // set_max_value
-//
-//    inline void set_max_value(Tango::WAttribute &self, boost::python::object value)
-//    {
+
+    inline void set_max_value(Tango::WAttribute& self, py::object& value)
+    {
 //        bopy::extract<string> value_convert(value);
 //
 //        if (value_convert.check())
@@ -215,12 +209,8 @@ namespace py = pybind11;
 //
 //            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, _set_max_value, self, value);
 //        }
-//    }
-///// @}
-//
-///// @name set_write_value
-///// @{
-//
+    }
+
 //    template<long tangoTypeConst>
 //    inline void __set_write_value_scalar(Tango::WAttribute &att,
 //                                         boost::python::object &value)
@@ -357,16 +347,16 @@ namespace py = pybind11;
 //                "set_write_value is not supported for DEV_ENCODED attributes.",
 //                "set_write_value()");
 //    }
-//
-//    inline void set_write_value(Tango::WAttribute &att, boost::python::object &value)
-//    {
-//        long type = att.get_data_type();
-//        Tango::AttrDataFormat format = att.get_data_format();
+
+    inline void set_write_value(Tango::WAttribute& self, py::object& value)
+    {
+        long type = self.get_data_type();
+        Tango::AttrDataFormat format = self.get_data_format();
 //
 //        if (format == Tango::SCALAR)
 //        {
 //            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __set_write_value_scalar,
-//                                              att, value);
+//                                              self, value);
 //        }
 //        else
 //        {
@@ -384,16 +374,16 @@ namespace py = pybind11;
 //            }
 //            long size = static_cast<long>(PySequence_Size(value.ptr()));
 //            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __set_write_value_array,
-//                                              att, value, size, 0);
+//                                              self, value, size, 0);
 //        }
-//    }
-//
-//    inline void set_write_value(Tango::WAttribute &att,
-//                                boost::python::object &value,
-//                                long x)
-//    {
-//        long type = att.get_data_type();
-//        Tango::AttrDataFormat format = att.get_data_format();
+    }
+
+    inline void set_write_value(Tango::WAttribute& self,
+                                py::object& value,
+                                long x)
+    {
+        long type = self.get_data_type();
+        Tango::AttrDataFormat format = self.get_data_format();
 //
 //        if (format == Tango::SCALAR)
 //        {
@@ -422,16 +412,16 @@ namespace py = pybind11;
 //                        "set_write_value()");
 //            }
 //            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __set_write_value_array,
-//                                              att, value, x, 0);
+//                                              self, value, x, 0);
 //        }
-//    }
-//
-//    inline void set_write_value(Tango::WAttribute &att,
-//                                boost::python::object &value,
-//                                long x, long y)
-//    {
-//        long type = att.get_data_type();
-//        Tango::AttrDataFormat format = att.get_data_format();
+    }
+
+    inline void set_write_value(Tango::WAttribute& self,
+                                py::object& value,
+                                long x, long y)
+    {
+        long type = self.get_data_type();
+        Tango::AttrDataFormat format = self.get_data_format();
 //
 //        if (format == Tango::SCALAR)
 //        {
@@ -460,20 +450,13 @@ namespace py = pybind11;
 //                        (const char *)"set_write_value()");
 //            }
 //            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __set_write_value_array,
-//                                              att, value, x, y);
+//                                              self, value, x, y);
 //        }
-//    }
-//
-///// @}
-//
-//
-///// @name get_write_value
-///// @{
-//
-//    //
-//    // PyTango 3 compatibility
-//    //
-//
+    }
+    //
+    // PyTango 3 compatibility
+    //
+
 //    template<long tangoTypeConst>
 //    void __get_write_value_pytango3(Tango::WAttribute &att, boost::python::list &seq)
 //    {
@@ -645,93 +628,65 @@ namespace py = pybind11;
 //        }
 //        *obj = result;
 //    }
-//
-///// @}
-//}
-//
-//#ifndef DISABLE_PYTANGO_NUMPY
-//#   include "wattribute_numpy.hpp"
-//#endif
-//
-//
-//namespace PyWAttribute
-//{
-//
-///// @name get_write_value
-///// @{
-//    inline boost::python::object get_write_value(Tango::WAttribute &att, PyTango::ExtractAs extract_as)
-//    {
-//        long type = att.get_data_type();
-//        boost::python::object value;
-//
-//        Tango::AttrDataFormat fmt = att.get_data_format();
-//
-//        const bool isScalar = fmt == Tango::SCALAR;
+
+    inline py::object get_write_value(Tango::WAttribute& self)
+    {
+        long type = self.get_data_type();
+        py::object value;
+
+        Tango::AttrDataFormat fmt = self.get_data_format();
+        const bool isScalar = fmt == Tango::SCALAR;
 //
 //        if (isScalar) {
-//            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __get_write_value_scalar, att, &value);
+//            TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, __get_write_value_scalar, self, &value);
 //        } else {
-//            switch (extract_as) {
-//                case PyTango::ExtractAsPyTango3: {
-//                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type,
-//                        __get_write_value_array_pytango3, att, &value);
-//                    break;
-//                }
-//                case PyTango::ExtractAsNumpy: {
-//#               ifndef DISABLE_PYTANGO_NUMPY
-//                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type,
-//                        __get_write_value_array_numpy, att, &value);
-//                    break;
-//#               endif
-//                }
-//                case PyTango::ExtractAsList: {
-//                    TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type,
-//                        __get_write_value_array_lists, att, &value);
-//                    break;
-//                }
-//                default:
-//                    Tango::Except::throw_exception(
-//                            "PyDs_WrongParameterValue",
-//                            "This extract method is not supported by the function.",
-//                            "PyWAttribute::get_write_value()");
-//            }
+//              TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type,
+//              __get_write_value_array_numpy, self, &value);
+//              break;
 //        }
-//        return value;
-//    }
-//
-///// @}
-//
-//};
-//
-
+        return value;
+    }
+};
 
 void export_wattribute(py::module& m) {
-//TODO  boost::noncopyable
     py::class_<Tango::WAttribute, Tango::Attribute>(m, "WAttribute")
-//        .def("get_min_value", (PyObject* (*) (Tango::WAttribute &))
-//            &PyWAttribute::get_min_value)
-//        .def("get_max_value", (PyObject* (*) (Tango::WAttribute &))
-//            &PyWAttribute::get_max_value)
-//        .def("set_min_value", &PyWAttribute::set_min_value)
-//        .def("set_max_value", &PyWAttribute::set_max_value)
-        .def("is_min_value", &Tango::WAttribute::is_min_value)
-        .def("is_max_value", &Tango::WAttribute::is_max_value)
-//        .def("get_write_value_length", &Tango::WAttribute::get_write_value_length)
-//        .def("set_write_value", (void (*) (Tango::WAttribute &, py::object &))
-//            &PyWAttribute::set_write_value)
-//        .def("set_write_value", (void (*) (Tango::WAttribute &, py::object &, long))
-//            &PyWAttribute::set_write_value)
-//        .def("set_write_value", (void (*) (Tango::WAttribute &, py::object &, long, long))
-//            &PyWAttribute::set_write_value)
-//
-//        // old style get_write_value
-//        .def("get_write_value",
-//            &PyWAttribute::get_write_value_pytango3,
-//            ( arg_("self"), arg_("empty_list")))
-//
-//        // new style get_write_value
-//        .def("get_write_value",
-//            &PyWAttribute::get_write_value,
-//            ( arg_("self"), arg_("extract_as")=PyTango::ExtractAsNumpy ))
-    ;
+        .def("get_min_value", [](Tango::WAttribute& self) -> py::object {
+            return PyWAttribute::get_min_value(self);
+        })
+        .def("get_max_value", [](Tango::WAttribute& self) -> py::object {
+            return PyWAttribute::get_max_value(self);
+        })
+        .def("set_min_value", [](Tango::WAttribute& self, py::object& min_value) -> void {
+            PyWAttribute::set_min_value(self, min_value);
+        })
+        .def("set_max_value", [](Tango::WAttribute& self, py::object& max_value) -> void {
+            PyWAttribute::set_max_value(self, max_value);
+        })
+        .def("is_min_value", [](Tango::WAttribute& self) -> bool {
+            return self.is_min_value();
+        })
+        .def("is_max_value", [](Tango::WAttribute& self) -> bool {
+            return self.is_max_value();
+        })
+        .def("get_write_value_length", [](Tango::WAttribute& self) -> long {
+            return self.get_write_value_length();
+        })
+        .def("set_write_value", [](Tango::WAttribute& self, py::object& value) -> void {
+            PyWAttribute::set_write_value(self, value);
+        })
+        .def("set_write_value", [](Tango::WAttribute& self, py::object& value, long x) -> void {
+            PyWAttribute::set_write_value(self, value, x);
+        })
+        .def("set_write_value", [](Tango::WAttribute& self, py::object& value, long x, long y) -> void {
+            PyWAttribute::set_write_value(self, value, x, y);
+        })
+        // new style get_write_value
+        .def("get_write_value", [](Tango::WAttribute& self) -> py::object {
+            return PyWAttribute::get_write_value(self);
+        })
+        // old style get_write_value
+        //.def("get_write_value",
+        //    &PyWAttribute::get_write_value_pytango3,
+        //    ( arg_("self"), arg_("empty_list")))
+  ;
 }

@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -35,7 +35,7 @@ public:
 
 //    std::unique_ptr<PyObject> m_cbk;
 
-    //    void set_extract_as(PyTango::ExtractAs extract_as);
+    //    void set_extract_as();
     void set_callback(py::object callback);
     void set_weak_parent(py::object parent);
 
@@ -45,7 +45,6 @@ public:
     //! monitor if it disappears, we are not needed anymore.
     PyObject* m_weak_parent;
 
-    PyTango::ExtractAs m_extract_as;
     py::object m_callback;
 
     static std::map<int, CallBackAutoDie*> s_weak2ob;
@@ -68,7 +67,6 @@ public:
     virtual ~CallBackPushEvent();
 
     void set_device(Tango::DeviceProxy& dp);
-    void set_extract_as(PyTango::ExtractAs extract_as);
 
     virtual void push_event(Tango::EventData* ev);
     virtual void push_event(Tango::AttrConfEventData* ev);
@@ -76,13 +74,12 @@ public:
     virtual void push_event(Tango::PipeEventData* ev);
     virtual void push_event(Tango::DevIntrChangeEventData* ev);
 
-    static void fill_py_event(Tango::EventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as);
-    static void fill_py_event(Tango::AttrConfEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as);
-    static void fill_py_event(Tango::DataReadyEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as);
-    static void fill_py_event(Tango::PipeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as);
-    static void fill_py_event(Tango::DevIntrChangeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as);
+    static void fill_py_event(Tango::EventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device);
+    static void fill_py_event(Tango::AttrConfEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device);
+    static void fill_py_event(Tango::DataReadyEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device);
+    static void fill_py_event(Tango::PipeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device);
+    static void fill_py_event(Tango::DevIntrChangeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device);
 
-    PyTango::ExtractAs m_extract_as;
     Tango::DeviceProxy m_device;
     py::object m_callback;
 };

@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -213,18 +213,7 @@ public:
  *
  * @return returns true is the method exists or false otherwise
  */
-bool is_method_defined(py::object &obj, const std::string& method_name);
-
-/**
- * Determines if the given method name exists and is callable
- * within the python class
- *
- * @param[in] obj object to search for the method
- * @param[in] method_name the name of the method
- *
- * @return returns true is the method exists or false otherwise
- */
-bool is_method_defined(PyObject *obj, const std::string& method_name);
+bool is_method_defined(py::object& obj, const std::string& method_name);
 
 /**
  * Determines if the given method name exists and is callable
@@ -236,21 +225,24 @@ bool is_method_defined(PyObject *obj, const std::string& method_name);
  * @param[out] is_method set to true if the symbol exists and is a method
  *             or false otherwise
  */
-void is_method_defined(PyObject *obj, const std::string& method_name,
+void is_method_defined(py::object& obj, const std::string& method_name,
                        bool &exists, bool &is_method);
 
-/**
- * Determines if the given method name exists and is callable
- * within the python class
- *
- * @param[in] obj object to search for the method
- * @param[in] method_name the name of the method
- * @param[out] exists set to true if the symbol exists or false otherwise
- * @param[out] is_method set to true if the symbol exists and is a method
- *             or false otherwise
- */
-void is_method_defined(py::object &obj, const std::string& method_name,
-                       bool &exists, bool &is_method);
+inline bool is_method_callable(py::object& obj, const std::string& method_name)
+{
+    std::cout << "is method_callable " << std::endl;
+    PyObject *meth = PyObject_GetAttrString_(obj.ptr(), method_name.c_str());
+    bool exists = (NULL != meth);
+    if (!exists)
+    {
+        PyErr_Clear();
+        return false;
+    }
+    bool callable = (1 == PyCallable_Check(meth));
+    Py_DECREF(meth);
+    std::cout << "leaving is method_callable " << callable << std::endl;
+    return callable;
+}
 
 #define PYTANGO_MOD \
     py::object pytango((py::cast(PyImport_AddModule("tango"))));
@@ -258,25 +250,3 @@ void is_method_defined(py::object &obj, const std::string& method_name,
 #define CALL_METHOD(retType, self, name, ...) \
     py::call_method<retType>(self, name , __VA_ARGS__);
 
-
-//bool hasattr(py::object &, const std::string& );
-
-inline bool is_method_callable(py::object& obj, const std::string& method_name)
-{
-    bool ret = false;
-    std::cout << "is method_callable" << std::endl;
-    try {
-        ret = PyObject_HasAttrString(obj.ptr(), method_name.c_str());
-    } catch (...) {
-        // do nothing method does not exist
-    }
-    std::cout << ret << std::endl;
-//    if (hasattr(obj, method_name))
-//    {
-//        py::object meth = obj.attr(method_name.c_str());
-//        if (PyCallable_Check(meth.ptr()))
-//            return true;
-//    }
-    std::cout << "leaving is method_callable " << ret << std::endl;
-    return ret;
-}

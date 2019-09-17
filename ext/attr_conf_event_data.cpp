@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -39,7 +39,7 @@ void export_attr_conf_event_data(py::module &m) {
         .def_readwrite("reception_date", &Tango::AttrConfEventData::reception_date)
         .def_property("errors", [](){
             return &Tango::DataReadyEventData::errors;
-        },[](Tango::AttrConfEventData &event_data, py::object &dev_failed) {
+        },[](Tango::AttrConfEventData &event_data, py::object& dev_failed) {
                 py::object errors = dev_failed.attr("args");
                 sequencePyDevError_2_DevErrorList(errors, event_data.errors);
         })

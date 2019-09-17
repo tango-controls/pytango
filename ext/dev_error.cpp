@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -18,21 +18,21 @@ namespace py = pybind11;
 void export_dev_error(py::module &m)
 {
     py::class_<Tango::DevError>(m, "DevError")
-        .def_property("reason", [](Tango::DevError &self) {
+        .def_property("reason", [](Tango::DevError& self) {
                 return py::str(self.reason);
-        }, [](Tango::DevError &self, std::string& res) {
+        }, [](Tango::DevError& self, std::string& res) {
             // strdup here cos its a crappy corba string
             self.reason = ::strdup(res.c_str());
         })
         .def_readwrite("severity", &Tango::DevError::severity)
-        .def_property("desc", [](Tango::DevError &self) {
+        .def_property("desc", [](Tango::DevError& self) {
                 return py::str(self.desc);
-        }, [](Tango::DevError &self, std::string& des) {
+        }, [](Tango::DevError& self, std::string& des) {
             self.desc = ::strdup(des.c_str());
         })
-        .def_property("origin", [](Tango::DevError &self) {
+        .def_property("origin", [](Tango::DevError& self) {
                 return py::str(self.origin);
-        }, [](Tango::DevError &self, std::string& orig) {
+        }, [](Tango::DevError& self, std::string& orig) {
             self.origin = ::strdup(orig.c_str());
         })
         .def(py::pickle(

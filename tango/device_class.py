@@ -32,8 +32,8 @@ from .utils import document_method as __document_method
 
 from .globals import get_class, get_class_by_class, \
     get_constructed_class_by_class
-#from .attr_data import AttrData
-#from .pipe_data import PipeData
+from .attr_data import AttrData
+from .pipe_data import PipeData
 
 
 class PropUtil:
@@ -336,16 +336,16 @@ def __DeviceClass__create_user_default_attr_prop(self, attr_name, extra_info):
 
 def __DeviceClass__attribute_factory(self, attr_list):
     """for internal usage only"""
-    print(attr_list)
+    print("python_DeviceClass__attribute_factory ", attr_list)
     for attr_name, attr_info in self.attr_list.items():
         if isinstance(attr_info, AttrData):
             attr_data = attr_info
         else:
             attr_data = AttrData(attr_name, self.get_name(), attr_info)
         if attr_data.forward:
-            self._create_fwd_attribute(attr_list, attr_data.name, attr_data.att_prop)
+            attr = self._create_fwd_attribute(attr_data.name, attr_data.att_prop)
         else:
-            self._create_attribute(attr_list, attr_data.attr_name,
+            attr = self._create_attribute(attr_data.attr_name,
                                    attr_data.attr_type,
                                    attr_data.attr_format,
                                    attr_data.attr_write,
@@ -358,6 +358,8 @@ def __DeviceClass__attribute_factory(self, attr_list):
                                    attr_data.write_method_name,
                                    attr_data.is_allowed_name,
                                    attr_data.att_prop)
+        attr_list.append(attr)
+    return attr_list
 
 
 def __DeviceClass__pipe_factory(self, pipe_list):
@@ -367,13 +369,21 @@ def __DeviceClass__pipe_factory(self, pipe_list):
             pipe_data = pipe_info
         else:
             pipe_data = PipeData(pipe_name, self.get_name(), pipe_info)
-        self._create_pipe(pipe_list, pipe_data.pipe_name,
+        print("here in _pipe_factory")
+        print(type(pipe_list))
+        print(pipe_list.__repr__)
+        pipe = self._create_pipe(#pipe_list,
+                          pipe_data.pipe_name,
                           pipe_data.pipe_write,
                           pipe_data.display_level,
                           pipe_data.read_method_name,
                           pipe_data.write_method_name,
                           pipe_data.is_allowed_name,
                           pipe_data.pipe_prop)
+        print(pipe.__repr__)
+        pipe_list.append(pipe)
+    print(pipe_list)
+    return pipe_list
 
 
 def __DeviceClass__command_factory(self):
@@ -576,8 +586,6 @@ def __DeviceClass__device_factory(self, device_list):
     tmp_dev_list = []
     for dev_name in device_list:
         print("got here ready to export", dev_name, klass, klass_name)
-#        import pdb
-#        pdb.set_trace()
         device = self._new_device(deviceImplClass, klass, dev_name)
         print("got here4 ready to export")
         self._add_device(device)

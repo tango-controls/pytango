@@ -19,7 +19,6 @@ void export_archive_event_info(py::module &m) {
         .def_readwrite("archive_rel_change", &Tango::ArchiveEventInfo::archive_rel_change)
         .def_readwrite("archive_abs_change", &Tango::ArchiveEventInfo::archive_abs_change)
         .def_readwrite("archive_period", &Tango::ArchiveEventInfo::archive_period)
-
         .def_property("extensions", [](Tango::ArchiveEventInfo& self) -> py::list {
             py::list py_list;
             for(auto& item : self.extensions)
@@ -29,7 +28,6 @@ void export_archive_event_info(py::module &m) {
             for(auto& item : py_list)
                 self.extensions.push_back(item.cast<std::string>());
         })
-
         .def(py::pickle(
             [](const Tango::ArchiveEventInfo &p) { //__getstate__
                 return py::make_tuple(p.archive_rel_change,

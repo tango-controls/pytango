@@ -53,6 +53,7 @@ assert info.out_type == tango.CmdArgType.DevDouble
 assert info.in_type_desc == u'Any DevDouble value'
 assert info.out_type_desc == u'Echo of the argin value'
 assert info.disp_level == tango.DispLevel.OPERATOR
+print("1")
 
 info_list = dp.get_command_config(['DevDouble', 'DevLong64', 'DevVarShortArray'])
 assert len(info_list) == 3
@@ -74,6 +75,7 @@ assert info_list[2].out_type == tango.CmdArgType.DevVarShortArray
 assert info_list[2].in_type_desc == u'-'
 assert info_list[2].out_type_desc == u'-'
 assert info_list[2].disp_level == tango.DispLevel.OPERATOR
+print("2")
 
 info = dp.command_query('DevDouble')
 assert info.cmd_name == u'DevDouble'
@@ -82,6 +84,7 @@ assert info.out_type == tango.CmdArgType.DevDouble
 assert info.in_type_desc == u'Any DevDouble value'
 assert info.out_type_desc == u'Echo of the argin value'
 assert info.disp_level == tango.DispLevel.OPERATOR
+print("3")
 
 cmd_info_list = dp.command_list_query()
 assert len(cmd_info_list) == 30
@@ -92,12 +95,14 @@ assert info.out_type == tango.CmdArgType.DevDouble
 assert info.in_type_desc == u'Any DevDouble value'
 assert info.out_type_desc == u'Echo of the argin value'
 assert info.disp_level == tango.DispLevel.OPERATOR
+print("4")
 
 info = dp.import_info()
 assert info.name == 'sys/tg_test/1'
 assert info.exported == 1
 assert info.ior[:4] == 'IOR:'
 assert info.version == '5'
+print("5")
 
 db_datum = DbDatum('test')
 db_datum.value_string = ['3.142']

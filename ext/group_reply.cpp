@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -29,15 +29,14 @@ void export_group_reply(py::module &m) {
     ;
 
     py::class_<Tango::GroupAttrReply, Tango::GroupReply>(m, "GroupAttrReply")
-//        .def("__get_data", [](Tango::GroupAttrReply& self,
-//                PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy) -> py::object {
+//        .def("__get_data", [](Tango::GroupAttrReply& self) -> py::object {
 //                // Usually we pass a device_proxy to "convert_to_python" in order to
 //                // get the data_format of the DeviceAttribute for Tango versions
 //                // older than 7.0. However, GroupAttrReply has no device_proxy to use!
 //                // So, we are using update_data_format() in:
 //                //       GroupElement::read_attribute_reply/read_attributes_reply
 ////                return PyDeviceAttribute::convert_to_python(
-////                return new Tango::DeviceAttribute(self.get_data()); //, extract_as );
+////                return new Tango::DeviceAttribute(self.get_data());
 //                return (py::object)nullptr;
 //        })
     ;

@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -22,14 +22,11 @@ namespace PyTango
 { 
     namespace DevicePipe 
     {
-        py::object extract(Tango::DevicePipe& device_pipe,
-            PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy);
+        py::object extract(Tango::DevicePipe& device_pipe);
 
-        py::object extract(Tango::DevicePipeBlob& blob,
-                PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy);
+        py::object extract(Tango::DevicePipeBlob& blob);
 
-        void update_values(Tango::DevicePipe& self, py::object& py_value,
-                      PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy);
+        void update_values(Tango::DevicePipe& self, py::object& py_value);
 
         /// @param self The DevicePipe instance that the new python object
         /// will represent. It must be allocated with new. The new python object
@@ -38,7 +35,7 @@ namespace PyTango
         /// responsibility of destroying it will already be in py_value side or
         /// the object will already be destroyed.
         template<typename TDevicePipe>
-        py::object convert_to_python(TDevicePipe* self, PyTango::ExtractAs extract_as)
+        py::object convert_to_python(TDevicePipe* self)
         {
             py::object py_value;
             try 
@@ -54,7 +51,7 @@ namespace PyTango
                 throw;
             }
 
-            update_values(*self, py_value, extract_as);
+            update_values(*self, py_value);
             return py_value;
         }
     } 

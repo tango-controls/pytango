@@ -2,7 +2,7 @@
 0  This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -23,13 +23,13 @@ namespace py = pybind11;
 namespace PyDeviceAttribute {
 
 //    template<long tangoTypeConst> static
-//    void _update_array_values_as_tuples(Tango::DeviceAttribute &self, bool isImage, py::object py_value);
+//    void _update_array_values_as_tuples(Tango::DeviceAttribute& self, bool isImage, py::object py_value);
 
 //    /// Set the value of a DeviceAttribute from python (useful for write*)
     void reset(Tango::DeviceAttribute& self, const Tango::AttributeInfo &attr_info, py::object py_value);
     void reset(Tango::DeviceAttribute & self, const std::string& attr_name, Tango::DeviceProxy &dev_proxy, py::object py_value);
 
-    void update_values(Tango::DeviceAttribute &self, py::object& py_value, PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy);
+    void update_values(Tango::DeviceAttribute& self, py::object& py_value);
 
     template<typename TDeviceAttribute>
     void update_data_format(Tango::DeviceProxy & dev_proxy, TDeviceAttribute* first, size_t nelems)
@@ -88,12 +88,12 @@ namespace PyDeviceAttribute {
     /// responsibility of destroying it will already be in py_value side or
     /// the object will already be destroyed.
     template<typename TDeviceAttribute>
-    py::object convert_to_python(TDeviceAttribute* dev_attr, PyTango::ExtractAs extract_as)
+    py::object convert_to_python(TDeviceAttribute* dev_attr)
     {
         py::object py_value;
         Tango::DeviceAttribute result = std::move(*dev_attr);
         py_value = py::cast(result);
-        update_values(result, py_value, extract_as);
+        update_values(result, py_value);
         return py_value;
     }
 
@@ -104,7 +104,7 @@ namespace PyDeviceAttribute {
     /// so the memory will finally be deleted.
     template<typename TDeviceAttribute>
     py::list convert_to_python(const std::unique_ptr<std::vector<TDeviceAttribute> >& dev_attr_vec,
-            Tango::DeviceProxy & dev_proxy, PyTango::ExtractAs extract_as) {
+            Tango::DeviceProxy & dev_proxy) {
         py::list ls;
         if (dev_attr_vec->empty()) {
             return ls;
@@ -114,7 +114,7 @@ namespace PyDeviceAttribute {
         // Convert the c++ vector of DeviceAttribute into a pythonic list
         typename std::vector<TDeviceAttribute>::const_iterator i, e = dev_attr_vec->end();
         for (i = dev_attr_vec->begin(); i != e; ++i)
-            ls.append(convert_to_python(new TDeviceAttribute(*i), extract_as));
+            ls.append(convert_to_python(new TDeviceAttribute(*i)));
         return ls;
     }
 
@@ -126,12 +126,11 @@ namespace PyDeviceAttribute {
     ///                 sent by older tango versions do not have all the
     ///                 necessary information to extract the values, so we
     ///                 may need to ask.
-    /// @param extract_as See ExtractAs enum.
     template<typename TDeviceAttribute>
-    py::object convert_to_python(TDeviceAttribute* dev_attr, Tango::DeviceProxy& dev_proxy, PyTango::ExtractAs extract_as)
+    py::object convert_to_python(TDeviceAttribute* dev_attr, Tango::DeviceProxy& dev_proxy)
     {
         update_data_format(dev_proxy, dev_attr, (size_t)1);
-        return convert_to_python(dev_attr, extract_as);
+        return convert_to_python(dev_attr);
     }
 
     template<long tangoTypeConst>

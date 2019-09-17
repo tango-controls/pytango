@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -46,7 +46,7 @@ namespace py = pybind11;
 // * @param[in] py_value python sequence object or a single string
 // * @param[out] result std string vector to be filled
 // */
-//void convert2array(const py::object &py_value, StdStringVector & result);
+//void convert2array(const py::object& py_value, StdStringVector & result);
 //
 ///**
 // * Converter from python sequence of characters to a Tango::DevVarCharArray
@@ -54,7 +54,7 @@ namespace py = pybind11;
 // * @param[in] py_value python sequence object or a single string
 // * @param[out] result Tango char array to be filled
 // */
-//void convert2array(const py::object &py_value, Tango::DevVarCharArray & result);
+//void convert2array(const py::object& py_value, Tango::DevVarCharArray & result);
 //
 ///**
 // * Converter from python sequence to a Tango CORBA sequence
@@ -63,7 +63,7 @@ namespace py = pybind11;
 // * @param[out] result CORBA sequence to be filled
 // */
 //template<typename TangoElementType>
-//void convert2array(const bopy::object &py_value, _CORBA_Sequence<TangoElementType> & result)
+//void convert2array(const bopy::object& py_value, _CORBA_Sequence<TangoElementType> & result)
 //{
 //    Py_ssize_t size = bopy::len(py_value);
 //    result.length(static_cast<CORBA::ULong>(size));
@@ -80,7 +80,7 @@ namespace py = pybind11;
  * @param[in] py_value python sequence object or a single string
  * @param[out] result Tango string array to be filled
  */
-void convert2array(const py::object &py_value, Tango::DevVarStringArray & result);
+void convert2array(const py::object& py_value, Tango::DevVarStringArray & result);
 
 inline void raise_convert2array_DevVarDoubleStringArray()
 {
@@ -96,7 +96,7 @@ inline void raise_convert2array_DevVarDoubleStringArray()
 // * @param[in] py_value python sequence object
 // * @param[out] result Tango array to be filled
 // */
-//void convert2array(const bopy::object &py_value, Tango::DevVarDoubleStringArray & result);
+//void convert2array(const bopy::object& py_value, Tango::DevVarDoubleStringArray & result);
 
 inline void raise_convert2array_DevVarLongStringArray()
 {
@@ -112,7 +112,7 @@ inline void raise_convert2array_DevVarLongStringArray()
  * @param[in] py_value python sequence object
  * @param[out] result Tango array to be filled
  */
-void convert2array(const py::object &py_value, Tango::DevVarLongStringArray & result);
+void convert2array(const py::object& py_value, Tango::DevVarLongStringArray & result);
 
 ///**
 // * Convert a python sequence into a C++ container
@@ -230,7 +230,7 @@ void convert2array(const py::object &py_value, Tango::DevVarLongStringArray & re
 //    SequenceT* m_seq;
 //    bool m_own;
 //    public:
-//    CSequenceFromPython(py::object &py_obj)
+//    CSequenceFromPython(py::object& py_obj)
 //    {
 ////        py::extract<SequenceT*> ext(py_obj);
 ////        if (ext.check()) {
@@ -267,19 +267,19 @@ void convert2array(const py::object &py_value, Tango::DevVarLongStringArray & re
 //    }
 //};
 
-//void from_py_object(bopy::object &, Tango::AttributeAlarm &);
-//void from_py_object(bopy::object &, Tango::ChangeEventProp &);
-//void from_py_object(bopy::object &, Tango::PeriodicEventProp &);
-//void from_py_object(bopy::object &, Tango::ArchiveEventProp &);
-//void from_py_object(bopy::object &, Tango::EventProperties &);
+//void from_py_object(bopy::object& , Tango::AttributeAlarm &);
+//void from_py_object(bopy::object& , Tango::ChangeEventProp &);
+//void from_py_object(bopy::object& , Tango::PeriodicEventProp &);
+//void from_py_object(bopy::object& , Tango::ArchiveEventProp &);
+//void from_py_object(bopy::object& , Tango::EventProperties &);
 //
-//void from_py_object(bopy::object &, Tango::AttributeConfig &);
-//void from_py_object(bopy::object &, Tango::AttributeConfig_2 &);
-//void from_py_object(bopy::object &, Tango::AttributeConfig_3 &);
-//void from_py_object(bopy::object &, Tango::AttributeConfig_5 &);
+//void from_py_object(bopy::object& , Tango::AttributeConfig &);
+//void from_py_object(bopy::object& , Tango::AttributeConfig_2 &);
+//void from_py_object(bopy::object& , Tango::AttributeConfig_3 &);
+//void from_py_object(bopy::object& , Tango::AttributeConfig_5 &);
 //
 //template<typename T>
-//void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_prop)
+//void from_py_object(bopy::object& py_obj, Tango::MultiAttrProp<T> &multi_attr_prop)
 //{
 //    multi_attr_prop.label = bopy::extract<string>(bopy::str(py_obj.attr("label")));
 //    multi_attr_prop.description = bopy::extract<string>(bopy::str(py_obj.attr("description")));
@@ -418,7 +418,7 @@ void convert2array(const py::object &py_value, Tango::DevVarLongStringArray & re
 //}
 //
 //template<>
-//inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::DevEncoded> &multi_attr_prop)
+//inline void from_py_object(bopy::object& py_obj, Tango::MultiAttrProp<Tango::DevEncoded> &multi_attr_prop)
 //{
 //    multi_attr_prop.label = bopy::extract<string>(bopy::str(py_obj.attr("label")));
 //    multi_attr_prop.description = bopy::extract<string>(bopy::str(py_obj.attr("description")));
@@ -557,7 +557,7 @@ void convert2array(const py::object &py_value, Tango::DevVarLongStringArray & re
 //}
 //
 //template<>
-//inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::DevString> &multi_attr_prop)
+//inline void from_py_object(bopy::object& py_obj, Tango::MultiAttrProp<Tango::DevString> &multi_attr_prop)
 //{
 //    string empty_str("");
 //
@@ -697,10 +697,10 @@ void convert2array(const py::object &py_value, Tango::DevVarLongStringArray & re
 //    }
 //}
 //
-//void from_py_object(bopy::object &, Tango::AttributeConfigList &);
-//void from_py_object(bopy::object &, Tango::AttributeConfigList_2 &);
-//void from_py_object(bopy::object &, Tango::AttributeConfigList_3 &);
-//void from_py_object(bopy::object &, Tango::AttributeConfigList_5 &);
+//void from_py_object(bopy::object& , Tango::AttributeConfigList &);
+//void from_py_object(bopy::object& , Tango::AttributeConfigList_2 &);
+//void from_py_object(bopy::object& , Tango::AttributeConfigList_3 &);
+//void from_py_object(bopy::object& , Tango::AttributeConfigList_5 &);
 //
-//void from_py_object(bopy::object &, Tango::PipeConfig &);
-//void from_py_object(bopy::object &, Tango::PipeConfigList &);
+//void from_py_object(bopy::object& , Tango::PipeConfig &);
+//void from_py_object(bopy::object& , Tango::PipeConfigList &);

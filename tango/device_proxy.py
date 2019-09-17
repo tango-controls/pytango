@@ -20,7 +20,7 @@ from ._tango import StdStringVector, DbData, DbDatum, AttributeInfo
 from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
 from ._tango import DeviceProxy, __CallBackAutoDie, __CallBackPushEvent
 from ._tango import EventType, DevFailed, Except
-from ._tango import ExtractAs, GreenMode
+from ._tango import GreenMode
 from ._tango import PipeInfo, PipeInfoList, constants
 from ._tango import CmdArgType, DevState
 
@@ -366,12 +366,11 @@ def __DeviceProxy__contains(self, key):
     return key.lower() in map(str.lower, self.get_attribute_list())
 
 
-def __DeviceProxy__read_attribute(self, value, extract_as=ExtractAs.Numpy):
-    return __check_read_attribute(self._read_attribute(value, extract_as))
+def __DeviceProxy__read_attribute(self, value):
+    return __check_read_attribute(self._read_attribute(value))
 
 
-def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None,
-                                          extract_as=ExtractAs.Numpy):
+def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None):
     """
     read_attributes_asynch( self, attr_names) -> int
 
@@ -387,7 +386,7 @@ def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None,
 
         New in PyTango 7.0.0
 
-    read_attributes_asynch( self, attr_names, callback, extract_as=Numpy) -> None
+    read_attributes_asynch( self, attr_names, callback) -> None
 
             Read asynchronously (push model) an attribute list.
 
@@ -396,7 +395,6 @@ def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None,
                 - callback   : (callable) This callback object should be an instance of a
                             user class with an attr_read() method. It can also
                             be any callable object.
-                - extract_as : (ExtractAs) Defaults to numpy.
         Return     : None
 
         Throws     : ConnectionFailed
@@ -504,16 +502,14 @@ def __DeviceProxy__write_attribute_asynch(self, attr_name, value, cb=None):
     return self.write_attributes_asynch([(attr_name, value)], cb)
 
 
-def __DeviceProxy__write_read_attribute(self, attr_name, value,
-                                        extract_as=ExtractAs.Numpy):
-    result = self._write_read_attribute(attr_name, value, extract_as)
+def __DeviceProxy__write_read_attribute(self, attr_name, value):
+    result = self._write_read_attribute(attr_name, value)
     return __check_read_attribute(result)
 
 
 def __DeviceProxy__write_read_attributes(self, name_val,
-                                         attr_read_names=None,
-                                         extract_as=ExtractAs.Numpy):
-    return self._write_read_attributes(name_val, extract_as)
+                                         attr_read_names=None):
+    return self._write_read_attributes(name_val)
 
 
 def __DeviceProxy__get_property(self, propname, value=None):
@@ -1130,7 +1126,6 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
                           seconds to subscribe for the specified event. At every
                           subscription retry, a callback is executed which contains
                           the corresponding exception
-            - extract_as : (ExtractAs)
             - green_mode : the corresponding green mode (default is GreenMode.Synchronous)
 
         Return     : An event id which has to be specified when unsubscribing
@@ -1210,7 +1205,6 @@ def __DeviceProxy__subscribe_event_global(self, event_type, cb,
 def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
                                           cb_or_queuesize,
                                           filters=[], stateless=False,
-                                          extract_as=ExtractAs.Numpy,
                                           green_mode=None):
 
     if isinstance(cb_or_queuesize, collections.Callable):
@@ -1294,9 +1288,9 @@ def __DeviceProxy__unsubscribe_event_all(self):
         self.__unsubscribe_event(event_id)
 
 
-def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractAs.Numpy):
+def __DeviceProxy__get_events(self, event_id, callback=None):
     """
-    get_events( event_id, callback=None, extract_as=Numpy) -> None
+    get_events( event_id, callback=None) -> None
 
         The method extracts all waiting events from the event reception buffer.
 
@@ -1317,8 +1311,6 @@ def __DeviceProxy__get_events(self, event_id, callback=None, extract_as=ExtractA
 
             - callback : (callable) Any callable object or any object with a "push_event"
                          method.
-
-            - extract_as: (ExtractAs)
 
         Return     : None
 
@@ -1375,9 +1367,11 @@ def __DeviceProxy__str(self):
     return "%s(%s)" % (info.dev_class, self.dev_name())
 
 
-def __DeviceProxy__read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy):
+def __DeviceProxy__read_pipe(self, pipe_name):
+    import pdb
+    pdb.set_trace()
     r = self.__read_pipe(pipe_name)
-    return r.extract(extract_as)
+    return r.extract()
 
 
 def __get_pipe_type_simple(obj):
@@ -1917,13 +1911,12 @@ def __doc_DeviceProxy():
     # set_attribute_config -> in code
 
     document_method("read_attribute", """
-    read_attribute(self, attr_name, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
+    read_attribute(self, attr_name, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
 
             Read a single attribute.
 
         Parameters :
             - attr_name  : (str) The name of the attribute to read.
-            - extract_as : (ExtractAs) Defaults to numpy.
             - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
                            (see :meth:`~tango.DeviceProxy.get_green_mode` and
                            :meth:`~tango.DeviceProxy.set_green_mode`).
@@ -1963,13 +1956,12 @@ def __doc_DeviceProxy():
     """)
 
     document_method("read_attributes", """
-    read_attributes(self, attr_names, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> sequence<DeviceAttribute>
+    read_attributes(self, attr_names, green_mode=None, wait=True, timeout=None) -> sequence<DeviceAttribute>
 
             Read the list of specified attributes.
 
         Parameters :
                 - attr_names : (sequence<str>) A list of attributes to read.
-                - extract_as : (ExtractAs) Defaults to numpy.
                 - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
                                (see :meth:`~tango.DeviceProxy.get_green_mode` and
                                :meth:`~tango.DeviceProxy.set_green_mode`).
@@ -2054,7 +2046,7 @@ def __doc_DeviceProxy():
     """)
 
     document_method("write_read_attribute", """
-    write_read_attribute(self, attr_name, value, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
+    write_read_attribute(self, attr_name, value, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
 
             Write then read a single attribute in a single network call.
             By default (serialisation by device), the execution of this call in
@@ -2077,7 +2069,7 @@ def __doc_DeviceProxy():
     """)
 
     document_method("write_read_attributes", """
-    write_read_attributes(self, name_val, attr_names=None, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
+    write_read_attributes(self, name_val, attr_names=None, green_mode=None, wait=True, timeout=None) -> DeviceAttribute
 
             Write then read attribute(s) in a single network call. By
             default (serialisation by device), the execution of this
@@ -2089,7 +2081,6 @@ def __doc_DeviceProxy():
         Parameters :
                 - name_val: A list of pairs (attr_name, value). See write_attribute
                 - attr_names : (sequence<str>) A list of attributes to read.(Ignored as of PyTango 9.2.5
-                - extract_as : (ExtractAs) Defaults to numpy.
                 - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
                                (see :meth:`~tango.DeviceProxy.get_green_mode` and
                                :meth:`~tango.DeviceProxy.set_green_mode`).
@@ -2116,7 +2107,7 @@ def __doc_DeviceProxy():
     # -------------------------------------
 
     document_method("read_pipe", """
-    read_pipe(self, pipe_name, extract_as=ExtractAs.Numpy, green_mode=None, wait=True, timeout=None) -> tuple
+    read_pipe(self, pipe_name, green_mode=None, wait=True, timeout=None) -> tuple
 
             Read a single pipe. The result is a *blob*: a tuple with two elements: blob name (string) and blob
             data (sequence). The blob data consists of a sequence where each element is a dictionary with the
@@ -2130,7 +2121,6 @@ def __doc_DeviceProxy():
 
         Parameters :
             - pipe_name  : (str) The name of the pipe to read.
-            - extract_as : (ExtractAs) Defaults to numpy.
             - green_mode : (GreenMode) Defaults to the current DeviceProxy GreenMode.
                            (see :meth:`~tango.DeviceProxy.get_green_mode` and
                            :meth:`~tango.DeviceProxy.set_green_mode`).
@@ -2204,7 +2194,7 @@ def __doc_DeviceProxy():
     """)
 
     document_method("attribute_history", """
-    attribute_history(self, attr_name, depth, extract_as=ExtractAs.Numpy) -> sequence<DeviceAttributeHistory>
+    attribute_history(self, attr_name, depth) -> sequence<DeviceAttributeHistory>
 
             Retrieve attribute history from the attribute polling buffer. See
             chapter on Advanced Feature for all details regarding polling
@@ -2212,7 +2202,6 @@ def __doc_DeviceProxy():
         Parameters :
            - attr_name  : (str) Attribute name.
            - depth      : (int) The wanted history depth.
-           - extract_as : (ExtractAs)
 
         Return     : This method returns a vector of DeviceAttributeHistory types.
 
@@ -2332,14 +2321,13 @@ def __doc_DeviceProxy():
     # read_attributes_asynch -> in code
     # read_attribute_reply -> in code
     document_method("read_attributes_reply", """
-    read_attributes_reply(self, id, extract_as=ExtractAs.Numpy) -> DeviceAttribute
+    read_attributes_reply(self, id) -> DeviceAttribute
 
             Check if the answer of an asynchronous read_attribute is
             arrived (polling model).
 
         Parameters :
             - id         : (int) is the asynchronous call identifier.
-            - extract_as : (ExtractAs)
         Return     : If the reply is arrived and if it is a valid reply, it is
                      returned to the caller in a list of DeviceAttribute. If the
                      reply is an exception, it is re-thrown by this call. An
@@ -2352,14 +2340,13 @@ def __doc_DeviceProxy():
         New in PyTango 7.0.0
 
 
-    read_attributes_reply(self, id, timeout, extract_as=ExtractAs.Numpy) -> DeviceAttribute
+    read_attributes_reply(self, id, timeout) -> DeviceAttribute
 
             Check if the answer of an asynchronous read_attributes is arrived (polling model).
 
         Parameters :
             - id         : (int) is the asynchronous call identifier.
             - timeout    : (int)
-            - extract_as : (ExtractAs)
         Return     : If the reply is arrived and if it is a valid reply, it is
                      returned to the caller in a list of DeviceAttribute. If the
                      reply is an exception, it is re-thrown by this call. If the

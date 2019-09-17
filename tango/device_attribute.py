@@ -20,7 +20,7 @@ __docformat__ = "restructuredtext"
 import copy
 
 from .utils import document_method as __document_method
-from ._tango import DeviceAttribute, ExtractAs
+from ._tango import DeviceAttribute
 
 
 def __DeviceAttribute__get_data(self):
@@ -56,14 +56,12 @@ def __doc_DeviceAttribute():
     DeviceAttribute.__doc__ = """
         This is the fundamental type for RECEIVING data from device attributes.
 
-        It contains several fields. The most important ones depend on the
-        ExtractAs method used to get the value. Normally they are:
+        It contains several fields. Normally they are:
 
             - value   : Normal scalar value or numpy array of values.
             - w_value : The write part of the attribute.
 
-        See other ExtractAs for different possibilities. There are some more
-        fields, these really fixed:
+        There are some more fields, these really fixed:
 
             - name        : (str)
             - data_format : (AttrDataFormat) Attribute format
@@ -135,7 +133,6 @@ def __doc_DeviceAttribute():
 def __init_DeviceAttribute():
     DeviceAttribute.__init_orig = DeviceAttribute.__init__
     DeviceAttribute.__init__ = __DeviceAttribute__init
-    DeviceAttribute.ExtractAs = ExtractAs
 
 
 def device_attribute_init(doc=True):

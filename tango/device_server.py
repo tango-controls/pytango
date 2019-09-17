@@ -2010,12 +2010,11 @@ def __doc_WAttribute():
 
     document_method("get_write_value", """
     get_write_value(self, lst) -> None  <= DEPRECATED
-    get_write_value(self, extract_as=ExtractAs.Numpy) -> obj
+    get_write_value(self) -> obj
 
             Retrieve the new value for writable attribute.
 
         Parameters :
-            - extract_as: (ExtractAs)
             - lst : [out] (list) a list object that will be filled with the attribute write value (DEPRECATED)
         Return     : (obj) the attribute write value.
     """)

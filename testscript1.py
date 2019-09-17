@@ -8,7 +8,6 @@ from tango import Database
 from tango import DbDatum
 from tango import Release
 dp = DeviceProxy('sys/tg_test/1')
-
 #
 # Connection methods
 #
@@ -30,9 +29,6 @@ assert dp.get_transparency_reconnection() is True
 dp.set_transparency_reconnection(False)
 assert dp.get_transparency_reconnection() is False
 dp.set_transparency_reconnection(True)
-# dp.connect()
-# dp.reconnect()
-# dp.set_source()
 
 assert dp.state() == DevState.RUNNING
 dp.command_inout("SwitchStates")

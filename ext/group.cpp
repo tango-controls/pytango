@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -19,7 +19,7 @@ namespace py = pybind11;
 namespace PyGroup
 {
 
-    static void __update_data_format(Tango::Group &self, Tango::GroupAttrReplyList& r)
+    static void __update_data_format(Tango::Group& self, Tango::GroupAttrReplyList& r)
     {
         // Usually we pass a device_proxy to "convert_to_python" in order to
         // get the data_format of the DeviceAttribute for Tango versions
@@ -35,7 +35,7 @@ namespace PyGroup
 //            PyDeviceAttribute::update_data_format( *dev_proxy, &(i->get_data()), 1 );
         }
     }
-static long _write_attribute_asynch(Tango::Group &self, const std::string& attr_name, py::object py_value, bool forward = true,
+static long _write_attribute_asynch(Tango::Group& self, const std::string& attr_name, py::object py_value, bool forward = true,
         bool multi = false) {
     Tango::DeviceProxy* dev_proxy = self.get_device(1);
     // If !dev_proxy (no device added in self or his children) then we
@@ -187,7 +187,7 @@ void export_group(py::module &m) {
                                          bool forward=true) {
             self.read_attribute_asynch(attr_name, forward);
         })
-        .def("read_attribute_reply", [](Tango::Group &self,
+        .def("read_attribute_reply", [](Tango::Group& self,
                                         long req_id,
                                         long timeout_ms=0) -> Tango::GroupAttrReplyList {
             Tango::GroupAttrReplyList r;
@@ -211,14 +211,14 @@ void export_group(py::module &m) {
             PyGroup::__update_data_format(self, r);
             return r;
         })
-        .def("write_attribute_asynch", [](Tango::Group &self, 
+        .def("write_attribute_asynch", [](Tango::Group& self, 
                                           const std::string& attr_name,
                                           py::object py_value,
                                           bool forward=true,
                                           bool multi=false) {
             PyGroup::_write_attribute_asynch(self, attr_name, py_value, forward, multi);
         })
-        .def("write_attribute_reply", [](Tango::Group &self,
+        .def("write_attribute_reply", [](Tango::Group& self,
                                          long req_id,
                                          long timeout_ms = 0) -> Tango::GroupReplyList {
             AutoPythonAllowThreads guard;

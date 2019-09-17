@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -81,8 +81,8 @@ static void copy_most_fields(CallBackAutoDie* self, const Tango::AttrWrittenEven
 //    // py_ev->ext =py::object(ev->ext);
 }
 
-//CallBackAutoDie::CallBackAutoDie(): m_self(0), m_weak_parent(0), m_extract_as(PyTango::ExtractAsNumpy) {}
-CallBackAutoDie::CallBackAutoDie() { //: m_extract_as(PyTango::ExtractAsNumpy) {
+//CallBackAutoDie::CallBackAutoDie(): m_self(0), m_weak_parent(0)) {}
+CallBackAutoDie::CallBackAutoDie() {
     cerr << "CallBackAutoDie constructor" << endl;
 }
 
@@ -228,7 +228,7 @@ void CallBackAutoDie::attr_written(Tango::AttrWrittenEvent* ev)
 //
 // CallBackPushEvent
 //
-CallBackPushEvent::CallBackPushEvent() : m_extract_as(PyTango::ExtractAsNumpy) {}
+CallBackPushEvent::CallBackPushEvent() {}
 CallBackPushEvent::~CallBackPushEvent() {}
 
 void CallBackPushEvent::set_device(Tango::DeviceProxy& dp)
@@ -236,23 +236,19 @@ void CallBackPushEvent::set_device(Tango::DeviceProxy& dp)
     m_device = dp;
 }
 
-void CallBackPushEvent::set_extract_as(PyTango::ExtractAs extract_as)
-{
-    m_extract_as = extract_as;
-}
 
-void CallBackPushEvent::fill_py_event(Tango::EventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as)
+void CallBackPushEvent::fill_py_event(Tango::EventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device)
 {
     if (ev->attr_value)
     {
         py_ev.attr("device") = py_device;
-        py::object py_attr = PyDeviceAttribute::convert_to_python(ev->attr_value, extract_as);
+        py::object py_attr = PyDeviceAttribute::convert_to_python(ev->attr_value);
         py_ev.attr("attr_value") = py_attr.ptr();
     }
 }
 
 
-void CallBackPushEvent::fill_py_event(Tango::AttrConfEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as)
+void CallBackPushEvent::fill_py_event(Tango::AttrConfEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device)
 {
     py_ev.attr("device") = py_device;
     if (ev->attr_conf) {
@@ -260,22 +256,22 @@ void CallBackPushEvent::fill_py_event(Tango::AttrConfEventData* ev, py::object& 
     }
 }
 
-void CallBackPushEvent::fill_py_event(Tango::DataReadyEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as)
+void CallBackPushEvent::fill_py_event(Tango::DataReadyEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device)
 {
     py_ev.attr("device") = py_device;
 }
 
-void CallBackPushEvent::fill_py_event(Tango::PipeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as)
+void CallBackPushEvent::fill_py_event(Tango::PipeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device)
 {
     py_ev.attr("device") = py_device;
     if (ev->pipe_value) {
         Tango::DevicePipe *pipe_value = new Tango::DevicePipe;
         (*pipe_value) = std::move(*ev->pipe_value);
-        py_ev.attr("pipe_value") = PyTango::DevicePipe::convert_to_python(pipe_value, extract_as);
+        py_ev.attr("pipe_value") = PyTango::DevicePipe::convert_to_python(pipe_value);
     }
 }
 
-void CallBackPushEvent::fill_py_event(Tango::DevIntrChangeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device, PyTango::ExtractAs extract_as)
+void CallBackPushEvent::fill_py_event(Tango::DevIntrChangeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device)
 {
     py_ev.attr("device") = py_device;
     py_ev.attr("cmd_list") = ev->cmd_list;
@@ -287,7 +283,7 @@ void CallBackPushEvent::push_event(Tango::EventData *ev)
 {
     Tango::EventData tg_ed = *ev;
     py::object py_ev = py::cast(tg_ed);
-    fill_py_event(ev, py_ev, m_device, m_extract_as);
+    fill_py_event(ev, py_ev, m_device);
     py::gil_scoped_acquire acquire;
     m_callback(py_ev);
     py::gil_scoped_release release;
@@ -376,10 +372,6 @@ void export_callback(py::module &m)
             cout << "setting callback" << endl;
             m.attr("free_on_callback") = self;
         })
-        .def("extract_as", [](CallBackAutoDie& self, PyTango::ExtractAs& as) {
-            cout << "extract as" << endl;
-            self.m_extract_as = as;
-        })
         .def("set_weak_parent", [](CallBackAutoDie& self, py::object parent) {
             cout << ".def set weak parent" << endl;
             self.m_weak_parent = parent.ptr();
@@ -398,9 +390,6 @@ void export_callback(py::module &m)
         .def(py::init<>())
         .def("device", [](CallBackPushEvent& self, Tango::DeviceProxy& dp) {
             self.m_device = dp;
-        })
-        .def("extract_as", [](CallBackPushEvent& self, PyTango::ExtractAs& as) {
-            self.m_extract_as = as;
         })
     ;
 }

@@ -2,12 +2,15 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
   See LICENSE.txt for more info.
 ******************************************************************************/
+
+#ifndef _PYTGUTILS_H_
+#define _PYTGUTILS_H_
 
 #include <tango.h>
 #include <pybind11/pybind11.h>
@@ -17,8 +20,6 @@ namespace py = pybind11;
 /// Get the python Global Interpret Lock
 class AutoPythonGIL
 {
-//    PyGILState_STATE m_gstate;
-    
     /**
      * Check python. Before acquiring python GIL check if python as not been
      * shutdown. If this is the case then the best we can do here is throw an
@@ -50,6 +51,28 @@ public:
     
 };
 
+class AutoPythonGILEnsure
+{
+    PyGILState_STATE m_gstate;
+
+public:
+    inline AutoPythonGILEnsure()
+    {
+        // When threads are created from tango c++ they don’t hold the GIL,
+        // nor is there a thread state structure for them.
+        // So ensure that the current thread is ready to call the Python C API
+        // regardless of the current state of Python, or of the global interpreter lock.
+        m_gstate = PyGILState_Ensure();
+        std::cerr << "Ensured GIL before calling Python code" << std::endl;
+    }
+
+
+    inline ~AutoPythonGILEnsure() {
+        PyGILState_Release(m_gstate);
+        std::cerr << "Released GIL after calling Python code" << std::endl;
+    }
+};
+
 /**
  * Translate a double into a timeval structure
  *
@@ -67,3 +90,4 @@ inline void double2timeval(struct timeval &tv, double t)
     tv.tv_sec = (suseconds_t)(sec);
 #endif
 }
+#endif //_PYTGUTILS_H_

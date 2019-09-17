@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -17,7 +17,7 @@
 
 namespace py = pybind11;
 
-void PyAttr::read(Tango::DeviceImpl *dev, Tango::Attribute &att)
+void PyAttr::read(Tango::DeviceImpl* dev, Tango::Attribute& att)
 {
     if (!_is_method(dev, read_name))
     {
@@ -26,7 +26,7 @@ void PyAttr::read(Tango::DeviceImpl *dev, Tango::Attribute &att)
         Tango::Except::throw_exception("PyTango_ReadAttributeMethodNotFound",
             o.str(), "PyTango::Attr::read");
     }
-    Device_5ImplWrap *__dev_ptr = (Device_5ImplWrap*) dev;
+    Device_5ImplWrap* __dev_ptr = (Device_5ImplWrap*) dev;
     AutoPythonGIL __py_lock;
     try {
         __dev_ptr->py_self.attr(read_name.c_str())(att);
@@ -35,7 +35,7 @@ void PyAttr::read(Tango::DeviceImpl *dev, Tango::Attribute &att)
     }
 }
 
-void PyAttr::write(Tango::DeviceImpl *dev, Tango::WAttribute &att)
+void PyAttr::write(Tango::DeviceImpl* dev, Tango::WAttribute& att)
 {
     if (!_is_method(dev, write_name))
     {
@@ -53,14 +53,14 @@ void PyAttr::write(Tango::DeviceImpl *dev, Tango::WAttribute &att)
     }
 }
 
-bool PyAttr::is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType type)
+bool PyAttr::is_allowed(Tango::DeviceImpl* dev, Tango::AttReqType type)
 {
     if (_is_method(dev, py_allowed_name))
     {
-        Device_5ImplWrap *__dev_ptr = (Device_5ImplWrap*) dev;
+        Device_5ImplWrap* __dev_ptr = (Device_5ImplWrap*) dev;
         AutoPythonGIL __py_lock;
         try {
-      return py::cast<bool>(__dev_ptr->py_self.attr(py_allowed_name.c_str())(type));
+            return py::cast<bool>(__dev_ptr->py_self.attr(py_allowed_name.c_str())(type));
         } catch (py::error_already_set &eas) {
             handle_python_exception(eas);
         }
@@ -69,22 +69,20 @@ bool PyAttr::is_allowed(Tango::DeviceImpl *dev, Tango::AttReqType type)
     return true;
 }
 
-bool PyAttr::_is_method(Tango::DeviceImpl *dev, const std::string& name)
+bool PyAttr::_is_method(Tango::DeviceImpl* dev, const std::string& name)
 {
     AutoPythonGIL __py_lock;
-    Device_5ImplWrap *__dev_ptr = (Device_5ImplWrap*) dev;
+    Device_5ImplWrap* __dev_ptr = (Device_5ImplWrap*) dev;
     py::object __dev_py = __dev_ptr->py_self;
     return is_method_defined(__dev_py, name);
 }
 
-void PyAttr::set_user_prop(std::vector<Tango::AttrProperty> &user_prop,
-                           Tango::UserDefaultAttrProp &def_prop)
+void PyAttr::set_user_prop(std::vector<Tango::AttrProperty>& user_prop,
+                           Tango::UserDefaultAttrProp& def_prop)
 {
-
 //
 // Is there any user defined prop. defined ?
 //
-
     size_t nb_prop = user_prop.size();
     if (nb_prop == 0)
         return;
@@ -138,44 +136,99 @@ void PyAttr::set_user_prop(std::vector<Tango::AttrProperty> &user_prop,
     }
 }
 
+
 void export_attr(py::module &m) {
     py::class_<Tango::Attr>(m, "Attr")
-        .def(py::init<const char *, long>())
-//        .def(py::init<const char *, long, optional<Tango::AttrWriteType, const char *>>())
-        .def("set_default_properties", &Tango::Attr::set_default_properties)
-        .def("set_disp_level", &Tango::Attr::set_disp_level)
-        .def("set_polling_period", &Tango::Attr::set_polling_period)
-        .def("set_memorized", &Tango::Attr::set_memorized)
-        .def("set_memorized_init", &Tango::Attr::set_memorized_init)
-        .def("set_change_event", &Tango::Attr::set_change_event)
-        .def("is_change_event", &Tango::Attr::is_change_event)
-        .def("is_check_change_criteria", &Tango::Attr::is_check_change_criteria)
-        .def("set_archive_event", &Tango::Attr::set_archive_event)
-        .def("is_archive_event", &Tango::Attr::is_archive_event)
-        .def("is_check_archive_criteria", &Tango::Attr::is_check_archive_criteria)
-        .def("set_data_ready_event", &Tango::Attr::set_data_ready_event)
-        .def("is_data_ready_event", &Tango::Attr::is_data_ready_event)
-        .def("get_name", &Tango::Attr::get_name,
-                py::return_value_policy::copy)
-        .def("get_format", &Tango::Attr::get_format)
-        .def("get_writable", &Tango::Attr::get_writable)
-        .def("get_type", &Tango::Attr::get_type)
-        .def("get_disp_level", &Tango::Attr::get_disp_level)
-        .def("get_polling_period", &Tango::Attr::get_polling_period)
-        .def("get_memorized", &Tango::Attr::get_memorized)
-        .def("get_memorized_init", &Tango::Attr::get_memorized_init)
-        .def("get_assoc", &Tango::Attr::get_assoc,
-                py::return_value_policy::copy)
-        .def("is_assoc", &Tango::Attr::is_assoc)
-        .def("get_cl_name", &Tango::Attr::get_cl_name,
-                py::return_value_policy::copy)
-        .def("set_cl_name", &Tango::Attr::set_cl_name)
-        .def("get_class_properties", &Tango::Attr::get_class_properties,
-                py::return_value_policy::reference)
-        .def("get_user_default_properties", &Tango::Attr::get_user_default_properties,
-                py::return_value_policy::reference)
-        .def("set_class_properties", &Tango::Attr::set_class_properties)
-        .def("check_type", &Tango::Attr::check_type)
+        .def(py::init([](std::string name, long data_type) {
+            return new Tango::Attr(name.c_str(), data_type);
+        }))
+        .def("set_default_properties", [](Tango::Attr& self, Tango::UserDefaultAttrProp &prop) -> void {
+            self.set_default_properties(prop);
+        })
+        .def("set_disp_level", [](Tango::Attr& self, Tango::DispLevel level) -> void {
+            self.set_disp_level(level);
+        })
+        .def("set_polling_period", [](Tango::Attr& self, long update) -> void {
+            self.set_polling_period(update);
+        })
+        .def("set_memorized", [](Tango::Attr& self) -> void {
+            self.set_memorized();
+        })
+        .def("set_memorized_init", [](Tango::Attr& self, bool write_on_init) -> void {
+            return self.set_memorized_init(write_on_init);
+        })
+        .def("set_change_event", [](Tango::Attr& self, bool implemented, bool detect) -> void {
+            return self.set_change_event(implemented, detect);
+        })
+        .def("is_change_event", [](Tango::Attr& self) -> bool {
+            return self.is_change_event();
+        })
+        .def("is_check_change_criteria", [](Tango::Attr& self) -> bool {
+            return self.is_check_change_criteria();
+        })
+        .def("set_archive_event", [](Tango::Attr& self, bool implemented, bool detect) -> void {
+            return self.set_archive_event(implemented, detect);
+        })
+        .def("is_archive_event", [](Tango::Attr& self) -> bool {
+            return self.is_archive_event();
+        })
+        .def("is_check_archive_criteria", [](Tango::Attr& self) -> bool {
+            return self.is_check_archive_criteria();
+        })
+        .def("set_data_ready_event", [](Tango::Attr& self, bool implemented) -> void {
+            return self.set_data_ready_event(implemented);
+        })
+        .def("is_data_ready_event", [](Tango::Attr& self) -> bool {
+            return self.is_data_ready_event();
+        })
+        .def("get_name", [](Tango::Attr& self) -> std::string& {
+            return self.get_name();
+        })
+        .def("get_format", [](Tango::Attr& self) -> Tango::AttrDataFormat {
+            return self.get_format();
+        })
+        .def("get_writable", [](Tango::Attr& self) -> Tango::AttrWriteType {
+            return self.get_writable();
+        })
+        .def("get_type", [](Tango::Attr& self) -> long {
+            return self.get_type();
+        })
+        .def("get_disp_level",[](Tango::Attr& self) -> Tango::DispLevel {
+            return self.get_disp_level();
+        })
+         .def("get_polling_period", [](Tango::Attr& self) -> long {
+            return self.get_polling_period();
+        })
+        .def("get_memorized", [](Tango::Attr& self) -> bool {
+            return self.get_memorized();
+        })
+        .def("get_memorized_init", [](Tango::Attr& self) -> bool {
+            return self.get_memorized_init();
+        })
+        .def("get_assoc", [](Tango::Attr& self) -> std::string& {
+            return self.get_assoc();
+        })
+        .def("is_assoc", [](Tango::Attr& self) -> bool {
+            return self.is_assoc();
+        })
+        .def("get_cl_name", [](Tango::Attr& self) -> const std::string& {
+            return self.get_cl_name();
+        })
+        .def("set_cl_name", [](Tango::Attr& self, std::string& cl) -> void {
+            return self.set_cl_name(cl.c_str());
+        })
+        .def("get_class_properties", [](Tango::Attr& self) -> std::vector<Tango::AttrProperty>& {
+            return self.get_class_properties();
+        })
+        .def("get_user_default_properties", [](Tango::Attr& self) -> std::vector<Tango::AttrProperty>& {
+            return self.get_user_default_properties();
+        })
+        .def("set_class_properties", [](Tango::Attr& self, std::vector<Tango::AttrProperty>& in_prop) -> void {
+            return self.set_class_properties(in_prop);
+        })
+        .def("check_type", [](Tango::Attr& self) -> void {
+            return self.check_type();
+        })
         .def("read", &Tango::Attr::read)
         .def("write", &Tango::Attr::write)
         .def("is_allowed", &Tango::Attr::is_allowed)

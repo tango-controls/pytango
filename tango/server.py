@@ -405,7 +405,6 @@ def __patch_standard_device_methods(klass):
 
 class _DeviceClass(DeviceClass):
     def __init__(self, name):
-#        sys.setrecursionlimit(2500)
         print("Python DeviceClass self ")
         DeviceClass.__init__(self, name)
         self.set_type(name)

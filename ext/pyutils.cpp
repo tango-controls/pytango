@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -72,30 +72,19 @@ namespace py = pybind11;
 //    }
 //}
 
-bool is_method_defined(py::object &obj, const std::string& method_name)
-{
-    return is_method_defined(obj.ptr(), method_name);
-}
-
-bool is_method_defined(PyObject *obj, const std::string& method_name)
+bool is_method_defined(py::object& obj, const std::string& method_name)
 {
     bool exists, is_method;
     is_method_defined(obj, method_name, exists, is_method);
     return exists && is_method;
 }
 
-void is_method_defined(py::object &obj, const std::string& method_name,
-                       bool &exists, bool &is_method)
-{
-    is_method_defined(obj.ptr(), method_name, exists, is_method);
-}
-
-void is_method_defined(PyObject *obj, const std::string& method_name,
-                       bool &exists, bool &is_method)
+void is_method_defined(py::object& obj, const std::string& method_name,
+                       bool& exists, bool& is_method)
 {
     exists = is_method = false;
-//
-//    PyObject *meth = PyObject_GetAttrString_(obj, method_name.c_str());
+
+//    PyObject *meth = PyObject_GetAttrString_(obj.ptr(), method_name.c_str());
 //
 //    exists = NULL != meth;
 //
@@ -181,10 +170,4 @@ EXIT:
 }
 
 #endif
-
-
-//bool hasattr(py::object& obj, const std::string& name)
-//{
-//    return PyObject_HasAttrString(obj.ptr(), name.c_str());
-//}
 

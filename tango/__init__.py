@@ -50,7 +50,7 @@ __all__ = [
     'DeviceUnlocked', 'Device_2Impl', 'Device_3Impl', 'Device_4Impl', 'Device_5Impl',
     'DispLevel', 'EncodedAttribute', 'ErrSeverity', 'ErrorIt',
     'EventData', 'EventProperties', 'EventSystemFailed', 'EventType',
-    'Except', 'ExtractAs', 'FMT_UNKNOWN', 'FatalIt', 'GreenMode', 'Group',
+    'Except', 'FMT_UNKNOWN', 'FatalIt', 'GreenMode', 'Group',
     'GroupAttrReply',
     'GroupAttrReplyList', 'GroupCmdReply', 'GroupCmdReplyList',
     'GroupReply', 'GroupReplyList', 'IMAGE', 'ImageAttr', 'InfoIt',
@@ -136,7 +136,7 @@ __prepare_nt()
 
 # Extension imports
 
-#from ._tango import AccessControlType
+from ._tango import AccessControlType
 from ._tango import ApiUtil
 from ._tango import ArchiveEventInfo
 from ._tango import AsynCall
@@ -244,7 +244,6 @@ from ._tango import EventData
 from ._tango import EventSystemFailed
 from ._tango import EventType
 from ._tango import Except
-from ._tango import ExtractAs
 from ._tango import FMT_UNKNOWN
 from ._tango import GreenMode
 from ._tango import GroupAttrReply

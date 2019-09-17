@@ -2,7 +2,7 @@
   This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
-  Copyright 2013-2014 European Synchrotron Radiation Facility, Grenoble, France
+  Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
 
   Distributed under the terms of the GNU Lesser General Public License,
   either version 3 of the License, or (at your option) any later version.
@@ -49,7 +49,7 @@
 //#endif
 //
 //    template<long tangoTypeConst>
-//    static inline void _update_array_values(Tango::DeviceAttribute &self, bool isImage, object py_value)
+//    static inline void _update_array_values(Tango::DeviceAttribute& self, bool isImage, object py_value)
 //    {
 //        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
 //        typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
@@ -156,20 +156,20 @@
 //    }
 //
 //    template<>
-//    inline void _update_array_values<Tango::DEV_STRING>(Tango::DeviceAttribute &self, bool isImage, object py_value)
+//    inline void _update_array_values<Tango::DEV_STRING>(Tango::DeviceAttribute& self, bool isImage, object py_value)
 //    {
 //        _update_array_values_as_tuples<Tango::DEV_STRING>(self, isImage, py_value);
 //    }
 //
 //    template<>
-//    inline void _update_array_values<Tango::DEV_ENCODED>(Tango::DeviceAttribute &self, bool isImage, object py_value)
+//    inline void _update_array_values<Tango::DEV_ENCODED>(Tango::DeviceAttribute& self, bool isImage, object py_value)
 //    {
 //        /// @todo Sure, it is not necessary?
 //        assert(false);
 //    }
 //
 //    // template<long tangoTypeConst>
-//    // static inline void _update_array_values(PythonDeviceAttribute &self, bool isImage)
+//    // static inline void _update_array_values(PythonDeviceAttribute& self, bool isImage)
 //    // {
 //    //     return _update_array_values_numpy<tangoTypeConst>(self, isImage);
 //    // }

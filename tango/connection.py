@@ -21,7 +21,7 @@ import collections
 
 from ._tango import DeviceData, CmdArgType
 from ._tango import __CallBackAutoDie
-from ._tango import DeviceProxy, Database, ExtractAs
+from ._tango import DeviceProxy, Database
 from .utils import document_method as __document_method
 from .utils import document_static_method as __document_static_method
 from .green import green
@@ -31,8 +31,7 @@ def __CallBackAutoDie__cmd_ended_aux(self, fn):
     def __new_fn(cmd_done_event):
         try:
             print("python cmd_ended")
-            cmd_done_event.argout = cmd_done_event.argout_raw.extract(
-                self.defaultCommandExtractAs)
+            cmd_done_event.argout = cmd_done_event.argout_raw.extract()
         except Exception:
             pass
         return fn(cmd_done_event)
@@ -107,7 +106,7 @@ def __DeviceProxy__command_inout(self, name, *args, **kwds):
     r = DeviceProxy.command_inout_raw(self, name, *args, **kwds)
     if isinstance(r, DeviceData):
         try:
-            return r.extract(self.defaultCommandExtractAs)
+            return r.extract()
         except Exception:
             return None
     else:
@@ -283,7 +282,7 @@ def __DeviceProxy__command_inout_reply(self, idx, timeout=None):
 
     if isinstance(r, DeviceData):
         try:
-            return r.extract(self.defaultCommandExtractAs)
+            return r.extract()
         except Exception:
             return None
     else:
@@ -294,7 +293,6 @@ __DeviceProxy__command_inout_reply.__name__ = "command_inout_reply"
 
 
 def __init_DeviceProxy():
-    DeviceProxy.defaultCommandExtractAs = ExtractAs.Numpy
     DeviceProxy.command_inout_raw = __DeviceProxy__command_inout_raw
     DeviceProxy.command_inout = green(__DeviceProxy__command_inout)
     DeviceProxy.command_inout_asynch = __DeviceProxy__command_inout_asynch
