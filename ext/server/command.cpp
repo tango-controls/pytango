@@ -23,7 +23,7 @@ namespace py = pybind11;
 
 bool PyCmd::is_allowed(Tango::DeviceImpl *dev, const CORBA::Any &any) {
     if (py_allowed_defined) {
-        Device_5ImplWrap *dev_ptr = (Device_5ImplWrap*) dev;
+        DeviceImplWrap *dev_ptr = (DeviceImplWrap*) dev;
         AutoPythonGILEnsure __py_lock;
         bool returned_value = true;
         std::cout << "does it do this?" << std::endl;
@@ -332,7 +332,7 @@ void __insert(CORBA::Any& any, py::object& py_value, const Tango::CmdArgType typ
 
 CORBA::Any *PyCmd::execute(Tango::DeviceImpl *dev, const CORBA::Any &param_any)
 {
-    Device_5ImplWrap *dev_ptr = (Device_5ImplWrap*)dev;
+    DeviceImplWrap *dev_ptr = (DeviceImplWrap*)dev;
 
     AutoPythonGILEnsure __py_lock;
     std::cout << "Got to execute in command.cpp" << std::endl;

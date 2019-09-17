@@ -412,12 +412,12 @@ void export_device_class(py::module &m)
         .def("device_name_factory", [](DeviceClass& self, std::vector<std::string> &dev_list) {
             self.device_name_factory(dev_list);
         })
-        .def("export_device", [](DeviceClass& self, Device_5ImplWrap *dev, std::string& dev_name) -> void {
+        .def("export_device", [](DeviceClass& self, DeviceImplWrap *dev, std::string& dev_name) -> void {
             py::print("export device_class");
             self.export_device(dev, const_cast<char*>(dev_name.c_str()));
         }, py::arg("dev"), py::arg("dev_name")="Unused")
 
-        .def("_add_device", [](DeviceClass& self, Device_5ImplWrap *dev) -> void {
+        .def("_add_device", [](DeviceClass& self, DeviceImplWrap *dev) -> void {
             self.add_device(dev);
         })
         .def("register_signal", [](DeviceClass& self, long signo) -> void {

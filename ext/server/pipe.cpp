@@ -26,7 +26,7 @@ namespace Pipe {
 void _Pipe::read(Tango::DeviceImpl *dev, Tango::Pipe &pipe)
 {
     std::cerr << "In pipe.cpp::_Pipe::Read" << std::endl;
-    Device_5ImplWrap* dev_ptr = dynamic_cast<Device_5ImplWrap*>(dev);
+    DeviceImplWrap* dev_ptr = dynamic_cast<DeviceImplWrap*>(dev);
     AutoPythonGIL __py_lock;
     if (!is_method_callable(dev_ptr->py_self, read_name))
     {
@@ -44,7 +44,7 @@ void _Pipe::read(Tango::DeviceImpl *dev, Tango::Pipe &pipe)
 
 void _Pipe::write(Tango::DeviceImpl* dev, Tango::WPipe &pipe)
 {
-    Device_5ImplWrap* dev_ptr = dynamic_cast<Device_5ImplWrap*>(dev);
+    DeviceImplWrap* dev_ptr = dynamic_cast<DeviceImplWrap*>(dev);
     AutoPythonGIL __py_lock;
     if (!is_method_callable(dev_ptr->py_self, write_name))
     {
@@ -62,7 +62,7 @@ void _Pipe::write(Tango::DeviceImpl* dev, Tango::WPipe &pipe)
 
 bool _Pipe::is_allowed(Tango::DeviceImpl *dev, Tango::PipeReqType ty)
 {
-    Device_5ImplWrap* dev_ptr = dynamic_cast<Device_5ImplWrap*>(dev);
+    DeviceImplWrap* dev_ptr = dynamic_cast<DeviceImplWrap*>(dev);
     AutoPythonGIL __py_lock;
     if (is_method_callable(dev_ptr->py_self, py_allowed_name))
     {

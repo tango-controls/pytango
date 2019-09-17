@@ -610,19 +610,19 @@ namespace PyDeviceImpl
     }
 }
 
-Device_5ImplWrap::Device_5ImplWrap(py::object& pyself, DeviceClass *cl, std::string& name)
+DeviceImplWrap::DeviceImplWrap(py::object& pyself, DeviceClass *cl, std::string& name)
   : Tango::Device_5Impl(cl, name)
 {
     py_self = pyself;
 }
 
-Device_5ImplWrap::Device_5ImplWrap(py::object& pyself, DeviceClass *cl, std::string& name, std::string& descr)
+DeviceImplWrap::DeviceImplWrap(py::object& pyself, DeviceClass *cl, std::string& name, std::string& descr)
   : Tango::Device_5Impl(cl, name, descr)
 {
     py_self = pyself;
 }
 
-Device_5ImplWrap::Device_5ImplWrap(py::object& pyself, DeviceClass *cl,
+DeviceImplWrap::DeviceImplWrap(py::object& pyself, DeviceClass *cl,
                                    std::string& name,
                                    std::string& desc,
                                    Tango::DevState sta,
@@ -632,14 +632,14 @@ Device_5ImplWrap::Device_5ImplWrap(py::object& pyself, DeviceClass *cl,
     py_self = pyself;
 }
 
-Device_5ImplWrap::~Device_5ImplWrap()
+DeviceImplWrap::~DeviceImplWrap()
 {
     delete_device();
 }
 
-void Device_5ImplWrap::delete_dev()
+void DeviceImplWrap::delete_dev()
 {
-    // Call here the delete_device method. It is defined in Device_5ImplWrap
+    // Call here the delete_device method. It is defined in DeviceImplWrap
     // class which is already destroyed when the Tango kernel call the
     // delete_device method
     try
@@ -652,12 +652,12 @@ void Device_5ImplWrap::delete_dev()
     }
 }
 
-void Device_5ImplWrap::py_delete_dev()
+void DeviceImplWrap::py_delete_dev()
 {
-    Device_5ImplWrap::delete_dev();
+    DeviceImplWrap::delete_dev();
 }
 
-void Device_5ImplWrap::init_device()
+void DeviceImplWrap::init_device()
 {
     std::cerr << "entering init_device" << std::endl;
     std::thread::id thread_id = std::this_thread::get_id();
@@ -675,7 +675,7 @@ void Device_5ImplWrap::init_device()
     }
 }
 
-void Device_5ImplWrap::delete_device()
+void DeviceImplWrap::delete_device()
 {
     AutoPythonGILEnsure __py_lock;
     try {
@@ -697,53 +697,53 @@ void Device_5ImplWrap::delete_device()
     }
 }
 
-void Device_5ImplWrap::default_delete_device()
+void DeviceImplWrap::default_delete_device()
 {
     this->Tango::Device_5Impl::delete_device();
 }
 
-bool Device_5ImplWrap::_is_attribute_polled(const std::string& att_name)
+bool DeviceImplWrap::_is_attribute_polled(const std::string& att_name)
 {
     return this->is_attribute_polled(att_name);
 }
 
-bool Device_5ImplWrap::_is_command_polled(const std::string& cmd_name)
+bool DeviceImplWrap::_is_command_polled(const std::string& cmd_name)
 {
     std::cout << &py_self << std::endl;
     return this->is_command_polled(cmd_name);
 }
 
-int Device_5ImplWrap::_get_attribute_poll_period(const std::string& att_name)
+int DeviceImplWrap::_get_attribute_poll_period(const std::string& att_name)
 {
     return this->get_attribute_poll_period(att_name);
 }
 
-int Device_5ImplWrap::_get_command_poll_period(const std::string& cmd_name)
+int DeviceImplWrap::_get_command_poll_period(const std::string& cmd_name)
 {
     return this->get_command_poll_period(cmd_name);
 }
 
-void Device_5ImplWrap::_poll_attribute(const std::string& att_name, int period)
+void DeviceImplWrap::_poll_attribute(const std::string& att_name, int period)
 {
     this->poll_attribute(att_name, period);
 }
 
-void Device_5ImplWrap::_poll_command(const std::string& cmd_name, int period)
+void DeviceImplWrap::_poll_command(const std::string& cmd_name, int period)
 {
     this->poll_command(cmd_name, period);
 }
 
-void Device_5ImplWrap::_stop_poll_attribute(const std::string& att_name)
+void DeviceImplWrap::_stop_poll_attribute(const std::string& att_name)
 {
     this->stop_poll_attribute(att_name);
 }
 
-void Device_5ImplWrap::_stop_poll_command(const std::string& cmd_name)
+void DeviceImplWrap::_stop_poll_command(const std::string& cmd_name)
 {
     this->stop_poll_command(cmd_name);
 }
 
-void Device_5ImplWrap::always_executed_hook()
+void DeviceImplWrap::always_executed_hook()
 {
     std::thread::id thread_id = std::this_thread::get_id();
     std::cerr << "always executed thread id " << thread_id << std::endl;
@@ -769,12 +769,12 @@ void Device_5ImplWrap::always_executed_hook()
     }
 }
 
-void Device_5ImplWrap::default_always_executed_hook()
+void DeviceImplWrap::default_always_executed_hook()
 {
     this->Tango::Device_5Impl::always_executed_hook();
 }
 
-void Device_5ImplWrap::read_attr_hardware(std::vector<long> &attr_list)
+void DeviceImplWrap::read_attr_hardware(std::vector<long> &attr_list)
 {
     std::thread::id thread_id = std::this_thread::get_id();
     std::cerr << "read_attr_hardware thread id " << thread_id << std::endl;
@@ -798,12 +798,12 @@ void Device_5ImplWrap::read_attr_hardware(std::vector<long> &attr_list)
     }
 }
 
-void Device_5ImplWrap::default_read_attr_hardware(vector<long> &attr_list)
+void DeviceImplWrap::default_read_attr_hardware(vector<long> &attr_list)
 {
     this->Tango::Device_5Impl::read_attr_hardware(attr_list);
 }
 
-void Device_5ImplWrap::write_attr_hardware(std::vector<long> &attr_list)
+void DeviceImplWrap::write_attr_hardware(std::vector<long> &attr_list)
 {
     std::thread::id thread_id = std::this_thread::get_id();
     std::cerr << "write_attr_hardware thread id " << thread_id << std::endl;
@@ -827,12 +827,12 @@ void Device_5ImplWrap::write_attr_hardware(std::vector<long> &attr_list)
     }
 }
 
-void Device_5ImplWrap::default_write_attr_hardware(vector<long> &attr_list)
+void DeviceImplWrap::default_write_attr_hardware(vector<long> &attr_list)
 {
     this->Tango::Device_5Impl::write_attr_hardware(attr_list);
 }
 
-Tango::DevState Device_5ImplWrap::dev_state()
+Tango::DevState DeviceImplWrap::dev_state()
 {
     AutoPythonGILEnsure __py_lock;
     try {
@@ -857,12 +857,12 @@ Tango::DevState Device_5ImplWrap::dev_state()
     }
 }
 
-Tango::DevState Device_5ImplWrap::default_dev_state()
+Tango::DevState DeviceImplWrap::default_dev_state()
 {
     return this->Tango::Device_5Impl::dev_state();
 }
 
-Tango::ConstDevString Device_5ImplWrap::dev_status()
+Tango::ConstDevString DeviceImplWrap::dev_status()
 {
     std::cerr << "Entering 5ImplWrap dev_status" << std::endl;
     AutoPythonGILEnsure __py_lock;
@@ -890,13 +890,13 @@ Tango::ConstDevString Device_5ImplWrap::dev_status()
     }
 }
 
-Tango::ConstDevString Device_5ImplWrap::default_dev_status()
+Tango::ConstDevString DeviceImplWrap::default_dev_status()
 {
     this->the_status = this->Tango::Device_5Impl::dev_status();
     return this->the_status.c_str();
 }
 
-void Device_5ImplWrap::signal_handler(long signo)
+void DeviceImplWrap::signal_handler(long signo)
 {
     try
     {
@@ -923,7 +923,7 @@ void Device_5ImplWrap::signal_handler(long signo)
     }
 }
 
-void Device_5ImplWrap::default_signal_handler(long signo)
+void DeviceImplWrap::default_signal_handler(long signo)
 {
     this->Tango::Device_5Impl::signal_handler(signo);
 }
@@ -996,338 +996,338 @@ void export_device_impl(py::module &m) {
 
     py::class_<Tango::Device_5Impl, PyDevice_5Impl>(m, "BaseDevice_5Impl")
     ;
-    py::class_<Device_5ImplWrap, Tango::Device_5Impl>(m, "Device_5Impl")
+    py::class_<DeviceImplWrap, Tango::Device_5Impl>(m, "Device_5Impl")
         .def(py::init([](DeviceClass *cppdev, std::string& name, py::object pyself) {
             std::thread::id thread_id = std::this_thread::get_id();
-            std::cout << "c++/python Device_5ImplWrap thread id " << thread_id << std::endl;
-            Device_5ImplWrap* cpp = new Device_5ImplWrap(pyself, cppdev, name);
+            std::cout << "c++/python DeviceImplWrap thread id " << thread_id << std::endl;
+            DeviceImplWrap* cpp = new DeviceImplWrap(pyself, cppdev, name);
             return cpp;
         }))
         .def(py::init([](py::object pyself, DeviceClass *cppdev, std::string& name, std::string& descr) {
-            Device_5ImplWrap* cpp = new Device_5ImplWrap(pyself, cppdev, name, descr);
+            DeviceImplWrap* cpp = new DeviceImplWrap(pyself, cppdev, name, descr);
             return cpp;
         }))
        .def(py::init([](py::object pyself, DeviceClass *cppdev, std::string& name,
             std::string& descr, Tango::DevState dstate, std::string& status) {
-            Device_5ImplWrap* cpp = new Device_5ImplWrap(pyself, cppdev, name, descr, dstate, status);
+            DeviceImplWrap* cpp = new DeviceImplWrap(pyself, cppdev, name, descr, dstate, status);
             return cpp;
         }))
-        .def("set_state", [](Device_5ImplWrap& self, const Tango::DevState &new_state) -> void {
+        .def("set_state", [](DeviceImplWrap& self, const Tango::DevState &new_state) -> void {
             self.set_state(new_state);
         })
-        .def("get_state", [](Device_5ImplWrap& self) -> Tango::DevState {
+        .def("get_state", [](DeviceImplWrap& self) -> Tango::DevState {
             return self.get_state();
         })
-        .def("get_prev_state", [](Device_5ImplWrap& self) -> Tango::DevState {
+        .def("get_prev_state", [](DeviceImplWrap& self) -> Tango::DevState {
             return self.get_prev_state();
         })
-        .def("get_name", [](Device_5ImplWrap& self) -> std::string {
+        .def("get_name", [](DeviceImplWrap& self) -> std::string {
             return self.get_name();
         })
-        .def("get_device_attr", [](Device_5ImplWrap& self) {
+        .def("get_device_attr", [](DeviceImplWrap& self) {
             return self.get_device_attr();
         })
-        .def("register_signal", [](Device_5ImplWrap& self, long signo, bool own_handler) -> void {
+        .def("register_signal", [](DeviceImplWrap& self, long signo, bool own_handler) -> void {
             self.register_signal(signo, own_handler);
         }, py::arg("signo"), py::arg("own_handler")=false)
-        .def("unregister_signal", [](Device_5ImplWrap& self, long signo) -> void {
+        .def("unregister_signal", [](DeviceImplWrap& self, long signo) -> void {
             self.unregister_signal(signo);
         })
-        .def("get_status", [](Device_5ImplWrap& self) -> std::string {
+        .def("get_status", [](DeviceImplWrap& self) -> std::string {
             return self.get_status();
         })
-        .def("set_status", [](Device_5ImplWrap& self, const std::string& new_status) -> void {
+        .def("set_status", [](DeviceImplWrap& self, const std::string& new_status) -> void {
             self.set_status(new_status);
         })
-        .def("append_status", [](Device_5ImplWrap& self, const std::string& stat, bool new_line) -> void {
+        .def("append_status", [](DeviceImplWrap& self, const std::string& stat, bool new_line) -> void {
             self.append_status(stat, new_line);
         }, py::arg("stat"), py::arg("new_line")=false)
-       .def("dev_state", [](Device_5ImplWrap& self) -> Tango::DevState {
+       .def("dev_state", [](DeviceImplWrap& self) -> Tango::DevState {
            return self.default_dev_state();
         })
-        .def("dev_status", [](Device_5ImplWrap& self) -> Tango::ConstDevString {
+        .def("dev_status", [](DeviceImplWrap& self) -> Tango::ConstDevString {
             return self.default_dev_status();
         })
-        .def("get_attribute_config", [](Device_5ImplWrap& self, py::object& py_attr_name_seq) {
+        .def("get_attribute_config", [](DeviceImplWrap& self, py::object& py_attr_name_seq) {
             return PyDeviceImpl::get_attribute_config(self, py_attr_name_seq);
         })
-        .def("set_change_event", [](Device_5ImplWrap& self, std::string& attr_name, bool implemented, bool detect ) -> void {
+        .def("set_change_event", [](DeviceImplWrap& self, std::string& attr_name, bool implemented, bool detect ) -> void {
             self.set_change_event(attr_name, implemented, detect);
         }, py::arg("attr_name"), py::arg("implemented"), py::arg("detect")=true)
-        .def("set_archive_event", [](Device_5ImplWrap& self, std::string& attr_name, bool implemented, bool detect) -> void {
+        .def("set_archive_event", [](DeviceImplWrap& self, std::string& attr_name, bool implemented, bool detect) -> void {
             self.set_archive_event(attr_name, implemented, detect);
         }, py::arg("attr_name"), py::arg("implemented"), py::arg("detect")=true)
-        .def("_add_attribute", [](Device_5ImplWrap& self, const Tango::Attr &new_attr,
+        .def("_add_attribute", [](DeviceImplWrap& self, const Tango::Attr &new_attr,
                        const std::string& read_meth_name,
                        const std::string& write_meth_name,
                        const std::string& is_allowed_meth_name) -> void {
             PyDeviceImpl::add_attribute(self, new_attr, read_meth_name, write_meth_name, is_allowed_meth_name);
         })
-        .def("_remove_attribute", [](Device_5ImplWrap& self, std::string& att_name, bool freeit, bool clean_db) -> void {
+        .def("_remove_attribute", [](DeviceImplWrap& self, std::string& att_name, bool freeit, bool clean_db) -> void {
             self.remove_attribute(att_name, freeit, clean_db);
         }, py::arg("att_name"), py::arg("freeit")=false, py::arg("clean_db")=true)
 
         //@TODO .def("get_device_class")
         //@TODO .def("get_db_device")
 
-        .def("is_attribute_polled", [](Device_5ImplWrap& self, const std::string& att_name) -> bool {
+        .def("is_attribute_polled", [](DeviceImplWrap& self, const std::string& att_name) -> bool {
             return self._is_attribute_polled(att_name);
         })
-        .def("is_command_polled", [](Device_5ImplWrap& self, const std::string& cmd_name) -> bool {
+        .def("is_command_polled", [](DeviceImplWrap& self, const std::string& cmd_name) -> bool {
             std::cout << "is the command " << cmd_name << " polled" << std::endl;
             return self._is_command_polled(cmd_name);
         })
-        .def("get_attribute_poll_period", [](Device_5ImplWrap& self, const std::string& att_name) -> int {
+        .def("get_attribute_poll_period", [](DeviceImplWrap& self, const std::string& att_name) -> int {
             return self._get_attribute_poll_period(att_name);
         })
-        .def("get_command_poll_period", [](Device_5ImplWrap& self, const std::string& cmd_name) -> int {
+        .def("get_command_poll_period", [](DeviceImplWrap& self, const std::string& cmd_name) -> int {
             return self._get_command_poll_period(cmd_name);
         })
-        .def("poll_attribute", [](Device_5ImplWrap& self, const std::string& att_name, int period) -> void {
+        .def("poll_attribute", [](DeviceImplWrap& self, const std::string& att_name, int period) -> void {
             self._poll_attribute(att_name, period);
         })
-        .def("poll_command", [](Device_5ImplWrap& self, const std::string& cmd_name, int period) -> void {
+        .def("poll_command", [](DeviceImplWrap& self, const std::string& cmd_name, int period) -> void {
             self._poll_command(cmd_name, period);
         })
-        .def("stop_poll_attribute", [](Device_5ImplWrap& self, const std::string& att_name) -> void {
+        .def("stop_poll_attribute", [](DeviceImplWrap& self, const std::string& att_name) -> void {
             self._stop_poll_attribute(att_name);
         })
-        .def("stop_poll_command", [](Device_5ImplWrap& self, const std::string& cmd_name) -> void {
+        .def("stop_poll_command", [](DeviceImplWrap& self, const std::string& cmd_name) -> void {
             self._stop_poll_command(cmd_name);
         })
-        .def("get_exported_flag", [](Device_5ImplWrap& self) -> bool {
+        .def("get_exported_flag", [](DeviceImplWrap& self) -> bool {
             return self.get_exported_flag();
         })
-        .def("get_poll_ring_depth", [](Device_5ImplWrap& self) -> long {
+        .def("get_poll_ring_depth", [](DeviceImplWrap& self) -> long {
             return self.get_poll_ring_depth();
         })
-        .def("get_poll_old_factor", [](Device_5ImplWrap& self) -> long {
+        .def("get_poll_old_factor", [](DeviceImplWrap& self) -> long {
             return self.get_poll_old_factor();
         })
-        .def("is_polled", [](Device_5ImplWrap& self) -> bool {
+        .def("is_polled", [](DeviceImplWrap& self) -> bool {
             return self.is_polled();
         })
-        .def("get_polled_cmd", [](Device_5ImplWrap& self) -> std::vector<std::string> {
+        .def("get_polled_cmd", [](DeviceImplWrap& self) -> std::vector<std::string> {
             return self.get_polled_cmd();
         })
-        .def("get_polled_attr", [](Device_5ImplWrap& self) -> std::vector<std::string> {
+        .def("get_polled_attr", [](DeviceImplWrap& self) -> std::vector<std::string> {
             return self.get_polled_attr();
         })
-        .def("get_non_auto_polled_cmd", [](Device_5ImplWrap& self) -> std::vector<std::string> {
+        .def("get_non_auto_polled_cmd", [](DeviceImplWrap& self) -> std::vector<std::string> {
             return self.get_non_auto_polled_cmd();
         })
-        .def("get_non_auto_polled_attr", [](Device_5ImplWrap& self) -> std::vector<std::string> {
+        .def("get_non_auto_polled_attr", [](DeviceImplWrap& self) -> std::vector<std::string> {
             return self.get_non_auto_polled_attr();
         })
 
         //@TODO .def("get_poll_obj_list", &PyDeviceImpl::get_poll_obj_list)
 
-        .def("stop_polling", [](Device_5ImplWrap& self, bool stop) -> void {
+        .def("stop_polling", [](DeviceImplWrap& self, bool stop) -> void {
             self.stop_polling(stop);
         }, py::arg("stop")=true)
-        .def("check_command_exists", [](Device_5ImplWrap& self, const std::string& cmd) -> void {
+        .def("check_command_exists", [](DeviceImplWrap& self, const std::string& cmd) -> void {
             self.check_command_exists(cmd);
         })
 
         //@TODO .def("get_command", &PyDeviceImpl::get_command)
 
-        .def("get_dev_idl_version", [](Device_5ImplWrap& self) {
+        .def("get_dev_idl_version", [](DeviceImplWrap& self) {
             self.get_dev_idl_version();
         })
-        .def("get_cmd_poll_ring_depth", [](Device_5ImplWrap& self, std::string& cmd) -> long {
+        .def("get_cmd_poll_ring_depth", [](DeviceImplWrap& self, std::string& cmd) -> long {
             return self.get_cmd_poll_ring_depth(cmd);
         })
-        .def("get_attr_poll_ring_depth", [](Device_5ImplWrap& self, std::string& attr) -> long {
+        .def("get_attr_poll_ring_depth", [](DeviceImplWrap& self, std::string& attr) -> long {
             return self.get_attr_poll_ring_depth(attr);
         })
-        .def("is_device_locked", [](Device_5ImplWrap& self) -> bool {
+        .def("is_device_locked", [](DeviceImplWrap& self) -> bool {
             return self.is_device_locked();
         })
-        .def("init_logger", [](Device_5ImplWrap& self) -> void {
+        .def("init_logger", [](DeviceImplWrap& self) -> void {
             self.init_logger();
         })
-        .def("start_logging", [](Device_5ImplWrap& self) -> void {
+        .def("start_logging", [](DeviceImplWrap& self) -> void {
             self.start_logging();
         })
-        .def("stop_logging", [](Device_5ImplWrap& self) -> void {
+        .def("stop_logging", [](DeviceImplWrap& self) -> void {
             self.stop_logging();
         })
-        .def("set_exported_flag", [](Device_5ImplWrap& self, bool exp) -> void {
+        .def("set_exported_flag", [](DeviceImplWrap& self, bool exp) -> void {
             self.set_exported_flag(exp);
         })
-        .def("set_poll_ring_depth", [](Device_5ImplWrap& self, long depth) -> void {
+        .def("set_poll_ring_depth", [](DeviceImplWrap& self, long depth) -> void {
             self.set_poll_ring_depth(depth);
         })
-        .def("push_change_event", [](Device_5ImplWrap& self, const std::string& attr_name) -> void {
+        .def("push_change_event", [](DeviceImplWrap& self, const std::string& attr_name) -> void {
             PyDeviceImpl::push_change_event(self, attr_name);
         })
-        .def("push_change_event",[](Device_5ImplWrap& self, const std::string& attr_name, py::object& data) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data);
         })
-        .def("push_change_event",[](Device_5ImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, str_data, data);
         })
-        .def("push_change_event",[](Device_5ImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, str_data, data);
         })
-        .def("push_change_event",[](Device_5ImplWrap& self, const std::string& attr_name, py::object& data, long x) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data, long x) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data, x);
         })
-        .def("push_change_event",[](Device_5ImplWrap& self, const std::string& attr_name, py::object& data, long x, long y) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data, long x, long y) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data, x, y);
         })
-        .def("push_change_event",[](Device_5ImplWrap& self, const std::string& attr_name, py::object& data, Tango::AttrQuality quality) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data, quality);
         })
-        .def("push_change_event",[](Device_5ImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, str_data, data, t, quality);
         })
-        .def("push_change_event",[](Device_5ImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, str_data, data, t, quality);
         })
-        .def("push_change_event",[](Device_5ImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data, t, quality, x);
         })
-        .def("push_change_event",[](Device_5ImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data, t, quality, x, y);
         })
-        .def("push_archive_event", [](Device_5ImplWrap& self, const std::string& attr_name) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name);
         })
-        .def("push_archive_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& data) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data);
         })
-        .def("push_archive_event", [](Device_5ImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, str_data, data);
         })
-        .def("push_archive_event", [](Device_5ImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, str_data, data);
         })
-        .def("push_archive_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& data, long x) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data, long x) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data, x);
         })
-        .def("push_archive_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& data, long x, long y) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data, long x, long y) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data, x, y);
         })
-        .def("push_archive_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data, t, quality);
         })
-        .def("push_archive_event", [](Device_5ImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, str_data, data, t, quality);
         })
-        .def("push_archive_event", [](Device_5ImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, str_data, data, t, quality);
         })
-        .def("push_archive_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data, t, quality, x);
         })
-        .def("push_archive_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data, t, quality, x, y);
         })
-        .def("push_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals) -> void {
+        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals);
         })
-        .def("push_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data) -> void {
+        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data);
         })
-        .def("push_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, const std::string& data) -> void {
+        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, const std::string& data) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, str_data, data);
         })
-        .def("push_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, py::object& data) -> void {
+        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, py::object& data) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, str_data, data);
         })
-        .def("push_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, long x) -> void {
+        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, long x) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data, x);
         })
-        .def("push_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, long x, long y) -> void {
+        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, long x, long y) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data, x, y);
         })
-        .def("push_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data, t, quality);
         })
-        .def("push_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, const std::string& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, const std::string& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, str_data, data, t, quality);
         })
-        .def("push_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, str_data, data, t, quality);
         })
-        .def("push_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
+        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data, t, quality, x);
         })
-        .def("push_event", [](Device_5ImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
+        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data, t, quality, x, y);
         })
-        .def("push_data_ready_event", [](Device_5ImplWrap& self, const std::string& attr_name, long ctr) -> void {
+        .def("push_data_ready_event", [](DeviceImplWrap& self, const std::string& attr_name, long ctr) -> void {
             PyDeviceImpl::push_data_ready_event(self, attr_name, ctr);
         })
 
 //         @TODO
-//        .def("push_att_conf_event", [](Device_5ImplWrap& self) -> void {
+//        .def("push_att_conf_event", [](DeviceImplWrap& self) -> void {
 //            self.push_att_conf_event();
 //            should be this?????????????
 //            self.push_att_conf_event(Attribute *);
 //        })
 
-        .def("push_pipe_event", [](Device_5ImplWrap& self, const std::string& pipe_name, py::object& pipe_data) -> void {
+        .def("push_pipe_event", [](DeviceImplWrap& self, const std::string& pipe_name, py::object& pipe_data) -> void {
             PyDeviceImpl::push_pipe_event(self, pipe_name, pipe_data);
         })
-        .def("get_logger", [](Device_5ImplWrap& self) {
+        .def("get_logger", [](DeviceImplWrap& self) {
             return self.get_logger();
         })
-        .def("__debug_stream", [](Device_5ImplWrap& self, const std::string& msg) {
+        .def("__debug_stream", [](DeviceImplWrap& self, const std::string& msg) {
             if (self.get_logger()->is_debug_enabled()) {
                 self.get_logger()->debug_stream() << log4tango::LogInitiator::_begin_log << msg;
             }
         })
-        .def("__info_stream", [](Device_5ImplWrap& self, const std::string& msg) -> void {
+        .def("__info_stream", [](DeviceImplWrap& self, const std::string& msg) -> void {
             if (self.get_logger()->is_info_enabled()) {
                 self.get_logger()->info_stream() << log4tango::LogInitiator::_begin_log << msg;
             }
         })
-        .def("__warn_stream", [](Device_5ImplWrap& self, const std::string& msg) -> void {
+        .def("__warn_stream", [](DeviceImplWrap& self, const std::string& msg) -> void {
             if (self.get_logger()->is_warn_enabled()) {
                 self.get_logger()->warn_stream() << log4tango::LogInitiator::_begin_log << msg;
             }
         })
-        .def("__error_stream", [](Device_5ImplWrap& self, const std::string& msg) -> void {
+        .def("__error_stream", [](DeviceImplWrap& self, const std::string& msg) -> void {
             if (self.get_logger()->is_error_enabled()) {
                 self.get_logger()->error_stream() << log4tango::LogInitiator::_begin_log << msg;
             }
         })
-        .def("__fatal_stream", [](Device_5ImplWrap& self, const std::string& msg) -> void {
+        .def("__fatal_stream", [](DeviceImplWrap& self, const std::string& msg) -> void {
             if (self.get_logger()->is_fatal_enabled()) {
                 self.get_logger()->fatal_stream() << log4tango::LogInitiator::_begin_log << msg;
             }
         })
-        .def("get_min_poll_period", [](Device_5ImplWrap& self) {
+        .def("get_min_poll_period", [](DeviceImplWrap& self) {
             self.get_min_poll_period();
         })
-        .def("get_cmd_min_poll_period", [](Device_5ImplWrap& self) {
+        .def("get_cmd_min_poll_period", [](DeviceImplWrap& self) {
             self.get_cmd_min_poll_period();
         })
-        .def("get_attr_min_poll_period", [](Device_5ImplWrap& self) {
+        .def("get_attr_min_poll_period", [](DeviceImplWrap& self) {
             self.get_attr_min_poll_period();
         })
-        .def("is_there_subscriber", [](Device_5ImplWrap& self, const std::string& att_name, Tango::EventType event_type) -> bool{
+        .def("is_there_subscriber", [](DeviceImplWrap& self, const std::string& att_name, Tango::EventType event_type) -> bool{
             self.is_there_subscriber(att_name, event_type);
         })
-        .def("init_device", [](Device_5ImplWrap& self) {
+        .def("init_device", [](DeviceImplWrap& self) {
             self.init_device();
         })
-        .def("delete_device", [](Device_5ImplWrap& self) {
+        .def("delete_device", [](DeviceImplWrap& self) {
             self.default_delete_device();
         })
-        .def("always_executed_hook", [](Device_5ImplWrap& self) {
+        .def("always_executed_hook", [](DeviceImplWrap& self) {
             std::cout << "does it do this executed hook code" << std::endl;
             self.default_always_executed_hook();
         })
-        .def("read_attr_hardware", [](Device_5ImplWrap& self, std::vector<long> &attr_list) {
+        .def("read_attr_hardware", [](DeviceImplWrap& self, std::vector<long> &attr_list) {
             self.default_read_attr_hardware(attr_list);
         })
-        .def("write_attr_hardware", [](Device_5ImplWrap& self, std::vector<long> &attr_list) {
+        .def("write_attr_hardware", [](DeviceImplWrap& self, std::vector<long> &attr_list) {
             self.default_write_attr_hardware(attr_list);
         })
-        .def("signal_handler", [](Device_5ImplWrap& self, long signo) {
+        .def("signal_handler", [](DeviceImplWrap& self, long signo) {
             self.default_signal_handler(signo);
         })
     ;

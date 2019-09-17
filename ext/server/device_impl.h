@@ -38,9 +38,9 @@ namespace py = pybind11;
 //};
 
 /**
- * Device_5ImplWrap is the class used to represent a Python Tango device.
+ * DeviceImplWrap is the class used to represent a Python Tango device.
  */
-class Device_5ImplWrap: public Tango::Device_5Impl //, public PyDeviceImplBase
+class DeviceImplWrap: public Tango::Device_5Impl //, public PyDeviceImplBase
 {
 
 public:
@@ -56,7 +56,7 @@ public:
      * @param[in] cl
      * @param[in] name
      */
-  Device_5ImplWrap(py::object& pyself, DeviceClass *cl, std::string& name);
+  DeviceImplWrap(py::object& pyself, DeviceClass *cl, std::string& name);
 
     /**
      * Constructor
@@ -66,7 +66,7 @@ public:
      * @param[in] name
      * @param[in] desc
      */
-  Device_5ImplWrap(py::object& pyself, DeviceClass *cl, std::string& name, std::string& desc);
+  DeviceImplWrap(py::object& pyself, DeviceClass *cl, std::string& name, std::string& desc);
 
     /**
      * Constructor
@@ -78,7 +78,7 @@ public:
      * @param[in] sta
      * @param[in] status
      */
-  Device_5ImplWrap(py::object& pyself, DeviceClass *cl,
+  DeviceImplWrap(py::object& pyself, DeviceClass *cl,
             std::string& name,
             std::string& desc,
             Tango::DevState sta,
@@ -87,7 +87,7 @@ public:
     /**
      * Destructor
      */
-    virtual ~Device_5ImplWrap();
+    virtual ~DeviceImplWrap();
 
     /**
      * Necessary init_device implementation to call python

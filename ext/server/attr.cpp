@@ -26,7 +26,7 @@ void PyAttr::read(Tango::DeviceImpl* dev, Tango::Attribute& att)
         Tango::Except::throw_exception("PyTango_ReadAttributeMethodNotFound",
             o.str(), "PyTango::Attr::read");
     }
-    Device_5ImplWrap* __dev_ptr = (Device_5ImplWrap*) dev;
+    DeviceImplWrap* __dev_ptr = (DeviceImplWrap*) dev;
     AutoPythonGIL __py_lock;
     try {
         __dev_ptr->py_self.attr(read_name.c_str())(att);
@@ -44,7 +44,7 @@ void PyAttr::write(Tango::DeviceImpl* dev, Tango::WAttribute& att)
         Tango::Except::throw_exception("PyTango_WriteAttributeMethodNotFound",
             o.str(), "PyTango::Attr::write");
     }
-    Device_5ImplWrap *__dev_ptr = (Device_5ImplWrap*) dev;
+    DeviceImplWrap *__dev_ptr = (DeviceImplWrap*) dev;
     AutoPythonGIL __py_lock;
     try {
         __dev_ptr->py_self.attr(write_name.c_str())(att);
@@ -57,7 +57,7 @@ bool PyAttr::is_allowed(Tango::DeviceImpl* dev, Tango::AttReqType type)
 {
     if (_is_method(dev, py_allowed_name))
     {
-        Device_5ImplWrap* __dev_ptr = (Device_5ImplWrap*) dev;
+        DeviceImplWrap* __dev_ptr = (DeviceImplWrap*) dev;
         AutoPythonGIL __py_lock;
         try {
             return py::cast<bool>(__dev_ptr->py_self.attr(py_allowed_name.c_str())(type));
@@ -72,7 +72,7 @@ bool PyAttr::is_allowed(Tango::DeviceImpl* dev, Tango::AttReqType type)
 bool PyAttr::_is_method(Tango::DeviceImpl* dev, const std::string& name)
 {
     AutoPythonGIL __py_lock;
-    Device_5ImplWrap* __dev_ptr = (Device_5ImplWrap*) dev;
+    DeviceImplWrap* __dev_ptr = (DeviceImplWrap*) dev;
     py::object __dev_py = __dev_ptr->py_self;
     return is_method_defined(__dev_py, name);
 }
