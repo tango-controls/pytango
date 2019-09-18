@@ -266,6 +266,7 @@ class PropUtil:
 def __DeviceClass__init__(self, name):
     print("python device_class __init__ ", hex(id(self)))
     print("python device_class __init__ ", hex(id(self.device_factory)))
+    print("python device_class __init__ ", name)
     DeviceClass.__init_orig__(self, name, self)
     print("DeviceClass.__init__", self)
     print("DeviceClass.__init__", hex(id(self)))
@@ -288,8 +289,8 @@ def __DeviceClass__init__(self, name):
         print(str(e))
 
 
-def __DeviceClass__str__(self):
-    return '%s(%s)' % (self.__class__.__name__, self.get_name())
+# def __DeviceClass__str__(self):
+#     return '%s(%s)' % (self.__class__.__name__, self.get_name())
 
 
 # def __DeviceClass__repr__(self):
@@ -712,7 +713,7 @@ def __init_DeviceClass():
     DeviceClass.pipe_list = {}
     DeviceClass.__init_orig__ = DeviceClass.__init__
     DeviceClass.__init__ = __DeviceClass__init__
-    DeviceClass.__str__ = __DeviceClass__str__
+#    DeviceClass.__str__ = __DeviceClass__str__
 #    DeviceClass.__repr__ = __DeviceClass__repr__
     DeviceClass._create_user_default_attr_prop = __DeviceClass__create_user_default_attr_prop
     DeviceClass._attribute_factory = __DeviceClass__attribute_factory

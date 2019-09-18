@@ -17,19 +17,19 @@ from __future__ import print_function
 
 import copy
 
-from ._tango import Device_5Impl
+from ._tango import DeviceImpl
 from ._tango import Attribute
+from ._tango import WAttribute
+from ._tango import MultiAttribute
+from ._tango import MultiClassAttribute
 from ._tango import Attr
 from ._tango import UserDefaultAttrProp
 from ._tango import Logger
+from ._tango import DevFailed
+from ._tango import AttrWriteType
+from ._tango import AttrDataFormat
+from ._tango import DispLevel
 
-# from ._tango import (
-#     DeviceImpl, Device_3Impl, Device_4Impl, Device_5Impl,
-#     DevFailed, Attribute, WAttribute,
-#     MultiAttribute, MultiClassAttribute,
-#     Attr, Logger, AttrWriteType, AttrDataFormat,
-#     DispLevel, UserDefaultAttrProp, StdStringVector
-# )
 
 from .utils import document_method as __document_method
 from .utils import copy_doc, get_latest_device_class
@@ -264,14 +264,14 @@ def __init_Attribute():
     Attribute.set_properties = __Attribute__set_properties
 
 
-def __Device_5Impl__get_device_class(self):
+def __DeviceImpl__get_device_class(self):
     try:
         return self._device_class_instance
     except AttributeError:
         return None
 
 
-def __Device_5Impl__get_device_properties(self, ds_class=None):
+def __DeviceImpl__get_device_properties(self, ds_class=None):
     """get_device_properties(self, ds_class = None) -> None
 
                 Utility method that fetches all the device properties from the database
@@ -307,7 +307,7 @@ def __Device_5Impl__get_device_properties(self, ds_class=None):
         raise df
 
 
-def __Device_5Impl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_meth=None):
+def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_meth=None):
     """add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_meth=None) -> Attr
 
             Add a new attribute to the device attribute list. Please, note that if you add
@@ -370,7 +370,7 @@ def __Device_5Impl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_
     return attr
 
 
-def __Device_5Impl__remove_attribute(self, attr_name):
+def __DeviceImpl__remove_attribute(self, attr_name):
     """remove_attribute(self, attr_name) -> None
 
             Remove one attribute from the device attribute list.
@@ -405,7 +405,7 @@ def __Device_5Impl__remove_attribute(self, attr_name):
     self._remove_attribute(attr_name)
 
 
-def __Device_5Impl___remove_attr_meth(self, attr_name):
+def __DeviceImpl___remove_attr_meth(self, attr_name):
     """for internal usage only"""
     cl = self.get_device_class()
     if cl.dyn_att_added_methods.count(attr_name) != 0:
@@ -423,7 +423,7 @@ def __Device_5Impl___remove_attr_meth(self, attr_name):
         cl.dyn_att_added_methods.remove(attr_name)
 
 
-def __Device_5Impl__add_command(self, cmd, device_level=True):
+def __DeviceImpl__add_command(self, cmd, device_level=True):
     """add_command(self, cmd, level=TANGO::OPERATOR) -> cmd
 
         Add a new command to the device command list.
@@ -456,7 +456,7 @@ def __Device_5Impl__add_command(self, cmd, device_level=True):
     return cmd
 
 
-def __Device_5Impl__remove_command(self, cmd_name, free_it=False, clean_db=True):
+def __DeviceImpl__remove_command(self, cmd_name, free_it=False, clean_db=True):
     """
     remove_command(self, attr_name) -> None
 
@@ -484,7 +484,7 @@ def __Device_5Impl__remove_command(self, cmd_name, free_it=False, clean_db=True)
     self._remove_command(cmd_name, free_it, clean_db)
 
 
-def __Device_5Impl__debug_stream(self, msg, *args):
+def __DeviceImpl__debug_stream(self, msg, *args):
     """
     debug_stream(self, msg, *args) -> None
 
@@ -501,7 +501,7 @@ def __Device_5Impl__debug_stream(self, msg, *args):
     self.__debug_stream(msg % args)
 
 
-def __Device_5Impl__info_stream(self, msg, *args):
+def __DeviceImpl__info_stream(self, msg, *args):
     """
     info_stream(self, msg, *args) -> None
 
@@ -518,7 +518,7 @@ def __Device_5Impl__info_stream(self, msg, *args):
     self.__info_stream(msg % args)
 
 
-def __Device_5Impl__warn_stream(self, msg, *args):
+def __DeviceImpl__warn_stream(self, msg, *args):
     """
     warn_stream(self, msg, *args) -> None
 
@@ -535,7 +535,7 @@ def __Device_5Impl__warn_stream(self, msg, *args):
     self.__warn_stream(msg % args)
 
 
-def __Device_5Impl__error_stream(self, msg, *args):
+def __DeviceImpl__error_stream(self, msg, *args):
     """
     error_stream(self, msg, *args) -> None
 
@@ -552,7 +552,7 @@ def __Device_5Impl__error_stream(self, msg, *args):
     self.__error_stream(msg % args)
 
 
-def __Device_5Impl__fatal_stream(self, msg, *args):
+def __DeviceImpl__fatal_stream(self, msg, *args):
     """
     fatal_stream(self, msg, *args) -> None
 
@@ -570,86 +570,73 @@ def __Device_5Impl__fatal_stream(self, msg, *args):
 
 
 @property
-def __Device_5Impl__debug(self):
+def __DeviceImpl__debug(self):
     if not hasattr(self, "_debug_s"):
         self._debug_s = TangoStream(self.debug_stream)
     return self._debug_s
 
 
 @property
-def __Device_5Impl__info(self):
+def __DeviceImpl__info(self):
     if not hasattr(self, "_info_s"):
         self._info_s = TangoStream(self.info_stream)
     return self._info_s
 
 
 @property
-def __Device_5Impl__warn(self):
+def __DeviceImpl__warn(self):
     if not hasattr(self, "_warn_s"):
         self._warn_s = TangoStream(self.warn_stream)
     return self._warn_s
 
 
 @property
-def __Device_5Impl__error(self):
+def __DeviceImpl__error(self):
     if not hasattr(self, "_error_s"):
         self._error_s = TangoStream(self.error_stream)
     return self._error_s
 
 
 @property
-def __Device_5Impl__fatal(self):
+def __DeviceImpl__fatal(self):
     if not hasattr(self, "_fatal_s"):
         self._fatal_s = TangoStream(self.fatal_stream)
     return self._fatal_s
 
 
-def __Device_5Impl__str(self):
+def __DeviceImpl__str(self):
     return '%s(%s)' % (self.__class__.__name__, self.get_name())
 
-# def __Device_5Impl__init__(self, *args, **kwargs):
-#     print("__Device_5Impl python", args)
-#     print("__Device_5Impl python", kwargs)
-#     print(dir(args[0]))
-# #     print("__Device_5Impl python", self)
-# #     print("__Device_5Impl python", hex(id(self)))
-# #     print("__Device_5Impl python", hex(id(self.rubbish)))
-# #     self.rubbish()
-#     Device_5Impl.__init_orig__(self, *args, **kwargs)
-#     print("Device_5Impl__init__", self)
-#     print("Device_5Impl__init__", hex(id(self)))
-#     print("Device_5Impl__init__", hex(id(self.rubbish)))
-#     self.rubbish()
 
-def __Device_5Impl__init__(self, cppdev, name):
-    print("__Device_5Impl python", cppdev)
-    print("__Device_5Impl python", name)
-    Device_5Impl.__init_orig__(self, cppdev, name, self)
+def __DeviceImpl__init__(self, cppdev, name):
+    print("__DeviceImpl python", cppdev)
+    print("__DeviceImpl python", name)
+    DeviceImpl.__init_orig__(self, cppdev, name, self)
 
 
-def __init_Device_5Impl():
-    Device_5Impl._device_class_instance = None
-    Device_5Impl.__init_orig__ = Device_5Impl.__init__
-    Device_5Impl.__init__ = __Device_5Impl__init__
-    Device_5Impl.get_device_class = __Device_5Impl__get_device_class
-    Device_5Impl.get_device_properties = __Device_5Impl__get_device_properties
-    Device_5Impl.add_attribute = __Device_5Impl__add_attribute
-    Device_5Impl.remove_attribute = __Device_5Impl__remove_attribute
-    Device_5Impl._remove_attr_meth = __Device_5Impl___remove_attr_meth
-    Device_5Impl.add_command = __Device_5Impl__add_command
-    Device_5Impl.remove_command = __Device_5Impl__remove_command
-    Device_5Impl.__str__ = __Device_5Impl__str
-    Device_5Impl.__repr__ = __Device_5Impl__str
-    Device_5Impl.debug_stream = __Device_5Impl__debug_stream
-    Device_5Impl.info_stream = __Device_5Impl__info_stream
-    Device_5Impl.warn_stream = __Device_5Impl__warn_stream
-    Device_5Impl.error_stream = __Device_5Impl__error_stream
-    Device_5Impl.fatal_stream = __Device_5Impl__fatal_stream
-    Device_5Impl.log_debug = __Device_5Impl__debug
-    Device_5Impl.log_info = __Device_5Impl__info
-    Device_5Impl.log_warn = __Device_5Impl__warn
-    Device_5Impl.log_error = __Device_5Impl__error
-    Device_5Impl.log_fatal = __Device_5Impl__fatal
+def __init_DeviceImpl():
+    DeviceImpl._device_class_instance = None
+    DeviceImpl.__init_orig__ = DeviceImpl.__init__
+    DeviceImpl.__init__ = __DeviceImpl__init__
+    DeviceImpl.get_device_class = __DeviceImpl__get_device_class
+    DeviceImpl.get_device_properties = __DeviceImpl__get_device_properties
+    DeviceImpl.add_attribute = __DeviceImpl__add_attribute
+    DeviceImpl.remove_attribute = __DeviceImpl__remove_attribute
+    DeviceImpl._remove_attr_meth = __DeviceImpl___remove_attr_meth
+    DeviceImpl.add_command = __DeviceImpl__add_command
+    DeviceImpl.remove_command = __DeviceImpl__remove_command
+    DeviceImpl.__str__ = __DeviceImpl__str
+    DeviceImpl.__repr__ = __DeviceImpl__str
+    DeviceImpl.debug_stream = __DeviceImpl__debug_stream
+    DeviceImpl.info_stream = __DeviceImpl__info_stream
+    DeviceImpl.warn_stream = __DeviceImpl__warn_stream
+    DeviceImpl.error_stream = __DeviceImpl__error_stream
+    DeviceImpl.fatal_stream = __DeviceImpl__fatal_stream
+    DeviceImpl.log_debug = __DeviceImpl__debug
+    DeviceImpl.log_info = __DeviceImpl__info
+    DeviceImpl.log_warn = __DeviceImpl__warn
+    DeviceImpl.log_error = __DeviceImpl__error
+    DeviceImpl.log_fatal = __DeviceImpl__fatal
 
 
 def __Logger__log(self, level, msg, *args):
@@ -795,11 +782,11 @@ def __init_Logger():
     Logger.fatal = __Logger__fatal
 
 
-def __doc_Device_5Impl():
+def __doc_DeviceImpl():
     def document_method(method_name, desc, append=True):
-        return __document_method(Device_5Impl, method_name, desc, append)
+        return __document_method(DeviceImpl, method_name, desc, append)
 
-    Device_5Impl.__doc__ = """
+    DeviceImpl.__doc__ = """
     Base class for all TANGO device.
     This class inherits from CORBA classes where all the network layer is implemented.
     """
@@ -1385,7 +1372,7 @@ def __doc_Device_5Impl():
     """)
 
 
-def __doc_extra_Device_5Impl(cls):
+def __doc_extra_DeviceImpl(cls):
     def document_method(method_name, desc, append=True):
         return __document_method(cls, method_name, desc, append)
 
@@ -2806,16 +2793,16 @@ def __doc_UserDefaultAttrProp():
 
 
 def device_server_init(doc=True):
-    __init_Device_5Impl()
+    __init_DeviceImpl()
     __init_Attribute()
     __init_Attr()
     __init_UserDefaultAttrProp()
     __init_Logger()
     if doc:
-        __doc_Device_5Impl()
-#        __doc_extra_Device_5Impl(Device_3Impl)
-#        __doc_extra_Device_5Impl(Device_4Impl)
-#        __doc_extra_Device_5Impl(Device_5Impl)
+        __doc_DeviceImpl()
+#        __doc_extra_DeviceImpl(Device_3Impl)
+#        __doc_extra_DeviceImpl(Device_4Impl)
+#        __doc_extra_DeviceImpl(DeviceImpl)
         __doc_Attribute()
         __doc_WAttribute()
         __doc_MultiAttribute()

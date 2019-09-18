@@ -26,8 +26,8 @@ import collections
 from ._tango import StdStringVector, StdDoubleVector
 from ._tango import DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat
 from ._tango import EventData, AttrConfEventData, DataReadyEventData, constants
-#from ._tango import PipeEventData, DevIntrChangeEventData
-#from ._tango import CommunicationFailed
+from ._tango import PipeEventData, DevIntrChangeEventData, DevState
+from ._tango import CommunicationFailed, DevFailed
 
 from . import _tango
 from ._tango.constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
@@ -329,7 +329,7 @@ def get_tango_device_classes():
     global __device_classes
     if __device_classes is None:
 
-        __device_classes = [_tango.Device_5Impl]
+        __device_classes = [_tango.DeviceImpl]
 #        i = 5  #2
 #        while True:
 #            dc = "Device_{0}Impl".format(i)

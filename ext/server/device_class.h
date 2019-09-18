@@ -17,12 +17,12 @@
 namespace py = pybind11;
 
 
-class DeviceClass: public Tango::DeviceClass
+class DeviceClassWrap: public Tango::DeviceClass
 {
 public:
-    DeviceClass(std::string& name, py::object py_self);
+    DeviceClassWrap(std::string& name, py::object py_self);
 
-    virtual ~DeviceClass();
+    virtual ~DeviceClassWrap();
 
     /**
      * Export a device.

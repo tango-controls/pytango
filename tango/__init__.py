@@ -1,4 +1,3 @@
-
 # ------------------------------------------------------------------------------
 # This file is part of PyTango (http://pytango.rtfd.io)
 #
@@ -46,8 +45,7 @@ __all__ = [
     'DevVoid', 'DeviceAttribute', 'DeviceAttributeConfig',
     'DeviceAttributeHistory', 'DeviceClass', 'DeviceData', 'DeviceDataList',
     'DeviceDataHistory', 'DeviceDataHistoryList',
-    'DeviceImpl', 'DeviceInfo', 'DeviceProxy',
-    'DeviceUnlocked', 'Device_2Impl', 'Device_3Impl', 'Device_4Impl', 'Device_5Impl',
+    'DeviceImpl', 'DeviceInfo', 'DeviceProxy', 'DeviceUnlocked',
     'DispLevel', 'EncodedAttribute', 'ErrSeverity', 'ErrorIt',
     'EventData', 'EventProperties', 'EventSystemFailed', 'EventType',
     'Except', 'FMT_UNKNOWN', 'FatalIt', 'GreenMode', 'Group',
@@ -169,7 +167,6 @@ from ._tango import CmdDoneEvent
 from ._tango import CommandInfo
 from ._tango import CommandInfoList
 from ._tango import CommunicationFailed
-#from ._tango import Connection
 from ._tango import ConnectionFailed
 #from ._tango import ConstDevString
 from ._tango import DServer
@@ -229,14 +226,10 @@ from ._tango import DeviceData
 from ._tango import DeviceDataHistory
 from ._tango import DeviceDataHistoryList
 from ._tango import DeviceDataList
-from ._tango import Device_5Impl
+from ._tango import DeviceImpl
 from ._tango import DeviceInfo
 from ._tango import DeviceProxy
 from ._tango import DeviceUnlocked
-#from ._tango import Device_2Impl
-#from ._tango import Device_3Impl
-#from ._tango import Device_4Impl
-#from ._tango import Device_5Impl
 from ._tango import DispLevel
 #from ._tango import EncodedAttribute
 from ._tango import ErrSeverity

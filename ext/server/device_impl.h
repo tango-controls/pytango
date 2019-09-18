@@ -22,25 +22,10 @@ namespace py = pybind11;
 //                     Tango::DevState sta = Tango::UNKNOWN,
 //                     const char *status = Tango::StatusNotSet);
 
-//class PyDeviceImplBase
-//{
-//public:
-//    /** a reference to itself */
-//    py::object py_self;
-//
-//    std::string the_status;
-//
-//    PyDeviceImplBase(py::object& self);
-//
-//    virtual ~PyDeviceImplBase();
-//
-//    virtual void py_delete_dev();
-//};
-
 /**
  * DeviceImplWrap is the class used to represent a Python Tango device.
  */
-class DeviceImplWrap: public Tango::Device_5Impl //, public PyDeviceImplBase
+class DeviceImplWrap: public Tango::Device_5Impl
 {
 
 public:
@@ -56,7 +41,7 @@ public:
      * @param[in] cl
      * @param[in] name
      */
-  DeviceImplWrap(py::object& pyself, DeviceClass *cl, std::string& name);
+  DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name);
 
     /**
      * Constructor
@@ -66,7 +51,7 @@ public:
      * @param[in] name
      * @param[in] desc
      */
-  DeviceImplWrap(py::object& pyself, DeviceClass *cl, std::string& name, std::string& desc);
+  DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name, std::string& desc);
 
     /**
      * Constructor
@@ -78,11 +63,11 @@ public:
      * @param[in] sta
      * @param[in] status
      */
-  DeviceImplWrap(py::object& pyself, DeviceClass *cl,
-            std::string& name,
-            std::string& desc,
-            Tango::DevState sta,
-            std::string& status);
+  DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl,
+                 std::string& name,
+                 std::string& desc,
+                 Tango::DevState sta,
+                 std::string& status);
 
     /**
      * Destructor

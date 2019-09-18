@@ -52,7 +52,7 @@ namespace PyUtil
         py::list constructed_classes = tango.attr("get_constructed_classes")();
         auto cc_len = len(constructed_classes);
         for (auto i = 0; i < cc_len; i++) {
-            DeviceClass* device_class_ptr = constructed_classes[i].cast<DeviceClass*>();
+            DeviceClassWrap* device_class_ptr = constructed_classes[i].cast<DeviceClassWrap*>();
             dserver->_add_class(device_class_ptr);
         }
     }
