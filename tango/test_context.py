@@ -372,20 +372,25 @@ class DeviceTestContext(MultiDeviceTestContext):
                 )
             },
         )
-        super().__init__(devices_info, server_name=server_name,
-                         instance_name=instance_name, db=db, host=host,
-                         port=port, debug=debug, process=process,
-                         daemon=daemon, timeout=timeout)
+        super(DeviceTestContext, self).__init__(devices_info,
+                                                server_name=server_name,
+                                                instance_name=instance_name,
+                                                db=db, host=host,
+                                                port=port, debug=debug,
+                                                process=process,
+                                                daemon=daemon,
+                                                timeout=timeout)
 
         self.device_name = device_name
         self.device = self.server = None
 
     def get_device_access(self):
         """Return the full device name."""
-        return super().get_device_access(self.device_name)
+        return super(DeviceTestContext, self).get_device_access(
+            self.device_name)
 
     def connect(self):
-        super().connect()
+        super(DeviceTestContext, self).connect()
         # Get device proxy
         print(self.get_device_access())
         self.device = DeviceProxy(self.get_device_access())
