@@ -26,9 +26,10 @@ from argparse import ArgumentParser, ArgumentTypeError
 
 # Local imports
 from .server import run
+from .utils import is_non_str_seq
 from . import DeviceProxy, Database, Util
 
-__all__ = ("DeviceTestContext", "run_device_test_context")
+__all__ = ("MultiDeviceTestContext", "DeviceTestContext", "run_device_test_context")
 
 # Helpers
 
@@ -95,37 +96,49 @@ def get_host_ip():
     return ip
 
 
-# Device test context
+class MultiDeviceTestContext(object):
+    """Context to run device(s) without a database.
 
-class DeviceTestContext(object):
-    """ Context to run a device without a database."""
-
+    The difference with respect to
+    :class:`~tango.test_context.DeviceTestContext` is that it allows
+    to export multiple devices (even of different Tango classes).
+    """
     nodb = "dbase=no"
     command = "{0} {1} -ORBendPoint giop:tcp:{2}:{3} -file={4}"
 
     thread_timeout = 3.
     process_timeout = 5.
 
-    def __init__(self, device, device_cls=None, server_name=None,
-                 instance_name=None, device_name=None, properties=None,
+    def __init__(self, devices_info, server_name=None, instance_name=None,
                  db=None, host=None, port=0, debug=3,
                  process=False, daemon=False, timeout=None):
-        """Inititalize the context to run a given device."""
-        # Argument
-        tangoclass = device.__name__
+        """Initialize the context to run given devices within one server.
+
+            :param devices_info: a sequence of dicts with information about
+              devices to be exported. Each dict consists of the following keys:
+                * "class" which value is either of:
+                  * :class:`~tango.server.Device`
+                  * a sequence of two elements :class:`~tango.DeviceClass`
+                    and :class:`~tango.DeviceImpl`
+                * "devices" which value is a sequence of dicts with
+                  the following keys:
+                  * "name" (str)
+                  * "properties" (dict)
+        """
         if not server_name:
-            server_name = tangoclass
+            first_cls = devices_info[0]["class"]
+            if is_non_str_seq(first_cls):
+                first_device = first_cls[1]
+            else:
+                first_device = first_cls
+            server_name = first_device.__name__
         if not instance_name:
             instance_name = server_name.lower()
-        if not device_name:
-            device_name = 'test/nodb/' + server_name.lower()
         if db is None:
             _, db = tempfile.mkstemp()
         if host is None:
             # IP address is used instead of the hostname on purpose (see #246)
             host = get_host_ip()
-        if properties is None:
-            properties = {}
         if timeout is None:
             timeout = self.process_timeout if process else self.thread_timeout
         # Patch bug #819
@@ -136,27 +149,46 @@ class DeviceTestContext(object):
         self.host = host
         self.port = port
         self.timeout = timeout
-        self.device_name = device_name
         self.server_name = "/".join(("dserver", server_name, instance_name))
-        self.device = self.server = None
         self.queue = multiprocessing.Queue() if process else queue.Queue()
-        # File
-        self.generate_db_file(server_name, instance_name, device_name,
-                              tangoclass, properties)
+
         # Command args
         string = self.command.format(
             server_name, instance_name, host, port, db)
         string += " -v{0}".format(debug) if debug else ""
         cmd_args = string.split()
+
+        class_list = []
+        device_list = []
+        device_cls = None
+        for device_info in devices_info:
+            cls = device_info["class"]
+            if is_non_str_seq(cls):
+                device_cls = cls[0]
+                device = cls[1]
+            else:
+                device = cls
+            tangoclass = device.__name__
+            # File
+            self.generate_db_file_tangoclass(server_name, instance_name,
+                                             tangoclass)
+            self.generate_db_file_device(device_info["devices"])
+
+            if device_cls:
+                class_list.append((device_cls, device, tangoclass))
+            else:
+                device_list.append(device)
+
         # Target and arguments
-        if device_cls:
-            class_dct = {tangoclass: (device_cls, device)}
-            runserver = partial(run, class_dct, cmd_args)
-        elif not hasattr(device, 'run_server'):
-            runserver = partial(run, (device,), cmd_args)
-        else:
+        if class_list:
+            runserver = partial(run, class_list, cmd_args)
+        elif len(device_list) == 1 and hasattr(device_list[0], "run_server"):
             runserver = partial(device.run_server, cmd_args)
-        # Thread
+        elif device_list:
+            runserver = partial(run, device_list, cmd_args)
+        else:
+            raise ValueError("Wrong format of devices_info")
+
         cls = multiprocessing.Process if process else threading.Thread
         self.thread = cls(target=self.target, args=(runserver, process))
         self.thread.daemon = daemon
@@ -197,28 +229,62 @@ class DeviceTestContext(object):
         """Generate a database file corresponding to the given arguments."""
         if not tangoclass:
             tangoclass = server
+        self.generate_db_file_tangoclass(server, instance, tangoclass)
+        device_prop_info = (
+            {
+                "name": device,
+                "properties": properties
+            }
+        )
+        return self.generate_db_file_device(device_prop_info)
+
+    def generate_db_file_tangoclass(self, server, instance, tangoclass):
+        """Generate a database file corresponding to the given arguments.
+
+        Only device server and device class information (no devices information)
+        """
         # Open the file
-        with open(self.db, 'w') as f:
+        with open(self.db, "a") as f:
             f.write("/".join((server, instance, "DEVICE", tangoclass)))
-            f.write(': "' + device + '"\n')
+            f.flush()
+
+    def generate_db_file_device(self, device_prop_info):
+        """Generate a database file corresponding to the given arguments.
+
+        Only devices information (neither device server nor device class
+        information)
+        """
+        # Open the file
+        device_names = [info["name"] for info in device_prop_info]
+        with open(self.db, "a") as f:
+            for device_name in device_names:
+                f.write(': "' + device_name + '"\n')
+                f.flush()
         # Create database
         db = Database(self.db)
-        # Patch the property dict to avoid a PyTango bug
-        patched = dict((key, value if value != '' else ' ')
-                       for key, value in properties.items())
         # Write properties
-        db.put_device_property(device, patched)
+        for info in device_prop_info:
+            device_name = info["name"]
+            properties = info.get("properties", {})
+            # Patch the property dict to avoid a PyTango bug
+            patched = dict((key, value if value != '' else ' ')
+                           for key, value in properties.items())
+            db.put_device_property(device_name, patched)
         return db
-
-    def get_device_access(self):
-        """Return the full device name."""
-        form = 'tango://{0}:{1}/{2}#{3}'
-        return form.format(self.host, self.port, self.device_name, self.nodb)
 
     def get_server_access(self):
         """Return the full server name."""
         form = 'tango://{0}:{1}/{2}#{3}'
         return form.format(self.host, self.port, self.server_name, self.nodb)
+
+    def get_device_access(self, device_name):
+        """Return the full device name."""
+        form = 'tango://{0}:{1}/{2}#{3}'
+        return form.format(self.host, self.port, device_name, self.nodb)
+
+    def get_device(self, device_name):
+        """Return the device proxy corresponding to the given device name."""
+        return DeviceProxy(self.get_device_access(device_name))
 
     def start(self):
         """Run the server."""
@@ -250,9 +316,6 @@ class DeviceTestContext(object):
         # Get server proxy
         self.server = DeviceProxy(self.get_server_access())
         self.server.ping()
-        # Get device proxy
-        self.device = DeviceProxy(self.get_device_access())
-        self.device.ping()
 
     def stop(self):
         """Kill the server."""
@@ -270,11 +333,69 @@ class DeviceTestContext(object):
         """Enter method for context support."""
         if not self.thread.is_alive():
             self.start()
-        return self.device
+        return self
 
     def __exit__(self, exc_type, exception, trace):
         """Exit method for context support."""
         self.stop()
+
+# Device test context
+
+class DeviceTestContext(MultiDeviceTestContext):
+    """ Context to run a device without a database."""
+
+    def __init__(self, device, device_cls=None, server_name=None,
+                 instance_name=None, device_name=None, properties=None,
+                 db=None, host=None, port=0, debug=3,
+                 process=False, daemon=False, timeout=None):
+        """Inititalize the context to run a given device."""
+        # Argument
+        if not server_name:
+            server_name = device.__name__
+        if not instance_name:
+            instance_name = server_name.lower()
+        if not device_name:
+            device_name = 'test/nodb/' + server_name.lower()
+        if properties is None:
+            properties = {}
+        if device_cls:
+            cls = (device_cls, device)
+        else:
+            cls = device
+        devices_info = (
+            {
+                "class": cls,
+                "devices": (
+                    {
+                        "name": device_name,
+                        "properties": properties},
+                )
+            },
+        )
+        super().__init__(devices_info, server_name=server_name,
+                         instance_name=instance_name, db=db, host=host,
+                         port=port, debug=debug, process=process,
+                         daemon=daemon, timeout=timeout)
+
+        self.device_name = device_name
+        self.device = self.server = None
+
+    def get_device_access(self):
+        """Return the full device name."""
+        return super().get_device_access(self.device_name)
+
+    def connect(self):
+        super().connect()
+        # Get device proxy
+        print(self.get_device_access())
+        self.device = DeviceProxy(self.get_device_access())
+        self.device.ping()
+
+    def __enter__(self):
+        """Enter method for context support."""
+        if not self.thread.is_alive():
+            self.start()
+        return self.device
 
 
 # Command line interface
