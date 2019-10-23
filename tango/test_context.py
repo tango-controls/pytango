@@ -184,6 +184,10 @@ class MultiDeviceTestContext(object):
                 device_list.append(device)
 
         # Target and arguments
+        if class_list and device_list:
+            os.unlink(self.db)
+            raise ValueError("mixing HLAPI and classical API in devices_info "
+                             "is not supported")
         if class_list:
             runserver = partial(run, class_list, cmd_args)
         elif len(device_list) == 1 and hasattr(device_list[0], "run_server"):
