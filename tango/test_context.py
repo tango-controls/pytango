@@ -160,8 +160,8 @@ class MultiDeviceTestContext(object):
 
         class_list = []
         device_list = []
-        device_cls = None
         for device_info in devices_info:
+            device_cls = None
             cls = device_info["class"]
             if is_non_str_seq(cls):
                 device_cls = cls[0]
