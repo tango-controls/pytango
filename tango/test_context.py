@@ -176,10 +176,8 @@ class MultiDeviceTestContext(object):
                                  "to the same Tango class")
             tangoclass_list.append(tangoclass)
             # File
-            self.generate_db_file_tangoclass(server_name, instance_name,
-                                             tangoclass)
-            self.generate_db_file_device(device_info["devices"])
-
+            self.append_db_file(server_name, instance_name, tangoclass,
+                                device_info["devices"])
             if device_cls:
                 class_list.append((device_cls, device, tangoclass))
             else:
@@ -230,42 +228,16 @@ class MultiDeviceTestContext(object):
                 "The post_init routine failed to report anything")
             self.queue.put((None, exc, None))
 
-    def generate_db_file(self, server, instance, device,
-                         tangoclass=None, properties={}):
-        """Generate a database file corresponding to the given arguments."""
-        if not tangoclass:
-            tangoclass = server
-        self.generate_db_file_tangoclass(server, instance, tangoclass)
-        device_prop_info = (
-            {
-                "name": device,
-                "properties": properties
-            }
-        )
-        return self.generate_db_file_device(device_prop_info)
-
-    def generate_db_file_tangoclass(self, server, instance, tangoclass):
+    def append_db_file(self, server, instance, tangoclass, device_prop_info):
         """Generate a database file corresponding to the given arguments.
-
-        Only device server and device class information (no devices information)
         """
+        device_names = [info["name"] for info in device_prop_info]
         # Open the file
         with open(self.db, "a") as f:
             f.write("/".join((server, instance, "DEVICE", tangoclass)))
-            f.flush()
-
-    def generate_db_file_device(self, device_prop_info):
-        """Generate a database file corresponding to the given arguments.
-
-        Only devices information (neither device server nor device class
-        information)
-        """
-        # Open the file
-        device_names = [info["name"] for info in device_prop_info]
-        with open(self.db, "a") as f:
             for device_name in device_names:
                 f.write(': "' + device_name + '"\n')
-                f.flush()
+            f.flush()
         # Create database
         db = Database(self.db)
         # Write properties
