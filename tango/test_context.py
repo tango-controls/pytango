@@ -160,6 +160,7 @@ class MultiDeviceTestContext(object):
 
         class_list = []
         device_list = []
+        tangoclass_list = []
         for device_info in devices_info:
             device_cls = None
             cls = device_info["class"]
@@ -169,6 +170,11 @@ class MultiDeviceTestContext(object):
             else:
                 device = cls
             tangoclass = device.__name__
+            if tangoclass in tangoclass_list:
+                os.unlink(self.db)
+                raise ValueError("multiple entries in devices_info pointing "
+                                 "to the same Tango class")
+            tangoclass_list.append(tangoclass)
             # File
             self.generate_db_file_tangoclass(server_name, instance_name,
                                              tangoclass)
