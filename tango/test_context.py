@@ -321,7 +321,7 @@ class MultiDeviceTestContext(object):
         """Exit method for context support."""
         self.stop()
 
-# Device test context
+# Single device test context
 
 class DeviceTestContext(MultiDeviceTestContext):
     """ Context to run a device without a database."""
