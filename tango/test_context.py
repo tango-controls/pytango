@@ -151,6 +151,7 @@ class MultiDeviceTestContext(object):
         self.timeout = timeout
         self.server_name = "/".join(("dserver", server_name, instance_name))
         self.queue = multiprocessing.Queue() if process else queue.Queue()
+        self._devices = {}
 
         # Command args
         string = self.command.format(
@@ -265,8 +266,15 @@ class MultiDeviceTestContext(object):
         return form.format(self.host, self.port, device_name, self.nodb)
 
     def get_device(self, device_name):
-        """Return the device proxy corresponding to the given device name."""
-        return DeviceProxy(self.get_device_access(device_name))
+        """Return the device proxy corresponding to the given device name.
+
+        Maintains previously accessed device proxies in a cache to not recreate
+        then on every access.
+        """
+        if not device_name in self._devices:
+            device = DeviceProxy(self.get_device_access(device_name))
+            self._devices[device_name] = device
+        return self._devices[device_name]
 
     def start(self):
         """Run the server."""
