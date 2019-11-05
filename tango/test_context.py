@@ -374,10 +374,12 @@ class DeviceTestContext(MultiDeviceTestContext):
         self.device_name = device_name
         self.device = self.server = None
 
-    def get_device_access(self):
+    def get_device_access(self, device_name=None):
         """Return the full device name."""
+        if device_name is None:
+            device_name = self.device_name
         return super(DeviceTestContext, self).get_device_access(
-            self.device_name)
+            device_name)
 
     def connect(self):
         super(DeviceTestContext, self).connect()
