@@ -382,7 +382,7 @@ class DeviceTestContext(MultiDeviceTestContext):
     def connect(self):
         super(DeviceTestContext, self).connect()
         # Get device proxy
-        self.device = DeviceProxy(self.get_device_access())
+        self.device = self.get_device(self.device_name)
         self.device.ping()
 
     def __enter__(self):
