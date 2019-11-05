@@ -438,7 +438,49 @@ class MultiDeviceTestContext(object):
 # Single device test context
 
 class DeviceTestContext(MultiDeviceTestContext):
-    """ Context to run a device without a database."""
+    """Context to run a single device without a database.
+
+    The difference with respect to
+    :class:`~tango.test_context.MultiDeviceTestContext` is that it only
+    allows to export a single device.
+
+    Example usage::
+
+        from time import sleep
+
+        from tango.server import Device, attribute, command
+        from tango.test_context import DeviceTestContext
+
+        class PowerSupply(Device):
+
+            @attribute(dtype=float)
+            def voltage(self):
+                return 1.23
+
+            @command
+            def calibrate(self):
+                sleep(0.1)
+
+        def test_calibrate():
+            '''Test device calibration and voltage reading.'''
+            with DeviceTestContext(PowerSupply, process=True) as proxy:
+                proxy.calibrate()
+                assert proxy.voltage == 1.23
+
+    :param device:
+      Device class to be run.
+    :type device:
+      :class:`~tango.server.Device` or :class:`~tango.DeviceImpl`
+    :param device_cls:
+      The device class can be provided if using the low-level API.
+      Optional.  Not required for high-level API devices, of type
+      :class:`~tango.server.Device`.
+    :type device_cls:
+      :class:`~tango.DeviceClass`
+
+     The rest of the parameters are described in
+     :class:`~tango.test_context.MultiDeviceTestContext`.
+     """
 
     def __init__(self, device, device_cls=None, server_name=None,
                  instance_name=None, device_name=None, properties=None,
