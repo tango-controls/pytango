@@ -11,7 +11,7 @@ except ImportError:
 # Local imports
 from . import DevState, GreenMode
 from .server import Device
-from .test_context import DeviceTestContext
+from .test_context import MultiDeviceTestContext, DeviceTestContext
 
 # Conditional imports
 try:
@@ -24,7 +24,7 @@ try:
 except ImportError:
     numpy = None
 
-__all__ = ('DeviceTestContext', 'SimpleDevice')
+__all__ = ('MultiDeviceTestContext', 'DeviceTestContext', 'SimpleDevice')
 
 PY3 = sys.version_info >= (3,)
 
