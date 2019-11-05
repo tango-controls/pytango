@@ -419,7 +419,14 @@ class MultiDeviceTestContext(object):
         self.thread.join(timeout)
 
     def __enter__(self):
-        """Enter method for context support."""
+        """Enter method for context support.
+
+        :return:
+          Instance of this test context.  Use `get_device` to get proxy
+          access to any of the devices started by this context.
+        :rtype:
+          :class:`~tango.test_context.MultiDeviceTestContext`
+        """
         if not self.thread.is_alive():
             self.start()
         return self
