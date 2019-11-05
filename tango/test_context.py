@@ -535,7 +535,13 @@ class DeviceTestContext(MultiDeviceTestContext):
         self.device.ping()
 
     def __enter__(self):
-        """Enter method for context support."""
+        """Enter method for context support.
+
+        :return:
+          A device proxy to the device started by this context.
+        :rtype:
+          :class:`~tango.DeviceProxy`
+        """
         if not self.thread.is_alive():
             self.start()
         return self.device
