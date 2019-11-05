@@ -102,6 +102,118 @@ class MultiDeviceTestContext(object):
     The difference with respect to
     :class:`~tango.test_context.DeviceTestContext` is that it allows
     to export multiple devices (even of different Tango classes).
+
+    Example usage::
+
+        from tango.server import Device, attribute
+        from tango.test_context import MultiDeviceTestContext
+
+
+        class Device1(Device):
+
+            attr1 = attribute()
+
+            def read_attr1(self):
+                return 1.0
+
+
+        class Device2(Device):
+
+            attr2 = attribute()
+
+            def read_attr2(self):
+                return 2.0
+
+
+        devices_info = (
+            {
+                "class": Device1,
+                "devices": (
+                    {
+                        "name": "test/device1/1"
+                    },
+                )
+            },
+            {
+                "class": Device2,
+                "devices": (
+                    {
+                        "name": "test/device2/1",
+                    }
+                )
+            }
+        )
+
+        def test_devices():
+            with MultiDeviceTestContext(devices_info, process=True) as context:
+                device1 = context.get_device("test/device1/1")
+                device2 = context.get_device("test/device2/1")
+                assert device1.read_attribute("attr1").value == 1.0
+                assert device2.read_attribute("attr1").value == 2.0
+
+    :param devices_info:
+      a sequence of dicts with information about
+      devices to be exported. Each dict consists of the following keys:
+        * "class" which value is either of:
+          * :class:`~tango.server.Device`
+          * a sequence of two elements :class:`~tango.DeviceClass`
+            and :class:`~tango.DeviceImpl`
+        * "devices" which value is a sequence of dicts with the following keys:
+          * "name" (str)
+          * "properties" (dict)
+    :type devices_info:
+      sequence<dict>
+    :param server_name:
+      Name to use for the device server.
+      Optional.  Default is the first device's class name.
+    :type server_name:
+      :py:obj:`str`
+    :param instance_name:
+      Name to use for the device server instance.
+      Optional.  Default is lower-case version of the server name.
+    :type instance_name:
+      :py:obj:`str`
+    :param db
+      Path to a pre-populated text file to use for the
+      database.
+      Optional.  Default is to create a new temporary file and populate it
+      based on the devices and properties supplied in `devices_info`.
+    :type db:
+      :py:obj:`str`
+    :param host:
+      Hostname to use for device server's ORB endpoint.
+      Optional.  Default is a local IP address.
+    :type host:
+      :py:obj:`str`
+    :param port:
+      Port number to use for the device server's ORB endpoint.
+      Optional.  Default is chosen by omniORB.
+    :type port:
+      :py:obj:`int`
+    :param debug:
+      Debug level for the device server logging.
+      0=OFF, 1=FATAL, 2=ERROR, 3=WARN, 4=INFO, 5=DEBUG.
+      Optional. Default is warn.
+    :type debug:
+      :py:obj:`int`
+    :param process:
+      True if the device server should be launched in a new process, otherwise
+      use a new thread.  Note:  if the context will be used mutiple times, it
+      may seg fault if the thread mode is chosen.
+      Optional.  Default is thread.
+    :type process:
+      :py:obj:`bool`
+    :param daemon:
+      True if the new thread/process must be created in daemon mode.
+      Optional.  Default is not daemon.
+    :type daemon:
+      :py:obj:`bool`
+    :param timeout:
+      How long to wait (seconds) for the device server to start up, and also
+      how long to wait on joining the thread/process when stopping.
+      Optional.  Default differs for thread and process modes.
+    :type timeout:
+      :py:obj:`float`
     """
     nodb = "dbase=no"
     command = "{0} {1} -ORBendPoint giop:tcp:{2}:{3} -file={4}"
@@ -112,19 +224,6 @@ class MultiDeviceTestContext(object):
     def __init__(self, devices_info, server_name=None, instance_name=None,
                  db=None, host=None, port=0, debug=3,
                  process=False, daemon=False, timeout=None):
-        """Initialize the context to run given devices within one server.
-
-            :param devices_info: a sequence of dicts with information about
-              devices to be exported. Each dict consists of the following keys:
-                * "class" which value is either of:
-                  * :class:`~tango.server.Device`
-                  * a sequence of two elements :class:`~tango.DeviceClass`
-                    and :class:`~tango.DeviceImpl`
-                * "devices" which value is a sequence of dicts with
-                  the following keys:
-                  * "name" (str)
-                  * "properties" (dict)
-        """
         if not server_name:
             first_cls = devices_info[0]["class"]
             if is_non_str_seq(first_cls):
