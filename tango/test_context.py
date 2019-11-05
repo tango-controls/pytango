@@ -486,7 +486,6 @@ class DeviceTestContext(MultiDeviceTestContext):
                  instance_name=None, device_name=None, properties=None,
                  db=None, host=None, port=0, debug=3,
                  process=False, daemon=False, timeout=None):
-        """Inititalize the context to run a given device."""
         # Argument
         if not server_name:
             server_name = device.__name__
