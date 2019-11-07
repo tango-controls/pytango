@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["time_val_init"]
+__all__ = ("time_val_init",)
 
 __docformat__ = "restructuredtext"
 

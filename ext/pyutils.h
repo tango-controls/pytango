@@ -193,9 +193,7 @@ public:
 
     inline AutoPythonAllowThreads()
     {
-        std::cerr << "In AutoPythonAllowThreads ctor" << std::endl;
         m_save = PyEval_SaveThread();
-        std::cerr << "Out AutoPythonAllowThreads ctor" << std::endl;
     }
 
     inline ~AutoPythonAllowThreads()
@@ -230,7 +228,6 @@ void is_method_defined(py::object& obj, const std::string& method_name,
 
 inline bool is_method_callable(py::object& obj, const std::string& method_name)
 {
-    std::cout << "is method_callable " << std::endl;
     PyObject *meth = PyObject_GetAttrString_(obj.ptr(), method_name.c_str());
     bool exists = (NULL != meth);
     if (!exists)
@@ -240,7 +237,6 @@ inline bool is_method_callable(py::object& obj, const std::string& method_name)
     }
     bool callable = (1 == PyCallable_Check(meth));
     Py_DECREF(meth);
-    std::cout << "leaving is method_callable " << callable << std::endl;
     return callable;
 }
 

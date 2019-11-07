@@ -16,7 +16,7 @@ namespace py = pybind11;
 
 void export_pipe_info(py::module &m) {
     py::class_<Tango::PipeInfo>(m, "PipeInfo")
-//        .def(py::init<const Tango::PipeInfo&>())
+        .def(py::init<const Tango::PipeInfo&>())
         .def_readwrite("name", &Tango::PipeInfo::name)
         .def_readwrite("description", &Tango::PipeInfo::description)
         .def_readwrite("label", &Tango::PipeInfo::label)

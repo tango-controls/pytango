@@ -31,7 +31,6 @@ class DeviceImplWrap: public Tango::Device_5Impl
 public:
     /** a reference to itself */
     py::object py_self;
-
     std::string the_status;
 
     /**
@@ -41,33 +40,36 @@ public:
      * @param[in] cl
      * @param[in] name
      */
-  DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name);
+    DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name);
 
-    /**
-     * Constructor
-     *
-     * @param[in] self
-     * @param[in] cl
-     * @param[in] name
-     * @param[in] desc
-     */
-  DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name, std::string& desc);
-
-    /**
-     * Constructor
-     *
-     * @param[in] self
-     * @param[in] cl
-     * @param[in] name
-     * @param[in] desc
-     * @param[in] sta
-     * @param[in] status
-     */
-  DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl,
-                 std::string& name,
-                 std::string& desc,
-                 Tango::DevState sta,
-                 std::string& status);
+//    /**
+//     * Constructor
+//     *
+//     * @param[in] self
+//     * @param[in] cl
+//     * @param[in] name
+//     * @param[in] desc
+//     */
+    DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name, std::string& desc);
+//
+//    /**
+//     * Constructor
+//     *
+//     * @param[in] self
+//     * @param[in] cl
+//     * @param[in] name
+//     * @param[in] desc
+//     * @param[in] sta
+//     * @param[in] status
+//     */
+    DeviceImplWrap(
+            py::object& pyself,
+            DeviceClassWrap *cl,
+            std::string& name,
+            std::string& desc,
+            Tango::DevState sta,
+            std::string& status
+            );
 
     /**
      * Destructor

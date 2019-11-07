@@ -75,6 +75,7 @@ CFLAGS += -g -std=c++14 -fvisibility=hidden
 CFLAGS += -I$(PYTHON_INCLUDE_DIR)
 CFLAGS += -I$(CONDA_PREFIX)/include/tango -Wno-deprecated
 CFLAGS += -I$(CONDA_PREFIX)/include
+CFLAGS += -I$(CONDA_PREFIX)/lib/python2.7/site-packages/numpy/core/include
 CFLAGS += -Iext
 
 srcs = $(objs:.o=.cpp)

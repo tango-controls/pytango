@@ -28,37 +28,42 @@ assert attr.r_dimension.dim_x == nx
 assert attr.r_dimension.dim_y == 0
 assert type(attr.time) == tango._tango.TimeVal
 assert attr.type == tango._tango.CmdArgType.DevDouble
-assert set(attr.value) == set(spectre)
+assert type(attr.value) == np.ndarray
+assert((attr.value == spectre).all())
 assert attr.w_dim_x == nx
 assert attr. w_dim_y == 0
 assert type(attr.w_dimension) == tango._tango.AttributeDimension
 assert attr.w_dimension.dim_x == nx
 assert attr.w_dimension.dim_y == 0
-assert set(attr.w_value) == set(spectre)
+assert((attr.w_value == spectre).all())
 
 spectre = np.array([True, True, False, True, False])
 dp.write_attribute('boolean_spectrum', spectre)
 attr = dp.read_attribute('boolean_spectrum')
-assert set(attr.value) == set(spectre)
-assert set(attr.w_value) == set(spectre)
+assert type(attr.value) == np.ndarray
+assert((attr.value == spectre).all())
+assert((attr.w_value == spectre).all())
+
+spectre = [i*i for i in range(32)]
+dp.write_attribute('short_spectrum', spectre)
+attr = dp.read_attribute('short_spectrum')
+assert type(attr.value) == np.ndarray
+assert((attr.value == spectre).all())
+assert((attr.w_value == spectre).all())
 
 spectre = [i*i*i for i in range(32)]
 dp.write_attribute('long64_spectrum', spectre)
 attr = dp.read_attribute('long64_spectrum')
-assert set(attr.value) == set(spectre)
-assert set(attr.w_value) == set(spectre)
+assert type(attr.value) == np.ndarray
+assert((attr.value == spectre).all())
+assert((attr.w_value == spectre).all())
 
-spectre = np.array(['ESRF', 'ALBA', 'MAXIV', 'PETRA3', 'SOLEIL', 'SOLARIS'])
+spectre = np.array(['ABCD', 'EFGH', 'IJKL', 'MNOP', 'QRST', 'UVWX'])
 dp.write_attribute('string_spectrum', spectre)
 attr = dp.read_attribute('string_spectrum')
-assert set(attr.value) == set(spectre)
-assert set(attr.w_value) == set(spectre)
-
-spectre = ['ESRF', 'ALBA', 'MAXIV', 'PETRA3', 'SOLEIL', 'SOLARIS']
-dp.write_attribute('string_spectrum', spectre)
-attr = dp.read_attribute('string_spectrum')
-assert set(attr.value) == set(spectre)
-assert set(attr.w_value) == set(spectre)
+assert type(attr.value) == np.ndarray
+assert((attr.value == spectre).all())
+assert((attr.w_value == spectre).all())
 
 nx = 7
 ny = 4
@@ -84,6 +89,7 @@ assert attr. w_dim_y == ny
 assert type(attr.w_dimension) == tango._tango.AttributeDimension
 assert attr.w_dimension.dim_x == nx
 assert attr.w_dimension.dim_y == ny
+assert type(attr.value) == np.ndarray
 for a, b in zip(attr.value.ravel(), img.ravel()):
     assert a == b
 for a, b in zip(attr.w_value.ravel(), img.ravel()):
@@ -92,17 +98,10 @@ for a, b in zip(attr.w_value.ravel(), img.ravel()):
 img = np.array([['one', 'two', 'three', 'four'],['five', 'six', 'seven', 'eight'], ['nine', 'ten', 'eleven', 'twelve']])
 dp.write_attribute('string_image', img)
 attr = dp.read_attribute('string_image')
+assert type(attr.value) == np.ndarray
 for a, b in zip(attr.value.ravel(), img.ravel()):
     assert a == b
 for a, b in zip(attr.w_value.ravel(), img.ravel()):
-    assert a == b
-
-img = [['one', 'two', 'three', 'four'],['five', 'six', 'seven', 'eight'], ['nine', 'ten', 'eleven', 'twelve']]
-dp.write_attribute('string_image', img)
-attr = dp.read_attribute('string_image')
-for a, b in zip(attr.value.ravel(), np.array(img).ravel()):
-    assert a == b
-for a, b in zip(attr.w_value.ravel(), np.array(img).ravel()):
     assert a == b
 
 print("passed")

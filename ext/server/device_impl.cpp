@@ -20,116 +20,19 @@
 #include <exception.h>
 #include <thread>
 #include <server/attr.h>
+#include <server/pipe.h>
+
 
 namespace py = pybind11;
-
-#define SAFE_PUSH(dev, attr, attr_name) \
-    std::string __att_name = attr_name; \
-    AutoPythonAllowThreads python_guard_ptr; \
-    Tango::AutoTangoMonitor tango_guard(&dev); \
-    Tango::Attribute & attr = dev.get_device_attr()->get_attr_by_name(__att_name.c_str()); \
-    python_guard_ptr.giveup();
-
-#define SAFE_PUSH_CHANGE_EVENT(dev, attr_name, data) \
-{ \
-    SAFE_PUSH(dev, attr, attr_name) \
-    PyAttribute::set_value(attr, data); \
-    attr.fire_change_event(); \
-}
-
-#define SAFE_PUSH_CHANGE_EVENT_VARGS(dev, attr_name, data, ...) \
-{ \
-    SAFE_PUSH(dev, attr, attr_name) \
-    PyAttribute::set_value(attr, data, __VA_ARGS__); \
-    attr.fire_change_event(); \
-}
-
-#define SAFE_PUSH_CHANGE_EVENT_DATE_QUALITY(dev, attr_name, data, date, quality) \
-{ \
-    SAFE_PUSH(dev, attr, attr_name) \
-    PyAttribute::set_value_date_quality(attr, data, date, quality); \
-    attr.fire_change_event(); \
-}
-
-#define SAFE_PUSH_CHANGE_EVENT_DATE_QUALITY_VARGS(dev, attr_name, data, date, quality, ...) \
-{ \
-    SAFE_PUSH(dev, attr, attr_name) \
-    PyAttribute::set_value_date_quality(attr, data, date, quality, __VA_ARGS__); \
-    attr.fire_change_event(); \
-}
-
-#define SAFE_PUSH_ARCHIVE_EVENT(dev, attr_name, data) \
-{ \
-    SAFE_PUSH(dev, attr, attr_name) \
-    PyAttribute::set_value(attr, data); \
-    attr.fire_archive_event(); \
-}
-
-#define SAFE_PUSH_ARCHIVE_EVENT_VARGS(dev, attr_name, data, ...) \
-{ \
-    SAFE_PUSH(dev, attr, attr_name) \
-    PyAttribute::set_value(attr, data, __VA_ARGS__); \
-    attr.fire_archive_event(); \
-}
-
-#define SAFE_PUSH_ARCHIVE_EVENT_DATE_QUALITY(dev, attr_name, data, date, quality) \
-{ \
-    SAFE_PUSH(dev, attr, attr_name) \
-    PyAttribute::set_value_date_quality(attr, data, date, quality); \
-    attr.fire_archive_event(); \
-}
-
-#define SAFE_PUSH_ARCHIVE_EVENT_DATE_QUALITY_VARGS(dev, attr_name, data, date, quality, ...) \
-{ \
-    SAFE_PUSH(dev, attr, attr_name) \
-    PyAttribute::set_value_date_quality(attr, data, date, quality, __VA_ARGS__); \
-    attr.fire_archive_event(); \
-}
-/*
- * do we have to do this conversion or is it pybind11 automatic
- */
-#define AUX_SAFE_PUSH_EVENT(dev, attr_name, filt_names, filt_vals) \
-    std::vector<std::string> filt_names_; \
-    std::vector<double> filt_vals_; \
-    SAFE_PUSH(dev, attr, attr_name)
-//    from_sequence<StdStringVector>::convert(filt_names, filt_names_); \
-//    from_sequence<StdDoubleVector>::convert(filt_vals, filt_vals_); \
-
-#define SAFE_PUSH_EVENT(dev, attr_name, filt_names, filt_vals, data) \
-{ \
-    AUX_SAFE_PUSH_EVENT(dev, attr_name, filt_names, filt_vals) \
-    PyAttribute::set_value(attr, data); \
-    attr.fire_event(filt_names_, filt_vals_); \
-}
-
-#define SAFE_PUSH_EVENT_VARGS(dev, attr_name, filt_names, filt_vals, data, ...) \
-{ \
-    AUX_SAFE_PUSH_EVENT(dev,attr_name, filt_names, filt_vals) \
-    PyAttribute::set_value(attr, data, __VA_ARGS__); \
-    attr.fire_event(filt_names_, filt_vals_); \
-}
-
-#define SAFE_PUSH_EVENT_DATE_QUALITY(dev, attr_name, filt_names, filt_vals, data, date, quality) \
-{ \
-    AUX_SAFE_PUSH_EVENT(dev, attr_name, filt_names, filt_vals) \
-    PyAttribute::set_value_date_quality(attr, data, date, quality); \
-    attr.fire_event(filt_names_, filt_vals_); \
-}
-
-#define SAFE_PUSH_EVENT_DATE_QUALITY_VARGS(dev, attr_name, filt_names, filt_vals, data, date, quality, ...) \
-{ \
-    AUX_SAFE_PUSH_EVENT(dev,attr_name, filt_names, filt_vals) \
-    PyAttribute::set_value_date_quality(attr, data, date, quality, __VA_ARGS__); \
-    attr.fire_event(filt_names_, filt_vals_); \
-}
 
 namespace PyDeviceImpl
 {
     /* **********************************
      * change event USING set_value
      * **********************************/
-    inline void push_change_event(Tango::DeviceImpl& self, const std::string& name)
+    inline void push_change_event(Tango::DeviceImpl& self, std::string& name)
     {
+        std::cerr << "push_change_event 1" << std::endl;
         std::string name_lower = name;
         std::transform(name_lower.begin(), name_lower.end(), name_lower.begin(), ::tolower);
         if ("state" != name_lower && "status" != name_lower)
@@ -139,305 +42,458 @@ namespace PyDeviceImpl
                 "push_change_event without data parameter is only allowed for "
                 "state and status attributes.", "DeviceImpl::push_change_event");
         }
-        SAFE_PUSH(self, attr, name)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         attr.fire_change_event();
     }
 
-    inline void push_change_event(Tango::DeviceImpl& self, const std::string& name, py::object& data)
+    inline void push_change_event(Tango::DeviceImpl& self, std::string& name, py::object& data)
     {
+        std::cerr << "push_change_event 2" << std::endl;
 //        boost::python::extract<Tango::DevFailed> except_convert(data);
 //        if (except_convert.check()) {
-//            SAFE_PUSH(self, attr, name);
+//            AutoPythonAllowThreads python_guard_ptr;
+//            Tango::AutoTangoMonitor tango_guard(&self);
+//            Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+//            python_guard_ptr.giveup();
 //            attr.fire_change_event(
 //                           const_cast<Tango::DevFailed*>( &except_convert() ));
 //            return;
 //        }
-        SAFE_PUSH_CHANGE_EVENT(self, name, data);
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value(attr, data);
+        attr.fire_change_event();
     }
 
     // Special variation for encoded data type
-    inline void push_change_event(Tango::DeviceImpl& self, const std::string& name, const std::string& str_data,
-                                  const std::string& data)
+    inline void push_change_event(Tango::DeviceImpl& self, std::string& name, std::string& str_data,
+                                  std::string& data)
     {
-        SAFE_PUSH(self, attr, name)
+        std::cerr << "push_change_event 3" << std::endl;
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value(attr, str_data, data);
         attr.fire_change_event();
     }
 
     // Special variation for encoded data type
-    inline void push_change_event(Tango::DeviceImpl& self, const std::string& name, const std::string& str_data,
+    inline void push_change_event(Tango::DeviceImpl& self, std::string& name, std::string& str_data,
                                   py::object& data)
     {
-        SAFE_PUSH(self, attr, name)
+        std::cerr << "push_change_event 4" << std::endl;
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value(attr, str_data, data);
         attr.fire_change_event();
     }
 
-    inline void push_change_event(Tango::DeviceImpl& self, const std::string& name, py::object& data,
+    inline void push_change_event(Tango::DeviceImpl& self, std::string& name, py::object& data,
                                   long x)
     {
-        SAFE_PUSH_CHANGE_EVENT_VARGS(self, name, data, x);
+        std::cerr << "push_change_event 5" << std::endl;
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value(attr, data, x);
+        attr.fire_change_event();
     }
 
-    inline void push_change_event(Tango::DeviceImpl& self, const std::string& name, py::object& data,
+    inline void push_change_event(Tango::DeviceImpl& self, std::string& name, py::object& data,
                                   long x, long y)
     {
-        SAFE_PUSH_CHANGE_EVENT_VARGS(self, name, data, x, y);
+        std::cerr << "push_change_event 6" << std::endl;
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value(attr, data, x, y);
+        attr.fire_change_event();
     }
 
     /* **********************************
      * change event USING set_value_date_quality
      * **********************************/
 
-    inline void push_change_event(Tango::DeviceImpl& self, const std::string& name, py::object& data,
+    inline void push_change_event(Tango::DeviceImpl& self, std::string& name, py::object& data,
                                   double t, Tango::AttrQuality quality)
     {
-        SAFE_PUSH_CHANGE_EVENT_DATE_QUALITY(self, name, data, t, quality)
+        std::cerr << "push_change_event 7" << std::endl;
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value_date_quality(attr, data, t, quality);
+        attr.fire_change_event();
     }
 
     // Special variation for encoded data type
-    inline void push_change_event(Tango::DeviceImpl& self, const std::string& name, const std::string& str_data,
-                                  const std::string& data, double t, Tango::AttrQuality quality)
+    inline void push_change_event(Tango::DeviceImpl& self, std::string& name, std::string& str_data,
+                                  std::string& data, double t, Tango::AttrQuality quality)
     {
-        SAFE_PUSH(self, attr, name)
+        std::cerr << "push_change_event 8" << std::endl;
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value_date_quality(attr, str_data, data, t, quality);
         attr.fire_change_event();
     }
 
     // Special variation for encoded data type
-    inline void push_change_event(Tango::DeviceImpl& self, const std::string& name, const std::string& str_data,
+    inline void push_change_event(Tango::DeviceImpl& self, std::string& name, std::string& str_data,
                                  py::object& data, double t, Tango::AttrQuality quality)
     {
-        SAFE_PUSH(self, attr, name)
+        std::cerr << "push_change_event 9" << std::endl;
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value_date_quality(attr, str_data, data, t, quality);
         attr.fire_change_event();
     }
 
-    inline void push_change_event(Tango::DeviceImpl& self, const std::string& name, py::object& data,
+    inline void push_change_event(Tango::DeviceImpl& self, std::string& name, py::object& data,
                                   double t, Tango::AttrQuality quality, long x)
     {
-        SAFE_PUSH_CHANGE_EVENT_DATE_QUALITY_VARGS(self, name, data, t, quality, x)
+        std::cerr << "push_change_event 10" << std::endl;
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value_date_quality(attr, data, t, quality, x);
+        attr.fire_change_event();
     }
 
-    inline void push_change_event(Tango::DeviceImpl& self, const std::string& name, py::object& data,
+    inline void push_change_event(Tango::DeviceImpl& self, std::string& name, py::object& data,
                                   double t, Tango::AttrQuality quality, long x, long y)
     {
-        SAFE_PUSH_CHANGE_EVENT_DATE_QUALITY_VARGS(self, name, data, t, quality, x, y)
+        std::cerr << "push_change_event 11" << std::endl;
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value_date_quality(attr, data, t, quality, x, y);
+        attr.fire_change_event();
     }
 
     /* **********************************
      * archive event USING set_value
      * **********************************/
-    inline void push_archive_event(Tango::DeviceImpl& self, const std::string& name)
+    inline void push_archive_event(Tango::DeviceImpl& self, std::string& name)
     {
-        SAFE_PUSH(self, attr, name)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         attr.fire_archive_event();
     }
 
-    inline void push_archive_event(Tango::DeviceImpl& self, const std::string& name, py::object& data)
+    inline void push_archive_event(Tango::DeviceImpl& self, std::string& name, py::object& data)
     {
 //        boost::python::extract<Tango::DevFailed> except_convert(data);
 //        if (except_convert.check()) {
-//            SAFE_PUSH(self, attr, name);
+//            AutoPythonAllowThreads python_guard_ptr;
+//            Tango::AutoTangoMonitor tango_guard(&self);
+//            Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+//            python_guard_ptr.giveup();
 //            attr.fire_archive_event(
 //                           const_cast<Tango::DevFailed*>( &except_convert() ));
 //            return;
 //        }
-        SAFE_PUSH_ARCHIVE_EVENT(self, name, data);
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value(attr, data);
+        attr.fire_archive_event();
     }
 
     // Special variation for encoded data type
-    inline void push_archive_event(Tango::DeviceImpl& self, const std::string& name, const std::string& str_data,
-                                   const std::string& data)
+    inline void push_archive_event(Tango::DeviceImpl& self, std::string& name, std::string& str_data,
+                                   std::string& data)
     {
-        SAFE_PUSH(self, attr, name)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value(attr, str_data, data);
         attr.fire_archive_event();
     }
 
     // Special variation for encoded data type
-    inline void push_archive_event(Tango::DeviceImpl& self, const std::string& name, const std::string& str_data,
+    inline void push_archive_event(Tango::DeviceImpl& self, std::string& name, std::string& str_data,
                                   py::object& data)
     {
-        SAFE_PUSH(self, attr, name)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value(attr, str_data, data);
         attr.fire_archive_event();
     }
 
-    inline void push_archive_event(Tango::DeviceImpl& self, const std::string& name, py::object& data,
+    inline void push_archive_event(Tango::DeviceImpl& self, std::string& name, py::object& data,
                            long x)
     {
-        SAFE_PUSH_ARCHIVE_EVENT_VARGS(self, name, data, x);
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value(attr, data, x);
+        attr.fire_archive_event();
     }
 
-    inline void push_archive_event(Tango::DeviceImpl& self, const std::string& name, py::object& data,
+    inline void push_archive_event(Tango::DeviceImpl& self, std::string& name, py::object& data,
                            long x, long y)
     {
-        SAFE_PUSH_ARCHIVE_EVENT_VARGS(self, name, data, x, y);
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value(attr, data, x, y);
+        attr.fire_archive_event();
     }
 
     /* **********************************
      * archive event USING set_value_date_quality
      * **********************************/
 
-    inline void push_archive_event(Tango::DeviceImpl& self, const std::string& name, py::object& data,
+    inline void push_archive_event(Tango::DeviceImpl& self, std::string& name, py::object& data,
                                   double t, Tango::AttrQuality quality)
     {
-        SAFE_PUSH_ARCHIVE_EVENT_DATE_QUALITY(self, name, data, t, quality)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value_date_quality(attr, data, t, quality);
+        attr.fire_archive_event();
     }
 
     // Special variation for encoded data type
-    inline void push_archive_event(Tango::DeviceImpl& self, const std::string& name, const std::string& str_data,
-                                   const std::string& data, double t, Tango::AttrQuality quality)
+    inline void push_archive_event(Tango::DeviceImpl& self, std::string& name, std::string& str_data,
+                                   std::string& data, double t, Tango::AttrQuality quality)
     {
-        SAFE_PUSH(self, attr, name)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value_date_quality(attr, str_data, data, t, quality);
         attr.fire_archive_event();
     }
 
     // Special variation for encoded data type
-    inline void push_archive_event(Tango::DeviceImpl& self, const std::string& name, const std::string& str_data,
+    inline void push_archive_event(Tango::DeviceImpl& self, std::string& name, std::string& str_data,
                                   py::object& data, double t, Tango::AttrQuality quality)
     {
-        SAFE_PUSH(self, attr, name)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value_date_quality(attr, str_data, data, t, quality);
         attr.fire_archive_event();
     }
 
-    inline void push_archive_event(Tango::DeviceImpl& self, const std::string& name, py::object& data,
+    inline void push_archive_event(Tango::DeviceImpl& self, std::string& name, py::object& data,
                                   double t, Tango::AttrQuality quality, long x)
     {
-        SAFE_PUSH_ARCHIVE_EVENT_DATE_QUALITY_VARGS(self, name, data, t, quality, x)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value_date_quality(attr, data, t, quality, x);
+        attr.fire_archive_event();
     }
 
-    inline void push_archive_event(Tango::DeviceImpl& self, const std::string& name, py::object& data,
+    inline void push_archive_event(Tango::DeviceImpl& self, std::string& name, py::object& data,
                                   double t, Tango::AttrQuality quality, long x, long y)
     {
-        SAFE_PUSH_ARCHIVE_EVENT_DATE_QUALITY_VARGS(self, name, data, t, quality, x, y)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value_date_quality(attr, data, t, quality, x, y);
+        attr.fire_archive_event();
     }
 
     /* **********************************
      * user event USING set_value
      * **********************************/
-    inline void push_event(Tango::DeviceImpl& self, const std::string& name,
-                          py::object& filt_names, py::object& filt_vals)
+    inline void push_event(Tango::DeviceImpl& self, std::string& name,
+            std::vector<std::string>& filt_names, std::vector<double>& filt_vals)
     {
-        AUX_SAFE_PUSH_EVENT(self, name, filt_names, filt_vals)
-        attr.fire_event(filt_names_, filt_vals_);
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        attr.fire_event(filt_names, filt_vals);
     }
 
-    inline void push_event(Tango::DeviceImpl& self, const std::string& name,
-                          py::object& filt_names, py::object& filt_vals, py::object& data)
+    inline void push_event(Tango::DeviceImpl& self, std::string& name,
+            std::vector<std::string>& filt_names, std::vector<double>& filt_vals, py::object& data)
     {
-        SAFE_PUSH_EVENT(self, name, filt_names, filt_vals, data)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value(attr, data);
+        attr.fire_event(filt_names, filt_vals);
     }
 
     // Special variation for encoded data type
-    inline void push_event(Tango::DeviceImpl& self, const std::string& name,
-                          py::object& filt_names, py::object& filt_vals,
-                           const std::string& str_data, const std::string& data)
+    inline void push_event(Tango::DeviceImpl& self, std::string& name,
+            std::vector<std::string>& filt_names, std::vector<double>& filt_vals,
+                           std::string& str_data, std::string& data)
     {
-        AUX_SAFE_PUSH_EVENT(self, name, filt_names, filt_vals)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value(attr, str_data, data);
-        attr.fire_event(filt_names_, filt_vals_);
+        attr.fire_event(filt_names, filt_vals);
     }
 
     // Special variation for encoded data type
-    inline void push_event(Tango::DeviceImpl& self, const std::string& name,
-                          py::object& filt_names, py::object& filt_vals,
-                           const std::string& str_data, py::object& data)
+    inline void push_event(Tango::DeviceImpl& self, std::string& name,
+            std::vector<std::string>& filt_names, std::vector<double>& filt_vals,
+                           std::string& str_data, py::object& data)
     {
-        AUX_SAFE_PUSH_EVENT(self, name, filt_names, filt_vals)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value(attr, str_data, data);
-        attr.fire_event(filt_names_, filt_vals_);
+        attr.fire_event(filt_names, filt_vals);
     }
 
-    inline void push_event(Tango::DeviceImpl& self, const std::string& name,
-                          py::object& filt_names, py::object& filt_vals, py::object& data,
+    inline void push_event(Tango::DeviceImpl& self, std::string& name,
+            std::vector<std::string>& filt_names, std::vector<double>& filt_vals, py::object& data,
                            long x)
     {
-        SAFE_PUSH_EVENT_VARGS(self, name, filt_names, filt_vals, data, x)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value(attr, data, x);
+        attr.fire_event(filt_names, filt_vals);
     }
 
-    inline void push_event(Tango::DeviceImpl& self, const std::string& name,
-                          py::object& filt_names, py::object& filt_vals, py::object& data,
+    inline void push_event(Tango::DeviceImpl& self, std::string& name,
+            std::vector<std::string>& filt_names, std::vector<double>& filt_vals, py::object& data,
                            long x, long y)
     {
-        SAFE_PUSH_EVENT_VARGS(self, name, filt_names, filt_vals, data, x, y)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value(attr, data, x, y);
+        attr.fire_event(filt_names, filt_vals);
     }
 
     /* ***************************************
      * user event USING set_value_date_quality
      * **************************************/
 
-    inline void push_event(Tango::DeviceImpl& self, const std::string& name,
-                           py::object& filt_names, py::object& filt_vals, py::object& data,
-                           double t, Tango::AttrQuality quality)
+    inline void push_event(Tango::DeviceImpl& self, std::string& name,
+            std::vector<std::string>& filt_names, std::vector<double>& filt_vals,
+            py::object& data, double t, Tango::AttrQuality quality)
     {
-        SAFE_PUSH_EVENT_DATE_QUALITY(self, name, filt_names, filt_vals, data, t, quality)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value_date_quality(attr, data, t, quality);
+        attr.fire_event(filt_names, filt_vals);
     }
 
     // Special variation for encoded data type
-    inline void push_event(Tango::DeviceImpl& self, const std::string& name,
-                           py::object& filt_names, py::object& filt_vals,
-                           const std::string& str_data, const std::string& data,
-                           double t, Tango::AttrQuality quality)
+    inline void push_event(Tango::DeviceImpl& self, std::string& name,
+            std::vector<std::string>& filt_names, std::vector<double>& filt_vals,
+            std::string& str_data, std::string& data,
+            double t, Tango::AttrQuality quality)
     {
-        AUX_SAFE_PUSH_EVENT(self, name, filt_names, filt_vals)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value_date_quality(attr, str_data, data, t, quality);
-        attr.fire_event(filt_names_, filt_vals_);
+        attr.fire_event(filt_names, filt_vals);
     }
 
     // Special variation for encoded data type
-    inline void push_event(Tango::DeviceImpl& self, const std::string& name,
-                           py::object& filt_names, py::object& filt_vals,
-                           const std::string& str_data, py::object& data,
-                           double t, Tango::AttrQuality quality)
+    inline void push_event(Tango::DeviceImpl& self, std::string& name,
+            std::vector<std::string>& filt_names, std::vector<double>& filt_vals,
+            std::string& str_data, py::object& data,
+            double t, Tango::AttrQuality quality)
     {
-        AUX_SAFE_PUSH_EVENT(self, name, filt_names, filt_vals)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
         PyAttribute::set_value_date_quality(attr, str_data, data, t, quality);
-        attr.fire_event(filt_names_, filt_vals_);
+        attr.fire_event(filt_names, filt_vals);
     }
 
-    inline void push_event(Tango::DeviceImpl& self, const std::string& name,
-                           py::object& filt_names, py::object& filt_vals, py::object& data,
-                           double t, Tango::AttrQuality quality, long x)
+    inline void push_event(Tango::DeviceImpl& self, std::string& name,
+            std::vector<std::string>& filt_names, std::vector<double>& filt_vals,
+            py::object& data, double t, Tango::AttrQuality quality, long x)
     {
-        SAFE_PUSH_EVENT_DATE_QUALITY_VARGS(self, name, filt_names, filt_vals, data, t, quality, x)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value_date_quality(attr, data, t, quality, x);
+        attr.fire_event(filt_names, filt_vals);
     }
 
-    inline void push_event(Tango::DeviceImpl& self, const std::string& name,
-                           py::object& filt_names, py::object& filt_vals, py::object& data,
-                           double t, Tango::AttrQuality quality, long x, long y)
+    inline void push_event(Tango::DeviceImpl& self, std::string& name,
+            std::vector<std::string>& filt_names, std::vector<double>& filt_vals,
+            py::object& data, double t, Tango::AttrQuality quality, long x, long y)
     {
-        SAFE_PUSH_EVENT_DATE_QUALITY_VARGS(self, name, filt_names, filt_vals, data, t, quality, x, y)
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        PyAttribute::set_value_date_quality(attr, data, t, quality, x, y);
+        attr.fire_event(filt_names, filt_vals);
     }
 
     /* **********************************
      * data ready event
      * **********************************/
-    inline void push_data_ready_event(Tango::DeviceImpl& self, const std::string& name, long ctr)
+    inline void push_data_ready_event(Tango::DeviceImpl& self, std::string& name, long ctr)
     {
-        SAFE_PUSH(self, attr, name)
-        self.push_data_ready_event(__att_name, ctr); //__att_name from SAFE_PUSH
+        std::cerr << "push_data_ready_event" << std::endl;
+        AutoPythonAllowThreads python_guard_ptr;
+        Tango::AutoTangoMonitor tango_guard(&self);
+        Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
+        python_guard_ptr.giveup();
+        self.push_data_ready_event(name, ctr);
     }
 
     /* **********************************
      * pipe event
      * **********************************/
-    inline void push_pipe_event(Tango::DeviceImpl& self, const std::string& pipe_name, py::object& pipe_data)
+    inline void push_pipe_event(Tango::DeviceImpl& self, std::string& pipe_name, py::object& pipe_data)
     {
-//        std::string __pipe_name;
-//        from_str_to_char(pipe_name.ptr(), __pipe_name);
 //        boost::python::extract<Tango::DevFailed> except_convert(pipe_data);
 //        if (except_convert.check()) {
-//            self.push_pipe_event(__pipe_name, const_cast<Tango::DevFailed*>(&except_convert()));
+//            self.push_pipe_event(pipe_name, const_cast<Tango::DevFailed*>(&except_convert()));
 //            return;
 //        }
-//        Tango::DevicePipeBlob dpb;
-//        bool reuse = false;
-//        PyDevicePipe::set_value(dpb, pipe_data);
-//        self.push_pipe_event(__pipe_name, &dpb, reuse);
+        Tango::DevicePipeBlob dpb;
+        bool reuse = false;
+        PyTango::Pipe::set_value(dpb, pipe_data);
+        self.push_pipe_event(pipe_name, &dpb, reuse);
     }
 
 //    void check_attribute_method_defined(PyObject *self,
@@ -485,7 +541,7 @@ namespace PyDeviceImpl
         std::string read_name_met, write_name_met, is_allowed_method;
         std::string attr_name = new_attr.get_name();
 
-        std::cout << "add_attribute name " << attr_name << std::endl;
+        std::cerr << "add_attribute name " << attr_name << std::endl;
         if (read_meth_name == "")
         {
             read_name_met = "read_" + attr_name;
@@ -517,14 +573,14 @@ namespace PyDeviceImpl
         // Create the attributepy::object according to attribute format
         //
 
-        PyScaAttr *sca_attr_ptr = NULL;
-        PySpecAttr *spec_attr_ptr = NULL;
-        PyImaAttr *ima_attr_ptr= NULL;
-        PyAttr *py_attr_ptr = NULL;
-        Tango::Attr *attr_ptr = NULL;
+        PyScaAttr *sca_attr_ptr = nullptr;
+        PySpecAttr *spec_attr_ptr = nullptr;
+        PyImaAttr *ima_attr_ptr= nullptr;
+        PyAttr *py_attr_ptr = nullptr;
+        Tango::Attr *attr_ptr = nullptr;
 
         long x, y;
-        vector<Tango::AttrProperty> &def_prop = new_attr.get_user_default_properties();
+        std::vector<Tango::AttrProperty> &def_prop = new_attr.get_user_default_properties();
         Tango::AttrDataFormat attr_format = new_attr.get_format();
         long attr_type = new_attr.get_type();
 
@@ -608,8 +664,45 @@ namespace PyDeviceImpl
 //        from_py_object(py_attr_conf_list, attr_conf_list);
 //        self.set_attribute_config(attr_conf_list);
     }
+
+//    py::object get_attribute_config_2(Tango::DeviceImpl& self, py::object& attr_name_seq)
+//    {
+//        Tango::DevVarStringArray par;
+//        convert2array(attr_name_seq, par);
+//
+//        Tango::AttributeConfigList_2 *attr_conf_list_ptr =
+//            self.get_attribute_config_2(par);
+//
+//        boost::python::list ret = to_py(*attr_conf_list_ptr);
+//        delete attr_conf_list_ptr;
+//
+//        return boost::python::incref(ret.ptr());
+//    }
+
+//    PyObject* get_attribute_config_3(Tango::Device_3Impl &self, object &attr_name_seq)
+//    {
+//        Tango::DevVarStringArray par;
+//        convert2array(attr_name_seq, par);
+//
+//        Tango::AttributeConfigList_3 *attr_conf_list_ptr =
+//            self.get_attribute_config_3(par);
+//
+//        boost::python::list ret = to_py(*attr_conf_list_ptr);
+//        delete attr_conf_list_ptr;
+//
+//        return boost::python::incref(ret.ptr());
+//    }
+//
+//    void set_attribute_config_3(Tango::Device_3Impl &self, object &py_attr_conf_list)
+//    {
+//        Tango::AttributeConfigList_3 attr_conf_list;
+//        from_py_object(py_attr_conf_list, attr_conf_list);
+//        self.set_attribute_config_3(attr_conf_list);
+//    }
 }
 
+//DeviceImplWrap::DeviceImplWrap(DeviceClassWrap *cl, std::string& name, py::object& pyself)
+//  : Tango::Device_5Impl(cl, name)
 DeviceImplWrap::DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name)
   : Tango::Device_5Impl(cl, name)
 {
@@ -622,11 +715,12 @@ DeviceImplWrap::DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::str
     py_self = pyself;
 }
 
-DeviceImplWrap::DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl,
-                                   std::string& name,
-                                   std::string& desc,
-                                   Tango::DevState sta,
-                                   std::string& status)
+DeviceImplWrap::DeviceImplWrap(py::object& pyself,
+        DeviceClassWrap *cl,
+        std::string& name,
+        std::string& desc,
+        Tango::DevState sta,
+        std::string& status)
   : Tango::Device_5Impl(cl, name, desc, sta, status)
 {
     py_self = pyself;
@@ -709,7 +803,7 @@ bool DeviceImplWrap::_is_attribute_polled(const std::string& att_name)
 
 bool DeviceImplWrap::_is_command_polled(const std::string& cmd_name)
 {
-    std::cout << &py_self << std::endl;
+    std::cerr << &py_self << std::endl;
     return this->is_command_polled(cmd_name);
 }
 
@@ -746,20 +840,16 @@ void DeviceImplWrap::_stop_poll_command(const std::string& cmd_name)
 void DeviceImplWrap::always_executed_hook()
 {
     std::thread::id thread_id = std::this_thread::get_id();
-    std::cerr << "always executed thread id " << thread_id << std::endl;
     AutoPythonGILEnsure __py_lock;
     try {
         if (is_method_callable(py_self, "always_executed_hook")) {
-            std::cout << "always_executed_hook is callable" << std::endl;
             py_self.attr("always_executed_hook")();
         }
         else {
-            std::cout << "always_executed_hook is NOT callable" << std::endl;
             Tango::Device_5Impl::always_executed_hook();
         }
     }
     catch(py::error_already_set &eas) {
-        std::cerr << "3" << std::endl;
         handle_python_exception(eas);
     }
     catch(...) {
@@ -777,8 +867,7 @@ void DeviceImplWrap::default_always_executed_hook()
 void DeviceImplWrap::read_attr_hardware(std::vector<long> &attr_list)
 {
     std::thread::id thread_id = std::this_thread::get_id();
-    std::cerr << "read_attr_hardware thread id " << thread_id << std::endl;
-    AutoPythonGIL __py_lock;
+    AutoPythonGILEnsure __py_lock;
     try {
         if (is_method_callable(py_self, "read_attr_hardware")) {
             py_self.attr("read_attr_hardware")(attr_list);
@@ -788,7 +877,6 @@ void DeviceImplWrap::read_attr_hardware(std::vector<long> &attr_list)
         }
     }
     catch(py::error_already_set &eas) {
-        std::cerr << "4" << std::endl;
         handle_python_exception(eas);
     }
     catch(...) {
@@ -798,22 +886,20 @@ void DeviceImplWrap::read_attr_hardware(std::vector<long> &attr_list)
     }
 }
 
-void DeviceImplWrap::default_read_attr_hardware(vector<long> &attr_list)
+void DeviceImplWrap::default_read_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_5Impl::read_attr_hardware(attr_list);
 }
 
 void DeviceImplWrap::write_attr_hardware(std::vector<long> &attr_list)
 {
-    std::thread::id thread_id = std::this_thread::get_id();
-    std::cerr << "write_attr_hardware thread id " << thread_id << std::endl;
-    AutoPythonGIL __py_lock;
+    AutoPythonGILEnsure __py_lock;
     try {
         if (is_method_callable(py_self, "write_attr_hardware")) {
             py_self.attr("write_attr_hardware")(attr_list);
         }
         else {
-        Tango::Device_5Impl::write_attr_hardware(attr_list);
+            Tango::Device_5Impl::write_attr_hardware(attr_list);
         }
     }
     catch(py::error_already_set &eas) {
@@ -827,7 +913,7 @@ void DeviceImplWrap::write_attr_hardware(std::vector<long> &attr_list)
     }
 }
 
-void DeviceImplWrap::default_write_attr_hardware(vector<long> &attr_list)
+void DeviceImplWrap::default_write_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_5Impl::write_attr_hardware(attr_list);
 }
@@ -837,17 +923,14 @@ Tango::DevState DeviceImplWrap::dev_state()
     AutoPythonGILEnsure __py_lock;
     try {
         if (is_method_callable(py_self, "dev_state")) {
-            std::cerr << "doing this devstate" << std::endl;
             py::object ret = py_self.attr("dev_state")();
             return ret.cast<Tango::DevState>();
         }
         else {
-            std::cerr << "OR doing this devstate" << std::endl;
             return Tango::Device_5Impl::dev_state();
         }
     }
     catch(py::error_already_set &eas) {
-        std::cerr << "6" << std::endl;
         handle_python_exception(eas);
     }
     catch(...) {
@@ -877,7 +960,6 @@ Tango::ConstDevString DeviceImplWrap::dev_status()
         }
     }
     catch(py::error_already_set &eas) {
-        std::cerr << "dev_status exception" << std::endl;
         handle_python_exception(eas);
     }
     catch(...) {
@@ -927,22 +1009,20 @@ void DeviceImplWrap::default_signal_handler(long signo)
 
 void export_device_impl(py::module &m) {
     py::class_<DeviceImplWrap>(m, "DeviceImpl")
-        .def(py::init([](DeviceClassWrap *cppdev, std::string& name, py::object pyself) {
-            std::thread::id thread_id = std::this_thread::get_id();
-            std::cout << "c++/python DeviceImplWrap thread id " << thread_id << std::endl;
+        .def(py::init([](py::object& pyself, DeviceClassWrap *cppdev, std::string& name) {
             DeviceImplWrap* cpp = new DeviceImplWrap(pyself, cppdev, name);
             return cpp;
         }))
-        .def(py::init([](py::object pyself, DeviceClassWrap *cppdev, std::string& name, std::string& descr) {
+        .def(py::init([](py::object& pyself, DeviceClassWrap *cppdev, std::string& name, std::string& descr) {
             DeviceImplWrap* cpp = new DeviceImplWrap(pyself, cppdev, name, descr);
             return cpp;
         }))
-       .def(py::init([](py::object pyself, DeviceClassWrap *cppdev, std::string& name,
+       .def(py::init([](py::object& pyself, DeviceClassWrap *cppdev, std::string& name,
             std::string& descr, Tango::DevState dstate, std::string& status) {
             DeviceImplWrap* cpp = new DeviceImplWrap(pyself, cppdev, name, descr, dstate, status);
             return cpp;
         }))
-        .def("set_state", [](DeviceImplWrap& self, const Tango::DevState &new_state) -> void {
+        .def("set_state", [](DeviceImplWrap& self, const Tango::DevState& new_state) -> void {
             self.set_state(new_state);
         })
         .def("get_state", [](DeviceImplWrap& self) -> Tango::DevState {
@@ -1004,7 +1084,7 @@ void export_device_impl(py::module &m) {
             return self._is_attribute_polled(att_name);
         })
         .def("is_command_polled", [](DeviceImplWrap& self, const std::string& cmd_name) -> bool {
-            std::cout << "is the command " << cmd_name << " polled" << std::endl;
+            std::cerr << "is the command " << cmd_name << " polled" << std::endl;
             return self._is_command_polled(cmd_name);
         })
         .def("get_attribute_poll_period", [](DeviceImplWrap& self, const std::string& att_name) -> int {
@@ -1088,117 +1168,117 @@ void export_device_impl(py::module &m) {
         .def("set_poll_ring_depth", [](DeviceImplWrap& self, long depth) -> void {
             self.set_poll_ring_depth(depth);
         })
-        .def("push_change_event", [](DeviceImplWrap& self, const std::string& attr_name) -> void {
+        .def("push_change_event", [](DeviceImplWrap& self, std::string& attr_name) -> void {
             PyDeviceImpl::push_change_event(self, attr_name);
         })
-        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, std::string& attr_name, py::object& data) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data);
         })
-        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, std::string& attr_name, std::string& str_data, std::string& data) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, str_data, data);
         })
-        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, std::string& attr_name, std::string& str_data, py::object& data) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, str_data, data);
         })
-        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data, long x) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, std::string& attr_name, py::object& data, long x) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data, x);
         })
-        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data, long x, long y) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, std::string& attr_name, py::object& data, long x, long y) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data, x, y);
         })
-        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data, Tango::AttrQuality quality) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, std::string& attr_name, py::object& data, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data, quality);
         })
-        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, std::string& attr_name, std::string& str_data, std::string& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, str_data, data, t, quality);
         })
-        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, std::string& attr_name, std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, str_data, data, t, quality);
         })
-        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data, t, quality, x);
         })
-        .def("push_change_event",[](DeviceImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
+        .def("push_change_event",[](DeviceImplWrap& self, std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
             PyDeviceImpl::push_change_event(self, attr_name, data, t, quality, x, y);
         })
-        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, std::string& attr_name) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name);
         })
-        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, std::string& attr_name, py::object& data) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data);
         })
-        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, std::string& attr_name, std::string& str_data, std::string& data) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, str_data, data);
         })
-        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, std::string& attr_name, std::string& str_data, py::object& data) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, str_data, data);
         })
-        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data, long x) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, std::string& attr_name, py::object& data, long x) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data, x);
         })
-        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data, long x, long y) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, std::string& attr_name, py::object& data, long x, long y) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data, x, y);
         })
-        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data, t, quality);
         })
-        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, const std::string& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, std::string& attr_name, std::string& str_data, std::string& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, str_data, data, t, quality);
         })
-        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, const std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, std::string& attr_name, std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, str_data, data, t, quality);
         })
-        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data, t, quality, x);
         })
-        .def("push_archive_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
+        .def("push_archive_event", [](DeviceImplWrap& self, std::string& attr_name, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
             PyDeviceImpl::push_archive_event(self, attr_name, data, t, quality, x, y);
         })
-        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals) -> void {
+        .def("push_event", [](DeviceImplWrap& self, std::string& attr_name, std::vector<std::string>& filt_names, std::vector<double>& filt_vals) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals);
         })
-        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data) -> void {
+        .def("push_event", [](DeviceImplWrap& self, std::string& attr_name, std::vector<std::string>& filt_names, std::vector<double>& filt_vals, py::object& data) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data);
         })
-        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, const std::string& data) -> void {
+        .def("push_event", [](DeviceImplWrap& self, std::string& attr_name, std::vector<std::string>& filt_names, std::vector<double>& filt_vals, std::string& str_data, std::string& data) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, str_data, data);
         })
-        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, py::object& data) -> void {
+        .def("push_event", [](DeviceImplWrap& self, std::string& attr_name, std::vector<std::string>& filt_names, std::vector<double>& filt_vals, std::string& str_data, py::object& data) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, str_data, data);
         })
-        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, long x) -> void {
+        .def("push_event", [](DeviceImplWrap& self, std::string& attr_name, std::vector<std::string>& filt_names, std::vector<double>& filt_vals, py::object& data, long x) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data, x);
         })
-        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, long x, long y) -> void {
+        .def("push_event", [](DeviceImplWrap& self, std::string& attr_name, std::vector<std::string>& filt_names, std::vector<double>& filt_vals, py::object& data, long x, long y) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data, x, y);
         })
-        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_event", [](DeviceImplWrap& self, std::string& attr_name, std::vector<std::string>& filt_names, std::vector<double>& filt_vals, py::object& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data, t, quality);
         })
-        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, const std::string& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_event", [](DeviceImplWrap& self, std::string& attr_name, std::vector<std::string>& filt_names, std::vector<double>& filt_vals, std::string& str_data, std::string& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, str_data, data, t, quality);
         })
-        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, const std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
+        .def("push_event", [](DeviceImplWrap& self, std::string& attr_name, std::vector<std::string>& filt_names, std::vector<double>& filt_vals, std::string& str_data, py::object& data, double t, Tango::AttrQuality quality) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, str_data, data, t, quality);
         })
-        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
+        .def("push_event", [](DeviceImplWrap& self, std::string& attr_name, std::vector<std::string>& filt_names, std::vector<double>& filt_vals, py::object& data, double t, Tango::AttrQuality quality, long x) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data, t, quality, x);
         })
-        .def("push_event", [](DeviceImplWrap& self, const std::string& attr_name, py::object& filt_names, py::object& filt_vals, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
+        .def("push_event", [](DeviceImplWrap& self, std::string& attr_name, std::vector<std::string>& filt_names, std::vector<double>& filt_vals, py::object& data, double t, Tango::AttrQuality quality, long x, long y) -> void {
             PyDeviceImpl::push_event(self, attr_name, filt_names, filt_vals, data, t, quality, x, y);
         })
-        .def("push_data_ready_event", [](DeviceImplWrap& self, const std::string& attr_name, long ctr) -> void {
+        .def("push_data_ready_event", [](DeviceImplWrap& self, std::string& attr_name, long ctr) -> void {
             PyDeviceImpl::push_data_ready_event(self, attr_name, ctr);
         })
 
 //         @TODO
 //        .def("push_att_conf_event", [](DeviceImplWrap& self) -> void {
 //            self.push_att_conf_event();
-//            should be this?????????????
+//            should be this??????????????
 //            self.push_att_conf_event(Attribute *);
 //        })
 
-        .def("push_pipe_event", [](DeviceImplWrap& self, const std::string& pipe_name, py::object& pipe_data) -> void {
+        .def("_push_pipe_event", [](DeviceImplWrap& self, std::string& pipe_name, py::object& pipe_data) -> void {
             PyDeviceImpl::push_pipe_event(self, pipe_name, pipe_data);
         })
         .def("get_logger", [](DeviceImplWrap& self) {
@@ -1248,7 +1328,6 @@ void export_device_impl(py::module &m) {
             self.default_delete_device();
         })
         .def("always_executed_hook", [](DeviceImplWrap& self) {
-            std::cout << "does it do this executed hook code" << std::endl;
             self.default_always_executed_hook();
         })
         .def("read_attr_hardware", [](DeviceImplWrap& self, std::vector<long> &attr_list) {
@@ -1260,5 +1339,8 @@ void export_device_impl(py::module &m) {
         .def("signal_handler", [](DeviceImplWrap& self, long signo) {
             self.default_signal_handler(signo);
         })
+//        .def("get_attribute_config_2", &PyDevice_2Impl::get_attribute_config_2)
+//        .def("get_attribute_config_3", &PyDevice_3Impl::get_attribute_config_3)
+//        .def("set_attribute_config_3", &PyDevice_3Impl::set_attribute_config_3)
     ;
 }

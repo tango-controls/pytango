@@ -31,15 +31,18 @@ assert dp.get_transparency_reconnection() is False
 dp.set_transparency_reconnection(True)
 
 assert dp.state() == DevState.RUNNING
-dp.command_inout("SwitchStates")
-assert dp.state() == DevState.FAULT
-dp.command_inout("SwitchStates")
+# dp.command_inout("ChangeState", DevState.FAULT)
+# assert dp.state() == DevState.FAULT
+# dp.command_inout("ChangeState", DevState.RUNNING)
 assert dp.state() == DevState.RUNNING
 
 assert dp.command_inout("DevDouble", 3.142) == 3.142
+assert dp.command_inout("DevDouble", 6.284) == 6.284
+assert dp.command_inout("DevDouble", 9.426) == 9.426
 assert dp.command_inout("DevBoolean", False) is False
 assert dp.command_inout("DevLong64", 123456789) == 123456789
 assert dp.command_inout("DevShort", 32767) == 32767
+assert dp.command_inout("DevString", "abcdefgh") == "abcdefgh"
 
 assert dp.command_inout_asynch("DevDouble", 3.142, True) == 0
 id = dp.command_inout_asynch("DevLong64", 123456789)
@@ -57,6 +60,7 @@ with pytest.raises(Exception):
 # reply = dp.get_asynch_replies()
 # dp.cancel_asynch_request(id)
 # dp.cancel_all_polling_asynch_request()
+assert dp.get_access_control() == tango._tango.AccessControlType.WRITE
+dp.set_access_control(tango.AccessControlType.ACCESS_WRITE)
+print(dp.get_access_control())
 assert dp.get_access_control() == tango._tango.AccessControlType.ACCESS_WRITE
-# dp.set_access_control()
-assert dp.get_access_right() == tango._tango.AccessControlType.ACCESS_WRITE

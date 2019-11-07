@@ -1,6 +1,7 @@
 # tests for tango_util.cpp
 #
 from tango._tango import *
+
 u=Util([u'Clock', u'clock'])
 assert u.get_trace_level() == 0
 u.set_trace_level(4)

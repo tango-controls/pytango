@@ -13,23 +13,120 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/functional.h>
 #include <server/attr.h>
+#include <server/attribute.h>
 #include <pyutils.h>
+#include <tgutils.h>
 
 namespace py = pybind11;
 
+template<long tangoTypeConst>
+inline py::object __get_attr_write_value(Tango::WAttribute& att)
+{
+    typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+    TangoScalarType value;
+    att.get_write_value(value);
+    return py::cast(value);
+}
+
+template<>
+inline py::object __get_attr_write_value<Tango::DEV_ENCODED>(Tango::WAttribute& att)
+{
+    typedef typename TANGO_const2type(Tango::DEV_ENCODED) TangoScalarType;
+    TangoScalarType value;
+    att.get_write_value(value);
+    std::string encoded_format = std::string(value.encoded_format);
+    Tango::DevVarCharArray encoded_data = value.encoded_data;
+    py::list encoded_list;
+    for (auto i=0; i<encoded_data.length(); i++) {
+        encoded_list.append(py::cast(encoded_data[i]));
+    }
+    py::str py_str = py::cast(encoded_format);
+    return py::make_tuple(py_str, encoded_list);
+}
+
+template<long tangoTypeConst>
+inline py::object __get_array_attr_write_value(Tango::WAttribute& att, bool isImage)
+{
+    typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+    const TangoScalarType* ptr;
+    att.get_write_value(ptr);
+
+    long dim_x = att.get_w_dim_x();
+    long dim_y = att.get_w_dim_y();
+    py::list values;
+    if (isImage) {
+        int k = 0;
+        for (int i=0; i<dim_y; i++) {
+            py::list sub_values_list;
+            for (int j=0; j<dim_x; j++) {
+                sub_values_list.append(py::cast(ptr[k++]));
+            }
+            values.append(sub_values_list);
+        }
+    } else {
+        for (int i=0; i<dim_x; i++) {
+            values.append(py::cast(ptr[i]));
+        }
+    }
+    return values;
+}
+
+template<>
+inline py::object __get_array_attr_write_value<Tango::DEV_STRING>(Tango::WAttribute& att, bool isImage)
+{
+    const Tango::ConstDevString* ptr;
+    att.get_write_value(ptr);
+    long dim_x = att.get_w_dim_x();
+    long dim_y = att.get_w_dim_y();
+    py::list values;
+    if (isImage) {
+        int k = 0;
+        for (int i=0; i<dim_y; i++) {
+            py::list sub_values_list;
+            for (int j=0; j<dim_x; j++) {
+                sub_values_list.append(py::cast(ptr[k++]));
+            }
+            values.append(sub_values_list);
+        }
+    } else {
+        for (int i=0; i<dim_x; i++) {
+            values.append(py::cast(ptr[i]));
+        }
+    }
+    return values;
+}
+
+py::object PyAttr::get_attr_write_value(Tango::WAttribute& att)
+{
+    long type = att.get_data_type();
+    Tango::AttrDataFormat format = att.get_data_format();
+
+    const bool isScalar = (format == Tango::SCALAR);
+    const bool isImage = (format == Tango::IMAGE);
+
+    if (isScalar) {
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_attr_write_value, att);
+    } else {
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_array_attr_write_value, att, isImage);
+    }
+}
+
 void PyAttr::read(Tango::DeviceImpl* dev, Tango::Attribute& att)
 {
-    if (!_is_method(dev, read_name))
+    DeviceImplWrap* dev_ptr = dynamic_cast<DeviceImplWrap*>(dev);
+    AutoPythonGILEnsure __py_lock;
+    if (!is_method_callable(dev_ptr->py_self, read_name))
     {
         std::stringstream o;
-        o << read_name << " method not found for " << att.get_name();
+        o << read_name << " method not found for " << &att.get_name();
         Tango::Except::throw_exception("PyTango_ReadAttributeMethodNotFound",
             o.str(), "PyTango::Attr::read");
     }
-    DeviceImplWrap* __dev_ptr = (DeviceImplWrap*) dev;
-    AutoPythonGIL __py_lock;
     try {
-        __dev_ptr->py_self.attr(read_name.c_str())(att);
+        py::object obj = dev_ptr->py_self.attr(read_name.c_str())();
+        if (!att.get_value_flag()) {
+            PyAttribute::set_complex_value(att, obj);
+        }
     } catch (py::error_already_set &eas) {
         handle_python_exception(eas);
     }
@@ -37,17 +134,18 @@ void PyAttr::read(Tango::DeviceImpl* dev, Tango::Attribute& att)
 
 void PyAttr::write(Tango::DeviceImpl* dev, Tango::WAttribute& att)
 {
-    if (!_is_method(dev, write_name))
+    DeviceImplWrap* dev_ptr = dynamic_cast<DeviceImplWrap*>(dev);
+    AutoPythonGILEnsure __py_lock;
+    if (!is_method_callable(dev_ptr->py_self, write_name))
     {
         std::stringstream o;
         o << write_name << " method not found for " << att.get_name();
         Tango::Except::throw_exception("PyTango_WriteAttributeMethodNotFound",
             o.str(), "PyTango::Attr::write");
     }
-    DeviceImplWrap *__dev_ptr = (DeviceImplWrap*) dev;
-    AutoPythonGIL __py_lock;
     try {
-        __dev_ptr->py_self.attr(write_name.c_str())(att);
+        py::object obj = get_attr_write_value(att);
+        dev_ptr->py_self.attr(write_name.c_str())(obj);
     } catch (py::error_already_set &eas) {
         handle_python_exception(eas);
     }
@@ -55,26 +153,18 @@ void PyAttr::write(Tango::DeviceImpl* dev, Tango::WAttribute& att)
 
 bool PyAttr::is_allowed(Tango::DeviceImpl* dev, Tango::AttReqType type)
 {
-    if (_is_method(dev, py_allowed_name))
+    DeviceImplWrap* dev_ptr = dynamic_cast<DeviceImplWrap*>(dev);
+    AutoPythonGILEnsure __py_lock;
+    if (is_method_callable(dev_ptr->py_self, py_allowed_name))
     {
-        DeviceImplWrap* __dev_ptr = (DeviceImplWrap*) dev;
-        AutoPythonGIL __py_lock;
         try {
-            return py::cast<bool>(__dev_ptr->py_self.attr(py_allowed_name.c_str())(type));
+            py::object obj = dev_ptr->py_self.attr(py_allowed_name.c_str())(type);
+            return obj.cast<bool>();
         } catch (py::error_already_set &eas) {
             handle_python_exception(eas);
         }
     }
-    // keep compiler quiet
-    return true;
-}
-
-bool PyAttr::_is_method(Tango::DeviceImpl* dev, const std::string& name)
-{
-    AutoPythonGIL __py_lock;
-    DeviceImplWrap* __dev_ptr = (DeviceImplWrap*) dev;
-    py::object __dev_py = __dev_ptr->py_self;
-    return is_method_defined(__dev_py, name);
+    return true; // keep compiler quiet
 }
 
 void PyAttr::set_user_prop(std::vector<Tango::AttrProperty>& user_prop,
@@ -136,11 +226,18 @@ void PyAttr::set_user_prop(std::vector<Tango::AttrProperty>& user_prop,
     }
 }
 
-
 void export_attr(py::module &m) {
     py::class_<Tango::Attr>(m, "Attr")
-        .def(py::init([](std::string name, long data_type) {
-            return new Tango::Attr(name.c_str(), data_type);
+        .def(py::init([](std::string& name, long data_type, Tango::AttrWriteType w_type, std::string& assoc) {
+            return new Tango::Attr(name.c_str(), data_type, w_type, assoc.c_str());
+        }), py::arg("name"), py::arg("data_type"),py::arg("w_type")=Tango::READ, py::arg("assoc")=Tango::AssocWritNotSpec)
+
+        .def(py::init([](std::string& name, long data_type, Tango::DispLevel level, Tango::AttrWriteType w_type, std::string& assoc) {
+            return new Tango::Attr(name.c_str(), data_type, level, w_type, assoc.c_str());
+        }), py::arg("name"), py::arg("data_type"),py::arg("level"), py::arg("w_type")=Tango::READ, py::arg("assoc")=Tango::AssocWritNotSpec)
+
+        .def(py::init([](const Tango::Attr& other) {
+            return new Tango::Attr(other);
         }))
         .def("set_default_properties", [](Tango::Attr& self, Tango::UserDefaultAttrProp &prop) -> void {
             self.set_default_properties(prop);
@@ -229,26 +326,53 @@ void export_attr(py::module &m) {
         .def("check_type", [](Tango::Attr& self) -> void {
             return self.check_type();
         })
-        .def("read", &Tango::Attr::read)
-        .def("write", &Tango::Attr::write)
-        .def("is_allowed", &Tango::Attr::is_allowed)
     ;
 
     py::class_<Tango::SpectrumAttr, Tango::Attr>(m, "SpectrumAttr")
-        .def(py::init<const char *, long, Tango::AttrWriteType, long>())
+        .def(py::init([](std::string& name, long data_type, long max_x) {
+            return new Tango::SpectrumAttr(name.c_str(), data_type, max_x);
+        }))
+        .def(py::init([](std::string& name, long data_type, Tango::AttrWriteType type, long max_x) {
+            return new Tango::SpectrumAttr(name.c_str(), data_type, type, max_x);
+        }))
+        .def(py::init([](std::string& name, long data_type, long max_x, Tango::DispLevel level) {
+            return new Tango::SpectrumAttr(name.c_str(), data_type, max_x);
+        }))
+        .def(py::init([](std::string& name, long data_type, Tango::AttrWriteType type, long max_x, Tango::DispLevel level) {
+            return new Tango::SpectrumAttr(name.c_str(), data_type, type, max_x, level);
+        }))
     ;
 
     py::class_<Tango::ImageAttr, Tango::SpectrumAttr>(m, "ImageAttr")
-        .def(py::init<const char *, long, Tango::AttrWriteType, long, long>())
+        .def(py::init([](std::string& name, long data_type, long max_x, long max_y) {
+            return new Tango::ImageAttr(name.c_str(), data_type, max_x, max_y);
+        }))
+        .def(py::init([](std::string& name, long data_type, Tango::AttrWriteType type, long max_x, long max_y) {
+            return new Tango::ImageAttr(name.c_str(), data_type, type, max_x, max_y);
+        }))
+        .def(py::init([](std::string& name, long data_type, long max_x, long max_y, Tango::DispLevel level) {
+            return new Tango::ImageAttr(name.c_str(), data_type, max_x, max_y, level);
+        }))
+        .def(py::init([](std::string& name, long data_type, Tango::AttrWriteType type, long max_x, long max_y, Tango::DispLevel level) {
+            return new Tango::ImageAttr(name.c_str(), data_type, type, max_x, max_y, level);
+        }))
     ;
 
     py::class_<Tango::AttrProperty>(m, "AttrProperty")
-        .def(py::init<const char *, const char *>())
-        .def(py::init<const char *, long>())
-        .def("get_value", &Tango::AttrProperty::get_value,
-                py::return_value_policy::copy)
-        .def("get_lg_value", &Tango::AttrProperty::get_lg_value)
-        .def("get_name", &Tango::AttrProperty::get_name,
-                py::return_value_policy::copy)
+        .def(py::init([](std::string& name, std::string& value) {
+            return new Tango::AttrProperty(name, value);
+        }))
+        .def(py::init([](std::string& name, long value) {
+            return new Tango::AttrProperty(name.c_str(), value);
+        }))
+        .def("get_value", [](Tango::AttrProperty& self) -> std::string& {
+            return self.get_value();
+        })
+        .def("get_lg_value", [](Tango::AttrProperty& self) -> long {
+            return self.get_lg_value();
+        })
+        .def("get_name", [](Tango::AttrProperty& self) -> std::string& {
+            return self.get_name();
+        })
     ;
 }

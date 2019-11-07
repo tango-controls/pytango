@@ -228,30 +228,36 @@ void export_database(py::module &m)
         .def("_get_property_forced", &Tango::Database::get_property_forced)
         .def("_put_property", &Tango::Database::put_property)
         .def("_delete_property", &Tango::Database::delete_property)
-        .def("get_property_history",
-            (std::vector<Tango::DbHistory> (Tango::Database::*) (const std::string& , const std::string& ))
-            &Tango::Database::get_property_history)
-        .def("get_object_list",
-            (Tango::DbDatum (Tango::Database::*) (const std::string& ))
-            &Tango::Database::get_object_list)
-        .def("get_object_property_list",
-            (Tango::DbDatum (Tango::Database::*) (const std::string& , const std::string& ))
-            &Tango::Database::get_object_property_list)
-        .def("_get_device_property",
-            (void (Tango::Database::*) (std::string, Tango::DbData &))
-            &Tango::Database::get_device_property)
-        .def("_put_device_property", &Tango::Database::put_device_property)
-        .def("_delete_device_property", &Tango::Database::delete_device_property)
-        .def("get_device_property_history",
-            (std::vector<Tango::DbHistory>(Tango::Database::*) (const std::string& , const std::string& ))
-            &Tango::Database::get_device_property_history)
-        .def("_get_device_property_list",
-            (Tango::DbDatum (Tango::Database::*) (std::string& , std::string& ))
-            &Tango::Database::get_device_property_list)
+
+        .def("get_property_history", [](Tango::Database& self, std::string& obj_name, std::string& prop_name) {
+            return self.get_property_history(obj_name, prop_name);  // Tango C++ signature
+        })
+        .def("get_object_list", [](Tango::Database& self, std::string& wildcard) {
+            return self.get_object_list(wildcard);  // Tango C++ signature
+        })
+        .def("get_object_property_list", [](Tango::Database& self, std::string& obj_name, std::string& wildcard) {
+            return self.get_object_property_list(obj_name, wildcard);  // Tango C++ signature
+        })
+        .def("_get_device_property", [](Tango::Database& self, const std::string& dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
+            self.get_device_property(dev_name, dbData);  // Tango C++ signature
+        })
+        .def("_put_device_property", [](Tango::Database& self, string dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
+            self.put_device_property(dev_name, dbData);  // Tango C++ signature
+        })
+        .def("_delete_device_property",  [](Tango::Database& self, string dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
+            self.delete_device_property(dev_name, dbData);  // Tango C++ signature
+        })
+        .def("get_device_property_history", [](Tango::Database& self, std::string& dev_name, std::string& prop_name) {
+            return self.get_device_property_history(dev_name, prop_name);  // Tango C++ signature
+        })
+        .def("_get_device_property_list", [](Tango::Database& self, std::string& devname, std::string& wildcard) {
+            self.get_device_property_list(devname, wildcard);
+        })
         .def("_get_device_property_list", [](Tango::Database& self, const std::string& devname,
                 const std::string& wildcard, std::vector<std::string> &d) {
             self.get_device_property_list(const_cast<std::string&>(devname), wildcard, d);
         })
+
         .def("_get_device_attribute_property",
             (void (Tango::Database::*) (std::string, Tango::DbData &))
             &Tango::Database::get_device_attribute_property)

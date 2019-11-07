@@ -16,12 +16,15 @@
 #include "exception.h"
 #include "pytgutils.h"
 #include "server/device_impl.h"
+#include <pybind11/pybind11.h>
 
 class PyAttr
 {
 public:
     PyAttr() {}
     virtual ~PyAttr() {}
+
+    py::object get_attr_write_value(Tango::WAttribute& att);
 
     /**
      * Read one attribute. This method forward the action to the python method.
@@ -165,7 +168,7 @@ public:
      * @param[in, out] att the attribute
      */
     inline virtual void read(Tango::DeviceImpl* dev, Tango::Attribute& att) {
-        return PyAttr::read(dev, att);
+        PyAttr::read(dev, att);
     }
 
     /**
@@ -175,7 +178,7 @@ public:
      * @param[in, out] att the attribute
      */
     virtual void write(Tango::DeviceImpl* dev, Tango::WAttribute& att) {
-        return PyAttr::write(dev, att);
+        PyAttr::write(dev, att);
     }
 };
 
@@ -244,7 +247,7 @@ public:
      * @param[in, out] att the attribute
      */
     inline virtual void read(Tango::DeviceImpl* dev, Tango::Attribute& att) {
-        return PyAttr::read(dev, att);
+        PyAttr::read(dev, att);
     }
 
     /**
@@ -254,7 +257,7 @@ public:
      * @param[in, out] att the attribute
      */
     virtual void write(Tango::DeviceImpl* dev, Tango::WAttribute& att) {
-        return PyAttr::write(dev, att);
+        PyAttr::write(dev, att);
     }
 };
 
@@ -324,7 +327,7 @@ public:
      * @param[in, out] att the attribute
      */
     inline virtual void read(Tango::DeviceImpl* dev, Tango::Attribute& att) {
-        return PyAttr::read(dev, att);
+        PyAttr::read(dev, att);
     }
 
     /**
@@ -334,7 +337,7 @@ public:
      * @param[in, out] att the attribute
      */
     virtual void write(Tango::DeviceImpl* dev, Tango::WAttribute& att) {
-        return PyAttr::write(dev, att);
+        PyAttr::write(dev, att);
     }
 };
 

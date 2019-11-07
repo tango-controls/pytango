@@ -66,29 +66,28 @@ public:
      * This method is intended to be called by python to register a new
      * attribute.
      */
-    Tango::Attr* create_attribute(const std::string& attr_name,
-                          Tango::CmdArgType attr_type,
-                          Tango::AttrDataFormat attr_format,
-                          Tango::AttrWriteType attr_write,
-                          long dim_x, long dim_y,
-                          Tango::DispLevel display_level,
-                          long polling_period,
-                          bool memorized, bool hw_memorized,
-                          const std::string& read_method_name,
-                          const std::string& write_method_name,
-                          const std::string& is_allowed_name,
-                          Tango::UserDefaultAttrProp *att_prop);
+    void create_attribute(const std::string& attr_name,
+            Tango::CmdArgType attr_type,
+            Tango::AttrDataFormat attr_format,
+            Tango::AttrWriteType attr_write,
+            long dim_x, long dim_y,
+            Tango::DispLevel display_level,
+            long polling_period,
+            bool memorized, bool hw_memorized,
+            const std::string& read_method_name,
+            const std::string& write_method_name,
+            const std::string& is_allowed_name,
+            Tango::UserDefaultAttrProp *att_prop);
 
-    Tango::Attr* create_fwd_attribute(const std::string& attr_name,
-                              Tango::UserDefaultFwdAttrProp *att_prop);
+    void create_fwd_attribute(const std::string& attr_name,
+            Tango::UserDefaultFwdAttrProp *att_prop);
 
     /**
      * Creates an pipe and adds it to the att_list.
      * This method is intended to be called by python to register a new
      * pipe.
      */
-    Tango::Pipe* create_pipe(//std::vector<Tango::Pipe *>& pipe_list,
-             const std::string& name,
+    void create_pipe(const std::string& name,
              Tango::PipeWriteType access,
              Tango::DispLevel display_level,
              const std::string& read_method_name,
@@ -125,6 +124,8 @@ public:
 protected:
     PyInterpreterState *interp;
     bool signal_handler_defined;
+    std::vector<Tango::Pipe*>* local_pipe_list;
+    std::vector<Tango::Attr*>* local_attr_list;
 };
 
 #endif // _DEVICE_CLASS_H_

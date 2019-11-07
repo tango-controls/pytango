@@ -24,7 +24,8 @@ import numbers
 import collections
 
 from ._tango import StdStringVector, StdDoubleVector
-from ._tango import DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat
+#from ._tango import DbData 
+from ._tango import DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat
 from ._tango import EventData, AttrConfEventData, DataReadyEventData, constants
 from ._tango import PipeEventData, DevIntrChangeEventData, DevState
 from ._tango import CommunicationFailed, DevFailed

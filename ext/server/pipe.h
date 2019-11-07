@@ -31,12 +31,12 @@ public:
     void set_allowed_name(const std::string& name) { py_allowed_name = name; }
     void set_read_name(const std::string& name) { read_name = name; }
     void set_write_name(const std::string& name) { write_name = name; }
-//    bool _is_method(Tango::DeviceImpl* dev, const std::string&);
 
 private:
     std::string py_allowed_name;
     std::string read_name;
     std::string write_name;
+
 };
 
 
@@ -70,13 +70,17 @@ public:
         { return _Pipe::is_allowed(dev, rt); }
 };
 
+void set_value(Tango::Pipe&, py::object&);
+py::object get_pipe_write_value(Tango::WPipe&);
+void set_value(Tango::DevicePipeBlob& dpb, py::object& py_data);
+
 }} // namespace PyTango::Pipe
 
-namespace PyDevicePipe
-{
-    void set_value(Tango::DevicePipeBlob&, py::object&);
-
-    void set_value(Tango::DevicePipe& pipe, py::object& py_value);
-//        __set_value<Tango::DevicePipe>(pipe, py_value);
-
-} // namespace PyDevicePipe
+//namespace PyDevicePipe
+//{
+//    void set_value(Tango::DevicePipeBlob&, py::object&);
+//
+//    void set_value(Tango::DevicePipe& pipe, py::object& py_value);
+////        __set_value<Tango::DevicePipe>(pipe, py_value);
+//
+//} // namespace PyDevicePipe

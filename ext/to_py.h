@@ -173,7 +173,7 @@ struct CORBA_sequence_to_list
     {
         unsigned long size = a.length();
         py::list ret;
-        for(unsigned long i=0; i < size; ++i)
+        for (unsigned long i=0; i < size; ++i)
         {
             ret.append(a[i]);
         }
@@ -186,20 +186,19 @@ struct CORBA_sequence_to_list
 template<>
 struct CORBA_sequence_to_list<Tango::DevVarStringArray>
 {
-    static py::list to_list(Tango::DevVarStringArray const& a)
+    static py::list to_list(Tango::DevVarStringArray const& arr)
     {
-        unsigned long size = a.length();
+        unsigned long size = arr.length();
         py::list ret;
-        for(unsigned long i=0; i < size; ++i)
-        {
-            ret.append(a[i].in());
+        for(unsigned long i=0; i < size; ++i) {
+            ret.append(arr[i].in());
         }
         return ret;
     }
     
-    static py::list convert(Tango::DevVarStringArray const& a)
+    static py::list convert(Tango::DevVarStringArray const& arr)
     {
-        return to_list(a);
+        return to_list(arr);
     }
 
 //    static const PyTypeObject* get_pytype() { return &PyList_Type; }
@@ -208,25 +207,20 @@ struct CORBA_sequence_to_list<Tango::DevVarStringArray>
 template<>
 struct CORBA_sequence_to_list<Tango::DevVarLongStringArray>
 {
-    static py::list convert(Tango::DevVarLongStringArray const& a)
+    static py::list convert(Tango::DevVarLongStringArray const& arr)
     {
-        unsigned long lsize = a.lvalue.length();
-        unsigned long ssize = a.svalue.length();
-        
+        unsigned long lsize = arr.lvalue.length();
+        unsigned long ssize = arr.svalue.length();
+
         py::list ret, lt, st;
-        for(unsigned long i=0; i < lsize; ++i)
-        {
-            lt.append(a.lvalue[i]);
+        for(unsigned long i=0; i < lsize; ++i) {
+            lt.append(arr.lvalue[i]);
         }
-        
-        for(unsigned long i=0; i < ssize; ++i)
-        {
-            st.append(a.svalue[i]);
+        for(unsigned long i=0; i < ssize; ++i) {
+            st.append(arr.svalue[i]);
         }
-        
         ret.append(lt);
         ret.append(st);
-        
         return ret;
     }
 
@@ -236,25 +230,20 @@ struct CORBA_sequence_to_list<Tango::DevVarLongStringArray>
 template<>
 struct CORBA_sequence_to_list <Tango::DevVarDoubleStringArray>
 {
-    static py::list convert(Tango::DevVarDoubleStringArray const& a)
+    static py::list convert(Tango::DevVarDoubleStringArray const& arr)
     {
-        unsigned long dsize = a.dvalue.length();
-        unsigned long ssize = a.svalue.length();
-        
+        unsigned long dsize = arr.dvalue.length();
+        unsigned long ssize = arr.svalue.length();
         py::list ret, dt, st;
-        for(unsigned long i=0; i < dsize; ++i)
-        {
-            dt.append(a.dvalue[i]);
-        }
-        
-        for(unsigned long i=0; i < ssize; ++i)
-        {
-            st.append(a.svalue[i]);
-        }
 
+        for(unsigned long i=0; i < dsize; ++i) {
+            dt.append(arr.dvalue[i]);
+        }
+        for(unsigned long i=0; i < ssize; ++i) {
+            st.append(arr.svalue[i]);
+        }
         ret.append(dt);
         ret.append(st);
-        
         return ret;
     }
 

@@ -34,6 +34,7 @@ from ._tango import DispLevel
 from .utils import document_method as __document_method
 from .utils import copy_doc, get_latest_device_class
 from .attr_data import AttrData
+from .pipe import sanitize_pipe_blob
 
 from .log4tango import TangoStream
 
@@ -484,6 +485,12 @@ def __DeviceImpl__remove_command(self, cmd_name, free_it=False, clean_db=True):
     self._remove_command(cmd_name, free_it, clean_db)
 
 
+def __DeviceImpl__push_pipe_event(self, pipe_name, pipe_data):
+    blob_name = pipe_data[0]
+    sanitized_pipe_data = sanitize_pipe_blob(pipe_data[1])
+    self._push_pipe_event(pipe_name, (blob_name, sanitized_pipe_data))
+
+
 def __DeviceImpl__debug_stream(self, msg, *args):
     """
     debug_stream(self, msg, *args) -> None
@@ -609,9 +616,7 @@ def __DeviceImpl__str(self):
 
 
 def __DeviceImpl__init__(self, cppdev, name):
-    print("__DeviceImpl python", cppdev)
-    print("__DeviceImpl python", name)
-    DeviceImpl.__init_orig__(self, cppdev, name, self)
+    DeviceImpl.__init_orig__(self, self, cppdev, name)
 
 
 def __init_DeviceImpl():
@@ -637,6 +642,7 @@ def __init_DeviceImpl():
     DeviceImpl.log_warn = __DeviceImpl__warn
     DeviceImpl.log_error = __DeviceImpl__error
     DeviceImpl.log_fatal = __DeviceImpl__fatal
+    DeviceImpl.push_pipe_event = __DeviceImpl__push_pipe_event
 
 
 def __Logger__log(self, level, msg, *args):

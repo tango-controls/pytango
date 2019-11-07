@@ -28,7 +28,6 @@ DeviceClassWrap::DeviceClassWrap(std::string& name, py::object py_self)
     :Tango::DeviceClass(name)
 {
     m_self = py_self;
-    py::print("DeviceClassWrap constructor", py_self);
     AutoPythonGIL python_guard;
     signal_handler_defined = is_method_defined(m_self, "signal_handler");
 }
@@ -46,7 +45,6 @@ void DeviceClassWrap::create_command(std::string& cmd_name,
                                      long polling_period,
                                      const std::string& is_allowed)
 {
-    py::print("in c++ create command ", cmd_name);
     PyCmd *cmd_ptr = new PyCmd(cmd_name, param_type, result_type,
                                param_desc, result_desc, display_level);
 
@@ -63,39 +61,36 @@ void DeviceClassWrap::create_command(std::string& cmd_name,
         command_list.push_back(cmd_ptr);
 }
 
-Tango::Attr* DeviceClassWrap::create_fwd_attribute(
+void DeviceClassWrap::create_fwd_attribute(
         const std::string& attr_name, Tango::UserDefaultFwdAttrProp *att_prop)
 {
     Tango::FwdAttr* attr_ptr = new Tango::FwdAttr(attr_name);
     attr_ptr->set_default_properties(*att_prop);
-    Tango::Attr* ret = static_cast<Tango::Attr*>(attr_ptr);
-    std::cerr << "created forward attribute and did the cast" << std::endl;
-    return ret;
+    this->local_attr_list->push_back(attr_ptr);
 }
 
-Tango::Attr* DeviceClassWrap::create_attribute(
-                                   const std::string& attr_name,
-                                   Tango::CmdArgType attr_type,
-                                   Tango::AttrDataFormat attr_format,
-                                   Tango::AttrWriteType attr_write,
-                                   long dim_x, long dim_y,
-                                   Tango::DispLevel display_level,
-                                   long polling_period,
-                                   bool memorized, bool hw_memorized,
-                                   const std::string& read_method_name,
-                                   const std::string& write_method_name,
-                                   const std::string& is_allowed_name,
-                                   Tango::UserDefaultAttrProp *att_prop)
+void DeviceClassWrap::create_attribute(
+        const std::string& attr_name,
+        Tango::CmdArgType attr_type,
+        Tango::AttrDataFormat attr_format,
+        Tango::AttrWriteType attr_write,
+        long dim_x, long dim_y,
+        Tango::DispLevel display_level,
+        long polling_period,
+        bool memorized, bool hw_memorized,
+        const std::string& read_method_name,
+        const std::string& write_method_name,
+        const std::string& is_allowed_name,
+        Tango::UserDefaultAttrProp *att_prop)
 {
-    std::cout << "device_class.cpp _create_attribute " << attr_name << std::endl;
     //
     // Create the attribute object according to attribute format
     //
-    PyScaAttr *sca_attr_ptr = NULL;
-    PySpecAttr *spec_attr_ptr = NULL;
-    PyImaAttr *ima_attr_ptr= NULL;
-    PyAttr *py_attr_ptr = NULL;
-    Tango::Attr *attr_ptr = NULL;
+    PyScaAttr *sca_attr_ptr = nullptr;
+    PySpecAttr *spec_attr_ptr = nullptr;
+    PyImaAttr *ima_attr_ptr= nullptr;
+    PyAttr *py_attr_ptr = nullptr;
+    Tango::Attr *attr_ptr = nullptr;
 
     switch (attr_format)
     {
@@ -132,9 +127,9 @@ Tango::Attr* DeviceClassWrap::create_attribute(
     py_attr_ptr->set_write_name(write_method_name);
     py_attr_ptr->set_allowed_name(is_allowed_name);
 
-    if (att_prop)
+    if (att_prop) {
         attr_ptr->set_default_properties(*att_prop);
-
+    }
     attr_ptr->set_disp_level(display_level);
     if (memorized)
     {
@@ -145,20 +140,18 @@ Tango::Attr* DeviceClassWrap::create_attribute(
     if (polling_period > 0)
         attr_ptr->set_polling_period(polling_period);
 
-//    att_list.push_back(attr_ptr);
-    return attr_ptr;
+    this->local_attr_list->push_back(attr_ptr);
 }
 
-Tango::Pipe* DeviceClassWrap::create_pipe(//std::vector<Tango::Pipe *>& pipe_list,
-                              const std::string& name,
-                              Tango::PipeWriteType access,
-                              Tango::DispLevel display_level,
-                              const std::string& read_method_name,
-                              const std::string& write_method_name,
-                              const std::string& is_allowed_name,
-                              Tango::UserDefaultPipeProp *prop)
+void DeviceClassWrap::create_pipe(const std::string& name,
+            Tango::PipeWriteType access,
+            Tango::DispLevel display_level,
+            const std::string& read_method_name,
+            const std::string& write_method_name,
+            const std::string& is_allowed_name,
+            Tango::UserDefaultPipeProp *prop)
 {
-    Tango::Pipe *pipe_ptr = NULL;
+    Tango::Pipe *pipe_ptr = nullptr;
     if(access == Tango::PIPE_READ)
     {
         PyTango::Pipe::PyPipe* py_pipe_ptr = new PyTango::Pipe::PyPipe(name, display_level, access);
@@ -177,63 +170,34 @@ Tango::Pipe* DeviceClassWrap::create_pipe(//std::vector<Tango::Pipe *>& pipe_lis
     if (prop) {
         pipe_ptr->set_default_properties(*prop);
     }
-//    std::cerr << "pipe_list address in create pipe " << &pipe_list << std::endl;
-    std::cerr << "pipe_ptr address in create pipe " << pipe_ptr << std::endl;
-//    pipe_list.push_back(pipe_ptr);
-//    std::cerr << pipe_list.size() << std::endl;
-    return pipe_ptr;
+    this->local_pipe_list->push_back(pipe_ptr);
 }
 
 void DeviceClassWrap::attribute_factory(std::vector<Tango::Attr *>& attr_list)
 {
-    std::thread::id fac_ctor_id = std::this_thread::get_id();
-    std::cerr << "attribute factory thread id " << fac_ctor_id << std::endl;
     AutoPythonGIL python_guard;
     try
     {
-        std::cerr << "calling python _attr_factory" << &attr_list << std::endl;
-        py::list py_attr_list = m_self.attr("_attribute_factory")(attr_list);
-        for (auto item : py_attr_list) {
-            py::print(item);
-//            try {
-//                attr_list.push_back(item.cast<Tango::Attr*>());
-//            } catch (...) {
-//                attr_list.push_back(item.cast<Tango::FwdAttr*>());
-//            }
-        }
-        py::print(py_attr_list);
-        py::print(attr_list);
-        std::cerr << "finished python _attr_factory" << &attr_list << std::endl;
+        this->local_attr_list = &attr_list;
+        m_self.attr("_attribute_factory")();
     }
     catch(py::error_already_set &eas)
     {
         handle_python_exception(eas);
     }
-    std::cerr << "Exit DeviceClassWrap attribute_factory" << std::endl;
 }
 
 void DeviceClassWrap::pipe_factory()
 {
-    std::thread::id pipe_ctor_id = std::this_thread::get_id();
-    std::cerr << "pipe factory thread id " << pipe_ctor_id << std::endl;
     AutoPythonGIL python_guard;
     try
     {
-        std::vector<Tango::Pipe*> pipe_list;
-        std::cerr << "calling python _pipe_factory" << &pipe_list << std::endl;
-        py::list py_pipe_list;
-        py::list obj = m_self.attr("_pipe_factory")(py_pipe_list);
-        for (auto item : obj) {
-            py::print(item);
-            pipe_list.push_back(item.cast<Tango::Pipe*>());
-        }
-        py::print(pipe_list);
-        std::cerr << "finished python _pipe_factory" << pipe_list[0]->get_name() << std::endl;
-        std::cerr << "finished python _pipe_factory" << pipe_list[0]->get_label() << std::endl;
+        this->local_pipe_list = &pipe_list;
+        m_self.attr("_pipe_factory")();
     }
     catch(py::error_already_set &eas)
     {
-        std::cerr << "exception in pipe factory" << std::endl;
+        std::cerr << eas.what() << std::endl;
         handle_python_exception(eas);
     }
 }
@@ -242,7 +206,6 @@ void DeviceClassWrap::command_factory()
 {
     AutoPythonGIL python_guard;
     try {
-        py::print("DeviceClassWrap: command_factory");
         m_self.attr("_command_factory")();
     }
     catch(py::error_already_set &eas) \
@@ -256,7 +219,6 @@ void DeviceClassWrap::device_name_factory(std::vector<std::string> &dev_list)
     AutoPythonGIL python_guard;
     try
     {
-        py::print("device_name_factory");
         m_self.attr("device_name_factory")(dev_list);
     }
     catch(py::error_already_set &eas)
@@ -269,11 +231,8 @@ void DeviceClassWrap::device_factory(const Tango::DevVarStringArray *dev_list)
 {
     AutoPythonGIL python_guard;
     try {
-        py::print("DeviceClassWrap::device_factory()");
-        py::print("dev_list length", dev_list->length());
         py::list py_dev_list;
         for(auto i = 0; i < dev_list->length(); ++i) {
-            py::print((*dev_list)[i].in());
             py_dev_list.append((*dev_list)[i].in());
         }
         m_self.attr("device_factory")(py_dev_list);
@@ -282,12 +241,10 @@ void DeviceClassWrap::device_factory(const Tango::DevVarStringArray *dev_list)
     {
         handle_python_exception(eas);
     }
-    std::cout << "Leaving device factory" << std::endl;
 }
 
 void DeviceClassWrap::signal_handler(long signo)
 {
-    py::print("DeviceClassWrap signal handler");
     if (signal_handler_defined == true)
     {
         AutoPythonGIL python_guard;
@@ -333,20 +290,16 @@ void export_device_class(py::module &m)
 {
     py::class_<DeviceClassWrap>(m, "DeviceClass")
         .def(py::init([](std::string name, py::object py_self) {
-            py::print("cpp device_class: init", name, py_self);
-            std::cout << "constructor device_class " << &py_self << std::endl;
             DeviceClassWrap* cpp = new DeviceClassWrap(name, py_self);
             return cpp;
         }))
         .def("device_factory", [](DeviceClassWrap& self, const Tango::DevVarStringArray *dev_list) {
-            py::print("also device_factory");
             self.device_factory(dev_list);
         })
         .def("device_name_factory", [](DeviceClassWrap& self, std::vector<std::string> &dev_list) {
             self.device_name_factory(dev_list);
         })
         .def("export_device", [](DeviceClassWrap& self, DeviceImplWrap *dev, std::string& dev_name) -> void {
-            py::print("export device_class");
             self.export_device(dev, const_cast<char*>(dev_name.c_str()));
         }, py::arg("dev"), py::arg("dev_name")="Unused")
 
@@ -366,8 +319,6 @@ void export_device_class(py::module &m)
         })
 #endif
         .def("signal_handler", [](DeviceClassWrap& self, long signo) {
-            py::print("device_class: signal_handler");
-            std::cout <<& self << std::endl;
             self.signal_handler(signo);
         })
         .def("unregister_signal", [](DeviceClassWrap& self, long signo) -> void {
@@ -431,11 +382,9 @@ void export_device_class(py::module &m)
             return self.get_cmd_by_name(name);
         })
         .def("get_pipe_by_name", [](DeviceClassWrap& self, const std::string& pipe_name, const std::string& dev_name) -> Tango::Pipe& {
-            std::cerr << "%%%%%%%%%%%%% do we get here?" << std::endl;
             return self.get_pipe_by_name(pipe_name, dev_name);
         })
         .def("set_type", [](DeviceClassWrap& self, std::string& type) -> void {
-            py::print("Is this the set type we're trying? ", type);
             self.set_type(type);
         })
         .def("add_wiz_dev_prop", [](DeviceClassWrap& self, std::string& name , std::string& desc) -> void {
@@ -465,9 +414,8 @@ void export_device_class(py::module &m)
                 const std::string& read_method_name,
                 const std::string& write_method_name,
                 const std::string& is_allowed_name,
-                Tango::UserDefaultAttrProp *att_prop) -> Tango::Attr* {
-            std::cout << "device_class.cpp _create_attribute" << std::endl;
-            return std::move(self.create_attribute(
+                Tango::UserDefaultAttrProp *att_prop) -> void {
+            self.create_attribute(
                     attr_name,
                     attr_type,
                     attr_format,
@@ -479,23 +427,22 @@ void export_device_class(py::module &m)
                     read_method_name,
                     write_method_name,
                     is_allowed_name,
-                    att_prop));
+                    att_prop);
         })
         .def("_create_fwd_attribute", [](DeviceClassWrap& self,
                 const std::string& attr_name,
-                Tango::UserDefaultFwdAttrProp *att_prop) -> Tango::Attr* {
-            return self.create_fwd_attribute(attr_name, att_prop);
+                Tango::UserDefaultFwdAttrProp *att_prop) -> void {
+            self.create_fwd_attribute(attr_name, att_prop);
         })
         .def("_create_pipe", [](DeviceClassWrap& self,
-//                std::vector<Tango::Pipe *>& pipe_list,
                 const std::string& name,
                 Tango::PipeWriteType access,
                 Tango::DispLevel display_level,
                 const std::string& read_method_name,
                 const std::string& write_method_name,
                 const std::string& is_allowed_name,
-                Tango::UserDefaultPipeProp *prop) -> Tango::Pipe* {
-            return self.create_pipe(//pipe_list,
+                Tango::UserDefaultPipeProp *prop) -> void {
+            self.create_pipe(
                     name,
                     access,
                     display_level,
@@ -503,9 +450,6 @@ void export_device_class(py::module &m)
                     write_method_name,
                     is_allowed_name,
                     prop);
-//            std::cerr << "pipe_list address in pybind pipe i/f " << &pipe_list << std::endl;
-//            std::cerr << pipe << std::endl;
-//            return pipe;
         })
         .def("_create_command", [](DeviceClassWrap& self,
                 std::string& cmd_name,
@@ -531,6 +475,5 @@ void export_device_class(py::module &m)
             return self.get_class_attr();
         })
     ;
-//    py::implicitly_convertible<std::shared_ptr<DeviceClassWrap>, std::shared_ptr<DeviceClass> >();
 }
 

@@ -28,9 +28,10 @@ from ._tango import GreenMode
 
 from .attr_data import AttrData
 from .pipe_data import PipeData
+from .pipe import sanitize_pipe_blob
 from .device_class import DeviceClass
 from .device_server import LatestDeviceImpl
-from .utils import is_seq, is_non_str_seq
+from .utils import is_seq, is_non_str_seq, is_pure_str
 from .utils import scalar_to_array_type, TO_TANGO_TYPE
 from .green import get_green_mode, get_executor
 from .pyutil import Util
@@ -78,10 +79,16 @@ def from_typeformat_to_type(dtype, dformat):
 
 
 def set_complex_value(attr, value):
+    # this method is not used when reading an attribute.
     is_tuple = isinstance(value, tuple)
     dtype, fmt = attr.get_data_type(), attr.get_data_format()
     if dtype == CmdArgType.DevEncoded:
-        if is_tuple and len(value) == 4:
+        if is_tuple and len(value) == 2:
+            if is_pure_str(value[1]):
+                attr.set_value(value[0], str(value[1]))
+            else:
+                attr.set_value(value[0], value[1])
+        elif is_tuple and len(value) == 4:
             attr.set_value_date_quality(*value)
         elif is_tuple and len(value) == 3 and is_non_str_seq(value[0]):
             attr.set_value_date_quality(value[0][0],
@@ -119,27 +126,22 @@ def _get_wrapped_read_method(attribute, read_method):
     if nb_args < 2:
         if green_mode == GreenMode.Synchronous:
             @functools.wraps(read_method)
-            def read_attr(self, attr):
-                ret = read_method(self)
-                if not attr.get_value_flag() and ret is not None:
-                    set_complex_value(attr, ret)
-                return ret
+            def read_attr(self):
+                return read_method(self)
         else:
             @functools.wraps(read_method)
-            def read_attr(self, attr):
+            def read_attr(self):
                 worker = get_worker()
                 ret = worker.execute(read_method, self)
-                if not attr.get_value_flag() and ret is not None:
-                    set_complex_value(attr, ret)
                 return ret
     else:
-        if green_mode == GreenMode.Synchronous:
-            read_attr = read_method
-        else:
-            @functools.wraps(read_method)
-            def read_attr(self, attr):
-                return get_worker().execute(read_method, self, attr)
-
+        print("this needs serious thought as passing attr causes double free")
+#         if green_mode == GreenMode.Synchronous:
+#             read_attr = read_method
+#         else:
+#             @functools.wraps(read_method)
+#             def read_attr(self, attr):
+#                 return get_worker().execute(read_method, self, attr)
     return read_attr
 
 
@@ -176,14 +178,12 @@ def _get_wrapped_write_method(attribute, write_method):
 
     if green_mode == GreenMode.Synchronous:
         @functools.wraps(write_method)
-        def write_attr(self, attr):
-            value = attr.get_write_value()
-            return write_method(self, value)
+        def write_attr(self, value):
+            write_method(self, value)
     else:
         @functools.wraps(write_method)
-        def write_attr(self, attr):
-            value = attr.get_write_value()
-            return get_worker().execute(write_method, self, value)
+        def write_attr(self, value):
+            get_worker().execute(write_method, self, value)
     return write_attr
 
 
@@ -241,26 +241,29 @@ def _get_wrapped_pipe_read_method(pipe, read_method):
     if nb_args < 2:
         if green_mode == GreenMode.Synchronous:
             @functools.wraps(read_method)
-            def read_pipe(self, pipe):
+            def read_pipe(self):
                 ret = read_method(self)
                 if not pipe.get_value_flag() and ret is not None:
-                    pipe.set_value(pipe, ret)
-                return ret
+                    root_blob_name, blob = ret
+                    sanitized_blob = sanitize_pipe_blob(blob)
+                return (root_blob_name,sanitized_blob)
         else:
             @functools.wraps(read_method)
-            def read_pipe(self, pipe):
+            def read_pipe(self):
                 worker = get_worker()
                 ret = worker.execute(read_method, self)
                 if ret is not None:
-                    pipe.set_value(ret)
-                return ret
+                    root_blob_name, blob = ret
+                    sanitized_blob = sanitize_pipe_blob(blob)
+                return (root_blob_name,sanitized_blob)
     else:
-        if green_mode == GreenMode.Synchronous:
-            read_pipe = read_method
-        else:
-            @functools.wraps(read_method)
-            def read_pipe(self, pipe):
-                return get_worker().execute(read_method, self, pipe)
+        print("this needs serious thought as passing attr causes double free")
+#         if green_mode == GreenMode.Synchronous:
+#             read_pipe = read_method
+#         else:
+#             @functools.wraps(read_method)
+#             def read_pipe(self, pipe):
+#                 return get_worker().execute(read_method, self, pipe)
 
     return read_pipe
 
@@ -292,20 +295,16 @@ def __patch_pipe_read_method(tango_device_klass, pipe):
 
     setattr(tango_device_klass, method_name, read_pipe)
 
-
 def _get_wrapped_pipe_write_method(pipe, write_method):
     green_mode = pipe.write_green_mode
-
     if green_mode == GreenMode.Synchronous:
         @functools.wraps(write_method)
-        def write_pipe(self, pipe):
-            value = pipe.get_value()
-            return write_method(self, value)
+        def write_pipe(self, value):
+            write_method(self, value)
     else:
         @functools.wraps(write_method)
-        def write_pipe(self, pipe):
-            value = pipe.get_value()
-            return get_worker().execute(write_method, self, value)
+        def write_pipe(self, value):
+            get_worker().execute(write_method, self, value)
     return write_pipe
 
 
@@ -405,7 +404,6 @@ def __patch_standard_device_methods(klass):
 
 class _DeviceClass(DeviceClass):
     def __init__(self, name):
-        print("Python DeviceClass self ")
         DeviceClass.__init__(self, name)
         self.set_type(name)
 
@@ -602,8 +600,7 @@ class BaseDevice(LatestDeviceImpl):
                 return
         try:
             pu = self.prop_util = ds_class.prop_util
-            self.device_property_list = copy.deepcopy(
-                ds_class.device_property_list)
+            self.device_property_list = ds_class.device_property_list
             class_prop = ds_class.class_property_list
             pu.get_device_properties(
                 self, class_prop, self.device_property_list)

@@ -16,7 +16,9 @@ import textwrap
 import threading
 import collections
 
-from ._tango import StdStringVector, DbData, DbDatum, AttributeInfo
+from ._tango import StdStringVector
+from ._tango import DbData
+from ._tango import DbDatum, AttributeInfo
 from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
 from ._tango import DeviceProxy, __CallBackAutoDie, __CallBackPushEvent
 from ._tango import EventType, DevFailed, Except
@@ -228,7 +230,6 @@ def __get_command_func(dp, cmd_info, name):
     _, doc = cmd_info
 
     def f(*args, **kwds):
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$")
         return dp.command_inout(name, *args, **kwds)
 
     f.__doc__ = doc
@@ -415,7 +416,7 @@ def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None):
         cb2.attr_read = cb
     else:
         cb2.attr_read = cb.attr_read
-    return self.__read_attributes_asynch(attr_names, cb2, extract_as)
+    return self.__read_attributes_asynch(attr_names, cb2)
 
 
 def __DeviceProxy__read_attribute_asynch(self, attr_name, cb=None):
@@ -432,8 +433,8 @@ def __DeviceProxy__read_attribute_asynch(self, attr_name, cb=None):
 
 def __DeviceProxy__read_attribute_reply(self, *args, **kwds):
     """
-    read_attribute_reply( self, id, extract_as) -> int
-    read_attribute_reply( self, id, timeout, extract_as) -> None
+    read_attribute_reply( self, id) -> int
+    read_attribute_reply( self, id, timeout) -> None
 
             Shortcut to self.read_attributes_reply()[0]
 
@@ -545,11 +546,11 @@ def __DeviceProxy__get_property(self, propname, value=None):
                      DevFailed from database device
     """
 
-    if is_pure_str(propname): # or isinstance(propname, StdStringVector):
-#        new_value = value
-#        if new_value is None:
-#            new_value = DbData()
-        db_data = self._get_property(propname) #, new_value)
+    if is_pure_str(propname) or isinstance(propname, StdStringVector):
+        new_value = value
+        if new_value is None:
+            new_value = DbData()
+        db_data = self._get_property(propname, new_value)
         return DbData_2_dict(db_data)
     elif isinstance(propname, DbDatum):
         new_value = list()
@@ -562,22 +563,22 @@ def __DeviceProxy__get_property(self, propname, value=None):
             return DbData_2_dict(db_data)
 
         if is_pure_str(propname[0]):
-            db_data = self._get_property(propname) #, new_value)
+            db_data = self._get_property(propname, new_value)
             return DbData_2_dict(db_data)
-#             new_propname = StdStringVector()
-#             for i in propname:
-#                 new_propname.append(i)
-#             new_value = value
-#             if new_value is None:
-#                 new_value = DbData()
-#             self._get_property(new_propname, new_value)
-#             return DbData_2_dict(new_value)
-#         elif isinstance(propname[0], DbDatum):
-#             new_value = list()
-#             for i in propname:
-#                 new_value.append(i)
-#             db_data = self._get_property(new_value)
-#             return DbData_2_dict(db_data)
+            new_propname = StdStringVector()
+            for i in propname:
+                new_propname.append(i)
+            new_value = value
+            if new_value is None:
+                new_value = DbData()
+            self._get_property(new_propname, new_value)
+            return DbData_2_dict(new_value)
+        elif isinstance(propname[0], DbDatum):
+            new_value = list()
+            for i in propname:
+                new_value.append(i)
+            db_data = self._get_property(new_value)
+            return DbData_2_dict(db_data)
 
 
 def __DeviceProxy__put_property(self, value):
@@ -719,25 +720,21 @@ def __DeviceProxy__get_property_list(self, filter, array=None):
         New in PyTango 7.0.0
     """
 
-#     if array is None:
-#         new_array = StdStringVector()
-#         self._get_property_list(filter, new_array)
-#         return new_array
-# 
-#     if isinstance(array, StdStringVector):
-#         self._get_property_list(filter, array)
-#         return array
-#     elif isinstance(array, collections.Sequence):
-#         new_array = StdStringVector()
-#         self._get_property_list(filter, new_array)
-#         StdStringVector_2_seq(new_array, array)
-#         return array
     if array is None:
-        array = list()
-    return self._get_property_list(filter, array)
-#    return array
+        new_array = StdStringVector()
+        self._get_property_list(filter, new_array)
+        return new_array
+ 
+    if isinstance(array, StdStringVector):
+        self._get_property_list(filter, array)
+        return array
+    elif isinstance(array, collections.Sequence):
+        new_array = StdStringVector()
+        self._get_property_list(filter, new_array)
+        StdStringVector_2_seq(new_array, array)
+        return array
 
-#    raise TypeError('array must be a mutable sequence<string>')
+    raise TypeError('array must be a mutable sequence<string>')
 
 
 def __DeviceProxy__get_attribute_config(self, value):
@@ -771,11 +768,11 @@ def __DeviceProxy__get_attribute_config(self, value):
 
         Deprecated: use get_attribute_config_ex instead
     """
-    if is_pure_str(value):  # or isinstance(value, StdStringVector) 
+    if isinstance(value, StdStringVector) or is_pure_str(value):
         return self._get_attribute_config(value)
     elif isinstance(value, collections.Sequence):
-#        v = seq_2_StdStringVector(value)
-        return self._get_attribute_config(value)
+#       v = seq_2_StdStringVector(value)
+       return self._get_attribute_config(value)
 
     raise TypeError('value must be a string or a sequence<string>')
 
@@ -857,13 +854,13 @@ def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
         Throws     : ConnectionFailed, CommunicationFailed,
                      DevFailed from device
     """
-#    if isinstance(value, StdStringVector) or is_pure_str(value):
-    return self._get_command_config(value)
-#    elif isinstance(value, collections.Sequence):
+    if isinstance(value, StdStringVector) or is_pure_str(value):
+        return self._get_command_config(value)
+    elif isinstance(value, collections.Sequence):
 #        v = seq_2_StdStringVector(value)
-#        return self._get_command_config(v)
+        return self._get_command_config(value)
 
-#    raise TypeError('value must be a string or a sequence<string>')
+    raise TypeError('value must be a string or a sequence<string>')
 
 
 def __DeviceProxy__get_pipe_config(self, value=(constants.AllPipe,)):
@@ -907,15 +904,16 @@ def __DeviceProxy__get_pipe_config(self, value=(constants.AllPipe,)):
 
         New in PyTango 9.2.0
     """
-#    if value is None:
-#        value = [constants.AllPipe]
-#    if isinstance(value, StdStringVector) or is_pure_str(value):
-    return self._get_pipe_config(value)
-#    elif isinstance(value, collections.Sequence):
+    if value is None:
+        value = [constants.AllPipe]
+        return self._get_pipe_config(v)
+    if isinstance(value, StdStringVector) or is_pure_str(value):
+        return self._get_pipe_config(value)
+    elif isinstance(value, collections.Sequence):
 #        v = seq_2_StdStringVector(value)
-#        return self._get_pipe_config(v)
+        return self._get_pipe_config(value)
 
-#    raise TypeError('value must be a string or a sequence<string>')
+    raise TypeError('value must be a string or a sequence<string>')
 
 
 def __DeviceProxy__set_attribute_config(self, value):
@@ -1093,7 +1091,7 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
         Throws     : EventSystemFailed
 
 
-    subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, extract_as=Numpy, green_mode=None) -> int
+    subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, green_mode=None) -> int
 
             The client call to subscribe for event reception in the push model.
             The client implements a callback method which is triggered when the
@@ -1223,7 +1221,7 @@ def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
             "Parameter cb_or_queuesize should be a number, a"
             " callable object or an object with a 'push_event' method.")
     event_id = self.__subscribe_event(
-        attr_name, event_type, cb, filters, stateless, extract_as)
+        attr_name, event_type, cb, filters, stateless)
 
     with self.__get_event_map_lock():
         se = self.__get_event_map()
@@ -1329,24 +1327,24 @@ def __DeviceProxy__get_events(self, event_id, callback=None):
                           EventType.PERIODIC_EVENT,
                           EventType.ARCHIVE_EVENT,
                           EventType.USER_EVENT):
-            return self.__get_data_events(event_id, extract_as)
+            return self.__get_data_events(event_id)
         elif event_type in (EventType.ATTR_CONF_EVENT,):
-            return self.__get_attr_conf_events(event_id, extract_as)
+            return self.__get_attr_conf_events(event_id)
         elif event_type in (EventType.DATA_READY_EVENT,):
-            return self.__get_data_ready_events(event_id, extract_as)
+            return self.__get_data_ready_events(event_id)
         elif event_type in (EventType.PIPE_EVENT,):
-            return self.__get_pipe_events(event_id, extract_as)
+            return self.__get_pipe_events(event_id)
         else:
             assert (False)
             raise ValueError("Unknown event_type: " + str(event_type))
     elif isinstance(callback, collections.Callable):
         cb = __CallBackPushEvent()
         cb.push_event = callback
-        return self.__get_callback_events(event_id, cb, extract_as)
+        return self.__get_callback_events(event_id, cb)
     elif hasattr(callback, 'push_event') and isinstance(callback.push_event, collections.Callable):
         cb = __CallBackPushEvent()
         cb.push_event = callback.push_event
-        return self.__get_callback_events(event_id, cb, extract_as)
+        return self.__get_callback_events(event_id, cb)
     else:
         raise TypeError(
             "Parameter 'callback' should be None, a callable object or an object with a 'push_event' method.")
@@ -1368,9 +1366,8 @@ def __DeviceProxy__str(self):
 
 
 def __DeviceProxy__read_pipe(self, pipe_name):
-    import pdb
-    pdb.set_trace()
     r = self.__read_pipe(pipe_name)
+    print(r)
     return r.extract()
 
 
@@ -1432,7 +1429,7 @@ def __get_pipe_type(obj, dtype=None):
     return __get_pipe_type_simple(obj)
 
 
-def __sanatize_pipe_element(elem):
+def __sanitize_pipe_element(elem):
     if isinstance(elem, dict):
         result = dict(elem)
     else:
@@ -1440,20 +1437,22 @@ def __sanatize_pipe_element(elem):
     result['value'] = value = result.get('value', result.pop('blob', None))
     result['dtype'] = dtype = __get_pipe_type(value, dtype=result.get('dtype'))
     if dtype == CmdArgType.DevPipeBlob:
-        result['value'] = value[0], __sanatize_pipe_blob(value[1])
+        result['value'] = value[0], __sanitize_pipe_blob(value[1])
     return result
 
 
-def __sanatize_pipe_blob(blob):
+def __sanitize_pipe_blob(blob):
     if isinstance(blob, dict):
-        return [__sanatize_pipe_element((k, v)) for k, v in blob.items()]
+        return [__sanitize_pipe_element((k, v)) for k, v in blob.items()]
     else:
-        return [__sanatize_pipe_element(elem) for elem in blob]
+        return [__sanitize_pipe_element(elem) for elem in blob]
 
 
 def __DeviceProxy__write_pipe(self, *args, **kwargs):
     pipe_name, (blob_name, blob_data) = args
-    sani_blob_data = __sanatize_pipe_blob(blob_data)
+    sani_blob_data = __sanitize_pipe_blob(blob_data)
+    print("++++++++++++++++++++++++sanitized")
+    print(sani_blob_data)
     self.__write_pipe(pipe_name, blob_name, sani_blob_data)
 
 
@@ -1953,6 +1952,7 @@ def __doc_DeviceProxy():
         *green_mode* parameter.
         *wait* parameter.
         *timeout* parameter.
+        *extract_as* removed
     """)
 
     document_method("read_attributes", """

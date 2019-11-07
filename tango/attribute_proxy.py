@@ -19,7 +19,8 @@ tango.attribute_proxy.
 
 import collections
 
-from ._tango import StdStringVector, DbData, DbDatum, DeviceProxy
+from ._tango import StdStringVector
+from ._tango import DbData, DbDatum, DeviceProxy
 from ._tango import __AttributeProxy as _AttributeProxy
 from .utils import seq_2_StdStringVector, seq_2_DbData, DbData_2_dict
 from .utils import is_pure_str, is_non_str_seq

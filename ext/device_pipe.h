@@ -38,13 +38,13 @@ namespace PyTango
         py::object convert_to_python(TDevicePipe* self)
         {
             py::object py_value;
-            try 
+            try
             {
                 py_value = py::cast(self, py::return_value_policy::move);
 
 //                py_value = py::object(
 //                    py::handle(py::to_python_indirect<TDevicePipe*, py::detail::make_owning_holder>() (self)));
-            } 
+            }
             catch (...)
             {
                 delete self;

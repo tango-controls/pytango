@@ -29,7 +29,6 @@ void export_base_types(py::module& m);
 void export_callback(py::module& m);
 void export_change_event_info(py::module& m);
 void export_command_info(py::module& m);
-//void export_connection(py::module &m);
 void export_constants(py::module &m);
 void export_data_ready_event_data(py::module &m);
 void export_database(py::module &m);
@@ -80,21 +79,12 @@ void export_wattribute(py::module &m);
 
 PYBIND11_MODULE(_tango, m) {
     m.doc() = "This module implements the Python Tango Device API pybind11 mapping.";
-    std::cout << "Initialising the Python Tango Device API pybind11 mapping." << std::endl;
+    std::cerr << "Initialising the Python Tango Device API pybind11 mapping." << std::endl;
     m.attr("__path__") = "PyTango";
-
-    //    setattr(m, "__path__", "PyTango");
-//    // Configure generated docstrings
-//    const bool show_user_defined = false;
-//    const bool show_py_signatures = false;
-//
-//    docstring_options doc_opts(show_user_defined,
-//                               show_py_signatures);
 
     py::print("pytango.cpp: initialise threads");
     PyEval_InitThreads();
     std::thread::id id1 = std::this_thread::get_id();
-    std::cout << "Initial thread id " << id1 << std::endl;
 
     export_api_util(m);
     export_archive_event_info(m);
@@ -111,7 +101,6 @@ PYBIND11_MODULE(_tango, m) {
     export_change_event_info(m);
     export_dev_command_info(m);
     export_command_info(m);
-    //    export_connection(m);
     export_constants(m);
     export_data_ready_event_data(m);
     export_db(m);

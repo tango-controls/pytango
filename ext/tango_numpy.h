@@ -15,18 +15,11 @@
 
 #include <Python.h>
 
+// Absolutely disgusting crap.
+// We are now at 1.14 and they can't even fix this
 //#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-// See "Importing the API" for the why of these weird defines before
-// the inclusion of numpy. They are needed so that you can do import_array
-// in just one file while using numpy in all the project files.
-// http://docs.scipy.org/doc/numpy/reference/c-api.array.html#miscellaneous
-// - {
-//#      define PY_ARRAY_UNIQUE_SYMBOL pytango_ARRAY_API
-//#      define NO_IMPORT_ARRAY
-//#      include <numpy/arrayobject.h>
-// - }
-
-#include "tgutils.h"
+//#include <numpy/arrayobject.h>
+//#include "tgutils.h"
 
 /// @name Conversion from a Tango scalar type name to the numpy equivalent name
 /// @{

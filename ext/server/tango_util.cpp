@@ -24,57 +24,43 @@ namespace PyUtil
 {
     void _class_factory(Tango::DServer* dserver)
     {
-        std::thread::id id3 = std::this_thread::get_id();
-        std::cout << "_class_factory thread id" << id3 << std::endl;
-
         AutoPythonGIL guard;
         py::object tango = py::cast<py::object>(PyImport_AddModule("tango"));
         py::list cpp_class_list = tango.attr("get_cpp_classes")();
         // First, create CPP class if any, their names are defined in a Python list
         auto cl_len =len(cpp_class_list);
-        for(auto i = 0; i < cl_len; ++i)
+        for (auto i = 0; i < cl_len; ++i)
         {
-            py::print("tango_util:_class_factory code needs checking");
-//            std::tuple class_info = cpp_class_list[i].cast<std::tuple>();
-//            char *class_name = extract<char *>(class_info[0]);
-//            char *par_name   = extract<char *>(class_info[1]);
+            std::cerr << "tango_util:_class_factory code needs checking here" << std::endl;
+//            std::tuple<std::string> class_info = cpp_class_list[i].cast<std::tuple<std::string>>();
+//            char *class_name = class_info[0].cast<std::string>().c_str();
+//            char *par_name   = class_info[1].cast<std::string>().c_str();
 //            dserver->_create_cpp_class(class_name, par_name);
         }
         //
         // Create Python classes with a call to the class_factory Python function
         //
-        py::print("tango_util.cpp: Entering python class factory");
         tango.attr("class_factory")();
-        py::print("Leaving python class factory");
         //
         // Make all Python tango class(es) known to C++ and set the PyInterpreter state
         //
         py::list constructed_classes = tango.attr("get_constructed_classes")();
-        auto cc_len = len(constructed_classes);
-        for (auto i = 0; i < cc_len; i++) {
-            DeviceClassWrap* device_class_ptr = constructed_classes[i].cast<DeviceClassWrap*>();
+        for (auto constructed_class : constructed_classes) {
+            DeviceClassWrap* device_class_ptr = constructed_class.cast<DeviceClassWrap*>();
             dserver->_add_class(device_class_ptr);
         }
-    }
+   }
 
-    inline Tango::Util* init(std::list<std::string>& arglist)
+    inline Tango::Util* init(std::vector<std::string>& arglist)
     {
-        std::cout << "tango_util::init called" << std::endl;
         int argc = (int) arglist.size();
         char** argv = new char*[argc];
-        static Tango::Util* res = 0;
-        int i = 0;
-        for (auto item : arglist) {
-            argv[i++] = (char*)item.c_str();
+        static Tango::Util* res = nullptr;
+        for (int i=0; i<argc; i++) {
+            argv[i] = (char*)arglist[i].c_str();
         }
         res = Tango::Util::init(argc, argv);
         delete [] argv;
-        // Is this necessary here, its done in pytango.cpp?
-        if (PyEval_ThreadsInitialized() == 0)
-        {
-            PyEval_InitThreads();
-            py::gil_scoped_release release;
-        }
         return res;
     }
 
@@ -105,7 +91,7 @@ void export_util(py::module &m) {
         .def("delete_thread", &Tango::Interceptors::delete_thread)
     ;
     py::class_<Tango::Util, std::unique_ptr<Tango::Util, py::nodelete>>(m, "Util")
-        .def(py::init([](std::list<std::string>& args) {
+        .def(py::init([](std::vector<std::string>& args) {
             Tango::Util* instance = PyUtil::init(args);
             return std::unique_ptr<Tango::Util, py::nodelete>(instance);
         }))
@@ -164,16 +150,10 @@ void export_util(py::module &m) {
             return self.get_dserver_device();
         })
         .def("server_init", [](Tango::Util& self, bool with_window) -> void {
-            std::thread::id id1 = std::this_thread::get_id();
-            std::cout << "tango_util.py: server_init thread id " << id1 << std::endl;
-            std::cerr << "tango_util.py: server_init() thread init'd " << PyEval_ThreadsInitialized() << std::endl;
-//            AutoPythonAllowThreads guard;
             Tango::DServer::register_class_factory(PyUtil::_class_factory);
-            std::thread::id id2 = std::this_thread::get_id();
-            std::cout << "tango_util.py: server_init thread id2 " << id2 << std::endl;
             self.server_init();
-            std::cerr << "tango_util.py: init done" << std::endl;
         }, py::arg("with_window")=false)
+
         .def("server_run", [](Tango::Util& self) -> void {
             AutoPythonAllowThreads guard;
             self.server_run();
@@ -215,18 +195,18 @@ void export_util(py::module &m) {
             return self.get_database();
         })
         .def("get_device_list_by_class", [](Tango::Util& self, const std::string& name) {
-            py::print("need to check the return code here");
+            std::cerr << "need to check the return code here" << std::endl;
             // Does the vector returned by this call get automatically
             // translated into a py::list, otherwise will have to iterate
             // over the vector and append to the list ??????????????????
             // see get_device_list() below.
             return self.get_device_list_by_class(name);
         })
-        .def("get_device_by_name", [](Tango::Util& self, const std::string& dev_name) {
+        .def("get_device_by_name", [](Tango::Util& self, const std::string& dev_name) -> py::object {
             Tango::DeviceImpl* value = self.get_device_by_name(dev_name);
             return py::cast(value);
         })
-        .def("get_device_list", [](Tango::Util& self, const std::string& name) {
+        .def("get_device_list", [](Tango::Util& self, const std::string& name) -> py::list {
             py::list py_dev_list;
             std::vector<Tango::DeviceImpl*> dev_list = self.get_device_list(name);
             for(std::vector<Tango::DeviceImpl*>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
@@ -240,7 +220,7 @@ void export_util(py::module &m) {
             PyUtil::server_set_event_loop(self, py_event_loop);
         })
         .def("set_interceptors", [](Tango::Util& self, Tango::Interceptors *in) -> void {
-                self.set_interceptors(in);
+            self.set_interceptors(in);
         })
         .def("_UseDb", [](Tango::Util& self) -> bool {
             return self._UseDb;
@@ -248,12 +228,12 @@ void export_util(py::module &m) {
        .def("_FileDb", [](Tango::Util& self) -> bool {
             return self._FileDb;
         })
-        .def("get_dserver_ior", [](Tango::Util& self, Tango::DServer* dserver) {
+        .def("get_dserver_ior", [](Tango::Util& self, Tango::DServer* dserver) -> std::string {
             Tango::Device_var d = dserver->_this();
             dserver->set_d_var(Tango::Device::_duplicate(d));
             return self.get_orb()->object_to_string(d);
         })
-        .def("get_device_ior", [](Tango::Util& self, Tango::DeviceImpl* device) {
+        .def("get_device_ior", [](Tango::Util& self, Tango::DeviceImpl* device) -> std::string {
             return self.get_orb()->object_to_string(device->get_d_var());
         })
         .def("orb_run", [](Tango::Util& self) -> void {

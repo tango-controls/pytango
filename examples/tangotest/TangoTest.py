@@ -20,7 +20,6 @@ import tango
 import gevent
 import numpy as np
 from gevent import lock
-from tango import DebugIt
 from tango import GreenMode
 from tango.server import run
 from tango.server import Device
@@ -86,37 +85,61 @@ class TangoTest(Device):
         self.__ushort_scalar = 32767
         self.__ushort_scalar_ro = 32767
         self.__encoded_string_scalar = ("format", "real data")
+        self.__encoded_string_scalar_ro = ("format", "real data")
         self.__encoded_byte_scalar = ("format", 
             [0x00, 0x01, 0x02,0xfd, 0xfe, 0xff])
+        self.__encoded_byte_scalar_ro = ("format", 
+            [0x00, 0x01, 0x02,0xfd, 0xfe, 0xff])
         self.__devstate_scalar = DevState.ON
-        self.__boolean_spectrum = [True]
-        self.__double_spectrum = [0.0, 1.0, 2.0, 3.0, 4.0]
-        self.__float_spectrum = [0.0]
-        self.__long64_spectrum = [0]
-        self.__long_spectrum = [0]
-        self.__short_spectrum = [0]
-        self.__string_spectrum = ["test string"]
-        self.__uchar_spectrum = [0]
-        self.__ulong64_spectrum = [0]
-        self.__ulong_spectrum = [0]
-        self.__ushort_spectrum = [0]
-        self.__devstate_spectrum = [DevState.ON, DevState.OFF, DevState.MOVING]
+        self.__boolean_spectrum = [True, True, False, False]
+        self.__double_spectrum = np.array([10.1, 11.1, 12.1, 13.1, 14.1], np.float64)
+        self.__float_spectrum = np.array([0.1, 1.1, 2.1, 3.1, 4.1], np.float)
+        self.__long64_spectrum = np.array([110, 111, 112, 113, 114, 115, 116, 117, 118, 119], np.int64)
+        self.__long_spectrum = np.array([10, 11, 12, 13, 14, 15, 16], np.int32)
+        self.__short_spectrum = np.array([0, -1, -2, -3, -4], np.short)
+        self.__string_spectrum = ["abc12", "def34", "ghi56", "jkl78"]
+        self.__uchar_spectrum = np.array([0, 1, 2, 3, 4, 5, 6, 7], np.byte)
+        self.__ulong64_spectrum = np.array([200, 201, 202, 203, 204, 205], np.uint64)
+        self.__ulong_spectrum = np.array([20, 21, 22, 23, 24, 25, 26], np.uint32)
+        self.__ushort_spectrum = np.array([0, 1, 2, 3, 4, 5, 6, 7 ,8], np.ushort)
+        self.__devstate_spectrum = np.array([DevState.ON, DevState.OFF, DevState.MOVING])
         self.__boolean_image = [[True]]
-        self.__double_image = [[0.0]]
-        self.__float_image = [[0.0]]
-        self.__long64_image = [[0]]
-        self.__long_image = [[0]]
-        self.__short_image = [[0]]
-        self.__string_image = [["test string"]]
-        self.__uchar_image = [[0]]
-        self.__ulong64_image = [[0]]
-        self.__ulong_image = [[0]]
-        self.__ushort_image = [[0]]
+        self.__double_image = np.array([[10.1, 11.1, 12.1, 13.1, 14.1],
+                                        [10.2, 11.2, 12.2, 13.2, 14.2],
+                                        [10.3, 11.3, 12.3, 13.3, 14.3]], np.float64)
+        self.__float_image = np.array([[0.1, 1.1, 2.1, 3.1, 4.1],
+                                        [0.2, 1.2, 2.2, 3.2, 4.2],
+                                        [0.3, 1.3, 2.3, 3.3, 4.3]], np.float)
+        self.__long64_image = np.array([[0, 1, 2],[3, 4, 5],[6, 7, 8]], np.int64)
+        self.__long_image = np.array([[0, 1, 2],[3, 4, 5],[6, 7, 8]], np.int32)
+        self.__short_image = np.array([[0, 1, 2],[3, 4, 5],[6, 7, 8]], np.int8)
+        self.__string_image = [["abc12", "def34", "ghi56", "jkl78"],
+                               ["mno12", "pqr34", "stu56", "vwx78"]]
+        self.__uchar_image = np.array([[0, 1, 2],[3, 4, 5],[6, 7, 8]], np.byte)
+        self.__ulong64_image = np.array([[0, 1, 2],[3, 4, 5],[6, 7, 8]], np.uint64)
+        self.__ulong_image = np.array([[0, 1, 2],[3, 4, 5],[6, 7, 8]], np.uint32)
+        self.__ushort_image = np.array([[0, 1, 2],[3, 4, 5],[6, 7, 8]], np.ushort)
         self.__rootBlobName = 'theBlob'
-        self.__blob = self.__rootBlobName, dict(x=[0.3,0.4], y=[1,2,3,4,5])
+        self.__inner_blob =  ("Inner", [("double_list",[0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2]),
+                                        ("np_array", np.array([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17], np.int64)),
+                                        ("int_list", [1,2,3,4,5,6,7,8,9,10,11,12]),
+                                        ("string_list", ["abc","def","ghi","jkl","mno"]),
+                                        ]
+                              )
+        self.__blob = self.__rootBlobName, [("double",3.142), 
+                                            ("integer64", 32767),
+                                            ("string", "abcdefghjklmno"),
+                                            ("bool", True),
+                                            ("innerblob", self.__inner_blob),
+                                            {"name":"encoded", "value":("format", 
+                                                [0x00, 0x01, 0x02,0xfd, 0xfe, 0xff]), "dtype":tango.CmdArgType.DevEncoded},
+                                            ]
         self.__lock = lock.Semaphore()
         self.__generate_task = None
-        self.set_state(tango.DevState.ON)
+        self.__push_scalar_change_events = False
+        self.__push_scalar_archive_events = False
+        self.__push_pipe_events = False
+        self.set_state(tango.DevState.RUNNING)
 
 # TODO
 #     DEVVAR_LONGSTRINGARRAY,
@@ -156,7 +179,6 @@ class TangoTest(Device):
         doc="A Tango::DevDouble scalar attribute",
     )
     def double_scalar(self):
-        print("returning double value............ ", self.__double_scalar)
         return self.__double_scalar
 
     @double_scalar.write
@@ -174,8 +196,10 @@ class TangoTest(Device):
         return self.__double_scalar_ro
 
     @attribute(
-        dtype="float",
+        dtype='DevFloat',
         label="float_scalar",
+        min_value = float_minmax[0],
+        max_value = float_minmax[1],
         doc="A Tango::DevFloat scalar attribute",
     )
     def float_scalar(self):
@@ -363,6 +387,14 @@ class TangoTest(Device):
 
     @attribute(
         dtype="DevEncoded",
+        label="encoded_string_scalar_ro",
+        doc="A encoded string readonly scalar attribute",
+    )
+    def encoded_string_scalar_ro(self):
+        return self.__encoded_string_scalar_ro
+
+    @attribute(
+        dtype="DevEncoded",
         label="encoded_byte_scalar",
         doc="A encoded byte scalar attribute",
     )
@@ -372,6 +404,14 @@ class TangoTest(Device):
     @encoded_byte_scalar.write
     def encoded_byte_scalar(self, value):
         self.__encoded_byte_scalar = value
+
+    @attribute(
+        dtype="DevEncoded",
+        label="encoded_byte_scalar_ro",
+        doc="A encoded byte readonly scalar attribute",
+    )
+    def encoded_byte_scalar_ro(self):
+        return self.__encoded_byte_scalar_ro
 
     @attribute(
         dtype="DevState",
@@ -458,7 +498,7 @@ class TangoTest(Device):
         doc="A short spectrum attribute (int16)",
     )
     def short_spectrum(self):
-        return self.__ushort_spectrum
+        return self.__short_spectrum
 
     @short_spectrum.write
     def short_spectrum(self, values):
@@ -625,8 +665,8 @@ class TangoTest(Device):
         return self.__short_image
 
     @short_image.write
-    def short_image(self, value):
-        pass
+    def short_image(self, values):
+        self.__short_image = values
 
     @attribute(
         dtype=(("str",),),
@@ -650,11 +690,11 @@ class TangoTest(Device):
         doc="An unsigned char image attribute (uint8/byte)",
     )
     def uchar_image(self):
-        return [[0]]
+        return self.__uchar_image
 
     @uchar_image.write
     def uchar_image(self, values):
-        pass
+        self.__uchar_image = values
 
     @attribute(
         dtype=(("uint64",),),
@@ -714,7 +754,6 @@ class TangoTest(Device):
         dtype_out="bool",
         doc_out="Echo of the input value",
     )
-    @DebugIt()
     def DevBoolean(self, value):
         return value
 
@@ -724,7 +763,6 @@ class TangoTest(Device):
         dtype_out="float",
         doc_out="Echo of the input value",
     )
-    @DebugIt()
     def DevFloat(self, value):
         return value
 
@@ -734,7 +772,6 @@ class TangoTest(Device):
         dtype_out="double",
         doc_out="Echo of the input value",
     )
-    @DebugIt()
     def DevDouble(self, value):
         return value
 
@@ -744,7 +781,6 @@ class TangoTest(Device):
         dtype_out="int16",
         doc_out="Echo of the input value",
     )
-    @DebugIt()
     def DevShort(self, value):
         return value
 
@@ -754,7 +790,6 @@ class TangoTest(Device):
         dtype_out="int32",
         doc_out="Echo of the input value",
     )
-    @DebugIt()
     def DevLong(self, value):
         return value
 
@@ -764,7 +799,6 @@ class TangoTest(Device):
         dtype_out="int64",
         doc_out="Echo of the input value",
     )
-    @DebugIt()
     def DevLong64(self, value):
         return value
 
@@ -774,7 +808,6 @@ class TangoTest(Device):
         dtype_out="uint16",
         doc_out="Echo of the input value",
     )
-    @DebugIt()
     def DevUShort(self, value):
         return value
 
@@ -784,7 +817,6 @@ class TangoTest(Device):
         dtype_out="uint32",
         doc_out="Echo of the input value",
     )
-    @DebugIt()
     def DevULong(self, value):
         return value
 
@@ -794,149 +826,164 @@ class TangoTest(Device):
         dtype_out="uint64",
         doc_out="Echo of the input value",
     )
-    @DebugIt()
     def DevULong64(self, value):
         return value
 
     @command(dtype_in="str",
              doc_in="A string value",
              dtype_out="str",
-             doc_out="Echo of the input value")
-    @DebugIt()
+             doc_out="Echo of the input value"
+    )
     def DevString(self, value):
         return value
 
     @command(dtype_in="DevState",
              doc_in="A DevState value",
              dtype_out="DevState",
-             doc_out="Echo of the input value")
-    @DebugIt()
+             doc_out="Echo of the input value"
+    )
     def DevState(self, value):
         return value
 
     @command(dtype_in="DevEncoded",
              doc_in="A DevEncoded value",
              dtype_out="DevEncoded",
-             doc_out="Echo of the input value")
-    @DebugIt()
+             doc_out="Echo of the input value"
+    )
     def DevEncoded(self, value):
         return value
 
     @command(dtype_in=("char",),
              doc_in="An array of characters",
              dtype_out=("char",),
-             doc_out="Echo of the input values")
-    @DebugIt()
+             doc_out="Echo of the input values"
+    )
     def DevVarCharArray(self, values):
         return values
 
     @command(dtype_in=("double",),
              doc_in="An array of double values",
              dtype_out=("double",),
-             doc_out="Echo of the input values")
-    @DebugIt()
+             doc_out="Echo of the input values"
+    )
     def DevVarDoubleArray(self, values):
         return values
 
     @command(dtype_in=("float",),
              doc_in="An array of float values",
              dtype_out=("float",),
-             doc_out="Echo of the input values")
-    @DebugIt()
+             doc_out="Echo of the input values"
+    )
     def DevVarFloatArray(self, values):
         return values
 
     @command(dtype_in=("int16",),
              doc_in="An array of short values",
              dtype_out=("int16",),
-             doc_out="Echo of the input values")
-    @DebugIt()
+             doc_out="Echo of the input values"
+    )
     def DevVarShortArray(self, values):
         return values
 
     @command(dtype_in=("int32",),
              doc_in="An array of long values",
              dtype_out=("int32",),
-             doc_out="Echo of the input values")
-    @DebugIt()
+             doc_out="Echo of the input values"
+    )
     def DevVarLongArray(self, values):
         return [0]
 
     @command(dtype_in=("int64",),
-             dtype_out=("int64",))
-    @DebugIt()
+             doc_in="An array of long64 values",
+             dtype_out=("int64",),
+             doc_out="Echo of the input values",
+    )
     def DevVarLong64Array(self, values):
         return values
 
     @command(dtype_in=("uint16",),
              doc_in="An array of unsigned short values",
              dtype_out=("uint16",),
-             doc_out="Echo of the input values")
-    @DebugIt()
+             doc_out="Echo of the input values"
+    )
     def DevVarUShortArray(self, values):
         return values
 
     @command(dtype_in=("uint32",),
              doc_in="An array of unsigned long values",
              dtype_out=("uint32",),
-             doc_out="Echo of the input values")
-    @DebugIt()
+             doc_out="Echo of the input values"
+    )
     def DevVarULongArray(self, values):
         return values
 
     @command(dtype_in=("uint64",),
              doc_in="An array of unsigned long64 values",
              dtype_out=("uint64",),
-             doc_out="Echo of the input values")
-    @DebugIt()
+             doc_out="Echo of the input values"
+    )
     def DevVarULong64Array(self, values):
         return values
 
     @command(dtype_in=("str",),
              doc_in="An array of strings",
              dtype_out=("str",),
-             doc_out="Echo of the input values")
-    @DebugIt()
+             doc_out="Echo of the input values"
+             )
     def DevVarStringArray(self, values):
         return values
 
     @command(
         dtype_in="DevVarLongStringArray",
-        doc_in="-",
+        doc_in="A tuple array of longs & strings",
         dtype_out="DevVarLongStringArray",
-        doc_out="-",
+        doc_out="Echo of the input values"
     )
-    @DebugIt()
     def DevVarLongStringArray(self, values):
         return [[0], [""]]
 
     @command(
         dtype_in="DevVarDoubleStringArray",
-        doc_in="-",
+        doc_in="A tuple array of doubles & strings",
         dtype_out="DevVarDoubleStringArray",
-        doc_out="-",
+        doc_out="Echo of the input values"
     )
-    @DebugIt()
     def DevVarDoubleStringArray(self, values):
         return [[0.0], [""]]
 
     @command
-    @DebugIt()
     def DevVoid(self):
         pass
 
-    @command
-    @DebugIt()
-    def SwitchStates(self):
-        if get_state() == Tango.ON:
-            set_state(Tango.FAULT)
-        else:
-            set_state(Tango.ON)
-#        pass
+    @command(
+        dtype_in="DevState",
+        doc_in="Set the state of the server")
+    def ChangeState(self, new_state ):
+        set_state(new_state)
+
+    @command(
+        dtype_in="bool",
+        doc_in="Push change events == true else false",
+    )
+    def PushScalarChangeEvents(self, enabled):
+        self.__push_scalar_change_events = enabled
+
+    @command(
+        dtype_in="bool",
+        doc_in="Push archive events == true else false",
+    )
+    def PushScalarArchiveEvents(self, enabled):
+        self.__push_scalar_archive_events = enabled
+
+    @command(
+        dtype_in="bool",
+        doc_in="Push pipe events == true else false",
+    )
+    def PushPipeEvents(self, enabled):
+        self.__push_pipe_events = enabled
 
     @command
-    @DebugIt()
-    def RandomiseRO(self):
+    def Randomise(self):
         if self.__generate_task is None:
             with self.__lock:
                 self.__generate_task = gevent.spawn(self.__generate_random_data)
@@ -961,6 +1008,12 @@ class TangoTest(Device):
                                                        self.ulong_minmax[1])
             self.__ushort_scalar_ro = np.random.randint(self.ushort_minmax[0],
                                                         self.ushort_minmax[1])
+            if self.__push_scalar_change_events:
+                self.push_change_event("double_scalar_ro", self.__double_scalar_ro)
+            if self.__push_scalar_archive_events:
+                self.push_archive_event("double_scalar_ro", self.__double_scalar_ro)
+            if self.__push_pipe_events:
+                self.push_pipe_event("TestPipe", self.__blob)
             gevent.sleep(1.0)
 
 
@@ -970,10 +1023,12 @@ class TangoTest(Device):
 
     @pipe(label="Test pipe", description="This is a test pipe")
     def TestPipe(self):
+        print("Reading TestPipe blob")
         return self.__blob
 
     @TestPipe.write
     def TestPipe(self, blob):
+        print("Writing blob")
         self.__blob = blob
         print(blob)
 

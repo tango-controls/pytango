@@ -26,12 +26,10 @@ from ._tango import DeviceClass
 from ._tango import CmdArgType, DispLevel, UserDefaultAttrProp
 from .pyutil import Util
 
-from .utils import is_pure_str, is_non_str_seq, seqStr_2_obj, obj_2_str, \
-    is_array
+from .utils import is_pure_str, is_non_str_seq, seqStr_2_obj, obj_2_str, is_array
 from .utils import document_method as __document_method
 
-from .globals import get_class, get_class_by_class, \
-    get_constructed_class_by_class
+from .globals import get_class, get_class_by_class, get_constructed_class_by_class
 from .attr_data import AttrData
 from .pipe_data import PipeData
 
@@ -264,12 +262,7 @@ class PropUtil:
 
 
 def __DeviceClass__init__(self, name):
-    print("python device_class __init__ ", hex(id(self)))
-    print("python device_class __init__ ", hex(id(self.device_factory)))
-    print("python device_class __init__ ", name)
     DeviceClass.__init_orig__(self, name, self)
-    print("DeviceClass.__init__", self)
-    print("DeviceClass.__init__", hex(id(self)))
     self.dyn_att_added_methods = []
     self.dyn_cmd_added_methods = []
     try:
@@ -289,12 +282,12 @@ def __DeviceClass__init__(self, name):
         print(str(e))
 
 
-# def __DeviceClass__str__(self):
-#     return '%s(%s)' % (self.__class__.__name__, self.get_name())
+def __DeviceClass__str__(self):
+    return '%s(%s)' % (self.__class__.__name__, self.get_name())
 
 
-# def __DeviceClass__repr__(self):
-#     return '%s(%s)' % (self.__class__.__name__, self.get_name())
+def __DeviceClass__repr__(self):
+    return '%s(%s)' % (self.__class__.__name__, self.get_name())
 
 
 def __throw_create_attribute_exception(msg):
@@ -335,9 +328,8 @@ def __DeviceClass__create_user_default_attr_prop(self, attr_name, extra_info):
     return p
 
 
-def __DeviceClass__attribute_factory(self, attr_list):
+def __DeviceClass__attribute_factory(self):
     """for internal usage only"""
-    print("python_DeviceClass__attribute_factory ", attr_list)
     for attr_name, attr_info in self.attr_list.items():
         if isinstance(attr_info, AttrData):
             attr_data = attr_info
@@ -346,7 +338,8 @@ def __DeviceClass__attribute_factory(self, attr_list):
         if attr_data.forward:
             attr = self._create_fwd_attribute(attr_data.name, attr_data.att_prop)
         else:
-            attr = self._create_attribute(attr_data.attr_name,
+            self._create_attribute(
+                                   attr_data.attr_name,
                                    attr_data.attr_type,
                                    attr_data.attr_format,
                                    attr_data.attr_write,
@@ -359,37 +352,27 @@ def __DeviceClass__attribute_factory(self, attr_list):
                                    attr_data.write_method_name,
                                    attr_data.is_allowed_name,
                                    attr_data.att_prop)
-        attr_list.append(attr)
-    return attr_list
 
 
-def __DeviceClass__pipe_factory(self, pipe_list):
+def __DeviceClass__pipe_factory(self):
     """for internal usage only"""
     for pipe_name, pipe_info in self.pipe_list.items():
         if isinstance(pipe_info, PipeData):
             pipe_data = pipe_info
         else:
             pipe_data = PipeData(pipe_name, self.get_name(), pipe_info)
-        print("here in _pipe_factory")
-        print(type(pipe_list))
-        print(pipe_list.__repr__)
-        pipe = self._create_pipe(#pipe_list,
-                          pipe_data.pipe_name,
+
+        self._create_pipe(pipe_data.pipe_name,
                           pipe_data.pipe_write,
                           pipe_data.display_level,
                           pipe_data.read_method_name,
                           pipe_data.write_method_name,
                           pipe_data.is_allowed_name,
                           pipe_data.pipe_prop)
-        print(pipe.__repr__)
-        pipe_list.append(pipe)
-    print(pipe_list)
-    return pipe_list
 
 
 def __DeviceClass__command_factory(self):
     """for internal usage only"""
-    print("device_class.py: command_factory")
     name = self.get_name()
     class_info = get_class(name)
     deviceimpl_class = class_info[1]
@@ -554,7 +537,6 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
     except:
         is_allowed_name = ""
 
-    print("self._create_command")
     self._create_command(cmd_name, param_type, result_type,
                          param_desc, result_desc,
                          display_level, default_command,
@@ -562,10 +544,6 @@ def __create_command(self, deviceimpl_class, cmd_name, cmd_info):
 
 
 def __DeviceClass__new_device(self, klass, dev_class, dev_name):
-    print("__deviceClass self:", self)
-    print("__deviceClass klass:", klass)
-    print("__deviceClass dev_class:", dev_class)
-    print("__deviceClass dev_name:", dev_name)
     return klass(dev_class, dev_name)
 
 
@@ -588,7 +566,6 @@ def __DeviceClass__device_factory(self, device_list):
     for dev_name in device_list:
         print("got here ready to export", dev_name, klass, klass_name)
         device = self._new_device(deviceImplClass, klass, dev_name)
-        print("got here4 ready to export")
         self._add_device(device)
         print("got here5 ready to export")
         tmp_dev_list.append(device)
@@ -713,8 +690,8 @@ def __init_DeviceClass():
     DeviceClass.pipe_list = {}
     DeviceClass.__init_orig__ = DeviceClass.__init__
     DeviceClass.__init__ = __DeviceClass__init__
-#    DeviceClass.__str__ = __DeviceClass__str__
-#    DeviceClass.__repr__ = __DeviceClass__repr__
+    DeviceClass.__str__ = __DeviceClass__str__
+    DeviceClass.__repr__ = __DeviceClass__repr__
     DeviceClass._create_user_default_attr_prop = __DeviceClass__create_user_default_attr_prop
     DeviceClass._attribute_factory = __DeviceClass__attribute_factory
     DeviceClass._pipe_factory = __DeviceClass__pipe_factory

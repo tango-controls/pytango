@@ -70,8 +70,10 @@ namespace PyDeviceProxy
 //gm        Tango::Except::throw_exception("PyDs_WrongPythonDataTypeForPipe", ss.str(), method);
     }
 
-    template<typename T, typename U>
-    void __append_scalar_encoded(T& obj, const std::string& name, py::object& py_value)
+
+    template<typename T>
+    void append_scalar_encoded(T& obj, const std::string& name,
+                       py::object& py_value)
     {
 //        py::object p0 = py_value[0];
 //        py::object p1 = py_value[1];
@@ -94,206 +96,257 @@ namespace PyDeviceProxy
 //        PyBuffer_Release(&view);
     }
 
-    template<typename T, typename U>
+    template<typename T, long tangoTypeConst>
     void __append_scalar(T &obj, const std::string& name, py::object& py_value)
     {
-        U value = py_value.cast<U>();
+        typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+        TangoScalarType value = py_value.cast<TangoScalarType>();
         obj << value;
     }
 
-    template<typename U>
-    void append_scalar(Tango::DevicePipe& pipe, const std::string& name, py::object& py_value)
+    template<typename T>
+    void __append_scalar_string(T& obj, const std::string& name, py::object& py_value)
     {
-        __append_scalar<Tango::DevicePipe, U>(pipe, name, py_value);
+        std::string value = py_value.cast<std::string>();
+        obj << value;
     }
 
-    template<typename U>
+    template<long tangoTypeConst>
+    void append_scalar(Tango::DevicePipe& pipe, const std::string& name,
+                   py::object& py_value)
+    {
+        __append_scalar<Tango::DevicePipe, tangoTypeConst>(pipe, name, py_value);
+    }
+
+    template<>
+    void append_scalar<Tango::DEV_STRING>(Tango::DevicePipe& pipe, const std::string& name,
+              py::object& py_value)
+    {
+        __append_scalar_string<Tango::DevicePipe>(pipe, name, py_value);
+    }
+
+    template<>
+    void append_scalar<Tango::DEV_VOID>(Tango::DevicePipe& pipe,
+                        const std::string& name, py::object& py_value)
+    {
+        throw_wrong_python_data_type(pipe.get_name(), "append_scalar");
+    }
+
+    template<>
+    void append_scalar<Tango::DEV_PIPE_BLOB>(Tango::DevicePipe& pipe,
+                             const std::string& name,
+                             py::object& py_value)
+    {
+        throw_wrong_python_data_type(pipe.get_name(), "append_scalar");
+    }
+
+    template<>
+    void append_scalar<Tango::DEV_ENCODED>(Tango::DevicePipe& pipe,
+                           const std::string& name,
+                           py::object& py_value)
+    {
+        append_scalar_encoded<Tango::DevicePipe>(pipe, name, py_value);
+    }
+
+
+    template<long tangoTypeConst>
     void append_scalar(Tango::DevicePipeBlob& blob, const std::string& name, py::object& py_value)
     {
-        __append_scalar<Tango::DevicePipeBlob, U>(blob, name, py_value);
+        __append_scalar<Tango::DevicePipeBlob, tangoTypeConst>(blob, name, py_value);
     }
 
-    template<typename U>
-    void append_scalar_encoded(Tango::DevicePipe& pipe, const std::string& name, py::object& py_value)
+    template<>
+    void append_scalar<Tango::DEV_STRING>(Tango::DevicePipeBlob& blob, const std::string &name,
+              py::object& py_value)
     {
-        __append_scalar_encoded<Tango::DevicePipe, U>(pipe, name, py_value);
+        __append_scalar_string<Tango::DevicePipeBlob>(blob, name, py_value);
     }
 
-    template<typename U>
-    void append_scalar_encoded(Tango::DevicePipeBlob& blob, const std::string& name, py::object& py_value)
+    template<>
+    void append_scalar<Tango::DEV_VOID>(Tango::DevicePipeBlob& blob,
+                        const std::string& name,
+                        py::object& py_value)
     {
-        __append_scalar_encoded<Tango::DevicePipeBlob, U>(blob, name, py_value);
+        throw_wrong_python_data_type(blob.get_name(), "append_scalar");
     }
-    // -------------
-    // Array version
-    // -------------
 
-    template<typename T, typename U>
+    template<>
+    void append_scalar<Tango::DEV_PIPE_BLOB>(Tango::DevicePipeBlob& blob,
+                             const std::string& name,
+                             py::object& py_value)
+    {
+        throw_wrong_python_data_type(blob.get_name(), "append_scalar");
+    }
+
+    template<>
+    void append_scalar<Tango::DEV_ENCODED>(Tango::DevicePipeBlob& blob,
+                           const std::string& name,
+                           py::object& py_value)
+    {
+        append_scalar_encoded<Tango::DevicePipeBlob>(blob, name, py_value);
+    }
+
+// -------------
+// Array version
+// -------------
+
+    template<typename T, long tangoArrayTypeConst>
     void __append_array(T& obj, const std::string& name, py::object& py_value)
     {
-        py::print(py_value);
+        typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
+        typedef typename TANGO_const2scalartype(tangoArrayTypeConst) TangoScalarType;
         py::list py_list = py_value;
-//        int len = py::len(py_list);
-        std::vector<U> values;
-        for (auto num : py_list) {
-            U value = num.cast<U>();
-            values.push_back(value);
+        long len = py::len(py_list);
+        TangoScalarType* data_buffer = new TangoScalarType[len];
+        TangoScalarType value;
+        for (int i=0; i<len; i++) {
+            value = py_list[i].cast<TangoScalarType>();
+            data_buffer[i] = value;
         }
-        for (auto val : values) {
-            std::cout << val << std::endl;
-        }
-//        obj << len;
-        obj << values;
-    }
-
-    template<typename U>
-    void append_array(Tango::DevicePipe& pipe, const std::string& name, py::object& py_value)
-    {
-        __append_array<Tango::DevicePipe, U>(pipe, name, py_value);
-    }
-
-    template<typename U>
-    void append_array(Tango::DevicePipeBlob& blob, const std::string& name, py::object& py_value)
-    {
-        __append_array<Tango::DevicePipeBlob, U>(blob, name, py_value);
+        TangoArrayType* array = new TangoArrayType(len, len, data_buffer, true);
+        obj << array;
     }
 
     template<typename T>
-    void __append(T& obj, const std::string& name, py::object& py_value, const Tango::CmdArgType dtype)
+    void __append_array_string(T& obj, const std::string& name, py::object& py_value)
     {
-        // This might be a bit verbose but at least WYSIWYG
-        switch (dtype)
-        {
-        case Tango::DEV_BOOLEAN:
-            append_scalar<Tango::DevBoolean>(obj, name, py_value);
-            break;
-        case Tango::DEV_SHORT:
-            append_scalar<Tango::DevShort>(obj, name, py_value);
-            break;
-        case Tango::DEV_LONG:
-            append_scalar<Tango::DevLong>(obj, name, py_value);
-            break;
-        case Tango::DEV_FLOAT:
-            append_scalar<Tango::DevFloat>(obj, name, py_value);
-            break;
-        case Tango::DEV_DOUBLE:
-            append_scalar<Tango::DevDouble>(obj, name, py_value);
-            break;
-        case Tango::DEV_USHORT:
-            append_scalar<Tango::DevUShort>(obj, name, py_value);
-            break;
-        case Tango::DEV_ULONG:
-            append_scalar<Tango::DevULong>(obj, name, py_value);
-            break;
-        case Tango::DEV_STRING:
-            append_scalar<std::string>(obj, name, py_value);
-            break;
-        case Tango::DEV_STATE:
-            append_scalar<Tango::DevState>(obj, name, py_value);
-            break;
-//        case Tango::CONST_DEV_STRING:
-//            append_scalar<Tango::DevString>(obj, name, py_value);
-//            break;
-        case Tango::DEV_UCHAR:
-            append_scalar<Tango::DevUChar>(obj, name, py_value);
-            break;
-        case Tango::DEV_LONG64:
-            append_scalar<Tango::DevLong64>(obj, name, py_value);
-            break;
-        case Tango::DEV_ULONG64:
-            append_scalar<Tango::DevULong64>(obj, name, py_value);
-            break;
-//        case Tango::DEV_INT:
-//            append_scalar<Tango::DevInt>(obj, name, py_value);
-//            break;
-//        case Tango::DEV_ENUM:
-//            append_scalar<Tango::DevEnum>(obj, name, py_value);
-//            break;
-        case Tango::DEV_ENCODED:
-            append_scalar_encoded<Tango::DevEncoded>(obj, name, py_value);
-            break;
-        case Tango::DEVVAR_CHARARRAY:
-            append_array<Tango::DevUChar>(obj, name, py_value);
-            break;
-        case Tango::DEVVAR_SHORTARRAY:
-            append_array<Tango::DevShort>(obj, name, py_value);
-            break;
-        case Tango::DEVVAR_LONGARRAY:
-            append_array<Tango::DevLong>(obj, name, py_value);
-            break;
-        case Tango::DEVVAR_FLOATARRAY:
-            append_array<Tango::DevFloat>(obj, name, py_value);
-            break;
-        case Tango::DEVVAR_DOUBLEARRAY:
-            append_array<Tango::DevDouble>(obj, name, py_value);
-            break;
-        case Tango::DEVVAR_USHORTARRAY:
-            append_array<Tango::DevUShort>(obj, name, py_value);
-            break;
-        case Tango::DEVVAR_ULONGARRAY:
-            append_array<Tango::DevULong>(obj, name, py_value);
-            break;
-//        case Tango::DEVVAR_STRINGARRAY:
-//            append_array<Tango::DevString>(obj, name, py_value);
-//            break;
-        case Tango::DEVVAR_BOOLEANARRAY:
-            append_array<Tango::DevBoolean>(obj, name, py_value);
-            break;
-        case Tango::DEVVAR_LONG64ARRAY:
-            append_array<Tango::DevLong64>(obj, name, py_value);
-            break;
-        case Tango::DEVVAR_ULONG64ARRAY:
-            append_array<Tango::DevULong64>(obj, name, py_value);
-            break;
-        case Tango::DEVVAR_STATEARRAY:
-            append_array<Tango::DevState>(obj, name, py_value);
-            break;
-        default:
-            throw;
+        py::list py_list = py_value;
+        std::vector<std::string> values;
+        for (auto& item : py_list) {
+            std::string value = item.cast<std::string>();
+            values.push_back(value);
         }
+        obj << values;
+    }
+
+    template<long tangoArrayTypeConst>
+    void append_array(Tango::DevicePipe& pipe, const std::string& name,
+                  py::object& py_value)
+    {
+        __append_array<Tango::DevicePipe, tangoArrayTypeConst>(pipe, name, py_value);
+    }
+
+    template<>
+    void append_array<Tango::DEVVAR_STRINGARRAY>(Tango::DevicePipe& pipe,
+                           const std::string& name,
+                           py::object& py_value)
+    {
+        __append_array_string<Tango::DevicePipe>(pipe, name, py_value);
+    }
+
+    template<>
+    void append_array<Tango::DEV_VOID>(Tango::DevicePipe& pipe,
+                       const std::string& name,
+                       py::object& py_value)
+    {
+        throw_wrong_python_data_type(pipe.get_name(), "append_array");
+    }
+
+    template<>
+    void append_array<Tango::DEV_PIPE_BLOB>(Tango::DevicePipe& pipe,
+                            const std::string& name,
+                            py::object& py_value)
+    {
+        throw_wrong_python_data_type(pipe.get_name(), "append_array");
+    }
+
+    template<>
+    void append_array<Tango::DEVVAR_LONGSTRINGARRAY>(Tango::DevicePipe& pipe,
+                                 const std::string& name,
+                                 py::object& py_value)
+    {
+        throw_wrong_python_data_type(pipe.get_name(), "append_array");
+    }
+
+    template<>
+    void append_array<Tango::DEVVAR_DOUBLESTRINGARRAY>(Tango::DevicePipe& pipe,
+                                   const std::string& name,
+                                   py::object& py_value)
+    {
+        throw_wrong_python_data_type(pipe.get_name(), "append_array");
+    }
+
+    template<long tangoArrayTypeConst>
+    void append_array(Tango::DevicePipeBlob& blob, const std::string& name,
+                  py::object& py_value)
+    {
+        __append_array<Tango::DevicePipeBlob, tangoArrayTypeConst>(blob, name, py_value);
+    }
+
+    template<>
+    void append_array<Tango::DEVVAR_STRINGARRAY>(Tango::DevicePipeBlob& blob,
+                           const std::string& name,
+                           py::object& py_value)
+    {
+        __append_array_string<Tango::DevicePipeBlob>(blob, name, py_value);
+    }
+
+    template<>
+    void append_array<Tango::DEV_VOID>(Tango::DevicePipeBlob& blob,
+                           const std::string& name,
+                           py::object& py_value)
+    {
+        throw_wrong_python_data_type(blob.get_name(), "append_array");
+    }
+
+    template<>
+    void append_array<Tango::DEV_PIPE_BLOB>(Tango::DevicePipeBlob& blob,
+                            const std::string& name,
+                            py::object& py_value)
+    {
+        throw_wrong_python_data_type(blob.get_name(), "append_array");
+    }
+
+    template<>
+    void append_array<Tango::DEVVAR_LONGSTRINGARRAY>(Tango::DevicePipeBlob& blob,
+                                 const std::string& name,
+                                 py::object& py_value)
+    {
+        throw_wrong_python_data_type(blob.get_name(), "append_array");
+    }
+
+    template<>
+    void append_array<Tango::DEVVAR_DOUBLESTRINGARRAY>(Tango::DevicePipeBlob& blob,
+                                   const std::string& name,
+                                   py::object& py_value)
+    {
+        throw_wrong_python_data_type(blob.get_name(), "append_array");
+    }
+    template<typename T>
+    void __append(T& obj, const std::string& name,
+        py::object& py_value, const Tango::CmdArgType dtype)
+    {
+        TANGO_DO_ON_DEVICE_DATA_TYPE_ID(dtype,
+            append_scalar<tangoTypeConst>(obj, name, py_value);
+        ,
+            append_array<tangoTypeConst>(obj, name, py_value);
+        );
     }
 
     template<typename T>
     void __set_value(T& obj, py::object& py_value)
     {
-        std::cerr << "__set_value" << std::endl;
         // need to fill item names first because in case it is a sub-blob,
         // the Tango C++ API doesnt't provide a way to do it
         std::vector<std::string> elem_names;
-        py::print(py_value);
         for (auto item : py_value) {
-            py::print("start ===========");
-            py::print(item);
-            py::print("end =============");
             elem_names.push_back(item["name"].cast<std::string>());
         }
         obj.set_data_elt_names(elem_names);
         for (auto item : py_value) {
-            py::print("start >>>>>>>>>>>");
-            py::print(item);
-            py::print("end >>>>>>>>>>>>>");
             std::string item_name = item["name"].cast<std::string>();
             py::object item_data = item["value"];
             Tango::CmdArgType item_dtype;
             item_dtype = item["dtype"].cast<Tango::CmdArgType>();
-            std::cout << item_dtype << std::endl;
             if (item_dtype == Tango::DEV_PIPE_BLOB) // a sub-blob
             {
-                py::print("start ************");
-                py::print("item is a pipe blob");
                 py::tuple inner_blob = item["value"];
-                py::print(inner_blob);
-                py::print("end **************");
                 std::string inner_blob_name = (inner_blob[0]).cast<std::string>();
-                py::print("blob name====", inner_blob_name);
                 py::object inner_blob_data = inner_blob[1];
-                py::print("blob value===", inner_blob_data);
                 Tango::DevicePipeBlob blob(inner_blob_name);
                 __set_value(blob, inner_blob_data);
-                py::print("----------- blob into obj");
                 obj << blob;
             } else {
-                py::print("not a pipe blob");
                 __append(obj, item_name, item_data, item_dtype);
             }
         }
@@ -330,22 +383,18 @@ void export_device_proxy(py::module &m) {
         .def(py::init<const Tango::DeviceProxy &>())
         .def(py::init([](std::string& name) {
             Tango::DeviceProxy* dp = nullptr;
-            std::cout << "executed? " << std::endl;
             AutoPythonAllowThreads guard;
             // C++ signature
             dp = new Tango::DeviceProxy(name);
             return dp;
-//            return std::shared_ptr<Tango::DeviceProxy>(dp);
         }))
 
         .def(py::init([](std::string& name, bool ch_access) {
             Tango::DeviceProxy* dp = nullptr;
-            std::cout << "executed with bool?" << std::endl;
             AutoPythonAllowThreads guard;
             // C++ signature
             dp = new Tango::DeviceProxy(name, ch_access);
             return dp;
-//            return std::shared_ptr<Tango::DeviceProxy>(dp);
         }))
         //
         // Pickle
@@ -356,163 +405,161 @@ void export_device_proxy(py::module &m) {
         // general methods
         //
         .def("dev_name", [](Tango::DeviceProxy& self) -> std::string {
-            return self.dev_name();
+            return self.dev_name(); // Tango C++ signature
         })
         .def("info", [](Tango::DeviceProxy& self) -> Tango::DeviceInfo {
-            return self.info();
+            return self.info(); // Tango C++ signature
         })
         .def("get_device_db", [](Tango::DeviceProxy& self) -> Tango::Database* {
-            return self.get_device_db();
+            return self.get_device_db(); // Tango C++ signature
         })
         .def("_status", [](Tango::DeviceProxy& self) -> std::string {
             AutoPythonAllowThreads guard;
-            return self.status();
+            return self.status(); // Tango C++ signature
         })
        .def("_state", [](Tango::DeviceProxy& self) -> Tango::DevState {
             AutoPythonAllowThreads guard;
-            return self.state();
+            return self.state(); // Tango C++ signature
         })
         .def("adm_name", [](Tango::DeviceProxy& self) -> std::string {
-            return self.adm_name();
+            return self.adm_name(); // Tango C++ signature
         })
         .def("description", [](Tango::DeviceProxy& self) -> std::string {
-            return self.description();
+            return self.description(); // Tango C++ signature
         })
         .def("name", [](Tango::DeviceProxy& self) -> std::string {
-            return self.name();
+            return self.name(); // Tango C++ signature
         })
         .def("alias", [](Tango::DeviceProxy& self) -> std::string {
-            return self.alias();
+            return self.alias(); // Tango C++ signature
         })
         .def("get_tango_lib_version", [](Tango::DeviceProxy& self) -> int {
-            return self.get_tango_lib_version();
+            return self.get_tango_lib_version(); // Tango C++ signature
         })
         .def("_ping", [](Tango::DeviceProxy& self) -> int {
             AutoPythonAllowThreads guard;
-            return self.ping();
+            return self.ping(); // Tango C++ signature
         })
         .def("black_box", [](Tango::DeviceProxy& self, int nb) -> std::vector<std::string>* {
-            return std::move(self.black_box(nb));
+            return std::move(self.black_box(nb)); // Tango C++ signature
         })
         //
         // command methods
         //
         .def("get_command_list", [](Tango::DeviceProxy& self) -> std::vector<std::string>* {
-            return std::move(self.get_command_list());
+            return std::move(self.get_command_list()); // Tango C++ signature
         })
         .def("_get_command_config", [](Tango::DeviceProxy& self, const std::string& cmd_name) -> Tango::CommandInfo {
-            return self.get_command_config(cmd_name);
+            return self.get_command_config(cmd_name); // Tango C++ signature
         })
         .def("_get_command_config", [](Tango::DeviceProxy& self, std::vector<std::string>& cmd_names) -> Tango::CommandInfoList* {
-            return self.get_command_config(cmd_names);
+            return self.get_command_config(cmd_names); // Tango C++ signature
         })
         .def("command_query", [](Tango::DeviceProxy& self, std::string cmd_name) -> Tango::CommandInfo {
-            return self.command_query(cmd_name);
+            return self.command_query(cmd_name); // Tango C++ signature
         })
         .def("command_list_query", [](Tango::DeviceProxy& self) -> Tango::CommandInfoList* {
-            return std::move(self.command_list_query());
+            return std::move(self.command_list_query()); // Tango C++ signature
         })
         .def("import_info", [](Tango::DeviceProxy& self) -> Tango::DbDevImportInfo {
-            return self.import_info();
+            Tango::DbDevImportInfo info = self.import_info(); // Tango C++ signature
+            return info;
         })
         //
         // property methods
         //
         .def("_get_property", [](Tango::DeviceProxy& self, std::string& prop_name) -> Tango::DbData {
             Tango::DbData dbData;
-            self.get_property(prop_name, dbData);
+            self.get_property(prop_name, dbData); // Tango C++ signature
             return dbData;
         })
         .def("_get_property", [](Tango::DeviceProxy& self, std::vector<std::string>& prop_names) -> Tango::DbData {
             Tango::DbData dbData;
-            self.get_property(prop_names, dbData);
+            self.get_property(prop_names, dbData); // Tango C++ signature
             return dbData;
         })
         .def("_get_property", [](Tango::DeviceProxy& self, Tango::DbData dbData) -> Tango::DbData {
-            self.get_property(dbData);
+            self.get_property(dbData); // Tango C++ signature
             return dbData;
         })
         .def("_put_property", [](Tango::DeviceProxy& self, Tango::DbData& dbData) -> void {
-            self.put_property(dbData);
+            self.put_property(dbData); // Tango C++ signature
         })
         .def("_delete_property", [](Tango::DeviceProxy& self, std::string& prop_name) -> void {
-            self.delete_property(prop_name);
+            self.delete_property(prop_name); // Tango C++ signature
         })
         .def("_delete_property", [](Tango::DeviceProxy& self, std::vector<std::string>& prop_names) -> void {
-            self.delete_property(prop_names);
+            self.delete_property(prop_names); // Tango C++ signature
         })
         .def("_delete_property", [](Tango::DeviceProxy& self, Tango::DbData& dbData) -> void {
-            self.delete_property(dbData);
+            self.delete_property(dbData); // Tango C++ signature
         })
         .def("_get_property_list", [](Tango::DeviceProxy& self, const std::string& filter, std::vector<std::string>& prop_list) -> std::vector<std::string> {
-            self.get_property_list(filter, prop_list);
+            self.get_property_list(filter, prop_list); // Tango C++ signature
             return prop_list;
         })
         //
         // pipe methods
         //
         .def("get_pipe_list", [](Tango::DeviceProxy& self) -> std::vector<std::string>* {
-            return self.get_pipe_list();
+            return self.get_pipe_list(); // Tango C++ signature
         })
-        .def("_get_pipe_config", [](Tango::DeviceProxy& self, const std::string& pipe_name) -> Tango::PipeInfo {
-            return self.get_pipe_config(pipe_name);
+        .def("_get_pipe_config", [](Tango::DeviceProxy& self, std::string& pipe_name) -> Tango::PipeInfo {
+            return self.get_pipe_config(pipe_name); // Tango C++ signature
         })
         .def("_get_pipe_config", [](Tango::DeviceProxy& self, std::vector<std::string>& pipe_names) -> Tango::PipeInfoList* {
-            return std::move(self.get_pipe_config(pipe_names));
+            return  self.get_pipe_config(pipe_names); // Tango C++ signature
         })
         .def("_set_pipe_config", [](Tango::DeviceProxy& self, Tango::PipeInfoList& pipes) -> void {
-            self.set_pipe_config(pipes);
+            self.set_pipe_config(pipes); // Tango C++ signature
         })
         .def("__read_pipe", [](Tango::DeviceProxy& self, const std::string& pipe_name) {
-            std::cerr << "in device_proxy::__read_pipe " << pipe_name << std::endl;
             AutoPythonAllowThreads guard;
-            return self.read_pipe(pipe_name);
+            return self.read_pipe(pipe_name); // Tango C++ signature
         })
         .def("__write_pipe", [](Tango::DeviceProxy& self, const std::string& pipe_name,
                               const std::string& root_blob_name, py::object py_value) {
             Tango::DevicePipe device_pipe(pipe_name, root_blob_name);
             PyDeviceProxy::set_value(device_pipe, py_value);
             AutoPythonAllowThreads guard;
-            std::cerr << "device_proxy.cpp:494" << pipe_name << " " << root_blob_name << std::endl;
-            // C++ signature
-            self.write_pipe(device_pipe);
+            self.write_pipe(device_pipe); // Tango C++ signature
         })
         //
         // attribute methods
         //
         .def("get_attribute_list", [](Tango::DeviceProxy& self) -> std::vector<std::string>* {
-            return std::move(self.get_attribute_list());
+            return std::move(self.get_attribute_list()); // Tango C++ signature
         })
         .def("_get_attribute_config", [](Tango::DeviceProxy& self, std::string& attr_name) -> Tango::AttributeInfoEx {
-            return self.get_attribute_config(attr_name);
+            return self.get_attribute_config(attr_name); // Tango C++ signature
         })
         .def("_get_attribute_config", [](Tango::DeviceProxy& self, std::vector<std::string>& attr_names) -> Tango::AttributeInfoList* {
-            return std::move(self.get_attribute_config(attr_names));
+            return std::move(self.get_attribute_config(attr_names)); // Tango C++ signature
         })
         .def("_get_attribute_config_ex", [](Tango::DeviceProxy& self, std::vector<std::string>& attr_names) -> Tango::AttributeInfoListEx* {
-            return std::move(self.get_attribute_config_ex(attr_names));
+            return std::move(self.get_attribute_config_ex(attr_names)); // Tango C++ signature
         })
         .def("attribute_query", [](Tango::DeviceProxy& self, std::string& attr_name) -> Tango::AttributeInfoEx {
-            return self.attribute_query(attr_name);
+            return self.attribute_query(attr_name); // Tango C++ signature
         })
         .def("attribute_list_query", [](Tango::DeviceProxy& self) -> Tango::AttributeInfoList* {
-            return std::move(self.attribute_list_query());
+            return std::move(self.attribute_list_query()); // Tango C++ signature
         })
         .def("attribute_list_query_ex", [](Tango::DeviceProxy& self) -> Tango::AttributeInfoListEx* {
-            return std::move(self.attribute_list_query_ex());
+            return std::move(self.attribute_list_query_ex()); // Tango C++ signature
         })
         .def("_set_attribute_config", [](Tango::DeviceProxy& self, Tango::AttributeInfoList &attrs) -> void {
-            self.set_attribute_config(attrs);
+            self.set_attribute_config(attrs); // Tango C++ signature
         })
 
         .def("_set_attribute_config", [](Tango::DeviceProxy& self, Tango::AttributeInfoListEx& attrs) -> void {
-            self.set_attribute_config(attrs);
+            self.set_attribute_config(attrs); // Tango C++ signature
         })
         .def("_read_attribute", [](Tango::DeviceProxy& self, std::string& attr_name) -> py::object {
             Tango::DeviceAttribute* dev_attr = nullptr;
             {
                 AutoPythonAllowThreads guard;
-                dev_attr = new Tango::DeviceAttribute(self.read_attribute(attr_name));
+                dev_attr = new Tango::DeviceAttribute(self.read_attribute(attr_name)); // Tango C++ signature
             }
             return PyDeviceAttribute::convert_to_python(dev_attr, self);
          })
@@ -520,7 +567,7 @@ void export_device_proxy(py::module &m) {
             std::unique_ptr<std::vector<Tango::DeviceAttribute>> dev_attr_vec;
             {
                 AutoPythonAllowThreads guard;
-                dev_attr_vec.reset(self.read_attributes(attr_names));
+                dev_attr_vec.reset(self.read_attributes(attr_names)); // Tango C++ signature
             }
             return PyDeviceAttribute::convert_to_python(dev_attr_vec, self);
         })
@@ -528,19 +575,19 @@ void export_device_proxy(py::module &m) {
             Tango::DeviceAttribute dev_attr;
             PyDeviceAttribute::reset(dev_attr, attr_name, self, py_value);
             AutoPythonAllowThreads guard;
-            self.write_attribute(dev_attr);
+            self.write_attribute(dev_attr); // Tango C++ signature
         })
         .def("_write_attribute", [](Tango::DeviceProxy& self, const Tango::AttributeInfo & attr_info, py::object py_value) -> void {
             Tango::DeviceAttribute da;
             PyDeviceAttribute::reset(da, attr_info, py_value);
             AutoPythonAllowThreads guard;
-            self.write_attribute(da);
+            self.write_attribute(da); // Tango C++ signature
         })
         .def("_write_attributes", [](Tango::DeviceProxy& self, py::object& py_list) -> void {
             std::vector<Tango::DeviceAttribute> dev_attrs;
             PyDeviceProxy::pylist_to_devattrs(self, py_list, dev_attrs);
             AutoPythonAllowThreads guard;
-            self.write_attributes(dev_attrs);
+            self.write_attributes(dev_attrs); // Tango C++ signature
         })
         .def("_write_read_attribute", [](Tango::DeviceProxy& self, std::string& attr_name,
                 py::object py_value) -> py::object {
@@ -549,8 +596,7 @@ void export_device_proxy(py::module &m) {
             PyDeviceAttribute::reset(w_dev_attr, attr_name, self, py_value);
             {
                 AutoPythonAllowThreads guard;
-                // C++ signature
-                Tango::DeviceAttribute da = self.write_read_attribute(w_dev_attr);
+                Tango::DeviceAttribute da = self.write_read_attribute(w_dev_attr); // Tango C++ signature
                 r_dev_attr = new Tango::DeviceAttribute(da);
             }
             // Convert the result back to python
@@ -834,7 +880,6 @@ void export_device_proxy(py::module &m) {
         .def("get_fqdn", [](Tango::DeviceProxy& self) -> std::string {
             std::string fqdn_str;
             self.get_fqdn(fqdn_str);
-            std::cerr << "fqdn " << fqdn_str << std::endl;
             return std::move(fqdn_str);
         })
         .def("is_dbase_used", [](Tango::DeviceProxy& self) -> bool {
@@ -868,13 +913,11 @@ void export_device_proxy(py::module &m) {
             self.set_transparency_reconnection(reconn);
         })
         .def("__command_inout", [](Tango::DeviceProxy& self, std::string& cmd_name) -> Tango::DeviceData {
-            py::print(">>>>>>>>>>>>>>>>>",cmd_name);
             AutoPythonAllowThreads guard;
             return self.command_inout(cmd_name);
         })
         .def("__command_inout", [](Tango::DeviceProxy& self, std::string& cmd_name,
                 Tango::DeviceData &argin) -> Tango::DeviceData {
-            py::print(">>>>>>>>>>>>>>>>>",cmd_name);
             AutoPythonAllowThreads guard;
             return self.command_inout(cmd_name, argin);
         })

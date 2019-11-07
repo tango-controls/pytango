@@ -20,17 +20,19 @@ namespace py = pybind11;
 
 namespace PyAttribute
 {
+    void set_complex_value(Tango::Attribute&, py::object&);
+
     void set_value(Tango::Attribute&, py::object&);
-    void set_value(Tango::Attribute&, const std::string& , const std::string&);
-    void set_value(Tango::Attribute&, const std::string& , py::object&);
+    void set_value(Tango::Attribute&, std::string& , std::string&);
+    void set_value(Tango::Attribute&, std::string& , py::object&);
     void set_value(Tango::Attribute&, py::object&, long);
     void set_value(Tango::Attribute&, py::object&, long, long);
 
     void set_value_date_quality(Tango::Attribute&, py::object&,
                                 double, Tango::AttrQuality);
-    void set_value_date_quality(Tango::Attribute&, const std::string&,
-                                const std::string&, double, Tango::AttrQuality);
-    void set_value_date_quality(Tango::Attribute&, const std::string&,
+    void set_value_date_quality(Tango::Attribute&, std::string&,
+                                std::string&, double, Tango::AttrQuality);
+    void set_value_date_quality(Tango::Attribute&, std::string&,
                                 py::object&, double, Tango::AttrQuality);
     void set_value_date_quality(Tango::Attribute&, py::object&,
                                 double, Tango::AttrQuality, long);

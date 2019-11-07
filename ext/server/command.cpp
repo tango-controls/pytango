@@ -26,7 +26,6 @@ bool PyCmd::is_allowed(Tango::DeviceImpl *dev, const CORBA::Any &any) {
         DeviceImplWrap *dev_ptr = (DeviceImplWrap*) dev;
         AutoPythonGILEnsure __py_lock;
         bool returned_value = true;
-        std::cout << "does it do this?" << std::endl;
         try {
             returned_value = dev_ptr->py_self.attr(py_allowed_name.c_str())().cast<bool>();
         } catch (py::error_already_set &eas) {
@@ -335,7 +334,6 @@ CORBA::Any *PyCmd::execute(Tango::DeviceImpl *dev, const CORBA::Any &param_any)
     DeviceImplWrap *dev_ptr = (DeviceImplWrap*)dev;
 
     AutoPythonGILEnsure __py_lock;
-    std::cout << "Got to execute in command.cpp" << std::endl;
     try
     {
         // This call extracts the CORBA any into a python object.

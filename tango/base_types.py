@@ -20,8 +20,8 @@ __docformat__ = "restructuredtext"
 from ._tango import (StdStringVector, StdLongVector, StdDoubleVector,
                      CommandInfoList, AttributeInfoList, AttributeInfoListEx, DbData,
                      DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList,
-                     DeviceDataHistoryList, StdGroupReplyVector,
-                     StdGroupCmdReplyVector, StdGroupAttrReplyVector,
+                     DeviceDataHistoryList, #StdGroupReplyVector,
+                     #StdGroupCmdReplyVector, StdGroupAttrReplyVector,
                      ArchiveEventInfo, EventData, AttrConfEventData, AttributeAlarmInfo,
                      AttributeDimension, AttributeEventInfo, DeviceAttributeConfig,
                      AttributeInfo, AttributeInfoEx, ChangeEventInfo, PeriodicEventInfo,
@@ -289,10 +289,11 @@ def __AttributeInfoEx__setstate__(self, state):
 def __init_base_types():
     v_klasses = (
         StdStringVector, StdLongVector, StdDoubleVector, CommandInfoList,
-        AttributeInfoList, AttributeInfoListEx, DbData, DbDevInfos,
+        AttributeInfoList, AttributeInfoListEx, DbDevInfos, DbData, 
         DbDevExportInfos, DbDevImportInfos, DbHistoryList,
-        DeviceDataHistoryList, StdGroupReplyVector,
-        StdGroupCmdReplyVector, StdGroupAttrReplyVector)
+        DeviceDataHistoryList, #StdGroupReplyVector,
+        #StdGroupCmdReplyVector, StdGroupAttrReplyVector
+        )
 
 #     for v_klass in v_klasses:
 #         __fillVectorClass(v_klass)

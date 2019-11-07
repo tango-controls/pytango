@@ -60,7 +60,7 @@ __all__ = [
     'PollCmdCode', 'PollDevice',
     'PollObjType', 'READ', 'READ_WITH_WRITE', 'READ_WRITE', 'Release', 'SCALAR',
     'SPECTRUM', 'SerialModel', 'SpectrumAttr', 'StdDoubleVector',
-    'StdGroupAttrReplyVector', 'StdGroupCmdReplyVector', 'StdGroupReplyVector',
+    #'StdGroupAttrReplyVector', 'StdGroupCmdReplyVector', 'StdGroupReplyVector',
     'StdLongVector', 'StdNamedDevFailedVector', 'StdStringVector', 'SubDevDiag',
     'TangoStream', 'TimeVal', 'UserDefaultAttrProp', 'UserDefaultPipeProp', 'Util',
     'WAttribute', 'WRITE', 'WarnIt', 'WrongData', 'WrongNameSyntax', '__version__',
@@ -280,9 +280,9 @@ from ._tango import SPECTRUM
 from ._tango import SerialModel
 from ._tango import SpectrumAttr
 from ._tango import StdDoubleVector
-from ._tango import StdGroupAttrReplyVector
-from ._tango import StdGroupCmdReplyVector
-from ._tango import StdGroupReplyVector
+#from ._tango import StdGroupAttrReplyVector
+#from ._tango import StdGroupCmdReplyVector
+#from ._tango import StdGroupReplyVector
 from ._tango import StdLongVector
 #from ._tango import StdNamedDevFailedVector
 from ._tango import StdStringVector

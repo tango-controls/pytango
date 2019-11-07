@@ -42,7 +42,6 @@ public:
         if (safe) check_python();
             // Acquire GIL before calling Python code
             py::gil_scoped_acquire acquire;
-            std::cout << "Acquired GIL before calling Python code" << std::endl;
     }
     
     inline ~AutoPythonGIL() {
@@ -63,13 +62,11 @@ public:
         // So ensure that the current thread is ready to call the Python C API
         // regardless of the current state of Python, or of the global interpreter lock.
         m_gstate = PyGILState_Ensure();
-        std::cerr << "Ensured GIL before calling Python code" << std::endl;
     }
 
 
     inline ~AutoPythonGILEnsure() {
         PyGILState_Release(m_gstate);
-        std::cerr << "Released GIL after calling Python code" << std::endl;
     }
 };
 

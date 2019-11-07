@@ -33,10 +33,10 @@ from ._tango import (AttributeInfoList, AttributeInfoListEx, PipeInfoList,
                       DevError, EventData, AttrConfEventData, DataReadyEventData,
                       TimeVal, DevFailed, CmdArgType)
  
-# from .device_server import AttributeAlarm, EventProperties
-# from .device_server import ChangeEventProp, PeriodicEventProp, ArchiveEventProp
-# from .device_server import AttributeConfig, AttributeConfig_2
-# from .device_server import AttributeConfig_3, AttributeConfig_5
+from .device_server import AttributeAlarm, EventProperties
+from .device_server import ChangeEventProp, PeriodicEventProp, ArchiveEventProp
+from .device_server import AttributeConfig, AttributeConfig_2
+from .device_server import AttributeConfig_3, AttributeConfig_5
 import collections
 
 
@@ -136,10 +136,10 @@ def __registerStructStr():
                DbServerInfo, 
 #               GroupReply, GroupAttrReply, GroupCmdReply,
                DevError, EventData, AttrConfEventData, DataReadyEventData,
-#               AttributeConfig, AttributeConfig_2, AttributeConfig_3,
-#               AttributeConfig_5,
-#               ChangeEventProp, PeriodicEventProp, ArchiveEventProp,
-#               AttributeAlarm, EventProperties
+               AttributeConfig, AttributeConfig_2, AttributeConfig_3,
+               AttributeConfig_5,
+               ChangeEventProp, PeriodicEventProp, ArchiveEventProp,
+               AttributeAlarm, EventProperties
                )
 
     for struct in structs:

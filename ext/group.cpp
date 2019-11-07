@@ -102,7 +102,6 @@ static long _write_attribute_asynch(Tango::Group& self, const std::string& attr_
 }
 
 void export_group(py::module &m) {
-// TODO noncopyable
     py::class_<Tango::Group, std::shared_ptr<Tango::Group> >(m, "Group")
         .def(py::init<const std::string&>())
         .def("_add", [](Tango::Group& self, const std::string& pattern, int timeout_ms=-1) {

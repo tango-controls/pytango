@@ -9,7 +9,7 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-__all__ = ['PipeConfig']
+__all__ = ['PipeConfig', 'sanitize_pipe_blob','sanitize_pipe_element']
 
 from ._tango import Pipe, PipeWriteType, UserDefaultPipeProp, \
     CmdArgType, DevState, DispLevel, constants
@@ -52,6 +52,9 @@ def __get_pipe_type_simple(obj):
         tg_type = CmdArgType.DevLong64
     elif is_number(obj):
         tg_type = CmdArgType.DevDouble
+    # this may be too simple but we'll try got now.
+    elif isinstance(obj, tuple):
+        tg_type = CmdArgtype.DevEncoded
     else:
         raise ValueError('Cannot determine object tango type')
     return tg_type
@@ -60,7 +63,7 @@ def __get_pipe_type_simple(obj):
 def __get_pipe_type_numpy_support(obj):
     try:
         ndim, dtype = obj.ndim, str(obj.dtype)
-    except AttributeError:
+    except AttributeError, TypeError:
         return __get_pipe_type_simple(obj)
     if ndim > 1:
         raise TypeError('cannot translate numpy array with {0} '
@@ -91,7 +94,7 @@ def __get_pipe_type(obj, dtype=None):
     return __get_pipe_type_simple(obj)
 
 
-def __sanatize_pipe_element(elem):
+def sanitize_pipe_element(elem):
     if isinstance(elem, dict):
         result = dict(elem)
     else:
@@ -99,34 +102,36 @@ def __sanatize_pipe_element(elem):
     result['value'] = value = result.get('value', result.pop('blob', None))
     result['dtype'] = dtype = __get_pipe_type(value, dtype=result.get('dtype'))
     if dtype == CmdArgType.DevPipeBlob:
-        result['value'] = value[0], __sanatize_pipe_blob(value[1])
+        result['value'] = value[0], sanitize_pipe_blob(value[1])
+    print("pipe.py", result)
     return result
 
 
-def __sanatize_pipe_blob(blob):
+def sanitize_pipe_blob(blob):
     if isinstance(blob, dict):
-        return [__sanatize_pipe_element((k, v)) for k, v in blob.items()]
+        return [sanitize_pipe_element((k, v)) for k, v in blob.items()]
     else:
-        return [__sanatize_pipe_element(elem) for elem in blob]
+        return [sanitize_pipe_element(elem) for elem in blob]
 
 
-def __Pipe__set_value(self, value):
-    """
-    Set the pipe value. Check ref:`pipe data types <pytango-pipe-data-types>`:
-    for more information on which values are supported
-    """
-    root_blob_name, blob = value
-    self.set_root_blob_name(root_blob_name)
-    value = __sanatize_pipe_blob(blob)
-    self._set_value(value)
+# def __Pipe__set_value(self, value):
+#     """
+#     Set the pipe value. Check ref:`pipe data types <pytango-pipe-data-types>`:
+#     for more information on which values are supported
+#     """
+#     root_blob_name, blob = value
+#     self.set_root_blob_name(root_blob_name)
+#     value = sanitize_pipe_blob(blob)
+#     self._set_value(value)
+#     return (root_blob_name, value)
 
 
 def __Pipe__get_value(self):
     return (self.get_root_blob_name(), self._get_value())
 
 
-def __init_Pipe():
-    Pipe.set_value = __Pipe__set_value
+# def __init_Pipe():
+#      Pipe.set_value = __Pipe__set_value
 
 
 def __doc_UserDefaultPipeProp():
@@ -164,6 +169,6 @@ def __doc_UserDefaultPipeProp():
 
 
 def pipe_init(doc=True):
-    __init_Pipe()
+#    __init_Pipe()
     if doc:
         __doc_UserDefaultPipeProp()

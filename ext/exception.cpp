@@ -245,7 +245,7 @@ void sequencePyDevError_2_DevErrorList(py::object value, Tango::DevErrorList &de
 //
 void handle_python_exception(py::error_already_set &eas)
 {
-    std::cerr << "in handle python exception" << std::endl;
+    std::cerr << "in handle python exception " <<eas.what() << std::endl;
 //    if (PyErr_ExceptionMatches(PyTango_DevFailed.ptr()))
 //    {
 //        throw_python_dev_failed();

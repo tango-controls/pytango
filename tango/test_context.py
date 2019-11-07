@@ -10,6 +10,7 @@ import time
 import struct
 import socket
 import tempfile
+import traceback
 import collections
 from functools import partial
 
@@ -21,13 +22,13 @@ from six.moves import queue
 # CLI imports
 from ast import literal_eval
 from importlib import import_module
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 
 # Local imports
 from .server import run
 from . import DeviceProxy, Database, Util
 
-__all__ = ["DeviceTestContext", "run_device_test_context"]
+__all__ = ("DeviceTestContext", "run_device_test_context")
 
 # Helpers
 
@@ -70,14 +71,19 @@ def literal_dict(arg):
 def device(path):
     """Get the device class from a given module."""
     module_name, device_name = path.rsplit(".", 1)
-    module = import_module(module_name)
+    try:
+        module = import_module(module_name)
+    except Exception:
+        raise ArgumentTypeError("Error importing {0}.{1}:\n{2}"
+                                .format(module_name, device_name,
+                                        traceback.format_exc()))
     return getattr(module, device_name)
 
 
-def get_hostname():
-    """Get the hostname corresponding to the primary, external IP.
+def get_host_ip():
+    """Get the primary external host IP.
 
-    This is useful because an explicit hostname is required to get
+    This is useful because an explicit IP is required to get
     tango events to work properly. Note that localhost does not work
     either.
     """
@@ -86,8 +92,7 @@ def get_hostname():
     s.connect(('8.8.8.8', 0))
     # Get ip address
     ip = s.getsockname()[0]
-    # Return host name
-    return socket.gethostbyaddr(ip)[0].split('.')[0]
+    return ip
 
 
 # Device test context
@@ -117,7 +122,8 @@ class DeviceTestContext(object):
         if db is None:
             _, db = tempfile.mkstemp()
         if host is None:
-            host = get_hostname()
+            # IP address is used instead of the hostname on purpose (see #246)
+            host = get_host_ip()
         if properties is None:
             properties = {}
         if timeout is None:
@@ -172,7 +178,7 @@ class DeviceTestContext(object):
             # because the it might segfault while cleaning up the
             # the tango resources
             if process:
-                time.sleep(0.01)
+                time.sleep(0.1)
 
     def post_init(self):
         try:
@@ -222,8 +228,7 @@ class DeviceTestContext(object):
 
     def connect(self):
         try:
-            args = self.queue.get(
-                timeout=self.timeout)
+            args = self.queue.get(timeout=self.timeout)
         except queue.Empty:
             if self.thread.is_alive():
                 raise RuntimeError(
