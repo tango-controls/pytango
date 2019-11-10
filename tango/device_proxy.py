@@ -34,6 +34,7 @@ from .utils import seq_2_StdStringVector, StdStringVector_2_seq
 from .utils import DbData_2_dict, obj_2_property
 from .utils import document_method as __document_method
 from .utils import dir2
+from .utils import ensure_binary
 
 from .green import green, green_callback
 from .green import get_green_mode
@@ -685,7 +686,7 @@ def __DeviceProxy__delete_property(self, value):
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
-                e = six.ensure_binary(e, 'latin-1')
+                e = ensure_binary(e, 'latin-1')
                 new_value.append(DbDatum(e))
     elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
