@@ -339,8 +339,9 @@ class MultiDeviceTestContext(object):
         # Open the file
         with open(self.db, "a") as f:
             f.write("/".join((server, instance, "DEVICE", tangoclass)))
-            for device_name in device_names:
-                f.write(': "' + device_name + '"\n')
+            f.write(": ")
+            f.write(", ".join(device_names))
+            f.write("\n")
         # Create database
         db = Database(self.db)
         # Write properties
