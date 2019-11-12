@@ -370,7 +370,7 @@ class MultiDeviceTestContext(object):
         Maintains previously accessed device proxies in a cache to not recreate
         then on every access.
         """
-        if not device_name in self._devices:
+        if device_name not in self._devices:
             device = DeviceProxy(self.get_device_access(device_name))
             self._devices[device_name] = device
         return self._devices[device_name]
