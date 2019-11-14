@@ -47,7 +47,7 @@ __all__ = (
     "CaselessList", "CaselessDict", "EventCallBack", "get_home",
     "from_version_str_to_hex_str", "from_version_str_to_int",
     "seq_2_StdStringVector", "StdStringVector_2_seq",
-    "dir2", "TO_TANGO_TYPE")
+    "dir2", "TO_TANGO_TYPE", "ensure_binary")
 
 __docformat__ = "restructuredtext"
 
@@ -1070,7 +1070,7 @@ def obj_2_property(value):
             else:
                 if not is_pure_str(v):
                     v = str(v)
-                v = six.ensure_binary(v, encoding='latin-1')
+                v = ensure_binary(v, encoding='latin-1')
                 db_datum.value_string.append(v)
             new_value.append(db_datum)
         value = new_value
@@ -1737,3 +1737,28 @@ def dir2(obj):
         attrs.update(dir2(cls))
     attrs.update(get_attrs(obj))
     return list(attrs)
+
+
+if hasattr(six, "ensure_binary"):
+    ensure_binary = six.ensure_binary
+else:
+    # For older versions of six (<1.12), fallback to local
+    # implementation
+
+    def ensure_binary(s, encoding='utf-8', errors='strict'):
+        """Coerce **s** to six.binary_type.
+        For Python 2:
+          - `unicode` -> encoded to `str`
+          - `str` -> `str`
+        For Python 3:
+          - `str` -> encoded to `bytes`
+          - `bytes` -> `bytes`
+
+        Code taken from https://github.com/benjaminp/six/blob/1.12.0/six.py#L853
+        """
+        if isinstance(s, six.text_type):
+            return s.encode(encoding, errors)
+        elif isinstance(s, six.binary_type):
+            return s
+        else:
+            raise TypeError("not expecting type '%s'" % type(s))
