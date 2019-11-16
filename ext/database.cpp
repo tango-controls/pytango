@@ -35,7 +35,7 @@ struct PyDatabase
                 return bopy::make_tuple();
         }
     };
-    
+
     static inline boost::shared_ptr<Tango::Database>
     makeDatabase_host_port1(const std::string &host, int port)
     {
@@ -120,7 +120,7 @@ struct PyDatabase
         self.get_device_from_alias(input, output);
         return boost::python::str(output);
     }
-    
+
     static inline boost::python::str
     get_alias_from_device(Tango::Database& self, const std::string &input)
     {
@@ -128,7 +128,7 @@ struct PyDatabase
         self.get_alias_from_device(input, output);
         return boost::python::str(output);
     }
-    
+
     static inline boost::python::str
     get_attribute_from_alias(Tango::Database& self, const std::string &input)
     {
@@ -136,7 +136,7 @@ struct PyDatabase
         self.get_attribute_from_alias(input, output);
         return boost::python::str(output);
     }
-    
+
     static inline boost::python::str
     get_alias_from_attribute(Tango::Database& self, const std::string &input)
     {
@@ -231,14 +231,14 @@ void export_database()
         &Tango::Database::import_device;
     Tango::DbDevFullInfo (Tango::Database::*get_device_info_)(std::string &) =
         &Tango::Database::get_device_info;
-    
+
     Tango::DbDatum (Tango::Database::*get_attribute_alias_list_)(std::string &) =
         &Tango::Database::get_attribute_alias_list;
     void (Tango::Database::*put_attribute_alias_)(std::string &, std::string &) =
         &Tango::Database::put_attribute_alias;
     void (Tango::Database::*delete_attribute_alias_)(std::string &) =
         &Tango::Database::delete_attribute_alias;
-    
+
     bopy::class_<Tango::Database, bopy::bases<Tango::Connection> > Database("Database", bopy::init<>())
     ;
 
@@ -252,7 +252,7 @@ void export_database()
         // Pickle
         //
         .def_pickle(PyDatabase::PickleSuite())
-        
+
         //
         // general methods
         //
@@ -272,7 +272,7 @@ void export_database()
         .def("is_multi_tango_host", &Tango::Database::is_multi_tango_host)
         .def("get_file_name", &Tango::Database::get_file_name,
             bopy::return_value_policy<bopy::copy_const_reference>())
-            
+
         //
         // General methods
         //
@@ -303,12 +303,12 @@ void export_database()
 
         .def("add_device", &Tango::Database::add_device)
         .def("delete_device", &Tango::Database::delete_device)
-        .def("import_device", 
+        .def("import_device",
             (Tango::DbDevImportInfo (Tango::Database::*) (const std::string &))
             import_device_)
         .def("export_device", &Tango::Database::export_device)
         .def("unexport_device", &Tango::Database::unexport_device)
-        .def("get_device_info", 
+        .def("get_device_info",
             (Tango::DbDevFullInfo (Tango::Database::*) (const std::string &))
             get_device_info_)
         .def("get_device_name",
@@ -346,7 +346,7 @@ void export_database()
         .def("delete_device_alias",
             (void (Tango::Database::*) (const std::string &))
             delete_device_alias_)
-        
+
         //
         // server methods
         //
@@ -391,7 +391,7 @@ void export_database()
             (Tango::DbDatum (Tango::Database::*) (const std::string &))
             get_device_class_list_)
         .def("get_server_release", &Tango::Database::get_server_release)
-        
+
         //
         // property methods
         //
@@ -486,7 +486,9 @@ void export_database()
             (void (Tango::Database::*) (const std::string &))
             &Tango::Database::unexport_event)
 
-// alias methods
+        //
+        // alias methods
+        //
 
         .def("get_device_from_alias", &PyDatabase::get_device_from_alias)
         .def("get_alias_from_device", &PyDatabase::get_alias_from_device)
@@ -495,4 +497,3 @@ void export_database()
 
         ;
 }
-

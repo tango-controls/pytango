@@ -1407,7 +1407,7 @@ def __doc_Database():
     document_method("_add_server", """
     _add_server(self, serv_name, dev_info) -> None
 
-            Add a a group of devices to the database.
+            Add a group of devices to the database.
             This corresponds to the pure C++ API call.
 
         Parameters :
@@ -1515,7 +1515,7 @@ def __doc_Database():
     document_method("get_server_class_list", """
     get_server_class_list(self, server) -> DbDatum
 
-            Query the database for a list of classes instancied by the
+            Query the database for a list of classes instantiated by the
             specified server. The DServer class exists in all TANGO servers
             and for this reason this class is removed from the returned list.
 
@@ -1562,7 +1562,7 @@ def __doc_Database():
     get_server_list(self, wildcard) -> DbDatum
 
             Return the list of all servers registered in the database.
-            If wildcard parameter is given, then the the list matching servers
+            If wildcard parameter is given, then the list of matching servers
             will be returned (ex: Serial/\*)
 
         Parameters :
@@ -1573,7 +1573,7 @@ def __doc_Database():
     document_method("get_host_server_list", """
     get_host_server_list(self, host_name) -> DbDatum
 
-            Query the database for a list of servers registred on the specified host.
+            Query the database for a list of servers registered on the specified host.
 
         Parameters :
             - host_name : (str) host name
@@ -1948,7 +1948,7 @@ def __doc_Database():
     _get_class_attribute_property(self, class_name, props) -> None
 
             Query the database for a list of class attribute properties for
-            the specified objec. The attribute names are returned with the
+            the specified object. The attribute names are returned with the
             number of properties specified as their value. The first DbDatum
             element of the returned DbData vector contains the first
             attribute name and the first attribute property number. The
@@ -1981,8 +1981,9 @@ def __doc_Database():
     document_method("get_class_attribute_property_history", """
     get_class_attribute_property_history(self, dev_name, attr_name, prop_name) -> DbHistoryList
 
-            Delete a list of properties for the specified class.
-            This corresponds to the pure C++ API call.
+            Get the list of the last 10 modifications of the specifed class attribute
+            property. Note that prop_name and attr_name can contain a wildcard character
+            (eg: 'prop*').
 
         Parameters :
             - dev_name : (str) device name
@@ -2075,8 +2076,8 @@ def __doc_Database():
     put_attribute_alias(self, attr_name, alias) -> None
 
             Set an alias for an attribute name. The attribute alias is
-            specified by aliasname and the attribute name is specifed by
-            attname. If the given alias already exists, a DevFailed exception
+            specified by alias and the attribute name is specifed by
+            attr_name. If the given alias already exists, a DevFailed exception
             is thrown.
 
         Parameters :
@@ -2174,8 +2175,8 @@ def __doc_DbDatum():
 
 def __doc_DbDevExportInfo():
     DbDevExportInfo.__doc__ = """
-    import info for a device (should be retrived from the database) with
-    the following members:
+    A structure containing export info for a device (should be
+    retrieved from the database) with the following members:
 
         - name : (str) device name
         - ior : (str) CORBA reference of the device
@@ -2186,8 +2187,8 @@ def __doc_DbDevExportInfo():
 
 def __doc_DbDevImportInfo():
     DbDevImportInfo.__doc__ = """
-    import info for a device (should be retrived from the database) with
-    the following members:
+    A structure containing import info for a device (should be
+    retrieved from the database) with the following members:
 
         - name : (str) device name
         - exported : 1 if device is running, 0 else
