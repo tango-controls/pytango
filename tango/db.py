@@ -802,7 +802,7 @@ def __Database__put_class_attribute_property(self, class_name, value):
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
 
     if isinstance(value, DbData):
-        pass
+        new_value = value
     elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
     elif isinstance(value, collections_abc.Mapping):
@@ -821,12 +821,11 @@ def __Database__put_class_attribute_property(self, class_name, value):
                 else:
                     db_datum.value_string.append(str(v2))
                 new_value.append(db_datum)
-        value = new_value
     else:
         raise TypeError(
             'Value must be a tango.DbData, '
             'a sequence<DbDatum> or a dictionary')
-    return self._put_class_attribute_property(class_name, value)
+    return self._put_class_attribute_property(class_name, new_value)
 
 
 def __Database__delete_class_attribute_property(self, class_name, value):
