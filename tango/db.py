@@ -1874,6 +1874,24 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
+    document_method("get_device_pipe_list", """
+    get_device_pipe_list(self, dev_name, pipe_list) -> None
+
+            Get the list of pipe(s) with some data defined in database
+            for a specified device. Note that this is not the list of all
+            device pipes because not all pipe(s) have some data
+            in database
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - dev_name : (str) device name
+            - pipe_list [out] : (StdStringVector) array that will contain the
+                                pipe name list
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
     document_method("_get_class_property", """
     _get_class_property(self, class_name, props) -> None
 
@@ -2027,6 +2045,21 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
 
         New in PyTango 7.0.0
+    """)
+
+    document_method("get_class_pipe_list", """
+    get_class_pipe_list(self, class_name, wildcard) -> DbDatum
+
+            Query the database for a list of pipes defined for the specified
+            class which match the specified wildcard.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - class_name : (str) class name
+            - wildcard : (str) pipe name
+        Return     : DbDatum containing the list of matching pipes for the given class
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
     document_method("get_attribute_alias", """

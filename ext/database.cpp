@@ -436,6 +436,9 @@ void export_database()
         .def("get_device_attribute_list",
             (void (Tango::Database::*) (const std::string &, StdStringVector &))
             &Tango::Database::get_device_attribute_list)
+        .def("get_device_pipe_list",
+            (void (Tango::Database::*) (const std::string &, StdStringVector &))
+            &Tango::Database::get_device_pipe_list)
         .def("_get_class_property",
             (void (Tango::Database::*) (std::string, Tango::DbData &))
             &Tango::Database::get_class_property)
@@ -464,6 +467,7 @@ void export_database()
         .def("get_class_attribute_list",
             (Tango::DbDatum (Tango::Database::*) (const std::string &, const std::string &))
             get_class_attribute_list_)
+        .def("get_class_pipe_list", &Tango::Database::get_class_pipe_list)
 
         //
         // Attribute methods
