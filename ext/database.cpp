@@ -433,6 +433,9 @@ void export_database()
         .def("get_device_attribute_property_history",
             (Tango::DbHistoryList (Tango::Database::*) (const std::string &, const std::string &, const std::string &))
             get_device_attribute_property_history_)
+        .def("get_device_attribute_list",
+            (void (Tango::Database::*) (const std::string &, StdStringVector &))
+            &Tango::Database::get_device_attribute_list)
         .def("_get_class_property",
             (void (Tango::Database::*) (std::string, Tango::DbData &))
             &Tango::Database::get_class_property)

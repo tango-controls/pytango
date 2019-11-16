@@ -1857,6 +1857,24 @@ def __doc_Database():
         New in PyTango 7.0.0
     """)
 
+    document_method("get_device_attribute_list", """
+    get_device_attribute_list(self, dev_name, att_list) -> None
+
+            Get the list of attribute(s) with some data defined in database
+            for a specified device. Note that this is not the list of all
+            device attributes because not all attribute(s) have some data
+            in database
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - dev_name : (str) device name
+            - att_list [out] : (StdStringVector) array that will contain the
+                               attribute name list
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
     document_method("_get_class_property", """
     _get_class_property(self, class_name, props) -> None
 
