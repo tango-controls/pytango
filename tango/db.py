@@ -263,6 +263,108 @@ def __Database__generic_delete_property(self, obj_name, value, f):
     return f(obj_name, new_value)
 
 
+def __Database__generic_get_attr_pipe_property(self, obj_name, value, f):
+    """internal usage for class or device attribute and pipe properties."""
+    if isinstance(value, DbData):
+        new_value = value
+    elif isinstance(value, DbDatum):
+        new_value = DbData()
+        new_value.append(value)
+    elif is_pure_str(value):
+        new_value = DbData()
+        new_value.append(DbDatum(value))
+    elif isinstance(value, collections_abc.Sequence):
+        new_value = DbData()
+        for e in value:
+            if isinstance(e, DbDatum):
+                new_value.append(e)
+            else:
+                new_value.append(DbDatum(str(e)))
+    elif isinstance(value, collections_abc.Mapping):
+        new_value = DbData()
+        for k, v in value.items():
+            if isinstance(v, DbDatum):
+                new_value.append(v)
+            else:
+                new_value.append(DbDatum(k))
+    else:
+        raise TypeError(
+            'Value must be a string, tango.DbDatum, '
+            'tango.DbData, a sequence or a dictionary')
+
+    f(obj_name, new_value)
+
+    ret = {}
+    nb_items = len(new_value)
+    i = 0
+    while i < nb_items:
+        db_datum = new_value[i]
+        curr_dict = {}
+        ret[db_datum.name] = curr_dict
+        nb_props = int(db_datum[0])
+        i += 1
+        for k in range(nb_props):
+            db_datum = new_value[i]
+            curr_dict[db_datum.name] = db_datum.value_string
+            i += 1
+
+    return ret
+
+
+def __Database__generic_put_attr_pipe_property(self, obj_name, value, f):
+    """internal usage for class or device attribute and pipe properties."""
+    if isinstance(value, DbData):
+        new_value = value
+    elif is_non_str_seq(value):
+        new_value = seq_2_DbData(value)
+    elif isinstance(value, collections_abc.Mapping):
+        new_value = DbData()
+        for k1, v1 in value.items():
+            attr = DbDatum(k1)
+            attr.append(str(len(v1)))
+            new_value.append(attr)
+            for k2, v2 in v1.items():
+                if isinstance(v2, DbDatum):
+                    new_value.append(v2)
+                    continue
+                db_datum = DbDatum(k2)
+                if is_non_str_seq(v2):
+                    seq_2_StdStringVector(v2, db_datum.value_string)
+                else:
+                    if not is_pure_str(v2):
+                        v2 = repr(v2)
+                    db_datum.value_string.append(v2)
+                new_value.append(db_datum)
+    else:
+        raise TypeError(
+            'Value must be a tango.DbData,'
+            'a sequence<DbDatum> or a dictionary')
+
+    return f(obj_name, new_value)
+
+
+def __Database__generic_delete_attr_pipe_property(self, obj_name, value, f):
+    """internal usage for class or device attribute and pipe properties."""
+    if isinstance(value, DbData):
+        new_value = value
+    elif is_non_str_seq(value):
+        new_value = seq_2_DbData(value)
+    elif isinstance(value, collections_abc.Mapping):
+        new_value = DbData()
+        for k1, v1 in value.items():
+            attr = DbDatum(k1)
+            attr.append(str(len(v1)))
+            new_value.append(attr)
+            for k2 in v1:
+                new_value.append(DbDatum(k2))
+    else:
+        raise TypeError(
+            'Value must be a string, tango.DbDatum, '
+            'tango.DbData, a sequence or a dictionary')
+
+    return f(obj_name, new_value)
+
+
 def __Database__put_property(self, obj_name, value):
     """
         put_property(self, obj_name, value) -> None
@@ -483,54 +585,8 @@ def __Database__get_device_attribute_property(self, dev_name, value):
                                  a DbDatum containing the property value.
 
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
-
-    ret = None
-    if isinstance(value, DbData):
-        new_value = value
-    elif isinstance(value, DbDatum):
-        new_value = DbData()
-        new_value.append(value)
-    elif is_pure_str(value):
-        new_value = DbData()
-        new_value.append(DbDatum(value))
-    elif isinstance(value, collections_abc.Sequence):
-        new_value = DbData()
-        for e in value:
-            if isinstance(e, DbDatum):
-                new_value.append(e)
-            else:
-                new_value.append(DbDatum(str(e)))
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k, v in value.items():
-            if isinstance(v, DbDatum):
-                new_value.append(v)
-            else:
-                new_value.append(DbDatum(k))
-    else:
-        raise TypeError(
-            'Value must be a string, tango.DbDatum, '
-            'tango.DbData, a sequence or a dictionary')
-
-    if ret is None:
-        ret = {}
-
-    self._get_device_attribute_property(dev_name, new_value)
-
-    nb_items = len(new_value)
-    i = 0
-    while i < nb_items:
-        db_datum = new_value[i]
-        curr_dict = {}
-        ret[db_datum.name] = curr_dict
-        nb_props = int(db_datum[0])
-        i += 1
-        for k in range(nb_props):
-            db_datum = new_value[i]
-            curr_dict[db_datum.name] = db_datum.value_string
-            i += 1
-
-    return ret
+    return __Database__generic_get_attr_pipe_property(
+        self, dev_name, value, self._get_device_attribute_property)
 
 
 def __Database__put_device_attribute_property(self, dev_name, value):
@@ -555,34 +611,8 @@ def __Database__put_device_attribute_property(self, dev_name, value):
             Return     : None
 
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
-    if isinstance(value, DbData):
-        pass
-    elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k1, v1 in value.items():
-            attr = DbDatum(k1)
-            attr.append(str(len(v1)))
-            new_value.append(attr)
-            for k2, v2 in v1.items():
-                if isinstance(v2, DbDatum):
-                    new_value.append(v2)
-                    continue
-                db_datum = DbDatum(k2)
-                if is_non_str_seq(v2):
-                    seq_2_StdStringVector(v2, db_datum.value_string)
-                else:
-                    if not is_pure_str(v2):
-                        v2 = repr(v2)
-                    db_datum.value_string.append(v2)
-                new_value.append(db_datum)
-        value = new_value
-    else:
-        raise TypeError(
-            'Value must be a tango.DbData,'
-            'a sequence<DbDatum> or a dictionary')
-    return self._put_device_attribute_property(dev_name, value)
+    return __Database__generic_put_attr_pipe_property(
+        self, dev_name, value, self._put_device_attribute_property)
 
 
 def __Database__delete_device_attribute_property(self, dev_name, value):
@@ -602,25 +632,8 @@ def __Database__delete_device_attribute_property(self, dev_name, value):
             Return     : None
 
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
-
-    if isinstance(value, DbData):
-        new_value = value
-    elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k1, v1 in value.items():
-            attr = DbDatum(k1)
-            attr.append(str(len(v1)))
-            new_value.append(attr)
-            for k2 in v1:
-                new_value.append(DbDatum(k2))
-    else:
-        raise TypeError(
-            'Value must be a string, tango.DbDatum, '
-            'tango.DbData, a sequence or a dictionary')
-
-    return self._delete_device_attribute_property(dev_name, new_value)
+    return __Database__generic_delete_attr_pipe_property(
+        self, dev_name, value, self._delete_device_attribute_property)
 
 
 def __Database__get_class_property(self, class_name, value):
@@ -728,54 +741,8 @@ def __Database__get_class_attribute_property(self, class_name, value):
                          a sequence of strings being the property value.
 
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
-
-    ret = None
-    if isinstance(value, DbData):
-        new_value = value
-    elif isinstance(value, DbDatum):
-        new_value = DbData()
-        new_value.append(value)
-    elif is_pure_str(value):
-        new_value = DbData()
-        new_value.append(DbDatum(value))
-    elif isinstance(value, collections_abc.Sequence):
-        new_value = DbData()
-        for e in value:
-            if isinstance(e, DbDatum):
-                new_value.append(e)
-            else:
-                new_value.append(DbDatum(str(e)))
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k, v in value.items():
-            if isinstance(v, DbDatum):
-                new_value.append(v)
-            else:
-                new_value.append(DbDatum(k))
-    else:
-        raise TypeError(
-            'Value must be a string, tango.DbDatum, '
-            'tango.DbData, a sequence or a dictionary')
-
-    self._get_class_attribute_property(class_name, new_value)
-
-    if ret is None:
-        ret = {}
-
-    nb_items = len(new_value)
-    i = 0
-    while i < nb_items:
-        db_datum = new_value[i]
-        curr_dict = {}
-        ret[db_datum.name] = curr_dict
-        nb_props = int(db_datum[0])
-        i += 1
-        for k in range(nb_props):
-            db_datum = new_value[i]
-            curr_dict[db_datum.name] = db_datum.value_string
-            i += 1
-
-    return ret
+    return __Database__generic_get_attr_pipe_property(
+        self, class_name, value, self._get_class_attribute_property)
 
 
 def __Database__put_class_attribute_property(self, class_name, value):
@@ -800,32 +767,8 @@ def __Database__put_class_attribute_property(self, class_name, value):
             Return     : None
 
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
-
-    if isinstance(value, DbData):
-        new_value = value
-    elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k1, v1 in value.items():
-            attr = DbDatum(k1)
-            attr.append(str(len(v1)))
-            new_value.append(attr)
-            for k2, v2 in v1.items():
-                if isinstance(v2, DbDatum):
-                    new_value.append(v2)
-                    continue
-                db_datum = DbDatum(k2)
-                if is_non_str_seq(v2):
-                    seq_2_StdStringVector(v2, db_datum.value_string)
-                else:
-                    db_datum.value_string.append(str(v2))
-                new_value.append(db_datum)
-    else:
-        raise TypeError(
-            'Value must be a tango.DbData, '
-            'a sequence<DbDatum> or a dictionary')
-    return self._put_class_attribute_property(class_name, new_value)
+    return __Database__generic_put_attr_pipe_property(
+        self, class_name, value, self._put_class_attribute_property)
 
 
 def __Database__delete_class_attribute_property(self, class_name, value):
@@ -848,24 +791,8 @@ def __Database__delete_class_attribute_property(self, class_name, value):
 
             Throws     : ConnectionFailed, CommunicationFailed
                          DevFailed from device (DB_SQLError)"""
-
-    if isinstance(value, DbData):
-        new_value = value
-    elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k1, v1 in value.items():
-            attr = DbDatum(k1)
-            attr.append(str(len(v1)))
-            new_value.append(attr)
-            for k2 in v1:
-                new_value.append(DbDatum(k2))
-    else:
-        raise TypeError(
-            'Value must be a DbDatum, DbData, a sequence or a dictionary')
-
-    return self._delete_class_attribute_property(class_name, new_value)
+    return __Database__generic_delete_attr_pipe_property(
+        self, class_name, value, self._delete_class_attribute_property)
 
 
 def __Database__get_service_list(self, filter='.*'):
