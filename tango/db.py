@@ -589,6 +589,39 @@ def __Database__get_device_attribute_property(self, dev_name, value):
         self, dev_name, value, self._get_device_attribute_property)
 
 
+def __Database__get_device_pipe_property(self, dev_name, value):
+    """
+        get_device_pipe_property(self, dev_name, value) -> dict<str, dict<str, seq<str>>>
+
+                Query the database for a list of device pipe properties for the
+                specified device. The method returns all the properties for the specified
+                pipes.
+
+            Parameters :
+                - dev_name : (string) device name
+                - value : can be one of the following:
+
+                    1. str [in] - single pipe properties to be fetched
+                    2. DbDatum [in] - single pipe properties to be fetched
+                    3. DbData [in,out] - several pipe properties to be fetched
+                       In this case (direct C++ API) the DbData will be filled with
+                       the property values
+                    4. sequence<str> [in] - several pipe properties to be fetched
+                    5. sequence<DbDatum> [in] - several pipe properties to be fetched
+                    6. dict<str, obj> [in,out] - keys are pipe names
+                       In this case the given dict values will be changed to contain the
+                       several pipe property values
+
+            Return     :  a dictionary which keys are the pipe names the
+                                 value associated with each key being a another
+                                 dictionary where keys are property names and value is
+                                 a DbDatum containing the property value.
+
+            Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_get_attr_pipe_property(
+        self, dev_name, value, self._get_device_pipe_property)
+
+
 def __Database__put_device_attribute_property(self, dev_name, value):
     """
         put_device_attribute_property( self, dev_name, value) -> None
@@ -615,6 +648,32 @@ def __Database__put_device_attribute_property(self, dev_name, value):
         self, dev_name, value, self._put_device_attribute_property)
 
 
+def __Database__put_device_pipe_property(self, dev_name, value):
+    """
+        put_device_pipe_property( self, dev_name, value) -> None
+
+                Insert or update a list of properties for the specified device.
+
+            Parameters :
+                - dev_name : (str) device name
+                - value : can be one of the following:
+
+                    1. DbData - several property data to be inserted
+                    2. sequence<DbDatum> - several property data to be inserted
+                    3. dict<str, dict<str, obj>> keys are pipe names and value being another
+                       dictionary which keys are the pipe property names and the value
+                       associated with each key being:
+
+                       3.1 seq<str>
+                       3.2 tango.DbDatum
+
+            Return     : None
+
+            Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_put_attr_pipe_property(
+        self, dev_name, value, self._put_device_pipe_property)
+
+
 def __Database__delete_device_attribute_property(self, dev_name, value):
     """
         delete_device_attribute_property(self, dev_name, value) -> None
@@ -634,6 +693,27 @@ def __Database__delete_device_attribute_property(self, dev_name, value):
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
     return __Database__generic_delete_attr_pipe_property(
         self, dev_name, value, self._delete_device_attribute_property)
+
+
+def __Database__delete_device_pipe_property(self, dev_name, value):
+    """
+        delete_device_pipe_property(self, dev_name, value) -> None
+
+                Delete a list of pipe properties for the specified device.
+
+            Parameters :
+                - devname : (string) device name
+                - propnames : can be one of the following:
+                    1. DbData [in] - several property data to be deleted
+                    2. sequence<str> [in]- several property data to be deleted
+                    3. sequence<DbDatum> [in] - several property data to be deleted
+                    3. dict<str, seq<str>> keys are pipe names and value being a list of pipe property names
+
+            Return     : None
+
+            Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_delete_attr_pipe_property(
+        self, dev_name, value, self._delete_device_pipe_property)
 
 
 def __Database__get_class_property(self, class_name, value):
@@ -745,6 +825,39 @@ def __Database__get_class_attribute_property(self, class_name, value):
         self, class_name, value, self._get_class_attribute_property)
 
 
+def __Database__get_class_pipe_property(self, class_name, value):
+    """
+        get_class_pipe_property( self, class_name, value) -> dict<str, dict<str, seq<str>>
+
+                Query the database for a list of class pipe properties for the
+                specified class. The method returns all the properties for the specified
+                pipes.
+
+            Parameters :
+                - class_name : (str) class name
+                - propnames : can be one of the following:
+
+                    1. str [in] - single pipe properties to be fetched
+                    2. DbDatum [in] - single pipe properties to be fetched
+                    3. DbData [in,out] - several pipe properties to be fetched
+                       In this case (direct C++ API) the DbData will be filled with the property
+                       values
+                    4. sequence<str> [in] - several pipe properties to be fetched
+                    5. sequence<DbDatum> [in] - several pipe properties to be fetched
+                    6. dict<str, obj> [in,out] - keys are pipe names
+                       In this case the given dict values will be changed to contain the several
+                       pipe property values
+
+            Return     : a dictionary which keys are the pipe names the
+                         value associated with each key being a another
+                         dictionary where keys are property names and value is
+                         a sequence of strings being the property value.
+
+            Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_get_attr_pipe_property(
+        self, class_name, value, self._get_class_pipe_property)
+
+
 def __Database__put_class_attribute_property(self, class_name, value):
     """
         put_class_attribute_property(self, class_name, value) -> None
@@ -771,6 +884,32 @@ def __Database__put_class_attribute_property(self, class_name, value):
         self, class_name, value, self._put_class_attribute_property)
 
 
+def __Database__put_class_pipe_property(self, class_name, value):
+    """
+        put_class_pipe_property(self, class_name, value) -> None
+
+                Insert or update a list of properties for the specified class.
+
+            Parameters :
+                - class_name : (str) class name
+                - propdata : can be one of the following:
+
+                    1. tango.DbData - several property data to be inserted
+                    2. sequence<DbDatum> - several property data to be inserted
+                    3. dict<str, dict<str, obj>> keys are pipe names and value
+                       being another dictionary which keys are the pipe property
+                       names and the value associated with each key being:
+
+                       3.1 seq<str>
+                       3.2 tango.DbDatum
+
+            Return     : None
+
+            Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_put_attr_pipe_property(
+        self, class_name, value, self._put_class_pipe_property)
+
+
 def __Database__delete_class_attribute_property(self, class_name, value):
     """
         delete_class_attribute_property(self, class_name, value) -> None
@@ -793,6 +932,30 @@ def __Database__delete_class_attribute_property(self, class_name, value):
                          DevFailed from device (DB_SQLError)"""
     return __Database__generic_delete_attr_pipe_property(
         self, class_name, value, self._delete_class_attribute_property)
+
+
+def __Database__delete_class_pipe_property(self, class_name, value):
+    """
+        delete_class_pipe_property(self, class_name, value) -> None
+
+                Delete a list of pipe properties for the specified class.
+
+            Parameters :
+                - class_name : (str) class name
+                - propnames : can be one of the following:
+
+                    1. DbData [in] - several property data to be deleted
+                    2. sequence<str> [in]- several property data to be deleted
+                    3. sequence<DbDatum> [in] - several property data to be deleted
+                    4. dict<str, seq<str>> keys are pipe names and value being a
+                       list of pipe property names
+
+            Return     : None
+
+            Throws     : ConnectionFailed, CommunicationFailed
+                         DevFailed from device (DB_SQLError)"""
+    return __Database__generic_delete_attr_pipe_property(
+        self, class_name, value, self._delete_class_pipe_property)
 
 
 def __Database__get_service_list(self, filter='.*'):
@@ -823,14 +986,20 @@ def __init_Database():
     Database.delete_device_property = __Database__delete_device_property
     Database.get_device_property_list = __Database__get_device_property_list
     Database.get_device_attribute_property = __Database__get_device_attribute_property
+    Database.get_device_pipe_property = __Database__get_device_pipe_property
     Database.put_device_attribute_property = __Database__put_device_attribute_property
+    Database.put_device_pipe_property = __Database__put_device_pipe_property
     Database.delete_device_attribute_property = __Database__delete_device_attribute_property
+    Database.delete_device_pipe_property = __Database__delete_device_pipe_property
     Database.get_class_property = __Database__get_class_property
     Database.put_class_property = __Database__put_class_property
     Database.delete_class_property = __Database__delete_class_property
     Database.get_class_attribute_property = __Database__get_class_attribute_property
+    Database.get_class_pipe_property = __Database__get_class_pipe_property
     Database.put_class_attribute_property = __Database__put_class_attribute_property
+    Database.put_class_pipe_property = __Database__put_class_pipe_property
     Database.delete_class_attribute_property = __Database__delete_class_attribute_property
+    Database.delete_class_pipe_property = __Database__delete_class_pipe_property
     Database.get_service_list = __Database__get_service_list
     Database.__str__ = __Database__str
     Database.__repr__ = __Database__str
@@ -1727,10 +1896,41 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
+    document_method("_get_device_pipe_property", """
+    _get_device_pipe_property(self, dev_name, props) -> None
+
+            Query the database for a list of device pipe properties for
+            the specified device. The pipe names are specified by the
+            DbData (seq<DbDatum>) structures. The method returns all the
+            properties for the specified pipes in the same DbDatum structures.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - dev_name : (str) device name
+            - props [in, out] : (DbData) pipe names
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
     document_method("_put_device_attribute_property", """
     _put_device_attribute_property(self, dev_name, props) -> None
 
             Insert or update a list of attribute properties for the specified device.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - dev_name : (str) device name
+            - props : (DbData) property data
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
+    document_method("_put_device_pipe_property", """
+    _put_device_pipe_property(self, dev_name, props) -> None
+
+            Insert or update a list of pipe properties for the specified device.
             This corresponds to the pure C++ API call.
 
         Parameters :
@@ -1764,8 +1964,25 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
+    document_method("_delete_device_pipe_property", """
+    _delete_device_pipe_property(self, dev_name, props) -> None
+
+            Delete a list of pipe properties for the specified device.
+            The pipe names are specified by the vector of DbDatum structures. Here
+            See _delete_device_attribute_property for example usage.
+
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - serv_name : (str) server name
+            - props : (DbData) pipe property data
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
     document_method("get_device_attribute_property_history", """
-    get_device_attribute_property_history(self, dev_name, att_name, prop_name) -> DbHistoryList
+    get_device_attribute_property_history(self, dev_name, attr_name, prop_name) -> DbHistoryList
 
             Get the list of the last 10 modifications of the specified device
             attribute property. Note that propname and devname can contain a
@@ -1773,7 +1990,7 @@ def __doc_Database():
 
         Parameters :
             - dev_name : (str) device name
-            - attn_ame : (str) attribute name
+            - attr_name : (str) attribute name
             - prop_name : (str) property name
 
         Return     : DbHistoryList containing the list of modifications
@@ -1781,6 +1998,23 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
 
         New in PyTango 7.0.0
+    """)
+
+    document_method("get_device_pipe_property_history", """
+    get_device_pipe_property_history(self, dev_name, pipe_name, prop_name) -> DbHistoryList
+
+            Get the list of the last 10 modifications of the specified device
+            pipe property. Note that propname and devname can contain a
+            wildcard character (eg: 'prop*').
+
+        Parameters :
+            - dev_name : (str) device name
+            - pipe_name : (str) pipe name
+            - prop_name : (str) property name
+
+        Return     : DbHistoryList containing the list of modifications
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
     document_method("get_device_attribute_list", """
@@ -1926,6 +2160,26 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
+    document_method("_get_class_pipe_property", """
+    _get_class_pipe_property(self, class_name, props) -> None
+
+            Query the database for a list of class pipe properties for
+            the specified object. The pipe names are returned with the
+            number of properties specified as their value. The first DbDatum
+            element of the returned DbData vector contains the first
+            pipe name and the first pipe property number. The
+            following DbDatum element contains the first pipe property
+            name and property values.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - class_name : (str) class name
+            - props [in,out] : (DbData) property names
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
     document_method("_put_class_attribute_property", """
     _put_class_attribute_property(self, class_name, props) -> None
 
@@ -1935,6 +2189,48 @@ def __doc_Database():
         Parameters :
             - class_name : (str) class name
             - props : (DbData) property data
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
+    document_method("_put_class_pipe_property", """
+    _put_class_pipe_property(self, class_name, props) -> None
+
+            Insert or update a list of pipe properties for the specified class.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - class_name : (str) class name
+            - props : (DbData) property data
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
+    document_method("_delete_class_attribute_property", """
+    _delete_class_attribute_property(self, class_name, props) -> None
+
+            Delete a list of attribute properties for the specified class.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - class_name : (str) server name
+            - props : (DbData) attribute property data
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
+    document_method("_delete_class_pipe_property", """
+    _delete_class_pipe_property(self, class_name, props) -> None
+
+            Delete a list of pipe properties for the specified class.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - class_name : (str) server name
+            - props : (DbData) pipe property data
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
@@ -1956,6 +2252,22 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
 
         New in PyTango 7.0.0
+    """)
+
+    document_method("get_class_pipe_property_history", """
+    get_class_pipe_property_history(self, dev_name, pipe_name, prop_name) -> DbHistoryList
+
+            Get the list of the last 10 modifications of the specifed class pipe
+            property. Note that prop_name and attr_name can contain a wildcard character
+            (eg: 'prop*').
+
+        Parameters :
+            - dev_name : (str) device name
+            - pipe_name : (str) pipe name
+            - prop_name : (str) property name
+        Return     : DbHistoryList containing the list of modifications
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
     document_method("get_class_attribute_list", """

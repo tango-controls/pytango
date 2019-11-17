@@ -216,6 +216,8 @@ void export_database()
         &Tango::Database::get_device_property_list;
     Tango::DbHistoryList (Tango::Database::*get_device_attribute_property_history_)(std::string &, std::string &, std::string &) =
         &Tango::Database::get_device_attribute_property_history;
+    Tango::DbHistoryList (Tango::Database::*get_device_pipe_property_history_)(std::string &, std::string &, std::string &) =
+        &Tango::Database::get_device_pipe_property_history;
     Tango::DbHistoryList (Tango::Database::*get_class_property_history_)(std::string &, std::string &) =
         &Tango::Database::get_class_property_history;
     Tango::DbDatum (Tango::Database::*get_class_list_)(std::string &) =
@@ -224,6 +226,8 @@ void export_database()
         &Tango::Database::get_class_property_list;
     Tango::DbHistoryList (Tango::Database::*get_class_attribute_property_history_)(std::string &, std::string &, std::string &) =
         &Tango::Database::get_class_attribute_property_history;
+    Tango::DbHistoryList (Tango::Database::*get_class_pipe_property_history_)(std::string &, std::string &, std::string &) =
+        &Tango::Database::get_class_pipe_property_history;
     Tango::DbDatum (Tango::Database::*get_class_attribute_list_)(std::string &, std::string &) =
         &Tango::Database::get_class_attribute_list;
 
@@ -426,13 +430,23 @@ void export_database()
         .def("_get_device_attribute_property",
             (void (Tango::Database::*) (std::string, Tango::DbData &))
             &Tango::Database::get_device_attribute_property)
+        .def("_get_device_pipe_property",
+            (void (Tango::Database::*) (std::string, Tango::DbData &))
+            &Tango::Database::get_device_pipe_property)
         .def("_put_device_attribute_property",
             &Tango::Database::put_device_attribute_property)
+        .def("_put_device_pipe_property",
+            &Tango::Database::put_device_pipe_property)
         .def("_delete_device_attribute_property",
             &Tango::Database::delete_device_attribute_property)
+        .def("_delete_device_pipe_property",
+            &Tango::Database::delete_device_pipe_property)
         .def("get_device_attribute_property_history",
             (Tango::DbHistoryList (Tango::Database::*) (const std::string &, const std::string &, const std::string &))
             get_device_attribute_property_history_)
+        .def("get_device_pipe_property_history",
+            (Tango::DbHistoryList (Tango::Database::*) (const std::string &, const std::string &, const std::string &))
+            get_device_pipe_property_history_)
         .def("get_device_attribute_list",
             (void (Tango::Database::*) (const std::string &, StdStringVector &))
             &Tango::Database::get_device_attribute_list)
@@ -456,13 +470,23 @@ void export_database()
         .def("_get_class_attribute_property",
             (void (Tango::Database::*) (std::string, Tango::DbData &))
             &Tango::Database::get_class_attribute_property)
+        .def("_get_class_pipe_property",
+            (void (Tango::Database::*) (std::string, Tango::DbData &))
+            &Tango::Database::get_class_pipe_property)
         .def("_put_class_attribute_property",
             &Tango::Database::put_class_attribute_property)
+        .def("_put_class_pipe_property",
+            &Tango::Database::put_class_pipe_property)
         .def("_delete_class_attribute_property",
             &Tango::Database::delete_class_attribute_property)
+        .def("_delete_class_pipe_property",
+            &Tango::Database::delete_class_pipe_property)
         .def("get_class_attribute_property_history",
             (Tango::DbHistoryList (Tango::Database::*) (const std::string &, const std::string &, const std::string &))
             get_class_attribute_property_history_)
+        .def("get_class_pipe_property_history",
+            (Tango::DbHistoryList (Tango::Database::*) (const std::string &, const std::string &, const std::string &))
+            get_class_pipe_property_history_)
 
         .def("get_class_attribute_list",
             (Tango::DbDatum (Tango::Database::*) (const std::string &, const std::string &))
