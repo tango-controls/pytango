@@ -1,14 +1,19 @@
+# ------------------------------------------------------------------------------
+# This file is part of PyTango (http://pytango.rtfd.io)
+#
+# Copyright 2019 European Synchrotron Radiation Facility, Grenoble, France
+#
+# Distributed under the terms of the GNU Lesser General Public License,
+# either version 3 of the License, or (at your option) any later version.
+# See LICENSE.txt for more info.
+# ------------------------------------------------------------------------------
+
 import tango
-import socket
 import pytest
 import numpy as np
 from time import sleep
 from tango import DeviceProxy
 from tango import DevState
-from tango import Database
-from tango import DbDatum
-from tango import Release
-from tango import AccessControlType
 
 dp = DeviceProxy('sys/tg_test/1')
 
@@ -85,24 +90,24 @@ assert dp.command_inout("DevLong", 456789) == 456789
 assert dp.command_inout("DevShort", 32767) == 32767
 assert dp.command_inout("DevString", "abcdefgh") == "abcdefgh"
 assert dp.command_inout("DevState", tango.DevState.MOVING) == tango.DevState.MOVING
-assert dp.command_inout("DevEncoded", ("format", [0,1,2,3, 0xfd, 0xfe, 0xff])) == ("format", [0,1,2,3, 0xfd, 0xfe, 0xff])
+assert dp.command_inout("DevEncoded", ("format", [0, 1, 2, 3, 0xfd, 0xfe, 0xff])) == ("format", [0, 1, 2, 3, 0xfd, 0xfe, 0xff])
 
-dvda = dp.command_inout("DevVarDoubleArray", [0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2])
+dvda = dp.command_inout("DevVarDoubleArray", [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2])
 assert type(dvda) == np.ndarray
-assert((dvda == [0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2]).all())
+assert((dvda == [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]).all())
 
-dvda2 = dp.command_inout("DevVarDoubleArray", np.array([0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2]))
+dvda2 = dp.command_inout("DevVarDoubleArray", np.array([0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]))
 assert type(dvda2) == np.ndarray
-assert((dvda2 == np.array([0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2])).all())
-dvl64a = dp.command_inout("DevVarLong64Array", [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17])
+assert((dvda2 == np.array([0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2])).all())
+dvl64a = dp.command_inout("DevVarLong64Array", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17])
 assert type(dvl64a) == np.ndarray
-assert((dvl64a == [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]).all())
-dvsa = dp.command_inout("DevVarStringArray", ["abc","def","ghi","jkl","mno"])
-assert dvsa == ["abc","def","ghi","jkl","mno"]
-dvlsa = dp.command_inout("DevVarLongStringArray", ([1,2,3,4,5],["abc","def","ghi","jkl","mno"]))
-assert dvlsa == ([1,2,3,4,5],["abc","def","ghi","jkl","mno"])
-dvdsa = dp.command_inout("DevVarDoubleStringArray", ([0.3,0.4,0.5,0.6,0.7],["abc","def","ghi","jkl","mno"]))
-assert dvdsa == ([0.3,0.4,0.5,0.6,0.7],["abc","def","ghi","jkl","mno"])
+assert((dvl64a == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]).all())
+dvsa = dp.command_inout("DevVarStringArray", ["abc", "def", "ghi", "jkl", "mno"])
+assert dvsa == ["abc", "def", "ghi", "jkl", "mno"]
+dvlsa = dp.command_inout("DevVarLongStringArray", ([1, 2, 3, 4, 5], ["abc", "def", "ghi", "jkl", "mno"]))
+assert dvlsa == ([1, 2, 3, 4, 5], ["abc", "def", "ghi", "jkl", "mno"])
+dvdsa = dp.command_inout("DevVarDoubleStringArray", ([0.3, 0.4, 0.5, 0.6, 0.7], ["abc", "def", "ghi", "jkl", "mno"]))
+assert dvdsa == ([0.3, 0.4, 0.5, 0.6, 0.7], ["abc", "def", "ghi", "jkl", "mno"])
 
 assert dp.command_inout_asynch("DevDouble", 3.142, True) == 0
 id = dp.command_inout_asynch("DevLong64", 1234567890)

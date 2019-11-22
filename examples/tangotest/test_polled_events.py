@@ -1,10 +1,18 @@
+# ------------------------------------------------------------------------------
+# This file is part of PyTango (http://pytango.rtfd.io)
+#
+# Copyright 2019 European Synchrotron Radiation Facility, Grenoble, France
+#
+# Distributed under the terms of the GNU Lesser General Public License,
+# either version 3 of the License, or (at your option) any later version.
+# See LICENSE.txt for more info.
+# ------------------------------------------------------------------------------
+
 import tango
-import socket
-import pytest
-import numpy as np
 from time import sleep
 from tango import DeviceProxy
 from tango import EventType
+
 
 def push_event(ev):
     if ev.attr_value is not None and ev.attr_value.value is not None:
@@ -14,12 +22,13 @@ def push_event(ev):
         assert ev.attr_value.name == expected_attr_name
         assert ev.attr_value.value == expected_attr_value
         assert ev.attr_value.quality == expected_quality
-        assert ev.err == False
+        assert ev.err is False
         if ev.err:
-            assert errors != []
- 
+            assert ev.errors != []
+
+
 dp = DeviceProxy('sys/tg_test/1')
-cb=push_event
+cb = push_event
 expected_device = dp.name()
 expected_event_type = "periodic"
 expected_attr_name = "double_scalar"
@@ -54,7 +63,8 @@ for i in range(5):
         sleep(0.5)
 dp.unsubscribe_event(eventId)
 print("passed archive events")
- 
+
+
 class EventManager:
     def push_event(self, ev):
         if ev.attr_value is not None and ev.attr_value.value is not None:
@@ -64,12 +74,13 @@ class EventManager:
             assert ev.attr_value.name == expected_attr_name
             assert ev.attr_value.value == expected_attr_value
             assert ev.attr_value.quality == expected_quality
-            assert ev.err == False
+            assert ev.err is False
             if ev.err:
-                assert errors != []
- 
+                assert ev.errors != []
+
+
 expected_event_type = "periodic"
-cb=EventManager()
+cb = EventManager()
 eventId = dp.subscribe_event("double_scalar", EventType.PERIODIC_EVENT, cb)
 for i in range(10):
     sleep(0.5)
