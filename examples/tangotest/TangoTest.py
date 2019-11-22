@@ -66,7 +66,7 @@ class TangoTest(Device):
     def init_device(self):
         Device.init_device(self)
         self.__boolean_scalar = True
-        self.__double_scalar = 6.284
+        self.__double_scalar = 152.34
         self.__double_scalar_ro = 6.284
         self.__float_scalar = 3.142
         self.__float_scalar_ro = 3.142
@@ -141,14 +141,6 @@ class TangoTest(Device):
         self.__push_pipe_events = False
         self.set_state(tango.DevState.RUNNING)
 
-# TODO
-#     DEVVAR_LONGSTRINGARRAY,
-#     DEVVAR_DOUBLESTRINGARRAY,
-#     CONST_DEV_STRING,?
-#     DEV_INT,?
-#     DEV_ENUM,
-#     DEV_PIPE_BLOB,
-
     def always_executed_hook(self):
         pass
 
@@ -176,6 +168,7 @@ class TangoTest(Device):
         label="double_scalar",
         min_warning = "-1.0",
         max_warning = "20000.0",
+        abs_change=0.1,
         doc="A Tango::DevDouble scalar attribute",
     )
     def double_scalar(self):
@@ -190,7 +183,7 @@ class TangoTest(Device):
         label="double_scalar_ro",
         min_value = double_minmax[0],
         max_value = double_minmax[1],
-         doc="A Tango::DevDouble readonly scalar attribute",
+        doc="A Tango::DevDouble readonly scalar attribute",
     )
     def double_scalar_ro(self):
         return self.__double_scalar_ro
@@ -940,7 +933,7 @@ class TangoTest(Device):
         doc_out="Echo of the input values"
     )
     def DevVarLongStringArray(self, values):
-        return [[0], [""]]
+        return values
 
     @command(
         dtype_in="DevVarDoubleStringArray",
@@ -949,7 +942,7 @@ class TangoTest(Device):
         doc_out="Echo of the input values"
     )
     def DevVarDoubleStringArray(self, values):
-        return [[0.0], [""]]
+        return values
 
     @command
     def DevVoid(self):
@@ -959,7 +952,7 @@ class TangoTest(Device):
         dtype_in="DevState",
         doc_in="Set the state of the server")
     def ChangeState(self, new_state ):
-        set_state(new_state)
+        self.set_state(new_state)
 
     @command(
         dtype_in="bool",

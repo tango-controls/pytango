@@ -3,8 +3,10 @@ import pytest
 import numpy as np
 from tango import DevState
 
-dev = tango.DeviceProxy('sys/tg_test/1')
-cfg = dev.get_pipe_config()
+dp = tango.DeviceProxy('sys/tg_test/1')
+
+assert dp.get_pipe_list() == ["TestPipe"]
+cfg = dp.get_pipe_config()
 assert cfg[0].description == u'This is a test pipe'
 assert cfg[0].disp_level == tango.DispLevel.OPERATOR
 assert cfg[0].label == u'Test pipe'
@@ -12,7 +14,7 @@ assert cfg[0].name == u'TestPipe'
 assert cfg[0].writable == tango.PipeWriteType.PIPE_READ_WRITE
 
 # read the blob stored in TangoTest.py
-read_blob = dev.read_pipe('TestPipe')
+read_blob = dp.read_pipe('TestPipe')
 assert read_blob[0] == "theBlob"
 blob_data = read_blob[1]
 assert blob_data[0]['name'] == 'double'
@@ -41,8 +43,8 @@ assert data == [0x00, 0x01, 0x02,0xfd, 0xfe, 0xff]
  
 blob = ('pipeWriteTest0', dict(double=56.98, long64=-169, str="write test",
                                bool=False, state=DevState.FAULT))
-dev.write_pipe('TestPipe', blob)
-read_blob = dev.read_pipe('TestPipe')
+dp.write_pipe('TestPipe', blob)
+read_blob = dp.read_pipe('TestPipe')
 assert read_blob[0] == "pipeWriteTest0"
 blob_data = read_blob[1]
 assert blob_data[0]['name'] == 'double'
@@ -72,8 +74,8 @@ blob = ("theBlob", [("double",3.142),
 #                                                 "dtype":tango.CmdArgType.DevEncoded},
                     ])
 # re-write the original blob stored in TangoTest.py and check
-dev.write_pipe('TestPipe', blob)
-read_blob = dev.read_pipe('TestPipe')
+dp.write_pipe('TestPipe', blob)
+read_blob = dp.read_pipe('TestPipe')
 assert read_blob[0] == "theBlob"
 blob_data = read_blob[1]
 assert blob_data[0]['name'] == 'double'
@@ -95,9 +97,10 @@ assert inner_blob_data[2]['name'] == "int_list"
 assert inner_blob_data[2]['value'] == [1,2,3,4,5,6,7,8,9,10,11,12]
 assert inner_blob_data[3]['name'] == "string_list"
 assert inner_blob_data[3]['value'] == ["abc","def","ghi","jkl","mno"]
-assert blob_data[5]['name'] == 'encoded'
-format,data = blob_data[5]['value']
-assert format == "format"
-assert data == [0x00, 0x01, 0x02,0xfd, 0xfe, 0xff]
+# uncomment this when cpp pipe write has been tested (see above)
+# assert blob_data[5]['name'] == 'encoded'
+# format,data = blob_data[5]['value']
+# assert format == "format"
+# assert data == [0x00, 0x01, 0x02,0xfd, 0xfe, 0xff]
 
-print("passed")
+print("passed pipe tests")
