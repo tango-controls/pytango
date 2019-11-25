@@ -40,11 +40,11 @@ from .log4tango import TangoStream
 
 __docformat__ = "restructuredtext"
 
-__all__ = ["ChangeEventProp", "PeriodicEventProp",
+__all__ = ("ChangeEventProp", "PeriodicEventProp",
            "ArchiveEventProp", "AttributeAlarm", "EventProperties",
            "AttributeConfig", "AttributeConfig_2",
            "AttributeConfig_3", "AttributeConfig_5",
-           "MultiAttrProp", "device_server_init"]
+           "MultiAttrProp", "device_server_init")
 
 
 class LatestDeviceImpl(get_latest_device_class()):

@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["device_attribute_init"]
+__all__ = ("device_attribute_init",)
 
 __docformat__ = "restructuredtext"
 

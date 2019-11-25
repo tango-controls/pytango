@@ -17,7 +17,10 @@ To access these members use directly :mod:`tango` module and NOT
 tango.attribute_proxy.
 """
 
-import collections
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 from ._tango import StdStringVector
 from ._tango import DbData, DbDatum, DeviceProxy
@@ -27,10 +30,10 @@ from .utils import is_pure_str, is_non_str_seq
 from .green import green, get_green_mode
 from .device_proxy import __init_device_proxy_internals as init_device_proxy
 
-__all__ = ["AttributeProxy", "attribute_proxy_init", "get_attribute_proxy"]
+__all__ = ("AttributeProxy", "attribute_proxy_init", "get_attribute_proxy")
 
 
-@green(consume_green_mode=True)
+@green(consume_green_mode=False)
 def get_attribute_proxy(*args, **kwargs):
     """
     get_attribute_proxy(self, full_attr_name, green_mode=None, wait=True, timeout=True) -> AttributeProxy
@@ -128,7 +131,7 @@ def __AttributeProxy__get_property(self, propname, value=None):
         new_value.append(propname)
         self._get_property(new_value)
         return DbData_2_dict(new_value)
-    elif isinstance(propname, collections.Sequence):
+    elif isinstance(propname, collections_abc.Sequence):
         if isinstance(propname, DbData):
             self._get_property(propname)
             return DbData_2_dict(propname)
@@ -175,7 +178,8 @@ def __AttributeProxy__put_property(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed
-                     DevFailed from device (DB_SQLError)
+                     DevFailed from device (DB_SQLError),
+                     TypeError
     """
     if isinstance(value, DbData):
         pass
@@ -185,7 +189,7 @@ def __AttributeProxy__put_property(self, value):
         value = new_value
     elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k, v in value.items():
             if isinstance(v, DbDatum):
@@ -238,7 +242,8 @@ def __AttributeProxy__delete_property(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed
-                    DevFailed from device (DB_SQLError)
+                     DevFailed from device (DB_SQLError),
+                     TypeError
     """
     if isinstance(value, DbData) or isinstance(value, StdStringVector) or \
             is_pure_str(value):
@@ -246,14 +251,14 @@ def __AttributeProxy__delete_property(self, value):
     elif isinstance(value, DbDatum):
         new_value = DbData()
         new_value.append(value)
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
         new_value = DbData()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k, v in value.items():
             if isinstance(v, DbDatum):

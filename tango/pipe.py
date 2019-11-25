@@ -9,7 +9,7 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
-__all__ = ['PipeConfig', 'sanitize_pipe_blob','sanitize_pipe_element']
+__all__ = ('PipeConfig', 'sanitize_pipe_blob','sanitize_pipe_element')
 
 from ._tango import Pipe, PipeWriteType, UserDefaultPipeProp, \
     CmdArgType, DevState, DispLevel, constants
@@ -52,7 +52,7 @@ def __get_pipe_type_simple(obj):
         tg_type = CmdArgType.DevLong64
     elif is_number(obj):
         tg_type = CmdArgType.DevDouble
-    # this may be too simple but we'll try got now.
+    # this may be too simple but we'll try it now.
     elif isinstance(obj, tuple):
         tg_type = CmdArgtype.DevEncoded
     else:
@@ -103,7 +103,6 @@ def sanitize_pipe_element(elem):
     result['dtype'] = dtype = __get_pipe_type(value, dtype=result.get('dtype'))
     if dtype == CmdArgType.DevPipeBlob:
         result['value'] = value[0], sanitize_pipe_blob(value[1])
-    print("pipe.py", result)
     return result
 
 

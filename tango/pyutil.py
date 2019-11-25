@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["Util", "pyutil_init"]
+__all__ = ("Util", "pyutil_init")
 
 __docformat__ = "restructuredtext"
 
@@ -24,7 +24,10 @@ from ._tango import Util, Except, DevFailed, DbDevInfo
 from .utils import document_method as __document_method
 # from utils import document_static_method as __document_static_method
 from .globals import class_list, cpp_class_list, get_constructed_classes
-import collections
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 
 def __simplify_device_name(dev_name):
@@ -81,7 +84,7 @@ def __Util__create_device(self, klass_name, device_name, alias=None, cb=None):
                    device name (str). Default value is None meaning no callback
 
         Return     : None"""
-    if cb is not None and not isinstance(cb, collections.Callable):
+    if cb is not None and not isinstance(cb, collections_abc.Callable):
         Except.throw_exception("PyAPI_InvalidParameter",
                                "The optional cb parameter must be a python callable",
                                "Util.create_device")
@@ -94,7 +97,7 @@ def __Util__create_device(self, klass_name, device_name, alias=None, cb=None):
     try:
         db.import_device(device_name)
     except DevFailed as df:
-        device_exists = not df[0].reason == "DB_DeviceNotDefined"
+        device_exists = not df.args[0].reason == "DB_DeviceNotDefined"
 
     # 1 - Make sure device name doesn't exist already in the database
     if device_exists:
@@ -169,7 +172,7 @@ def __Util__delete_device(self, klass_name, device_name):
     try:
         db.import_device(device_name)
     except DevFailed as df:
-        device_exists = not df[0].reason == "DB_DeviceNotDefined"
+        device_exists = not df.args[0].reason == "DB_DeviceNotDefined"
 
     # 1 - Make sure device name exists in the database
     if not device_exists:
@@ -205,6 +208,12 @@ def __Util__init__(self, args):
     args = copy.copy(args)
     args[0] = os.path.splitext(args[0])[0]
     Util.__init_orig__(self, args)
+
+
+def __Util__init(args):
+    args = list(args)
+    args[0] = os.path.splitext(args[0])[0]
+    return Util.__init_orig(args)
 
 
 def __Util__add_TgClass(self, klass_device_class, klass_device,
@@ -261,6 +270,8 @@ def __Util__add_class(self, *args, **kwargs):
 def __init_Util():
     Util.__init_orig__ = Util.__init__
     Util.__init__ = __Util__init__
+    Util.__init_orig = staticmethod(Util.init)
+    Util.init = staticmethod(__Util__init)
     Util.add_TgClass = __Util__add_TgClass
     Util.add_Cpp_TgClass = __Util__add_Cpp_TgClass
     Util.add_class = __Util__add_class

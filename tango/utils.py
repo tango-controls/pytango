@@ -21,10 +21,14 @@ import sys
 import six
 import types
 import numbers
-import collections
+import enum
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 from ._tango import StdStringVector, StdDoubleVector
-#from ._tango import DbData 
+from ._tango import DbData, DbDatum
 from ._tango import DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat
 from ._tango import EventData, AttrConfEventData, DataReadyEventData, constants
 from ._tango import PipeEventData, DevIntrChangeEventData, DevState
@@ -34,7 +38,7 @@ from . import _tango
 from ._tango.constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
 from .release import Release
 
-__all__ = [
+__all__ = (
     "requires_pytango", "requires_tango",
     "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
     "is_number", "is_scalar_type", "is_array_type", "is_numerical_type",
@@ -45,7 +49,7 @@ __all__ = [
     "CaselessList", "CaselessDict", "EventCallBack", "get_home",
     "from_version_str_to_hex_str", "from_version_str_to_int",
     "seq_2_StdStringVector", "StdStringVector_2_seq",
-    "dir2", "TO_TANGO_TYPE"]
+    "dir2", "TO_TANGO_TYPE")
 
 __docformat__ = "restructuredtext"
 
@@ -353,7 +357,7 @@ except NameError:
 
 __int_klasses = int,
 __number_klasses = numbers.Number,
-__seq_klasses = collections.Sequence, bytearray, StdStringVector
+__seq_klasses = collections_abc.Sequence, bytearray, StdStringVector
 
 __use_unicode = False
 try:
@@ -417,6 +421,53 @@ def get_tango_type(obj):
     if constants.NUMPY_SUPPORT:
         return __get_tango_type_numpy_support(obj)
     return __get_tango_type(obj)
+
+
+class EnumTypeError(Exception):
+    """Invalid Enum class for use with DEV_ENUM."""
+
+
+def get_enum_labels(enum_cls):
+    """
+    Return list of enumeration labels from Enum class.
+
+    The list is useful when creating an attribute, for the
+    `enum_labels` parameter.  The enumeration values are checked
+    to ensure they are unique, start at zero, and increment by one.
+
+    :param enum_cls: the Enum class to be inspected
+    :type enum_cls: :py:obj:`enum.Enum`
+
+    :return: List of label strings
+    :rtype: :py:obj:`list`
+
+    :raises EnumTypeError: in case the given class is invalid
+    """
+    if not issubclass(enum_cls, enum.Enum):
+        raise EnumTypeError("Input class '%s' must be derived from enum.Enum"
+                            % enum_cls)
+
+    # Check there are no duplicate labels
+    try:
+        enum.unique(enum_cls)
+    except ValueError as exc:
+        raise EnumTypeError("Input class '%s' must be unique - %s"
+                            % (enum_cls, exc))
+
+    # Check the values start at 0, and increment by 1, since that is
+    # assumed by tango's DEV_ENUM implementation.
+    values = [member.value for member in enum_cls]
+    if not values:
+        raise EnumTypeError("Input class '%s' has no members!" % enum_cls)
+    expected_value = 0
+    for value in values:
+        if value != expected_value:
+            raise EnumTypeError("Enum values for '%s' must start at 0 and "
+                                "increment by 1.  Values: %s"
+                                % (enum_cls, values))
+        expected_value += 1
+
+    return [member.name for member in enum_cls]
 
 
 def is_pure_str(obj):
@@ -1000,6 +1051,38 @@ def obj_2_str(obj, tg_type=None):
     return '\n'.join([str(i) for i in obj])
 
 
+def obj_2_property(value):
+    if isinstance(value, DbData):
+        pass
+    elif isinstance(value, DbDatum):
+        new_value = DbData()
+        new_value.append(value)
+        value = new_value
+    elif is_non_str_seq(value):
+        value = seq_2_DbData(value)
+    elif isinstance(value, collections_abc.Mapping):
+        new_value = DbData()
+        for k, v in value.items():
+            if isinstance(v, DbDatum):
+                new_value.append(v)
+                continue
+            db_datum = DbDatum(k)
+            if is_non_str_seq(v):
+                seq_2_StdStringVector(v, db_datum.value_string)
+            else:
+                if not is_pure_str(v):
+                    v = str(v)
+                v = six.ensure_binary(v, encoding='latin-1')
+                db_datum.value_string.append(v)
+            new_value.append(db_datum)
+        value = new_value
+    else:
+        raise TypeError(
+            'Value must be a tango.DbDatum, tango.DbData, '
+            'a sequence<DbDatum> or a dictionary')
+    return value
+
+
 def __get_meth_func(klass, method_name):
     meth = getattr(klass, method_name)
     func = meth
@@ -1023,7 +1106,7 @@ def document_method(klass, method_name, d, add=True):
     if add:
         cpp_doc = meth.__doc__
         if cpp_doc:
-#             func.__doc__ = "%s\n%s" % (d, cpp_doc)
+            func.__doc__ = "%s\n%s" % (d, cpp_doc)
             return
     func.__doc__ = d
 

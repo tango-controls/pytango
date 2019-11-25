@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ("api_util_init")
+__all__ = ("api_util_init",)
 
 __docformat__ = "restructuredtext"
 
@@ -130,6 +130,22 @@ def __doc_api_util():
         Return     : (cb_sub_model) the active asynchronous callback sub-model.
 
         New in PyTango 7.1.3
+    """)
+
+
+    document_static_method(ApiUtil, "cleanup", """
+    cleanup() -> None
+
+            Destroy the ApiUtil singleton instance.
+            After `cleanup()` all references to
+            `DeviceProxy`, `AttributeProxy` or `Database` objects
+            in the current process become invalid
+            and these objects need to be reconstructed.
+
+        Parameters : None
+        Return     : None
+
+        New in PyTango 9.3.0
     """)
 
 

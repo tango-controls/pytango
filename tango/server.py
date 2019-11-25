@@ -17,28 +17,33 @@ from __future__ import absolute_import
 
 import sys
 import copy
+import enum
+try:
+    from inspect import getfullargspec as inspect_getargspec  # python 3.0+
+except ImportError:
+    from inspect import getargspec as inspect_getargspec
 import inspect
 import logging
 import functools
 import traceback
 
 from ._tango import AttrDataFormat, AttrWriteType, CmdArgType, PipeWriteType
-from ._tango import DevFailed, SerialModel
-from ._tango import GreenMode
+from ._tango import DevFailed, GreenMode, SerialModel
 
 from .attr_data import AttrData
 from .pipe_data import PipeData
 from .pipe import sanitize_pipe_blob
 from .device_class import DeviceClass
 from .device_server import LatestDeviceImpl
-from .utils import is_seq, is_non_str_seq, is_pure_str
+from .utils import get_enum_labels
+from .utils import is_seq, is_non_str_seq
 from .utils import scalar_to_array_type, TO_TANGO_TYPE
 from .green import get_green_mode, get_executor
 from .pyutil import Util
 
-__all__ = ["DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
+__all__ = ("DeviceMeta", "Device", "LatestDeviceImpl", "attribute",
            "command", "pipe", "device_property", "class_property",
-           "run", "server_run", "Server"]
+           "run", "server_run", "Server")
 
 API_VERSION = 2
 
@@ -83,12 +88,7 @@ def set_complex_value(attr, value):
     is_tuple = isinstance(value, tuple)
     dtype, fmt = attr.get_data_type(), attr.get_data_format()
     if dtype == CmdArgType.DevEncoded:
-        if is_tuple and len(value) == 2:
-            if is_pure_str(value[1]):
-                attr.set_value(value[0], str(value[1]))
-            else:
-                attr.set_value(value[0], value[1])
-        elif is_tuple and len(value) == 4:
+        if is_tuple and len(value) == 4:
             attr.set_value_date_quality(*value)
         elif is_tuple and len(value) == 3 and is_non_str_seq(value[0]):
             attr.set_value_date_quality(value[0][0],
@@ -118,7 +118,7 @@ def set_complex_value(attr, value):
 
 
 def _get_wrapped_read_method(attribute, read_method):
-    read_args = inspect.getargspec(read_method)
+    read_args = inspect_getargspec(read_method)
     nb_args = len(read_args.args)
 
     green_mode = attribute.read_green_mode
@@ -233,7 +233,7 @@ def __patch_attr_methods(tango_device_klass, attribute):
 
 
 def _get_wrapped_pipe_read_method(pipe, read_method):
-    read_args = inspect.getargspec(read_method)
+    read_args = inspect_getargspec(read_method)
     nb_args = len(read_args.args)
 
     green_mode = pipe.read_green_mode
@@ -800,8 +800,21 @@ class attribute(AttrData):
         self.__doc__ = kwargs.get('doc', kwargs.get('description',
                                                     'TANGO attribute'))
         if 'dtype' in kwargs:
+            dtype = kwargs['dtype']
+            dformat = kwargs.get('dformat')
+            if inspect.isclass(dtype) and issubclass(dtype, enum.Enum):
+                if dformat and dformat != AttrDataFormat.SCALAR:
+                    raise TypeError("DevEnum types can only be scalar, not {0}."
+                                    .format(dformat))
+                enum_labels = kwargs.get('enum_labels')
+                if enum_labels:
+                    raise TypeError("For dtype of enum.Enum the enum_labels must not "
+                                    "be specified - dtype: {0}, enum_labels: {1}."
+                                    .format(dtype, enum_labels))
+                kwargs['enum_labels'] = get_enum_labels(dtype)
+                dtype = CmdArgType.DevEnum
             kwargs['dtype'], kwargs['dformat'] = \
-                _get_tango_type_format(kwargs['dtype'], kwargs.get('dformat'))
+                _get_tango_type_format(dtype, dformat)
         self.build_from_dict(kwargs)
 
     def get_attribute(self, obj):
@@ -1001,7 +1014,7 @@ class pipe(PipeData):
 def __build_command_doc(f, name, dtype_in, doc_in, dtype_out, doc_out):
     doc = "'{0}' TANGO command".format(name)
     if dtype_in is not None:
-        arg_spec = inspect.getargspec(f)
+        arg_spec = inspect_getargspec(f)
         if len(arg_spec.args) > 1:
             # arg[0] should be self and arg[1] the command argument
             param_name = arg_spec.args[1]
@@ -1308,7 +1321,7 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
     post_init_callback = __to_cb(post_init_callback)
 
     if util is None:
-        util = Util(args)
+        util = Util.init(args)
 
     if green_mode in (GreenMode.Gevent, GreenMode.Asyncio):
         util.set_serial_model(SerialModel.NO_SYNC)

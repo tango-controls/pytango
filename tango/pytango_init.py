@@ -53,29 +53,23 @@ def init_constants():
     tg_ver_str = "0x%02d%02d%02d00" % (tg_ver[0], tg_ver[1], tg_ver[2])
     constants.TANGO_VERSION_HEX = int(tg_ver_str, 16)
 
-#      PYBIND11_VERSION = ".".join(map(str, (constants.PYBIND11_MAJOR_VERSION,
-#                                         constants.PYBIND11_MINOR_VERSION,
-#                                         constants.PYBIND11_PATCH_VERSION)))
-#      constants.PYBIND11_VERSION = PYBIND11_VERSION
 
     class Compile(object):
         PY_VERSION = constants.PY_VERSION
         TANGO_VERSION = constants.TANGO_VERSION
-#         PYBIND11_VERSION = constants.PYBIND _VERSION
         NUMPY_VERSION = constants.NUMPY_VERSION
         # UNAME = tuple(map(str, json.loads(constants.UNAME)))
 
-#     tg_rt_ver_nb = _get_tango_lib_release()
-#     tg_rt_major_ver = tg_rt_ver_nb // 100
-#     tg_rt_minor_ver = tg_rt_ver_nb // 10 % 10
-#     tg_rt_patch_ver = tg_rt_ver_nb % 10
-#     tg_rt_ver = ".".join(map(str, (tg_rt_major_ver, tg_rt_minor_ver,
-#                                    tg_rt_patch_ver)))
+    tg_rt_ver_nb = _get_tango_lib_release()
+    tg_rt_major_ver = tg_rt_ver_nb // 100
+    tg_rt_minor_ver = tg_rt_ver_nb // 10 % 10
+    tg_rt_patch_ver = tg_rt_ver_nb % 10
+    tg_rt_ver = ".".join(map(str, (tg_rt_major_ver, tg_rt_minor_ver,
+                                   tg_rt_patch_ver)))
 
     class Runtime(object):
         PY_VERSION = ".".join(map(str, sys.version_info[:3]))
-#         TANGO_VERSION = tg_rt_ver
-#         BOOST_VERSION = '0.0.0'
+        TANGO_VERSION = tg_rt_ver
         if constants.NUMPY_SUPPORT:
             import numpy
             NUMPY_VERSION = numpy.__version__

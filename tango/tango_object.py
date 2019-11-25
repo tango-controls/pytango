@@ -13,9 +13,13 @@
 
 import os
 import sys
-import types
+import six
 import logging
 import weakref
+try:
+    from inspect import getfullargspec as inspect_getargspec  # python 3.0+
+except ImportError:
+    from inspect import getargspec as inspect_getargspec
 import inspect
 import functools
 
@@ -28,7 +32,7 @@ from .server import Device, _to_classes, _add_classes
 from .server import get_worker, set_worker
 from .green import get_executor
 
-__all__ = ['Server']
+__all__ = ('Server',)
 
 _CLEAN_UP_TEMPLATE = """
 import sys
@@ -130,7 +134,7 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
             in_type = CmdArgType.DevEncoded
             out_type = CmdArgType.DevEncoded
             try:
-                arg_spec = inspect.getargspec(member)
+                arg_spec = inspect_getargspec(member)
                 if not arg_spec.args:
                     in_type = CmdArgType.DevVoid
             except TypeError:
@@ -155,7 +159,7 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
             if doc is None:
                 doc = ""
             cmd.__doc__ = doc
-            cmd = types.MethodType(cmd, None, DeviceDispatcher)
+            cmd = six.create_unbound_method(cmd, DeviceDispatcher)
             setattr(DeviceDispatcher, name, cmd)
             DeviceDispatcherClass.cmd_list[name] = \
                 [[in_type, doc], [out_type, ""]]

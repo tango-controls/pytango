@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["group_reply_init"]
+__all__ = ("group_reply_init",)
 
 __docformat__ = "restructuredtext"
 

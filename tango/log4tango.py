@@ -21,13 +21,13 @@ Example::
 
     class MyDev(tango.Device_4Impl):
 
-        tango.InfoIt()
+        @tango.InfoIt()
         def read_Current(self, attr):
             attr.set_value(self._current)
 """
 
-__all__ = ["TangoStream", "LogIt", "DebugIt", "InfoIt", "WarnIt",
-           "ErrorIt", "FatalIt"]
+__all__ = ("TangoStream", "LogIt", "DebugIt", "InfoIt", "WarnIt",
+           "ErrorIt", "FatalIt")
 
 __docformat__ = "restructuredtext"
 

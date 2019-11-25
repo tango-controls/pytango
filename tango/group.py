@@ -13,11 +13,14 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["Group", "group_init"]
+__all__ = ("Group", "group_init")
 
 __docformat__ = "restructuredtext"
 
-import collections
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 from ._tango import __Group as _RealGroup, StdStringVector
 from .utils import seq_2_StdStringVector, is_pure_str
 from .utils import document_method as __document_method

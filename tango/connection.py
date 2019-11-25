@@ -13,14 +13,17 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["connection_init"]
+__all__ = ("connection_init",)
 
 __docformat__ = "restructuredtext"
 
-import collections
 
-from ._tango import DeviceData, CmdArgType
-from ._tango import __CallBackAutoDie
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
+
+from ._tango import DeviceData, __CallBackAutoDie, CmdArgType
 from ._tango import DeviceProxy, Database
 from .utils import document_method as __document_method
 from .utils import document_static_method as __document_static_method
@@ -30,7 +33,6 @@ from .green import green
 def __CallBackAutoDie__cmd_ended_aux(self, fn):
     def __new_fn(cmd_done_event):
         try:
-            print("python cmd_ended")
             cmd_done_event.argout = cmd_done_event.argout_raw.extract()
         except Exception:
             pass
@@ -60,7 +62,7 @@ def __get_command_inout_param(self, cmd_name, cmd_param=None):
         if isinstance(cmd_param, str):
             param.insert(CmdArgType.DevString, cmd_param)
             return param
-        elif isinstance(cmd_param, collections.Sequence) and all([isinstance(x, str) for x in cmd_param]):
+        elif isinstance(cmd_param, collections_abc.Sequence) and all([isinstance(x, str) for x in cmd_param]):
             param.insert(CmdArgType.DevVarStringArray, cmd_param)
             return param
         else:
@@ -102,7 +104,6 @@ def __DeviceProxy__command_inout(self, name, *args, **kwds):
         *wait* parameter.
         *timeout* parameter.
     """
-    print("connection.command_inout")
     r = DeviceProxy.command_inout_raw(self, name, *args, **kwds)
     if isinstance(r, DeviceData):
         try:
@@ -118,7 +119,7 @@ __DeviceProxy__command_inout.__name__ = "command_inout"
 
 def __DeviceProxy__command_inout_raw(self, cmd_name, cmd_param=None):
     """
-    command_inout_raw( self, cmd_name, cmd_param=None) -> DeviceData
+    command_inout_raw( self, cmd_name, cmd_param=None) -> Devconnection.command_inouticeData
 
             Execute a command on a device.
 
@@ -127,13 +128,11 @@ def __DeviceProxy__command_inout_raw(self, cmd_name, cmd_param=None):
                 - cmd_param : (any) It should be a value of the type expected by the
                               command or a DeviceData object with this value inserted.
                               It can be ommited if the command should not get any argument.
-        Return     : A DeviceData object.
+        Return     : A DeviceData object.connection.command_inout
 
         Throws     : ConnectionFailed, CommunicationFailed, DeviceUnlocked, DevFailed from device
     """
-    print("connection.command_inout")
     param = __get_command_inout_param(self, cmd_name, cmd_param)
-    print("connection.command_inout - 2")
     return self.__command_inout(cmd_name, param)
 
 
@@ -191,47 +190,32 @@ def __DeviceProxy__command_inout_asynch(self, cmd_name, *args):
         forget = False
         return self.__command_inout_asynch_id(cmd_name, argin, forget)
     elif len(args) == 1:
-        if isinstance(args[0], collections.Callable):  # command_inout_asynch(lambda)
-            print("here1")
+        if isinstance(args[0], collections_abc.Callable):  # command_inout_asynch(lambda)
             cb = __CallBackAutoDie()
-            cb.set_callback(__CallBackAutoDie__cmd_ended_aux(self, args[0]))
-#            print(type(cb.m_callback))
-#            cb.m_callback = args[0]
-#            cb.set_callback(args[0])
-            cb.set_weak_parent(self)
-            print("here also")
+            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[0])
             argin = __get_command_inout_param(self, cmd_name)
-            print("here again")
-            print(type(cb))
-            return self.__command_inout_asynch_cb(cmd_name, cb)
+            return self.__command_inout_asynch_cb(cmd_name, argin, cb)
         elif hasattr(args[0], 'cmd_ended'):  # command_inout_asynch(Cbclass)
-            print("here2")
             cb = __CallBackAutoDie()
-            cb.m_callback = __CallBackAutoDie__cmd_ended_aux(self, args[0].cmd_ended)
+            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[0].cmd_ended)
             argin = __get_command_inout_param(self, cmd_name)
-            return self.__command_inout_asynch_cb(cmd_name, cb)
+            return self.__command_inout_asynch_cb(cmd_name, argin, cb)
         else:  # command_inout_asynch(value)
-            print("here3")
             argin = __get_command_inout_param(self, cmd_name, args[0])
             forget = False
             return self.__command_inout_asynch_id(cmd_name, argin, forget)
     elif len(args) == 2:
-        if isinstance(args[1], collections.Callable):  # command_inout_asynch( value, lambda)
-            print("here4")
+        if isinstance(args[1], collections_abc.Callable):  # command_inout_asynch( value, lambda)
             cb = __CallBackAutoDie()
-#            cb.m_callback = __CallBackAutoDie__cmd_ended_aux(self, args[1])
-            print(type(args[1]))
-            cb.m_callback = args[1]
+            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[1])
             argin = __get_command_inout_param(self, cmd_name, args[0])
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
         elif hasattr(args[1], 'cmd_ended'):  # command_inout_asynch(value, cbClass)
-            print("here5")
             cb = __CallBackAutoDie()
-            cb.m_callback = __CallBackAutoDie__cmd_ended_aux(self, args[1].cmd_ended)
+            cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[1].cmd_ended)
             argin = __get_command_inout_param(self, cmd_name, args[0])
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
         else:  # command_inout_asynch(value, forget)
-            print("here6")
             argin = __get_command_inout_param(self, cmd_name, args[0])
             forget = bool(args[1])
             return self.__command_inout_asynch_id(cmd_name, argin, forget)

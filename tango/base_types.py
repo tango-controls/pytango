@@ -13,15 +13,15 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["base_types_init"]
+__all__ = ("base_types_init",)
 
 __docformat__ = "restructuredtext"
 
 from ._tango import (StdStringVector, StdLongVector, StdDoubleVector,
                      CommandInfoList, AttributeInfoList, AttributeInfoListEx, DbData,
                      DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList,
-                     DeviceDataHistoryList, #StdGroupReplyVector,
-                     #StdGroupCmdReplyVector, StdGroupAttrReplyVector,
+                     DeviceDataHistoryList, # StdGroupReplyVector,
+                     # StdGroupCmdReplyVector, StdGroupAttrReplyVector,
                      ArchiveEventInfo, EventData, AttrConfEventData, AttributeAlarmInfo,
                      AttributeDimension, AttributeEventInfo, DeviceAttributeConfig,
                      AttributeInfo, AttributeInfoEx, ChangeEventInfo, PeriodicEventInfo,

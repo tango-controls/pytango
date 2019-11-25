@@ -13,18 +13,23 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["db_init"]
+__all__ = ("db_init",)
 
 __docformat__ = "restructuredtext"
 
-import collections
+import six
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 from ._tango import StdStringVector, Database, DbDatum, DbData
 from ._tango import DbDevInfo, DbDevInfos, DbDevImportInfo, DbDevExportInfo
 from ._tango import DbDevExportInfos, DbHistory, DbServerInfo, DbServerData
 
 from .utils import is_pure_str, is_non_str_seq, seq_2_StdStringVector
-from .utils import seq_2_DbDevInfos, seq_2_DbDevExportInfos, seq_2_DbData, DbData_2_dict
+from .utils import seq_2_DbDevInfos, seq_2_DbDevExportInfos, seq_2_DbData
+from .utils import DbData_2_dict, obj_2_property
 from .utils import document_method as __document_method
 
 
@@ -125,7 +130,7 @@ def __Database__add_server(self, servname, dev_info, with_dserver=False):
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """
 
-    if not isinstance(dev_info, collections.Sequence) and \
+    if not isinstance(dev_info, collections_abc.Sequence) and \
             not isinstance(dev_info, DbDevInfo):
         raise TypeError(
             'Value must be a DbDevInfos, a seq<DbDevInfo> or a DbDevInfo')
@@ -165,7 +170,7 @@ def __Database__export_server(self, dev_info):
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """
 
-    if not isinstance(dev_info, collections.Sequence) and \
+    if not isinstance(dev_info, collections_abc.Sequence) and \
             not isinstance(dev_info, DbDevExportInfo):
         raise TypeError(
             'Value must be a DbDevExportInfos, a seq<DbDevExportInfo> or '
@@ -191,14 +196,14 @@ def __Database__generic_get_property(self, obj_name, value, f):
     elif is_pure_str(value):
         new_value = list()
         new_value.append(DbDatum(value))
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
         new_value = list()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = list()
         for k, v in value.items():
             if isinstance(v, DbDatum):
@@ -219,31 +224,7 @@ def __Database__generic_get_property(self, obj_name, value, f):
 
 def __Database__generic_put_property(self, obj_name, value, f):
     """internal usage"""
-    if isinstance(value, DbData):
-        pass
-    elif isinstance(value, DbDatum):
-        new_value = DbData()
-        new_value.append(value)
-        value = new_value
-    elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
-    elif isinstance(value, collections.Mapping):
-        new_value = DbData()
-        for k, v in value.items():
-            if isinstance(v, DbDatum):
-                new_value.append(v)
-                continue
-            db_datum = DbDatum(k)
-            if is_non_str_seq(v):
-                seq_2_StdStringVector(v, db_datum.value_string)
-            else:
-                db_datum.value_string.append(str(v))
-            new_value.append(db_datum)
-        value = new_value
-    else:
-        raise TypeError(
-            'Value must be a tango.DbDatum, tango.DbData, '
-            'a sequence<DbDatum> or a dictionary')
+    value = obj_2_property(value)
     return f(obj_name, value)
 
 
@@ -257,14 +238,14 @@ def __Database__generic_delete_property(self, obj_name, value, f):
     elif is_pure_str(value):
         new_value = DbData()
         new_value.append(DbDatum(value))
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
         new_value = DbData()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k, v in value.items():
             if isinstance(v, DbDatum):
@@ -509,14 +490,14 @@ def __Database__get_device_attribute_property(self, dev_name, value):
     elif is_pure_str(value):
         new_value = DbData()
         new_value.append(DbDatum(value))
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
         new_value = DbData()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k, v in value.items():
             if isinstance(v, DbDatum):
@@ -575,7 +556,7 @@ def __Database__put_device_attribute_property(self, dev_name, value):
         pass
     elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k1, v1 in value.items():
             attr = DbDatum(k1)
@@ -623,7 +604,7 @@ def __Database__delete_device_attribute_property(self, dev_name, value):
         new_value = value
     elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k1, v1 in value.items():
             attr = DbDatum(k1)
@@ -754,14 +735,14 @@ def __Database__get_class_attribute_property(self, class_name, value):
     elif is_pure_str(value):
         new_value = DbData()
         new_value.append(DbDatum(value))
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
         new_value = DbData()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k, v in value.items():
             if isinstance(v, DbDatum):
@@ -821,7 +802,7 @@ def __Database__put_class_attribute_property(self, class_name, value):
         pass
     elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k1, v1 in value.items():
             attr = DbDatum(k1)
@@ -870,7 +851,7 @@ def __Database__delete_class_attribute_property(self, class_name, value):
         new_value = value
     elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = DbData()
         for k1, v1 in value.items():
             attr = DbDatum(k1)

@@ -14,29 +14,31 @@
 import time
 import textwrap
 import threading
-import collections
+import enum
+import six
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
-from ._tango import StdStringVector
-from ._tango import DbData
-from ._tango import DbDatum, AttributeInfo
+from ._tango import StdStringVector, DbData, DbDatum, AttributeInfo
 from ._tango import AttributeInfoEx, AttributeInfoList, AttributeInfoListEx
 from ._tango import DeviceProxy, __CallBackAutoDie, __CallBackPushEvent
-from ._tango import EventType, DevFailed, Except
-from ._tango import GreenMode
+from ._tango import EventType, DevFailed, Except, GreenMode
 from ._tango import PipeInfo, PipeInfoList, constants
 from ._tango import CmdArgType, DevState
 
 from .utils import TO_TANGO_TYPE, scalar_to_array_type
 from .utils import is_pure_str, is_non_str_seq, is_integer, is_number
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
-from .utils import seq_2_DbData, DbData_2_dict
+from .utils import DbData_2_dict, obj_2_property
 from .utils import document_method as __document_method
 from .utils import dir2
 
 from .green import green, green_callback
 from .green import get_green_mode
 
-__all__ = ["device_proxy_init", "get_device_proxy"]
+__all__ = ("device_proxy_init", "get_device_proxy")
 
 __docformat__ = "restructuredtext"
 
@@ -152,7 +154,7 @@ def __DeviceProxy__get_attr_cache(self):
     try:
         ret = self.__dict__['__attr_cache']
     except KeyError:
-        self.__dict__['__attr_cache'] = ret = ()
+        self.__dict__['__attr_cache'] = ret = {}
     return ret
 
 
@@ -217,7 +219,15 @@ def __DeviceProxy__refresh_cmd_cache(self):
 
 
 def __DeviceProxy__refresh_attr_cache(self):
-    attr_cache = [attr_name.lower() for attr_name in self.get_attribute_list()]
+    attr_list = self.attribute_list_query_ex()
+    attr_cache = {}
+    for attr in attr_list:
+        name = attr.name.lower()
+        enum_class = None
+        if attr.data_type == CmdArgType.DevEnum and attr.enum_labels:
+            labels = StdStringVector_2_seq(attr.enum_labels)
+            enum_class = enum.IntEnum(attr.name, labels, start=0)
+        attr_cache[name] = (attr.name, enum_class, )
     self.__dict__['__attr_cache'] = attr_cache
 
 
@@ -236,6 +246,30 @@ def __get_command_func(dp, cmd_info, name):
     return f
 
 
+def __get_attribute_value(self, attr_info, name):
+    _, enum_class = attr_info
+    attr_value = self.read_attribute(name).value
+    if enum_class:
+        return enum_class(attr_value)
+    else:
+        return attr_value
+
+
+def __set_attribute_value(self, name, value):
+    attr_info = self.__get_attr_cache().get(name.lower())
+    if attr_info:
+        # allow writing DevEnum attributes using string values
+        _, enum_class = attr_info
+        if enum_class and is_pure_str(value):
+            try:
+                value = enum_class[value]
+            except KeyError:
+                raise AttributeError(
+                    'Invalid enum value %s for attribute %s. Valid ones: %s' %
+                    (value, name, [m for m in enum_class.__members__.keys()]))
+    return self.write_attribute(name, value)
+
+
 def __DeviceProxy__getattr(self, name):
     # trait_names is a feature of IPython. Hopefully they will solve
     # ticket http://ipython.scipy.org/ipython/ipython/ticket/229 someday
@@ -249,8 +283,9 @@ def __DeviceProxy__getattr(self, name):
     if cmd_info:
         return __get_command_func(self, cmd_info, name)
 
-    if name_l in self.__get_attr_cache():
-        return self.read_attribute(name).value
+    attr_info = self.__get_attr_cache().get(name_l)
+    if attr_info:
+        return __get_attribute_value(self, attr_info, name)
 
     if name_l in self.__get_pipe_cache():
         return self.read_pipe(name)
@@ -269,8 +304,9 @@ def __DeviceProxy__getattr(self, name):
     except:
         pass
 
-    if name_l in self.__get_attr_cache():
-        return self.read_attribute(name).value
+    attr_info = self.__get_attr_cache().get(name_l)
+    if attr_info:
+        return __get_attribute_value(self, attr_info, name)
 
     try:
         self.__refresh_pipe_cache()
@@ -290,7 +326,7 @@ def __DeviceProxy__setattr(self, name, value):
         raise TypeError('Cannot set the value of a command')
 
     if name_l in self.__get_attr_cache():
-        return self.write_attribute(name, value)
+        return __set_attribute_value(self, name, value)
 
     if name_l in self.__get_pipe_cache():
         return self.write_pipe(name, value)
@@ -309,7 +345,7 @@ def __DeviceProxy__setattr(self, name, value):
         pass
 
     if name_l in self.__get_attr_cache():
-        return self.write_attribute(name, value)
+        return __set_attribute_value(self, name, value)
 
     try:
         self.__refresh_pipe_cache()
@@ -356,12 +392,14 @@ def __DeviceProxy__getitem(self, key):
             raise ValueError('only accept empty slices')
     return self.read_attributes(key)
 
+
 def __DeviceProxy__setitem(self, key, value):
     if isinstance(key, (str, unicode)):
         return self.write_attribute(key, value)
     else:
         args = zip(key, value)
         return self.write_attributes(args)
+
 
 def __DeviceProxy__contains(self, key):
     return key.lower() in map(str.lower, self.get_attribute_list())
@@ -412,7 +450,7 @@ def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None):
         return self.__read_attributes_asynch(attr_names)
 
     cb2 = __CallBackAutoDie()
-    if isinstance(cb, collections.Callable):
+    if isinstance(cb, collections_abc.Callable):
         cb2.attr_read = cb
     else:
         cb2.attr_read = cb.attr_read
@@ -483,11 +521,10 @@ def __DeviceProxy__write_attributes_asynch(self, attr_values, cb=None):
         return self.__write_attributes_asynch(attr_values)
 
     cb2 = __CallBackAutoDie()
-    if isinstance(cb, collections.Callable):
-        cb2.attr_written = cb
-        print(cb2)
+    if isinstance(cb, collections_abc.Callable):
+        cb2.attr_write = cb
     else:
-        cb2.attr_written = cb.attr_written
+        cb2.attr_write = cb.attr_write
     return self.__write_attributes_asynch(attr_values, cb2)
 
 
@@ -606,7 +643,7 @@ def __DeviceProxy__put_property(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed
-                    DevFailed from device (DB_SQLError)
+                     DevFailed from device (DB_SQLError)
     """
     if isinstance(value, DbData):
         pass
@@ -616,7 +653,7 @@ def __DeviceProxy__put_property(self, value):
         value = new_value
     elif is_non_str_seq(value):
         new_value = seq_2_DbData(value)
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = list()
         for k, v in value.items():
             if isinstance(v, DbDatum):
@@ -664,22 +701,23 @@ def __DeviceProxy__delete_property(self, value):
 
         Return     : None
 
-        Throws     : ConnectionFailed, CommunicationFailed
-                    DevFailed from device (DB_SQLError)
+        Throws     : ConnectionFailed, CommunicationFailed,
+                     DevFailed from device (DB_SQLError),
+                     TypeError
     """
     if isinstance(value, DbData) or is_pure_str(value):  # or isinstance(value, StdStringVector)
         new_value = value
     elif isinstance(value, DbDatum):
         new_value = list()
         new_value.append(value)
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
         new_value = list()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
-    elif isinstance(value, collections.Mapping):
+    elif isinstance(value, collections_abc.Mapping):
         new_value = list()
         for k, v in value.items():
             if isinstance(v, DbDatum):
@@ -713,9 +751,10 @@ def __DeviceProxy__get_property_list(self, filter, array=None):
                     if array is None)
 
         Throws     : NonDbDevice, WrongNameSyntax,
-                    ConnectionFailed (with database),
-                    CommunicationFailed (with database)
-                    DevFailed from database device
+                     ConnectionFailed (with database),
+                     CommunicationFailed (with database),
+                     DevFailed from database device,
+                     TypeError
 
         New in PyTango 7.0.0
     """
@@ -724,11 +763,11 @@ def __DeviceProxy__get_property_list(self, filter, array=None):
         new_array = StdStringVector()
         self._get_property_list(filter, new_array)
         return new_array
- 
+
     if isinstance(array, StdStringVector):
         self._get_property_list(filter, array)
         return array
-    elif isinstance(array, collections.Sequence):
+    elif isinstance(array, collections_abc.Sequence):
         new_array = StdStringVector()
         self._get_property_list(filter, new_array)
         StdStringVector_2_seq(new_array, array)
@@ -770,7 +809,7 @@ def __DeviceProxy__get_attribute_config(self, value):
     """
     if isinstance(value, StdStringVector) or is_pure_str(value):
         return self._get_attribute_config(value)
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
 #       v = seq_2_StdStringVector(value)
        return self._get_attribute_config(value)
 
@@ -803,7 +842,8 @@ def __DeviceProxy__get_attribute_config_ex(self, value):
                         information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                        DevFailed from device
+                     DevFailed from device,
+                     TypeError
     """
 #    if isinstance(value, StdStringVector):
 #        return self._get_attribute_config_ex(value)
@@ -811,7 +851,7 @@ def __DeviceProxy__get_attribute_config_ex(self, value):
 #        v = StdStringVector()
 #        v.append(value)
         return self._get_attribute_config_ex([value])
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
 #        v = seq_2_StdStringVector(value)
         return self._get_attribute_config_ex(value)
 
@@ -828,7 +868,8 @@ def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     get_command_config( self, name) -> CommandInfo
 
@@ -840,7 +881,8 @@ def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     get_command_config( self, names) -> CommandInfoList
 
@@ -852,18 +894,19 @@ def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
     """
     if isinstance(value, StdStringVector) or is_pure_str(value):
         return self._get_command_config(value)
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
 #        v = seq_2_StdStringVector(value)
         return self._get_command_config(value)
 
     raise TypeError('value must be a string or a sequence<string>')
 
 
-def __DeviceProxy__get_pipe_config(self, value=(constants.AllPipe,)):
+def __DeviceProxy__get_pipe_config(self, value=None):
     """
     get_pipe_config( self) -> PipeInfoList
 
@@ -873,7 +916,8 @@ def __DeviceProxy__get_pipe_config(self, value=(constants.AllPipe,)):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     get_pipe_config( self, name) -> PipeInfo
 
@@ -886,7 +930,8 @@ def __DeviceProxy__get_pipe_config(self, value=(constants.AllPipe,)):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     get_pipe_config( self, names) -> PipeInfoList
 
@@ -900,16 +945,17 @@ def __DeviceProxy__get_pipe_config(self, value=(constants.AllPipe,)):
                      information
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
         New in PyTango 9.2.0
     """
     if value is None:
         value = [constants.AllPipe]
-        return self._get_pipe_config(v)
+        return self._get_pipe_config(value)
     if isinstance(value, StdStringVector) or is_pure_str(value):
         return self._get_pipe_config(value)
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
 #        v = seq_2_StdStringVector(value)
         return self._get_pipe_config(value)
 
@@ -927,7 +973,8 @@ def __DeviceProxy__set_attribute_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                        DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     set_attribute_config( self, attr_info_ex) -> None
 
@@ -938,7 +985,8 @@ def __DeviceProxy__set_attribute_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                        DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     set_attribute_config( self, attr_info) -> None
 
@@ -949,7 +997,8 @@ def __DeviceProxy__set_attribute_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                        DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     set_attribute_config( self, attr_info_ex) -> None
 
@@ -961,7 +1010,8 @@ def __DeviceProxy__set_attribute_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                        DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     """
     if isinstance(value, AttributeInfoEx):
@@ -974,7 +1024,7 @@ def __DeviceProxy__set_attribute_config(self, value):
         v = value
     elif isinstance(value, AttributeInfoListEx):
         v = value
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
         if not len(value):
             return
         if isinstance(value[0], AttributeInfoEx):
@@ -1006,7 +1056,8 @@ def __DeviceProxy__set_pipe_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
 
     set_pipe_config( self, pipe_info) -> None
 
@@ -1017,14 +1068,15 @@ def __DeviceProxy__set_pipe_config(self, value):
         Return     : None
 
         Throws     : ConnectionFailed, CommunicationFailed,
-                     DevFailed from device
+                     DevFailed from device,
+                     TypeError
     """
     if isinstance(value, PipeInfo):
         v = PipeInfoList()
         v.append(value)
     elif isinstance(value, PipeInfoList):
         v = value
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, collections_abc.Sequence):
         if not len(value):
             return
         if isinstance(value[0], PipeInfo):
@@ -1088,7 +1140,8 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
         Return     : An event id which has to be specified when unsubscribing
                      from this event.
 
-        Throws     : EventSystemFailed
+        Throws     : EventSystemFailed,
+                     TypeError
 
 
     subscribe_event(self, attr_name, event, callback, filters=[], stateless=False, green_mode=None) -> int
@@ -1129,7 +1182,8 @@ def __DeviceProxy__subscribe_event(self, *args, **kwargs):
         Return     : An event id which has to be specified when unsubscribing
                      from this event.
 
-        Throws     : EventSystemFailed
+        Throws     : EventSystemFailed,
+                     TypeError
 
 
     subscribe_event(self, attr_name, event, queuesize, filters=[], stateless=False, green_mode=None) -> int
@@ -1168,12 +1222,12 @@ def __DeviceProxy__subscribe_event_global(self, event_type, cb,
     if event_type != EventType.INTERFACE_CHANGE_EVENT:
         raise TypeError("This method is only for Interface Change Events")
     else:
-        if isinstance(cb, collections.Callable):
+        if isinstance(cb, collections_abc.Callable):
             cbfn = __CallBackPushEvent()
             cbfn.push_event = green_callback(
                 cb, obj=self, green_mode=green_mode)
         elif hasattr(cb, "push_event") and isinstance(
-                cb.push_event, collections.Callable):
+                cb.push_event, collections_abc.Callable):
             cbfn = __CallBackPushEvent()
             cbfn.push_event = green_callback(
                 cb.push_event, obj=self, green_mode=green_mode)
@@ -1205,14 +1259,14 @@ def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
                                           filters=[], stateless=False,
                                           green_mode=None):
 
-    if isinstance(cb_or_queuesize, collections.Callable):
+    if isinstance(cb_or_queuesize, collections_abc.Callable):
         cb = __CallBackPushEvent()
-        cb.m_callback = green_callback(
+        cb.push_event = green_callback(
             cb_or_queuesize, obj=self, green_mode=green_mode)
     elif hasattr(cb_or_queuesize, "push_event") and \
-            isinstance(cb_or_queuesize.push_event, collections.Callable):
+            isinstance(cb_or_queuesize.push_event, collections_abc.Callable):
         cb = __CallBackPushEvent()
-        cb.m_callback = green_callback(
+        cb.push_event = green_callback(
             cb_or_queuesize.push_event, obj=self, green_mode=green_mode)
     elif is_integer(cb_or_queuesize):
         cb = cb_or_queuesize  # queuesize
@@ -1220,6 +1274,7 @@ def __DeviceProxy__subscribe_event_attrib(self, attr_name, event_type,
         raise TypeError(
             "Parameter cb_or_queuesize should be a number, a"
             " callable object or an object with a 'push_event' method.")
+
     event_id = self.__subscribe_event(
         attr_name, event_type, cb, filters, stateless)
 
@@ -1253,7 +1308,8 @@ def __DeviceProxy__unsubscribe_event(self, event_id):
 
         Return     : None
 
-        Throws     : EventSystemFailed
+        Throws     : EventSystemFailed,
+                     KeyError
     """
     events_del = set()
     timestamp = time.time()
@@ -1312,7 +1368,9 @@ def __DeviceProxy__get_events(self, event_id, callback=None):
 
         Return     : None
 
-        Throws     : EventSystemFailed
+        Throws     : EventSystemFailed,
+                     TypeError,
+                     ValueError
 
         See Also   : subscribe_event
 
@@ -1337,11 +1395,11 @@ def __DeviceProxy__get_events(self, event_id, callback=None):
         else:
             assert (False)
             raise ValueError("Unknown event_type: " + str(event_type))
-    elif isinstance(callback, collections.Callable):
+    elif isinstance(callback, collections_abc.Callable):
         cb = __CallBackPushEvent()
         cb.push_event = callback
         return self.__get_callback_events(event_id, cb)
-    elif hasattr(callback, 'push_event') and isinstance(callback.push_event, collections.Callable):
+    elif hasattr(callback, 'push_event') and isinstance(callback.push_event, collections_abc.Callable):
         cb = __CallBackPushEvent()
         cb.push_event = callback.push_event
         return self.__get_callback_events(event_id, cb)
@@ -1367,7 +1425,6 @@ def __DeviceProxy__str(self):
 
 def __DeviceProxy__read_pipe(self, pipe_name):
     r = self.__read_pipe(pipe_name)
-    print(r)
     return r.extract()
 
 
@@ -1451,8 +1508,6 @@ def __sanitize_pipe_blob(blob):
 def __DeviceProxy__write_pipe(self, *args, **kwargs):
     pipe_name, (blob_name, blob_data) = args
     sani_blob_data = __sanitize_pipe_blob(blob_data)
-    print("++++++++++++++++++++++++sanitized")
-    print(sani_blob_data)
     self.__write_pipe(pipe_name, blob_name, sani_blob_data)
 
 
@@ -1571,39 +1626,40 @@ def __init_DeviceProxy():
     DeviceProxy.write_read_attribute = green(__DeviceProxy__write_read_attribute)
     DeviceProxy.write_read_attributes = green(__DeviceProxy__write_read_attributes)
 
-    DeviceProxy.read_attributes_asynch = __DeviceProxy__read_attributes_asynch
-    DeviceProxy.read_attribute_asynch = __DeviceProxy__read_attribute_asynch
-    DeviceProxy.read_attribute_reply = __DeviceProxy__read_attribute_reply
-    DeviceProxy.write_attributes_asynch = __DeviceProxy__write_attributes_asynch
-    DeviceProxy.write_attribute_asynch = __DeviceProxy__write_attribute_asynch
-    DeviceProxy.write_attribute_reply = __DeviceProxy__write_attribute_reply
+    DeviceProxy.read_attributes_asynch = green(__DeviceProxy__read_attributes_asynch)
+    DeviceProxy.read_attribute_asynch = green(__DeviceProxy__read_attribute_asynch)
+    DeviceProxy.read_attribute_reply = green(__DeviceProxy__read_attribute_reply)
+    DeviceProxy.write_attributes_asynch = green(__DeviceProxy__write_attributes_asynch)
+    DeviceProxy.write_attribute_asynch = green(__DeviceProxy__write_attribute_asynch)
+    DeviceProxy.write_attribute_reply = green(__DeviceProxy__write_attribute_reply)
 
     DeviceProxy.read_pipe = green(__DeviceProxy__read_pipe)
     DeviceProxy.write_pipe = green(__DeviceProxy__write_pipe)
 
-    DeviceProxy.get_property = __DeviceProxy__get_property
-    DeviceProxy.put_property = __DeviceProxy__put_property
-    DeviceProxy.delete_property = __DeviceProxy__delete_property
-    DeviceProxy.get_property_list = __DeviceProxy__get_property_list
-    DeviceProxy.get_attribute_config = __DeviceProxy__get_attribute_config
-    DeviceProxy.get_attribute_config_ex = __DeviceProxy__get_attribute_config_ex
-    DeviceProxy.set_attribute_config = __DeviceProxy__set_attribute_config
+    DeviceProxy.get_property = green(__DeviceProxy__get_property)
+    DeviceProxy.put_property = green(__DeviceProxy__put_property)
+    DeviceProxy.delete_property = green(__DeviceProxy__delete_property)
+    DeviceProxy.get_property_list = green(__DeviceProxy__get_property_list)
+    DeviceProxy.get_attribute_config = green(__DeviceProxy__get_attribute_config)
+    DeviceProxy.get_attribute_config_ex = green(__DeviceProxy__get_attribute_config_ex)
+    DeviceProxy.set_attribute_config = green(__DeviceProxy__set_attribute_config)
 
-    DeviceProxy.get_command_config = __DeviceProxy__get_command_config
+    DeviceProxy.get_command_config = green(__DeviceProxy__get_command_config)
 
-    DeviceProxy.get_pipe_config = __DeviceProxy__get_pipe_config
-    DeviceProxy.set_pipe_config = __DeviceProxy__set_pipe_config
+    DeviceProxy.get_pipe_config = green(__DeviceProxy__get_pipe_config)
+    DeviceProxy.set_pipe_config = green(__DeviceProxy__set_pipe_config)
 
     DeviceProxy.__get_event_map = __DeviceProxy__get_event_map
     DeviceProxy.__get_event_map_lock = __DeviceProxy__get_event_map_lock
+
     DeviceProxy.subscribe_event = green(
         __DeviceProxy__subscribe_event, consume_green_mode=False)
     DeviceProxy.unsubscribe_event = green(__DeviceProxy__unsubscribe_event)
-    DeviceProxy.__unsubscribe_event_all = __DeviceProxy__unsubscribe_event_all
     DeviceProxy.get_events = __DeviceProxy__get_events
+    DeviceProxy.__unsubscribe_event_all = __DeviceProxy__unsubscribe_event_all
+
     DeviceProxy.__str__ = __DeviceProxy__str
     DeviceProxy.__repr__ = __DeviceProxy__str
-
     DeviceProxy._get_info_ = __DeviceProxy___get_info_
 
 

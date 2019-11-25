@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["NumpyType", "numpy_type", "numpy_spectrum", "numpy_image"]
+__all__ = ("NumpyType", "numpy_type", "numpy_spectrum", "numpy_image")
 
 __docformat__ = "restructuredtext"
 
@@ -21,7 +21,10 @@ from ._tango import Except, Attribute, AttributeInfo, constants
 from ._tango import CmdArgType as ArgType
 
 from .attribute_proxy import AttributeProxy
-import collections
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 
 def _numpy_invalid(*args, **kwds):
@@ -102,7 +105,7 @@ def _define_numpy():
                         - sequence:
                 """
                 np_type = NumpyType.tango_to_numpy(tg_type)
-                if isinstance(dim_x, collections.Sequence):
+                if isinstance(dim_x, collections_abc.Sequence):
                     return numpy.array(dim_x, dtype=np_type)
                 else:
                     return numpy.ndarray(shape=(dim_x,), dtype=np_type)
