@@ -189,6 +189,7 @@ DEF_TANGO_SCALAR_ARRAY_NAMES( DEV_STATE,   DEVVAR_STATEARRAY );
         __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_SHORT, DOIT) \
         __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_LONG, DOIT) \
         __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_DOUBLE, DOIT) \
+        __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_STRING, DOIT) \
         __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_FLOAT, DOIT) \
         __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_BOOLEAN, DOIT) \
         __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_USHORT, DOIT) \
@@ -199,7 +200,6 @@ DEF_TANGO_SCALAR_ARRAY_NAMES( DEV_STATE,   DEVVAR_STATEARRAY );
         __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_STATE, DOIT) \
         __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_ENCODED, DOIT) \
         __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_ENUM, DOIT) \
-        __TANGO_DEPEND_ON_TYPE_AUX_ID(DEV_STRING, DOIT) \
         default: \
             assert(false); \
     } } else (void)0
@@ -468,3 +468,35 @@ DEF_TANGO_SCALAR_ARRAY_NAMES( DEV_STATE,   DEVVAR_STATEARRAY );
 
 #define TANGO_CALL_ON_NUMERICAL_ATTRIBUTE_DATA_TYPE_NAME(tid, fn, ...) \
     TANGO_DO_ON_NUMERICAL_ATTRIBUTE_DATA_TYPE_NAME(tid, fn<tangoTypeConst>(__VA_ARGS__))
+
+// On windows, for tango < 9.3 and python >= 3 the Visual Studio compiler
+// complains about the following missing definitions
+#if TANGO_VERSION_NB < 90300 && _MSC_VER > 1800
+namespace pybind11
+{
+	template <>
+	Tango::ApiUtil const volatile * get_pointer<class Tango::ApiUtil const volatile >(
+		class Tango::ApiUtil const volatile *c)
+	{
+		return c;
+	}
+    template <>
+	Tango::Pipe const volatile * get_pointer<class Tango::Pipe const volatile >(
+		class Tango::Pipe const volatile *c)
+	{
+		return c;
+	}
+	template <>
+	Tango::WPipe const volatile * get_pointer<class Tango::WPipe const volatile >(
+		class Tango::WPipe const volatile *c)
+	{
+		return c;
+	}
+    template <>
+	Tango::WAttribute const volatile * get_pointer<class Tango::WAttribute const volatile >(
+		class Tango::WAttribute const volatile *c)
+	{
+		return c;
+	}
+}
+#endif

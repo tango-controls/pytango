@@ -53,5 +53,16 @@ void export_api_util(py::module &m) {
         .def("get_user_connect_timeout", [](Tango::ApiUtil& self) -> int {
             return self.get_user_connect_timeout();
         })
+        .def("get_ip_from_if", [](Tango::ApiUtil& self) -> py::list {
+            std::vector<std::string> ipvec;
+            py::list iplist;
+            self.get_ip_from_if(ipvec);
+            for (auto& item : ipvec)
+                iplist.append(py::cast(item));
+            return iplist;
+        })
+        .def_static("cleanup", [](Tango::ApiUtil& self) -> void {
+            self.cleanup();
+        })
     ;
 }

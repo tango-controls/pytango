@@ -75,25 +75,19 @@ namespace PyDeviceProxy
     void append_scalar_encoded(T& obj, const std::string& name,
                        py::object& py_value)
     {
-//        py::object p0 = py_value[0];
-//        py::object p1 = py_value[1];
-//
-//        const char* encoded_format = py::extract<const char *> (p0.ptr());
-//
-//        PyObject* data_ptr = p1.ptr();
-//        Py_buffer view;
-//
-//        if (PyObject_GetBuffer(data_ptr, &view, PyBUF_FULL_RO) < 0)
-//        {
-//            throw_wrong_python_data_type(obj.get_name(), "append_scalar_encoded");
-//        }
-//        CORBA::ULong nb = static_cast<CORBA::ULong>(view.len);
-//        Tango::DevVarCharArray arr(nb, nb, (CORBA::Octet*)view.buf, false);
-//        Tango::DevEncoded value;
-//        value.encoded_format = CORBA::string_dup(encoded_format);
-//        value.encoded_data = arr;
-//        obj << value;
-//        PyBuffer_Release(&view);
+        py::tuple tup = py_value;
+        std::string encoded_format = tup[0].cast<std::string>();
+        py::list encoded_data = tup[1];
+        long len = py::len(encoded_data);
+        unsigned char* bptr = new unsigned char[len];
+        for (auto& item : encoded_data) {
+            *bptr++ = item.cast<unsigned char>();
+        }
+        Tango::DevVarCharArray array(len, len, bptr-len, false);
+        Tango::DevEncoded value;
+        value.encoded_format = strdup(encoded_format.c_str());
+        value.encoded_data = array;
+        obj << value;
     }
 
     template<typename T, long tangoTypeConst>
@@ -431,10 +425,19 @@ void export_device_proxy(py::module &m) {
             return self.name(); // Tango C++ signature
         })
         .def("alias", [](Tango::DeviceProxy& self) -> std::string {
-            return self.alias(); // Tango C++ signature
+            py::print("in pybind c++ alias method");
+            try {
+                return self.alias(); // Tango C++ signature
+            } catch (exception& e) {
+                py::print("got the exception");
+            }
         })
         .def("get_tango_lib_version", [](Tango::DeviceProxy& self) -> int {
-            return self.get_tango_lib_version(); // Tango C++ signature
+            py::print("in pybind get_tango_lib_version");
+            int version = self.get_tango_lib_version();
+            std::cerr << version << std::endl;
+            return version;
+//            return self.get_tango_lib_version(); // Tango C++ signature
         })
         .def("_ping", [](Tango::DeviceProxy& self) -> int {
             AutoPythonAllowThreads guard;
@@ -670,8 +673,8 @@ void export_device_proxy(py::module &m) {
         //
         .def("__read_attributes_asynch", [](Tango::DeviceProxy& self, std::vector<std::string> names) -> long {
             AutoPythonAllowThreads guard;
-            // C++ signature
-            return self.read_attributes_asynch(names);
+
+            return self.read_attributes_asynch(names); // C++ signature
         })
         .def("read_attributes_reply", [](Tango::DeviceProxy& self, long id) -> py::list {
             std::unique_ptr<std::vector<Tango::DeviceAttribute>> dev_attr_vec;
@@ -686,14 +689,13 @@ void export_device_proxy(py::module &m) {
             std::unique_ptr<std::vector<Tango::DeviceAttribute>> dev_attr_vec;
             {
                 AutoPythonAllowThreads guard;
-                // C++ signature
-                dev_attr_vec.reset(self.read_attributes_reply(id, timeout));
+                dev_attr_vec.reset(self.read_attributes_reply(id, timeout)); // C++ signature
             }
             return PyDeviceAttribute::convert_to_python(dev_attr_vec, self);
         })
         .def("pending_asynch_call", [](Tango::DeviceProxy& self, Tango::asyn_req_type req_type)  -> long {
-           // C++ signature
-           return self.pending_asynch_call(req_type);
+
+           return self.pending_asynch_call(req_type); // C++ signature
         })
         .def("__write_attributes_asynch", [](Tango::DeviceProxy& self, py::object py_list) -> long {
             std::vector<Tango::DeviceAttribute> dev_attrs;
@@ -704,13 +706,12 @@ void export_device_proxy(py::module &m) {
         })
         .def("write_attributes_reply", [](Tango::DeviceProxy& self, long id) {
             AutoPythonAllowThreads guard;
-            // C++ signature
-            self.write_attributes_reply(id);
+            self.write_attributes_reply(id); // C++ signature
         })
         .def("write_attributes_reply",[](Tango::DeviceProxy& self, long id, long timeout) {
             AutoPythonAllowThreads guard;
-            // C++ signature
-            self.write_attributes_reply(id, timeout);
+
+            self.write_attributes_reply(id, timeout); // C++ signature
         })
         .def("__read_attributes_asynch", [](Tango::DeviceProxy& self, std::vector<std::string> names,
                 py::object py_cb) {
@@ -995,13 +996,13 @@ void export_device_proxy(py::module &m) {
         // Control access related methods
         //
         .def("get_access_control", [](Tango::DeviceProxy& self) -> Tango::AccessControlType {
-            self.get_access_control();
+            return self.get_access_control();
         })
         .def("set_access_control", [](Tango::DeviceProxy& self, Tango::AccessControlType& act) -> void {
             self.set_access_control(act);
         })
         .def("get_access_right", [](Tango::DeviceProxy& self) -> Tango::AccessControlType {
-            self.get_access_right();
+            return self.get_access_right();
         })
 
     ;

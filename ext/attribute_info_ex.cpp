@@ -19,7 +19,7 @@ void export_attribute_info_ex(py::module &m) {
         .def(py::init<const Tango::AttributeInfoEx&>())
         .def_readwrite("root_attr_name", &Tango::AttributeInfoEx::root_attr_name)
         .def_readwrite("memorized", &Tango::AttributeInfoEx::memorized)
-        .def_readwrite("enum_labels", &Tango::AttributeInfoEx::enum_labels)
+//        .def_readwrite("enum_labels", &Tango::AttributeInfoEx::enum_labels)
 
         .def_property("enum_labels", [](Tango::AttributeInfoEx& self) -> py::list {
             py::list py_list;
@@ -33,6 +33,7 @@ void export_attribute_info_ex(py::module &m) {
 
         .def_readwrite("alarms", &Tango::AttributeInfoEx::alarms)
         .def_readwrite("events", &Tango::AttributeInfoEx::events)
+//        .def_readwrite("sys_extensions", &Tango::AttributeInfoEx::sys_extensions)
 
         .def_property("sys_extensions", [](Tango::AttributeInfoEx& self) -> py::list {
             py::list py_list;

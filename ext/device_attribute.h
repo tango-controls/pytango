@@ -1,5 +1,5 @@
 /******************************************************************************
-0  This file is part of PyTango (http://pytango.rtfd.io)
+  This file is part of PyTango (http://pytango.rtfd.io)
 
   Copyright 2006-2012 CELLS / ALBA Synchrotron, Bellaterra, Spain
   Copyright 2013-2019 European Synchrotron Radiation Facility, Grenoble, France
@@ -104,8 +104,9 @@ namespace PyDeviceAttribute {
     /// so the memory will finally be deleted.
     template<typename TDeviceAttribute>
     py::list convert_to_python(const std::unique_ptr<std::vector<TDeviceAttribute> >& dev_attr_vec,
-            Tango::DeviceProxy & dev_proxy) {
-        py::list ls;
+            Tango::DeviceProxy & dev_proxy)
+    {
+    	py::list ls;
         if (dev_attr_vec->empty()) {
             return ls;
         }
@@ -164,5 +165,4 @@ namespace PyDeviceAttribute {
             encoded_data.push_back(encoded_data_obj[i].cast<unsigned char>());
         dev_attr.insert(encoded_format, encoded_data);
     }
-
-}
+} // end namespace PyDeviceAttribute

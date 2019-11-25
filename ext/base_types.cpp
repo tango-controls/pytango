@@ -15,13 +15,6 @@
 
 namespace py = pybind11;
 
-//#include "precompiled_header.hpp"
-//#include "pytgutils.h"
-//#include "fast_from_py.h"
-//#include "base_types_numpy.hpp"
-//
-//using namespace boost::python;
-//
 //// from tango_const.h
 //void export_poll_device();
 //
@@ -108,8 +101,12 @@ inline bool operator==(const Tango::DeviceDataHistory& ddh1_, const Tango::Devic
 }
 
 inline bool operator==(const Tango::PipeInfo& pi1, const Tango::PipeInfo& pi2) {
-    return pi1.name == pi2.name && pi1.description == pi2.description && pi1.label == pi2.label && pi1.disp_level == pi2.disp_level
-            && pi1.writable == pi2.writable && pi1.extensions == pi2.extensions;
+    return pi1.name == pi2.name && 
+        pi1.description == pi2.description &&
+        pi1.label == pi2.label &&
+        pi1.disp_level == pi2.disp_level &&
+        pi1.writable == pi2.writable &&
+        pi1.extensions == pi2.extensions;
 }
 
 } // end namespace Tango

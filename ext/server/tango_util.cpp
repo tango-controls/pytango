@@ -95,6 +95,9 @@ void export_util(py::module &m) {
             Tango::Util* instance = PyUtil::init(args);
             return std::unique_ptr<Tango::Util, py::nodelete>(instance);
         }))
+        .def_static("init", [](std::vector<std::string>& args) {
+            return PyUtil::init(args);
+        })
         .def_static("instance", [](bool b) {
             return Tango::Util::instance(b);
         }, py::arg("bool") = true)

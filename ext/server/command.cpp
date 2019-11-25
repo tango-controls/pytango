@@ -54,68 +54,128 @@ void throw_bad_type(const char *type) {
 }
 
 template<long tangoTypeConst>
-void insert_scalar(CORBA::Any& any, py::object& o)
+void insert_scalar(CORBA::Any& any, py::object& py_value)
 {
     typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-    TangoScalarType value =  o.cast<TangoScalarType>();
-    py::print(value);
-    py::print(tangoTypeConst);
+    TangoScalarType value =  py_value.cast<TangoScalarType>();
     any <<= value;
 }
 
-void insert_scalar_boolean(CORBA::Any& any, py::object& o)
+template<>
+void insert_scalar<Tango::DEV_BOOLEAN>(CORBA::Any& any, py::object& py_value)
 {
-    Tango::DevBoolean value = o.cast<Tango::DevBoolean>();
+    Tango::DevBoolean value = py_value.cast<Tango::DevBoolean>();
     CORBA::Any::from_boolean any_value(value);
     any <<= any_value;
 }
 
-void insert_scalar_string(CORBA::Any& any, py::object& o)
+template<>
+void insert_scalar<Tango::DEV_STRING>(CORBA::Any& any, py::object& py_value)
 {
-    std::string value = o.cast<std::string>();
+    std::string value = py_value.cast<std::string>();
     any <<= CORBA::string_dup(value.c_str());
 }
 
-void insert_scalar_encoded(CORBA::Any& any, py::object& obj)
+template<>
+void insert_scalar<Tango::DEV_ENCODED>(CORBA::Any& any, py::object& py_value)
 {
-    py::tuple tup = obj;
-    py::object p0 = tup[0];
-    py::array_t<unsigned char> p1(tup[1]);
-    std::string encoded_format = p0.cast<std::string>();
-    Py_buffer view;
-    if (PyObject_GetBuffer(p1.ptr(), &view, PyBUF_FULL_RO) < 0)
-    {
-        throw_bad_type(Tango::CmdArgTypeName[Tango::DEV_ENCODED]);
+    py::tuple tup(py_value);
+    std::string encoded_format = tup[0].cast<std::string>();
+    py::list encoded_data = tup[1];
+    long len = py::len(encoded_data);
+    unsigned char* bptr = new unsigned char[len];
+    for (auto& item : encoded_data) {
+        *bptr++ = item.cast<unsigned char>();
     }
-    CORBA::ULong nb = static_cast<CORBA::ULong>(view.len);
-    Tango::DevVarCharArray arr(nb, nb, (CORBA::Octet*)view.buf, false);
-    Tango::DevEncoded *data = new Tango::DevEncoded;
-    data->encoded_format = CORBA::string_dup(encoded_format.c_str());
-    data->encoded_data = arr;
-    any <<= data;
-    PyBuffer_Release(&view);
+    Tango::DevVarCharArray array(len, len, bptr-len, false);
+    Tango::DevEncoded value;
+    value.encoded_format = strdup(encoded_format.c_str());
+    value.encoded_data = array;
+    any <<= value;
+}
+
+template<>
+void insert_scalar<Tango::DEV_VOID>(CORBA::Any& any, py::object& py_value)
+{}
+
+template<>
+void insert_scalar<Tango::DEV_PIPE_BLOB>(CORBA::Any& any, py::object& py_value)
+{
+    assert(false);
 }
 
 template<long tangoArrayTypeConst>
-void insert_array(CORBA::Any &any, py::object& obj) {
+void insert_array(CORBA::Any &any, py::object& py_value) {
     typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
     typedef typename TANGO_const2scalartype(tangoArrayTypeConst) TangoScalarType;
 
-    // Destruction will be handled by CORBA, not by Tango.
-    // TangoArrayType* data = fast_convert2array<tangoArrayTypeConst>(o);
-    // By giving a pointer to <<= we are giving ownership of the data
-    // buffer to CORBA
-    // any <<= data;
-    py::array_t<TangoScalarType> p1(obj);
-    Py_buffer view;
-    if (PyObject_GetBuffer(p1.ptr(), &view, PyBUF_FULL_RO) < 0)
-    {
-        throw_bad_type(Tango::CmdArgTypeName[tangoArrayTypeConst]);
+    py::list py_list = py_value;
+    long len = py::len(py_list);
+    TangoScalarType* data_buffer = new TangoScalarType[len];
+    TangoScalarType value;
+    for (int i=0; i<len; i++) {
+        value = py_list[i].cast<TangoScalarType>();
+        data_buffer[i] = value;
     }
-    CORBA::ULong nb = static_cast<CORBA::ULong>(view.len) / sizeof(TangoScalarType);
-    TangoArrayType arr(nb, nb, (TangoScalarType*)view.buf, false);
-    any <<= arr;
-    PyBuffer_Release(&view);
+    TangoArrayType array(len, len, data_buffer, true);
+    any <<= array;
+}
+
+template<>
+void insert_array<Tango::DEVVAR_STRINGARRAY>(CORBA::Any& any, py::object& py_value)
+{
+    py::list py_list = py_value;
+    long len = py::len(py_list);
+    Tango::DevString* data_buffer = new Tango::DevString[len];
+    for (int i=0; i<len; i++) {
+        std::string value = py_list[i].cast<std::string>();
+        data_buffer[i] = strdup(value.c_str());
+    }
+    Tango::DevVarStringArray array(len, len, data_buffer, false);
+    any <<= array;
+}
+
+template<>
+void insert_array<Tango::DEVVAR_LONGSTRINGARRAY>(CORBA::Any& any, py::object& py_value)
+{
+    py::tuple tup = py_value;
+    py::list long_data = tup[0];
+    py::list string_data = tup[1];
+    long llen = py::len(long_data);
+    long slen = py::len(string_data);
+
+    Tango::DevVarLongStringArray *array = new Tango::DevVarLongStringArray();
+    array->lvalue.length(llen);
+    for (auto i=0; i<llen; i++) {
+        (array->lvalue)[i] = long_data[i].cast<long>();
+    }
+    array->svalue.length(slen);
+    for (auto i=0; i<slen; i++) {
+        std::string ss = string_data[i].cast<std::string>();
+        (array->svalue)[i] = strdup(ss.c_str());
+    }
+    any <<= array;
+}
+
+template<>
+void insert_array<Tango::DEVVAR_DOUBLESTRINGARRAY>(CORBA::Any& any, py::object& py_value)
+{
+    py::tuple tup = py_value;
+    py::list double_data = tup[0];
+    py::list string_data = tup[1];
+    long dlen = py::len(double_data);
+    long slen = py::len(string_data);
+    Tango::DevVarDoubleStringArray *array = new Tango::DevVarDoubleStringArray();
+    array->dvalue.length(dlen);
+    for (auto i=0; i<dlen; i++) {
+        (array->dvalue)[i] = double_data[i].cast<double>();
+    }
+    array->svalue.length(slen);
+    for (auto i=0; i<slen; i++) {
+        std::string ss = string_data[i].cast<std::string>();
+        (array->svalue)[i] = strdup(ss.c_str());
+    }
+    any <<= array;
 }
 
 template<long tangoTypeConst>
@@ -149,91 +209,98 @@ void extract_scalar<Tango::DEV_PIPE_BLOB>(const CORBA::Any &any, py::object& o) 
 }
 
 template<>
-void extract_scalar<Tango::DEV_ENCODED>(const CORBA::Any &any, py::object& o) {
-    Tango::DevEncoded* data;
-
-    if ((any >>= data) == false) {
-        throw_bad_type(Tango::CmdArgTypeName[Tango::DEV_ENCODED]);
+void extract_scalar<Tango::DEV_ENCODED>(const CORBA::Any &any, py::object& obj) {
+    Tango::DevEncoded* val;
+    any >>= val;
+    py::str encoded_format = strdup(val->encoded_format);
+    py::list encoded_data;
+    unsigned int len = val->encoded_data.length();
+    for (auto i=0; i<len; i++) {
+        encoded_data.append(val->encoded_data[i]);
     }
-    py::str encoded_format(data[0].encoded_format);
-    py::str encoded_data((const char*)data[0].encoded_data.get_buffer(),
-                           data[0].encoded_data.length());
-
-    o = py::make_tuple(encoded_format, encoded_data);
+    obj = py::make_tuple(encoded_format, encoded_data);
 }
-
-//#ifndef DISABLE_PYTANGO_NUMPY
-///// This callback is run to delete Tango::DevVarXArray* objects.
-///// It is called by python. The array was associated with an attribute
-///// value object that is not being used anymore.
-///// @param ptr_ The array object.
-///// @param type_ The type of the array objects. We need it to convert ptr_
-/////              to the proper type before deleting it.
-/////              ex: Tango::DEVVAR_SHORTARRAY.
-//#    ifdef PYCAPSULE_OLD
-//         template<long type>
-//         static void dev_var_x_array_deleter__(void * ptr_)
-//         {
-//             TANGO_DO_ON_DEVICE_ARRAY_DATA_TYPE_ID(type,
-//                 delete static_cast<TANGO_const2type(tangoTypeConst)*>(ptr_);
-//             );
-//         }
-//#    else
-//         template<long type>
-//         static void dev_var_x_array_deleter__(PyObject* obj)
-//         {
-//             void * ptr_ = PyCapsule_GetPointer(obj, NULL);
-//             TANGO_DO_ON_DEVICE_ARRAY_DATA_TYPE_ID(type,
-//                 delete static_cast<TANGO_const2type(tangoTypeConst)*>(ptr_);
-//             );
-//         }
-//#endif
-//#endif
 
 template<long tangoArrayTypeConst>
 void extract_array(const CORBA::Any &any, py::object& py_result)
 {
+    typedef typename TANGO_const2scalartype(tangoArrayTypeConst) TangoScalarType;
     typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
 
-    TangoArrayType *tmp_ptr;
-
-    if ((any >>= tmp_ptr) == false)
+    TangoArrayType *tmp_arr;
+    if ((any >>= tmp_arr) == false)
         throw_bad_type(Tango::CmdArgTypeName[tangoArrayTypeConst]);
 
-//#ifndef DISABLE_PYTANGO_NUMPY
-//      // For numpy we need a 'guard' object that handles the memory used
-//      // by the numpy object (releases it).
-//      // But I cannot manage memory inside our 'any' object, because it is
-//      // const and handles it's memory itself. So I need a copy before
-//      // creating the object.
-//      TangoArrayType* copy_ptr = new TangoArrayType(*tmp_ptr);
-//
-//      // numpy.ndarray() does not own it's memory, so we need to manage it.
-//      // We can assign a 'base' object that will be informed (decref'd) when
-//      // the last copy of numpy.ndarray() disappears.
-//      // PyCObject is intended for that kind of things. It's seen as a
-//      // black box object from python. We assign him a function to be called
-//      // when it is deleted -> the function deletes de data.
+    // For numpy we need a 'guard' object that handles the memory used
+    // by the numpy object (releases it).
+    // But I cannot manage memory inside our 'any' object, because it is
+    // const and handles it's memory itself. So I need a copy before
+    // creating the object.
+    TangoArrayType* copy_ptr = new TangoArrayType(*tmp_arr);
 
-//    py::capsule free_when_done(reinterpret_cast<void*>(value_ptr), [](void* f) {
-//        TangoScalarType *ptr = reinterpret_cast<TangoScalarType *>(f);
-//        delete[] ptr;
-//    });
+    // numpy.ndarray() does not own it's memory, so we need to manage it.
+    // We can assign a 'base' object that will be informed (decref'd) when
+    // the last copy of numpy.ndarray() disappears.
+    py::capsule free_when_done(reinterpret_cast<void*>(copy_ptr), [](void* f) {
+         TangoScalarType *ptr = reinterpret_cast<TangoScalarType *>(f);
+         delete[] ptr;
+    });
+    py::array array;
+    int dims[1];
+    dims[0] = copy_ptr->length();
+    array = py::array_t<TangoScalarType>(dims,
+            reinterpret_cast<TangoScalarType*>(copy_ptr->get_buffer()), free_when_done);
 
-    //      PyObject* guard = PyCapsule_New(
-//              static_cast<void*>(copy_ptr),
-//              NULL,
-//              dev_var_x_array_deleter__<tangoArrayTypeConst>);
-//      if (!guard ) {
-//          delete copy_ptr;
-//          throw_error_already_set();
-//      }
-//
-//      py_result = to_py_numpy<tangoArrayTypeConst>(copy_ptr, object(handle<>(guard)));
-//#else
-//      py_result = to_py_list(tmp_ptr);
-      py_result = py::none();
-//#endif
+    py_result = py::object(array);
+}
+
+template<>
+void extract_array<Tango::DEVVAR_STRINGARRAY>(const CORBA::Any &any, py::object& py_result)
+{
+    Tango::DevVarStringArray *array;
+    if ((any >>= array) == false)
+        throw_bad_type(Tango::CmdArgTypeName[Tango::DEVVAR_STRINGARRAY]);
+
+    py::list result;
+    int len = array->length();
+    for (auto i=0; i<array->length(); i++) {
+        result.append(py::str((*array)[i]));
+    }
+
+    py_result = result;
+}
+
+template<>
+void extract_array<Tango::DEVVAR_LONGSTRINGARRAY>(const CORBA::Any &any, py::object& py_result)
+{
+    py::list long_data;
+    py::list string_data;
+    const Tango::DevVarLongStringArray *array = NULL;
+    if ((any >>= array) == false)
+        throw_bad_type(Tango::CmdArgTypeName[Tango::DEVVAR_LONGSTRINGARRAY]);
+    for (auto i=0; i<array->lvalue.length(); i++) {
+        long_data.append(py::cast((array->lvalue)[i]));
+    }
+    for (auto i=0; i<array->svalue.length(); i++) {
+        string_data.append(py::str((array->svalue)[i]));
+    }
+    py_result = py::make_tuple(long_data, string_data);
+}
+
+template<>
+void extract_array<Tango::DEVVAR_DOUBLESTRINGARRAY>(const CORBA::Any &any, py::object& py_result)
+{
+    py::list double_data;
+    py::list string_data;
+    const Tango::DevVarDoubleStringArray *array = NULL;
+    any >>= array;
+    for (auto i=0; i<array->dvalue.length(); i++) {
+        double_data.append(py::cast((array->dvalue)[i]));
+    }
+    for (auto i=0; i<array->svalue.length(); i++) {
+        string_data.append(py::str((array->svalue)[i]));
+    }
+    py_result = py::make_tuple(double_data, string_data);
 }
 
 template<>
@@ -241,92 +308,6 @@ void extract_array<Tango::DEV_PIPE_BLOB>(const CORBA::Any &any,
                      py::object& py_result)
 {
     assert(false);
-}
-
-void __insert(CORBA::Any& any, py::object& py_value, const Tango::CmdArgType type)
-{
-    // This might be a bit verbose but at least WYSIWYG
-    switch (type)
-    {
-    case Tango::DEV_BOOLEAN:
-        insert_scalar_boolean(any, py_value);
-        break;
-    case Tango::DEV_SHORT:
-        insert_scalar<Tango::DEV_SHORT>(any, py_value);
-        break;
-    case Tango::DEV_LONG:
-        insert_scalar<Tango::DEV_LONG>(any, py_value);
-        break;
-    case Tango::DEV_FLOAT:
-        insert_scalar<Tango::DEV_FLOAT>(any, py_value);
-        break;
-    case Tango::DEV_DOUBLE:
-        insert_scalar<Tango::DEV_DOUBLE>(any, py_value);
-        break;
-    case Tango::DEV_USHORT:
-        insert_scalar<Tango::DEV_USHORT>(any, py_value);
-        break;
-    case Tango::DEV_ULONG:
-        insert_scalar<Tango::DEV_ULONG>(any, py_value);
-        break;
-    case Tango::DEV_STRING:
-        insert_scalar_string(any, py_value);
-        break;
-    case Tango::DEV_STATE:
-        insert_scalar<Tango::DEV_STATE>(any, py_value);
-        break;
-    case Tango::DEV_LONG64:
-        insert_scalar<Tango::DEV_LONG64>(any, py_value);
-        break;
-    case Tango::DEV_ULONG64:
-        insert_scalar<Tango::DEV_ULONG64>(any, py_value);
-        break;
-    case Tango::DEV_ENCODED:
-        insert_scalar_encoded(any, py_value);
-        break;
-    case Tango::DEV_ENUM:
-        insert_scalar<Tango::DEV_ENUM>(any, py_value);
-        break;
-//    case Tango::DEVVAR_CHARARRAY:
-//        insert_array<Tango::DEV_UCHAR>(any, py_value);
-//        break;
-    case Tango::DEVVAR_SHORTARRAY:
-        insert_array<Tango::DEVVAR_SHORTARRAY>(any, py_value);
-        break;
-    case Tango::DEVVAR_LONGARRAY:
-        insert_array<Tango::DEVVAR_LONGARRAY>(any, py_value);
-        break;
-    case Tango::DEVVAR_FLOATARRAY:
-        insert_array<Tango::DEVVAR_FLOATARRAY>(any, py_value);
-        break;
-    case Tango::DEVVAR_DOUBLEARRAY:
-        insert_array<Tango::DEVVAR_DOUBLEARRAY>(any, py_value);
-        break;
-    case Tango::DEVVAR_USHORTARRAY:
-        insert_array<Tango::DEVVAR_USHORTARRAY>(any, py_value);
-        break;
-    case Tango::DEVVAR_ULONGARRAY:
-        insert_array<Tango::DEVVAR_ULONGARRAY>(any, py_value);
-        break;
-    case Tango::DEVVAR_BOOLEANARRAY:
-
-        insert_array<Tango::DEVVAR_BOOLEANARRAY>(any, py_value);
-        break;
-    case Tango::DEVVAR_LONG64ARRAY:
-        insert_array<Tango::DEVVAR_LONG64ARRAY>(any, py_value);
-        break;
-    case Tango::DEVVAR_ULONG64ARRAY:
-        insert_array<Tango::DEVVAR_ULONG64ARRAY>(any, py_value);
-        break;
-    case Tango::DEVVAR_STATEARRAY:
-        insert_array<Tango::DEVVAR_STATEARRAY>(any, py_value);
-        break;
-//        __TANGO_DEPEND_ON_TYPE_AUX_ID(DEVVAR_STRINGARRAY, DOIT_ARRAY) \
-//        __TANGO_DEPEND_ON_TYPE_AUX_ID(DEVVAR_LONGSTRINGARRAY, DOIT_ARRAY) \
-//        __TANGO_DEPEND_ON_TYPE_AUX_ID(DEVVAR_DOUBLESTRINGARRAY, DOIT_ARRAY) \
-    default:
-        throw;
-    }
 }
 
 CORBA::Any *PyCmd::execute(Tango::DeviceImpl *dev, const CORBA::Any &param_any)
@@ -359,16 +340,13 @@ CORBA::Any *PyCmd::execute(Tango::DeviceImpl *dev, const CORBA::Any &param_any)
         CORBA::Any *ret_any;
         allocate_any(ret_any);
         std::unique_ptr<CORBA::Any> ret_any_guard(ret_any);
-        // Insert the python object into CORBA any for return
-        __insert(*ret_any, ret_py_obj, out_type);
 
         // It does: ret_any = ret_py_obj
-//        TANGO_DO_ON_DEVICE_DATA_TYPE_ID(out_type,
-//            insert_scalar<tangoTypeConst>(ret_py_obj, *ret_any);
-//        ,
-//            insert_array<tangoTypeConst>(ret_py_obj, *ret_any);
-//        );
-
+        TANGO_DO_ON_DEVICE_DATA_TYPE_ID(out_type,
+            insert_scalar<tangoTypeConst>(*ret_any, ret_py_obj);
+        ,
+            insert_array<tangoTypeConst>(*ret_any, ret_py_obj);
+        );
         return ret_any_guard.release();
     } catch(py::error_already_set &eas) {
         handle_python_exception(eas);
