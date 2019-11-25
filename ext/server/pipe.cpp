@@ -60,9 +60,7 @@ void _Pipe::write(Tango::DeviceImpl* dev, Tango::WPipe &pipe)
                o.str(), "PyTango::Pipe::write");
     }
     try {
-        py::print("before get_pipe_write_value");
         py::object value = get_pipe_write_value(pipe);
-        py::print("after get_pipe_write_value");
         dev_ptr->py_self.attr(write_name.c_str())(value);
     }
     catch(py::error_already_set &eas) {
@@ -379,12 +377,8 @@ void set_value(Tango::DevicePipeBlob& dpb, py::object& py_data) {
 
 py::object get_pipe_write_value(Tango::WPipe& pipe)
 {
-    py::print("in get_pipe_write_value");
     Tango::DevicePipeBlob blob = pipe.get_blob();
-    py::print("before extract blob");
-    py::object ret = PyTango::DevicePipe::extract(blob);
-    py::print("after extract blob");
-    return ret;
+    return PyTango::DevicePipe::extract(blob);
 }
 
 }} // namespace PyTango::Pipe

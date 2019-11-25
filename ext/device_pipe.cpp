@@ -162,7 +162,6 @@ namespace DevicePipe
     template<>
     py::object __extract_scalar<Tango::DevicePipe, Tango::DEV_ENCODED>(Tango::DevicePipe& obj, size_t elt_idx)
     {
-        py::print("in __extract_scalar<Tango::DevicePipe, Tango::DEV_ENCODED>");
         Tango::DevEncoded val;
         obj >> val;
         py::str encoded_format = strdup(val.encoded_format);
@@ -200,10 +199,8 @@ namespace DevicePipe
     template<>
     py::object __extract_scalar<Tango::DevicePipeBlob, Tango::DEV_ENCODED>(Tango::DevicePipeBlob& obj, size_t elt_idx)
     {
-        py::print("in __extract_scalar<Tango::DevicePipeBlob, Tango::DEV_ENCODED>");
         Tango::DevEncoded val;
         obj >> val;
-        py::print("crap");
         py::str encoded_format = strdup(val.encoded_format);
         py::list encoded_data;
         unsigned int len = val.encoded_data.length();
@@ -318,9 +315,7 @@ namespace DevicePipe
     template<typename T>
     py::object __extract_item(T& obj, size_t elt_idx, int type)
     {
-//        const int elt_type = obj.get_data_elt_type(elt_idx);
         const int elt_type = type;
-        py::print("before extract_scaler<t>");
         TANGO_DO_ON_DEVICE_DATA_TYPE_ID(elt_type,
                 return extract_scalar<tangoTypeConst>(obj, elt_idx); ,
                 return extract_array<tangoTypeConst>(obj, elt_idx);
@@ -338,7 +333,6 @@ namespace DevicePipe
         {
             py::dict elem;
             elem["name"] = obj.get_data_elt_name(elt_idx);
-            py::print(elem["name"], elt_idx);
             std::string nam = "encoded";
             if (elem["name"].cast<std::string>() == nam) {
                 elt_type = 28;
@@ -347,7 +341,6 @@ namespace DevicePipe
                 elt_type = obj.get_data_elt_type(elt_idx);
                 elem["dtype"] = static_cast<Tango::CmdArgType>(obj.get_data_elt_type(elt_idx));
             }
-            py::print(elem["dtype"]);
             elem["value"] = __extract_item(obj, elt_idx, elt_type);
             data.append(elem);
         }
@@ -355,7 +348,6 @@ namespace DevicePipe
     }
     py::object extract(Tango::DevicePipeBlob& blob)
     {
-        py::print("in extract blob");
         py::object name = py::str(blob.get_name());
         py::object value = __extract<Tango::DevicePipeBlob>(blob);
         return py::make_tuple(name, value);
