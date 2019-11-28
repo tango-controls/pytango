@@ -12,6 +12,7 @@
 #pragma once
 
 #include <boost/python.hpp>
+#include <omnithread.h>
 
 namespace bopy = boost::python;
 
@@ -208,6 +209,12 @@ public:
     {
         giveup();
     }
+private:
+  // The following variable ensures usage of this from a non-omnithread will
+  // still get a dummy omnithread ID - cppTango requires threads to
+  // be identifiable in this way.
+  // See https://github.com/tango-controls/pytango/issues/307
+  omni_thread::ensure_self auto_self;
 };
 
 /**
