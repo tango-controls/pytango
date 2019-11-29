@@ -295,7 +295,6 @@ namespace PyDeviceAttribute {
     {
         static const long tangoTypeConst = Tango::DEV_STRING;
         typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
-//        typedef typename TANGO_const2arraytype(tangoTypeConst) TangoArrayType;
 
         // Extract the actual data from Tango::DeviceAttribute (self)
         std::vector<std::string> value_ptr;

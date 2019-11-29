@@ -16,7 +16,6 @@ from tango import DeviceProxy
 from tango import DevState
 
 dp = DeviceProxy('sys/tg_test/1')
-
 assert dp.get_command_list() == [u'ChangeState', u'DevBoolean', u'DevDouble', u'DevEncoded', u'DevFloat',
                                  u'DevLong', u'DevLong64', u'DevShort', u'DevState',
                                  u'DevString', u'DevULong', u'DevULong64', u'DevUShort',

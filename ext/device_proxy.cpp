@@ -379,16 +379,13 @@ void export_device_proxy(py::module &m) {
             Tango::DeviceProxy* dp = nullptr;
             AutoPythonAllowThreads guard;
             // C++ signature
-            dp = new Tango::DeviceProxy(name);
-            return dp;
+            return new Tango::DeviceProxy(name); // C++ signature
         }))
 
         .def(py::init([](std::string& name, bool ch_access) {
             Tango::DeviceProxy* dp = nullptr;
             AutoPythonAllowThreads guard;
-            // C++ signature
-            dp = new Tango::DeviceProxy(name, ch_access);
-            return dp;
+            return new Tango::DeviceProxy(name, ch_access); // C++ signature
         }))
         //
         // Pickle
@@ -464,8 +461,12 @@ void export_device_proxy(py::module &m) {
         .def("command_list_query", [](Tango::DeviceProxy& self) -> Tango::CommandInfoList* {
             return std::move(self.command_list_query()); // Tango C++ signature
         })
-        .def("import_info", [](Tango::DeviceProxy& self) -> Tango::DbDevImportInfo {
-            Tango::DbDevImportInfo info = self.import_info(); // Tango C++ signature
+        .def("import_info", [](Tango::DeviceProxy& self) {
+            py::print("import info");
+//            Tango::DbDevImportInfo info = self.import_info(); // Tango C++ signature
+            self.import_info(); // Tango C++ signature
+            py::print("imported info");
+            Tango::DbDevImportInfo info;
             return info;
         })
         //
@@ -768,6 +769,7 @@ void export_device_proxy(py::module &m) {
                                      py::object py_cb_or_queuesize,
                                      std::vector<std::string> filters,
                                      bool stateless) -> int {
+            py::print("in dp subscribe event");
             if (PyDeviceProxy::check_cast<int>(py_cb_or_queuesize)) {
                 int event_queue_size = py_cb_or_queuesize.cast<int>();
                 AutoPythonAllowThreads guard;
@@ -776,7 +778,7 @@ void export_device_proxy(py::module &m) {
             } else {
                 CallBackPushEvent* cb = py::cast<CallBackPushEvent*>(py_cb_or_queuesize);
                 cb->set_device(self);
-                cb->m_callback = py::getattr(py_cb_or_queuesize, "m_callback");
+                cb->m_callback = py::getattr(py_cb_or_queuesize, "push_event");
                 AutoPythonAllowThreads guard;
                 // C++ signature
                 return self.subscribe_event(attr_name, event, cb, filters, stateless);

@@ -96,7 +96,6 @@ protected:
         if (mon == NULL)
             return;
 
-        // TODO remove this bullshit
         int cur_thread = omni_thread::self()->id();
         int mon_thread = mon->get_locking_thread_id();
         int lock_count = mon->get_locking_ctr();
@@ -116,7 +115,6 @@ protected:
 private:
     Tango::TangoMonitor *mon;
     int count;
-// TODO remove this bullshit
     omni_thread::ensure_self auto_self;
 };
 

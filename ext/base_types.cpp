@@ -280,7 +280,9 @@ void export_base_types(py::module &m) {
 
     //py::class_<Tango::EventDataList>(m, "EventDataList")
 
-    py::class_<std::vector<Tango::DbDatum>>(m, "DbData");
+//    py::class_<std::vector<Tango::DbDatum>>(m, "DbData");
+    py::class_<py::list>(m, "DbData")
+        .def(py::init());
 
     py::class_<std::vector<Tango::DbDevInfos>>(m, "DbDevInfos");
 

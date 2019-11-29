@@ -139,6 +139,7 @@ class TangoTest(Device):
         self.__push_scalar_change_events = False
         self.__push_scalar_archive_events = False
         self.__push_pipe_events = False
+        self.__pipe_task = None
         self.set_state(tango.DevState.RUNNING)
 
     def always_executed_hook(self):
@@ -315,7 +316,7 @@ class TangoTest(Device):
     @attribute(
         dtype="uint64",
         label="ulong64_scalar_ro",
-        min_valu=ulong64_minmax[0],
+        min_value=ulong64_minmax[0],
         max_value=ulong64_minmax[1],
         doc="A Tango::DevULong64 readonly scalar attribute (int64)",
     )
@@ -983,11 +984,19 @@ class TangoTest(Device):
         self.__push_scalar_archive_events = enabled
 
     @command(
-        dtype_in="bool",
-        doc_in="Push pipe events == true else false",
+        dtype_in="double",
+        doc_in="Frequency of pipe events (s)",
     )
-    def PushPipeEvents(self, enabled):
-        self.__push_pipe_events = enabled
+    def PushPipeEvents(self, period):
+        if period != 0.0:
+            self.__push_pipe_events = True
+            if self.__pipe_task is None:
+                with self.__lock:
+                    self.__pipe_task = gevent.spawn(self.__send_pipe_events)
+        else:
+            with self.__lock:
+                self.__push_pipe_events = False
+            self.__pipe_task = None
 
     @command
     def Randomise(self):
@@ -1019,8 +1028,6 @@ class TangoTest(Device):
                 self.push_change_event("double_scalar_ro", self.__double_scalar_ro)
             if self.__push_scalar_archive_events:
                 self.push_archive_event("double_scalar_ro", self.__double_scalar_ro)
-            if self.__push_pipe_events:
-                self.push_pipe_event("TestPipe", self.__blob)
             gevent.sleep(1.0)
 
     # --------
@@ -1029,15 +1036,17 @@ class TangoTest(Device):
 
     @pipe(label="Test pipe", description="This is a test pipe")
     def TestPipe(self):
-        print("Reading TestPipe blob")
         return self.__blob
 
     @TestPipe.write
     def TestPipe(self, blob):
-        print("Writing blob")
         self.__blob = blob
-        print(blob)
 
+    def __send_pipe_events(self, period=1.0):
+        while self.__push_pipe_events:
+            self.push_pipe_event("TestPipe", self.__blob)
+            print("pushed self.__blob")
+            gevent.sleep(period)
 
 # ----------
 # Run server

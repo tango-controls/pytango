@@ -120,16 +120,16 @@ def __AttributeProxy__get_property(self, propname, value=None):
                      DevFailed from database device
     """
 
-    if is_pure_str(propname) or isinstance(propname, StdStringVector):
+    if is_pure_str(propname): # or isinstance(propname, StdStringVector):
         new_value = value
         if new_value is None:
-            new_value = DbData()
-        self._get_property(propname, new_value)
+            new_value = list()
+        new_value = self._get_property(propname, new_value)
         return DbData_2_dict(new_value)
     elif isinstance(propname, DbDatum):
-        new_value = DbData()
-        new_value.append(propname)
-        self._get_property(new_value)
+#         new_value = DbData()
+#         new_value.append(propname)
+        new_value = self._get_property([propname])
         return DbData_2_dict(new_value)
     elif isinstance(propname, collections_abc.Sequence):
         if isinstance(propname, DbData):
@@ -137,19 +137,20 @@ def __AttributeProxy__get_property(self, propname, value=None):
             return DbData_2_dict(propname)
 
         if is_pure_str(propname[0]):
-            new_propname = StdStringVector()
-            for i in propname:
-                new_propname.append(i)
+#            new_propname = StdStringVector()
+#            new_propname = list()
+#            for i in propname:
+#                new_propname.append(i)
             new_value = value
             if new_value is None:
-                new_value = DbData()
-            self._get_property(new_propname, new_value)
+                new_value = list()
+            new_value = self._get_property(propname, new_value)
             return DbData_2_dict(new_value)
         elif isinstance(propname[0], DbDatum):
-            new_value = DbData()
-            for i in propname:
-                new_value.append(i)
-            self._get_property(new_value)
+#             new_value = DbData()
+#             for i in propname:
+#                 new_value.append(i)
+            new_value = self._get_property(propname)
             return DbData_2_dict(new_value)
 
 
@@ -181,32 +182,36 @@ def __AttributeProxy__put_property(self, value):
                      DevFailed from device (DB_SQLError),
                      TypeError
     """
-    if isinstance(value, DbData):
-        pass
-    elif isinstance(value, DbDatum):
-        new_value = DbData()
-        new_value.append(value)
-        value = new_value
+#    if isinstance(value, DbData):
+#        pass
+    if isinstance(value, DbDatum):
+#        new_value = DbData()
+#        new_value = ()
+#        new_value.append(value)
+#        value = new_value
+        self._put_property([value])
     elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
+#        new_value = seq_2_DbData(value)
+        self._put_property(value)
     elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
+        new_value = list()
         for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
                 continue
             db_datum = DbDatum(k)
             if is_non_str_seq(v):
-                seq_2_StdStringVector(v, db_datum.value_string)
+                db_datum.value_string = v
+#                seq_2_StdStringVector(v, db_datum.value_string)
             else:
-                db_datum.value_string.append(str(v))
+                db_datum.value_string = [str(v)]
             new_value.append(db_datum)
-        value = new_value
+        self._put_property(new_value)
+#        value = new_value
     else:
         raise TypeError(
             'Value must be a tango.DbDatum, tango.DbData, '
             'a sequence<DbDatum> or a dictionary')
-    return self._put_property(value)
 
 
 def __AttributeProxy__delete_property(self, value):
@@ -245,32 +250,38 @@ def __AttributeProxy__delete_property(self, value):
                      DevFailed from device (DB_SQLError),
                      TypeError
     """
-    if isinstance(value, DbData) or isinstance(value, StdStringVector) or \
-            is_pure_str(value):
+#     if isinstance(value, DbData) or isinstance(value, list) or \
+#             is_pure_str(value):
+    if is_pure_str(value):
         new_value = value
     elif isinstance(value, DbDatum):
-        new_value = DbData()
-        new_value.append(value)
+        new_value = value.name
+#        new_value.append(value)
     elif isinstance(value, collections_abc.Sequence):
-        new_value = DbData()
+        new_value = list()
         for e in value:
             if isinstance(e, DbDatum):
-                new_value.append(e)
+#                new_value.append(e)
+                new_value.append(e.name)
             else:
-                new_value.append(DbDatum(str(e)))
+#                new_value.append(DbDatum(str(e)))
+                new_value.append(e)
     elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
+        new_value = list()
         for k, v in value.items():
             if isinstance(v, DbDatum):
-                new_value.append(v)
+                new_value.append(v.name)
+#                new_value.append(v)
             else:
-                new_value.append(DbDatum(k))
+#                new_value.append(DbDatum(k))
+                new_value.append(k)
     else:
         raise TypeError(
             'Value must be a string, tango.DbDatum, '
             'tango.DbData, a sequence or a dictionary')
 
-    return self._delete_property(new_value)
+    # always pass string or list of strings
+    self._delete_property(new_value)
 
 
 # It is easier to reimplement AttributeProxy in python using DeviceProxy than

@@ -11,18 +11,15 @@
 
 #include <tango.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 namespace py = pybind11;
 
 void export_attribute_proxy(py::module& m)
 {
-    py::class_<Tango::AttributeProxy, std::shared_ptr<Tango::AttributeProxy>>(m, "__AttributeProxy")
-        .def(py::init<const Tango::AttributeProxy &>())
-        .def(py::init([](const std::string& name) {
-            return std::shared_ptr<Tango::AttributeProxy>(new Tango::AttributeProxy(name.c_str()));
-        }))
-        .def(py::init([](const Tango::DeviceProxy *dev, const std::string& name) {
-            return std::shared_ptr<Tango::AttributeProxy>(new Tango::AttributeProxy(dev, name.c_str()));
+    py::class_<Tango::AttributeProxy>(m, "__AttributeProxy")
+        .def(py::init([](std::string& name) {
+            return new Tango::AttributeProxy(name);
         }))
         //
         // general methods
@@ -36,17 +33,20 @@ void export_attribute_proxy(py::module& m)
         //
         // property methods
         //
-        .def("_get_property", [](Tango::AttributeProxy& self, std::string& prop_name, Tango::DbData& db) -> void {
-            self.get_property(prop_name, db);
+        .def("_get_property", [](Tango::AttributeProxy& self, std::string& prop_name, Tango::DbData& db_data) -> std::vector<Tango::DbDatum> {
+            self.get_property(prop_name, db_data);
+            return db_data;
         })
-        .def("_get_property", [](Tango::AttributeProxy& self, std::vector<std::string>& prop_names, Tango::DbData& db) -> void {
-            self.get_property(prop_names, db);
+        .def("_get_property", [](Tango::AttributeProxy& self, std::vector<std::string>& prop_names, Tango::DbData& db_data) -> std::vector<Tango::DbDatum> {
+            self.get_property(prop_names, db_data);
+            return db_data;
         })
-        .def("_get_property", [](Tango::AttributeProxy& self, Tango::DbData& db) -> void {
-            self.get_property(db);
+        .def("_get_property", [](Tango::AttributeProxy& self, Tango::DbData& db_data) -> std::vector<Tango::DbDatum> {
+            self.get_property(db_data);
+            return db_data;
         })
-        .def("_put_property", [](Tango::AttributeProxy& self, Tango::DbData& db) -> void {
-            self.put_property(db);
+        .def("_put_property", [](Tango::AttributeProxy& self, Tango::DbData& db_data) -> void {
+            self.put_property(db_data);
         })
         .def("_delete_property", [](Tango::AttributeProxy& self, std::string& prop_name) -> void {
             self.delete_property(prop_name);
@@ -54,8 +54,9 @@ void export_attribute_proxy(py::module& m)
         .def("_delete_property", [](Tango::AttributeProxy& self, std::vector<std::string>& prop_names) -> void {
             self.delete_property(prop_names);
         })
-        .def("_delete_property", [](Tango::AttributeProxy& self, Tango::DbData& db) -> void {
-            self.delete_property(db);
+        .def("_delete_property", [](Tango::AttributeProxy& self, std::vector<Tango::DbDatum>& db_data) -> void {
+            py::print(db_data);
+            self.delete_property(db_data);
         })
         //
         // Pickle

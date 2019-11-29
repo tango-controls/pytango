@@ -341,6 +341,7 @@ namespace PyDeviceImpl
     inline void push_event(Tango::DeviceImpl& self, std::string& name,
             std::vector<std::string>& filt_names, std::vector<double>& filt_vals, py::object& data)
     {
+        py::print("push event....");
         AutoPythonAllowThreads python_guard_ptr;
         Tango::AutoTangoMonitor tango_guard(&self);
         Tango::Attribute& attr = self.get_device_attr()->get_attr_by_name(name.c_str());
