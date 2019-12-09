@@ -82,7 +82,7 @@ class Group:
             return self.__group._add(patterns_or_group, timeout_ms)
         elif isinstance(patterns_or_group, str):
             return self.__group._add(patterns_or_group, timeout_ms)
-        elif isinstance(patterns_or_group, collections.Sequence):
+        elif isinstance(patterns_or_group, collections_abc.Sequence):
             patterns = seq_2_StdStringVector(patterns_or_group)
             return self.__group._add(patterns, timeout_ms)
         else:
@@ -91,7 +91,7 @@ class Group:
     def remove(self, patterns, forward=True):
         if isinstance(patterns, str):
             return self.__group._remove(patterns, forward)
-        elif isinstance(patterns, collections.Sequence):
+        elif isinstance(patterns, collections_abc.Sequence):
             std_patterns = seq_2_StdStringVector(patterns)
             return self.__group._remove(std_patterns, forward)
         else:

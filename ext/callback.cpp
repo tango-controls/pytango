@@ -64,8 +64,7 @@ static void copy_most_fields(CallBackAutoDie* self, Tango::AttrReadEvent* ev, Py
 //    py_ev->attr_names =py::object(ev->attr_names);
 //
 //    PyDeviceAttribute::AutoDevAttrVector dev_attr_vec(ev->argout);
-//    py_ev->argout = PyDeviceAttribute::convert_to_python( \
-//                            dev_attr_vec, *ev->device, self->m_extract_as);
+//    py_ev->argout = PyDeviceAttribute::convert_to_python(dev_attr_vec, *ev->device);
 //
 //    py_ev->err =py::object(ev->err);
 //    py_ev->errors =py::object(ev->errors);

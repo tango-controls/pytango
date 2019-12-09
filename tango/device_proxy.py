@@ -15,7 +15,7 @@ import time
 import textwrap
 import threading
 import enum
-import six
+#import six
 try:
     import collections.abc as collections_abc  # python 3.3+
 except ImportError:
@@ -30,8 +30,8 @@ from ._tango import CmdArgType, DevState
 
 from .utils import TO_TANGO_TYPE, scalar_to_array_type
 from .utils import is_pure_str, is_non_str_seq, is_integer, is_number
-from .utils import seq_2_StdStringVector, StdStringVector_2_seq
-from .utils import DbData_2_dict, obj_2_property
+from .utils import StdStringVector_2_seq
+from .utils import DbData_2_dict
 from .utils import document_method as __document_method
 from .utils import dir2
 
@@ -602,7 +602,8 @@ def __DeviceProxy__get_property(self, propname, value=None):
         if is_pure_str(propname[0]):
             db_data = self._get_property(propname, new_value)
             return DbData_2_dict(db_data)
-            new_propname = StdStringVector()
+        if is_pure_str(propname[0]):
+            new_propname = list()
             for i in propname:
                 new_propname.append(i)
             new_value = value
@@ -810,8 +811,7 @@ def __DeviceProxy__get_attribute_config(self, value):
     if isinstance(value, StdStringVector) or is_pure_str(value):
         return self._get_attribute_config(value)
     elif isinstance(value, collections_abc.Sequence):
-#       v = seq_2_StdStringVector(value)
-       return self._get_attribute_config(value)
+        return self._get_attribute_config(value)
 
     raise TypeError('value must be a string or a sequence<string>')
 
@@ -845,14 +845,9 @@ def __DeviceProxy__get_attribute_config_ex(self, value):
                      DevFailed from device,
                      TypeError
     """
-#    if isinstance(value, StdStringVector):
-#        return self._get_attribute_config_ex(value)
     if is_pure_str(value):
-#        v = StdStringVector()
-#        v.append(value)
         return self._get_attribute_config_ex([value])
     elif isinstance(value, collections_abc.Sequence):
-#        v = seq_2_StdStringVector(value)
         return self._get_attribute_config_ex(value)
 
     raise TypeError('value must be a string or a sequence<string>')
@@ -900,7 +895,6 @@ def __DeviceProxy__get_command_config(self, value=(constants.AllCmd,)):
     if isinstance(value, StdStringVector) or is_pure_str(value):
         return self._get_command_config(value)
     elif isinstance(value, collections_abc.Sequence):
-#        v = seq_2_StdStringVector(value)
         return self._get_command_config(value)
 
     raise TypeError('value must be a string or a sequence<string>')
@@ -956,7 +950,6 @@ def __DeviceProxy__get_pipe_config(self, value=None):
     if isinstance(value, StdStringVector) or is_pure_str(value):
         return self._get_pipe_config(value)
     elif isinstance(value, collections_abc.Sequence):
-#        v = seq_2_StdStringVector(value)
         return self._get_pipe_config(value)
 
     raise TypeError('value must be a string or a sequence<string>')

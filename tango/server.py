@@ -16,7 +16,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import sys
-import copy
+#import copy
 import enum
 try:
     from inspect import getfullargspec as inspect_getargspec  # python 3.0+

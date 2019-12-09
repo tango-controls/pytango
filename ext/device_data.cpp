@@ -173,7 +173,7 @@ template <long tangoTypeConst>
         self >> val;
         py::str encoded_format = strdup(val.encoded_format);
         py::list encoded_data;
-        unsigned int len = val.encoded_data.length();
+        int len = val.encoded_data.length();
         for (auto i=0; i<len; i++) {
             encoded_data.append(val.encoded_data[i]);
         }
@@ -206,7 +206,8 @@ template <long tangoTypeConst>
         py::list data;
         const Tango::DevVarStringArray* array;
         self >> array;
-        for (auto i=0; i<array->length(); i++) {
+        int len = array->length();
+        for (auto i=0; i<len; i++) {
             data.append(py::str((*array)[i]));
         }
         return data;
@@ -219,10 +220,12 @@ template <long tangoTypeConst>
         py::list string_data;
         const Tango::DevVarLongStringArray *array = NULL;
         self >> array;
-        for (auto i=0; i<array->lvalue.length(); i++) {
+        int llen = array->lvalue.length();
+        for (auto i=0; i<llen; i++) {
             long_data.append(py::cast((array->lvalue)[i]));
         }
-        for (auto i=0; i<array->svalue.length(); i++) {
+        int slen = array->svalue.length();
+        for (auto i=0; i<slen; i++) {
             string_data.append(py::str((array->svalue)[i]));
         }
         return py::make_tuple(long_data, string_data);
@@ -235,10 +238,12 @@ template <long tangoTypeConst>
         py::list string_data;
         const Tango::DevVarDoubleStringArray *array = NULL;
         self >> array;
-        for (auto i=0; i<array->dvalue.length(); i++) {
+        int dlen = array->dvalue.length();
+        for (auto i=0; i<dlen; i++) {
             double_data.append(py::cast((array->dvalue)[i]));
         }
-        for (auto i=0; i<array->svalue.length(); i++) {
+        int slen = array->svalue.length();
+        for (auto i=0; i<slen; i++) {
             string_data.append(py::str((array->svalue)[i]));
         }
         return py::make_tuple(double_data, string_data);

@@ -70,7 +70,9 @@ namespace PyWAttribute
         if(type == Tango::DEV_ENCODED)
             type = Tango::DEV_UCHAR;
 
-        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_min_value, self);
+        py::object minval;
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, minval = __get_min_value, self);
+        return minval;
     }
 
     template<long tangoTypeConst>
@@ -90,7 +92,9 @@ namespace PyWAttribute
         if(type == Tango::DEV_ENCODED)
             type = Tango::DEV_UCHAR;
 
-        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_max_value, self);
+        py::object maxval;
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, maxval = __get_max_value, self);
+        return maxval;
     }
 
     template<long tangoTypeConst>

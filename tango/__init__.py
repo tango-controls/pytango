@@ -75,7 +75,8 @@ __all__ = (
     'set_green_mode', 'get_green_mode', 'get_device_proxy',
     'is_scalar_type', 'is_array_type', 'is_numerical_type',
     'is_int_type', 'is_float_type', 'is_bool_type', 'is_str_type',
-    'obj_2_str', 'str_2_obj', 'seqStr_2_obj')
+    'obj_2_str', 'str_2_obj', #'seqStr_2_obj'
+    )
 
 __docformat__ = "restructuredtext"
 
@@ -238,6 +239,7 @@ from ._tango import EventType
 from ._tango import Except
 from ._tango import FMT_UNKNOWN
 from ._tango import GreenMode
+from ._tango import Group
 from ._tango import GroupAttrReply
 from ._tango import GroupAttrReplyList
 from ._tango import GroupCmdReply

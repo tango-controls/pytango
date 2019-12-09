@@ -423,11 +423,13 @@ void export_device_proxy(py::module &m) {
         })
         .def("alias", [](Tango::DeviceProxy& self) -> std::string {
             py::print("in pybind c++ alias method");
+            std::string alias;
             try {
-                return self.alias(); // Tango C++ signature
+                alias = self.alias(); // Tango C++ signature
             } catch (exception& e) {
                 py::print("got the exception");
             }
+            return alias;
         })
         .def("get_tango_lib_version", [](Tango::DeviceProxy& self) -> int {
             py::print("in pybind get_tango_lib_version");
@@ -714,7 +716,7 @@ void export_device_proxy(py::module &m) {
 
             self.write_attributes_reply(id, timeout); // C++ signature
         })
-        .def("__read_attributes_asynch", [](Tango::DeviceProxy& self, std::vector<std::string> names,
+        .def("__read_attributes_asynch", [](Tango::DeviceProxy& self, std::vector<std::string>& names,
                 py::object py_cb) {
 //            CallBackAutoDie* cb = py::cast<CallBackAutoDie>(py_cb);
 //            cb->set_autokill_references(py_cb, py_self);

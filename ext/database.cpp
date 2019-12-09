@@ -259,7 +259,7 @@ void export_database(py::module &m)
             return self.get_host_server_list(host_name); // C++ signature
         })
         .def("get_server_release", [](Tango::Database& self) -> int {
-            self.get_server_release(); // C++ signature
+            return self.get_server_release(); // C++ signature
         })
         //
         // property methods
@@ -295,7 +295,7 @@ void export_database(py::module &m)
             return self.get_device_property_history(dev_name, prop_name);  // Tango C++ signature
         })
         .def("_get_device_property_list", [](Tango::Database& self, std::string& dev_name, std::string& wildcard) -> Tango::DbDatum {
-            self.get_device_property_list(dev_name, wildcard);
+            return self.get_device_property_list(dev_name, wildcard);
         })
         .def("_get_device_property_list", [](Tango::Database& self, std::string& dev_name,
                 std::string& wildcard, std::vector<std::string>& prop_list) -> std::vector<std::string> {
@@ -313,10 +313,11 @@ void export_database(py::module &m)
             self.delete_device_attribute_property(dev_name, dbData); // C++ signature
         })
         .def("get_device_attribute_property_history", [](Tango::Database& self, std::string& dev_name, std::string& prop_name, std::string& att_name) -> std::vector<Tango::DbHistory> {
-            self.get_device_attribute_property_history(dev_name, prop_name, att_name);  // C++ signature
+            return self.get_device_attribute_property_history(dev_name, prop_name, att_name);  // C++ signature
         })
         .def("get_device_attribute_list", [](Tango::Database& self, std::string& dev_name, std::vector<std::string>& att_list) -> std::vector<std::string> {
             self.get_device_attribute_list(dev_name, att_list); // C++ signature
+            return att_list;
         })
         .def("_get_class_property", [](Tango::Database& self, std::string& dev_class, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
             self.get_class_property(dev_class, dbData, NULL); // C++ signature
@@ -351,7 +352,7 @@ void export_database(py::module &m)
         .def("export_event", [](Tango::Database& self, std::vector<std::string>& event_data) {
             Tango::DevVarStringArray dvsa;
             dvsa.length(event_data.size());
-            for (int i=0; i<event_data.size(); i++) {
+            for (auto i=0u; i<event_data.size(); i++) {
                 dvsa[i] = strdup(event_data[i].c_str());
             }
             self.export_event(&dvsa);

@@ -689,7 +689,9 @@ namespace PyAttribute
         if(tangoTypeConst == Tango::DEV_ENCODED)
             tangoTypeConst = Tango::DEV_UCHAR;
 
-        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_min_alarm, att);
+        py::object min_alarm;
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, min_alarm = __get_min_alarm, att);
+        return min_alarm;
     }
 
     template<long tangoTypeConst>
@@ -708,7 +710,9 @@ namespace PyAttribute
         if(tangoTypeConst == Tango::DEV_ENCODED)
             tangoTypeConst = Tango::DEV_UCHAR;
 
-        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_max_alarm, att);
+        py::object max_alarm;
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, max_alarm = __get_max_alarm, att);
+        return max_alarm;
     }
 
     template<long tangoTypeConst>
@@ -727,7 +731,9 @@ namespace PyAttribute
         if(tangoTypeConst == Tango::DEV_ENCODED)
             tangoTypeConst = Tango::DEV_UCHAR;
 
-        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_min_warning, att);
+        py::object min_warn;
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, min_warn = __get_min_warning, att);
+        return min_warn;
     }
 
     template<long tangoTypeConst>
@@ -746,7 +752,9 @@ namespace PyAttribute
         if(tangoTypeConst == Tango::DEV_ENCODED)
             tangoTypeConst = Tango::DEV_UCHAR;
 
-        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, return __get_max_warning, att);
+        py::object max_warn;
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(tangoTypeConst, max_warn = __get_max_warning, att);
+        return max_warn;
     }
 };
 
@@ -889,16 +897,16 @@ void export_attribute(py::module &m)
             return self.use_zmq_event();
         })
         .def("get_min_alarm", [](Tango::Attribute& self) -> py::object {
-            PyAttribute::get_min_alarm(self);
+            return PyAttribute::get_min_alarm(self);
         })
         .def("get_max_alarm", [](Tango::Attribute& self) -> py::object {
-            PyAttribute::get_max_alarm(self);
+            return PyAttribute::get_max_alarm(self);
         })
         .def("get_min_warning", [](Tango::Attribute& self) -> py::object {
-            PyAttribute::get_min_warning(self);
+            return PyAttribute::get_min_warning(self);
         })
         .def("get_max_warning", [](Tango::Attribute& self) -> py::object {
-            PyAttribute::get_max_warning(self);
+            return PyAttribute::get_max_warning(self);
         })
         .def("set_value", [](Tango::Attribute& self, py::object& value) -> void {
             PyAttribute::set_value(self, value);

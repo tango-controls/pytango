@@ -33,24 +33,24 @@ from .utils import document_enum as __document_enum
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
 
 
-def __StdVector__add(self, seq):
-    ret = seq.__class__(self)
-    ret.extend(seq)
-    return ret
+# def __StdVector__add(self, seq):
+#     ret = seq.__class__(self)
+#     ret.extend(seq)
+#     return ret
 
 
-def __StdVector__mul(self, n):
-    ret = self.__class__()
-    for _ in range(n):
-        ret.extend(self)
-    return ret
+# def __StdVector__mul(self, n):
+#     ret = self.__class__()
+#     for _ in range(n):
+#         ret.extend(self)
+#     return ret
 
 
-def __StdVector__imul(self, n):
-    ret = self.__class__()
-    for _ in range(n):
-        ret.extend(self)
-    return ret
+# def __StdVector__imul(self, n):
+#     ret = self.__class__()
+#     for _ in range(n):
+#         ret.extend(self)
+#     return ret
 
 
 # def __StdVector__getitem(self, key):
@@ -65,11 +65,11 @@ def __StdVector__imul(self, n):
 #         return res
 #     if stop > nb:
 #         stop = nb
-
-    for i in range(start, stop, key.step or 1):
-        res.append(self[i])
-
-    return res
+# 
+#     for i in range(start, stop, key.step or 1):
+#         res.append(self[i])
+# 
+#     return res
 
 
 # def __fillVectorClass(klass):

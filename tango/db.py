@@ -17,7 +17,7 @@ __all__ = ("db_init",)
 
 __docformat__ = "restructuredtext"
 
-import six
+#import six
 try:
     import collections.abc as collections_abc  # python 3.3+
 except ImportError:
@@ -187,9 +187,6 @@ def __Database__export_server(self, dev_info):
 
 def __Database__generic_get_property(self, obj_name, value, f):
     """internal usage"""
-    ret = None
-#    if isinstance(value, DbData):
-#        new_value = value
     if isinstance(value, DbDatum):
         new_value = list()
         new_value.append(value)
@@ -210,16 +207,13 @@ def __Database__generic_get_property(self, obj_name, value, f):
                 new_value.append(v)
             else:
                 new_value.append(DbDatum(k))
-        ret = value
     else:
         raise TypeError(
             'Value must be a string, tango.DbDatum, '
-            'tango.DbData, a sequence or a dictionary')
+            'a sequence or a dictionary')
 
-    f(obj_name, new_value)
-    if ret is None:
-        ret = {}
-    return DbData_2_dict(new_value, ret)
+    ret = f(obj_name, new_value)
+    return DbData_2_dict(ret, {})
 
 
 def __Database__generic_put_property(self, obj_name, value, f):
@@ -230,23 +224,21 @@ def __Database__generic_put_property(self, obj_name, value, f):
 
 def __Database__generic_delete_property(self, obj_name, value, f):
     """internal usage"""
-    if isinstance(value, DbData):
-        new_value = value
-    elif isinstance(value, DbDatum):
-        new_value = DbData()
+    if isinstance(value, DbDatum):
+        new_value = list()
         new_value.append(value)
     elif is_pure_str(value):
-        new_value = DbData()
+        new_value = list()
         new_value.append(DbDatum(value))
     elif isinstance(value, collections_abc.Sequence):
-        new_value = DbData()
+        new_value = list()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
     elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
+        new_value = list()
         for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
@@ -255,7 +247,7 @@ def __Database__generic_delete_property(self, obj_name, value, f):
     else:
         raise TypeError(
             'Value must be a string, tango.DbDatum, '
-            'tango.DbData, a sequence or a dictionary')
+            'a sequence or a dictionary')
 
     return f(obj_name, new_value)
 

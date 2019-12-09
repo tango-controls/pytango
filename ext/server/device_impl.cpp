@@ -840,7 +840,6 @@ void DeviceImplWrap::_stop_poll_command(const std::string& cmd_name)
 
 void DeviceImplWrap::always_executed_hook()
 {
-    std::thread::id thread_id = std::this_thread::get_id();
     AutoPythonGILEnsure __py_lock;
     try {
         if (is_method_callable(py_self, "always_executed_hook")) {
@@ -867,7 +866,6 @@ void DeviceImplWrap::default_always_executed_hook()
 
 void DeviceImplWrap::read_attr_hardware(std::vector<long> &attr_list)
 {
-    std::thread::id thread_id = std::this_thread::get_id();
     AutoPythonGILEnsure __py_lock;
     try {
         if (is_method_callable(py_self, "read_attr_hardware")) {
@@ -922,13 +920,14 @@ void DeviceImplWrap::default_write_attr_hardware(std::vector<long> &attr_list)
 Tango::DevState DeviceImplWrap::dev_state()
 {
     AutoPythonGILEnsure __py_lock;
+    Tango::DevState dstate;
     try {
         if (is_method_callable(py_self, "dev_state")) {
             py::object ret = py_self.attr("dev_state")();
-            return ret.cast<Tango::DevState>();
+            dstate = ret.cast<Tango::DevState>();
         }
         else {
-            return Tango::Device_5Impl::dev_state();
+            dstate = Tango::Device_5Impl::dev_state();
         }
     }
     catch(py::error_already_set &eas) {
@@ -939,6 +938,7 @@ Tango::DevState DeviceImplWrap::dev_state()
                 "An unexpected C++ exception occurred",
                 "delete_device");
     }
+    return dstate;
 }
 
 Tango::DevState DeviceImplWrap::default_dev_state()
@@ -949,15 +949,16 @@ Tango::DevState DeviceImplWrap::default_dev_state()
 Tango::ConstDevString DeviceImplWrap::dev_status()
 {
     AutoPythonGILEnsure __py_lock;
+    std::string dstatus;
     try {
         if (is_method_callable(py_self, "dev_status")) {
             py::object ret = py_self.attr("dev_status")();
             this->the_status = ret.cast<std::string>();
-            return this->the_status.c_str();
+            dstatus = this->the_status;
         }
         else {
             this->the_status = Tango::Device_5Impl::dev_status();
-            return this->the_status.c_str();
+            dstatus = this->the_status;
         }
     }
     catch(py::error_already_set &eas) {
@@ -968,6 +969,7 @@ Tango::ConstDevString DeviceImplWrap::dev_status()
                 "An unexpected C++ exception occurred",
                 "delete_device");
     }
+    return dstatus.c_str();
 }
 
 Tango::ConstDevString DeviceImplWrap::default_dev_status()
@@ -1319,8 +1321,8 @@ void export_device_impl(py::module &m) {
         .def("get_attr_min_poll_period", [](DeviceImplWrap& self) {
             self.get_attr_min_poll_period();
         })
-        .def("is_there_subscriber", [](DeviceImplWrap& self, const std::string& att_name, Tango::EventType event_type) -> bool{
-            self.is_there_subscriber(att_name, event_type);
+        .def("is_there_subscriber", [](DeviceImplWrap& self, const std::string& att_name, Tango::EventType event_type) -> bool {
+            return self.is_there_subscriber(att_name, event_type);
         })
         .def("init_device", [](DeviceImplWrap& self) {
             self.init_device();

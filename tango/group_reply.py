@@ -31,15 +31,15 @@ def __GroupAttrReply__get_data(self):
     # an empty value, which is an unexpected behaviour.
     # That's why we cache the result of the first call.
     try:
-        data, orig_extract_as = self.__dataCache
+        data = self.__dataCache
     except AttributeError:
-        data = self.__get_data(extract_as)
-        self.__dataCache = data, extract_as
+        data = self.__get_data()
+        self.__dataCache = data
         return data
 
-    if extract_as != orig_extract_as:
-        raise Exception("Successive calls to get_data() must receive the same"
-                        " parameters as the first one.")
+    #     if extract_as != orig_extract_as:
+    #         raise Exception("Successive calls to get_data() must receive the same"
+    #                         " parameters as the first one.")
     return data
 
 

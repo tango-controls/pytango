@@ -37,7 +37,8 @@ inline py::object __get_attr_write_value<Tango::DEV_ENCODED>(Tango::WAttribute& 
     std::string encoded_format = std::string(value.encoded_format);
     Tango::DevVarCharArray encoded_data = value.encoded_data;
     py::list encoded_list;
-    for (auto i=0; i<encoded_data.length(); i++) {
+    int len = encoded_data.length();
+    for (auto i=0; i<len; i++) {
         encoded_list.append(py::cast(encoded_data[i]));
     }
     py::str py_str = py::cast(encoded_format);
@@ -104,11 +105,13 @@ py::object PyAttr::get_attr_write_value(Tango::WAttribute& att)
     const bool isScalar = (format == Tango::SCALAR);
     const bool isImage = (format == Tango::IMAGE);
 
+    py::object wval;
     if (isScalar) {
-        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_attr_write_value, att);
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, wval = __get_attr_write_value, att);
     } else {
-        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, return __get_array_attr_write_value, att, isImage);
+        TANGO_CALL_ON_ATTRIBUTE_DATA_TYPE_ID(type, wval = __get_array_attr_write_value, att, isImage);
     }
+    return wval;
 }
 
 void PyAttr::read(Tango::DeviceImpl* dev, Tango::Attribute& att)

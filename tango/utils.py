@@ -734,10 +734,13 @@ def seq_2_StdStringVector(seq, vec=None):
         :rtype: :class:`tango.StdStringVector`
     """
     if vec is None:
-        if isinstance(seq, StdStringVector):
+#        if isinstance(seq, StdStringVector):
+        if isinstance(seq, list):
             return seq
-        vec = StdStringVector()
-    if not isinstance(vec, StdStringVector):
+#        vec = StdStringVector()
+        vec = list()
+#    if not isinstance(vec, StdStringVector):
+    if not isinstance(vec, list):
         raise TypeError('vec must be a tango.StdStringVector')
     for e in seq:
         vec.append(str(e))
@@ -1052,28 +1055,29 @@ def obj_2_str(obj, tg_type=None):
 
 
 def obj_2_property(value):
-    if isinstance(value, DbData):
-        pass
-    elif isinstance(value, DbDatum):
-        new_value = DbData()
+#    if isinstance(value, DbData):
+#        pass
+    if isinstance(value, DbDatum):
+#        new_value = DbData()
+        new_value = list()
         new_value.append(value)
         value = new_value
     elif is_non_str_seq(value):
         value = seq_2_DbData(value)
     elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
+        new_value = list()
         for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
                 continue
             db_datum = DbDatum(k)
             if is_non_str_seq(v):
-                seq_2_StdStringVector(v, db_datum.value_string)
+                db_datum.value_string = v
             else:
                 if not is_pure_str(v):
                     v = str(v)
-                v = six.ensure_binary(v, encoding='latin-1')
-                db_datum.value_string.append(v)
+#                v = six.ensure_binary(v, encoding='latin-1')
+                db_datum.value_string = [v]
             new_value.append(db_datum)
         value = new_value
     else:

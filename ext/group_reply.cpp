@@ -22,7 +22,7 @@ void export_group_reply(py::module &m) {
             return self.has_failed(); // Tango C++ signature
         })
         .def("group_element_enabled", [](Tango::GroupReply& self) -> bool {
-            self.group_element_enabled(); // Tango C++ signature
+            return self.group_element_enabled(); // Tango C++ signature
         })
         .def("dev_name", [](Tango::GroupReply& self) -> std::string {
             std::string ret = static_cast<std::string>(self.dev_name()); // Tango C++ signature

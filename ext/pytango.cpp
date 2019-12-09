@@ -84,7 +84,6 @@ PYBIND11_MODULE(_tango, m) {
 
     py::print("pytango.cpp: initialise threads");
     PyEval_InitThreads();
-    std::thread::id id1 = std::this_thread::get_id();
 
     export_api_util(m);
     export_archive_event_info(m);

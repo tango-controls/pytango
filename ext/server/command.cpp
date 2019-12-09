@@ -214,7 +214,7 @@ void extract_scalar<Tango::DEV_ENCODED>(const CORBA::Any &any, py::object& obj) 
     any >>= val;
     py::str encoded_format = strdup(val->encoded_format);
     py::list encoded_data;
-    unsigned int len = val->encoded_data.length();
+    int len = val->encoded_data.length();
     for (auto i=0; i<len; i++) {
         encoded_data.append(val->encoded_data[i]);
     }
@@ -263,7 +263,7 @@ void extract_array<Tango::DEVVAR_STRINGARRAY>(const CORBA::Any &any, py::object&
 
     py::list result;
     int len = array->length();
-    for (auto i=0; i<array->length(); i++) {
+    for (auto i=0; i<len; i++) {
         result.append(py::str((*array)[i]));
     }
 
@@ -278,10 +278,12 @@ void extract_array<Tango::DEVVAR_LONGSTRINGARRAY>(const CORBA::Any &any, py::obj
     const Tango::DevVarLongStringArray *array = NULL;
     if ((any >>= array) == false)
         throw_bad_type(Tango::CmdArgTypeName[Tango::DEVVAR_LONGSTRINGARRAY]);
-    for (auto i=0; i<array->lvalue.length(); i++) {
+    int llen = array->lvalue.length();
+    for (auto i=0; i<llen; i++) {
         long_data.append(py::cast((array->lvalue)[i]));
     }
-    for (auto i=0; i<array->svalue.length(); i++) {
+    int slen = array->svalue.length();
+    for (auto i=0; i<slen; i++) {
         string_data.append(py::str((array->svalue)[i]));
     }
     py_result = py::make_tuple(long_data, string_data);
@@ -294,10 +296,12 @@ void extract_array<Tango::DEVVAR_DOUBLESTRINGARRAY>(const CORBA::Any &any, py::o
     py::list string_data;
     const Tango::DevVarDoubleStringArray *array = NULL;
     any >>= array;
-    for (auto i=0; i<array->dvalue.length(); i++) {
+    int dlen = array->dvalue.length();
+    for (auto i=0; i<dlen; i++) {
         double_data.append(py::cast((array->dvalue)[i]));
     }
-    for (auto i=0; i<array->svalue.length(); i++) {
+    int slen = array->svalue.length();
+    for (auto i=0; i<slen; i++) {
         string_data.append(py::str((array->svalue)[i]));
     }
     py_result = py::make_tuple(double_data, string_data);

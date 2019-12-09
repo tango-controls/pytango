@@ -9,11 +9,12 @@
 # See LICENSE.txt for more info.
 # ------------------------------------------------------------------------------
 
+# pylint: disable=deprecated-method
+
 import os
-import imp
 import sys
+import runpy
 import struct
-import platform
 import subprocess
 
 from setuptools import setup, Extension
@@ -24,6 +25,12 @@ from setuptools.command.install import install as dftinstall
 from distutils.command.build import build as dftbuild
 from distutils.unixccompiler import UnixCCompiler
 from distutils.version import LooseVersion as V
+
+# Distro import
+try:
+    from pip._vendor import distro
+except ImportError:
+    import platform as distro
 
 # Sphinx imports
 try:
@@ -44,16 +51,17 @@ except ImportError:
 POSIX = 'posix' in os.name
 WINDOWS = 'nt' in os.name
 IS64 = 8 * struct.calcsize("P") == 64
-PYTHON_VERSION = platform.python_version_tuple()
-PYTHON2 = ('2',) <= PYTHON_VERSION < ('3',)
-PYTHON3 = ('3',) <= PYTHON_VERSION < ('4',)
+PYTHON_VERSION = sys.version_info
+PYTHON2 = (2,) <= PYTHON_VERSION < (3,)
+PYTHON3 = (3,) <= PYTHON_VERSION < (4,)
 
 # Linux distribution
-distribution = platform.linux_distribution()[0].lower() if POSIX else ""
+distribution = distro.linux_distribution()[0].lower() if POSIX else ""
 distribution_match = lambda names: any(x in distribution for x in names)
 DEBIAN = distribution_match(['debian', 'ubuntu', 'mint'])
-REDHAT = distribution_match(['redhat', 'fedora', 'centos'])
+REDHAT = distribution_match(['redhat', 'fedora', 'centos', 'opensuse'])
 GENTOO = distribution_match(['gentoo'])
+CONDA = 'CONDA_PREFIX' in os.environ
 
 # Arguments
 TESTING = any(x in sys.argv for x in ['test', 'pytest'])
@@ -94,11 +102,10 @@ def abspath(*path):
 
 
 def get_release_info():
-    name = "release"
-    release_dir = abspath('tango')
-    data = imp.find_module(name, [release_dir])
-    release = imp.load_module(name, *data)
-    return release.Release
+    namespace = runpy.run_path(
+        abspath('tango/release.py'),
+        run_name='tango.release')
+    return namespace['Release']
 
 
 def uniquify(seq):
@@ -236,33 +243,38 @@ class build(dftbuild):
     sub_commands = dftbuild.sub_commands + [('build_doc', has_doc), ]
 
 
-# class build_ext(dftbuild_ext):
-# 
-#     def build_extensions(self):
-#         self.use_cpp_0x = False
-#         if isinstance(self.compiler, UnixCCompiler):
-#             compiler_pars = self.compiler.compiler_so
-#             while '-Wstrict-prototypes' in compiler_pars:
-#                 del compiler_pars[compiler_pars.index('-Wstrict-prototypes')]
-#             # self.compiler.compiler_so = " ".join(compiler_pars)
-# 
-#             # mimic tango check to activate C++0x extension
-#             compiler = self.compiler.compiler
-#             proc = subprocess.Popen(
-#                 compiler + ["-dumpversion"],
-#                 stdout=subprocess.PIPE)
-#             pipe = proc.stdout
-#             proc.wait()
-#             gcc_ver = pipe.readlines()[0].decode().strip()
-#             if V(gcc_ver) >= V("4.3.3"):
-#                 self.use_cpp_0x = True
-#         dftbuild_ext.build_extensions(self)
-# 
-#     def build_extension(self, ext):
-#         if self.use_cpp_0x:
-#             ext.extra_compile_args += ['-std=c++0x']
-#             ext.define_macros += [('PYTANGO_HAS_UNIQUE_PTR', '1')]
-#         dftbuild_ext.build_extension(self, ext)
+class build_ext(dftbuild_ext):
+
+    def build_extensions(self):
+        self.use_cpp_0x = False
+        if isinstance(self.compiler, UnixCCompiler):
+            compiler_pars = self.compiler.compiler_so
+            while '-Wstrict-prototypes' in compiler_pars:
+                del compiler_pars[compiler_pars.index('-Wstrict-prototypes')]
+            # self.compiler.compiler_so = " ".join(compiler_pars)
+
+            # mimic tango check to activate C++0x extension
+            compiler = self.compiler.compiler
+            proc = subprocess.Popen(
+                compiler + ["-dumpversion"],
+                stdout=subprocess.PIPE)
+            pipe = proc.stdout
+            proc.wait()
+            gcc_ver = pipe.readlines()[0].decode().strip()
+            if V(gcc_ver) >= V("4.8"):
+                self.use_cpp_14 = True
+        dftbuild_ext.build_extensions(self)
+
+    def build_extension(self, ext):
+        if self.use_cpp_14:
+            ext.extra_compile_args += ['-std=c++14']
+        else:
+            ext.extra_compile_args += ['-std=c++11']
+        ext.extra_compile_args += ['-Wno-unused-variable',
+                                   '-fvisibility=hidden',
+                                   '-Wno-deprecated',
+                                   '-Wno-maybe-uninitialized']
+        dftbuild_ext.build_extension(self, ext)
 
 
 if sphinx:
@@ -357,32 +369,7 @@ def setup_args():
     add_lib('zmq', directories, sys_libs, lib_name='libzmq')
     add_lib('tango', directories, sys_libs, inc_suffix='tango')
 
-    # special boost-python configuration
-
-#     BOOST_ROOT = os.environ.get('BOOST_ROOT')
-#     boost_library_name = 'boost_python'
-#     if BOOST_ROOT is None:
-#         if DEBIAN:
-#             suffix = "-py{v[0]}{v[1]}".format(v=PYTHON_VERSION)
-#             boost_library_name += suffix
-#         elif REDHAT:
-#             if PYTHON3:
-#                 boost_library_name += '3'
-#         elif GENTOO:
-#             suffix = "-{v[0]}.{v[1]}".format(v=PYTHON_VERSION)
-#             boost_library_name += suffix
-#     else:
-#         inc_dir = os.path.join(BOOST_ROOT, 'include')
-#         lib_dirs = [os.path.join(BOOST_ROOT, 'lib')]
-#         if IS64:
-#             lib64_dir = os.path.join(BOOST_ROOT, 'lib64')
-#             if os.path.isdir(lib64_dir):
-#                 lib_dirs.insert(0, lib64_dir)
-# 
-#         directories['include_dirs'].append(inc_dir)
-#         directories['library_dirs'].extend(lib_dirs)
-# 
-#     directories['libraries'].append(boost_library_name)
+    # special pybind11 configuration
 
     # special numpy configuration
 
@@ -421,14 +408,16 @@ def setup_args():
     ]
 
     requires = [
-#        'boost_python (>=1.33)',
+        'pybind11 (>=2.43)',
         'numpy (>=1.1)',
-        'six',
+        'six (>=1.12)',
     ]
 
     install_requires = [
-        'six',
+        'six (>=1.12)',
     ]
+    if PYTHON_VERSION < (3, 4):
+        install_requires.append('enum34')
 
     setup_requires = []
 
@@ -437,15 +426,17 @@ def setup_args():
 
     tests_require = [
         'pytest-xdist',
-        'gevent',
+        'gevent != 1.5a1',
         'psutil',
     ]
 
     if PYTHON2:
-        tests_require += ['trollius']
+        tests_require += ['trollius', 'futures', 'pytest < 5']
+    else:
+        tests_require += ['pytest']
 
     package_data = {
-        'PyTango': [],
+        'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
     }
 
     data_files = []
@@ -464,8 +455,9 @@ def setup_args():
         'Programming Language :: C',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Scientific/Engineering',
         'Topic :: Software Development :: Libraries',
     ]
@@ -507,21 +499,21 @@ def setup_args():
     library_dirs = uniquify(directories['library_dirs'])
     libraries = uniquify(directories['libraries'])
 
-#     pytango_ext = Extension(
-#         name='_tango',
-#         sources=cppfiles,
-#         include_dirs=include_dirs,
-#         library_dirs=library_dirs,
-#         libraries=libraries,
-#         define_macros=macros,
-#         extra_compile_args=extra_compile_args,
-#         extra_link_args=extra_link_args,
-#         language='c++',
-#         depends=[])
+    pytango_ext = Extension(
+        name='_tango',
+        sources=cppfiles,
+        include_dirs=include_dirs,
+        library_dirs=library_dirs,
+        libraries=libraries,
+        define_macros=macros,
+        extra_compile_args=extra_compile_args,
+        extra_link_args=extra_link_args,
+        language='c++',
+        depends=[])
 
     cmdclass = {
-#        'build': build,
-#        'build_ext': build_ext,
+        'build': build,
+        'build_ext': build_ext,
         'install_html': install_html,
         'install': install}
 
@@ -553,7 +545,7 @@ def setup_args():
         setup_requires=setup_requires,
         tests_require=tests_require,
         ext_package='tango',
-#        ext_modules=[pytango_ext],
+        ext_modules=[pytango_ext],
         cmdclass=cmdclass)
 
     return opts

@@ -232,7 +232,7 @@ void DeviceClassWrap::device_factory(const Tango::DevVarStringArray *dev_list)
     AutoPythonGIL python_guard;
     try {
         py::list py_dev_list;
-        for(auto i = 0; i < dev_list->length(); ++i) {
+        for(auto i=0u; i<dev_list->length(); ++i) {
             py_dev_list.append((*dev_list)[i].in());
         }
         m_self.attr("device_factory")(py_dev_list);

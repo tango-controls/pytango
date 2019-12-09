@@ -166,7 +166,7 @@ namespace DevicePipe
         obj >> val;
         py::str encoded_format = strdup(val.encoded_format);
         py::list encoded_data;
-        unsigned int len = val.encoded_data.length();
+        int len = val.encoded_data.length();
         for (auto i=0; i<len; i++) {
             encoded_data.append(val.encoded_data[i]);
         }
@@ -203,7 +203,7 @@ namespace DevicePipe
         obj >> val;
         py::str encoded_format = strdup(val.encoded_format);
         py::list encoded_data;
-        unsigned int len = val.encoded_data.length();
+        int len = val.encoded_data.length();
         for (auto i=0; i<len; i++) {
             encoded_data.append(val.encoded_data[i]);
         }
@@ -233,12 +233,12 @@ namespace DevicePipe
     template <typename T, long tangoArrayTypeConst>
     py::object __extract_array(T& obj, size_t elt_idx)
     {
-        typedef typename TANGO_const2scalartype(tangoArrayTypeConst) TangoScalarType;
         typedef typename TANGO_const2type(tangoArrayTypeConst) TangoArrayType;
         py::list data;
         TangoArrayType tmp_arr;
         obj >> (&tmp_arr);
-        for (auto i=0; i<tmp_arr.length(); i++) {
+        int len = tmp_arr.length();
+        for (auto i=0; i<len; i++) {
             data.append(py::cast(tmp_arr[i]));
         }
         return data;

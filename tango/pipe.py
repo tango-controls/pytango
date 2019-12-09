@@ -11,7 +11,7 @@
 
 __all__ = ('PipeConfig', 'sanitize_pipe_blob','sanitize_pipe_element')
 
-from ._tango import Pipe, PipeWriteType, UserDefaultPipeProp, \
+from ._tango import PipeWriteType, UserDefaultPipeProp, \
     CmdArgType, DevState, DispLevel, constants
 
 from .utils import scalar_to_array_type, TO_TANGO_TYPE, \

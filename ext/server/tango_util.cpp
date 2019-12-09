@@ -29,7 +29,7 @@ namespace PyUtil
         py::list cpp_class_list = tango.attr("get_cpp_classes")();
         // First, create CPP class if any, their names are defined in a Python list
         auto cl_len =len(cpp_class_list);
-        for (auto i = 0; i < cl_len; ++i)
+        for (auto i=0u; i<cl_len; ++i)
         {
             std::cerr << "tango_util:_class_factory code needs checking here" << std::endl;
 //            std::tuple<std::string> class_info = cpp_class_list[i].cast<std::tuple<std::string>>();
