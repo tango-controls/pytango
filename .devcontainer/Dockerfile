@@ -4,7 +4,7 @@ FROM continuumio/miniconda3
 
 ARG PYTHON_VERSION=3.7
 ARG TANGO_VERSION=9.3.2alpha.1
-ADD environment-py${PYTHON_VERSION}-tango${TANGO_VERSION}.yml /tmp/environment.yml
+COPY environment-py${PYTHON_VERSION}-tango${TANGO_VERSION}.yml /tmp/environment.yml
 
 RUN conda update -n base -c defaults conda
 RUN conda env create -f /tmp/environment.yml
@@ -22,4 +22,4 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # copy the Python runner utility script
-ADD run-conda-python.sh /usr/local/bin/run-conda-python.sh
+COPY run-conda-python.sh /usr/local/bin/run-conda-python.sh
