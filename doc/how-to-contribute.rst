@@ -57,6 +57,17 @@ favourite tool easily.
 .. _PyLint: https://www.pylint.org
 .. _Codacy: https://www.codacy.com/app/tango-controls/pytango/dashboard
 
+
+Using Docker for development
+----------------------------
+
+Docker containers are useful for developing, testing and debugging PyTango.  See the
+folder ``.devcontainer`` in the root of the source repo.  It includes instructions for
+building the Docker images and using them for development.
+
+For direct usage, rather than PyTango developement, a Docker image with PyTango already
+installed is available:  https://hub.docker.com/r/tangocs/tango-pytango.
+
 Releasing a new version
 -----------------------
 
