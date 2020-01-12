@@ -111,16 +111,14 @@ class MultiDeviceTestContext(object):
 
         class Device1(Device):
 
-            attr1 = attribute()
-
-            def read_attr1(self):
+            @attribute
+            def attr1(self):
                 return 1.0
 
 
         class Device2(Device):
 
-            attr2 = attribute()
-
+            @attribute
             def read_attr2(self):
                 return 2.0
 
@@ -128,28 +126,28 @@ class MultiDeviceTestContext(object):
         devices_info = (
             {
                 "class": Device1,
-                "devices": (
+                "devices": [
                     {
                         "name": "test/device1/1"
                     },
-                )
+                ]
             },
             {
                 "class": Device2,
-                "devices": (
+                "devices": [
                     {
                         "name": "test/device2/1",
-                    }
-                )
+                    },
+                ]
             }
         )
 
         def test_devices():
             with MultiDeviceTestContext(devices_info, process=True) as context:
-                device1 = context.get_device("test/device1/1")
-                device2 = context.get_device("test/device2/1")
-                assert device1.read_attribute("attr1").value == 1.0
-                assert device2.read_attribute("attr1").value == 2.0
+                proxy1 = context.get_device("test/device1/1")
+                proxy2 = context.get_device("test/device2/1")
+                assert proxy1.attr1 == 1.0
+                assert proxy2.attr2 == 2.0
 
     :param devices_info:
       a sequence of dicts with information about
@@ -435,8 +433,8 @@ class MultiDeviceTestContext(object):
         """Exit method for context support."""
         self.stop()
 
-# Single device test context
 
+# Single device test context
 class DeviceTestContext(MultiDeviceTestContext):
     """Context to run a single device without a database.
 
