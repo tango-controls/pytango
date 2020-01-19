@@ -59,6 +59,7 @@ void export_device_impl();
 void export_group();
 void export_log4tango();
 void export_auto_tango_monitor();
+void export_ensure_omni_thread();
 
 #ifdef DISABLE_PYTANGO_NUMPY
 void init_numpy(void) {}
@@ -121,4 +122,5 @@ BOOST_PYTHON_MODULE(_tango)
     export_group();
     export_log4tango();
     export_auto_tango_monitor();
-}
+    export_ensure_omni_thread();
+ }

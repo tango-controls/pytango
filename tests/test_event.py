@@ -4,11 +4,14 @@
 import time
 import socket
 from functools import partial
+from threading import Thread
 
 import pytest
 from six import StringIO
 
-from tango import EventType, GreenMode, DeviceProxy, AttrQuality
+from tango import (
+    EventType, GreenMode, DeviceProxy, AttrQuality, EnsureOmniThread, is_omni_thread,
+)
 from tango.server import Device
 from tango.server import command, attribute
 from tango.test_utils import DeviceTestContext
@@ -194,3 +197,76 @@ def test_push_event_with_timestamp(event_device):
     assert line2 in string.getvalue()
     # Unsubscribe
     event_device.unsubscribe_event(eid)
+
+
+def test_main_thread_is_omni_thread():
+    assert is_omni_thread()
+
+
+def test_ensure_omni_thread_main_thread_is_omni_thread():
+    with EnsureOmniThread():
+        assert is_omni_thread()
+
+
+def test_user_thread_is_not_omni_thread():
+    thread_is_omni = dict(result=None)  # use a dict so thread can modify it
+
+    def thread_func():
+        thread_is_omni['result'] = is_omni_thread()
+
+    thread = Thread(target=thread_func)
+    thread.start()
+    thread.join()
+    assert thread_is_omni['result'] == False
+
+
+def test_ensure_omni_thread_user_thread_is_omni_thread():
+    thread_is_omni = dict(result=None)  # use a dict so thread can modify it
+
+    def thread_func():
+        with EnsureOmniThread():
+            thread_is_omni['result'] = is_omni_thread()
+
+    thread = Thread(target=thread_func)
+    thread.start()
+    thread.join()
+    assert thread_is_omni['result'] == True
+
+
+def test_subscribe_change_event_from_user_thread(event_device):
+    results = []
+
+    def callback(evt):
+        results.append(evt.attr_value.value)
+
+    def thread_func():
+        with EnsureOmniThread():
+            eid = event_device.subscribe_event(
+                "attr", EventType.CHANGE_EVENT, callback, wait=True)
+            assert eid == 1
+            while running:
+                time.sleep(0.05)
+            event_device.unsubscribe_event(eid)
+
+    # Start the thread
+    thread = Thread(target=thread_func)
+    running = True
+    thread.start()
+    # Wait for tango events
+    retries = 20
+    for _ in range(retries):
+        event_device.read_attribute("state", wait=True)
+        if len(results) == 1:
+            # Trigger an event (1 result means thread has completed subscription,
+            # as that results in an initial callback)
+            event_device.command_inout("send_event", wait=True)
+        elif len(results) > 1:
+            # At least 2 events means an event was received after subscription
+            break
+        time.sleep(0.05)
+    # Stop the thread
+    running = False
+    thread.join()
+    # Test the event values
+    assert results == [0., 1.]
+

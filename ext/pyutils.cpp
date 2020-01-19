@@ -224,3 +224,13 @@ bool hasattr(boost::python::object& obj, const std::string& name)
 {
     return PyObject_HasAttrString(obj.ptr(), name.c_str());
 }
+
+void export_ensure_omni_thread()
+{
+  bopy::class_<EnsureOmniThread, boost::noncopyable>(
+    "EnsureOmniThread", bopy::init<>())
+    .def("_acquire", &EnsureOmniThread::acquire)
+    .def("_release", &EnsureOmniThread::release)
+  ;
+  bopy::def("is_omni_thread", is_omni_thread);
+}
