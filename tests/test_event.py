@@ -217,7 +217,7 @@ def test_user_thread_is_not_omni_thread():
     thread = Thread(target=thread_func)
     thread.start()
     thread.join()
-    assert thread_is_omni['result'] == False
+    assert thread_is_omni['result'] is False
 
 
 def test_ensure_omni_thread_user_thread_is_omni_thread():
@@ -230,7 +230,7 @@ def test_ensure_omni_thread_user_thread_is_omni_thread():
     thread = Thread(target=thread_func)
     thread.start()
     thread.join()
-    assert thread_is_omni['result'] == True
+    assert thread_is_omni['result'] is True
 
 
 def test_subscribe_change_event_from_user_thread(event_device):
@@ -243,7 +243,6 @@ def test_subscribe_change_event_from_user_thread(event_device):
         with EnsureOmniThread():
             eid = event_device.subscribe_event(
                 "attr", EventType.CHANGE_EVENT, callback, wait=True)
-            assert eid == 1
             while running:
                 time.sleep(0.05)
             event_device.unsubscribe_event(eid)
