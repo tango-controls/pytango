@@ -75,7 +75,6 @@ def init_constants():
     class Runtime(object):
         PY_VERSION = ".".join(map(str, sys.version_info[:3]))
         TANGO_VERSION = tg_rt_ver
-        BOOST_VERSION = '0.0.0'
         if constants.NUMPY_SUPPORT:
             import numpy
             NUMPY_VERSION = numpy.__version__

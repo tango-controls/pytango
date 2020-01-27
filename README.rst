@@ -88,7 +88,6 @@ To test the installation, import ``tango`` and check ``tango.utils.info()``::
         Python : 2.7.15
         Numpy  : 1.16.2
         Tango  : 9.3.3
-        Boost  : 0.0.0
 
     PyTango running on:
     ('Linux', 'hostname', '4.4.0-131-generic', '#157-Ubuntu SMP Sat Jul 27 06:00:36 UTC 2019', 'x86_64', 'x86_64')

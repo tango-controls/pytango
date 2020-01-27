@@ -1693,7 +1693,6 @@ PyTango runtime is:
     Python : {2.PY_VERSION}
     Numpy  : {2.NUMPY_VERSION}
     Tango  : {2.TANGO_VERSION}
-    Boost  : {2.BOOST_VERSION}
 
 PyTango running on:
 {2.UNAME}
