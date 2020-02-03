@@ -322,6 +322,24 @@ def test_device_property_with_default_value(typed_values, server_green_mode):
         assert_close(proxy.get_prop(), expected(value))
 
 
+def test_device_get_device_properties_when_init_device(server_green_mode):
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+        _got_properties = False
+
+        def get_device_properties(self, *args, **kwargs):
+            super(TestDevice, self).get_device_properties(*args, **kwargs)
+            self._got_properties = True
+
+        @attribute(dtype=bool)
+        def got_properties(self):
+            return self._got_properties
+
+    with DeviceTestContext(TestDevice, process=True) as proxy:
+        assert proxy.got_properties
+
+
 # Test inheritance
 
 def test_inheritance(server_green_mode):
