@@ -11,7 +11,7 @@ dependencies:
   - blas=1.0=mkl
   - boost=1.67.0=py37_4
   - bzip2=1.0.8=h7b6447c_0
-  - ca-certificates=2019.11.27=0
+  - ca-certificates
   - certifi=2019.11.28=py37_0
   - cffi=1.13.2=py37h2e261b9_0
   - execnet=1.7.1=py_0

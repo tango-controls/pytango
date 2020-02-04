@@ -13,11 +13,12 @@ dependencies:
   - blas=1.0=mkl
   - boost=1.67.0=py27_4
   - bzip2=1.0.8=h7b6447c_0
-  - ca-certificates=2019.11.27=0
+  - ca-certificates
   - certifi=2019.11.28=py27_0
   - cffi=1.13.2=py27h2e261b9_0
   - configparser=4.0.2=py27_0
   - contextlib2=0.6.0.post1=py_0
+  - enum34=1.1.6=py27_1
   - execnet=1.7.1=py_0
   - funcsigs=1.0.2=py27_0
   - futures=3.3.0=py27_0
