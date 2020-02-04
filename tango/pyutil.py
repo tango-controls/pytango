@@ -760,7 +760,7 @@ def __doc_EnsureOmniThread():
 
     Tango servers and clients that start their own additional threads
     that will interact with Tango must guard these threads within this
-    python context.  This is especially important when working with
+    Python context.  This is especially important when working with
     event subscriptions.
     
     This context handler class ensures a non-omniORB thread will still
@@ -785,6 +785,7 @@ def __doc_EnsureOmniThread():
                     sleep(1)
                 dp.unsubscribe_event(eid)
         
+    
         cb = tango.utils.EventCallback()  # print events to stdout
         dp = tango.DeviceProxy("sys/tg_test/1")
         dp.poll_attribute("double_scalar", 1000)
