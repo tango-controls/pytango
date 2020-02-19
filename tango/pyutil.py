@@ -13,14 +13,14 @@
 This is an internal PyTango module.
 """
 
-__all__ = ("Util", "pyutil_init")
+__all__ = ("Util", "pyutil_init", "EnsureOmniThread", "is_omni_thread")
 
 __docformat__ = "restructuredtext"
 
 import os
 import copy
 
-from ._tango import Util, Except, DevFailed, DbDevInfo
+from ._tango import Util, Except, DevFailed, DbDevInfo, EnsureOmniThread, is_omni_thread
 from .utils import document_method as __document_method
 # from utils import document_static_method as __document_static_method
 from .globals import class_list, cpp_class_list, get_constructed_classes
@@ -736,17 +736,89 @@ def __doc_Util():
     """)
 
 
-#    document_static_method("init_python", """
-#    init_python() -> None
+
 #
-#            Static method
-#            For internal usage.
+# EnsureOmniThread context handler
 #
-#        Parameters : None
-#        Return     : None
-#    """ )
+
+def __EnsureOmniThread__enter__(self):
+    self._acquire()
+    return self
+
+
+def __EnsureOmniThread__exit__(self, *args, **kwargs):
+    self._release()
+
+
+def __init_EnsureOmniThread():
+    EnsureOmniThread.__enter__ = __EnsureOmniThread__enter__
+    EnsureOmniThread.__exit__ = __EnsureOmniThread__exit__
+
+
+def __doc_EnsureOmniThread():
+    EnsureOmniThread.__doc__ = """\
+
+    Tango servers and clients that start their own additional threads
+    that will interact with Tango must guard these threads within this
+    Python context.  This is especially important when working with
+    event subscriptions.
+    
+    This context handler class ensures a non-omniORB thread will still
+    get a dummy omniORB thread ID - cppTango requires threads to
+    be identifiable in this way.  It should only be acquired once for
+    the lifetime of the thread, and must be released before the thread
+    is cleaned up.
+        
+    Here is an example::
+
+        import tango
+        from threading import Thread
+        from time import sleep
+        
+        
+        def my_thread_run():
+            with tango.EnsureOmniThread():
+                eid = dp.subscribe_event(
+                    "double_scalar", tango.EventType.PERIODIC_EVENT, cb)
+                while running:
+                    print("num events stored {}".format(len(cb.get_events())))
+                    sleep(1)
+                dp.unsubscribe_event(eid)
+        
+    
+        cb = tango.utils.EventCallback()  # print events to stdout
+        dp = tango.DeviceProxy("sys/tg_test/1")
+        dp.poll_attribute("double_scalar", 1000)
+        thread = Thread(target=my_thread_run)
+        running = True
+        thread.start()
+        sleep(5)
+        running = False
+        thread.join()
+        
+    New in PyTango 9.3.2
+    """
+
+
+def __doc_is_omni_thread():
+    is_omni_thread.__doc__ = """\
+
+    Determines if the calling thread is (or looks like) an omniORB thread.
+    This includes user threads that have a dummy omniORB thread ID, such
+    as that provided by EnsureOmniThread.
+
+        Parameters : None
+
+        Return     : (bool) True if the calling thread is an omnithread.
+
+    New in PyTango 9.3.2
+    """
+
 
 def pyutil_init(doc=True):
     __init_Util()
+    __init_EnsureOmniThread()
     if doc:
         __doc_Util()
+        __doc_EnsureOmniThread()
+        __doc_is_omni_thread()

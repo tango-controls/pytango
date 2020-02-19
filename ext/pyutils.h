@@ -12,6 +12,7 @@
 #pragma once
 
 #include <boost/python.hpp>
+#include <omnithread.h>
 
 namespace bopy = boost::python;
 
@@ -208,6 +209,57 @@ public:
     {
         giveup();
     }
+};
+
+/// The following class ensures usage in a non-omniORB thread will
+/// still get a dummy omniORB thread ID - cppTango requires threads to
+/// be identifiable in this way.  It should only be acquired once for the
+/// lifetime of the thread, and must be released before the thread is
+/// cleaned up.
+/// See https://github.com/tango-controls/pytango/issues/307
+class EnsureOmniThread
+{
+    omni_thread::ensure_self *ensure_self;
+
+public:
+    inline EnsureOmniThread()
+    {
+        ensure_self = NULL;
+    }
+
+    inline void acquire()
+    {
+        if (ensure_self == NULL)
+        {
+          ensure_self = new omni_thread::ensure_self;
+        }
+    }
+
+    inline void release()
+    {
+        if (ensure_self != NULL)
+        {
+          delete ensure_self;
+          ensure_self = NULL;
+        }
+    }
+
+    inline ~EnsureOmniThread()
+    {
+      release();
+    }
+
+};
+
+/**
+ * Determines if the calling thread is (or looks like) an omniORB thread.
+ *
+ * @return returns true if the calling thread has an omniORB thread ID or false otherwise
+ */
+inline bool is_omni_thread()
+{
+    omni_thread *thread_id = omni_thread::self();
+    return (thread_id != NULL);
 };
 
 /**

@@ -47,7 +47,7 @@ __all__ = (
     'DeviceDataHistory', 'DeviceDataHistoryList',
     'DeviceImpl', 'DeviceInfo', 'DeviceProxy',
     'DeviceUnlocked', 'Device_2Impl', 'Device_3Impl', 'Device_4Impl', 'Device_5Impl',
-    'DispLevel', 'EncodedAttribute', 'ErrSeverity', 'ErrorIt',
+    'DispLevel', 'EncodedAttribute', 'EnsureOmniThread', 'ErrSeverity', 'ErrorIt',
     'EventData', 'EventProperties', 'EventSystemFailed', 'EventType',
     'Except', 'ExtractAs', 'FMT_UNKNOWN', 'FatalIt', 'GreenMode', 'Group',
     'GroupAttrReply',
@@ -74,7 +74,7 @@ __all__ = (
     'AutoTangoAllowThreads', 'LatestDeviceImpl', 'Interceptors',
     'get_attribute_proxy', 'requires_tango', 'requires_pytango',
     'set_green_mode', 'get_green_mode', 'get_device_proxy',
-    'is_scalar_type', 'is_array_type', 'is_numerical_type',
+    'is_scalar_type', 'is_array_type', 'is_omni_thread', 'is_numerical_type',
     'is_int_type', 'is_float_type', 'is_bool_type', 'is_str_type',
     'obj_2_str', 'str_2_obj', 'seqStr_2_obj')
 
@@ -102,8 +102,8 @@ from ._tango import (
     DeviceAttribute, DeviceAttributeConfig, DeviceAttributeHistory,
     DeviceData, DeviceDataList, DeviceDataHistory, DeviceDataHistoryList,
     DeviceImpl, DeviceInfo, DeviceProxy, DeviceUnlocked, Device_2Impl,
-    Device_3Impl, Device_4Impl, Device_5Impl, DispLevel, EncodedAttribute, ErrSeverity,
-    EventData, EventSystemFailed, EventType, PipeEventData,
+    Device_3Impl, Device_4Impl, Device_5Impl, DispLevel, EncodedAttribute,
+    EnsureOmniThread, ErrSeverity, EventData, EventSystemFailed, EventType, PipeEventData,
     Except, ExtractAs, GreenMode, FMT_UNKNOWN, GroupAttrReply, GroupAttrReplyList,
     GroupCmdReply, GroupCmdReplyList, GroupReply, GroupReplyList,
     IMAGE, ImageAttr, KeepAliveCmdCode, Level, LockCmdCode, LockerInfo,
@@ -118,7 +118,7 @@ from ._tango import (
     UserDefaultAttrProp, UserDefaultPipeProp, WAttribute, WRITE, WrongData,
     WrongNameSyntax, alarm_flags, asyn_req_type, cb_sub_model, constants,
     raise_asynch_exception, Interceptors,
-    AutoTangoMonitor, AutoTangoAllowThreads)
+    AutoTangoMonitor, AutoTangoAllowThreads, is_omni_thread)
 
 
 # Aliases
