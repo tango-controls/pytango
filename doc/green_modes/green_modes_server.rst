@@ -1,10 +1,6 @@
 Server green modes
 ------------------
 
-.. warning::
-   Green modes for the server side are still very much experimental.
-   If you encounter any issues, please report them on the GitHub issues_ page.
-
 PyTango server API from version 9.2.0 supports two green modes:
 :obj:`~tango.GreenMode.Gevent` and :obj:`~tango.GreenMode.Asyncio`.
 Both can be used in writing new device servers in an asynchronous way.
@@ -26,11 +22,10 @@ as it is a lot harder to debug. You should use this green mode with care.
 change too much in your existing code (or you don't feel comfortable with
 writing syntax of asynchronous calls).
 
-Another thing to have in mind is that the Tango monitor lock is present - you
-can't have two read operations happening concurrently. Any subsequent ones
-will always have to wait for the first one to finish.
+Another thing to keep in mind is that when using :obj:`~tango.GreenMode.Gevent`
+green mode there is no Tango monitor lock!
 
-Greenlets (a task in a background, but handled within the event loop) can be
+Greenlets (a task in the background, but handled within the event loop) can be
 used.
 
 
