@@ -23,10 +23,10 @@ change too much in your existing code (or you don't feel comfortable with
 writing syntax of asynchronous calls).
 
 Another thing to keep in mind is that when using :obj:`~tango.GreenMode.Gevent`
-green mode there is no Tango monitor lock!
+green mode is that the Tango monitor lock is disabled, so the client requests can
+be processed concurrently.
 
-Greenlets (a task in the background, but handled within the event loop) can be
-used.
+Greenlets can also be used to spawn tasks in the background.
 
 
 asyncio mode
