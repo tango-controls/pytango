@@ -28,7 +28,7 @@ DeviceClassWrap::DeviceClassWrap(std::string& name, py::object py_self)
     :Tango::DeviceClass(name)
 {
     m_self = py_self;
-    AutoPythonGIL python_guard;
+    AutoPythonGILEnsure python_guard;
     signal_handler_defined = is_method_defined(m_self, "signal_handler");
 }
 
@@ -175,7 +175,7 @@ void DeviceClassWrap::create_pipe(const std::string& name,
 
 void DeviceClassWrap::attribute_factory(std::vector<Tango::Attr *>& attr_list)
 {
-    AutoPythonGIL python_guard;
+    AutoPythonGILEnsure python_guard;
     try
     {
         this->local_attr_list = &attr_list;
@@ -189,7 +189,7 @@ void DeviceClassWrap::attribute_factory(std::vector<Tango::Attr *>& attr_list)
 
 void DeviceClassWrap::pipe_factory()
 {
-    AutoPythonGIL python_guard;
+    AutoPythonGILEnsure python_guard;
     try
     {
         this->local_pipe_list = &pipe_list;
@@ -204,7 +204,7 @@ void DeviceClassWrap::pipe_factory()
 
 void DeviceClassWrap::command_factory()
 {
-    AutoPythonGIL python_guard;
+    AutoPythonGILEnsure python_guard;
     try {
         m_self.attr("_command_factory")();
     }
@@ -216,7 +216,7 @@ void DeviceClassWrap::command_factory()
 
 void DeviceClassWrap::device_name_factory(std::vector<std::string> &dev_list)
 {
-    AutoPythonGIL python_guard;
+    AutoPythonGILEnsure python_guard;
     try
     {
         m_self.attr("device_name_factory")(dev_list);
@@ -229,7 +229,7 @@ void DeviceClassWrap::device_name_factory(std::vector<std::string> &dev_list)
 
 void DeviceClassWrap::device_factory(const Tango::DevVarStringArray *dev_list)
 {
-    AutoPythonGIL python_guard;
+    AutoPythonGILEnsure python_guard;
     try {
         py::list py_dev_list;
         for(auto i=0u; i<dev_list->length(); ++i) {
@@ -247,7 +247,7 @@ void DeviceClassWrap::signal_handler(long signo)
 {
     if (signal_handler_defined == true)
     {
-        AutoPythonGIL python_guard;
+        AutoPythonGILEnsure python_guard;
         try {
             m_self.attr("signal_handler")(signo);
         }
@@ -269,7 +269,7 @@ void DeviceClassWrap::signal_handler(long signo)
 
 void DeviceClassWrap::delete_class()
 {
-    AutoPythonGIL python_guard;
+    AutoPythonGILEnsure python_guard;
     try
     {
         //

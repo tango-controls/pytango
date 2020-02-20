@@ -759,7 +759,7 @@ def __UserDefaultAttrProp_set_enum_labels(self, enum_labels):
 
         New in PyTango 9.2.0
     """
-    elbls = StdStringVector()
+    elbls = list()
     for enu in enum_labels:
         elbls.append(enu)
     return self._set_enum_labels(elbls)

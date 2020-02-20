@@ -58,7 +58,7 @@ void throw_python_generic_exception(PyObject *type=NULL, PyObject *value=NULL,
  * @param[in] eas the boost python exception description (currently not used)
  */
 void handle_python_exception(py::error_already_set &eas);
-
+/*
 #define SAFE_CATCH_REPORT(meth_name) \
     catch(py::error_already_set &) \
     { \
@@ -98,4 +98,4 @@ void handle_python_exception(py::error_already_set &eas);
     { \
         std::cerr << meth_name << " generated an unknown exception." << std::endl; \
     }
-
+*/

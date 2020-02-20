@@ -21,7 +21,9 @@
 
 namespace py = pybind11;
 
-struct __attribute__ ((visibility("hidden"))) PyCmdDoneEvent {
+//struct __attribute__ ((visibility("hidden"))) PyCmdDoneEvent {
+class PyCmdDoneEvent {
+public:
     py::object device;
     py::object cmd_name;
     py::object argout;
@@ -31,7 +33,9 @@ struct __attribute__ ((visibility("hidden"))) PyCmdDoneEvent {
     py::object ext;
 };
 
-struct __attribute__ ((visibility("hidden"))) PyAttrReadEvent {
+//struct __attribute__ ((visibility("hidden"))) PyAttrReadEvent {
+class PyAttrReadEvent {
+public:
     py::object device;
     py::object attr_names;
     py::object argout;
@@ -40,7 +44,9 @@ struct __attribute__ ((visibility("hidden"))) PyAttrReadEvent {
     py::object ext;
 };
 
-struct __attribute__ ((visibility("hidden"))) PyAttrWrittenEvent {
+//struct __attribute__ ((visibility("hidden"))) PyAttrWrittenEvent {
+class PyAttrWrittenEvent {
+public:
     py::object device;
     py::object attr_names;
     py::object err;
@@ -48,126 +54,95 @@ struct __attribute__ ((visibility("hidden"))) PyAttrWrittenEvent {
     py::object ext;
 };
 
-static void copy_most_fields(CallBackAutoDie* self, Tango::CmdDoneEvent* ev, PyCmdDoneEvent* py_ev)
+static void copy_most_fields(PyCallBackAutoDie& self, Tango::CmdDoneEvent* ev, PyCmdDoneEvent* py_ev)
 {
-//    // py_ev->device
-//    py_ev->cmd_name =py::object(ev->cmd_name);
-//    py_ev->argout_raw =py::object(ev->argout);
-//    py_ev->err =py::object(ev->err);
-//    py_ev->errors =py::object(ev->errors);
-//    // py_ev->ext =py::object(ev->ext);
+    // py_ev->device
+    py_ev->cmd_name = py::cast(ev->cmd_name);
+    py_ev->argout_raw = py::cast(ev->argout);
+    py_ev->err = py::cast(ev->err);
+    py_ev->errors = py::cast(ev->errors);
+    // py_ev->ext = py::object(ev->ext);
 }
 
-static void copy_most_fields(CallBackAutoDie* self, Tango::AttrReadEvent* ev, PyAttrReadEvent* py_ev)
+static void copy_most_fields(PyCallBackAutoDie& self, Tango::AttrReadEvent* ev, PyAttrReadEvent* py_ev)
 {
-//    // py_ev->device
-//    py_ev->attr_names =py::object(ev->attr_names);
-//
+    // py_ev->device
+    py_ev->attr_names = py::cast(ev->attr_names);
+
 //    PyDeviceAttribute::AutoDevAttrVector dev_attr_vec(ev->argout);
 //    py_ev->argout = PyDeviceAttribute::convert_to_python(dev_attr_vec, *ev->device);
-//
-//    py_ev->err =py::object(ev->err);
-//    py_ev->errors =py::object(ev->errors);
-//    // py_ev->ext =py::object(ev->ext);
+
+    py_ev->err = py::cast(ev->err);
+    py_ev->errors = py::cast(ev->errors);
+    // py_ev->ext = py::object(ev->ext);
 }
 
-static void copy_most_fields(CallBackAutoDie* self, const Tango::AttrWrittenEvent* ev, PyAttrWrittenEvent* py_ev)
+static void copy_most_fields(PyCallBackAutoDie& self, const Tango::AttrWrittenEvent* ev, PyAttrWrittenEvent* py_ev)
 {
-//    // py_ev->device
-//    py_ev->attr_names =py::object(ev->attr_names);
-//    py_ev->err =py::object(ev->err);
-//    py_ev->errors =py::object(ev->errors);
-//    // py_ev->ext =py::object(ev->ext);
+    // py_ev->device
+    py_ev->attr_names = py::cast(ev->attr_names);
+    py_ev->err = py::cast(ev->err);
+    py_ev->errors = py::cast(ev->errors);
+    // py_ev->ext = py::object(ev->ext);
 }
 
-//CallBackAutoDie::CallBackAutoDie(): m_self(0), m_weak_parent(0)) {}
-CallBackAutoDie::CallBackAutoDie() {
-    cerr << "CallBackAutoDie constructor" << endl;
-}
+/*static*/ py::object PyCallBackAutoDie::py_on_callback_parent_fades;
+/*static*/ std::map<py::object, py::object> PyCallBackAutoDie::s_weak2ob;
 
-CallBackAutoDie::~CallBackAutoDie() {
-    cerr << "CallBackAutoDie destructor" << endl;
-//    if (this->m_weak_parent) {
-//        CallBackAutoDie::s_weak2ob.erase(this->m_weak_parent);
+PyCallBackAutoDie::~PyCallBackAutoDie() {
+    cerr << "PyCallBackAutoDie destructor" << endl;
+    if (this->m_weak_parent) {
+        PyCallBackAutoDie::s_weak2ob.erase(this->m_weak_parent);
 //        boost::python::xdecref(this->m_weak_parent);
-//    }
+    }
 }
 
-void CallBackAutoDie::set_callback(py::object callback)
+/*static*/ void PyCallBackAutoDie::init()
 {
-    cout << "setting callback in func" << endl;
-    m_callback = callback;
-//    std::unique_ptr<PyObject> cbk(callback.ptr());
-//    m_cbk = std::move(cbk);
-}
+//    py::object py_scope = py::scope();
 
-void CallBackAutoDie::set_weak_parent(py::object parent)
-{
-    cout << "setting weak parent" << endl;
-    m_weak_parent = parent.ptr();
-    cerr << "ref count" << static_cast<int>(Py_REFCNT(m_weak_parent)) << endl;
-    Py_INCREF(m_weak_parent);
-    cerr << "ref count" << static_cast<int>(Py_REFCNT(m_weak_parent)) << endl;
-}
-
-/*static*/
-//py::object CallBackAutoDie::py_on_callback_parent_fades;
-/*static*/
-//std::map<PyObject*, PyObject*> CallBackAutoDie::s_weak2ob;
-
-
-
-/*static*/ void CallBackAutoDie::init()
-{
-//   py::object py_scope = py::scope();
 //    def ("__on_callback_parent_fades", on_callback_parent_fades);
-//    CallBackAutoDie::py_on_callback_parent_fades = py_scope.attr("__on_callback_parent_fades");
+//    PyCallBackAutoDie::py_on_callback_parent_fades = py_scope.attr("__on_callback_parent_fades");
 }
 
-void CallBackAutoDie::on_callback_parent_fades(PyObject* weakobj)
+void PyCallBackAutoDie::on_callback_parent_fades(py::object& weakobj)
 {
-    cerr << "on_callback_parent_fades" << endl;
-//    PyObject* ob = CallBackAutoDie::s_weak2ob[weakobj];
-//
-//    if (!ob)
-//        return;
-//
-////     while (ob->ob_refcnt)
+    py::object ob = PyCallBackAutoDie::s_weak2ob[weakobj];
+
+    if (!ob)
+        return;
+
+//     while (ob->ob_refcnt)
 //    boost::python::xdecref(ob);
 }
 
-void CallBackAutoDie::set_autokill_references(CallBackAutoDie* cb, Tango::Connection& parent)
+void PyCallBackAutoDie::set_autokill_references(py::object& py_self, py::object& py_parent)
 {
-    cout << "set autokill refs " << &parent << endl;
-    std::string index = "parent";
-}
-//{
-//    if (m_self == 0)
-//        m_self = py_self.ptr();
-//
-//    assert(m_self == py_self.ptr());
-//
-//    PyObject* recb = CallBackAutoDie::py_on_callback_parent_fades.ptr();
-//    this->m_weak_parent = PyWeakref_NewRef(py_parent.ptr(), recb);
-//
-//    if (!this->m_weak_parent)
-//        throw_error_already_set();
-//
+    if (m_self.is(py::none()))
+        m_self = py_self;
+
+    assert(m_self.is(py_self));
+
+    py::object recb = PyCallBackAutoDie::py_on_callback_parent_fades;
+    this->m_weak_parent = py::reinterpret_borrow<py::object>(PyWeakref_NewRef(py_parent.ptr(), recb.ptr()));
+
+    if (!this->m_weak_parent)
+        throw py::error_already_set();
+
 //    boost::python::incref(this->m_self);
-//    CallBackAutoDie::s_weak2ob[this->m_weak_parent] = py_self.ptr();
-//}
+    PyCallBackAutoDie::s_weak2ob[this->m_weak_parent] = py_self;
+}
 
-//void CallBackAutoDie::unset_autokill_references()
-//{
+void PyCallBackAutoDie::unset_autokill_references()
+{
 //    boost::python::decref(m_self);
-//}
+}
 
+template<typename OriginalT, typename CopyT>
+static void _run_virtual_once(PyCallBackAutoDie* self, OriginalT * ev, const char* virt_fn_name)
+{
+    AutoPythonGILEnsure gil;
 
-//template<typename OriginalT, typename CopyT>
-//static void _run_virtual_once(CallBackAutoDie* self, OriginalT * ev, const char* virt_fn_name)
-//{
-//    AutoPythonGIL gil;
-//
 //    try {
 //        CopyT* py_ev = new CopyT();
 //       py::object py_value =py::object( handle<>(
@@ -197,72 +172,159 @@ void CallBackAutoDie::set_autokill_references(CallBackAutoDie* cb, Tango::Connec
 //        throw;
 //    }
 //    self->unset_autokill_references();
-//};
+};
 
-void CallBackAutoDie::cmd_ended(Tango::CmdDoneEvent* ev)
+void PyCallBackAutoDie::cmd_ended(Tango::CmdDoneEvent* ev)
 {
-    cerr << "CallBackAutoDie::cmd_ended " << endl;
-    py::gil_scoped_acquire acquire;
-//    PyObject* cbk = m_cbk.release();
-//    PyObject_CallObject(cbk, nullptr);
-    py::gil_scoped_release release;
+    cerr << "cmd_ended run_virtual_once" << endl;
 //    _run_virtual_once<Tango::CmdDoneEvent, PyCmdDoneEvent>(this, ev, "cmd_ended");
 };
 
 
 /*virtual*/
-void CallBackAutoDie::attr_read(Tango::AttrReadEvent* ev)
+void PyCallBackAutoDie::attr_read(Tango::AttrReadEvent* ev)
 {
     py::print("attr read _run_virtual_once");
 //    _run_virtual_once<Tango::AttrReadEvent, PyAttrReadEvent>(this, ev, "attr_read");
 };
 
 /*virtual*/
-void CallBackAutoDie::attr_written(Tango::AttrWrittenEvent* ev)
+void PyCallBackAutoDie::attr_written(Tango::AttrWrittenEvent* ev)
 {
     py::print("attr written _run_virtual_once");
 //    _run_virtual_once<Tango::AttrWrittenEvent, PyAttrWrittenEvent>(this, ev, "attr_written");
 };
 
-//
-// CallBackPushEvent
-//
-CallBackPushEvent::CallBackPushEvent() {}
-CallBackPushEvent::~CallBackPushEvent() {}
-
-void CallBackPushEvent::set_device(Tango::DeviceProxy& dp)
+PyCallBackPushEvent::~PyCallBackPushEvent()
 {
-    m_device = dp;
+//    boost::python::xdecref(this->m_weak_device);
 }
 
-
-void CallBackPushEvent::fill_py_event(Tango::EventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device)
+void PyCallBackPushEvent::set_device(Tango::DeviceProxy& dp)
 {
+    py::object py_device = py::cast(dp);
+    this->m_weak_device = py::reinterpret_borrow<py::object>(PyWeakref_NewRef(py_device.ptr(), py::none().ptr()));
+
+    if (!this->m_weak_device)
+        throw py::error_already_set();
+}
+
+namespace {
+
+    template<typename OriginalT>
+    void copy_device(OriginalT* ev, py::object& py_ev, Tango::DeviceProxy& dp)
+    {
+        py::object py_device = py::cast(dp);
+        if (!py_device.is(py::none()))
+            py_ev.attr("device") = py_device;
+        else
+            py_ev.attr("device") = py::cast(ev->device);
+    }
+
+    template<typename OriginalT>
+    static void _push_event(PyCallBackPushEvent* self, OriginalT* ev)
+    {
+    	// If the event is received after python dies but before the process
+        // finishes then discard the event
+        if (!Py_IsInitialized())
+        {
+            cout4 << "Tango event (" << ev->event <<
+                  ") received for after python shutdown. "
+                  << "Event will be ignored" << std::endl;
+            return;
+        }
+
+        AutoPythonGILEnsure gil;
+
+        // Make a copy of ev in python
+        // (the original will be deleted by TangoC++ on return)
+        py::object py_ev(ev);
+        OriginalT* ev_copy = py_ev.cast<OriginalT*>();
+
+        // If possible, reuse the original DeviceProxy
+        py::object py_device;
+        if (self->m_weak_device) {
+            py_device = py::reinterpret_borrow<py::object>(PyWeakref_GET_OBJECT(self->m_weak_device.ptr()));
+        }
+
+        try
+        {
+            PyCallBackPushEvent::fill_py_event(ev_copy, py_ev, py_device);
+        }
+        catch(py::error_already_set &eas)
+        {
+            std::cerr << "PyTango generated an unexpected python exception in "
+                      << "PyCallBackPushEvent::fill_py_eventmeth_name." << std::endl
+                      << "Please report this bug to PyTango with the following report:"
+                      << std::endl;
+//            PyErr_Print();
+        }
+        catch(Tango::DevFailed &df)
+        {
+            std::cerr << "PyTango generated a DevFailed exception in "
+                      << "PyCallBackPushEvent::fill_py_eventmeth_name." << std::endl
+                      << "Please report this bug to PyTango with the following report:"
+                      << std::endl;
+            Tango::Except::print_exception(df);
+        }
+        catch(...)
+        {
+            std::cerr << "PyTango generated an unknown exception in "
+                      << "PyCallBackPushEvent::fill_py_event." << std::endl
+                      << "Please report this bug to PyTango." << std::endl;
+        }
+        try
+        {
+            std::cerr << "should push event here" <<std::endl;
+//            self->attr("push_event")(py_ev);
+        }
+        catch(py::error_already_set& eas)
+        {
+            std::cerr << "push_event generated the following python exception:" << std::endl;
+//            PyErr_Print();
+        }
+        catch(Tango::DevFailed &df)
+        {
+            std::cerr << "push_event generated the following DevFailed exception:" << std::endl;
+            Tango::Except::print_exception(df);
+        }
+        catch(...)
+        {
+            std::cerr << "push_event generated an unknown exception." << std::endl; \
+        }
+    };
+}
+
+void PyCallBackPushEvent::fill_py_event(Tango::EventData* ev, py::object& py_ev, Tango::DeviceProxy& dp)
+{
+    copy_device(ev, py_ev, dp);
     if (ev->attr_value)
     {
-        py_ev.attr("device") = py_device;
-        py::object py_attr = PyDeviceAttribute::convert_to_python(ev->attr_value);
-        py_ev.attr("attr_value") = py_attr.ptr();
+        Tango::DeviceAttribute *attr = new Tango::DeviceAttribute;
+        (*attr) = std::move(*ev->attr_value);
+        py_ev.attr("attr_value") = PyDeviceAttribute::convert_to_python(attr, *ev->device);
     }
+    // ev->attr_value = 0; // Do not delete, python will.
 }
 
 
-void CallBackPushEvent::fill_py_event(Tango::AttrConfEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device)
+void PyCallBackPushEvent::fill_py_event(Tango::AttrConfEventData* ev, py::object& py_ev, Tango::DeviceProxy& dp)
 {
-    py_ev.attr("device") = py_device;
+    copy_device(ev, py_ev, dp);
+
     if (ev->attr_conf) {
         py_ev.attr("attr_conf") = *ev->attr_conf;
     }
 }
 
-void CallBackPushEvent::fill_py_event(Tango::DataReadyEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device)
+void PyCallBackPushEvent::fill_py_event(Tango::DataReadyEventData* ev, py::object& py_ev, Tango::DeviceProxy& dp)
 {
-    py_ev.attr("device") = py_device;
+    copy_device(ev, py_ev, dp);
 }
 
-void CallBackPushEvent::fill_py_event(Tango::PipeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device)
+void PyCallBackPushEvent::fill_py_event(Tango::PipeEventData* ev, py::object& py_ev, Tango::DeviceProxy& dp)
 {
-    py_ev.attr("device") = py_device;
+    copy_device(ev, py_ev, dp);
     if (ev->pipe_value) {
         Tango::DevicePipe *pipe_value = new Tango::DevicePipe;
         (*pipe_value) = std::move(*ev->pipe_value);
@@ -270,70 +332,51 @@ void CallBackPushEvent::fill_py_event(Tango::PipeEventData* ev, py::object& py_e
     }
 }
 
-void CallBackPushEvent::fill_py_event(Tango::DevIntrChangeEventData* ev, py::object& py_ev, Tango::DeviceProxy& py_device)
+void PyCallBackPushEvent::fill_py_event(Tango::DevIntrChangeEventData* ev, py::object& py_ev, Tango::DeviceProxy& dp)
 {
-    py_ev.attr("device") = py_device;
+    copy_device(ev, py_ev, dp);
     py_ev.attr("cmd_list") = ev->cmd_list;
     py_ev.attr("att_list") = ev->att_list;
 }
 
-/*virtual*/
-void CallBackPushEvent::push_event(Tango::EventData *ev)
+
+void PyCallBackPushEvent::push_event(Tango::EventData *ev)
 {
-    Tango::EventData tg_ed = *ev;
-    py::object py_ev = py::cast(tg_ed);
-    fill_py_event(ev, py_ev, m_device);
-    py::gil_scoped_acquire acquire;
-    m_callback(py_ev);
-    py::gil_scoped_release release;
+//    _push_event(this, ev);
 }
 
-/*virtual*/
-void CallBackPushEvent::push_event(Tango::AttrConfEventData *ev)
+void PyCallBackPushEvent::push_event(Tango::AttrConfEventData *ev)
 {
-    Tango::AttrConfEventData tg_ed = *ev;
-    py::object py_ev = py::cast(tg_ed);
-
-    py::gil_scoped_acquire acquire;
-    m_callback(py_ev);
-    py::gil_scoped_release release;
+//    _push_event(this, ev);
 }
 
-/*virtual*/
-void CallBackPushEvent::push_event(Tango::DataReadyEventData *ev)
+void PyCallBackPushEvent::push_event(Tango::DataReadyEventData *ev)
 {
-    Tango::DataReadyEventData tg_ed = *ev;
-    py::object py_ev = py::cast(tg_ed);
-
-    py::gil_scoped_acquire acquire;
-    m_callback(py_ev);
-    py::gil_scoped_release release;
+//    _push_event(this, ev);
 }
 
-/*virtual*/
-void CallBackPushEvent::push_event(Tango::PipeEventData *ev)
+void PyCallBackPushEvent::push_event(Tango::PipeEventData *ev)
 {
-    Tango::PipeEventData tg_ed = *ev;
-    py::object py_ev = py::cast(tg_ed);
-
-    py::gil_scoped_acquire acquire;
-    m_callback(py_ev);
-    py::gil_scoped_release release;
+    Tango::PipeEventData event_data = *ev;
+    py::object py_ev = py::cast(event_data);
+    AutoPythonGILEnsure gil;
+//    m_callback(py_ev);
+//    _push_event(this, ev);
 }
 
-/*virtual*/
-void CallBackPushEvent::push_event(Tango::DevIntrChangeEventData *ev)
+void PyCallBackPushEvent::push_event(Tango::DevIntrChangeEventData *ev)
 {
-    Tango::DevIntrChangeEventData tg_ed = *ev;
-    py::object py_ev = py::cast(tg_ed);
-
-    py::gil_scoped_acquire acquire;
-    m_callback(py_ev);
-    py::gil_scoped_release release;
+    Tango::DevIntrChangeEventData event_data = *ev;
+    py::object py_ev = py::cast(event_data);
+    AutoPythonGILEnsure gil;
+//    m_callback(py_ev);
+//    _push_event(this, ev);
 }
 
 void export_callback(py::module &m)
 {
+    PyCallBackAutoDie::init();
+
     py::class_<PyCmdDoneEvent>(m, "CmdDoneEvent")
         .def_readonly("device", &PyCmdDoneEvent::device)
         .def_readonly("cmd_name", &PyCmdDoneEvent::cmd_name)
@@ -362,33 +405,49 @@ void export_callback(py::module &m)
     ;
 
 //    py::class_<CallBackAutoDie>(m, "__CallBackAutoDie", py::dynamic_attr(), "INTERNAL CLASS - DO NOT USE IT")
-    py::class_<CallBackAutoDie, std::shared_ptr<CallBackAutoDie>>(m, "__CallBackAutoDie", "INTERNAL CLASS - DO NOT USE IT")
+    py::class_<PyCallBackAutoDie>(m, "__CallBackAutoDie", "INTERNAL CLASS - DO NOT USE IT")
         .def(py::init<>())
-        .def("set_callback", [&](CallBackAutoDie& self, py::object& callback) {
-//            std::unique_ptr<PyObject> cbk(callback.ptr());
-//            self.m_cbk = std::move(cbk);
-            self.m_callback = callback;
-            cout << "setting callback" << endl;
-            m.attr("free_on_callback") = self;
-        })
-        .def("set_weak_parent", [](CallBackAutoDie& self, py::object parent) {
-            cout << ".def set weak parent" << endl;
-            self.m_weak_parent = parent.ptr();
-            cerr << "ref count" << static_cast<int>(Py_REFCNT(self.m_weak_parent)) << endl;
-            Py_INCREF(self.m_weak_parent);
-            cerr << "ref count" << static_cast<int>(Py_REFCNT(self.m_weak_parent)) << endl;
-            cout << ".def set weak parent" << endl;
-        })
+//        .def("set_callback", [&](CallBackAutoDie& self, py::object& callback) {
+////            std::unique_ptr<PyObject> cbk(callback.ptr());
+////            self.m_cbk = std::move(cbk);
+//            self.m_callback = callback;
+//            cout << "setting callback" << endl;
+//            m.attr("free_on_callback") = self;
+//        })
+//        .def("set_weak_parent", [](CallBackAutoDie& self, py::object parent) {
+//            cout << ".def set weak parent" << endl;
+//            self.m_weak_parent = parent.ptr();
+//            cerr << "ref count" << static_cast<int>(Py_REFCNT(self.m_weak_parent)) << endl;
+//            Py_INCREF(self.m_weak_parent);
+//            cerr << "ref count" << static_cast<int>(Py_REFCNT(self.m_weak_parent)) << endl;
+//            cout << ".def set weak parent" << endl;
+//        })
 //        .def("set_autokill_references", [](CallBackAutoDie& self, py::object parent) {
 //            cout << "set autokill refs" << endl;
 ////            CallBackAutoDie::s_weak2ob[parent.ptr()] = self.m_callback.ptr();
 //        })
+//        .def("cmd_ended", &PyCallBackAutoDie::cmd_ended,
+//            "This method is defined as being empty and must be overloaded by the user when the asynchronous callback model is used. This is the method which will be executed when the server reply from a command_inout is received in both push and pull sub-mode.")
+//        .def("attr_read", &PyCallBackAutoDie::attr_read,
+//            "This method is defined as being empty and must be overloaded by the user when the asynchronous callback model is used. This is the method which will be executed when the server reply from a read_attribute(s) is received in both push and pull sub-mode.")
+//        .def("attr_written", &PyCallBackAutoDie::attr_written,
+//            "This method is defined as being empty and must be overloaded by the user when the asynchronous callback model is used. This is the method which will be executed when the server reply from a write_attribute(s) is received in both push and pull sub-mode. ")
     ;
 
-    py::class_<CallBackPushEvent>(m,"__CallBackPushEvent", py::dynamic_attr(), "INTERNAL CLASS - DO NOT USE IT")
+    py::class_<PyCallBackPushEvent>(m,"__CallBackPushEvent", py::dynamic_attr(), "INTERNAL CLASS - DO NOT USE IT")
         .def(py::init<>())
-        .def("device", [](CallBackPushEvent& self, Tango::DeviceProxy& dp) {
-            self.m_device = dp;
-        })
+//        .def("device", [](PyCallBackPushEvent& self, Tango::DeviceProxy& dp) {
+//            self.m_device = dp;
+//        })
+//        .def("push_event", (void (PyCallBackAutoDie::*)(Tango::EventData*))&PyCallBackAutoDie::push_event,
+//            "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send event(s) to the client. ")
+//        .def("push_event", (void (PyCallBackAutoDie::*)(Tango::AttrConfEventData*))&PyCallBackAutoDie::push_event,
+//            "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send attribute configuration change event(s) to the client. ")
+//        .def("push_event", (void (PyCallBackAutoDie::*)(Tango::DataReadyEventData*))&PyCallBackAutoDie::push_event,
+//            "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send attribute data ready event(s) to the client. ")
+//        .def("push_event", (void (PyCallBackAutoDie::*)(Tango::PipeEventData*))&PyCallBackAutoDie::push_event,
+//            "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send pipe event(s) to the client. ")
+//        .def("push_event", (void (PyCallBackAutoDie::*)(Tango::DevIntrChangeEventData*))&PyCallBackAutoDie::push_event,
+//            "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send device interface change event(s) to the client. ")
     ;
 }

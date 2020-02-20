@@ -173,12 +173,12 @@ build: init $(LINK_TASK)
 # Rules for API files
 #
 $(OBJS_DIR)/%.o : $(SRC_DIR)/%.cpp
-	@echo -n "Compiling $(<F)... "
+	@echo "Compiling $(<F)... "
 	$(GXX) -shared $(CFLAGS) -c $< -o $(OBJS_DIR)/$*.o
 	@echo Done!
 
 $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
-	@echo -n "Compiling $(<F)... "
+	@echo "Compiling $(<F)... "
 	$(GXX) -shared $(CFLAGS) -c $< -o $(OBJS_DIR)/$*.o
 	@echo Done!
 
@@ -188,12 +188,13 @@ $(OBJS_DIR)/%.o: $(SRC_DIR)/server/%.cpp
 
 link: $(OBJS)
 	@echo -n "Linking shared $(LIB_NAME)... "
-	@$(LINKER) -o $(OBJS_DIR)/$(LIB_NAME) $(LNFLAGS)
+#	@$(LINKER) -o $(OBJS_DIR)/$(LIB_NAME) $(LNFLAGS)
+	@$(LINKER) -o tango/$(LIB_NAME) $(LNFLAGS)
 	@echo $(OK)
 
 link-opt: link
-	@echo Optimizing shared $(LIB_NAME)
-	@echo -n "  Building separate debug file... "
+	@echo -n Optimizing shared $(LIB_NAME)
+	@echo "  Building separate debug file... "
 	@objcopy --only-keep-debug $(OBJS_DIR)/$(LIB_NAME) $(OBJS_DIR)/$(LIB_SYMB_NAME)
 	@echo $(OK)
 	@echo -n "  Stripping $(LIB_NAME)... "
@@ -204,12 +205,12 @@ link-opt: link
 	@echo $(OK)
 
 clean:
-	@echo -n Cleaning ...
+	@echo -n "Cleaning $(OBJS_DIR)... "
 	@rm -f $(OBJS_DIR)/*.o
 	@echo $(OK)
 
 clean-all:
-	@echo -n Cleaning all...
+	@echo -n "Cleaning all $(OBJS_DIR)... "
 	@rm -rf $(OBJS_DIR)
 	@echo $(OK)
 
@@ -222,7 +223,7 @@ install-py:
 
 install-lib:
 	@echo -n "Installing binary files into $(prefix)/tango... "
-	@rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/tango
+#	@rsync $(OBJS_DIR)/$(LIB_NAME) $(prefix)/tango
 	@echo $(OK)
 
 install-all: install-py install-lib

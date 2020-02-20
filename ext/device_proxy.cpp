@@ -16,6 +16,7 @@
 #include <callback.h>
 #include <device_attribute.h>
 #include <from_py.h>
+#include <stdio.h>
 
 namespace py = pybind11;
 
@@ -49,13 +50,12 @@ namespace PyDeviceProxy
     get_events__aux(Tango::DeviceProxy& self, int event_id)
     {
         EDList event_list;
-        // C++ signature
-        self.get_events(event_id, event_list);
+        self.get_events(event_id, event_list); // C++ signature
         py::list r;
         for (size_t i=0; i < event_list.size(); ++i) {
             ED* event_data = event_list[i];
             py::object py_ev = py::cast(event_data);
-            CallBackPushEvent::fill_py_event(event_data, py_ev, self);
+            PyCallBackPushEvent::fill_py_event(event_data, py_ev, self);
             r.append(py_ev);
         }
         return r;
@@ -63,7 +63,7 @@ namespace PyDeviceProxy
 
     // This code also appears in pipe.cpp
     static void throw_wrong_python_data_type(const std::string& name,
-                 const char *method)
+            const char* method)
     {
         std::stringstream ss;
         ss << "Wrong Python type for pipe " << name << ends;
@@ -376,16 +376,9 @@ void export_device_proxy(py::module &m) {
         .def(py::init<>())
         .def(py::init<const Tango::DeviceProxy &>())
         .def(py::init([](std::string& name) {
-            Tango::DeviceProxy* dp = nullptr;
-            AutoPythonAllowThreads guard;
-            // C++ signature
-            return new Tango::DeviceProxy(name); // C++ signature
-        }))
-
-        .def(py::init([](std::string& name, bool ch_access) {
-            Tango::DeviceProxy* dp = nullptr;
-            AutoPythonAllowThreads guard;
-            return new Tango::DeviceProxy(name, ch_access); // C++ signature
+            // AutoPythonAllowThreads guard;
+            Tango::DeviceProxy* dp = new Tango::DeviceProxy(name); // C++ signature
+            return dp;
         }))
         //
         // Pickle
@@ -406,7 +399,8 @@ void export_device_proxy(py::module &m) {
         })
         .def("_status", [](Tango::DeviceProxy& self) -> std::string {
             AutoPythonAllowThreads guard;
-            return self.status(); // Tango C++ signature
+            std::string status_string = self.status();
+            return status_string; // Tango C++ signature
         })
        .def("_state", [](Tango::DeviceProxy& self) -> Tango::DevState {
             AutoPythonAllowThreads guard;
@@ -422,19 +416,15 @@ void export_device_proxy(py::module &m) {
             return self.name(); // Tango C++ signature
         })
         .def("alias", [](Tango::DeviceProxy& self) -> std::string {
-            py::print("in pybind c++ alias method");
             std::string alias;
             try {
                 alias = self.alias(); // Tango C++ signature
             } catch (exception& e) {
                 py::print("got the exception");
             }
-            return alias;
         })
         .def("get_tango_lib_version", [](Tango::DeviceProxy& self) -> int {
-            py::print("in pybind get_tango_lib_version");
             int version = self.get_tango_lib_version();
-            std::cerr << version << std::endl;
             return version;
 //            return self.get_tango_lib_version(); // Tango C++ signature
         })
@@ -464,44 +454,43 @@ void export_device_proxy(py::module &m) {
             return std::move(self.command_list_query()); // Tango C++ signature
         })
         .def("import_info", [](Tango::DeviceProxy& self) {
-            py::print("import info");
-//            Tango::DbDevImportInfo info = self.import_info(); // Tango C++ signature
-            self.import_info(); // Tango C++ signature
-            py::print("imported info");
-            Tango::DbDevImportInfo info;
-            return info;
+            return self.import_info(); // Tango C++ signature
         })
         //
         // property methods
         //
-        .def("_get_property", [](Tango::DeviceProxy& self, std::string& prop_name) -> Tango::DbData {
-            Tango::DbData dbData;
+        .def("_get_property", [](Tango::DeviceProxy& self, std::string& prop_name, Tango::DbData dbData) -> Tango::DbData {
             self.get_property(prop_name, dbData); // Tango C++ signature
             return dbData;
         })
-        .def("_get_property", [](Tango::DeviceProxy& self, std::vector<std::string>& prop_names) -> Tango::DbData {
-            Tango::DbData dbData;
-            self.get_property(prop_names, dbData); // Tango C++ signature
+        .def("_get_property", [](Tango::DeviceProxy& self, py::list prop_names, Tango::DbData dbData) -> Tango::DbData {
+            std::vector<std::string> names;
+            for (int i=0; i<py::len(prop_names); i++) {
+                std::string ss = prop_names[i].cast<std::string>();
+                names.push_back(ss);
+            }
+            self.get_property(names, dbData); // Tango C++ signature
             return dbData;
         })
         .def("_get_property", [](Tango::DeviceProxy& self, Tango::DbData dbData) -> Tango::DbData {
             self.get_property(dbData); // Tango C++ signature
             return dbData;
         })
-        .def("_put_property", [](Tango::DeviceProxy& self, Tango::DbData& dbData) -> void {
+        .def("_put_property", [](Tango::DeviceProxy& self, std::vector<Tango::DbDatum>& dbData) -> void {
             self.put_property(dbData); // Tango C++ signature
         })
         .def("_delete_property", [](Tango::DeviceProxy& self, std::string& prop_name) -> void {
             self.delete_property(prop_name); // Tango C++ signature
         })
-        .def("_delete_property", [](Tango::DeviceProxy& self, std::vector<std::string>& prop_names) -> void {
-            self.delete_property(prop_names); // Tango C++ signature
-        })
         .def("_delete_property", [](Tango::DeviceProxy& self, Tango::DbData& dbData) -> void {
             self.delete_property(dbData); // Tango C++ signature
         })
-        .def("_get_property_list", [](Tango::DeviceProxy& self, const std::string& filter, std::vector<std::string>& prop_list) -> std::vector<std::string> {
-            self.get_property_list(filter, prop_list); // Tango C++ signature
+        .def("_get_property_list", [](Tango::DeviceProxy& self, std::string& filter, py::list prop_list) -> py::list {
+            std::vector<std::string> proplist;
+            self.get_property_list(filter, proplist); // Tango C++ signature
+            for (int i=0; i<proplist.size(); i++) {
+                prop_list.append(proplist[i]);
+            }
             return prop_list;
         })
         //
@@ -676,15 +665,13 @@ void export_device_proxy(py::module &m) {
         //
         .def("__read_attributes_asynch", [](Tango::DeviceProxy& self, std::vector<std::string> names) -> long {
             AutoPythonAllowThreads guard;
-
             return self.read_attributes_asynch(names); // C++ signature
         })
         .def("read_attributes_reply", [](Tango::DeviceProxy& self, long id) -> py::list {
             std::unique_ptr<std::vector<Tango::DeviceAttribute>> dev_attr_vec;
             {
                 AutoPythonAllowThreads guard;
-                // C++ signature
-                dev_attr_vec.reset(self.read_attributes_reply(id));
+                dev_attr_vec.reset(self.read_attributes_reply(id)); // C++ signature
             }
             return PyDeviceAttribute::convert_to_python(dev_attr_vec, self);
         })
@@ -704,8 +691,7 @@ void export_device_proxy(py::module &m) {
             std::vector<Tango::DeviceAttribute> dev_attrs;
             PyDeviceProxy::pylist_to_devattrs(self, py_list, dev_attrs);
             AutoPythonAllowThreads guard;
-            // C++ signature
-            return self.write_attributes_asynch(dev_attrs);
+            return self.write_attributes_asynch(dev_attrs); // C++ signature
         })
         .def("write_attributes_reply", [](Tango::DeviceProxy& self, long id) {
             AutoPythonAllowThreads guard;
@@ -713,34 +699,30 @@ void export_device_proxy(py::module &m) {
         })
         .def("write_attributes_reply",[](Tango::DeviceProxy& self, long id, long timeout) {
             AutoPythonAllowThreads guard;
-
             self.write_attributes_reply(id, timeout); // C++ signature
         })
         .def("__read_attributes_asynch", [](Tango::DeviceProxy& self, std::vector<std::string>& names,
-                py::object py_cb) {
-//            CallBackAutoDie* cb = py::cast<CallBackAutoDie>(py_cb);
-//            cb->set_autokill_references(py_cb, py_self);
+                PyCallBackAutoDie& cb) {
+//            PyCallBackAutoDie cb = py_cb.cast<PyCallBackAutoDie>();
+//            cb.set_autokill_references(py_cb, py_self);
             try {
                 AutoPythonAllowThreads guard;
-                // C++ signature
-//                self.read_attributes_asynch(names, cb);
+                self.read_attributes_asynch(names, cb); // C++ signature
             } catch (...) {
-//                cb->unset_autokill_references();
+//                cb.unset_autokill_references();
                 throw;
             }
         })
-        .def("__write_attributes_asynch",[](Tango::DeviceProxy& self, py::object py_list, py::object py_cb) {
+        .def("__write_attributes_asynch",[](Tango::DeviceProxy& self, py::list py_list, PyCallBackAutoDie& cb) {
             std::vector<Tango::DeviceAttribute> dev_attrs;
             PyDeviceProxy::pylist_to_devattrs(self, py_list, dev_attrs);
-//            CallBackAutoDie* cb = py::cast<CallBackAutoDie*>(py_cb);
+//            PyCallBackAutoDie cb = py_cb.cast<PyCallBackAutoDie>();
 //            cb->set_autokill_references(py_cb, py_self);
-//            cb.attr_written(nullptr);
             try {
                 AutoPythonAllowThreads guard;
-                // C++ signature
-//                self.write_attributes_asynch(dev_attrs, *cb);
+                self.write_attributes_asynch(dev_attrs, cb); // C++ signature
             } catch (...) {
-//                cb->unset_autokill_references();
+//                cb.unset_autokill_references();
                 throw;
             }
         })
@@ -766,6 +748,15 @@ void export_device_proxy(py::module &m) {
         // Event methods
         //
         .def("__subscribe_event", [](Tango::DeviceProxy& self,
+                Tango::EventType event,
+                py::object py_cb,
+                bool stateless) -> int {
+            PyCallBackPushEvent* cb = py::cast<PyCallBackPushEvent*>(py_cb);
+            cb->set_device(self);
+            AutoPythonAllowThreads guard;
+            return self.subscribe_event(event, cb, stateless); // C++ signature
+        })
+        .def("__subscribe_event", [](Tango::DeviceProxy& self,
                                      std::string& attr_name,
                                      Tango::EventType event,
                                      py::object py_cb_or_queuesize,
@@ -778,12 +769,11 @@ void export_device_proxy(py::module &m) {
                 // C++ signature
                 return self.subscribe_event(attr_name, event, event_queue_size, filters, stateless);
             } else {
-                CallBackPushEvent* cb = py::cast<CallBackPushEvent*>(py_cb_or_queuesize);
+                PyCallBackPushEvent* cb = py::cast<PyCallBackPushEvent*>(py_cb_or_queuesize);
                 cb->set_device(self);
-                cb->m_callback = py::getattr(py_cb_or_queuesize, "push_event");
+                //cb->m_callback = py::getattr(py_cb_or_queuesize, "push_event");
                 AutoPythonAllowThreads guard;
-                // C++ signature
-                return self.subscribe_event(attr_name, event, cb, filters, stateless);
+                return self.subscribe_event(attr_name, event, cb, filters, stateless); // C++ signature
             }
         }, py::arg("attr_name"),
            py::arg("event"),
@@ -795,14 +785,12 @@ void export_device_proxy(py::module &m) {
             // If the callback is running, unsubscribe_event will lock
             // until it finishes. So we MUST release GIL to avoid a deadlock
             AutoPythonAllowThreads guard;
-            // C++ signature
-            self.unsubscribe_event(event_id);
+            self.unsubscribe_event(event_id); // C++ signature
         })
         .def("__get_callback_events", [](Tango::DeviceProxy& self, int event_id,
-                 CallBackPushEvent *cb) -> void{
+                 PyCallBackPushEvent *cb) -> void{
              cb->set_device(self);
-             // C++ signature
-             self.get_events(event_id, cb);
+             self.get_events(event_id, cb); // C++ signature
         })
         .def("__get_attr_conf_events", [](Tango::DeviceProxy& self, int event_id) {
             return PyDeviceProxy::get_events__aux<Tango::AttrConfEventData, Tango::AttrConfEventDataList>(
@@ -828,44 +816,35 @@ void export_device_proxy(py::module &m) {
         // methods to access data in event queues
         //
         .def("event_queue_size", [](Tango::DeviceProxy& self, int event_id) -> int {
-            // C++ signature
-            return self.event_queue_size(event_id);
+            return self.event_queue_size(event_id); // C++ signature
         })
         .def("get_last_event_date", [](Tango::DeviceProxy& self, int event_id) -> Tango::TimeVal {
-            // C++ signature
-            return self.get_last_event_date(event_id);
+            return self.get_last_event_date(event_id); // C++ signature
         })
         .def("is_event_queue_empty", [](Tango::DeviceProxy& self, int event_id) -> bool {
-            // C++ signature
-            return self.is_event_queue_empty(event_id);
+            return self.is_event_queue_empty(event_id); // C++ signature
         })
         //
         // Locking methods
         //
         .def("lock", [](Tango::DeviceProxy& self, int lock_validity) -> void {
-            // C++ signature
-            return self.lock(lock_validity);
+            return self.lock(lock_validity); // C++ signature
         }, py::arg("lock_validity")=Tango::DEFAULT_LOCK_VALIDITY)
         .def("unlock", [](Tango::DeviceProxy& self, bool force) -> void {
-            // C++ signature
-            return self.unlock(force);
+            return self.unlock(force); // C++ signature
         }, py::arg("force")=false)
 
         .def("locking_status", [](Tango::DeviceProxy& self) -> std::string {
-            // C++ signature
-            return self.locking_status();
+            return self.locking_status(); // C++ signature
         })
         .def("is_locked", [](Tango::DeviceProxy& self) -> bool {
-            // C++ signature
-            return self.is_locked();
+            return self.is_locked(); // C++ signature
         })
         .def("is_locked_by_me", [](Tango::DeviceProxy& self) -> bool {
-            // C++ signature
-            return self.is_locked_by_me();
+            return self.is_locked_by_me(); // C++ signature
         })
         .def("get_locker", [](Tango::DeviceProxy& self, Tango::LockerInfo& li) -> bool {
-            // C++ signature
-            return self.get_locker(li);
+            return self.get_locker(li); // C++ signature
         })
         //
         // Connection methods
@@ -937,8 +916,8 @@ void export_device_proxy(py::module &m) {
         }, py::arg("cmd_name"), py::arg("forget")=false)
 
         .def("__command_inout_asynch_cb", [](Tango::DeviceProxy& self, std::string& cmd_name,
-                py::object py_cb) -> void {
-            std::shared_ptr<CallBackAutoDie> cb = std::shared_ptr<CallBackAutoDie>(py::cast<CallBackAutoDie*>(py_cb));
+                PyCallBackAutoDie& cb) -> void {
+//            PyCallBackAutoDie> cb = py::cast<PyCallBackAutoDie>(py_cb));
             cerr << "after cast" << endl;
 //            cb->m_callback(py::getattr(py_cb, "m_callback"));
 //            cb->set_weak_parent(py::getattr(py_cb, "m_weak_parent"));
@@ -946,8 +925,7 @@ void export_device_proxy(py::module &m) {
             try {
                 cerr << "inout cmd no arg async going to issue" << endl;
                 AutoPythonAllowThreads guard;
-                // C++ signature
-                self.command_inout_asynch(cmd_name, *cb);
+                self.command_inout_asynch(cmd_name, cb); // C++ signature
                 cerr << "inout cmd no arg async issued" << endl;
             } catch (...) {
 //                cb->unset_autokill_references();
@@ -955,14 +933,13 @@ void export_device_proxy(py::module &m) {
             }
         })
         .def("__command_inout_asynch_cb", [](Tango::DeviceProxy& self, std::string& cmd_name,
-                Tango::DeviceData &argin, py::object py_cb) -> void {
-            CallBackAutoDie* cb = py::cast<CallBackAutoDie*>(py_cb);
+                Tango::DeviceData &argin, PyCallBackAutoDie& cb) -> void {
+//            PyCallBackAutoDie cb = py::cast<PyCallBackAutoDie>(py_cb);
 //            cb->set_callback(py::getattr(py_cb, "m_callback"));
 //            cb->set_autokill_references(cb, self);
             try {
                 AutoPythonAllowThreads guard;
-                // C++ signature
-                self.command_inout_asynch(cmd_name, argin, *cb);
+                self.command_inout_asynch(cmd_name, argin, cb); // C++ signature
                 cerr << "inout cmd async issued" << endl;
             } catch (...) {
 //                cb->unset_autokill_references();

@@ -268,8 +268,8 @@ def __Util__add_class(self, *args, **kwargs):
 
 
 def __init_Util():
-    Util.__init_orig__ = Util.__init__
-    Util.__init__ = __Util__init__
+#    Util.__init_orig__ = Util.__init__
+#    Util.__init__ = __Util__init__
     Util.__init_orig = staticmethod(Util.init)
     Util.init = staticmethod(__Util__init)
     Util.add_TgClass = __Util__add_TgClass

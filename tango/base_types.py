@@ -30,7 +30,7 @@ from ._tango import (StdStringVector, StdLongVector, StdDoubleVector,
 
 from .utils import document_method, is_integer
 from .utils import document_enum as __document_enum
-from .utils import seq_2_StdStringVector, StdStringVector_2_seq
+from .utils import seq_2_StdStringVector #, StdStringVector_2_seq
 
 
 # def __StdVector__add(self, seq):

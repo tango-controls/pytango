@@ -34,7 +34,7 @@ namespace DevicePipe
         TangoScalarType val;
         py::str name(self.get_data_elt_name(elt_idx));
         self >> val;
-        py::object data = py::cast(val);
+//        py::object data = py::cast(val);
         return py::make_tuple(name, val);
     }
 
@@ -316,11 +316,12 @@ namespace DevicePipe
     py::object __extract_item(T& obj, size_t elt_idx, int type)
     {
         const int elt_type = type;
+        py::object value;
         TANGO_DO_ON_DEVICE_DATA_TYPE_ID(elt_type,
-                return extract_scalar<tangoTypeConst>(obj, elt_idx); ,
-                return extract_array<tangoTypeConst>(obj, elt_idx);
+                value = extract_scalar<tangoTypeConst>(obj, elt_idx); ,
+                value =  extract_array<tangoTypeConst>(obj, elt_idx);
         );
-        return py::object();
+        return value;
     }
 
     template<typename T>

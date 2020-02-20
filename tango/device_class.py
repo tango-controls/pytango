@@ -345,7 +345,7 @@ def __DeviceClass__attribute_factory(self):
         else:
             attr_data = AttrData(attr_name, self.get_name(), attr_info)
         if attr_data.forward:
-            attr = self._create_fwd_attribute(attr_data.name, attr_data.att_prop)
+            self._create_fwd_attribute(attr_data.name, attr_data.att_prop)
         else:
             self._create_attribute(attr_data.attr_name,
                                    attr_data.attr_type,

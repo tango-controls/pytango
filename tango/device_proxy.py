@@ -15,7 +15,6 @@ import time
 import textwrap
 import threading
 import enum
-#import six
 try:
     import collections.abc as collections_abc  # python 3.3+
 except ImportError:
@@ -30,8 +29,8 @@ from ._tango import CmdArgType, DevState
 
 from .utils import TO_TANGO_TYPE, scalar_to_array_type
 from .utils import is_pure_str, is_non_str_seq, is_integer, is_number
-from .utils import StdStringVector_2_seq
-from .utils import DbData_2_dict
+#from .utils import StdStringVector_2_seq
+from .utils import DbData_2_dict, obj_2_property
 from .utils import document_method as __document_method
 from .utils import dir2
 
@@ -225,8 +224,7 @@ def __DeviceProxy__refresh_attr_cache(self):
         name = attr.name.lower()
         enum_class = None
         if attr.data_type == CmdArgType.DevEnum and attr.enum_labels:
-            labels = StdStringVector_2_seq(attr.enum_labels)
-            enum_class = enum.IntEnum(attr.name, labels, start=0)
+            enum_class = enum.IntEnum(attr.name, attr.enum_labels, start=0)
         attr_cache[name] = (attr.name, enum_class, )
     self.__dict__['__attr_cache'] = attr_cache
 
@@ -406,7 +404,8 @@ def __DeviceProxy__contains(self, key):
 
 
 def __DeviceProxy__read_attribute(self, value):
-    return __check_read_attribute(self._read_attribute(value))
+    x = self._read_attribute(value)
+    return __check_read_attribute(x)
 
 
 def __DeviceProxy__read_attributes_asynch(self, attr_names, cb=None):
@@ -582,11 +581,10 @@ def __DeviceProxy__get_property(self, propname, value=None):
                      CommunicationFailed (with database),
                      DevFailed from database device
     """
-
-    if is_pure_str(propname) or isinstance(propname, StdStringVector):
+    if is_pure_str(propname):
         new_value = value
         if new_value is None:
-            new_value = DbData()
+            new_value = list()
         db_data = self._get_property(propname, new_value)
         return DbData_2_dict(db_data)
     elif isinstance(propname, DbDatum):
@@ -594,23 +592,26 @@ def __DeviceProxy__get_property(self, propname, value=None):
         new_value.append(propname)
         db_data = self._get_property(new_value)
         return DbData_2_dict(db_data)
-    elif isinstance(propname, collections.Sequence):
-        if isinstance(propname, list):
-            db_data = self._get_property(propname)
-            return DbData_2_dict(db_data)
-
-        if is_pure_str(propname[0]):
-            db_data = self._get_property(propname, new_value)
-            return DbData_2_dict(db_data)
-        if is_pure_str(propname[0]):
-            new_propname = list()
-            for i in propname:
-                new_propname.append(i)
+    elif isinstance(propname, collections_abc.Sequence):
+        if isinstance(propname, list) and is_pure_str(propname[0]):
             new_value = value
             if new_value is None:
-                new_value = DbData()
-            self._get_property(new_propname, new_value)
-            return DbData_2_dict(new_value)
+                new_value = list()
+            db_data = self._get_property(propname, new_value)
+            return DbData_2_dict(db_data)
+# 
+#         if is_pure_str(propname[0]):
+#             db_data = self._get_property(propname, new_value)
+#             return DbData_2_dict(db_data)
+#         if is_pure_str(propname[0]):
+#             new_propname = list()
+#             for i in propname:
+#                 new_propname.append(i)
+#             new_value = value
+#             if new_value is None:
+#                 new_value = list()
+#             self._get_property(new_propname, new_value)
+#             return DbData_2_dict(new_value)
         elif isinstance(propname[0], DbDatum):
             new_value = list()
             for i in propname:
@@ -618,6 +619,11 @@ def __DeviceProxy__get_property(self, propname, value=None):
             db_data = self._get_property(new_value)
             return DbData_2_dict(db_data)
 
+
+def __Database__generic_put_property(self, obj_name, value, f):
+    """internal usage"""
+    value = obj_2_property(value)
+    return f(obj_name, value)
 
 def __DeviceProxy__put_property(self, value):
     """
@@ -646,14 +652,13 @@ def __DeviceProxy__put_property(self, value):
         Throws     : ConnectionFailed, CommunicationFailed
                      DevFailed from device (DB_SQLError)
     """
-    if isinstance(value, DbData):
-        pass
-    elif isinstance(value, DbDatum):
+    # return __Database__generic_put_property(self, obj_name, value, self._put_property)
+    if isinstance(value, DbDatum):
         new_value = list()
         new_value.append(value)
         value = new_value
     elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
+        new_value = value
     elif isinstance(value, collections_abc.Mapping):
         new_value = list()
         for k, v in value.items():
@@ -666,12 +671,11 @@ def __DeviceProxy__put_property(self, value):
             else:
                 db_datum.value_string.append(str(v))
             new_value.append(db_datum)
-        value = new_value
     else:
         raise TypeError(
             'Value must be a tango.DbDatum, tango.DbData, '
             'a sequence<DbDatum> or a dictionary')
-    return self._put_property(value)
+    self._put_property(new_value)
 
 
 def __DeviceProxy__delete_property(self, value):
@@ -761,17 +765,13 @@ def __DeviceProxy__get_property_list(self, filter, array=None):
     """
 
     if array is None:
-        new_array = StdStringVector()
+        new_array = list()
         self._get_property_list(filter, new_array)
         return new_array
 
-    if isinstance(array, StdStringVector):
-        self._get_property_list(filter, array)
-        return array
-    elif isinstance(array, collections_abc.Sequence):
-        new_array = StdStringVector()
+    if isinstance(array, collections_abc.Sequence):
+        new_array = list()
         self._get_property_list(filter, new_array)
-        StdStringVector_2_seq(new_array, array)
         return array
 
     raise TypeError('array must be a mutable sequence<string>')
@@ -1370,7 +1370,7 @@ def __DeviceProxy__get_events(self, event_id, callback=None):
         New in PyTango 7.0.0
     """
     if callback is None:
-        queuesize, event_type, attr_name = self.__get_event_map().get(event_id, (None, None, None))
+        _, event_type, _ = self.__get_event_map().get(event_id, (None, None, None))
         if event_type is None:
             raise ValueError("Invalid event_id. You are not subscribed to event %s." % str(event_id))
         if event_type in (EventType.CHANGE_EVENT,
@@ -1610,7 +1610,7 @@ def __init_DeviceProxy():
 
     DeviceProxy.ping = green(__DeviceProxy__ping)
     DeviceProxy.state = green(__DeviceProxy__state)
-    DeviceProxy.status = green(__DeviceProxy__status)
+    DeviceProxy.status = __DeviceProxy__status
 
     DeviceProxy.read_attribute = green(__DeviceProxy__read_attribute)
     DeviceProxy.read_attributes = green(__DeviceProxy__read_attributes)

@@ -24,7 +24,7 @@ namespace PyUtil
 {
     void _class_factory(Tango::DServer* dserver)
     {
-        AutoPythonGIL guard;
+        AutoPythonGILEnsure guard;
         py::object tango = py::cast<py::object>(PyImport_AddModule("tango"));
         py::list cpp_class_list = tango.attr("get_cpp_classes")();
         // First, create CPP class if any, their names are defined in a Python list
@@ -51,13 +51,15 @@ namespace PyUtil
         }
    }
 
-    inline Tango::Util* init(std::vector<std::string>& arglist)
+//    inline Tango::Util* init(std::vector<std::string>& arglist)
+    inline Tango::Util* init(py::object& args)
     {
-        int argc = (int) arglist.size();
+        py::list pylist = args;
+        int argc = len(args);
         char** argv = new char*[argc];
         static Tango::Util* res = nullptr;
         for (int i=0; i<argc; i++) {
-            argv[i] = (char*)arglist[i].c_str();
+            argv[i] = strdup(pylist[i].cast<std::string>().c_str());
         }
         res = Tango::Util::init(argc, argv);
         delete [] argv;
@@ -66,7 +68,7 @@ namespace PyUtil
 
     inline bool event_loop()
     {
-        AutoPythonGIL guard;
+        AutoPythonGILEnsure guard;
         py::object tango = py::cast<py::object>(PyImport_AddModule("tango"));
         py::object py_event_loop = tango.attr("_server_event_loop");
         return py_event_loop().cast<bool>();
@@ -90,17 +92,27 @@ void export_util(py::module &m) {
         .def("create_thread", &Tango::Interceptors::create_thread)
         .def("delete_thread", &Tango::Interceptors::delete_thread)
     ;
-    py::class_<Tango::Util, std::unique_ptr<Tango::Util, py::nodelete>>(m, "Util")
-        .def(py::init([](std::vector<std::string>& args) {
-            Tango::Util* instance = PyUtil::init(args);
-            return std::unique_ptr<Tango::Util, py::nodelete>(instance);
+//    py::class_<Tango::Util, std::unique_ptr<Tango::Util, py::nodelete>>(m, "Util")
+    py::class_<Tango::Util, std::shared_ptr<Tango::Util>>(m, "Util")
+        .def(py::init([](py::object& args) {
+            std::cerr << "here here here here1" << std::endl;
+//            Tango::Util* instance = PyUtil::init(args);
+            return std::shared_ptr<Tango::Util>(PyUtil::init(args));
+////    py::class_<Tango::Util>(m, "Util")
+////        .def(py::init([](py::object& args) {
+////            return PyUtil::init(args);
         }))
-        .def_static("init", [](std::vector<std::string>& args) {
+        .def_static("init", [](py::object& args) {
+            std::cerr << "here here here here2" << std::endl;
             return PyUtil::init(args);
         })
         .def_static("instance", [](bool b) {
-            return Tango::Util::instance(b);
+            std::cerr << "here here here here3" << std::endl;
+            Tango::Util* inst = Tango::Util::instance(b);
+            py::print(inst);
+            return inst;
         }, py::arg("bool") = true)
+
         .def("set_trace_level", [](Tango::Util& self, int level) -> void {
             self.set_trace_level(level);
         })

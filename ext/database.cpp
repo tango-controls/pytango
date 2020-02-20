@@ -147,7 +147,7 @@ void export_database(py::module &m)
         .def("add_device", [](Tango::Database& self, Tango::DbDevInfo& dev_info) -> void {
             self.add_device(dev_info); // C++ signature
         })
-        .def("delete_device", [](Tango::Database& self, std::string dev_name) -> void {
+        .def("delete_device", [](Tango::Database& self, std::string& dev_name) -> void {
             self.delete_device(dev_name); // C++ signature
         })
         .def("import_device", [](Tango::Database& self, std::string& dev_name) -> Tango::DbDevImportInfo {
@@ -240,22 +240,22 @@ void export_database(py::module &m)
         .def("delete_server_info", [](Tango::Database& self, std::string& info_name) -> void {
             self.delete_server_info(info_name); // C++ signature
         })
-        .def("get_server_class_list", [](Tango::Database& self, std::string &ds_name) -> Tango::DbDatum {
+        .def("get_server_class_list", [](Tango::Database& self, std::string& ds_name) -> Tango::DbDatum {
             return self.get_server_class_list(ds_name); // C++ signature
         })
         .def("get_server_name_list", [](Tango::Database& self) -> Tango::DbDatum {
             return self.get_server_name_list(); // C++ signature
         })
-        .def("get_instance_name_list", [](Tango::Database& self, std::string &ds_name) -> Tango::DbDatum {
+        .def("get_instance_name_list", [](Tango::Database& self, std::string& ds_name) -> Tango::DbDatum {
             return self.get_instance_name_list(ds_name); // C++ signature
         })
         .def("get_server_list", [](Tango::Database& self) -> Tango::DbDatum {
             return self.get_server_list(); // C++ signature
         })
-        .def("get_server_list", [](Tango::Database& self, std::string &wildcard) -> Tango::DbDatum {
+        .def("get_server_list", [](Tango::Database& self, std::string& wildcard) -> Tango::DbDatum {
             return self.get_server_list(wildcard); // C++ signature
         })
-        .def("get_host_server_list", [](Tango::Database& self, std::string &host_name) -> Tango::DbDatum {
+        .def("get_host_server_list", [](Tango::Database& self, std::string& host_name) -> Tango::DbDatum {
             return self.get_host_server_list(host_name); // C++ signature
         })
         .def("get_server_release", [](Tango::Database& self) -> int {
@@ -264,18 +264,18 @@ void export_database(py::module &m)
         //
         // property methods
         //
-        .def("_get_property", [](Tango::Database& self, std::string obj_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
+        .def("_get_property", [](Tango::Database& self, std::string& obj_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
             self.get_property(obj_name, dbData); // C++ signature
             return dbData;
         })
-        .def("_get_property_forced", [](Tango::Database& self, std::string obj_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
+        .def("_get_property_forced", [](Tango::Database& self, std::string& obj_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
             self.get_property_forced(obj_name, dbData, NULL); // C++ signature
             return dbData;
         })
-        .def("_put_property", [](Tango::Database& self, std::string obj_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_put_property", [](Tango::Database& self, std::string& obj_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.put_property(obj_name, dbData); // C++ signature
         })
-        .def("_delete_property", [](Tango::Database& self, std::string obj_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_delete_property", [](Tango::Database& self, std::string& obj_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.delete_property(obj_name, dbData); // C++ signature
         })
         .def("get_property_history", [](Tango::Database& self, std::string& obj_name, std::string& prop_name) -> std::vector<Tango::DbHistory> {
@@ -285,35 +285,35 @@ void export_database(py::module &m)
             self.get_device_property(dev_name, dbData);  // Tango C++ signature
             return dbData;
         })
-        .def("_put_device_property", [](Tango::Database& self, string dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_put_device_property", [](Tango::Database& self, std::string& dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.put_device_property(dev_name, dbData);  // Tango C++ signature
         })
-        .def("_delete_device_property", [](Tango::Database& self, string dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_delete_device_property", [](Tango::Database& self, std::string& dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.delete_device_property(dev_name, dbData);  // Tango C++ signature
         })
         .def("get_device_property_history", [](Tango::Database& self, std::string& dev_name, std::string& prop_name) -> std::vector<Tango::DbHistory> {
             return self.get_device_property_history(dev_name, prop_name);  // Tango C++ signature
         })
         .def("_get_device_property_list", [](Tango::Database& self, std::string& dev_name, std::string& wildcard) -> Tango::DbDatum {
-            return self.get_device_property_list(dev_name, wildcard);
+            return self.get_device_property_list(dev_name, wildcard); // C++ signature
         })
         .def("_get_device_property_list", [](Tango::Database& self, std::string& dev_name,
                 std::string& wildcard, std::vector<std::string>& prop_list) -> std::vector<std::string> {
-            self.get_device_property_list(dev_name, wildcard, prop_list);
+            self.get_device_property_list(dev_name, wildcard, prop_list); // C++ signature
             return prop_list;
         })
-        .def("_get_device_attribute_property", [](Tango::Database& self, string dev_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
+        .def("_get_device_attribute_property", [](Tango::Database& self, std::string& dev_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
             self.get_device_attribute_property(dev_name, dbData); // C++ signature
             return dbData;
         })
-        .def("_put_device_attribute_property", [](Tango::Database& self, string dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_put_device_attribute_property", [](Tango::Database& self, std::string& dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.put_device_attribute_property(dev_name, dbData); // C++ signature
         })
-        .def("_delete_device_attribute_property", [](Tango::Database& self, string dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_delete_device_attribute_property", [](Tango::Database& self, std::string& dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.delete_device_attribute_property(dev_name, dbData); // C++ signature
         })
-        .def("get_device_attribute_property_history", [](Tango::Database& self, std::string& dev_name, std::string& prop_name, std::string& att_name) -> std::vector<Tango::DbHistory> {
-            return self.get_device_attribute_property_history(dev_name, prop_name, att_name);  // C++ signature
+        .def("get_device_attribute_property_history", [](Tango::Database& self, std::string& dev_name, std::string& att_name, std::string& prop_name) -> std::vector<Tango::DbHistory> {
+            return self.get_device_attribute_property_history(dev_name, att_name, prop_name);  // C++ signature
         })
         .def("get_device_attribute_list", [](Tango::Database& self, std::string& dev_name, std::vector<std::string>& att_list) -> std::vector<std::string> {
             self.get_device_attribute_list(dev_name, att_list); // C++ signature
@@ -332,14 +332,14 @@ void export_database(py::module &m)
         .def("get_class_property_history", [](Tango::Database& self, std::string& class_name, std::string& prop_name) -> std::vector<Tango::DbHistory> {
             return self.get_class_property_history(class_name, prop_name); // C++ signature
         })
-        .def("_get_class_attribute_property", [](Tango::Database& self, std::string class_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
+        .def("_get_class_attribute_property", [](Tango::Database& self, std::string& class_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
             self.get_class_attribute_property(class_name, dbData);  // C++ signature
             return dbData;
         })
-        .def("_put_class_attribute_property", [](Tango::Database& self, std::string class_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_put_class_attribute_property", [](Tango::Database& self, std::string& class_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.put_class_attribute_property(class_name, dbData);  // C++ signature
         })
-        .def("_delete_class_attribute_property", [](Tango::Database& self, std::string class_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_delete_class_attribute_property", [](Tango::Database& self, std::string& class_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.delete_class_attribute_property(class_name, dbData);  // C++ signature
         })
         .def("get_class_attribute_property_history", [](Tango::Database& self, std::string& class_name, std::string& att_name,
@@ -357,7 +357,7 @@ void export_database(py::module &m)
             }
             self.export_event(&dvsa);
         })
-        .def("unexport_event",[](Tango::Database& self, std::string &ev) -> void {
+        .def("unexport_event",[](Tango::Database& self, std::string& ev) -> void {
             self.unexport_event(ev); // C++ signature
         })
         //
@@ -367,28 +367,28 @@ void export_database(py::module &m)
             self.get_device_pipe_list(dev_name, pipe_list); // C++ signature
             return pipe_list;
         })
-        .def("get_device_pipe_property", [](Tango::Database& self, std::string dev_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
+        .def("_get_device_pipe_property", [](Tango::Database& self, std::string& dev_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
             self.get_device_pipe_property(dev_name, dbData); // C++ signature
             return dbData;
         })
-        .def("put_device_pipe_property", [](Tango::Database& self, std::string dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_put_device_pipe_property", [](Tango::Database& self, std::string& dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.put_device_pipe_property(dev_name, dbData); // C++ signature
         })
-        .def("delete_device_pipe_property", [](Tango::Database& self, std::string dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_delete_device_pipe_property", [](Tango::Database& self, std::string& dev_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.delete_device_pipe_property(dev_name, dbData); // C++ signature
         })
         .def("get_device_pipe_property_history", [](Tango::Database& self, std::string& dev_name,
                std::string& pipe_name, std::string& prop_name) -> std::vector<Tango::DbHistory> {
             return self.get_device_pipe_property_history(dev_name, pipe_name, prop_name); // C++ signature
         })
-        .def("get_class_pipe_property", [](Tango::Database& self, std::string class_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
+        .def("_get_class_pipe_property", [](Tango::Database& self, std::string& class_name, std::vector<Tango::DbDatum>& dbData) -> std::vector<Tango::DbDatum> {
             self.get_class_pipe_property(class_name, dbData); // C++ signature
             return dbData;
         })
-        .def("put_class_pipe_property", [](Tango::Database& self, std::string class_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_put_class_pipe_property", [](Tango::Database& self, std::string& class_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.put_class_pipe_property(class_name, dbData); // C++ signature
         })
-        .def("delete_class_pipe_property", [](Tango::Database& self, std::string class_name, std::vector<Tango::DbDatum>& dbData) -> void {
+        .def("_delete_class_pipe_property", [](Tango::Database& self, std::string& class_name, std::vector<Tango::DbDatum>& dbData) -> void {
             self.delete_class_pipe_property(class_name, dbData); // C++ signature
         })
         .def("get_class_pipe_property_history", [](Tango::Database& self, std::string& class_name,
@@ -439,7 +439,8 @@ void export_database(py::module &m)
             self.get_attribute_alias(alias, att_name); // C++ signature
             return std::move(att_name);
         })
-        .def("put_attribute_alias", [](Tango::Database& self, std::string att_name, std::string& alias) -> void {
+        .def("put_attribute_alias", [](Tango::Database& self, std::string& att_name, std::string& alias) -> void {
+            std::cerr << "herehere" << std::endl;
             self.put_attribute_alias(att_name, alias); // C++ signature
         })
         .def("delete_attribute_alias", [](Tango::Database& self, std::string& alias) -> void {

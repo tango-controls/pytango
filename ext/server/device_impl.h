@@ -18,9 +18,9 @@
 
 namespace py = pybind11;
 
-//                     const char *desc = "A Tango device",
+static std::string default_description = "A Tango device";
 //                     Tango::DevState sta = Tango::UNKNOWN,
-//                     const char *status = Tango::StatusNotSet);
+static std::string default_status = "";
 
 /**
  * DeviceImplWrap is the class used to represent a Python Tango device.
@@ -40,7 +40,7 @@ public:
      * @param[in] cl
      * @param[in] name
      */
-    DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name);
+//    DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name);
 
 //    /**
 //     * Constructor
@@ -50,7 +50,7 @@ public:
 //     * @param[in] name
 //     * @param[in] desc
 //     */
-    DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name, std::string& desc);
+//    DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name, std::string& desc);
 //
 //    /**
 //     * Constructor
@@ -66,9 +66,9 @@ public:
             py::object& pyself,
             DeviceClassWrap *cl,
             std::string& name,
-            std::string& desc,
-            Tango::DevState sta,
-            std::string& status
+            std::string& desc = default_description,
+            Tango::DevState sta = Tango::UNKNOWN,
+            std::string& status = default_status
             );
 
     /**
@@ -140,7 +140,8 @@ public:
     /**
      * Executes default dev_status implementation
      */
-    Tango::ConstDevString default_dev_status();
+//    Tango::ConstDevString default_dev_status();
+    std::string default_dev_status();
     /**
      * Necessary signal_handler implementation to call python
      */

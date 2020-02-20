@@ -17,38 +17,38 @@
 
 namespace py = pybind11;
 
-/// Get the python Global Interpret Lock
-class AutoPythonGIL
-{
-    /**
-     * Check python. Before acquiring python GIL check if python as not been
-     * shutdown. If this is the case then the best we can do here is throw an
-     * exception to try to prevent the PyTango from calling python code
-     **/
-    inline void check_python()
-    {
-        if (!Py_IsInitialized())
-        {
-            Tango::Except::throw_exception(
-                "AutoPythonGIL_PythonShutdown",
-                "Trying to execute python code when python interpreter as shutdown.",
-                "AutoPythonGIL::check_python");
-        }
-    }
-
-public:
-    inline AutoPythonGIL(bool safe=true) 
-    { 
-        if (safe) check_python();
-            // Acquire GIL before calling Python code
-            py::gil_scoped_acquire acquire;
-    }
-    
-    inline ~AutoPythonGIL() {
-        py::gil_scoped_release release;
-    }
-    
-};
+///// Get the python Global Interpret Lock
+//class AutoPythonGIL
+//{
+//    /**
+//     * Check python. Before acquiring python GIL check if python as not been
+//     * shutdown. If this is the case then the best we can do here is throw an
+//     * exception to try to prevent the PyTango from calling python code
+//     **/
+//    inline void check_python()
+//    {
+//        if (!Py_IsInitialized())
+//        {
+//            Tango::Except::throw_exception(
+//                "AutoPythonGIL_PythonShutdown",
+//                "Trying to execute python code when python interpreter as shutdown.",
+//                "AutoPythonGIL::check_python");
+//        }
+//    }
+//
+//public:
+//    inline AutoPythonGIL(bool safe=true)
+//    {
+//        if (safe) check_python();
+//            // Acquire GIL before calling Python code
+//            py::gil_scoped_acquire acquire;
+//    }
+//
+//    inline ~AutoPythonGIL() {
+//        py::gil_scoped_release release;
+//    }
+//
+//};
 
 class AutoPythonGILEnsure
 {

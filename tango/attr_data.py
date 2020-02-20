@@ -28,7 +28,7 @@ from ._tango import Attr, SpectrumAttr, ImageAttr, FwdAttr
 from .utils import is_non_str_seq, is_pure_str
 
 
-class AttrData(object):
+class AttrData():
     """A helper class that contains the same information one of the items in
     DeviceClass.attr_list but in object form"""
 

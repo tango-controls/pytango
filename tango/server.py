@@ -1322,6 +1322,8 @@ def __server_run(classes, args=None, msg_stream=sys.stdout, util=None,
 
     if util is None:
         util = Util.init(args)
+        print(dir(util))
+        print(Util.instance())
 
     if green_mode in (GreenMode.Gevent, GreenMode.Asyncio):
         util.set_serial_model(SerialModel.NO_SYNC)

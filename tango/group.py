@@ -22,7 +22,7 @@ try:
 except ImportError:
     import collections as collections_abc
 from ._tango import __Group as _RealGroup, StdStringVector
-from .utils import seq_2_StdStringVector, is_pure_str
+from .utils import is_pure_str #, seq_2_StdStringVector
 from .utils import document_method as __document_method
 from .device_proxy import __init_device_proxy_internals as init_device_proxy
 
@@ -83,7 +83,8 @@ class Group:
         elif isinstance(patterns_or_group, str):
             return self.__group._add(patterns_or_group, timeout_ms)
         elif isinstance(patterns_or_group, collections_abc.Sequence):
-            patterns = seq_2_StdStringVector(patterns_or_group)
+            # patterns = seq_2_StdStringVector(patterns_or_group)
+            patterns = patterns_or_group
             return self.__group._add(patterns, timeout_ms)
         else:
             raise TypeError('Parameter patterns_or_group: Should be Group, str or a sequence of strings.')
@@ -92,7 +93,8 @@ class Group:
         if isinstance(patterns, str):
             return self.__group._remove(patterns, forward)
         elif isinstance(patterns, collections_abc.Sequence):
-            std_patterns = seq_2_StdStringVector(patterns)
+#            std_patterns = seq_2_StdStringVector(patterns)
+            std_patterns = patterns
             return self.__group._remove(std_patterns, forward)
         else:
             raise TypeError('Parameter patterns: Should be a str or a sequence of str.')

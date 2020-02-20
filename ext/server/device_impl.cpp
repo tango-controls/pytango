@@ -704,17 +704,17 @@ namespace PyDeviceImpl
 
 //DeviceImplWrap::DeviceImplWrap(DeviceClassWrap *cl, std::string& name, py::object& pyself)
 //  : Tango::Device_5Impl(cl, name)
-DeviceImplWrap::DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name)
-  : Tango::Device_5Impl(cl, name)
-{
-    py_self = pyself;
-}
-
-DeviceImplWrap::DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name, std::string& descr)
-  : Tango::Device_5Impl(cl, name, descr)
-{
-    py_self = pyself;
-}
+//DeviceImplWrap::DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name)
+//  : Tango::Device_5Impl(cl, name)
+//{
+//    py_self = pyself;
+//}
+//
+//DeviceImplWrap::DeviceImplWrap(py::object& pyself, DeviceClassWrap *cl, std::string& name, std::string& descr)
+//  : Tango::Device_5Impl(cl, name, descr)
+//{
+//    py_self = pyself;
+//}
 
 DeviceImplWrap::DeviceImplWrap(py::object& pyself,
         DeviceClassWrap *cl,
@@ -855,7 +855,7 @@ void DeviceImplWrap::always_executed_hook()
     catch(...) {
         Tango::Except::throw_exception("CppException",
                 "An unexpected C++ exception occurred",
-                "delete_device");
+                "always_executed_hook");
     }
 }
 
@@ -881,7 +881,7 @@ void DeviceImplWrap::read_attr_hardware(std::vector<long> &attr_list)
     catch(...) {
         Tango::Except::throw_exception("CppException",
                 "An unexpected C++ exception occurred",
-                "delete_device");
+                "read_attr_hardware");
     }
 }
 
@@ -908,7 +908,7 @@ void DeviceImplWrap::write_attr_hardware(std::vector<long> &attr_list)
     catch(...) {
         Tango::Except::throw_exception("CppException",
                 "An unexpected C++ exception occurred",
-                "delete_device");
+                "write_attr_hardware");
     }
 }
 
@@ -936,7 +936,7 @@ Tango::DevState DeviceImplWrap::dev_state()
     catch(...) {
         Tango::Except::throw_exception("CppException",
                 "An unexpected C++ exception occurred",
-                "delete_device");
+                "dev_state");
     }
     return dstate;
 }
@@ -949,6 +949,7 @@ Tango::DevState DeviceImplWrap::default_dev_state()
 Tango::ConstDevString DeviceImplWrap::dev_status()
 {
     AutoPythonGILEnsure __py_lock;
+    std::cerr << "dev_status ===================================" << std::endl;
     std::string dstatus;
     try {
         if (is_method_callable(py_self, "dev_status")) {
@@ -967,15 +968,18 @@ Tango::ConstDevString DeviceImplWrap::dev_status()
     catch(...) {
         Tango::Except::throw_exception("CppException",
                 "An unexpected C++ exception occurred",
-                "delete_device");
+                "dev_status");
     }
-    return dstatus.c_str();
+    std::cerr << "device_impl status " << dstatus << std::endl;
+    return strdup(dstatus.c_str());
 }
 
-Tango::ConstDevString DeviceImplWrap::default_dev_status()
+//Tango::ConstDevString DeviceImplWrap::default_dev_status()
+std::string DeviceImplWrap::default_dev_status()
 {
-    this->the_status = this->Tango::Device_5Impl::dev_status();
-    return this->the_status.c_str();
+    this->the_status = std::string(this->Tango::Device_5Impl::dev_status());
+    std::cerr << "default_dev_status " << this->the_status << std::endl;
+    return this->the_status;
 }
 
 void DeviceImplWrap::signal_handler(long signo)
@@ -1047,6 +1051,7 @@ void export_device_impl(py::module &m) {
             self.unregister_signal(signo);
         })
         .def("get_status", [](DeviceImplWrap& self) -> std::string {
+            std::cerr << "deviceImpl get_status" << std::endl;
             return self.get_status();
         })
         .def("set_status", [](DeviceImplWrap& self, const std::string& new_status) -> void {
@@ -1058,7 +1063,8 @@ void export_device_impl(py::module &m) {
        .def("dev_state", [](DeviceImplWrap& self) -> Tango::DevState {
            return self.default_dev_state();
         })
-        .def("dev_status", [](DeviceImplWrap& self) -> Tango::ConstDevString {
+        .def("dev_status", [](DeviceImplWrap& self) -> std::string {
+            std::cerr << "deviceImpl dev_status" << self.default_dev_status() << std::endl;
             return self.default_dev_status();
         })
         .def("get_attribute_config", [](DeviceImplWrap& self, py::object& py_attr_name_seq) {

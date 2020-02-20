@@ -55,8 +55,8 @@ class TangoTest(Device):
     # Device Properties
     # -----------------
 
-    multithreaded_impl = device_property(dtype="int16")
-    sleep_period = device_property(dtype="int")
+    multithreaded_impl = device_property(dtype="bool", default_value=True)
+    sleep_period = device_property(dtype="float", default_value=1.0)
     image_size = device_property(dtype="int", default_value=251)
 
     # ---------------
@@ -141,6 +141,7 @@ class TangoTest(Device):
         self.__push_pipe_events = False
         self.__pipe_task = None
         self.set_state(tango.DevState.RUNNING)
+        self.set_status("The device is in RUNNING state.")
 
     def always_executed_hook(self):
         pass

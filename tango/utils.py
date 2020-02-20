@@ -48,7 +48,7 @@ __all__ = (
     "document_method", "document_static_method", "document_enum",
     "CaselessList", "CaselessDict", "EventCallBack", "get_home",
     "from_version_str_to_hex_str", "from_version_str_to_int",
-    "seq_2_StdStringVector", "StdStringVector_2_seq",
+#    "seq_2_StdStringVector", "StdStringVector_2_seq",
     "dir2", "TO_TANGO_TYPE")
 
 __docformat__ = "restructuredtext"
@@ -724,7 +724,7 @@ is_binary_type = is_binary
 
 def seq_2_StdStringVector(seq, vec=None):
     """Converts a python sequence<str> object to a :class:`tango.StdStringVector`
-
+ 
         :param seq: the sequence of strings
         :type seq: sequence<:py:obj:`str`>
         :param vec: (optional, default is None) an :class:`tango.StdStringVector`
@@ -734,12 +734,9 @@ def seq_2_StdStringVector(seq, vec=None):
         :rtype: :class:`tango.StdStringVector`
     """
     if vec is None:
-#        if isinstance(seq, StdStringVector):
         if isinstance(seq, list):
             return seq
-#        vec = StdStringVector()
         vec = list()
-#    if not isinstance(vec, StdStringVector):
     if not isinstance(vec, list):
         raise TypeError('vec must be a tango.StdStringVector')
     for e in seq:
@@ -747,23 +744,23 @@ def seq_2_StdStringVector(seq, vec=None):
     return vec
 
 
-def StdStringVector_2_seq(vec, seq=None):
-    """Converts a :class:`tango.StdStringVector` to a python sequence<str>
-
-        :param seq: the :class:`tango.StdStringVector`
-        :type seq: :class:`tango.StdStringVector`
-        :param vec: (optional, default is None) a python sequence to be filled.
-                     If None is given, a new list is created
-        :return: a python sequence filled with the same contents as seq
-        :rtype: sequence<str>
-    """
-    if seq is None:
-        seq = []
-    if not isinstance(vec, StdStringVector):
-        raise TypeError('vec must be a tango.StdStringVector')
-    for e in vec:
-        seq.append(str(e))
-    return seq
+# def StdStringVector_2_seq(vec, seq=None):
+#     """Converts a :class:`tango.StdStringVector` to a python sequence<str>
+# 
+#         :param seq: the :class:`tango.StdStringVector`
+#         :type seq: :class:`tango.StdStringVector`
+#         :param vec: (optional, default is None) a python sequence to be filled.
+#                      If None is given, a new list is created
+#         :return: a python sequence filled with the same contents as seq
+#         :rtype: sequence<str>
+#     """
+#     if seq is None:
+#         seq = []
+#     if not isinstance(vec, StdStringVector):
+#         raise TypeError('vec must be a tango.StdStringVector')
+#     for e in vec:
+#         seq.append(str(e))
+#     return seq
 
 
 def seq_2_StdDoubleVector(seq, vec=None):
@@ -1055,10 +1052,7 @@ def obj_2_str(obj, tg_type=None):
 
 
 def obj_2_property(value):
-#    if isinstance(value, DbData):
-#        pass
     if isinstance(value, DbDatum):
-#        new_value = DbData()
         new_value = list()
         new_value.append(value)
         value = new_value
@@ -1076,7 +1070,7 @@ def obj_2_property(value):
             else:
                 if not is_pure_str(v):
                     v = str(v)
-#                v = six.ensure_binary(v, encoding='latin-1')
+                    # v = six.ensure_binary(v, encoding='latin-1')
                 db_datum.value_string = [v]
             new_value.append(db_datum)
         value = new_value

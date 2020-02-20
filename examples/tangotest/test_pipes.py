@@ -24,6 +24,7 @@ assert cfg[0].writable == tango.PipeWriteType.PIPE_READ_WRITE
 
 # read the blob stored in TangoTest.py
 read_blob = dp.read_pipe('TestPipe')
+print(read_blob)
 assert read_blob[0] == "theBlob"
 blob_data = read_blob[1]
 assert blob_data[0]['name'] == 'double'
@@ -56,16 +57,17 @@ dp.write_pipe('TestPipe', blob)
 read_blob = dp.read_pipe('TestPipe')
 assert read_blob[0] == "pipeWriteTest0"
 blob_data = read_blob[1]
+print(blob_data)
 assert blob_data[0]['name'] == 'double'
 assert blob_data[0]['value'] == 56.98
-assert blob_data[1]['name'] == 'state'
-assert blob_data[1]['value'] == tango.DevState.FAULT
-assert blob_data[2]['name'] == 'bool'
-assert blob_data[2]['value'] is False
-assert blob_data[3]['name'] == 'long64'
-assert blob_data[3]['value'] == -169
-assert blob_data[4]['name'] == 'str'
-assert blob_data[4]['value'] == "write test"
+assert blob_data[1]['name'] == 'long64'
+assert blob_data[1]['value'] == -169
+assert blob_data[2]['name'] == 'str'
+assert blob_data[2]['value'] == "write test"
+assert blob_data[3]['name'] == 'bool'
+assert blob_data[3]['value'] is False
+assert blob_data[4]['name'] == 'state'
+assert blob_data[4]['value'] == tango.DevState.FAULT
 
 inner_blob = ("Inner", [("double_list", [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]),
                         ("np_array", np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], np.int64)),

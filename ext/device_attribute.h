@@ -124,8 +124,6 @@ namespace PyDeviceAttribute {
     ///                 about deallocating this object (python will do it) even
     ///                 if the call to convert_to_python fails.
     /// @param dev_proxy Device proxy where the value was got. DeviceAttribute
-    ///                 sent by older tango versions do not have all the
-    ///                 necessary information to extract the values, so we
     ///                 may need to ask.
     template<typename TDeviceAttribute>
     py::object convert_to_python(TDeviceAttribute* dev_attr, Tango::DeviceProxy& dev_proxy)

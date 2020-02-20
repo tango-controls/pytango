@@ -17,18 +17,18 @@ __all__ = ("db_init",)
 
 __docformat__ = "restructuredtext"
 
-#import six
+import re
 try:
     import collections.abc as collections_abc  # python 3.3+
 except ImportError:
     import collections as collections_abc
 
-from ._tango import StdStringVector, Database, DbDatum, DbData
+from ._tango import Database, DbDatum
 from ._tango import DbDevInfo, DbDevInfos, DbDevImportInfo, DbDevExportInfo
 from ._tango import DbDevExportInfos, DbHistory, DbServerInfo, DbServerData
 
-from .utils import is_pure_str, is_non_str_seq, seq_2_StdStringVector
-from .utils import seq_2_DbDevInfos, seq_2_DbDevExportInfos, seq_2_DbData
+from .utils import is_pure_str, is_non_str_seq
+from .utils import seq_2_DbDevInfos, seq_2_DbDevExportInfos
 from .utils import DbData_2_dict, obj_2_property
 from .utils import document_method as __document_method
 
@@ -187,21 +187,19 @@ def __Database__export_server(self, dev_info):
 
 def __Database__generic_get_property(self, obj_name, value, f):
     """internal usage"""
+    ret = None
+    new_value = list()
     if isinstance(value, DbDatum):
-        new_value = list()
         new_value.append(value)
     elif is_pure_str(value):
-        new_value = list()
         new_value.append(DbDatum(value))
     elif isinstance(value, collections_abc.Sequence):
-        new_value = list()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
     elif isinstance(value, collections_abc.Mapping):
-        new_value = list()
         for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
@@ -224,26 +222,116 @@ def __Database__generic_put_property(self, obj_name, value, f):
 
 def __Database__generic_delete_property(self, obj_name, value, f):
     """internal usage"""
+    new_value = list()
     if isinstance(value, DbDatum):
-        new_value = list()
         new_value.append(value)
     elif is_pure_str(value):
-        new_value = list()
         new_value.append(DbDatum(value))
     elif isinstance(value, collections_abc.Sequence):
-        new_value = list()
         for e in value:
             if isinstance(e, DbDatum):
                 new_value.append(e)
             else:
                 new_value.append(DbDatum(str(e)))
     elif isinstance(value, collections_abc.Mapping):
-        new_value = list()
         for k, v in value.items():
             if isinstance(v, DbDatum):
                 new_value.append(v)
             else:
                 new_value.append(DbDatum(k))
+    else:
+        raise TypeError(
+            'Value must be a string, tango.DbDatum, '
+            'a sequence or a dictionary')
+
+    return f(obj_name, new_value)
+
+
+def __Database__generic_get_attr_pipe_property(self, obj_name, value, f):
+    """internal usage for class or device attribute and pipe properties."""
+    new_value = list()
+    if isinstance(value, DbDatum):
+        new_value.append(value)
+    elif is_pure_str(value):
+        new_value.append(DbDatum(value))
+    elif isinstance(value, collections_abc.Sequence):
+        for e in value:
+            if isinstance(e, DbDatum):
+                new_value.append(e)
+            else:
+                new_value.append(DbDatum(str(e)))
+    elif isinstance(value, collections_abc.Mapping):
+        for k, v in value.items():
+            if isinstance(v, DbDatum):
+                new_value.append(v)
+            else:
+                new_value.append(DbDatum(k))
+    else:
+        raise TypeError(
+            'Value must be a string, tango.DbDatum, '
+            'a sequence or a dictionary')
+
+    ret_value = f(obj_name, new_value)
+
+    ret = {}
+    nb_items = len(ret_value)
+    i = 0
+    while i < nb_items:
+        db_datum = ret_value[i]
+        curr_dict = {}
+        ret[db_datum.name] = curr_dict
+        nb_props = int(db_datum[0])
+        i += 1
+        for k in range(nb_props):
+            db_datum = ret_value[i]
+            curr_dict[db_datum.name] = db_datum.value_string
+            i += 1
+
+    return ret
+
+
+def __Database__generic_put_attr_pipe_property(self, obj_name, value, f):
+    """internal usage for class or device attribute and pipe properties."""
+    if is_non_str_seq(value):
+        new_value = value
+    elif isinstance(value, collections_abc.Mapping):
+        new_value = list()
+        for k1, v1 in value.items():
+            attr = DbDatum(k1)
+            attr.value_string = [str(len(v1))]
+            new_value.append(attr)
+            for k2, v2 in v1.items():
+                if isinstance(v2, DbDatum):
+                    new_value.append(v2)
+                    continue
+                db_datum = DbDatum(k2)
+                if is_non_str_seq(v2):
+                    db_datum.value_string = v2
+                else:
+                    if not is_pure_str(v2):
+                        v2 = repr(v2)
+                    db_datum.value_string.append(v2)
+                new_value.append(db_datum)
+    else:
+        raise TypeError(
+            'Value must be a tango.DbData,'
+            'a sequence<DbDatum> or a dictionary')
+
+    return f(obj_name, new_value)
+
+
+def __Database__generic_delete_attr_pipe_property(self, obj_name, value, f):
+    """internal usage for class or device attribute and pipe properties."""
+    if is_non_str_seq(value):
+        new_value = value
+    elif isinstance(value, collections_abc.Mapping):
+        new_value = list()
+        for k1, v1 in value.items():
+            attr = DbDatum(k1)
+            attr.append(str(len(v1)))
+            new_value.append(attr)
+            for k2 in v1:
+                new_value.append(DbDatum(k2))
     else:
         raise TypeError(
             'Value must be a string, tango.DbDatum, '
@@ -434,7 +522,7 @@ def __Database__get_device_property_list(self, dev_name, wildcard, array=None):
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device"""
     if array is None:
         return self._get_device_property_list(dev_name, wildcard)
-    elif isinstance(array, StdStringVector):
+    elif isinstance(array, list):
         return self._get_device_property_list(dev_name, wildcard, array)
     elif is_non_str_seq(array):
         res = self._get_device_property_list(dev_name, wildcard)
@@ -472,54 +560,41 @@ def __Database__get_device_attribute_property(self, dev_name, value):
                                  a DbDatum containing the property value.
 
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_get_attr_pipe_property(
+        self, dev_name, value, self._get_device_attribute_property)
 
-    ret = None
-    if isinstance(value, DbData):
-        new_value = value
-    elif isinstance(value, DbDatum):
-        new_value = DbData()
-        new_value.append(value)
-    elif is_pure_str(value):
-        new_value = DbData()
-        new_value.append(DbDatum(value))
-    elif isinstance(value, collections_abc.Sequence):
-        new_value = DbData()
-        for e in value:
-            if isinstance(e, DbDatum):
-                new_value.append(e)
-            else:
-                new_value.append(DbDatum(str(e)))
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k, v in value.items():
-            if isinstance(v, DbDatum):
-                new_value.append(v)
-            else:
-                new_value.append(DbDatum(k))
-    else:
-        raise TypeError(
-            'Value must be a string, tango.DbDatum, '
-            'tango.DbData, a sequence or a dictionary')
 
-    if ret is None:
-        ret = {}
+def __Database__get_device_pipe_property(self, dev_name, value):
+    """
+        get_device_pipe_property(self, dev_name, value) -> dict<str, dict<str, seq<str>>>
 
-    self._get_device_attribute_property(dev_name, new_value)
+                Query the database for a list of device pipe properties for the
+                specified device. The method returns all the properties for the specified
+                pipes.
 
-    nb_items = len(new_value)
-    i = 0
-    while i < nb_items:
-        db_datum = new_value[i]
-        curr_dict = {}
-        ret[db_datum.name] = curr_dict
-        nb_props = int(db_datum[0])
-        i += 1
-        for k in range(nb_props):
-            db_datum = new_value[i]
-            curr_dict[db_datum.name] = db_datum.value_string
-            i += 1
+            Parameters :
+                - dev_name : (string) device name
+                - value : can be one of the following:
 
-    return ret
+                    1. str [in] - single pipe properties to be fetched
+                    2. DbDatum [in] - single pipe properties to be fetched
+                    3. DbData [in,out] - several pipe properties to be fetched
+                       In this case (direct C++ API) the DbData will be filled with
+                       the property values
+                    4. sequence<str> [in] - several pipe properties to be fetched
+                    5. sequence<DbDatum> [in] - several pipe properties to be fetched
+                    6. dict<str, obj> [in,out] - keys are pipe names
+                       In this case the given dict values will be changed to contain the
+                       several pipe property values
+
+            Return     :  a dictionary which keys are the pipe names the
+                                 value associated with each key being a another
+                                 dictionary where keys are property names and value is
+                                 a DbDatum containing the property value.
+
+            Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_get_attr_pipe_property(
+        self, dev_name, value, self._get_device_pipe_property)
 
 
 def __Database__put_device_attribute_property(self, dev_name, value):
@@ -544,34 +619,34 @@ def __Database__put_device_attribute_property(self, dev_name, value):
             Return     : None
 
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
-    if isinstance(value, DbData):
-        pass
-    elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k1, v1 in value.items():
-            attr = DbDatum(k1)
-            attr.append(str(len(v1)))
-            new_value.append(attr)
-            for k2, v2 in v1.items():
-                if isinstance(v2, DbDatum):
-                    new_value.append(v2)
-                    continue
-                db_datum = DbDatum(k2)
-                if is_non_str_seq(v2):
-                    seq_2_StdStringVector(v2, db_datum.value_string)
-                else:
-                    if not is_pure_str(v2):
-                        v2 = repr(v2)
-                    db_datum.value_string.append(v2)
-                new_value.append(db_datum)
-        value = new_value
-    else:
-        raise TypeError(
-            'Value must be a tango.DbData,'
-            'a sequence<DbDatum> or a dictionary')
-    return self._put_device_attribute_property(dev_name, value)
+    return __Database__generic_put_attr_pipe_property(
+        self, dev_name, value, self._put_device_attribute_property)
+
+
+def __Database__put_device_pipe_property(self, dev_name, value):
+    """
+        put_device_pipe_property( self, dev_name, value) -> None
+
+                Insert or update a list of properties for the specified device.
+
+            Parameters :
+                - dev_name : (str) device name
+                - value : can be one of the following:
+
+                    1. DbData - several property data to be inserted
+                    2. sequence<DbDatum> - several property data to be inserted
+                    3. dict<str, dict<str, obj>> keys are pipe names and value being another
+                       dictionary which keys are the pipe property names and the value
+                       associated with each key being:
+
+                       3.1 seq<str>
+                       3.2 tango.DbDatum
+
+            Return     : None
+
+            Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_put_attr_pipe_property(
+        self, dev_name, value, self._put_device_pipe_property)
 
 
 def __Database__delete_device_attribute_property(self, dev_name, value):
@@ -591,25 +666,29 @@ def __Database__delete_device_attribute_property(self, dev_name, value):
             Return     : None
 
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_delete_attr_pipe_property(
+        self, dev_name, value, self._delete_device_attribute_property)
 
-    if isinstance(value, DbData):
-        new_value = value
-    elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k1, v1 in value.items():
-            attr = DbDatum(k1)
-            attr.append(str(len(v1)))
-            new_value.append(attr)
-            for k2 in v1:
-                new_value.append(DbDatum(k2))
-    else:
-        raise TypeError(
-            'Value must be a string, tango.DbDatum, '
-            'tango.DbData, a sequence or a dictionary')
 
-    return self._delete_device_attribute_property(dev_name, new_value)
+def __Database__delete_device_pipe_property(self, dev_name, value):
+    """
+        delete_device_pipe_property(self, dev_name, value) -> None
+
+                Delete a list of pipe properties for the specified device.
+
+            Parameters :
+                - devname : (string) device name
+                - propnames : can be one of the following:
+                    1. DbData [in] - several property data to be deleted
+                    2. sequence<str> [in]- several property data to be deleted
+                    3. sequence<DbDatum> [in] - several property data to be deleted
+                    3. dict<str, seq<str>> keys are pipe names and value being a list of pipe property names
+
+            Return     : None
+
+            Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_delete_attr_pipe_property(
+        self, dev_name, value, self._delete_device_pipe_property)
 
 
 def __Database__get_class_property(self, class_name, value):
@@ -717,54 +796,41 @@ def __Database__get_class_attribute_property(self, class_name, value):
                          a sequence of strings being the property value.
 
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_get_attr_pipe_property(
+        self, class_name, value, self._get_class_attribute_property)
 
-    ret = None
-    if isinstance(value, DbData):
-        new_value = value
-    elif isinstance(value, DbDatum):
-        new_value = DbData()
-        new_value.append(value)
-    elif is_pure_str(value):
-        new_value = DbData()
-        new_value.append(DbDatum(value))
-    elif isinstance(value, collections_abc.Sequence):
-        new_value = DbData()
-        for e in value:
-            if isinstance(e, DbDatum):
-                new_value.append(e)
-            else:
-                new_value.append(DbDatum(str(e)))
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k, v in value.items():
-            if isinstance(v, DbDatum):
-                new_value.append(v)
-            else:
-                new_value.append(DbDatum(k))
-    else:
-        raise TypeError(
-            'Value must be a string, tango.DbDatum, '
-            'tango.DbData, a sequence or a dictionary')
 
-    self._get_class_attribute_property(class_name, new_value)
+def __Database__get_class_pipe_property(self, class_name, value):
+    """
+        get_class_pipe_property( self, class_name, value) -> dict<str, dict<str, seq<str>>
 
-    if ret is None:
-        ret = {}
+                Query the database for a list of class pipe properties for the
+                specified class. The method returns all the properties for the specified
+                pipes.
 
-    nb_items = len(new_value)
-    i = 0
-    while i < nb_items:
-        db_datum = new_value[i]
-        curr_dict = {}
-        ret[db_datum.name] = curr_dict
-        nb_props = int(db_datum[0])
-        i += 1
-        for k in range(nb_props):
-            db_datum = new_value[i]
-            curr_dict[db_datum.name] = db_datum.value_string
-            i += 1
+            Parameters :
+                - class_name : (str) class name
+                - propnames : can be one of the following:
 
-    return ret
+                    1. str [in] - single pipe properties to be fetched
+                    2. DbDatum [in] - single pipe properties to be fetched
+                    3. DbData [in,out] - several pipe properties to be fetched
+                       In this case (direct C++ API) the DbData will be filled with the property
+                       values
+                    4. sequence<str> [in] - several pipe properties to be fetched
+                    5. sequence<DbDatum> [in] - several pipe properties to be fetched
+                    6. dict<str, obj> [in,out] - keys are pipe names
+                       In this case the given dict values will be changed to contain the several
+                       pipe property values
+
+            Return     : a dictionary which keys are the pipe names the
+                         value associated with each key being a another
+                         dictionary where keys are property names and value is
+                         a sequence of strings being the property value.
+
+            Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_get_attr_pipe_property(
+        self, class_name, value, self._get_class_pipe_property)
 
 
 def __Database__put_class_attribute_property(self, class_name, value):
@@ -789,33 +855,34 @@ def __Database__put_class_attribute_property(self, class_name, value):
             Return     : None
 
             Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_put_attr_pipe_property(
+        self, class_name, value, self._put_class_attribute_property)
 
-    if isinstance(value, DbData):
-        pass
-    elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k1, v1 in value.items():
-            attr = DbDatum(k1)
-            attr.append(str(len(v1)))
-            new_value.append(attr)
-            for k2, v2 in v1.items():
-                if isinstance(v2, DbDatum):
-                    new_value.append(v2)
-                    continue
-                db_datum = DbDatum(k2)
-                if is_non_str_seq(v2):
-                    seq_2_StdStringVector(v2, db_datum.value_string)
-                else:
-                    db_datum.value_string.append(str(v2))
-                new_value.append(db_datum)
-        value = new_value
-    else:
-        raise TypeError(
-            'Value must be a tango.DbData, '
-            'a sequence<DbDatum> or a dictionary')
-    return self._put_class_attribute_property(class_name, value)
+
+def __Database__put_class_pipe_property(self, class_name, value):
+    """
+        put_class_pipe_property(self, class_name, value) -> None
+
+                Insert or update a list of properties for the specified class.
+
+            Parameters :
+                - class_name : (str) class name
+                - propdata : can be one of the following:
+
+                    1. tango.DbData - several property data to be inserted
+                    2. sequence<DbDatum> - several property data to be inserted
+                    3. dict<str, dict<str, obj>> keys are pipe names and value
+                       being another dictionary which keys are the pipe property
+                       names and the value associated with each key being:
+
+                       3.1 seq<str>
+                       3.2 tango.DbDatum
+
+            Return     : None
+
+            Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)"""
+    return __Database__generic_put_attr_pipe_property(
+        self, class_name, value, self._put_class_pipe_property)
 
 
 def __Database__delete_class_attribute_property(self, class_name, value):
@@ -838,28 +905,35 @@ def __Database__delete_class_attribute_property(self, class_name, value):
 
             Throws     : ConnectionFailed, CommunicationFailed
                          DevFailed from device (DB_SQLError)"""
+    return __Database__generic_delete_attr_pipe_property(
+        self, class_name, value, self._delete_class_attribute_property)
 
-    if isinstance(value, DbData):
-        new_value = value
-    elif is_non_str_seq(value):
-        new_value = seq_2_DbData(value)
-    elif isinstance(value, collections_abc.Mapping):
-        new_value = DbData()
-        for k1, v1 in value.items():
-            attr = DbDatum(k1)
-            attr.append(str(len(v1)))
-            new_value.append(attr)
-            for k2 in v1:
-                new_value.append(DbDatum(k2))
-    else:
-        raise TypeError(
-            'Value must be a DbDatum, DbData, a sequence or a dictionary')
 
-    return self._delete_class_attribute_property(class_name, new_value)
+def __Database__delete_class_pipe_property(self, class_name, value):
+    """
+        delete_class_pipe_property(self, class_name, value) -> None
+
+                Delete a list of pipe properties for the specified class.
+
+            Parameters :
+                - class_name : (str) class name
+                - propnames : can be one of the following:
+
+                    1. DbData [in] - several property data to be deleted
+                    2. sequence<str> [in]- several property data to be deleted
+                    3. sequence<DbDatum> [in] - several property data to be deleted
+                    4. dict<str, seq<str>> keys are pipe names and value being a
+                       list of pipe property names
+
+            Return     : None
+
+            Throws     : ConnectionFailed, CommunicationFailed
+                         DevFailed from device (DB_SQLError)"""
+    return __Database__generic_delete_attr_pipe_property(
+        self, class_name, value, self._delete_class_pipe_property)
 
 
 def __Database__get_service_list(self, filter='.*'):
-    import re
     data = self.get_property('CtrlSystem', 'Services')
     res = {}
     filter_re = re.compile(filter)
@@ -886,14 +960,20 @@ def __init_Database():
     Database.delete_device_property = __Database__delete_device_property
     Database.get_device_property_list = __Database__get_device_property_list
     Database.get_device_attribute_property = __Database__get_device_attribute_property
+    Database.get_device_pipe_property = __Database__get_device_pipe_property
     Database.put_device_attribute_property = __Database__put_device_attribute_property
+    Database.put_device_pipe_property = __Database__put_device_pipe_property
     Database.delete_device_attribute_property = __Database__delete_device_attribute_property
+    Database.delete_device_pipe_property = __Database__delete_device_pipe_property
     Database.get_class_property = __Database__get_class_property
     Database.put_class_property = __Database__put_class_property
     Database.delete_class_property = __Database__delete_class_property
     Database.get_class_attribute_property = __Database__get_class_attribute_property
+    Database.get_class_pipe_property = __Database__get_class_pipe_property
     Database.put_class_attribute_property = __Database__put_class_attribute_property
+    Database.put_class_pipe_property = __Database__put_class_pipe_property
     Database.delete_class_attribute_property = __Database__delete_class_attribute_property
+    Database.delete_class_pipe_property = __Database__delete_class_pipe_property
     Database.get_service_list = __Database__get_service_list
     Database.__str__ = __Database__str
     Database.__repr__ = __Database__str
@@ -1396,7 +1476,7 @@ def __doc_Database():
     document_method("_add_server", """
     _add_server(self, serv_name, dev_info) -> None
 
-            Add a a group of devices to the database.
+            Add a group of devices to the database.
             This corresponds to the pure C++ API call.
 
         Parameters :
@@ -1504,7 +1584,7 @@ def __doc_Database():
     document_method("get_server_class_list", """
     get_server_class_list(self, server) -> DbDatum
 
-            Query the database for a list of classes instancied by the
+            Query the database for a list of classes instantiated by the
             specified server. The DServer class exists in all TANGO servers
             and for this reason this class is removed from the returned list.
 
@@ -1551,18 +1631,18 @@ def __doc_Database():
     get_server_list(self, wildcard) -> DbDatum
 
             Return the list of all servers registered in the database.
-            If wildcard parameter is given, then the the list matching servers
-            will be returned (ex: Serial/\*)
+            If wildcard parameter is given, then the list of matching servers
+            will be returned (ex: Serial/*)
 
         Parameters :
-            - wildcard : (str) host wildcard (ex: Serial/\*)
+            - wildcard : (str) host wildcard (ex: Serial/*)
         Return     : DbDatum containing list of registered servers
     """)
 
     document_method("get_host_server_list", """
     get_host_server_list(self, host_name) -> DbDatum
 
-            Query the database for a list of servers registred on the specified host.
+            Query the database for a list of servers registered on the specified host.
 
         Parameters :
             - host_name : (str) host name
@@ -1764,7 +1844,7 @@ def __doc_Database():
         Parameters :
             - dev_name : (str) device name
             - wildcard : (str) property name wildcard
-            - container [out] : (StdStringVector) array that will contain the matching
+            - container [out] : list that will contain the matching
                                 property names
         Return     : DbDatum containing the list of property names or None
 
@@ -1790,10 +1870,41 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
+    document_method("_get_device_pipe_property", """
+    _get_device_pipe_property(self, dev_name, props) -> None
+
+            Query the database for a list of device pipe properties for
+            the specified device. The pipe names are specified by the
+            DbData (seq<DbDatum>) structures. The method returns all the
+            properties for the specified pipes in the same DbDatum structures.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - dev_name : (str) device name
+            - props [in, out] : (DbData) pipe names
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
     document_method("_put_device_attribute_property", """
     _put_device_attribute_property(self, dev_name, props) -> None
 
             Insert or update a list of attribute properties for the specified device.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - dev_name : (str) device name
+            - props : (DbData) property data
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
+    document_method("_put_device_pipe_property", """
+    _put_device_pipe_property(self, dev_name, props) -> None
+
+            Insert or update a list of pipe properties for the specified device.
             This corresponds to the pure C++ API call.
 
         Parameters :
@@ -1827,8 +1938,25 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
+    document_method("_delete_device_pipe_property", """
+    _delete_device_pipe_property(self, dev_name, props) -> None
+
+            Delete a list of pipe properties for the specified device.
+            The pipe names are specified by the vector of DbDatum structures. Here
+            See _delete_device_attribute_property for example usage.
+
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - serv_name : (str) server name
+            - props : (DbData) pipe property data
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
     document_method("get_device_attribute_property_history", """
-    get_device_attribute_property_history(self, dev_name, att_name, prop_name) -> DbHistoryList
+    get_device_attribute_property_history(self, dev_name, attr_name, prop_name) -> DbHistoryList
 
             Get the list of the last 10 modifications of the specified device
             attribute property. Note that propname and devname can contain a
@@ -1836,7 +1964,7 @@ def __doc_Database():
 
         Parameters :
             - dev_name : (str) device name
-            - attn_ame : (str) attribute name
+            - attr_name : (str) attribute name
             - prop_name : (str) property name
 
         Return     : DbHistoryList containing the list of modifications
@@ -1844,6 +1972,59 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
 
         New in PyTango 7.0.0
+    """)
+
+    document_method("get_device_pipe_property_history", """
+    get_device_pipe_property_history(self, dev_name, pipe_name, prop_name) -> DbHistoryList
+
+            Get the list of the last 10 modifications of the specified device
+            pipe property. Note that propname and devname can contain a
+            wildcard character (eg: 'prop*').
+
+        Parameters :
+            - dev_name : (str) device name
+            - pipe_name : (str) pipe name
+            - prop_name : (str) property name
+
+        Return     : DbHistoryList containing the list of modifications
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
+    document_method("get_device_attribute_list", """
+    get_device_attribute_list(self, dev_name, att_list) -> None
+
+            Get the list of attribute(s) with some data defined in database
+            for a specified device. Note that this is not the list of all
+            device attributes because not all attribute(s) have some data
+            in database
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - dev_name : (str) device name
+            - att_list [out] : list that will contain the
+                               attribute name list
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
+    document_method("get_device_pipe_list", """
+    get_device_pipe_list(self, dev_name, pipe_list) -> None
+
+            Get the list of pipe(s) with some data defined in database
+            for a specified device. Note that this is not the list of all
+            device pipes because not all pipe(s) have some data
+            in database
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - dev_name : (str) device name
+            - pipe_list [out] : list that will contain the
+                                pipe name list
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
     document_method("_get_class_property", """
@@ -1937,11 +2118,31 @@ def __doc_Database():
     _get_class_attribute_property(self, class_name, props) -> None
 
             Query the database for a list of class attribute properties for
-            the specified objec. The attribute names are returned with the
+            the specified object. The attribute names are returned with the
             number of properties specified as their value. The first DbDatum
             element of the returned DbData vector contains the first
             attribute name and the first attribute property number. The
             following DbDatum element contains the first attribute property
+            name and property values.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - class_name : (str) class name
+            - props [in,out] : (DbData) property names
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
+    document_method("_get_class_pipe_property", """
+    _get_class_pipe_property(self, class_name, props) -> None
+
+            Query the database for a list of class pipe properties for
+            the specified object. The pipe names are returned with the
+            number of properties specified as their value. The first DbDatum
+            element of the returned DbData vector contains the first
+            pipe name and the first pipe property number. The
+            following DbDatum element contains the first pipe property
             name and property values.
             This corresponds to the pure C++ API call.
 
@@ -1967,11 +2168,54 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
+    document_method("_put_class_pipe_property", """
+    _put_class_pipe_property(self, class_name, props) -> None
+
+            Insert or update a list of pipe properties for the specified class.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - class_name : (str) class name
+            - props : (DbData) property data
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
+    document_method("_delete_class_attribute_property", """
+    _delete_class_attribute_property(self, class_name, props) -> None
+
+            Delete a list of attribute properties for the specified class.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - class_name : (str) server name
+            - props : (DbData) attribute property data
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
+    document_method("_delete_class_pipe_property", """
+    _delete_class_pipe_property(self, class_name, props) -> None
+
+            Delete a list of pipe properties for the specified class.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - class_name : (str) server name
+            - props : (DbData) pipe property data
+        Return     : None
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
+    """)
+
     document_method("get_class_attribute_property_history", """
     get_class_attribute_property_history(self, dev_name, attr_name, prop_name) -> DbHistoryList
 
-            Delete a list of properties for the specified class.
-            This corresponds to the pure C++ API call.
+            Get the list of the last 10 modifications of the specifed class attribute
+            property. Note that prop_name and attr_name can contain a wildcard character
+            (eg: 'prop*').
 
         Parameters :
             - dev_name : (str) device name
@@ -1982,6 +2226,22 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
 
         New in PyTango 7.0.0
+    """)
+
+    document_method("get_class_pipe_property_history", """
+    get_class_pipe_property_history(self, dev_name, pipe_name, prop_name) -> DbHistoryList
+
+            Get the list of the last 10 modifications of the specifed class pipe
+            property. Note that prop_name and attr_name can contain a wildcard character
+            (eg: 'prop*').
+
+        Parameters :
+            - dev_name : (str) device name
+            - pipe_name : (str) pipe name
+            - prop_name : (str) property name
+        Return     : DbHistoryList containing the list of modifications
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
     document_method("get_class_attribute_list", """
@@ -1998,6 +2258,21 @@ def __doc_Database():
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
 
         New in PyTango 7.0.0
+    """)
+
+    document_method("get_class_pipe_list", """
+    get_class_pipe_list(self, class_name, wildcard) -> DbDatum
+
+            Query the database for a list of pipes defined for the specified
+            class which match the specified wildcard.
+            This corresponds to the pure C++ API call.
+
+        Parameters :
+            - class_name : (str) class name
+            - wildcard : (str) pipe name
+        Return     : DbDatum containing the list of matching pipes for the given class
+
+        Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)
     """)
 
     document_method("get_attribute_alias", """
@@ -2064,8 +2339,8 @@ def __doc_Database():
     put_attribute_alias(self, attr_name, alias) -> None
 
             Set an alias for an attribute name. The attribute alias is
-            specified by aliasname and the attribute name is specifed by
-            attname. If the given alias already exists, a DevFailed exception
+            specified by alias and the attribute name is specifed by
+            attr_name. If the given alias already exists, a DevFailed exception
             is thrown.
 
         Parameters :
@@ -2163,8 +2438,8 @@ def __doc_DbDatum():
 
 def __doc_DbDevExportInfo():
     DbDevExportInfo.__doc__ = """
-    import info for a device (should be retrived from the database) with
-    the following members:
+    A structure containing export info for a device (should be
+    retrieved from the database) with the following members:
 
         - name : (str) device name
         - ior : (str) CORBA reference of the device
@@ -2175,8 +2450,8 @@ def __doc_DbDevExportInfo():
 
 def __doc_DbDevImportInfo():
     DbDevImportInfo.__doc__ = """
-    import info for a device (should be retrived from the database) with
-    the following members:
+    A structure containing import info for a device (should be
+    retrieved from the database) with the following members:
 
         - name : (str) device name
         - exported : 1 if device is running, 0 else

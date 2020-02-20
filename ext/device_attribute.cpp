@@ -39,46 +39,46 @@ const char *invalid_spectrum = "Parameter must be an SPECTRUM. This is a"
                                " sequence of scalar values or a unidimensional"
                                " numpy.array";
 
-template<long tangoTypeConst>
-struct python_tangocpp
-{
-    typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+//template<long tangoTypeConst>
+//struct python_tangocpp
+//{
+//    typedef typename TANGO_const2type(tangoTypeConst) TangoScalarType;
+//
+//    static inline void to_cpp(const py::object&  py_value, TangoScalarType & result)
+//    {
+//        result = py_value.cast<TangoScalarType>();
+//    }
+//
+//    static inline py::object to_python(const TangoScalarType & value)
+//    {
+//        return py::cast(value);
+//    }
+//};
+//
+//template<>
+//struct python_tangocpp<Tango::DEV_STRING>
+//{
+//    static const long tangoTypeConst = Tango::DEV_STRING;
+//    typedef TANGO_const2type(tangoTypeConst) TangoScalarType;
+//
+//    static inline void to_cpp(const py::object& py_value, TangoScalarType& result)
+//    {
+//        result = const_cast<char*>(py_value.cast<std::string>().c_str());
+//    }
+//
+//    static inline py::object to_python(const TangoScalarType & value)
+//    {
+//        return py::cast(std::string(value));
+//    }
+//};
 
-    static inline void to_cpp(const py::object&  py_value, TangoScalarType & result)
-    {
-        result = py_value.cast<TangoScalarType>();
-    }
-
-    static inline py::object to_python(const TangoScalarType & value)
-    {
-        return py::cast(value);
-    }
-};
-
-template<>
-struct python_tangocpp<Tango::DEV_STRING>
-{
-    static const long tangoTypeConst = Tango::DEV_STRING;
-    typedef TANGO_const2type(tangoTypeConst) TangoScalarType;
-
-    static inline void to_cpp(const py::object& py_value, TangoScalarType& result)
-    {
-        result = const_cast<char*>(py_value.cast<std::string>().c_str());
-    }
-
-    static inline py::object to_python(const TangoScalarType & value)
-    {
-        return py::cast(std::string(value));
-    }
-};
-
-#define EXTRACT_VALUE(self, value_ptr) \
-try { \
-    self >> value_ptr; \
-} catch (Tango::DevFailed &e ) { \
-    if (strcmp(e.errors[0].reason.in(),"API_EmptyDeviceAttribute") != 0) \
-        throw; \
-}
+//#define EXTRACT_VALUE(self, value_ptr) \
+//try { \
+//    self >> value_ptr; \
+//} catch (Tango::DevFailed &e ) { \
+//    if (strcmp(e.errors[0].reason.in(),"API_EmptyDeviceAttribute") != 0) \
+//        throw; \
+//}
 
 
 namespace PyDeviceAttribute {

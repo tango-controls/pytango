@@ -79,7 +79,7 @@ void export_wattribute(py::module &m);
 
 PYBIND11_MODULE(_tango, m) {
     m.doc() = "This module implements the Python Tango Device API pybind11 mapping.";
-    std::cerr << "Initialising the Python Tango Device API pybind11 mapping." << std::endl;
+    std::cerr << "Initialising the Python Tango Device API pybind11 mapping v3." << std::endl;
     m.attr("__path__") = "PyTango";
 
     py::print("pytango.cpp: initialise threads");

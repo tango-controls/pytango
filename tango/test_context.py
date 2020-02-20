@@ -183,7 +183,10 @@ class DeviceTestContext(object):
     def post_init(self):
         try:
             host, port = get_server_host_port()
-            self.queue.put((host, port))
+            import pdb
+            pdb.set_trace()
+            print(host, port)
+#            self.queue.put((host, port))
         except Exception as exc:
             self.queue.put((None, exc, None))
         finally:

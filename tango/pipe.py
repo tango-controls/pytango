@@ -54,7 +54,7 @@ def __get_pipe_type_simple(obj):
         tg_type = CmdArgType.DevDouble
     # this may be too simple but we'll try it now.
     elif isinstance(obj, tuple):
-        tg_type = CmdArgtype.DevEncoded
+        tg_type = CmdArgType.DevEncoded
     else:
         raise ValueError('Cannot determine object tango type')
     return tg_type
@@ -63,7 +63,7 @@ def __get_pipe_type_simple(obj):
 def __get_pipe_type_numpy_support(obj):
     try:
         ndim, dtype = obj.ndim, str(obj.dtype)
-    except AttributeError, TypeError:
+    except AttributeError:
         return __get_pipe_type_simple(obj)
     if ndim > 1:
         raise TypeError('cannot translate numpy array with {0} '
