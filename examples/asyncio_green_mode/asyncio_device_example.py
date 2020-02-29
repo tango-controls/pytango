@@ -14,6 +14,12 @@ class AsyncioDevice(Device):
 
     @command
     async def long_running_command(self):
+        self.set_state(DevState.OPEN)
+        await asyncio.sleep(2)
+        self.set_state(DevState.CLOSE)
+
+    @command
+    async def background_task_command(self):
         loop = asyncio.get_event_loop()
         future = loop.create_task(self.coroutine_target())
 
