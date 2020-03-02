@@ -5,7 +5,7 @@ import textwrap
 import pytest
 import enum
 
-from tango import AttrData, AttrWriteType, DevFailed, DevEncoded, \
+from tango import Attr, AttrData, AttrWriteType, DevFailed, DevEncoded, \
     DevEnum, DevState, GreenMode, READ_WRITE, SCALAR
 from tango.server import Device
 from tango.server import command, attribute, device_property
@@ -425,7 +425,7 @@ def test_device_property_with_default_value(typed_values, server_green_mode):
                            properties={'prop_with_db_value': value}) as proxy:
         assert_close(proxy.get_prop_without_db_value(), expected(default))
         assert_close(proxy.get_prop_with_db_value(), expected(value))
-    
+
 
 def test_device_get_device_properties_when_init_device(server_green_mode):
 
@@ -677,3 +677,28 @@ def test_exeption_propagation(server_green_mode):
         with pytest.raises(DevFailed) as record:
             proxy.cmd()
         assert "ZeroDivisionError" in record.value.args[0].desc
+
+# Test server dynamic attributes async mode
+
+def test_dyn_attr_async_read(typed_values, server_green_mode):
+    dtype, values, expected = typed_values
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        def __init__(self, *args, **kwargs):
+            super(TestDevice, self).__init__(*args, **kwargs)
+
+            attr = Attr("Attribute", dtype, AttrWriteType.READ_WRITE)
+            self.add_attribute(attr, self.read_attr, self.write_attr)
+
+        def read_attr(self, attr):
+            attr.set_value(self.attr_value)
+
+        def write_attr(self, attr):
+            self.attr_value = attr.get_write_value()
+
+    with DeviceTestContext(TestDevice) as proxy:
+        for value in values:
+            proxy.Attribute = value
+            assert_close(proxy.attr, expected(value))
