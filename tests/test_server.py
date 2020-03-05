@@ -560,7 +560,7 @@ def test_dyn_attr_async_read(typed_values, server_green_mode):
         def __init__(self, *args, **kwargs):
             super(TestDevice, self).__init__(*args, **kwargs)
 
-            attr = Attr("Attribute", dtype, AttrWriteType.READ_WRITE)
+            attr = Attr("TestAttr", dtype, AttrWriteType.READ_WRITE)
             self.add_attribute(attr, self.read_attr, self.write_attr)
 
         def read_attr(self, attr):
@@ -571,5 +571,5 @@ def test_dyn_attr_async_read(typed_values, server_green_mode):
 
     with DeviceTestContext(TestDevice) as proxy:
         for value in values:
-            proxy.Attribute = value
+            proxy.TestAttr = value
             assert_close(proxy.attr, expected(value))
