@@ -159,13 +159,46 @@ def add_lib(name, dirs, sys_libs,
 
 
 def add_lib_boost(dirs):
-    # special boost-python configuration
+    """Add boost-python configuration details.
+
+    There are optional environment variables that can be used for
+    non-standard boost installations.
+
+    The BOOST_ROOT can be used for a custom boost installation in
+    a separate directory, like:
+
+        /opt/my_boost
+            |- include
+            |- lib
+
+    In this case, use:
+
+        BOOST_ROOT=/opt/my_boost
+
+    Alternatively, the header and library folders can be specified
+    individually (do not set BOOST_ROOT):
+
+        BOOST_HEADERS=/usr/local/include/boost123
+
+    and/or:
+
+        BOOST_LIBRARIES=/usr/local/lib/boost123
+
+    Lastly, the boost-python library name can be specified, if the
+    automatic detection is not working.  For example, if the
+    library is libboost_python_custom.so, then use:
+
+        BOOST_PYTHON_LIB=boost_python_custom
+
+    """
 
     BOOST_ROOT = os.environ.get('BOOST_ROOT')
-    BOOST_LIB = os.environ.get('BOOST_LIB')
-    boost_library_name = BOOST_LIB if BOOST_LIB else 'boost_python'
+    BOOST_HEADERS = os.environ.get('BOOST_HEADERS')
+    BOOST_LIBRARIES = os.environ.get('BOOST_LIBRARIES')
+    BOOST_PYTHON_LIB = os.environ.get('BOOST_PYTHON_LIB')
+    boost_library_name = BOOST_PYTHON_LIB if BOOST_PYTHON_LIB else 'boost_python'
     if BOOST_ROOT is None:
-        if POSIX and not BOOST_LIB:
+        if POSIX and not BOOST_PYTHON_LIB:
             # library name differs widely across distributions, so if it
             # wasn't specified as an environment var, then try the
             # various options, being as Python version specific as possible
@@ -182,6 +215,10 @@ def add_lib_boost(dirs):
                 if find_library(candidate):
                     boost_library_name = candidate
                     break
+        if BOOST_HEADERS:
+            dirs['include_dirs'].append(BOOST_HEADERS)
+        if BOOST_LIBRARIES:
+            dirs['library_dirs'].append(BOOST_LIBRARIES)
     else:
         inc_dir = os.path.join(BOOST_ROOT, 'include')
         lib_dirs = [os.path.join(BOOST_ROOT, 'lib')]
