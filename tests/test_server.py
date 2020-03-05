@@ -683,8 +683,8 @@ def test_exeption_propagation(server_green_mode):
 def test_dyn_attr_async_read(typed_values, server_green_mode):
     py_dtype, values, expected = typed_values
 
-    import tango.device_proxy.__get_tango_type as get_tango_type
-    dtype = get_tango_type(py_dtype)
+    from tango.device_proxy import __get_tango_type
+    dtype = __get_tango_type(py_dtype)
 
     class TestDevice(Device):
         green_mode = server_green_mode
