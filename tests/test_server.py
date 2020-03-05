@@ -556,12 +556,13 @@ def test_dyn_attr_async_read(typed_values, server_green_mode):
 
     class TestDevice(Device):
         green_mode = server_green_mode
+        _is_testattr_allowed = True
 
         def __init__(self, *args, **kwargs):
             super(TestDevice, self).__init__(*args, **kwargs)
 
             attr = Attr("TestAttr", dtype, AttrWriteType.READ_WRITE)
-            self.add_attribute(attr, self.read_attr, self.write_attr)
+            self.add_attribute(attr, self.read_attr, self.write_attr, self.is_attr_allowed)
 
         def read_attr(self, attr):
             attr.set_value(self.attr_value)
@@ -569,7 +570,16 @@ def test_dyn_attr_async_read(typed_values, server_green_mode):
         def write_attr(self, attr):
             self.attr_value = attr.get_write_value()
 
+        def is_attr_allowed(self, req_type):
+            return self._is_testattr_allowed
+
     with DeviceTestContext(TestDevice) as proxy:
+        proxy._is_testattr_allowed = True
         for value in values:
             proxy.TestAttr = value
             assert_close(proxy.attr, expected(value))
+
+        proxy._is_testattr_allowed = False
+        for value in values:
+            with pytest.raises(DevFailed) as record:
+                proxy.TestAttr = value
