@@ -176,11 +176,12 @@ def add_lib_boost(dirs):
         BOOST_ROOT=/opt/my_boost
 
     Alternatively, the header and library folders can be specified
-    individually (do not set BOOST_ROOT):
+    individually (do not set BOOST_ROOT).  For example, if the
+    python.hpp file is in /usr/local/include/boost123/boost/:
 
         BOOST_HEADERS=/usr/local/include/boost123
 
-    and/or:
+    If the libboost_python.so file is in /usr/local/lib/boost123:
 
         BOOST_LIBRARIES=/usr/local/lib/boost123
 

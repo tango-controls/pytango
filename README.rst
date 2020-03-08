@@ -37,7 +37,7 @@ General dependencies:
 Python dependencies:
 
 -  numpy_ >= 1.1
--  six_
+-  six_ >= 1.10
 
 Build dependencies:
 
@@ -51,7 +51,9 @@ Optional dependencies:
 
 .. note:: As a general rule, libtango_ and pytango_ should share the same major
 	  and minor version (for a version ``X.Y.Z``, ``X`` and ``Y`` should
-	  match)
+	  match).
+      On some systems you may need to install ``libtango``, ``omniORB4`` and ``libzmq`` related
+      development packages.
 
 
 Install
@@ -70,9 +72,9 @@ In both cases, the installation takes a few minutes since the ``_tango`` boost
 extension has to compile.
 
 .. note::
-   
-   On some systems you may need to install ``libtango``, ``omniORB4`` and ``libzmq`` related 
-   developement packages.
+   For custom `Boost.Python`_ installation locations, environment variables can be used
+   to modify the default paths.  See the description of the ``BOOST_ROOT`` and related
+   variables in the ``setup.py`` file.
 
 Usage
 -----
@@ -148,7 +150,7 @@ All contributions,  `PR and bug reports`_ are welcome, please see: `How to Contr
 .. _PyPI: http://pypi.python.org/pypi/pytango
 
 .. _libtango: http://tango-controls.org/downloads
-.. _Boost.Python: http://boost.org/doc/libs/1_61_0/libs/python/doc/html
+.. _Boost.Python: https://www.boost.org/doc/libs/release/libs/python/doc/html/index.html
 .. _numpy: http://pypi.python.org/pypi/numpy
 .. _six: http://pypi.python.org/pypi/six
 .. _setuptools: http://pypi.python.org/pypi/setuptools
