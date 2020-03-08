@@ -29,6 +29,10 @@ Documentation is written in reStructuredText_ and built with Sphinx_ - it's easy
 It also uses autodoc_ importing docstrings from tango package.
 Theme is not important, a theme prepared for Tango Community can be also used.
 
+To test the docs locally requires Python >= 3.5:
+      - ``$ pip install sphinx sphinx_rtd_theme``
+      - ``$ python setup.py build_doc``
+
 Source code standard
 --------------------
 
@@ -187,7 +191,7 @@ Bump the version with "-dev" in the develop branch
     ``(9, 3, 3, 'dev', 0)``.
   * In ``appveyor.yml``, change ``version``, e.g. from ``9.3.2.{build}`` to
     ``9.3.3.dev0.{build}``.
-   * Create PR, merge to ``develop``.
+  * Create PR, merge to ``develop``.
 
 Create and fill in the release description on GitHub
   * Go to the Tags page: https://github.com/tango-controls/pytango/tags

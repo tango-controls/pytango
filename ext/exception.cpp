@@ -177,9 +177,9 @@ Tango::DevFailed to_dev_failed(PyObject *type, PyObject *value,
 
             PyObject *tbList_ptr = PyObject_CallMethod(
                     tracebackModule,
-                    (char *)"format_tb",
-                    (char *)"O",
-                    traceback == NULL ? Py_None : traceback);
+                    (char *)"format_exception",
+                    (char *)"OOO",
+                    type, value, traceback);
             
             boost::python::object tbList = object(handle<>(tbList_ptr));
             boost::python::str origin = str("").join(tbList);

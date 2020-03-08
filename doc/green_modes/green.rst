@@ -8,6 +8,9 @@ modes have been added: :obj:`~tango.GreenMode.Futures` and
 :obj:`~tango.GreenMode.Gevent`. In version 9.2.0 another one has been
 added: :obj:`~tango.GreenMode.Asyncio`.
 
+.. note:: The preferred mode to use for new projects is :obj:`~tango.GreenMode.Asyncio`.
+          Support for this mode will take priority over the others.
+
 The :obj:`~tango.GreenMode.Futures` uses the standard python module
 :mod:`concurrent.futures`.
 The :obj:`~tango.GreenMode.Gevent` mode uses the well known gevent_ library.
