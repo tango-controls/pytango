@@ -456,7 +456,7 @@ def setup_args():
     ]
 
     if PYTHON2:
-        tests_require += ['trollius', 'futures', 'pytest < 5']
+        tests_require += ['trollius', 'futures', 'pytest < 5', 'zipp >= 0.5, < 2']
     else:
         tests_require += ['pytest']
 

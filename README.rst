@@ -31,7 +31,7 @@ PyTango_ is compatible with python 2 and python 3.
 
 General dependencies:
 
--  libtango_ >= 9.2
+-  libtango_ >= 9.3, and its dependencies: omniORB4 and libzmq
 -  `Boost.Python`_ >= 1.33
 
 Python dependencies:
@@ -69,6 +69,10 @@ Alternatively, PyTango_ can be built and installed from the
 In both cases, the installation takes a few minutes since the ``_tango`` boost
 extension has to compile.
 
+.. note::
+   
+   On some systems you may need to install ``libtango``, ``omniORB4`` and ``libzmq`` related 
+   developement packages.
 
 Usage
 -----
