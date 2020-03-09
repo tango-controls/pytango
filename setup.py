@@ -17,6 +17,8 @@ import runpy
 import struct
 import subprocess
 
+from ctypes.util import find_library
+
 from setuptools import setup, Extension
 from setuptools import Command
 from setuptools.command.build_ext import build_ext as dftbuild_ext
@@ -25,12 +27,6 @@ from setuptools.command.install import install as dftinstall
 from distutils.command.build import build as dftbuild
 from distutils.unixccompiler import UnixCCompiler
 from distutils.version import LooseVersion as V
-
-# Distro import
-try:
-    from pip._vendor import distro
-except ImportError:
-    import platform as distro
 
 # Sphinx imports
 try:
@@ -54,14 +50,6 @@ IS64 = 8 * struct.calcsize("P") == 64
 PYTHON_VERSION = sys.version_info
 PYTHON2 = (2,) <= PYTHON_VERSION < (3,)
 PYTHON3 = (3,) <= PYTHON_VERSION < (4,)
-
-# Linux distribution
-distribution = distro.linux_distribution()[0].lower() if POSIX else ""
-distribution_match = lambda names: any(x in distribution for x in names)
-DEBIAN = distribution_match(['debian', 'ubuntu', 'mint'])
-REDHAT = distribution_match(['redhat', 'fedora', 'centos', 'opensuse'])
-GENTOO = distribution_match(['gentoo'])
-CONDA = 'CONDA_PREFIX' in os.environ
 
 # Arguments
 TESTING = any(x in sys.argv for x in ['test', 'pytest'])
@@ -168,6 +156,82 @@ def add_lib(name, dirs, sys_libs,
         if lib_name.startswith('lib'):
             lib_name = lib_name[3:]
         dirs['libraries'].append(lib_name)
+
+
+def add_lib_boost(dirs):
+    """Add boost-python configuration details.
+
+    There are optional environment variables that can be used for
+    non-standard boost installations.
+
+    The BOOST_ROOT can be used for a custom boost installation in
+    a separate directory, like:
+
+        /opt/my_boost
+            |- include
+            |- lib
+
+    In this case, use:
+
+        BOOST_ROOT=/opt/my_boost
+
+    Alternatively, the header and library folders can be specified
+    individually (do not set BOOST_ROOT).  For example, if the
+    python.hpp file is in /usr/local/include/boost123/boost/:
+
+        BOOST_HEADERS=/usr/local/include/boost123
+
+    If the libboost_python.so file is in /usr/local/lib/boost123:
+
+        BOOST_LIBRARIES=/usr/local/lib/boost123
+
+    Lastly, the boost-python library name can be specified, if the
+    automatic detection is not working.  For example, if the
+    library is libboost_python_custom.so, then use:
+
+        BOOST_PYTHON_LIB=boost_python_custom
+
+    """
+
+    BOOST_ROOT = os.environ.get('BOOST_ROOT')
+    BOOST_HEADERS = os.environ.get('BOOST_HEADERS')
+    BOOST_LIBRARIES = os.environ.get('BOOST_LIBRARIES')
+    BOOST_PYTHON_LIB = os.environ.get('BOOST_PYTHON_LIB')
+    boost_library_name = BOOST_PYTHON_LIB if BOOST_PYTHON_LIB else 'boost_python'
+    if BOOST_ROOT is None:
+        if POSIX and not BOOST_PYTHON_LIB:
+            # library name differs widely across distributions, so if it
+            # wasn't specified as an environment var, then try the
+            # various options, being as Python version specific as possible
+            suffixes = [
+                "{v[0]}{v[1]}".format(v=PYTHON_VERSION),
+                "-{v[0]}{v[1]}".format(v=PYTHON_VERSION),
+                "-py{v[0]}{v[1]}".format(v=PYTHON_VERSION),
+                "{v[0]}-py{v[0]}{v[1]}".format(v=PYTHON_VERSION),
+                "{v[0]}".format(v=PYTHON_VERSION),
+                ""
+            ]
+            for suffix in suffixes:
+                candidate = boost_library_name + suffix
+                if find_library(candidate):
+                    boost_library_name = candidate
+                    break
+        if BOOST_HEADERS:
+            dirs['include_dirs'].append(BOOST_HEADERS)
+        if BOOST_LIBRARIES:
+            dirs['library_dirs'].append(BOOST_LIBRARIES)
+    else:
+        inc_dir = os.path.join(BOOST_ROOT, 'include')
+        lib_dirs = [os.path.join(BOOST_ROOT, 'lib')]
+        if IS64:
+            lib64_dir = os.path.join(BOOST_ROOT, 'lib64')
+            if os.path.isdir(lib64_dir):
+                lib_dirs.insert(0, lib64_dir)
+
+        dirs['include_dirs'].append(inc_dir)
+        dirs['library_dirs'].extend(lib_dirs)
+
+    dirs['libraries'].append(boost_library_name)
 
 
 class build(dftbuild):
@@ -366,35 +430,7 @@ def setup_args():
     add_lib('omni', directories, sys_libs, lib_name='omniORB4')
     add_lib('zmq', directories, sys_libs, lib_name='libzmq')
     add_lib('tango', directories, sys_libs, inc_suffix='tango')
-
-    # special boost-python configuration
-
-    BOOST_ROOT = os.environ.get('BOOST_ROOT')
-    boost_library_name = 'boost_python'
-    if BOOST_ROOT is None:
-        if CONDA:
-            suffix = ''
-        elif DEBIAN:
-            suffix = "-py{v[0]}{v[1]}".format(v=PYTHON_VERSION)
-            boost_library_name += suffix
-        elif REDHAT:
-            if PYTHON3:
-                boost_library_name += '3'
-        elif GENTOO:
-            suffix = "-{v[0]}.{v[1]}".format(v=PYTHON_VERSION)
-            boost_library_name += suffix
-    else:
-        inc_dir = os.path.join(BOOST_ROOT, 'include')
-        lib_dirs = [os.path.join(BOOST_ROOT, 'lib')]
-        if IS64:
-            lib64_dir = os.path.join(BOOST_ROOT, 'lib64')
-            if os.path.isdir(lib64_dir):
-                lib_dirs.insert(0, lib64_dir)
-
-        directories['include_dirs'].append(inc_dir)
-        directories['library_dirs'].extend(lib_dirs)
-
-    directories['libraries'].append(boost_library_name)
+    add_lib_boost(directories)
 
     # special numpy configuration
 
