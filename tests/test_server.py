@@ -710,7 +710,7 @@ def test_dyn_attr_async_read(typed_values, server_green_mode):
             self._is_testattr_allowed = yesno
 
     with DeviceTestContext(TestDevice) as proxy:
-        proxy._is_testattr_allowed = True
+        proxy.make_allowed(True)
         for value in values:
             proxy.TestAttr = value
             assert_close(proxy.TestAttr, expected(value))
