@@ -573,7 +573,7 @@ def test_dyn_attr_async_read(typed_values, server_green_mode):
         def is_attr_allowed(self, req_type):
             return self._is_testattr_allowed
 
-        @command
+        @command(dtype_in=bool)
         def make_allowed(self, yesno):
             self._is_testattr_allowed = yesno
 
