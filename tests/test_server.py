@@ -709,7 +709,7 @@ def test_dyn_attr_async_read(typed_values, server_green_mode):
         proxy._is_testattr_allowed = True
         for value in values:
             proxy.TestAttr = value
-            assert_close(proxy.attr, expected(value))
+            assert_close(proxy.TestAttr, expected(value))
 
         proxy._is_testattr_allowed = False
         for value in values:
