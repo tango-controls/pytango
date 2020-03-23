@@ -246,7 +246,7 @@ Now you can access it from a python console::
     >>> power_supply.current
     2.3
 
-    >>> power_supply.PowerOn()
+    >>> power_supply.TurnOn()
     >>> power_supply.Ramp(2.1)
     True
 
