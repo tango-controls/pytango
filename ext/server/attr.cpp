@@ -164,6 +164,18 @@ void PyAttr::set_user_prop(vector<Tango::AttrProperty> &user_prop,
             def_prop.set_archive_event_rel_change(prop_value);
         else if (prop_name == "archive_period")
             def_prop.set_archive_event_period(prop_value);
+        else if (prop_name == "enum_labels") {
+            // Convert string back to vector
+            vector<string> labels;
+            string label_str = prop.get_value();
+            size_t offset = 0, pos = 0;
+            while( (pos = label_str.find(",", offset)) != string::npos) {
+                labels.push_back(label_str.substr(offset, pos-offset));
+                offset = pos + 1;
+            }
+            labels.push_back(label_str.substr(offset));
+            def_prop.set_enum_labels(labels);
+        }
     }
 }
 
