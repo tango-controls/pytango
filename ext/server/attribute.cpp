@@ -236,7 +236,6 @@ namespace PyAttribute
 
         PYTG_NEW_TIME_FROM_DOUBLE(t, tv);
 	Tango::DevString val_str_real = val_str;
-        att.set_value(&val_str_real, (Tango::DevUChar*)view.buf, (long)view.len);	
         att.set_value_date_quality(&val_str_real, (Tango::DevUChar*)view.buf,
                                    (long)view.len, tv, quality);
 	PyBuffer_Release(&view);
