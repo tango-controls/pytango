@@ -5,7 +5,8 @@ import textwrap
 import pytest
 import enum
 
-from tango import DevState, AttrWriteType, GreenMode, DevFailed, DevEncoded
+from tango import AttrData, AttrWriteType, DevFailed, DevEncoded, \
+    DevEnum, DevState, GreenMode, READ_WRITE, SCALAR
 from tango.server import Device
 from tango.server import command, attribute, device_property
 from tango.test_utils import DeviceTestContext, assert_close, \
@@ -269,6 +270,104 @@ def test_wrong_attribute_read(server_green_mode):
             proxy.attr_int_err
         with pytest.raises(DevFailed):
             proxy.attr_str_list_err
+
+
+def test_read_write_dynamic_attribute(typed_values, server_green_mode):
+    dtype, values, expected = typed_values
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        def __init__(self, *args, **kwargs):
+            super(TestDevice, self).__init__(*args, **kwargs)
+            self.attr_value = None
+
+        @command
+        def add_dyn_attr(self):
+            attr = attribute(
+                name="dyn_attr",
+                dtype=dtype,
+                max_dim_x=10,
+                access=AttrWriteType.READ_WRITE,
+                fget=self.read,
+                fset=self.write)
+            self.add_attribute(attr)
+
+        @command
+        def delete_dyn_attr(self):
+            self.remove_attribute("dyn_attr")
+
+        def read(self, attr):
+            attr.set_value(self.attr_value)
+
+        def write(self, attr):
+            self.attr_value = attr.get_write_value()
+
+    with DeviceTestContext(TestDevice) as proxy:
+        proxy.add_dyn_attr()
+        for value in values:
+            proxy.dyn_attr = value
+            assert_close(proxy.dyn_attr, expected(value))
+        proxy.delete_dyn_attr()
+        assert "dyn_attr" not in proxy.get_attribute_list()
+
+
+def test_read_write_dynamic_attribute_enum(server_green_mode):
+    values = (member.value for member in GoodEnum)
+    enum_labels = get_enum_labels(GoodEnum)
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        def __init__(self, *args, **kwargs):
+            super(TestDevice, self).__init__(*args, **kwargs)
+            self.attr_value = 0
+
+        @command
+        def add_dyn_attr_old(self):
+            attr = AttrData(
+                "dyn_attr",
+                None,
+                attr_info=[
+                    (DevEnum, SCALAR, READ_WRITE),
+                    {"enum_labels": enum_labels},
+                ],
+            )
+            self.add_attribute(attr, r_meth=self.read, w_meth=self.write)
+
+        @command
+        def add_dyn_attr_new(self):
+            attr = attribute(
+                name="dyn_attr",
+                dtype=GoodEnum,
+                access=AttrWriteType.READ_WRITE,
+                fget=self.read,
+                fset=self.write)
+            self.add_attribute(attr)
+
+        @command
+        def delete_dyn_attr(self):
+            self.remove_attribute("dyn_attr")
+
+        def read(self, attr):
+            attr.set_value(self.attr_value)
+
+        def write(self, attr):
+            self.attr_value = attr.get_write_value()
+
+    with DeviceTestContext(TestDevice) as proxy:
+        for add_attr_cmd in [proxy.add_dyn_attr_old, proxy.add_dyn_attr_new]:
+            add_attr_cmd()
+            for value, label in zip(values, enum_labels):
+                proxy.dyn_attr = value
+                read_attr = proxy.dyn_attr
+                assert read_attr == value
+                assert isinstance(read_attr, enum.IntEnum)
+                assert read_attr.value == value
+                assert read_attr.name == label
+            proxy.delete_dyn_attr()
+            assert "dyn_attr" not in proxy.get_attribute_list()
+
 
 # Test properties
 
