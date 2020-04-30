@@ -107,6 +107,8 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 | 08/08/19 | `9.3.1 <http://pytango.readthedocs.io/en/v9.3.1>`_                               | 9.3.1 Release                                       | A\. Joubert                    |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
+| 30/04/19 | `9.3.2 <http://pytango.readthedocs.io/en/v9.3.2>`_                               | 9.3.2 Release                                       | A\. Joubert                    |
++----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 
 .. _pytango-version-history:
 
@@ -116,6 +118,30 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
+| 9.3.2    | 9.3.2 release.                                                                                                                                                        |
+|          |                                                                                                                                                                       |
+|          | Features:                                                                                                                                                             |
+|          |     - `Pull Request #314: Add MultiDeviceTestContext for testing more than one Device <https://github.com/tango-controls/pytango/pull/314>`_                          |
+|          |     - `Pull Request #317: Add get_device_attribute_list and missing pipe methods to Database interface (#313) <https://github.com/tango-controls/pytango/pull/317>`_  |
+|          |     - `Pull Request #327: Add EnsureOmniThread and is_omni_thread (#307, #292) <https://github.com/tango-controls/pytango/pull/327>`_                                 |
+|          |                                                                                                                                                                       |
+|          | Changes:                                                                                                                                                              |
+|          |     - `Pull Request #316: Reduce six requirement from 1.12 to 1.10 (#296) <https://github.com/tango-controls/pytango/pull/316>`_                                      |
+|          |     - `Pull Request #326: Add Docker development container  <https://github.com/tango-controls/pytango/pull/326>`_                                                    |
+|          |     - `Pull Request #330: Add enum34 to Python 2.7 docker images <https://github.com/tango-controls/pytango/pull/330>`_                                               |
+|          |     - `Pull Request #329: Add test to verify get_device_properties called on init <https://github.com/tango-controls/pytango/pull/329>`_                              |
+|          |     - `Pull Request #341: Build DevFailed origin from format_exception (#340) <https://github.com/tango-controls/pytango/pull/341>`_                                  |
+|          |                                                                                                                                                                       |
+|          | Bug/doc fixes:                                                                                                                                                        |
+|          |     - `Pull Request #301: Fix documentation error <https://github.com/tango-controls/pytango/pull/301>`_                                                              |
+|          |     - `Pull Request #334: Update green mode docs and asyncio example (#333) <https://github.com/tango-controls/pytango/pull/334>`_                                    |
+|          |     - `Pull Request #335: Generalise search for libboost_python on POSIX (#300, #310) <https://github.com/tango-controls/pytango/pull/335>`_                          |
+|          |     - `Pull Request #343: Extend the info on dependencies in README <https://github.com/tango-controls/pytango/pull/343>`_                                            |
+|          |     - `Pull Request #345: Fix power_supply client example PowerOn -> TurnOn <https://github.com/tango-controls/pytango/pull/345>`_                                    |
+|          |     - `Pull Request #347: Fix memory leak for DevEncoded attributes <https://github.com/tango-controls/pytango/pull/347>`_                                            |
+|          |     - `Pull Request #348: Fix dynamic enum attributes created without labels (#56) <https://github.com/tango-controls/pytango/pull/348>`_                             |
+|          |                                                                                                                                                                       |
++----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 9.3.1    | 9.3.1 release.                                                                                                                                                        |
 |          |                                                                                                                                                                       |
 |          | Changes:                                                                                                                                                              |
