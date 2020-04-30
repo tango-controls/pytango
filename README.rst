@@ -50,8 +50,8 @@ Optional dependencies:
 - gevent_
 
 .. note:: As a general rule, libtango_ and pytango_ should share the same major
-	  and minor version (for a version ``X.Y.Z``, ``X`` and ``Y`` should
-	  match).
+      and minor version (for a version ``X.Y.Z``, ``X`` and ``Y`` should
+      match).
       On some systems you may need to install ``libtango``, ``omniORB4`` and ``libzmq`` related
       development packages.
 
