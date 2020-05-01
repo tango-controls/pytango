@@ -83,7 +83,7 @@ To test the installation, import ``tango`` and check ``tango.utils.info()``::
 
     >>> import tango
     >>> print(tango.utils.info())
-    PyTango 9.3.2 (9, 3, 2)
+    PyTango 9.3.3 (9, 3, 3)
     PyTango compiled with:
         Python : 2.7.15
         Numpy  : 1.16.2
