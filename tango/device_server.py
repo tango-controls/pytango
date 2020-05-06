@@ -1396,6 +1396,7 @@ def __doc_extra_DeviceImpl(cls):
         Parameters :
             attr_list : (sequence<int>) list of indices in the device object attribute vector
                         of an attribute to be read.
+
         Return     : None
 
         Throws     : DevFailed This method does not throw exception but a redefined method can.
