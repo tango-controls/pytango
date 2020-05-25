@@ -198,7 +198,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC $ENV{TANGO_ROOT}/lib/libtango.lib
                                              $ENV{TANGO_ROOT}/lib/omnithread.lib
                                              $ENV{TANGO_ROOT}/lib/msvcstub.lib)
 target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32 mswsock advapi32 comctl32 odbc32)
-target_link_libraries(${PROJECT_NAME} PUBLIC $ENV{TANGO_ROOT}/lib/pthreadVC2.lib)
+target_link_libraries(${PROJECT_NAME} PUBLIC $ENV{TANGO_ROOT}/lib/pthreadVC2-s.lib)
 target_link_libraries(${PROJECT_NAME} PUBLIC $ENV{TANGO_ROOT}/lib/libzmq-v${VCSTR}-mt-s-${ZMQ_VERSION_}.lib)
 target_link_libraries(${PROJECT_NAME} PUBLIC $ENV{BOOST_ROOT}/lib/libboost_python$ENV{PYTHON_VER}-vc${VCSTR}-mt-s-x${PY_TARGET}-${BOOST_VERSION_}.lib)
 target_link_libraries(${PROJECT_NAME} PUBLIC $ENV{PYTHON_ROOT}/libs/python$ENV{PYTHON_VER}.lib)
