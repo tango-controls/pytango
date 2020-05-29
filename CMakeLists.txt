@@ -17,7 +17,7 @@ add_definitions(-DNPY_NO_DEPRECATED_API)
 add_definitions(-DBOOST_PYTHON_STATIC_LIB)
 add_definitions(-DBOOST_ALL_NO_LIB)
 add_definitions(-DZMQ_STATIC)
-add_definitions(-D__POSIX_NT__)
+# add_definitions(-D__POSIX_NT__) #not present in cppTango build, try to make args identical
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(PY_TARGET "64")
