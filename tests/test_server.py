@@ -439,6 +439,24 @@ def test_device_get_device_properties_when_init_device(server_green_mode):
         assert proxy.got_properties
 
 
+def test_device_get_attr_config(server_green_mode):
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        @attribute(dtype=bool)
+        def attr_config_ok(self):
+            # testing that call to get_attribute_config for all types of
+            # input arguments gives same result and doesn't raise an exception
+            ac1 = self.get_attribute_config(b"attr_config_ok")
+            ac2 = self.get_attribute_config(u"attr_config_ok")
+            ac3 = self.get_attribute_config(["attr_config_ok"])
+            return repr(ac1) == repr(ac2) == repr(ac3)
+
+    with DeviceTestContext(TestDevice, process=True) as proxy:
+        assert proxy.attr_config_ok
+
+
 # Test inheritance
 
 def test_inheritance(server_green_mode):
