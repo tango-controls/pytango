@@ -1,15 +1,27 @@
+"""
+A module defining pytest fixtures for testing with MultiDeviceTestContext
+Requires pytest and pytest-mock
+"""
+
 from collections import defaultdict
 import pytest
 import socket
 import tango
 from tango.test_context import MultiDeviceTestContext, get_host_ip
 
+
 @pytest.fixture(scope="module")
 def devices_info(request):
     yield getattr(request.module, "devices_info")
 
+    
 @pytest.fixture(scope="function")
 def tango_context(mocker, devices_info):
+    """
+    Creates and returns a TANGO MultiDeviceTestContext object, with
+    tango.DeviceProxy patched to work around a name-resolving issue.
+    """
+    
     def _get_open_port():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind(("", 0))
@@ -31,5 +43,5 @@ def tango_context(mocker, devices_info):
         )
     )
 
-    with MultiDeviceTestContext(devices_info, host=HOST, port=PORT) as context:
+    with MultiDeviceTestContext(devices_info, host=HOST, port=PORT, process=True) as context:
         yield context
