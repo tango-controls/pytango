@@ -21,6 +21,7 @@ class Master(Device):
 
 class Worker(Device):
     def init_device(self):
+        super(Worker, self).init_device()
         self._is_on = False
 
     is_on = attribute(
