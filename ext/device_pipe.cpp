@@ -24,8 +24,6 @@ namespace PyTango
 { 
     namespace DevicePipe 
     {
-        bopy::object extract(Tango::DevicePipeBlob&, PyTango::ExtractAs);
-
         template<long tangoTypeConst>
         bopy::object
         __update_scalar_values(Tango::DevicePipe& self, size_t elt_idx)
@@ -68,7 +66,7 @@ namespace PyTango
             Tango::DevicePipeBlob val;
             bopy::str name(self.get_data_elt_name(elt_idx));
             self >> val;
-            bopy::object data(val);
+            bopy::object data = extract(val, PyTango::ExtractAsNumpy);
             return bopy::make_tuple(name, data);
         }        
 
@@ -360,7 +358,7 @@ namespace PyTango
 
         bopy::object
 	extract(Tango::DevicePipeBlob& blob, 
-		PyTango::ExtractAs extract_as=PyTango::ExtractAsNumpy)
+		PyTango::ExtractAs extract_as)
 	{
 	    bopy::object name = bopy::str(blob.get_name());
 	    bopy::object value = __extract<Tango::DevicePipeBlob>(blob, extract_as);
@@ -410,6 +408,10 @@ void export_device_pipe()
 
         .def("extract", 
 	     (bopy::object (*) (Tango::DevicePipe &, PyTango::ExtractAs))
+	     PyTango::DevicePipe::extract)
+
+		 .def("extract",
+	     (bopy::object (*) (Tango::DevicePipeBlob &, PyTango::ExtractAs))
 	     PyTango::DevicePipe::extract)
     ;
 }

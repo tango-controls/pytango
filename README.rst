@@ -2,11 +2,14 @@ PyTango
 =======
 
 |Doc Status|
-|Build Status|
+|Travis Build Status|
+|Appveyor Build Status|
 |Pypi Version|
 |Python Versions|
+|Anaconda Cloud|
+|Codacy|
 
-Main website: http://pytango.rtfd.io
+Main website: http://pytango.readthedocs.io
 
 Python binding for Tango_, a library dedicated to distributed control systems.
 
@@ -28,13 +31,13 @@ PyTango_ is compatible with python 2 and python 3.
 
 General dependencies:
 
--  libtango_ >= 9.2
+-  libtango_ >= 9.3, and its dependencies: omniORB4 and libzmq
 -  `Boost.Python`_ >= 1.33
 
 Python dependencies:
 
 -  numpy_ >= 1.1
--  six_
+-  six_ >= 1.10
 
 Build dependencies:
 
@@ -47,8 +50,10 @@ Optional dependencies:
 - gevent_
 
 .. note:: As a general rule, libtango_ and pytango_ should share the same major
-	  and minor version (for a version ``X.Y.Z``, ``X`` and ``Y`` should
-	  match)
+      and minor version (for a version ``X.Y.Z``, ``X`` and ``Y`` should
+      match).
+      On some systems you may need to install ``libtango``, ``omniORB4`` and ``libzmq`` related
+      development packages.
 
 
 Install
@@ -66,15 +71,32 @@ Alternatively, PyTango_ can be built and installed from the
 In both cases, the installation takes a few minutes since the ``_tango`` boost
 extension has to compile.
 
+.. note::
+   For custom `Boost.Python`_ installation locations, environment variables can be used
+   to modify the default paths.  See the description of the ``BOOST_ROOT`` and related
+   variables in the ``setup.py`` file.
 
 Usage
 -----
 
-To test the installation, import ``tango`` and check ``tango.__version__``::
+To test the installation, import ``tango`` and check ``tango.utils.info()``::
 
     >>> import tango
-    >>> tango.__version__
-    '9.2.0'
+    >>> print(tango.utils.info())
+    PyTango 9.3.3 (9, 3, 3)
+    PyTango compiled with:
+        Python : 2.7.15
+        Numpy  : 1.16.2
+        Tango  : 9.3.3
+        Boost  : 1.67.0
+
+    PyTango runtime is:
+        Python : 2.7.15
+        Numpy  : 1.16.2
+        Tango  : 9.3.3
+
+    PyTango running on:
+    ('Linux', 'hostname', '4.4.0-131-generic', '#157-Ubuntu SMP Sat Jul 27 06:00:36 UTC 2019', 'x86_64', 'x86_64')
 
 For an interactive use, consider using ITango_, a tango IPython_ profile.
 
@@ -91,16 +113,20 @@ Support and contribution
 
 You can get support from the `Tango forums`_, for both Tango_ and PyTango_ questions.
 
-All contributions,  `PR and bug reports`_ are welcome!
+All contributions,  `PR and bug reports`_ are welcome, please see: `How to Contribute`_ !
 
 
 .. |Doc Status| image:: https://readthedocs.org/projects/pytango/badge/?version=latest
                 :target: http://pytango.readthedocs.io/en/latest
                 :alt:
 
-.. |Build Status| image:: https://travis-ci.org/tango-controls/pytango.svg
-                  :target: https://travis-ci.org/tango-controls/pytango
-                  :alt:
+.. |Travis Build Status| image:: https://travis-ci.org/tango-controls/pytango.svg
+                         :target: https://travis-ci.org/tango-controls/pytango
+                         :alt:
+
+.. |Appveyor Build Status| image:: https://ci.appveyor.com/api/projects/status/v971w26kjdxmjopp?svg=true
+                           :target: https://ci.appveyor.com/project/tiagocoutinho/pytango
+                           :alt:
 
 .. |Pypi Version| image:: https://img.shields.io/pypi/v/PyTango.svg
                   :target: https://pypi.python.org/pypi/PyTango
@@ -110,13 +136,21 @@ All contributions,  `PR and bug reports`_ are welcome!
                      :target: https://pypi.python.org/pypi/PyTango/
                      :alt:
 
+.. |Anaconda Cloud| image:: https://anaconda.org/tango-controls/pytango/badges/version.svg
+                    :target: https://anaconda.org/tango-controls/pytango
+                    :alt:
+
+.. |Codacy| image:: https://api.codacy.com/project/badge/Grade/c8f2b9fbdcd74f44b41bb4babcb4c8f3
+            :target: https://www.codacy.com/app/tango-controls/pytango?utm_source=github.com&utm_medium=referral&utm_content=tango-controls/pytango&utm_campaign=badger
+            :alt: Codacy Badge
+
 .. _Tango: http://tango-controls.org
-.. _Tango C++ API: http://esrf.eu/computing/cs/tango/tango_doc/kernel_doc/cpp_doc
+.. _Tango C++ API: https://tango-controls.github.io/cppTango-docs/index.html
 .. _PyTango: http://github.com/tango-cs/pytango
 .. _PyPI: http://pypi.python.org/pypi/pytango
 
-.. _libtango: http://tango-controls.org/downloads/source
-.. _Boost.Python: http://boost.org/doc/libs/1_61_0/libs/python/doc/html
+.. _libtango: http://tango-controls.org/downloads
+.. _Boost.Python: https://www.boost.org/doc/libs/release/libs/python/doc/html/index.html
 .. _numpy: http://pypi.python.org/pypi/numpy
 .. _six: http://pypi.python.org/pypi/six
 .. _setuptools: http://pypi.python.org/pypi/setuptools
@@ -131,3 +165,4 @@ All contributions,  `PR and bug reports`_ are welcome!
 .. _Tango forums: http://tango-controls.org/community/forum
 .. _PR and bug reports: PyTango_
 .. _sources: PyTango_
+.. _How to Contribute: http://pytango.readthedocs.io/en/latest/how-to-contribute.html#how-to-contribute

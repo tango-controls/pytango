@@ -4,6 +4,6 @@ DeviceProxy
 -----------
 
 .. autoclass:: tango.DeviceProxy
-    :show-inheritance: 
+    :show-inheritance:
     :members:
     :inherited-members:

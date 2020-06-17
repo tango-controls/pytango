@@ -13,9 +13,13 @@
 
 import os
 import sys
-import types
+import six
 import logging
 import weakref
+try:
+    from inspect import getfullargspec as inspect_getargspec  # python 3.0+
+except ImportError:
+    from inspect import getargspec as inspect_getargspec
 import inspect
 import functools
 
@@ -28,8 +32,7 @@ from .server import Device, _to_classes, _add_classes
 from .server import get_worker, set_worker
 from .green import get_executor
 
-__all__ = ['Server']
-
+__all__ = ('Server',)
 
 _CLEAN_UP_TEMPLATE = """
 import sys
@@ -65,11 +68,11 @@ def __to_tango_type_fmt(value):
             shape_l = len(value.shape)
             if shape_l == 1:
                 dfmt = AttrDataFormat.SPECTRUM
-                max_dim_x = max(2**16, value.shape[0])
+                max_dim_x = max(2 ** 16, value.shape[0])
             elif shape_l == 2:
                 dfmt = AttrDataFormat.IMAGE
-                max_dim_x = max(2**16, value.shape[0])
-                max_dim_y = max(2**16, value.shape[1])
+                max_dim_x = max(2 ** 16, value.shape[0])
+                max_dim_y = max(2 ** 16, value.shape[1])
         else:
             dtype = CmdArgType.DevEncoded
     return dtype, dfmt, max_dim_x, max_dim_y
@@ -131,7 +134,7 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
             in_type = CmdArgType.DevEncoded
             out_type = CmdArgType.DevEncoded
             try:
-                arg_spec = inspect.getargspec(member)
+                arg_spec = inspect_getargspec(member)
                 if not arg_spec.args:
                     in_type = CmdArgType.DevVoid
             except TypeError:
@@ -156,7 +159,7 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
             if doc is None:
                 doc = ""
             cmd.__doc__ = doc
-            cmd = types.MethodType(cmd, None, DeviceDispatcher)
+            cmd = six.create_unbound_method(cmd, DeviceDispatcher)
             setattr(DeviceDispatcher, name, cmd)
             DeviceDispatcherClass.cmd_list[name] = \
                 [[in_type, doc], [out_type, ""]]
@@ -201,9 +204,7 @@ def create_tango_class(server, obj, tango_class_name=None, member_filter=None):
 
             pars = dict(name=name, dtype=dtype, dformat=fmt,
                         max_dim_x=x, max_dim_y=y, fget=read)
-            if read_only:
-                write = None
-            else:
+            if not read_only:
                 write.__name__ = "_write_" + name
                 pars['fset'] = write
                 setattr(DeviceDispatcher, write.__name__, write)
@@ -320,9 +321,9 @@ class Server:
                 except:
                     self.log.info("Last time server was not properly "
                                   "shutdown!")
-            db_class_map, db_device_map = self.get_devices()
+            _, db_device_map = self.get_devices()
         else:
-            db_class_map, db_device_map = {}, {}
+            db_device_map = {}
 
         db_devices_add = {}
 
@@ -510,10 +511,8 @@ class Server:
     def register_tango_device(self, klass, name):
         if inspect.isclass(klass):
             if isinstance(klass, Device):
-                kk, Device.TangoClassClass
-                k = Device
-                kname = Device.TangoClassName
-                # TODO: ??
+                # TODO
+                raise NotImplementedError
             else:
                 raise ValueError
         else:

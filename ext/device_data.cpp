@@ -133,7 +133,7 @@ namespace PyDeviceData {
             typedef std::string TangoScalarType;
             TangoScalarType val;
             self >> val;
-            return boost::python::object(val);
+            return from_char_to_boost_str(val);
         }
 
         template <>
@@ -182,7 +182,7 @@ namespace PyDeviceData {
         template <>
         object extract_array<Tango::DEVVAR_STATEARRAY>(Tango::DeviceData &self, object &py_self, PyTango::ExtractAs extract_as)
         {
-            assert(False);
+            assert(false);
             return object();
         }
     /// @}

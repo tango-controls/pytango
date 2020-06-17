@@ -21,32 +21,35 @@ import sys
 import six
 import types
 import numbers
-import collections
+import enum
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 from ._tango import StdStringVector, StdDoubleVector, \
-    DbData, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
+    DbData, DbDatum, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
     EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
-    DevState, CommunicationFailed
+    DevState, CommunicationFailed, PipeEventData, DevIntrChangeEventData
 
 from . import _tango
 from .constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
 from .release import Release
 
-__all__ = [
+__all__ = (
     "requires_pytango", "requires_tango",
     "is_pure_str", "is_seq", "is_non_str_seq", "is_integer",
     "is_number", "is_scalar_type", "is_array_type", "is_numerical_type",
-    "is_int_type", "is_float_type", "is_bool_type", "is_bin_type",
+    "is_int_type", "is_float_type", "is_bool_type", "is_binary_type",
     "is_str_type", "obj_2_str", "seqStr_2_obj",
     "scalar_to_array_type",
     "document_method", "document_static_method", "document_enum",
     "CaselessList", "CaselessDict", "EventCallBack", "get_home",
     "from_version_str_to_hex_str", "from_version_str_to_int",
     "seq_2_StdStringVector", "StdStringVector_2_seq",
-    "dir2", "TO_TANGO_TYPE"]
+    "dir2", "TO_TANGO_TYPE", "ensure_binary")
 
 __docformat__ = "restructuredtext"
-
 
 # Types
 
@@ -118,40 +121,40 @@ _binary_types = (
 
 def __build_to_tango_type():
     ret = {
-        int         : CmdArgType.DevLong64,
-        str         : CmdArgType.DevString,
-        bool        : CmdArgType.DevBoolean,
-        bytearray   : CmdArgType.DevEncoded,
-        float       : CmdArgType.DevDouble,
-        chr         : CmdArgType.DevUChar,
-        None        : CmdArgType.DevVoid,
+        int: CmdArgType.DevLong64,
+        str: CmdArgType.DevString,
+        bool: CmdArgType.DevBoolean,
+        bytearray: CmdArgType.DevEncoded,
+        float: CmdArgType.DevDouble,
+        chr: CmdArgType.DevUChar,
+        None: CmdArgType.DevVoid,
 
-        'int'       : CmdArgType.DevLong64,
-        'int16'     : CmdArgType.DevShort,
-        'int32'     : CmdArgType.DevLong,
-        'int64'     : CmdArgType.DevLong64,
-        'uint'      : CmdArgType.DevULong64,
-        'uint16'    : CmdArgType.DevUShort,
-        'uint32'    : CmdArgType.DevULong,
-        'uint64'    : CmdArgType.DevULong64,
-        'str'       : CmdArgType.DevString,
-        'string'    : CmdArgType.DevString,
-        'text'      : CmdArgType.DevString,
-        'bool'      : CmdArgType.DevBoolean,
-        'boolean'   : CmdArgType.DevBoolean,
-        'bytes'     : CmdArgType.DevEncoded,
-        'bytearray' : CmdArgType.DevEncoded,
-        'float'     : CmdArgType.DevDouble,
-        'float32'   : CmdArgType.DevFloat,
-        'float64'   : CmdArgType.DevDouble,
-        'double'    : CmdArgType.DevDouble,
-        'byte'      : CmdArgType.DevUChar,
-        'chr'       : CmdArgType.DevUChar,
-        'char'      : CmdArgType.DevUChar,
-        'None'      : CmdArgType.DevVoid,
-        'state'     : CmdArgType.DevState,
-        'enum'      : CmdArgType.DevEnum,
-        'blob'      : CmdArgType.DevPipeBlob,
+        'int': CmdArgType.DevLong64,
+        'int16': CmdArgType.DevShort,
+        'int32': CmdArgType.DevLong,
+        'int64': CmdArgType.DevLong64,
+        'uint': CmdArgType.DevULong64,
+        'uint16': CmdArgType.DevUShort,
+        'uint32': CmdArgType.DevULong,
+        'uint64': CmdArgType.DevULong64,
+        'str': CmdArgType.DevString,
+        'string': CmdArgType.DevString,
+        'text': CmdArgType.DevString,
+        'bool': CmdArgType.DevBoolean,
+        'boolean': CmdArgType.DevBoolean,
+        'bytes': CmdArgType.DevEncoded,
+        'bytearray': CmdArgType.DevEncoded,
+        'float': CmdArgType.DevDouble,
+        'float32': CmdArgType.DevFloat,
+        'float64': CmdArgType.DevDouble,
+        'double': CmdArgType.DevDouble,
+        'byte': CmdArgType.DevUChar,
+        'chr': CmdArgType.DevUChar,
+        'char': CmdArgType.DevUChar,
+        'None': CmdArgType.DevVoid,
+        'state': CmdArgType.DevState,
+        'enum': CmdArgType.DevEnum,
+        'blob': CmdArgType.DevPipeBlob,
     }
 
     try:
@@ -184,29 +187,29 @@ def __build_to_tango_type():
             ret[value] = key
     return ret
 
+
 TO_TANGO_TYPE = __build_to_tango_type()
 
 _scalar_to_array_type = {
-    CmdArgType.DevBoolean : CmdArgType.DevVarBooleanArray,
-    CmdArgType.DevUChar : CmdArgType.DevVarCharArray,
-    CmdArgType.DevShort : CmdArgType.DevVarShortArray,
-    CmdArgType.DevUShort : CmdArgType.DevVarUShortArray,
-    CmdArgType.DevInt : CmdArgType.DevVarLongArray,
-    CmdArgType.DevLong : CmdArgType.DevVarLongArray,
-    CmdArgType.DevULong : CmdArgType.DevVarULongArray,
-    CmdArgType.DevLong64 : CmdArgType.DevVarLong64Array,
-    CmdArgType.DevULong64 : CmdArgType.DevVarULong64Array,
-    CmdArgType.DevFloat : CmdArgType.DevVarFloatArray,
-    CmdArgType.DevDouble : CmdArgType.DevVarDoubleArray,
-    CmdArgType.DevString : CmdArgType.DevVarStringArray,
-    CmdArgType.ConstDevString : CmdArgType.DevVarStringArray,
+    CmdArgType.DevBoolean: CmdArgType.DevVarBooleanArray,
+    CmdArgType.DevUChar: CmdArgType.DevVarCharArray,
+    CmdArgType.DevShort: CmdArgType.DevVarShortArray,
+    CmdArgType.DevUShort: CmdArgType.DevVarUShortArray,
+    CmdArgType.DevInt: CmdArgType.DevVarLongArray,
+    CmdArgType.DevLong: CmdArgType.DevVarLongArray,
+    CmdArgType.DevULong: CmdArgType.DevVarULongArray,
+    CmdArgType.DevLong64: CmdArgType.DevVarLong64Array,
+    CmdArgType.DevULong64: CmdArgType.DevVarULong64Array,
+    CmdArgType.DevFloat: CmdArgType.DevVarFloatArray,
+    CmdArgType.DevDouble: CmdArgType.DevVarDoubleArray,
+    CmdArgType.DevString: CmdArgType.DevVarStringArray,
+    CmdArgType.ConstDevString: CmdArgType.DevVarStringArray,
 }
 
 # add derived scalar types to scalar to array map
 for k, v in TO_TANGO_TYPE.items():
     if v in _scalar_to_array_type:
         _scalar_to_array_type[k] = _scalar_to_array_type[v]
-
 
 __NO_STR_VALUE = AlrmValueNotSpec, StatusNotSet
 
@@ -350,10 +353,9 @@ try:
 except NameError:
     __str_klasses = str,
 
-
 __int_klasses = int,
 __number_klasses = numbers.Number,
-__seq_klasses = collections.Sequence, bytearray, StdStringVector
+__seq_klasses = collections_abc.Sequence, bytearray, StdStringVector
 
 __use_unicode = False
 try:
@@ -373,6 +375,7 @@ except NameError:
 
 if constants.NUMPY_SUPPORT:
     import numpy
+
     __int_klasses = tuple(list(__int_klasses) + [numpy.integer])
     __number_klasses = tuple(list(__number_klasses) + [numpy.number])
     __seq_klasses = tuple(list(__seq_klasses) + [numpy.ndarray])
@@ -384,10 +387,9 @@ __seq_klasses = tuple(__seq_klasses)
 
 
 def __get_tango_type(obj):
-    from .device_server import DataElement
     if is_non_str_seq(obj):
         tg_type, tg_format = get_tango_type(obj[0])
-        tg_format = AttrDataFormat(int(tg_format)+1)
+        tg_format = AttrDataFormat(int(tg_format) + 1)
         return tg_type, tg_format
     elif is_pure_str(obj):
         r = CmdArgType.DevString
@@ -403,7 +405,6 @@ def __get_tango_type(obj):
 
 
 def __get_tango_type_numpy_support(obj):
-    import numpy
     try:
         ndim, dtype = obj.ndim, str(obj.dtype)
         if ndim > 2:
@@ -418,6 +419,53 @@ def get_tango_type(obj):
     if constants.NUMPY_SUPPORT:
         return __get_tango_type_numpy_support(obj)
     return __get_tango_type(obj)
+
+
+class EnumTypeError(Exception):
+    """Invalid Enum class for use with DEV_ENUM."""
+
+
+def get_enum_labels(enum_cls):
+    """
+    Return list of enumeration labels from Enum class.
+
+    The list is useful when creating an attribute, for the
+    `enum_labels` parameter.  The enumeration values are checked
+    to ensure they are unique, start at zero, and increment by one.
+
+    :param enum_cls: the Enum class to be inspected
+    :type enum_cls: :py:obj:`enum.Enum`
+
+    :return: List of label strings
+    :rtype: :py:obj:`list`
+
+    :raises EnumTypeError: in case the given class is invalid
+    """
+    if not issubclass(enum_cls, enum.Enum):
+        raise EnumTypeError("Input class '%s' must be derived from enum.Enum"
+                            % enum_cls)
+
+    # Check there are no duplicate labels
+    try:
+        enum.unique(enum_cls)
+    except ValueError as exc:
+        raise EnumTypeError("Input class '%s' must be unique - %s"
+                            % (enum_cls, exc))
+
+    # Check the values start at 0, and increment by 1, since that is
+    # assumed by tango's DEV_ENUM implementation.
+    values = [member.value for member in enum_cls]
+    if not values:
+        raise EnumTypeError("Input class '%s' has no members!" % enum_cls)
+    expected_value = 0
+    for value in values:
+        if value != expected_value:
+            raise EnumTypeError("Enum values for '%s' must start at 0 and "
+                                "increment by 1.  Values: %s"
+                                % (enum_cls, values))
+        expected_value += 1
+
+    return [member.name for member in enum_cls]
 
 
 def is_pure_str(obj):
@@ -518,6 +566,7 @@ def is_scalar(tg_type):
     global _scalar_types
     return tg_type in _scalar_types
 
+
 is_scalar_type = is_scalar
 
 
@@ -532,6 +581,7 @@ def is_array(tg_type):
     """
     global _array_types
     return tg_type in _array_types
+
 
 is_array_type = is_array
 
@@ -555,6 +605,7 @@ def is_numerical(tg_type, inc_array=False):
         return False
     return tg_type in _array_numerical_types
 
+
 is_numerical_type = is_numerical
 
 
@@ -576,6 +627,7 @@ def is_int(tg_type, inc_array=False):
     if not inc_array:
         return False
     return tg_type in _array_int_types
+
 
 is_int_type = is_int
 
@@ -599,6 +651,7 @@ def is_float(tg_type, inc_array=False):
         return False
     return tg_type in _array_float_types
 
+
 is_float_type = is_float
 
 
@@ -620,6 +673,7 @@ def is_bool(tg_type, inc_array=False):
     if not inc_array:
         return False
     return tg_type in _array_bool_types
+
 
 is_bool_type = is_bool
 
@@ -643,10 +697,11 @@ def is_str(tg_type, inc_array=False):
         return False
     return tg_type in _array_str_types
 
+
 is_str_type = is_str
 
 
-def is_bin(tg_type, inc_array=False):
+def is_binary(tg_type, inc_array=False):
     """Tells if the given tango type is binary
 
     :param tg_type: tango type
@@ -658,10 +713,11 @@ def is_bin(tg_type, inc_array=False):
     :return: True if the given tango type is binary or False otherwise
     :rtype: :py:obj:`bool`
     """
-    global _scalar_bin_types
-    return tg_type in _scalar_bin_types
+    global _binary_types
+    return tg_type in _binary_types
 
-is_bin_type = is_bin
+
+is_binary_type = is_binary
 
 
 def seq_2_StdStringVector(seq, vec=None):
@@ -696,7 +752,8 @@ def StdStringVector_2_seq(vec, seq=None):
         :return: a python sequence filled with the same contents as seq
         :rtype: sequence<str>
     """
-    if seq is None: seq = []
+    if seq is None:
+        seq = []
     if not isinstance(vec, StdStringVector):
         raise TypeError('vec must be a tango.StdStringVector')
     for e in vec:
@@ -801,11 +858,13 @@ def seq_2_DbData(seq, vec=None):
         :rtype: :class:`tango.DbData`
     """
     if vec is None:
-        if isinstance(seq, DbData): return seq
+        if isinstance(seq, DbData):
+            return seq
         vec = DbData()
     if not isinstance(vec, DbData):
         raise TypeError('vec must be a tango.DbData')
-    for e in seq: vec.append(e)
+    for e in seq:
+        vec.append(e)
     return vec
 
 
@@ -839,11 +898,10 @@ def seqStr_2_obj(seq, tg_type, tg_format=None):
 
 
 def _seqStr_2_obj_from_type(seq, tg_type):
-
     if is_pure_str(seq):
         seq = seq,
 
-    #    Scalar cases
+    # Scalar cases
     global _scalar_int_types
     if tg_type in _scalar_int_types:
         return int(seq[0])
@@ -991,6 +1049,38 @@ def obj_2_str(obj, tg_type=None):
     return '\n'.join([str(i) for i in obj])
 
 
+def obj_2_property(value):
+    if isinstance(value, DbData):
+        pass
+    elif isinstance(value, DbDatum):
+        new_value = DbData()
+        new_value.append(value)
+        value = new_value
+    elif is_non_str_seq(value):
+        value = seq_2_DbData(value)
+    elif isinstance(value, collections_abc.Mapping):
+        new_value = DbData()
+        for k, v in value.items():
+            if isinstance(v, DbDatum):
+                new_value.append(v)
+                continue
+            db_datum = DbDatum(k)
+            if is_non_str_seq(v):
+                seq_2_StdStringVector(v, db_datum.value_string)
+            else:
+                if not is_pure_str(v):
+                    v = str(v)
+                v = ensure_binary(v, encoding='latin-1')
+                db_datum.value_string.append(v)
+            new_value.append(db_datum)
+        value = new_value
+    else:
+        raise TypeError(
+            'Value must be a tango.DbDatum, tango.DbData, '
+            'a sequence<DbDatum> or a dictionary')
+    return value
+
+
 def __get_meth_func(klass, method_name):
     meth = getattr(klass, method_name)
     func = meth
@@ -1066,6 +1156,7 @@ class CaselessList(list):
     Inherited methods :
     __imul__, __len__, __iter__, pop, reverse, sort
     """
+
     def __init__(self, inlist=[]):
         list.__init__(self)
         for entry in inlist:
@@ -1304,6 +1395,7 @@ class CaselessDict(dict):
     def keys(self):
         return CaselessList(dict.keys(self))
 
+
 __DEFAULT_FACT_IOR_FILE = "/tmp/rdifact.ior"
 __BASE_LINE = "notifd"
 __END_NOTIFD_LINE = "/DEVICE/notifd:"
@@ -1387,14 +1479,14 @@ def _notifd2db_real_db(ior_string, host=None, out=sys.stdout):
               "to TANGO database", file=out)
 
 
-class EventCallBack(object):
+class EventCallback(object):
     """
     Useful event callback for test purposes
 
     Usage::
 
         >>> dev = tango.DeviceProxy(dev_name)
-        >>> cb = tango.utils.EventCallBack()
+        >>> cb = tango.utils.EventCallback()
         >>> id = dev.subscribe_event("state", tango.EventType.CHANGE_EVENT, cb, [])
         2011-04-06 15:33:18.910474 sys/tg_test/1 STATE CHANGE [ATTR_VALID] ON
 
@@ -1440,7 +1532,7 @@ class EventCallBack(object):
         import datetime
         now = datetime.datetime.now()
         try:
-            date = evt.get_date().todatetime()
+            date = self._get_date(evt)
         except:
             date = now
         try:
@@ -1463,9 +1555,9 @@ class EventCallBack(object):
             value = self._get_value(evt)
         except Exception as e:
             value = "Unexpected exception in getting event value: %s" % str(e)
-        d = { "date" : date, "reception_date" : reception_date,
-              "type" : evt_type, "dev_name" : dev_name, "name" : attr_name,
-              "value" : value }
+        d = {"date": date, "reception_date": reception_date,
+             "type": evt_type, "dev_name": dev_name, "name": attr_name,
+             "value": value}
         print(self._msg.format(**d), file=self._fd)
 
     def _append(self, evt):
@@ -1474,6 +1566,14 @@ class EventCallBack(object):
         if len(evts) == self._max_buf:
             evts.pop(0)
         evts.append(evt)
+
+    def _get_date(self, evt):
+        if isinstance(evt, EventData):
+            return evt.attr_value.time.todatetime()
+        elif isinstance(evt, PipeEventData):
+            return evt.pipe_value.time.todatetime()
+        else:
+            return evt.get_date().todatetime()
 
     def _get_value(self, evt):
         """Internal usage only"""
@@ -1489,6 +1589,11 @@ class EventCallBack(object):
             return "label='%s'; unit='%s'" % (cfg.label, cfg.unit)
         elif isinstance(evt, DataReadyEventData):
             return ""
+        elif isinstance(evt, PipeEventData):
+            return evt.pipe_value
+        elif isinstance(evt, DevIntrChangeEventData):
+            print("utils::_get_value()")
+            return
 
 
 def get_home():
@@ -1570,7 +1675,7 @@ def from_version_str_to_hex_str(version_str):
 
 
 def from_version_str_to_int(version_str):
-    return int(from_version_str_to_hex_str(version_str, 16))
+    return int(from_version_str_to_hex_str(version_str), 16)
 
 
 def info():
@@ -1588,7 +1693,6 @@ PyTango runtime is:
     Python : {2.PY_VERSION}
     Numpy  : {2.NUMPY_VERSION}
     Tango  : {2.TANGO_VERSION}
-    Boost  : {2.BOOST_VERSION}
 
 PyTango running on:
 {2.UNAME}
@@ -1632,3 +1736,28 @@ def dir2(obj):
         attrs.update(dir2(cls))
     attrs.update(get_attrs(obj))
     return list(attrs)
+
+
+if hasattr(six, "ensure_binary"):
+    ensure_binary = six.ensure_binary
+else:
+    # For older versions of six (<1.12), fallback to local
+    # implementation
+
+    def ensure_binary(s, encoding='utf-8', errors='strict'):
+        """Coerce **s** to six.binary_type.
+        For Python 2:
+          - `unicode` -> encoded to `str`
+          - `str` -> `str`
+        For Python 3:
+          - `str` -> encoded to `bytes`
+          - `bytes` -> `bytes`
+
+        Code taken from https://github.com/benjaminp/six/blob/1.12.0/six.py#L853
+        """
+        if isinstance(s, six.text_type):
+            return s.encode(encoding, errors)
+        elif isinstance(s, six.binary_type):
+            return s
+        else:
+            raise TypeError("not expecting type '%s'" % type(s))

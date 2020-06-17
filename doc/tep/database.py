@@ -26,7 +26,7 @@
 
 """This class manage the TANGO database."""
 
-__all__ = ["DataBase", "DataBaseClass", "main"]
+__all__ = ("DataBase", "DataBaseClass", "main")
 
 __docformat__ = 'restructuredtext'
 
@@ -34,7 +34,10 @@ import PyTango
 import sys
 # Add additional import
 #----- PROTECTED REGION ID(DataBase.additionnal_import) ENABLED START -----#
-
+try:
+    from __future__ import print_function
+except ImportError:
+    pass
 #----- PROTECTED REGION END -----#	//	DataBase.additionnal_import
 
 ##############################################################################
@@ -2066,7 +2069,8 @@ class DataBaseClass(PyTango.DeviceClass):
     def __init__(self, name):
         PyTango.DeviceClass.__init__(self, name)
         self.set_type(name);
-        print "In DataBase Class  constructor"
+        print("In DataBase Class  constructor")
+
 
 #==================================================================
 #
@@ -2082,10 +2086,11 @@ def main():
         U.server_init()
         U.server_run()
 
-    except PyTango.DevFailed,e:
-        print '-------> Received a DevFailed exception:',e
-    except Exception,e:
-        print '-------> An unforeseen exception occured....',e
+    except PyTango.DevFailed as e:
+        print('-------> Received a DevFailed exception:', e)
+    except Exception as e:
+        print('-------> An unforeseen exception occured....', e)
+
 
 if __name__ == '__main__':
     main()

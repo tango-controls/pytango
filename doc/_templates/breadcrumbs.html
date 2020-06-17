@@ -1,0 +1,18 @@
+{% extends "sphinx_rtd_theme/breadcrumbs.html" %}
+
+{% block breadcrumbs %}
+    <li><a href="{{ pathto('index') }}">home</a>|&nbsp;</li>
+    <li><a href="{{ pathto('start') }}">getting started</a>|&nbsp;</li>
+    <li><a href="{{ pathto('quicktour') }}">quick tour</a>|&nbsp;</li>
+    <li><a href="{{ pathto('howto') }}">how to</a>|&nbsp;</li>
+    <li><a href="{{ pathto('faq') }}">FAQ</a>|&nbsp;</li>
+    <li><a href="{{ pathto('contents') }}">documentation (v{{ release }})</a> &raquo;</li>
+    {% for doc in parents %}
+        <li><a href="{{ doc.link|e }}">{{ doc.title }}</a> &raquo;</li>
+    {% endfor %}
+    <li>{{ title }}</li>
+
+{% endblock %}
+
+{% block breadcrumbs_aside %}
+{% endblock %}

@@ -24,10 +24,12 @@ from functools import partial
 from tango import DeviceProxy, DevFailed, GreenMode
 from tango import DeviceInfo, AttributeInfo, AttributeInfoEx
 from tango.utils import is_str_type, is_int_type, is_float_type, is_bool_type
+from tango.test_utils import PY3, assert_close, bytes_devstring, str_devstring
 
 from tango.gevent import DeviceProxy as gevent_DeviceProxy
 from tango.futures import DeviceProxy as futures_DeviceProxy
 from tango.asyncio import DeviceProxy as asyncio_DeviceProxy
+
 
 ATTRIBUTES = [
     'ampli',
@@ -94,6 +96,7 @@ ATTRIBUTES = [
     'Status',
 ]
 
+
 device_proxy_map = {
     GreenMode.Synchronous: DeviceProxy,
     GreenMode.Futures: futures_DeviceProxy,
@@ -119,7 +122,7 @@ def start_server(server, inst, device):
     exe = find_executable(server)
     cmd = ("{0} {1} -ORBendPoint giop:tcp::0 -nodb -dlist {2}"
            .format(exe, inst, device))
-    proc = Popen(cmd.split())
+    proc = Popen(cmd.split(), close_fds=True)
     proc.poll()
     return proc
 
@@ -130,7 +133,7 @@ def get_proxy(host, port, device, green_mode):
     return device_proxy_map[green_mode](access)
 
 
-def wait_for_proxy(host, proc, device, green_mode, retries=100, delay=0.01):
+def wait_for_proxy(host, proc, device, green_mode, retries=400, delay=0.01):
     for i in range(retries):
         ports = get_ports(proc.pid)
         if ports:
@@ -185,6 +188,13 @@ def writable_scalar_attribute(request):
     return request.param
 
 
+@pytest.fixture(params=[a for a in ATTRIBUTES
+                        if "spectrum" in a and
+                        a.split("_")[-1] not in ("ro", "rww")])
+def writable_spectrum_attribute(request):
+    return request.param
+
+
 # Tests
 
 def test_ping(tango_test):
@@ -201,18 +211,19 @@ def test_info(tango_test):
 
 def test_read_attribute(tango_test, readable_attribute):
     "Check that readable attributes can be read"
-    # This is a hack:
-    # Without this sleep, the following error is very likely to be raised:
+    # For read-only string spectrum and read-only string image types,
+    # the following error is very likely to be raised:
     # -> MARSHAL CORBA system exception: MARSHAL_PassEndOfMessage
+    # An explicit sleep fixes the problem but it's annoying to maintain
     if readable_attribute in ["string_image_ro", "string_spectrum_ro"]:
-        sleep(0.05)
+        pytest.xfail()
     tango_test.read_attribute(readable_attribute, wait=True)
 
 
 def test_write_scalar_attribute(tango_test, writable_scalar_attribute):
     "Check that writable scalar attributes can be written"
     attr_name = writable_scalar_attribute
-    config = tango_test.get_attribute_config(writable_scalar_attribute)
+    config = tango_test.get_attribute_config(attr_name, wait=True)
     if is_bool_type(config.data_type):
         tango_test.write_attribute(attr_name, True, wait=True)
     elif is_int_type(config.data_type):
@@ -223,6 +234,80 @@ def test_write_scalar_attribute(tango_test, writable_scalar_attribute):
         tango_test.write_attribute(attr_name, "hello", wait=True)
     else:
         pytest.xfail("Not currently testing this type")
+
+
+def test_write_read_spectrum_attribute(tango_test, writable_spectrum_attribute):
+    "Check that writable spectrum attributes can be written and read"
+    attr_name = writable_spectrum_attribute
+    config = tango_test.get_attribute_config(attr_name, wait=True)
+    use_all_elements = True
+    if is_bool_type(config.data_type):
+        write_values = [True, False]
+    elif is_int_type(config.data_type):
+        write_values = [76, 77]
+    elif is_float_type(config.data_type):
+        write_values = [-28.2, 44.3]
+    elif is_str_type(config.data_type):
+        # string spectrum attributes don't reduce their x dimension
+        # when written to, so we only compare the values written
+        use_all_elements = False
+        write_values = ["hello", "hola"]
+    else:
+        pytest.xfail("Not currently testing this type")
+
+    tango_test.write_attribute(attr_name, write_values, wait=True)
+    read_attr = tango_test.read_attribute(attr_name, wait=True)
+    if use_all_elements:
+        read_values = read_attr.value
+    else:
+        read_values = read_attr.value[0:len(write_values)]
+    assert_close(read_values, write_values)
+
+
+def test_write_read_empty_spectrum_attribute(tango_test, writable_spectrum_attribute):
+    "Check that writing empty list to spectrum attribute reads back as None."
+    attr_name = writable_spectrum_attribute
+    config = tango_test.get_attribute_config(attr_name, wait=True)
+    if is_str_type(config.data_type):
+        pytest.xfail("String spectrum x dimension does not reduce")
+
+    tango_test.write_attribute(attr_name, [], wait=True)
+    read_attr = tango_test.read_attribute(attr_name, wait=True)
+    assert read_attr.value is None
+
+
+def test_write_read_string_attribute(tango_test):
+    attr_name = 'string_scalar'
+    bytes_big = 100000 * b'big data '
+    str_big = bytes_big.decode('latin-1')
+
+    values = [b'', '', 'Hello, World!', b'Hello, World!',
+              bytes_devstring, str_devstring, bytes_big, str_big]
+    if PY3:
+        expected_values = ['', '', 'Hello, World!', 'Hello, World!',
+                           str_devstring, str_devstring,
+                           str_big, str_big]
+    else:
+        expected_values = ['', '', 'Hello, World!', 'Hello, World!',
+                           bytes_devstring, bytes_devstring,
+                           bytes_big, bytes_big]
+
+    for value, expected_value in zip(values, expected_values):
+        tango_test.write_attribute(attr_name, value, wait=True)
+        result = tango_test.read_attribute(attr_name, wait=True)
+        assert result.value == expected_value
+
+    attr_name = 'string_spectrum'
+    for value, expected_value in zip(values, expected_values):
+        tango_test.write_attribute(attr_name, ['', value, ''], wait=True)
+        result = tango_test.read_attribute(attr_name, wait=True)
+        assert result.value[1] == expected_value
+
+    attr_name = 'string_image'
+    for value, expected_value in zip(values, expected_values):
+        tango_test.write_attribute(attr_name, [[value], [value]], wait=True)
+        result = tango_test.read_attribute(attr_name, wait=True)
+        assert result.value == ((expected_value,), (expected_value,))
 
 
 def test_read_attribute_config(tango_test, attribute):
@@ -261,3 +346,68 @@ def test_device_proxy_dir_method(tango_test):
     assert set(methods) <= set(lst)
     # Check internals
     assert set(internals) <= set(lst)
+
+
+def test_device_polling_command(tango_test):
+
+    dct = {"SwitchStates": 1000, "DevVoid": 10000, "DumpExecutionState": 5000}
+
+    for command, period in dct.items():
+        tango_test.poll_command(command, period)
+
+    ans = tango_test.polling_status()
+    for info in ans:
+        lines = info.split('\n')
+        command = lines[0].split('= ')[1]
+        period = int(lines[1].split('= ')[1])
+        assert dct[command] == period
+
+
+def test_device_polling_attribute(tango_test):
+
+    dct = {"boolean_scalar": 1000, "double_scalar": 10000, "long_scalar": 5000}
+
+    for attr, poll_period in dct.items():
+        tango_test.poll_attribute(attr, poll_period)
+
+    ans = tango_test.polling_status()
+    for x in ans:
+        lines = x.split('\n')
+        attr = lines[0].split('= ')[1]
+        poll_period = int(lines[1].split('= ')[1])
+        assert dct[attr] == poll_period
+
+
+def test_command_string(tango_test):
+    cmd_name = 'DevString'
+    bytes_big = 100000 * b'big data '
+    str_big = bytes_big.decode('latin-1')
+
+    values = [b'', '', 'Hello, World!', b'Hello, World!',
+              bytes_devstring, str_devstring, bytes_big, str_big]
+    if PY3:
+        expected_values = ['', '', 'Hello, World!', 'Hello, World!',
+                           str_devstring, str_devstring,
+                           str_big, str_big]
+    else:
+        expected_values = ['', '', 'Hello, World!', 'Hello, World!',
+                           bytes_devstring, bytes_devstring,
+                           bytes_big, bytes_big]
+
+    for value, expected_value in zip(values, expected_values):
+        result = tango_test.command_inout(cmd_name, value, wait=True)
+        assert result == expected_value
+
+    cmd_name = 'DevVarStringArray'
+    for value, expected_value in zip(values, expected_values):
+        result = tango_test.command_inout(cmd_name, [value, value], wait=True)
+        assert result == [expected_value, expected_value]
+
+    cmd_name = 'DevVarLongStringArray'
+    for value, expected_value in zip(values, expected_values):
+        result = tango_test.command_inout(cmd_name,
+                                          [[-10, 200], [value, value]],
+                                          wait=True)
+        assert len(result) == 2
+        assert_close(result[0], [-10, 200])
+        assert_close(result[1], [expected_value, expected_value])

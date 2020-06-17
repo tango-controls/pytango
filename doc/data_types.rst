@@ -14,34 +14,35 @@ will be the used for the input arguments. Also, it is recomended to use numpy
 arrays of the appropiate type for output arguments as well, as they tend to be
 much more efficient.
 
+
 **For scalar types (SCALAR)**
 
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |   Tango data type       |              Python 2.x type                                              |              Python 3.x type (*New in PyTango 8.0*)                       |
 +=========================+===========================================================================+===========================================================================+
-|          DEV_VOID       |                    No data                                                |                    No data                                                |
+| DEV_VOID                |                    No data                                                |                    No data                                                |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|       DEV_BOOLEAN       | :py:obj:`bool`                                                            | :py:obj:`bool`                                                            |
+| DEV_BOOLEAN             | :py:obj:`bool`                                                            | :py:obj:`bool`                                                            |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|         DEV_SHORT       | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
+| DEV_SHORT               | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|         DEV_LONG        | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
+| DEV_LONG                | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|        DEV_LONG64       | - :py:obj:`long` (on a 32 bits computer)                                  | :py:obj:`int`                                                             |
+| DEV_LONG64              | - :py:obj:`long` (on a 32 bits computer)                                  | :py:obj:`int`                                                             |
 |                         | - :py:obj:`int` (on a 64 bits computer)                                   |                                                                           |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|         DEV_FLOAT       | :py:obj:`float`                                                           | :py:obj:`float`                                                           |
+| DEV_FLOAT               | :py:obj:`float`                                                           | :py:obj:`float`                                                           |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|       DEV_DOUBLE        | :py:obj:`float`                                                           | :py:obj:`float`                                                           |
+| DEV_DOUBLE              | :py:obj:`float`                                                           | :py:obj:`float`                                                           |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|        DEV_USHORT       | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
+| DEV_USHORT              | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|        DEV_ULONG        | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
+| DEV_ULONG               | :py:obj:`int`                                                             | :py:obj:`int`                                                             |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|        DEV_ULONG64      | * :py:obj:`long` (on a 32 bits computer)                                  | :py:obj:`int`                                                             |
+| DEV_ULONG64             | * :py:obj:`long` (on a 32 bits computer)                                  | :py:obj:`int`                                                             |
 |                         | * :py:obj:`int` (on a 64 bits computer)                                   |                                                                           |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|        DEV_STRING       | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
+| DEV_STRING              | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |                         | sequence of two elements:                                                 | sequence of two elements:                                                 |
 | DEV_ENCODED             |                                                                           |                                                                           |
@@ -49,6 +50,14 @@ much more efficient.
 |                         | 1. :py:obj:`bytes` (for any value of *extract_as*)                        | 1. :py:obj:`bytes` (for any value of *extract_as*, except String.         |
 |                         |                                                                           |    In this case it is :py:obj:`str` (decoded with default python          |
 |                         |                                                                           |    encoding *utf-8*))                                                     |
++-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
+|                         | * :py:obj:`int` (for value)                                               | * :py:obj:`int` (for value)                                               |
+|                         | * :py:class:`list` <:py:obj:`str`> (for enum_labels)                      | * :py:class:`list` <:py:obj:`str`>  (for enum_labels)                     |
+| DEV_ENUM                |                                                                           |                                                                           |
+| (*New in PyTango 9.0*)  | Note:  direct attribute access via DeviceProxy will return enumerated     | Note:  direct attribute access via DeviceProxy will return enumerated     |
+|                         |        type :py:obj:`enum.IntEnum`.                                       |        type :py:obj:`enum.IntEnum`.                                       |
+|                         |        This type uses the package enum34.                                 |        Python < 3.4, uses the package enum34.                             |
+|                         |                                                                           |        Python >= 3.4, uses standard package enum.                         |
 +-------------------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 
 **For array types (SPECTRUM/IMAGE)**
@@ -62,7 +71,7 @@ much more efficient.
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |                         | ByteArray       | :py:obj:`bytearray`                                                       | :py:obj:`bytearray`                                                       |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|                         | String          | :py:obj:`str`                                                             | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | String          | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |                         | List            | :py:class:`list` <:py:obj:`int`>                                          | :py:class:`list` <:py:obj:`int`>                                          |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
@@ -74,7 +83,7 @@ much more efficient.
 | or                      +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 | (DEV_SHORT + IMAGE)     | ByteArray       | :py:obj:`bytearray`                                                       | :py:obj:`bytearray`                                                       |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|                         | String          | :py:obj:`str`                                                             | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | String          | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |                         | List            | :py:class:`list` <:py:obj:`int`>                                          | :py:class:`list` <:py:obj:`int`>                                          |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
@@ -86,7 +95,7 @@ much more efficient.
 | or                      +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 | (DEV_LONG + IMAGE)      | ByteArray       | :py:obj:`bytearray`                                                       | :py:obj:`bytearray`                                                       |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|                         | String          | :py:obj:`str`                                                             | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | String          | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |                         | List            | :py:class:`list` <:py:obj:`int`>                                          | :py:class:`list` <:py:obj:`int`>                                          |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
@@ -98,7 +107,7 @@ much more efficient.
 | or                      +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 | (DEV_LONG64 + IMAGE)    | ByteArray       | :py:obj:`bytearray`                                                       | :py:obj:`bytearray`                                                       |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|                         | String          | :py:obj:`str`                                                             | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | String          | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |                         | List            | :py:class:`list` <int (64 bits) / long (32 bits)>                         | :py:class:`list` <:py:obj:`int`>                                          |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
@@ -110,7 +119,7 @@ much more efficient.
 | or                      +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 | (DEV_FLOAT + IMAGE)     | ByteArray       | :py:obj:`bytearray`                                                       | :py:obj:`bytearray`                                                       |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|                         | String          | :py:obj:`str`                                                             | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | String          | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |                         | List            | :py:class:`list` <:py:obj:`float`>                                        | :py:class:`list` <:py:obj:`float`>                                        |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
@@ -122,7 +131,7 @@ much more efficient.
 | or                      +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 | (DEV_DOUBLE + IMAGE)    | ByteArray       | :py:obj:`bytearray`                                                       | :py:obj:`bytearray`                                                       |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|                         | String          | :py:obj:`str`                                                             | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | String          | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |                         | List            | :py:class:`list` <:py:obj:`float`>                                        | :py:class:`list` <:py:obj:`float`>                                        |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
@@ -134,7 +143,7 @@ much more efficient.
 | or                      +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 | (DEV_USHORT + IMAGE)    | ByteArray       | :py:obj:`bytearray`                                                       | :py:obj:`bytearray`                                                       |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|                         | String          | :py:obj:`str`                                                             | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | String          | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |                         | List            | :py:class:`list` <:py:obj:`int`>                                          | :py:class:`list` <:py:obj:`int`>                                          |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
@@ -146,7 +155,7 @@ much more efficient.
 | or                      +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 | (DEV_ULONG + IMAGE)     | ByteArray       | :py:obj:`bytearray`                                                       | :py:obj:`bytearray`                                                       |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|                         | String          | :py:obj:`str`                                                             | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | String          | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |                         | List            | :py:class:`list` <:py:obj:`int`>                                          | :py:class:`list` <:py:obj:`int`>                                          |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
@@ -158,7 +167,7 @@ much more efficient.
 | or                      +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 | (DEV_ULONG64 + IMAGE)   | ByteArray       | :py:obj:`bytearray`                                                       | :py:obj:`bytearray`                                                       |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
-|                         | String          | :py:obj:`str`                                                             | String    :py:obj:`str` (decoded with default python encoding *utf-8*!!!) |
+|                         | String          | :py:obj:`str`                                                             | :py:obj:`str` (decoded with *latin-1*, aka *ISO-8859-1*)                  |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
 |                         | List            | :py:class:`list` <int (64 bits) / long (32 bits)>                         | :py:class:`list` <:py:obj:`int`>                                          |
 |                         +-----------------+---------------------------------------------------------------------------+---------------------------------------------------------------------------+
@@ -315,3 +324,111 @@ examples of what you can return in a server as a read request from a pipe::
       {'name': '2DE', 'value': (3,4,5,6), 'dtype': ('int32',) },
      )
     )
+
+
+.. _pytango-devenum-data-types:
+
+DevEnum pythonic usage
+----------------------
+
+When using regular tango DeviceProxy and AttributeProxy DevEnum is treated just
+like in cpp tango (see `enumerated attributes
+<https://tango-controls.readthedocs.io/en/latest/development/device-api/enumerated-attribute.html>`_
+for more info). However, since PyTango >= 9.2.5 there is a more pythonic way of
+using DevEnum data types if you use the :ref:`high level API <pytango-hlapi>`,
+both in server and client side.
+
+In server side you can use python :py:obj:`enum.IntEnum` class to deal with
+DevEnum attributes::
+
+    import time
+    from enum import IntEnum
+    from tango import AttrWriteType
+    from tango.server import Device, attribute, command
+
+
+    class Noon(IntEnum):
+        AM = 0  # DevEnum's must start at 0
+        PM = 1  # and increment by 1
+
+
+    class DisplayType(IntEnum):
+        ANALOG = 0  # DevEnum's must start at 0
+        DIGITAL = 1  # and increment by 1
+
+
+    class Clock(Device):
+
+        display_type = DisplayType(0)
+
+        @attribute(dtype=float)
+        def time(self):
+            return time.time()
+
+        gmtime = attribute(dtype=(int,), max_dim_x=9)
+
+        def read_gmtime(self):
+            return time.gmtime()
+
+        @attribute(dtype=Noon)
+        def noon(self):
+            time_struct = time.gmtime(time.time())
+            return Noon.AM if time_struct.tm_hour < 12 else Noon.PM
+
+        display = attribute(dtype=DisplayType, access=AttrWriteType.READ_WRITE)
+
+        def read_display(self):
+            return self.display_type
+
+        def write_display(self, display_type):
+            self.display_type = display_type
+
+        @command(dtype_in=float, dtype_out=str)
+        def ctime(self, seconds):
+            """
+            Convert a time in seconds since the Epoch to a string in local time.
+            This is equivalent to asctime(localtime(seconds)). When the time tuple
+            is not present, current time as returned by localtime() is used.
+            """
+            return time.ctime(seconds)
+
+        @command(dtype_in=(int,), dtype_out=float)
+        def mktime(self, tupl):
+            return time.mktime(tupl)
+
+
+    if __name__ == "__main__":
+        Clock.run_server()
+
+
+On the client side you can also use a pythonic approach for using DevEnum attributes::
+
+    import sys
+    import PyTango
+
+    if len(sys.argv) != 2:
+        print("must provide one and only one clock device name")
+        sys.exit(1)
+
+    clock = PyTango.DeviceProxy(sys.argv[1])
+    t = clock.time
+    gmt = clock.gmtime
+    noon = clock.noon
+    display = clock.display
+    print(t)
+    print(gmt)
+    print(noon, noon.name, noon.value)
+    if noon == noon.AM:
+        print('Good morning!')
+    print(clock.ctime(t))
+    print(clock.mktime(gmt))
+    print(display, display.name, display.value)
+    clock.display = display.ANALOG
+    clock.display = 'DIGITAL'  # you can use a valid string to set the value
+    print(clock.display, clock.display.name, clock.display.value)
+    display_type = type(display)  # or even create your own IntEnum type
+    analog = display_type(0)
+    clock.display = analog
+    print(clock.display, clock.display.name, clock.display.value)
+    clock.display = clock.display.DIGITAL
+    print(clock.display, clock.display.name, clock.display.value)

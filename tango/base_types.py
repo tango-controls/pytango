@@ -13,30 +13,31 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["base_types_init"]
+__all__ = ("base_types_init",)
 
 __docformat__ = "restructuredtext"
 
-
-from ._tango import (StdStringVector, StdLongVector, StdDoubleVector, \
-    CommandInfoList, AttributeInfoList, AttributeInfoListEx, DbData, \
-    DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList, \
-    DeviceDataHistoryList, StdGroupReplyVector, \
-    StdGroupCmdReplyVector, StdGroupAttrReplyVector, \
-    ArchiveEventInfo, EventData, AttrConfEventData, AttributeAlarmInfo, \
-    AttributeDimension, AttributeEventInfo, DeviceAttributeConfig, \
-    AttributeInfo, AttributeInfoEx, ChangeEventInfo, PeriodicEventInfo, \
-    DevCommandInfo, CommandInfo, DataReadyEventData, DeviceInfo, \
-    LockerInfo, PollDevice, TimeVal, AttrWriteType, AttrDataFormat, DispLevel)
+from ._tango import (StdStringVector, StdLongVector, StdDoubleVector,
+                     CommandInfoList, AttributeInfoList, AttributeInfoListEx, DbData,
+                     DbDevInfos, DbDevExportInfos, DbDevImportInfos, DbHistoryList,
+                     DeviceDataHistoryList, StdGroupReplyVector,
+                     StdGroupCmdReplyVector, StdGroupAttrReplyVector,
+                     ArchiveEventInfo, EventData, AttrConfEventData, AttributeAlarmInfo,
+                     AttributeDimension, AttributeEventInfo, DeviceAttributeConfig,
+                     AttributeInfo, AttributeInfoEx, ChangeEventInfo, PeriodicEventInfo,
+                     DevCommandInfo, CommandInfo, DataReadyEventData, DeviceInfo,
+                     LockerInfo, PollDevice, TimeVal, AttrWriteType, AttrDataFormat, DispLevel)
 
 from .utils import document_method, is_integer
 from .utils import document_enum as __document_enum
 from .utils import seq_2_StdStringVector, StdStringVector_2_seq
 
+
 def __StdVector__add(self, seq):
     ret = seq.__class__(self)
     ret.extend(seq)
     return ret
+
 
 def __StdVector__mul(self, n):
     ret = self.__class__()
@@ -44,11 +45,13 @@ def __StdVector__mul(self, n):
         ret.extend(self)
     return ret
 
+
 def __StdVector__imul(self, n):
     ret = self.__class__()
     for _ in range(n):
         ret.extend(self)
     return ret
+
 
 def __StdVector__getitem(self, key):
     if is_integer(key) or key.step is None:
@@ -57,7 +60,7 @@ def __StdVector__getitem(self, key):
     res = self.__class__()
     nb = len(self)
     start = key.start or 0
-    stop  = key.stop or nb
+    stop = key.stop or nb
     if start >= nb:
         return res
     if stop > nb:
@@ -68,12 +71,14 @@ def __StdVector__getitem(self, key):
 
     return res
 
+
 def __fillVectorClass(klass):
     klass.__add__ = __StdVector__add
     klass.__mul__ = __StdVector__mul
     klass.__imul__ = __StdVector__imul
     klass.__original_getitem = klass.__getitem__
     klass.__getitem__ = __StdVector__getitem
+
 
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 # DeviceAttributeConfig pickle
@@ -82,26 +87,28 @@ def __fillVectorClass(klass):
 def __DeviceAttributeConfig__getinitargs__(self):
     return ()
 
+
 def __DeviceAttributeConfig__getstate__(self):
-    ret = self.name, \
-          int(self.writable), \
-          int(self.data_format), \
-          self.data_type, \
-          self.max_dim_x, \
-          self.max_dim_y, \
-          self.description, \
-          self.label, \
-          self.unit, \
-          self.standard_unit, \
-          self.display_unit, \
-          self.format, \
-          self.min_value, \
-          self.max_value, \
-          self.min_alarm, \
-          self.max_alarm, \
-          self.writable_attr_name, \
-          StdStringVector_2_seq(self.extensions)
-    return ret
+    return (
+        self.name,
+        int(self.writable),
+        int(self.data_format),
+        self.data_type,
+        self.max_dim_x,
+        self.max_dim_y,
+        self.description,
+        self.label,
+        self.unit,
+        self.standard_unit,
+        self.display_unit,
+        self.format,
+        self.min_value,
+        self.max_value,
+        self.min_alarm,
+        self.max_alarm,
+        self.writable_attr_name,
+        StdStringVector_2_seq(self.extensions))
+
 
 def __DeviceAttributeConfig__setstate__(self, state):
     self.name = state[0]
@@ -123,6 +130,7 @@ def __DeviceAttributeConfig__setstate__(self, state):
     self.writable_attr_name = state[16]
     self.extensions = seq_2_StdStringVector(state[17])
 
+
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 # AttributeInfo pickle
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
@@ -130,14 +138,17 @@ def __DeviceAttributeConfig__setstate__(self, state):
 def __AttributeInfo__getinitargs__(self):
     return ()
 
+
 def __AttributeInfo__getstate__(self):
     ret = list(__DeviceAttributeConfig__getstate__(self))
     ret.append(int(self.disp_level))
     return tuple(ret)
 
+
 def __AttributeInfo__setstate__(self, state):
     __DeviceAttributeConfig__setstate__(self, state)
     self.disp_level = DispLevel(state[18])
+
 
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 # AttributeAlarmInfo pickle
@@ -146,14 +157,17 @@ def __AttributeInfo__setstate__(self, state):
 def __AttributeAlarmInfo__getinitargs__(self):
     return ()
 
+
 def __AttributeAlarmInfo__getstate__(self):
-    return self.min_alarm, \
-           self.max_alarm, \
-           self.min_warning, \
-           self.max_warning, \
-           self.delta_t, \
-           self.delta_val, \
-           StdStringVector_2_seq(self.extensions)
+    return (
+        self.min_alarm,
+        self.max_alarm,
+        self.min_warning,
+        self.max_warning,
+        self.delta_t,
+        self.delta_val,
+        StdStringVector_2_seq(self.extensions))
+
 
 def __AttributeAlarmInfo__setstate__(self, state):
     self.min_alarm = state[0]
@@ -164,6 +178,7 @@ def __AttributeAlarmInfo__setstate__(self, state):
     self.delta_val = state[5]
     self.extensions = seq_2_StdStringVector(state[6])
 
+
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 # ChangeEventInfo pickle
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
@@ -171,15 +186,19 @@ def __AttributeAlarmInfo__setstate__(self, state):
 def __ChangeEventInfo__getinitargs__(self):
     return ()
 
+
 def __ChangeEventInfo__getstate__(self):
-    return self.rel_change, \
-           self.abs_change, \
-           StdStringVector_2_seq(self.extensions)
+    return (
+        self.rel_change,
+        self.abs_change,
+        StdStringVector_2_seq(self.extensions))
+
 
 def __ChangeEventInfo__setstate__(self, state):
     self.rel_change = state[0]
     self.abs_change = state[1]
     self.extensions = seq_2_StdStringVector(state[2])
+
 
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 # PeriodicEventInfo pickle
@@ -188,13 +207,17 @@ def __ChangeEventInfo__setstate__(self, state):
 def __PeriodicEventInfo__getinitargs__(self):
     return ()
 
+
 def __PeriodicEventInfo__getstate__(self):
-    return self.period, \
-        StdStringVector_2_seq(self.extensions)
+    return (
+        self.period,
+        StdStringVector_2_seq(self.extensions))
+
 
 def __PeriodicEventInfo__setstate__(self, state):
     self.period = state[0]
     self.extensions = seq_2_StdStringVector(state[1])
+
 
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 # ArchiveEventInfo pickle
@@ -203,17 +226,21 @@ def __PeriodicEventInfo__setstate__(self, state):
 def __ArchiveEventInfo__getinitargs__(self):
     return ()
 
+
 def __ArchiveEventInfo__getstate__(self):
-    return self.archive_rel_change, \
-           self.archive_abs_change, \
-           self.archive_period, \
-           StdStringVector_2_seq(self.extensions)
+    return (
+        self.archive_rel_change,
+        self.archive_abs_change,
+        self.archive_period,
+        StdStringVector_2_seq(self.extensions))
+
 
 def __ArchiveEventInfo__setstate__(self, state):
     self.archive_rel_change = state[0]
     self.archive_abs_change = state[1]
     self.archive_period = state[2]
     self.extensions = seq_2_StdStringVector(state[3])
+
 
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 # AttributeEventInfo pickle
@@ -222,15 +249,19 @@ def __ArchiveEventInfo__setstate__(self, state):
 def __AttributeEventInfo__getinitargs__(self):
     return ()
 
+
 def __AttributeEventInfo__getstate__(self):
-    return self.ch_event, \
-           self.per_event, \
-           self.arch_event
+    return (
+        self.ch_event,
+        self.per_event,
+        self.arch_event)
+
 
 def __AttributeEventInfo__setstate__(self, state):
     self.ch_event = state[0]
     self.per_event = state[1]
     self.arch_event = state[2]
+
 
 # -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 # AttributeInfoEx pickle
@@ -239,6 +270,7 @@ def __AttributeEventInfo__setstate__(self, state):
 def __AttributeInfoEx__getinitargs__(self):
     return ()
 
+
 def __AttributeInfoEx__getstate__(self):
     ret = list(__AttributeInfo__getstate__(self))
     ret.append(self.alarms)
@@ -246,19 +278,21 @@ def __AttributeInfoEx__getstate__(self):
     ret.append(StdStringVector_2_seq(self.sys_extensions))
     return tuple(ret)
 
+
 def __AttributeInfoEx__setstate__(self, state):
     __AttributeInfo__setstate__(self, state)
     self.alarms = state[19]
     self.events = state[20]
     self.sys_extensions = seq_2_StdStringVector(state[21])
 
-def __init_base_types():
 
-    v_klasses = (StdStringVector,StdLongVector,StdDoubleVector,CommandInfoList, \
-                 AttributeInfoList,AttributeInfoListEx,DbData,DbDevInfos, \
-                 DbDevExportInfos,DbDevImportInfos,DbHistoryList, \
-                 DeviceDataHistoryList, StdGroupReplyVector, \
-                 StdGroupCmdReplyVector, StdGroupAttrReplyVector)
+def __init_base_types():
+    v_klasses = (
+        StdStringVector, StdLongVector, StdDoubleVector, CommandInfoList,
+        AttributeInfoList, AttributeInfoListEx, DbData, DbDevInfos,
+        DbDevExportInfos, DbDevImportInfos, DbHistoryList,
+        DeviceDataHistoryList, StdGroupReplyVector,
+        StdGroupCmdReplyVector, StdGroupAttrReplyVector)
 
     for v_klass in v_klasses:
         __fillVectorClass(v_klass)
@@ -297,7 +331,6 @@ def __init_base_types():
 
 
 def __doc_base_types():
-
     def document_enum(enum_name, desc):
         import tango
         __document_enum(tango, enum_name, desc)
@@ -323,7 +356,7 @@ def __doc_base_types():
         - String   : The data will be stored 'as is', the binary data
           as it comes from TangoC++ in 'value'.
         - Nothing  : The value will not be extracted from DeviceAttribute
-    """ )
+    """)
 
     document_enum("CmdArgType", """
     An enumeration representing the command argument type.
@@ -359,7 +392,7 @@ def __doc_base_types():
         - DevEncoded
         - DevEnum
         - DevPipeBlob
-    """ )
+    """)
 
     document_enum("LockerLanguage", """
     An enumeration representing the programming language in which the
@@ -369,7 +402,7 @@ def __doc_base_types():
         - JAVA : Java language
 
     New in PyTango 7.0.0
-    """ )
+    """)
 
     document_enum("MessBoxType", """
     An enumeration representing the MessBoxType
@@ -378,7 +411,7 @@ def __doc_base_types():
         - INFO
 
     New in PyTango 7.0.0
-    """ )
+    """)
 
     document_enum("PollObjType", """
     An enumeration representing the PollObjType
@@ -389,7 +422,7 @@ def __doc_base_types():
         - STORE_SUBDEV
 
     New in PyTango 7.0.0
-    """ )
+    """)
 
     document_enum("PollCmdCode", """
     An enumeration representing the PollCmdCode
@@ -406,7 +439,7 @@ def __doc_base_types():
         - POLL_REM_HEARTBEAT
 
     New in PyTango 7.0.0
-    """ )
+    """)
 
     document_enum("SerialModel", """
     An enumeration representing the type of serialization performed by the device server
@@ -415,14 +448,14 @@ def __doc_base_types():
         - BY_CLASS
         - BY_PROCESS
         - NO_SYNC
-    """ )
+    """)
 
     document_enum("AttReqType", """
     An enumeration representing the type of attribute request
 
         - READ_REQ
         - WRITE_REQ
-    """ )
+    """)
 
     document_enum("LockCmdCode", """
     An enumeration representing the LockCmdCode
@@ -433,7 +466,7 @@ def __doc_base_types():
         - LOCK_EXIT
 
     New in PyTango 7.0.0
-    """ )
+    """)
 
     document_enum("LogLevel", """
     An enumeration representing the LogLevel
@@ -446,7 +479,7 @@ def __doc_base_types():
         - LOG_DEBUG
 
     New in PyTango 7.0.0
-    """ )
+    """)
 
     document_enum("LogTarget", """
     An enumeration representing the LogTarget
@@ -456,7 +489,7 @@ def __doc_base_types():
         - LOG_DEVICE
 
     New in PyTango 7.0.0
-    """ )
+    """)
 
     document_enum("EventType", """
     An enumeration representing event type
@@ -468,10 +501,14 @@ def __doc_base_types():
         - USER_EVENT
         - ATTR_CONF_EVENT
         - DATA_READY_EVENT
+        - INTERFACE_CHANGE_EVENT
+        - PIPE_EVENT
 
         *DATA_READY_EVENT - New in PyTango 7.0.0*
+        *INTERFACE_CHANGE_EVENT - New in PyTango 9.2.2*
+        *PIPE_EVENT - New in PyTango 9.2.2*
 
-    """ )
+    """)
 
     document_enum("AttrSerialModel", """
     An enumeration representing the AttrSerialModel
@@ -481,7 +518,7 @@ def __doc_base_types():
         - ATTR_BY_USER
 
     New in PyTango 7.1.0
-    """ )
+    """)
 
     document_enum("KeepAliveCmdCode", """
     An enumeration representing the KeepAliveCmdCode
@@ -489,7 +526,7 @@ def __doc_base_types():
         - EXIT_TH
 
     New in PyTango 7.0.0
-    """ )
+    """)
 
     document_enum("AccessControlType", """
     An enumeration representing the AccessControlType
@@ -498,7 +535,7 @@ def __doc_base_types():
         - ACCESS_WRITE
 
     New in PyTango 7.0.0
-    """ )
+    """)
 
     document_enum("asyn_req_type", """
     An enumeration representing the asynchronous request type
@@ -506,14 +543,14 @@ def __doc_base_types():
         - POLLING
         - CALLBACK
         - ALL_ASYNCH
-    """ )
+    """)
 
     document_enum("cb_sub_model", """
     An enumeration representing callback sub model
 
         - PUSH_CALLBACK
         - PULL_CALLBACK
-    """ )
+    """)
 
     document_enum("AttrQuality", """
     An enumeration representing the attribute quality
@@ -523,7 +560,7 @@ def __doc_base_types():
         - ATTR_ALARM
         - ATTR_CHANGING
         - ATTR_WARNING
-    """ )
+    """)
 
     document_enum("AttrWriteType", """
     An enumeration representing the attribute type
@@ -532,7 +569,7 @@ def __doc_base_types():
         - READ_WITH_WRITE
         - WRITE
         - READ_WRITE
-    """ )
+    """)
 
     document_enum("AttrDataFormat", """
     An enumeration representing the attribute format
@@ -541,14 +578,14 @@ def __doc_base_types():
         - SPECTRUM
         - IMAGE
         - FMT_UNKNOWN
-    """ )
+    """)
 
     document_enum("PipeWriteType", """
     An enumeration representing the pipe type
 
         - PIPE_READ
         - PIPE_READ_WRITE
-    """ )
+    """)
 
     document_enum("DevSource", """
     An enumeration representing the device source for data
@@ -556,7 +593,7 @@ def __doc_base_types():
         - DEV
         - CACHE
         - CACHE_DEV
-    """ )
+    """)
 
     document_enum("ErrSeverity", """
     An enumeration representing the error severity
@@ -564,7 +601,7 @@ def __doc_base_types():
         - WARN
         - ERR
         - PANIC
-    """ )
+    """)
 
     document_enum("DevState", """
     An enumeration representing the device state
@@ -583,14 +620,14 @@ def __doc_base_types():
         - ALARM
         - DISABLE
         - UNKNOWN
-    """ )
+    """)
 
     document_enum("DispLevel", """
     An enumeration representing the display level
 
         - OPERATOR
         - EXPERT
-    """ )
+    """)
 
     document_enum("GreenMode", """
     An enumeration representing the GreenMode
@@ -600,7 +637,7 @@ def __doc_base_types():
         - Gevent
 
     New in PyTango 8.1.0
-    """ )
+    """)
 
     ArchiveEventInfo.__doc__ = """
     A structure containing available archiving event information for an attribute
@@ -635,7 +672,7 @@ def __doc_base_types():
         Return     : (TimeVal) the timestamp of the event
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     AttrConfEventData.__doc__ = """
     This class is used to pass data to the callback method when a
@@ -661,7 +698,7 @@ def __doc_base_types():
         Return     : (TimeVal) the timestamp of the event
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     AttributeAlarmInfo.__doc__ = """
     A structure containing available alarm information for an attribute
@@ -868,7 +905,7 @@ def __doc_base_types():
         Return     : (TimeVal) the timestamp of the event
 
         New in PyTango 7.0.0
-    """ )
+    """)
 
     TimeVal.__doc__ = """
     Time value structure with the following members:
@@ -876,6 +913,7 @@ def __doc_base_types():
         - tv_sec : seconds
         - tv_usec : microseconds
         - tv_nsec : nanoseconds"""
+
 
 def base_types_init(doc=True):
     __init_base_types()

@@ -13,11 +13,11 @@
 This is an internal PyTango module.
 """
 
-__all__ = [ "get_class", "get_classes", "get_cpp_class", "get_cpp_classes",
-            "get_constructed_class", "get_constructed_classes",
-            "class_factory", "delete_class_list",
-            "class_list", "cpp_class_list", "constructed_class"]
-            
+__all__ = ("get_class", "get_classes", "get_cpp_class", "get_cpp_classes",
+           "get_constructed_class", "get_constructed_classes",
+           "class_factory", "delete_class_list",
+           "class_list", "cpp_class_list", "constructed_class")
+
 __docformat__ = "restructuredtext"
 
 # list of tuple<DeviceClass class, DeviceImpl class, tango device class name>
@@ -29,9 +29,11 @@ cpp_class_list = []
 # list of DeviceClass objects, one for each registered device class
 constructed_class = []
 
+
 def get_classes():
     global class_list
     return class_list
+
 
 def get_class(name):
     for klass_info in get_classes():
@@ -39,15 +41,18 @@ def get_class(name):
             return klass_info
     return None
 
+
 def get_class_by_class(klass):
     for klass_info in get_classes():
         if klass_info[0] == klass:
             return klass_info
     return None
 
+
 def get_cpp_classes():
     global cpp_class_list
     return cpp_class_list
+
 
 def get_cpp_class(name):
     for klass_info in get_cpp_classes():
@@ -55,9 +60,11 @@ def get_cpp_class(name):
             return klass_info
     return None
 
+
 def get_constructed_classes():
     global constructed_class
     return constructed_class
+
 
 def get_constructed_class(name):
     for klass in get_constructed_classes():
@@ -65,11 +72,13 @@ def get_constructed_class(name):
             return klass
     return None
 
+
 def get_constructed_class_by_class(klass):
     for k in get_constructed_classes():
         if k.__class__ == klass:
             return k
     return None
+
 
 #
 # A method to delete Tango classes from Python
@@ -78,7 +87,8 @@ def get_constructed_class_by_class(klass):
 def delete_class_list():
     global constructed_class
     if len(constructed_class) != 0:
-       del(constructed_class[:])
+        del (constructed_class[:])
+
 
 #
 # A generic class_factory method
@@ -105,4 +115,3 @@ def class_factory():
         tango_device_class_name = class_info[2]
         device_class = device_class_class(tango_device_class_name)
         local_constructed_class.append(device_class)
-

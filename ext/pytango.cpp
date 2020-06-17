@@ -23,7 +23,7 @@
 #include <tango.h>
 
 using namespace boost::python;
- 
+
 void export_version();
 void export_enums();
 void export_constants();
@@ -31,22 +31,26 @@ void export_base_types();
 void export_event_data();
 void export_attr_conf_event_data();
 void export_data_ready_event_data();
+void export_pipe_event_data();
 void export_exceptions();
 void export_api_util();
 void export_connection();
 void export_device_proxy();
+void export_devintr_change_event_data();
 void export_attribute_proxy();
 void export_db();
 void export_callback(); /// @todo not sure were to put it...
 void export_util();
 void export_pipe();
 void export_attr();
+void export_fwdattr();
 void export_attribute();
 void export_encoded_attribute();
 void export_wattribute();
 void export_multi_attribute();
 void export_multi_class_attribute();
 void export_user_default_attr_prop();
+void export_user_default_fwdattr_prop();
 void export_user_default_pipe_prop();
 void export_sub_dev_diag();
 void export_dserver();
@@ -55,6 +59,7 @@ void export_device_impl();
 void export_group();
 void export_log4tango();
 void export_auto_tango_monitor();
+void export_ensure_omni_thread();
 
 #ifdef DISABLE_PYTANGO_NUMPY
 void init_numpy(void) {}
@@ -76,10 +81,6 @@ BOOST_PYTHON_MODULE(_tango)
                                show_py_signatures);
 #endif
 
-    // specify that this module is actually a package
-    boost::python::object package = boost::python::scope();
-    package.attr("__path__") = "PyTango";
-
     PyEval_InitThreads();
 
     init_numpy();
@@ -93,6 +94,8 @@ BOOST_PYTHON_MODULE(_tango)
     export_event_data();
     export_attr_conf_event_data();
     export_data_ready_event_data();
+    export_pipe_event_data();
+    export_devintr_change_event_data();
     export_exceptions();
     export_api_util();
     export_connection();
@@ -102,12 +105,14 @@ BOOST_PYTHON_MODULE(_tango)
     export_util();
     export_pipe();
     export_attr();
+    export_fwdattr();
     export_attribute();
     export_encoded_attribute();
     export_wattribute();
     export_multi_attribute();
     export_multi_class_attribute();
     export_user_default_attr_prop();
+    export_user_default_fwdattr_prop();
     export_user_default_pipe_prop();
     export_sub_dev_diag();
     export_device_class();
@@ -117,4 +122,5 @@ BOOST_PYTHON_MODULE(_tango)
     export_group();
     export_log4tango();
     export_auto_tango_monitor();
-}
+    export_ensure_omni_thread();
+ }

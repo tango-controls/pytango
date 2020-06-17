@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["group_reply_list_init"]
+__all__ = ("group_reply_list_init",)
 
 __docformat__ = "restructuredtext"
 
@@ -31,15 +31,15 @@ def __GroupReplyList__getitem(self, item):
     # boost::vector_indexing_suite, but when the value is extracted
     # it is not anymore in any C++ object but in the python object, so
     # we must still keep it.
-    
+
     # Slices support
     if isinstance(item, slice):
         return [self.__getitem__(x) for x in range(*item.indices(len(self)))]
-    
+
     # We want to get the same cache value for x[-1] as for x[len(x)-1]
     if item < 0:
         item = item + len(self)
-    
+
     # Try to get from cache
     try:
         return self.__listCache[item]
@@ -56,11 +56,13 @@ def __GroupReplyList__getitem(self, item):
     self.__listCache[item] = r
     return r
 
+
 def __GroupReplyList__iter(self):
     # Same problem as getitem. In this case it is easier for me to just
     # reimplement __iter__ in terms of __getitem__
     for x in range(len(self)):
         yield self[x]
+
 
 def __init_GroupReplyList():
     GroupReplyList.__GroupReplyList_original_getitem = GroupReplyList.__getitem__
@@ -76,8 +78,10 @@ def __init_GroupReplyList():
     GroupCmdReplyList.__iter__ = __GroupReplyList__iter
     GroupAttrReplyList.__iter__ = __GroupReplyList__iter
 
+
 def __doc_GroupReplyList():
     pass
+
 
 def group_reply_list_init(doc=True):
     __init_GroupReplyList()

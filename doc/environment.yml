@@ -1,6 +1,10 @@
-name: py35
+name: py3
 dependencies:
-- python=3.5
+- python=3
 - numpy
 - gevent
 - graphviz
+- mock
+- pillow
+- sphinx
+- sphinx_rtd_theme

@@ -15,27 +15,28 @@ from __future__ import absolute_import
 # Imports
 import sys
 import six
-import types
 import functools
-
-# Combatibility imports
-try:
-    from threading import get_ident
-except:
-    from threading import _get_ident as get_ident
+from collections import namedtuple
 
 # Gevent imports
+import gevent.event
 import gevent.queue
+import gevent.monkey
+import gevent.threadpool
+
+# Bypass gevent monkey patching
+ThreadSafeEvent = gevent.monkey.get_original('threading', 'Event')
 
 # Tango imports
 from .green import AbstractExecutor
 
-__all__ = ["get_global_executor", "set_global_executor", "GeventExecutor"]
 
+__all__ = ("get_global_executor", "set_global_executor", "GeventExecutor")
 
 # Global executor
 
 _EXECUTOR = None
+_THREAD_POOL = None
 
 
 def get_global_executor():
@@ -50,105 +51,82 @@ def set_global_executor(executor):
     _EXECUTOR = executor
 
 
-# Patch for gevent threadpool
-
 def get_global_threadpool():
-    """Before gevent-1.1.0, patch the spawn method to propagate exception
-    raised in the loop to the AsyncResult.
-    """
-    threadpool = gevent.get_hub().threadpool
-    if gevent.version_info < (1, 1) and not hasattr(threadpool, '_spawn'):
-        threadpool._spawn = threadpool.spawn
-        threadpool.spawn = types.MethodType(
-            spawn, threadpool, type(threadpool))
-    return threadpool
+    global _THREAD_POOL
+    if _THREAD_POOL is None:
+        _THREAD_POOL = ThreadPool(maxsize=10**4)
+    return _THREAD_POOL
 
 
-class ExceptionWrapper:
-    def __init__(self, exception, error_string, tb):
-        self.exception = exception
-        self.error_string = error_string
-        self.tb = tb
+ExceptionInfo = namedtuple('ExceptionInfo', 'type value traceback')
 
 
-def wrap_errors(func):
+def wrap_error(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except:
-            return ExceptionWrapper(*sys.exc_info())
+            return ExceptionInfo(*sys.exc_info())
+
     return wrapper
 
 
-def get_with_exception(result, block=True, timeout=None):
-    result = result._get(block, timeout)
-    if isinstance(result, ExceptionWrapper):
-        # Raise the exception using the caller context
-        six.reraise(result.exception, result.error_string, result.tb)
-    return result
+def unwrap_error(source):
+    destination = gevent.event.AsyncResult()
+
+    def link(source):
+        if isinstance(source.value, ExceptionInfo):
+            try:
+                destination.set_exception(
+                    source.value.value, exc_info=source.value)
+            # Gevent 1.0 compatibility
+            except TypeError:
+                destination.set_exception(source.value.value)
+            return
+        destination(source)
+
+    source.rawlink(link)
+    return destination
 
 
-def spawn(threadpool, fn, *args, **kwargs):
-    # The gevent threadpool do not raise exception with async results,
-    # we have to wrap it
-    fn = wrap_errors(fn)
-    result = threadpool._spawn(fn, *args, **kwargs)
-    result._get = result.get
-    result.get = types.MethodType(get_with_exception, result, type(result))
-    return result
+class ThreadPool(gevent.threadpool.ThreadPool):
+
+    def spawn(self, fn, *args, **kwargs):
+        wrapped = wrap_error(fn)
+        raw = super(ThreadPool, self).spawn(wrapped, *args, **kwargs)
+        return unwrap_error(raw)
 
 
 # Gevent task and event loop
 
 class GeventTask:
-
-    def __init__(self, event, func, *args, **kwargs):
-        self.event = event
+    def __init__(self, func, *args, **kwargs):
         self.func = func
         self.args = args
         self.kwargs = kwargs
         self.value = None
         self.exception = None
+        self.done = ThreadSafeEvent()
+        self.started = ThreadSafeEvent()
 
     def run(self):
+        self.started.set()
         try:
             self.value = self.func(*self.args, **self.kwargs)
         except:
             self.exception = sys.exc_info()
         finally:
-            self.event.set()
+            self.done.set()
 
     def spawn(self):
         return gevent.spawn(self.run)
 
     def result(self):
-        self.event.wait()
+        self.done.wait()
         if self.exception:
             six.reraise(*self.exception)
         return self.value
-
-
-class GeventLoop:
-
-    def __init__(self):
-        self.thread_id = get_ident()
-        self.tasks = gevent.queue.Queue()
-        self.loop = gevent.spawn(self.run)
-
-    def run(self):
-        while True:
-            self.tasks.get().spawn()
-
-    def is_gevent_thread(self):
-        return self.thread_id == get_ident()
-
-    def submit(self, func, *args, **kwargs):
-        event = gevent._threading.Event()
-        task = GeventTask(event, func, *args, **kwargs)
-        self.tasks.put_nowait(task)
-        self.tasks.hub.loop.async().send()
-        return task
 
 
 # Gevent executor
@@ -160,8 +138,9 @@ class GeventExecutor(AbstractExecutor):
     default_wait = True
 
     def __init__(self, loop=None, subexecutor=None):
+        super(GeventExecutor, self).__init__()
         if loop is None:
-            loop = GeventLoop()
+            loop = gevent.get_hub().loop
         if subexecutor is None:
             subexecutor = get_global_threadpool()
         self.loop = loop
@@ -175,12 +154,29 @@ class GeventExecutor(AbstractExecutor):
         """Return a result from an gevent future."""
         return accessor.get(timeout=timeout)
 
+    def create_watcher(self):
+        try:
+            return self.loop.async_()
+        except AttributeError:
+            return getattr(self.loop, 'async')()
+
     def submit(self, fn, *args, **kwargs):
-        return self.loop.submit(fn, *args, **kwargs)
+        task = GeventTask(fn, *args, **kwargs)
+        watcher = self.create_watcher()
+        watcher.start(task.spawn)
+        watcher.send()
+        task.started.wait()
+        # The watcher has to be stopped in order to be garbage-collected.
+        # This step is crucial since the watcher holds a reference to the
+        # `task.spawn` method which itself holds a reference to the task.
+        # It's also important to wait for the task to be spawned before
+        # stopping the watcher, otherwise the task won't run.
+        watcher.stop()
+        return task
 
     def execute(self, fn, *args, **kwargs):
         """Execute an operation and return the result."""
-        if self.loop.is_gevent_thread():
+        if self.in_executor_context():
             return fn(*args, **kwargs)
         task = self.submit(fn, *args, **kwargs)
         return task.result()

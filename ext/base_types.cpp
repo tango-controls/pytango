@@ -158,7 +158,7 @@ struct convert_PySequence_to_CORBA_Sequence
     static void construct(PyObject* obj,
                           boost::python::converter::rvalue_from_python_stage1_data* data)
     {
-            
+
         typedef boost::python::converter::rvalue_from_python_storage<CorbaSequence> CorbaSequence_storage;
 
         void* const storage = reinterpret_cast<CorbaSequence_storage*>(data)->storage.bytes;
@@ -167,13 +167,12 @@ struct convert_PySequence_to_CORBA_Sequence
         convert2array(object(handle<>(obj)), *ptr);
         data->convertible = storage;
     }
-    
+
 };
 
-#if PY_VERSION_HEX < 0x03000000
 bool is_str(PyObject* obj)
 {
-    return PyString_Check(obj) || PyUnicode_Check(obj);
+    return PyBytes_Check(obj) || PyUnicode_Check(obj);
 }
 
 struct StdString_from_python_str_unicode
@@ -185,7 +184,7 @@ struct StdString_from_python_str_unicode
           &construct,
           boost::python::type_id<std::string>());
     }
- 
+
     // Determine if obj_ptr can be converted in a std::string
     static void* convertible(PyObject* obj)
     {
@@ -195,7 +194,7 @@ struct StdString_from_python_str_unicode
         }
         return obj;
     }
- 
+
     // Convert obj_ptr into a std::string
     static void construct(PyObject* obj,
                           boost::python::converter::rvalue_from_python_stage1_data* data)
@@ -207,18 +206,19 @@ struct StdString_from_python_str_unicode
           decref = true;
           obj = PyUnicode_AsLatin1String(obj);
       }
-      
+
       const char* value = PyBytes_AsString(obj);
- 
+      Py_ssize_t size = PyBytes_Size(obj);
+
       // Grab pointer to memory into which to construct the new std::string
       void* storage = (
         (boost::python::converter::rvalue_from_python_storage<std::string>*)
         data)->storage.bytes;
- 
+
       // in-place construct the new std::string using the character data
       // extraced from the python object
-      new (storage) std::string(value);
- 
+      new (storage) std::string(value, size);
+
       // Stash the memory chunk pointer for later use by boost.python
       data->convertible = storage;
 
@@ -227,7 +227,22 @@ struct StdString_from_python_str_unicode
     }
 };
 
-#endif // PY_VERSION_HEX < 0x03000000
+PyObject* vector_string_get_item(const StdStringVector &vec, int index)
+{
+    size_t pos = index < 0 ? index + vec.size() : (size_t)index;
+    if (pos >= vec.size()) {
+        PyErr_SetString(PyExc_IndexError, "Index out of range");
+        boost::python::throw_error_already_set();
+	return NULL;
+    }
+    return from_char_to_python_str(vec[pos]);
+}
+
+
+void* convert_to_cstring(PyObject* obj)
+{
+    return PyBytes_Check(obj) ? PyBytes_AsString(obj) : 0;
+}
 
 int raise_asynch_exception(long thread_id, boost::python::object exp_klass)
 {
@@ -236,6 +251,11 @@ int raise_asynch_exception(long thread_id, boost::python::object exp_klass)
 
 void export_base_types()
 {
+#if PY_VERSION_HEX > 0x03000000
+    // Add missing convert from python bytes to char *
+    converter::registry::insert(convert_to_cstring,type_id<char>(),&converter::wrap_pytype<&PyBytes_Type>::get_pytype);
+#endif
+
     enum_<PyTango::ExtractAs>("ExtractAs")
         .value("Numpy", PyTango::ExtractAsNumpy)
         .value("ByteArray", PyTango::ExtractAsByteArray)
@@ -285,7 +305,8 @@ void export_base_types()
     //              >> exception (unexisting is stored in the other obj)
 
     class_<StdStringVector>("StdStringVector")
-        .def(vector_indexing_suite<StdStringVector, true>());
+        .def(vector_indexing_suite<StdStringVector, true>())
+      .def("__getitem__", &vector_string_get_item);
 
     class_<StdLongVector>("StdLongVector")
         .def(vector_indexing_suite<StdLongVector, true>());
@@ -367,10 +388,10 @@ void export_base_types()
     to_python_converter<Tango::DevVarDoubleStringArray, CORBA_sequence_to_list<Tango::DevVarDoubleStringArray> >();
     to_python_converter<Tango::DevVarLong64Array, CORBA_sequence_to_list<Tango::DevVarLong64Array> >();
     to_python_converter<Tango::DevVarULong64Array, CORBA_sequence_to_list<Tango::DevVarULong64Array> >();
-    
+
     to_python_converter<Tango::DevEncoded, DevEncoded_to_tuple>();
     //to_python_converter<unsigned char, UChar_to_str>();
-    
+
     convert_PySequence_to_CORBA_Sequence<Tango::DevVarCharArray>();
     convert_PySequence_to_CORBA_Sequence<Tango::DevVarShortArray>();
     convert_PySequence_to_CORBA_Sequence<Tango::DevVarLongArray>();
@@ -394,9 +415,7 @@ void export_base_types()
     convert_numpy_to_integer<Tango::DEV_LONG64>();
     convert_numpy_to_integer<Tango::DEV_ULONG64>();
 
-#if PY_VERSION_HEX < 0x03000000
     StdString_from_python_str_unicode();
-#endif
 
     // from tango_const.h
     export_poll_device();
@@ -425,7 +444,7 @@ void export_base_types()
 
     export_dev_error();
     export_time_val();
-    
+
     def("raise_asynch_exception", &raise_asynch_exception);
 
     def("_get_tango_lib_release", &Tango::_convert_tango_lib_release);

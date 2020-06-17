@@ -1,17 +1,21 @@
-sudo: false
+dist: xenial
 language: python
-os: linux
 branches:
   only:
-    - master
+    - stable
     - develop
 
-python:
-  - 2.7
-  - 3.4
-  - 3.5
+env:
+  global:
+    - TANGO_VERSION=9.3.2alpha.1
+  matrix:
+    - PYTHON_VERSION=2.7
+    - PYTHON_VERSION=3.5
+    - PYTHON_VERSION=3.6
+    - PYTHON_VERSION=3.7
 
 cache:
+  timeout: 300
   directories:
     - ./miniconda  # Conda environment
     - ./.eggs      # pytest eggs
@@ -22,19 +26,23 @@ before_install:
   # Add conda to path
   - export PATH="$PWD/miniconda/bin:$PATH"
   # Install miniconda if not in cache
-  - conda -V || wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - conda -V || wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - conda -V || bash miniconda.sh -b -p ./miniconda -f
   # Update conda
-  - conda update --yes conda
+  - conda install --yes conda
+  # Enable conda
+  - source ./miniconda/etc/profile.d/conda.sh
   # Create build environment if it doesn't exist
-  - source activate buildenv || conda create --yes --name buildenv python=$TRAVIS_PYTHON_VERSION
+  - conda activate buildenv || conda create --yes --name buildenv python=$PYTHON_VERSION
   # Activate build environment
-  - source activate buildenv
+  - conda activate buildenv
+  # Pin python version
+  - echo "python == $PYTHON_VERSION.*" > $CONDA_PREFIX/conda-meta/pinned
 
 install:
   # Install build dependencies
-  - conda install --yes boost
-  - conda install --yes -c vxgmichel tango=9.2.2
+  - conda install --yes boost gxx_linux-64
+  - conda install --yes -c tango-controls tango=$TANGO_VERSION
   - conda install --yes numpy  # Not a strong requirement yet
   # Use conda prefix as root for the dependencies
   - export BOOST_ROOT=$CONDA_PREFIX TANGO_ROOT=$CONDA_PREFIX ZMQ_ROOT=$CONDA_PREFIX OMNI_ROOT=$CONDA_PREFIX
@@ -47,7 +55,7 @@ before_script:
   # Make sure old_ext exists
   - mkdir -p cached_ext
   # Touch the .so files if the extension hasn't changed
-  - diff cached_ext ext && find build -name _tango*.so -printf "touching %p\n" -exec touch {} + || true
+  - diff -r cached_ext ext && find build -name _tango*.so -printf "touching %p\n" -exec touch {} + || true
 
 script:
   # Build the package
@@ -56,3 +64,5 @@ script:
   - rsync -a --delete ext/ cached_ext/
   # Run the tests
   - python setup.py test
+  # Kill all the hanging tango test processes
+  - killall -9 TangoTest || true

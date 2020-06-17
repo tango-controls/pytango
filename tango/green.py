@@ -14,11 +14,17 @@
 import os
 from functools import wraps
 
+# Compatibility imports
+try:
+    from threading import get_ident
+except:
+    from threading import _get_ident as get_ident
+
 # Tango imports
 from ._tango import GreenMode
 
-__all__ = ['get_green_mode', 'set_green_mode', 'green', 'green_callback',
-           'get_executor', 'get_object_executor']
+__all__ = ('get_green_mode', 'set_green_mode', 'green', 'green_callback',
+           'get_executor', 'get_object_executor')
 
 # Handle current green mode
 
@@ -59,9 +65,14 @@ def get_green_mode():
 # Abstract executor class
 
 class AbstractExecutor(object):
-
     asynchronous = NotImplemented
     default_wait = NotImplemented
+
+    def __init__(self):
+        self.thread_id = get_ident()
+
+    def in_executor_context(self):
+        return self.thread_id == get_ident()
 
     def delegate(self, fn, *args, **kwargs):
         """Delegate an operation and return an accessor."""
@@ -90,10 +101,11 @@ class AbstractExecutor(object):
     def run(self, fn, args=(), kwargs={}, wait=None, timeout=None):
         if wait is None:
             wait = self.default_wait
+        # Wait and timeout are not supported in synchronous mode
+        if not self.asynchronous and (not wait or timeout):
+            raise ValueError('Not supported in synchronous mode')
         # Sychronous (no delegation)
-        if not self.asynchronous:
-            if not wait or timeout:
-                raise ValueError('Not supported in synchronous mode')
+        if not self.asynchronous or not self.in_executor_context():
             return fn(*args, **kwargs)
         # Asynchronous delegation
         accessor = self.delegate(fn, *args, **kwargs)
@@ -103,7 +115,6 @@ class AbstractExecutor(object):
 
 
 class SynchronousExecutor(AbstractExecutor):
-
     asynchronous = False
     default_wait = True
 
@@ -112,6 +123,7 @@ class SynchronousExecutor(AbstractExecutor):
 
 def get_synchronous_executor():
     return _SYNCHRONOUS_EXECUTOR
+
 
 _SYNCHRONOUS_EXECUTOR = SynchronousExecutor()
 
@@ -172,7 +184,6 @@ def green(fn=None, consume_green_mode=True):
     """Make a function green. Can be used as a decorator."""
 
     def decorator(fn):
-
         @wraps(fn)
         def greener(obj, *args, **kwargs):
             args = (obj,) + args

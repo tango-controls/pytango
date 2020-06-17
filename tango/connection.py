@@ -13,12 +13,15 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["connection_init"]
+__all__ = ("connection_init",)
 
 __docformat__ = "restructuredtext"
 
-import operator
-import collections
+
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 
 from ._tango import Connection, DeviceData, __CallBackAutoDie, CmdArgType, \
     DeviceProxy, Database, ExtractAs
@@ -31,11 +34,13 @@ def __CallBackAutoDie__cmd_ended_aux(self, fn):
     def __new_fn(cmd_done_event):
         try:
             cmd_done_event.argout = cmd_done_event.argout_raw.extract(
-                                       self.defaultCommandExtractAs)
+                self.defaultCommandExtractAs)
         except Exception:
             pass
         return fn(cmd_done_event)
+
     return __new_fn
+
 
 def __get_command_inout_param(self, cmd_name, cmd_param=None):
     if cmd_param is None:
@@ -58,13 +63,15 @@ def __get_command_inout_param(self, cmd_name, cmd_param=None):
         if isinstance(cmd_param, str):
             param.insert(CmdArgType.DevString, cmd_param)
             return param
-        elif isinstance(cmd_param, collections.Sequence) and all([isinstance(x,str) for x in cmd_param]):
+        elif isinstance(cmd_param, collections_abc.Sequence) and all([isinstance(x, str) for x in cmd_param]):
             param.insert(CmdArgType.DevVarStringArray, cmd_param)
             return param
         else:
-            raise TypeError("command_inout() parameter must be a DeviceData object or a string or a sequence of strings")
+            raise TypeError(
+                "command_inout() parameter must be a DeviceData object or a string or a sequence of strings")
     else:
         raise TypeError("command_inout() parameter must be a DeviceData object.")
+
 
 def __Connection__command_inout(self, name, *args, **kwds):
     """
@@ -106,9 +113,12 @@ def __Connection__command_inout(self, name, *args, **kwds):
             return None
     else:
         return r
+
+
 __Connection__command_inout.__name__ = "command_inout"
 
-def __Connection__command_inout_raw(self, cmd_name, cmd_param = None):
+
+def __Connection__command_inout_raw(self, cmd_name, cmd_param=None):
     """
     command_inout_raw( self, cmd_name, cmd_param=None) -> DeviceData
 
@@ -125,7 +135,6 @@ def __Connection__command_inout_raw(self, cmd_name, cmd_param = None):
     """
     param = __get_command_inout_param(self, cmd_name, cmd_param)
     return self.__command_inout(cmd_name, param)
-
 
 
 def __Connection__command_inout_asynch(self, cmd_name, *args):
@@ -177,43 +186,46 @@ def __Connection__command_inout_asynch(self, cmd_name, *args):
         need to change the global TANGO model to PUSH_CALLBACK.
         You can do this with the :meth:`tango.ApiUtil.set_asynch_cb_sub_model`
     """
-    if len(args) == 0: # command_inout_asynch()
+    if len(args) == 0:  # command_inout_asynch()
         argin = DeviceData()
         forget = False
         return self.__command_inout_asynch_id(cmd_name, argin, forget)
     elif len(args) == 1:
-        if isinstance(args[0], collections.Callable): # command_inout_asynch(lambda)
+        if isinstance(args[0], collections_abc.Callable):  # command_inout_asynch(lambda)
             cb = __CallBackAutoDie()
             cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[0])
             argin = __get_command_inout_param(self, cmd_name)
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
-        elif hasattr(args[0], 'cmd_ended'): # command_inout_asynch(Cbclass)
+        elif hasattr(args[0], 'cmd_ended'):  # command_inout_asynch(Cbclass)
             cb = __CallBackAutoDie()
             cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[0].cmd_ended)
             argin = __get_command_inout_param(self, cmd_name)
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
-        else: # command_inout_asynch(value)
+        else:  # command_inout_asynch(value)
             argin = __get_command_inout_param(self, cmd_name, args[0])
             forget = False
             return self.__command_inout_asynch_id(cmd_name, argin, forget)
     elif len(args) == 2:
-        if isinstance(args[1], collections.Callable): #command_inout_asynch( value, lambda)
+        if isinstance(args[1], collections_abc.Callable):  # command_inout_asynch( value, lambda)
             cb = __CallBackAutoDie()
             cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[1])
             argin = __get_command_inout_param(self, cmd_name, args[0])
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
-        elif hasattr(args[1], 'cmd_ended'): #command_inout_asynch(value, cbClass)
+        elif hasattr(args[1], 'cmd_ended'):  # command_inout_asynch(value, cbClass)
             cb = __CallBackAutoDie()
             cb.cmd_ended = __CallBackAutoDie__cmd_ended_aux(self, args[1].cmd_ended)
             argin = __get_command_inout_param(self, cmd_name, args[0])
             return self.__command_inout_asynch_cb(cmd_name, argin, cb)
-        else: # command_inout_asynch(value, forget)
+        else:  # command_inout_asynch(value, forget)
             argin = __get_command_inout_param(self, cmd_name, args[0])
             forget = bool(args[1])
             return self.__command_inout_asynch_id(cmd_name, argin, forget)
     else:
         raise TypeError("Wrong number of attributes!")
+
+
 __Connection__command_inout_asynch.__name__ = "command_inout_asynch"
+
 
 def __Connection__command_inout_reply(self, idx, timeout=None):
     """
@@ -260,7 +272,10 @@ def __Connection__command_inout_reply(self, idx, timeout=None):
             return None
     else:
         return r
+
+
 __Connection__command_inout_reply.__name__ = "command_inout_reply"
+
 
 def __init_Connection():
     Connection.defaultCommandExtractAs = ExtractAs.Numpy
@@ -268,6 +283,7 @@ def __init_Connection():
     Connection.command_inout = green(__Connection__command_inout)
     Connection.command_inout_asynch = __Connection__command_inout_asynch
     Connection.command_inout_reply = __Connection__command_inout_reply
+
 
 def __doc_Connection():
     def document_method(method_name, desc, append=True):
@@ -333,7 +349,6 @@ def __doc_Connection():
 
         New in PyTango 7.0.0
     """)
-
 
     document_method("connect", """
     connect(self, corba_name) -> None
@@ -475,9 +490,9 @@ def __doc_Connection():
         Throws     : AsynCall, AsynReplyNotArrived, CommunicationFailed, DevFailed from device
     """)
 
-    #//
-    #// Asynchronous methods
-    #//
+    # //
+    # // Asynchronous methods
+    # //
 
     document_method("get_asynch_replies", """
     get_asynch_replies(self) -> None
@@ -537,9 +552,9 @@ def __doc_Connection():
         New in PyTango 7.0.0
     """)
 
-    #//
-    #// Control access related methods
-    #//
+    # //
+    # // Control access related methods
+    # //
 
     document_method("get_access_control", """
     get_access_control(self) -> AccessControlType
@@ -619,6 +634,7 @@ def __doc_Connection():
 
         New in PyTango 7.2.0
     """)
+
 
 def connection_init(doc=True):
     __init_Connection()

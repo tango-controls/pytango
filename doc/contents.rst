@@ -14,12 +14,14 @@ Contents
     start
     quicktour
     ITango <itango>
-    green
+    green_modes/green
     API <api>
     How to <howto>
+    How to contribute <how-to-contribute>
     FAQ <faq>
     TEP <tep>
     History of changes <revision>
+    indexes
     
 **Last update:** |today|
 

@@ -12,13 +12,21 @@ How to
 This is a small list of how-tos specific to PyTango. A more general Tango how-to
 list can be found `here <http://www.tango-controls.org/resources/howto>`_.
 
+How to contribute
+-----------------
+
+Everyone is welcome to contribute to PyTango project.
+If you don't feel comfortable with writing core PyTango we are looking for contributors to documentation or/and tests.
+
+It refers to the next section, see :ref:`how-to-contribute`.
+
 
 Check the default TANGO host
 ----------------------------
 
 The default TANGO host can be defined using the environment variable
 :envvar:`TANGO_HOST` or in a `tangorc` file
-(see `Tango environment variables <http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node11.html#SECTION0011123000000000000000>`_
+(see `Tango environment variables <https://tango-controls.readthedocs.io/en/latest/development/advanced/reference.html#environment-variables>`_
 for complete information)
 
 To check what is the current value that TANGO uses for the default configuration
@@ -36,25 +44,23 @@ The PyTango version::
 
     >>> import tango
     >>> tango.__version__
-    '9.2.1'
+    '9.3.3'
     >>> tango.__version_info__
-    (9, 2, 1)
+    (9, 3, 3)
 
 and the Tango C++ library version that PyTango was compiled with::
 
     >>> import tango
     >>> tango.constants.TgLibVers
-    '9.2.2'
+    '9.3.3'
 
 
 Report a bug
 ------------
 
-Bugs can be reported as tickets in `TANGO Source forge <https://sourceforge.net/p/tango-cs/bugs/>`_.
+Bugs can be reported as issues in `PyTango Github <https://github.com/tango-controls/pytango/issues>`_.
 
-When making a bug report don't forget to select *PyTango* in **Category**.
-
-It is also helpfull if you can put in the ticket description the PyTango information.
+It is also helpful if you can put in the issue description the PyTango information.
 It can be a dump of:
 
 .. sourcecode:: console
@@ -96,7 +102,7 @@ Basic read/write attribute operations::
     print("Long_scalar value = {0}".format(scalar.value))
 
     # PyTango provides a shorter way:
-    scalar = tango_test.long_scalar.value
+    scalar = tango_test.long_scalar
     print("Long_scalar value = {0}".format(scalar))
 
     # Read a spectrum attribute
@@ -187,7 +193,7 @@ structures::
     # variable containing an array of longs and an array of strings
     argin = ([1,2,3], ["Hello", "TangoTest device"])
 
-    result = tango_test.DevVarLongArray(argin)
+    result = tango_test.DevVarLongStringArray(argin)
     print("Result of execution of DevVarLongArray command = {0}".format(result))
 
 Work with Groups
@@ -287,13 +293,152 @@ API should be accessed from Python::
     axis_properties["AxisNumber"] = ["6"]
     axis1.put_property(axis_properties)
 
+Using clients with multiprocessing
+----------------------------------
+
+Since version 9.3.0 PyTango provides :meth:`~tango.ApiUtil.cleanup()`
+which resets CORBA connection.
+This static function is needed when you want to use :mod:`tango` with
+:mod:`multiprocessing` in your client code.
+
+In the case when both your parent process and your child process create
+:class:`~tango.DeviceProxy`, :class:`~tango.Database`
+or/and :class:`~tango.AttributeProxy`
+your child process inherits the context from your parent process,
+i.e. open file descriptors, the TANGO and the CORBA state.
+Sharing the above objects between the processes may cause unpredictable
+errors, e.g. *TRANSIENT_CallTimedout*, *unidentifiable C++ exception*.
+Therefore, when you start a new process you must reset CORBA connection::
+
+    import time
+    import tango
+
+    from multiprocessing import Process
+
+
+    class Worker(Process):
+
+	def __init__(self):
+	    Process.__init__(self)
+
+	def run(self):
+            # reset CORBA connection
+            tango.ApiUtil.cleanup()
+
+	    proxy = tango.DeviceProxy('test/tserver/1')
+
+	    stime = time.time()
+	    etime = stime
+	    while etime - stime < 1.:
+		try:
+		    proxy.read_attribute("Value")
+		except Exception as e:
+		    print(str(e))
+		etime = time.time()
+
+
+    def runworkers():
+	workers = [Worker() for _ in range(6)]
+	for wk in workers:
+	    wk.start()
+	for wk in workers:
+	    wk.join()
+
+
+    db = tango.Database()
+    dp = tango.DeviceProxy('test/tserver/1')
+
+    for i in range(4):
+	runworkers()
+
+After `cleanup()` all references to :class:`~tango.DeviceProxy`,
+:class:`~tango.AttributeProxy` or :class:`~tango.Database` objects
+in the current process become invalid
+and these objects need to be reconstructed.
+
+Using clients with multithreading
+---------------------------------
+
+When performing Tango I/O from user-created threads, there can be problems.
+This is often more noticeable with event subscription and unsubscription,
+but it could affect any Tango I/O.  As PyTango wraps the cppTango library,
+we needs to consider how cppTango's threads work.
+
+cppTango was originally developed at a time where C++ didn't have standard
+threads. All the threads currently created in cppTango are omni threads,
+since this is what the omniORB library is using to create threads and since
+this implementation is available for free with omniORB.
+
+In C++, users used to create omni threads in the past so there was no issue.
+Since C++11, C++ comes with an implementation of standard threads.
+cppTango is currently (version 9.3.3) not directly thread safe when
+a user is using C++11 standard threads or threads different than omni threads.
+This lack of thread safety includes threads created from Python's
+:mod:`threading` module.
+
+In an ideal future cppTango should should protect itself, regardless
+of what type of threads are used.  In the meantime, we need a work-around.
+
+The work-around when using threads which are not omni threads is to create an
+object of the C++ class ``omni_thread::ensure_self`` in the user thread, just
+after the thread creation, and to delete this object only when the thread
+has finished its job. This ``omni_thread::ensure_self`` object provides a
+dummy omniORB ID for the thread. This ID is used when accessing thread
+locks within cppTango, so the ID must remain the same for the lifetime
+of the thread.  Also note that this object MUST be released before the
+thread has exited, otherwise omniORB will throw an exception.
+
+A Pythonic way to implement this work-around for multithreaded
+applications is available via the :class:`~tango.EnsureOmniThread` class.
+It was added in PyTango version 9.3.2.  This class is best used as a
+context handler to wrap the target method of the user thread.  An example
+is shown below::
+
+    import tango
+    from threading import Thread
+    from time import sleep
+
+
+    def thread_task():
+        with tango.EnsureOmniThread():
+            eid = dp.subscribe_event(
+                "double_scalar", tango.EventType.PERIODIC_EVENT, cb)
+            while running:
+                print("num events stored {}".format(len(cb.get_events())))
+                sleep(1)
+            dp.unsubscribe_event(eid)
+
+
+    cb = tango.utils.EventCallback()  # print events to stdout
+    dp = tango.DeviceProxy("sys/tg_test/1")
+    dp.poll_attribute("double_scalar", 1000)
+    thread = Thread(target=thread_task)
+    running = True
+    thread.start()
+    sleep(5)
+    running = False
+    thread.join()
+
+Another way to create threads in Python is the
+:class:`concurrent.futures.ThreadPoolExecutor`.  The problem with this is that
+the API does not provide an easy way for the context handler to cover the
+lifetime of the threads, which are created as daemons.  One option is to
+at least use the context handler for the functions that are submitted to the
+executor. I.e., ``executor.submit(thread_task)``.  This is not guaranteed to work.
+A second option to investigate (if using at least Python 3.7) is the
+``initializer`` argument which could be used to ensure a call to the
+:meth:`~tango.EnsureOmniThread.__enter__()` method for a thread-specific
+instance of :class:`~tango.EnsureOmniThread`.  However, calling the
+:meth:`~tango.EnsureOmniThread.__exit__()` method on the corresponding
+object at shutdown is a problem.  Maybe it could be submitted as work.
+
 Write a server
 --------------
 
 Before reading this chapter you should be aware of the TANGO basic concepts.
 This chapter does not explain what a Tango device or a device server is.
-This is explained in details in the
-`Tango control system manual <http://www.tango-controls.org/resources/documentation/kernel/>`_
+This is explained in detail in the
+`Tango control system manual <http://www.tango-controls.org/documentation/kernel/>`_
 
 Since version 8.1, PyTango provides a helper module which simplifies the
 development of a Tango device server. This helper is provided through the
@@ -319,11 +464,11 @@ high level API
         def strftime(self, format):
             return time.strftime(format)
 
-	@pipe
-	def info(self):
+        @pipe
+        def info(self):
             return ('Information',
                     dict(manufacturer='Tango',
-	                 model='PS2000',
+                         model='PS2000',
                          version_number=123))
 
 
@@ -354,9 +499,11 @@ high level API
     for the complete list of pipe options.
 
 **line 24**
-    start the Tango run loop. The mandatory argument is a list of python classes
-    that are to be exported as Tango classes. Check :func:`~tango.server.run`
-    for the complete list of options
+    start the Tango run loop.  This method automatically determines the Python
+    class name and exports it as a Tango class.  For more complicated cases,
+    check :func:`~tango.server.run` for the complete list of options
+
+There is a more detailed clock device server in the examples/Clock folder.
 
 Here is a more complete example on how to write a *PowerSupply* device server
 using the high level API. The example contains:
@@ -398,7 +545,7 @@ using the high level API. The example contains:
         host = device_property(dtype=str)
         port = class_property(dtype=int, default_value=9788)
 
-	@attribute
+        @attribute
         def voltage(self):
             self.info_stream("get voltage(%s, %d)" % (self.host, self.port))
             return 10.0
@@ -431,8 +578,8 @@ create tango log messages on your device server.
 The logging system explained here is the Tango Logging Service (TLS). For
 detailed information on how this logging system works please check:
 
-    * `3.5 The tango logging service <http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node4.html#sec:The-Tango-Logging>`_
-    * `9.3 The tango logging service <http://www.esrf.eu/computing/cs/tango/tango_doc/kernel_doc/ds_prog/node9.html#SECTION00930000000000000000>`_
+    * `Usage <https://tango-controls.readthedocs.io/en/latest/development/device-api/device-server-model.html#the-tango-logging-service>`_
+    * `Property reference <https://tango-controls.readthedocs.io/en/latest/development/advanced/reference.html#the-device-logging>`_
 
 The easiest way to start seeing log messages on your device server console is
 by starting it with the verbose option. Example::
@@ -461,8 +608,8 @@ Example::
 
     def read_voltage(self):
         self.info_stream("read voltage attribute")
-	# ...
-	return voltage_value
+        # ...
+        return voltage_value
 
 This will print a message like::
 
@@ -474,8 +621,8 @@ The logging methods support argument list feature (since PyTango 8.1). Example::
 
     def read_voltage(self):
         self.info_stream("read_voltage(%s, %d)", self.host, self.port)
-	# ...
-	return voltage_value
+        # ...
+        return voltage_value
 
 
 Logging with print statement
@@ -491,15 +638,15 @@ Same example as above, but now using *print chevron*::
 
     def read_voltage(self, the_att):
         print >>self.log_info, "read voltage attribute"
-	# ...
-	return voltage_value
+        # ...
+        return voltage_value
 
 Or using the python 3k print function::
 
     def read_Long_attr(self, the_att):
         print("read voltage attribute", file=self.log_info)
-	# ...
-	return voltage_value
+        # ...
+        return voltage_value
 
 
 Logging with decorators
@@ -660,22 +807,22 @@ Here is an example of a device which has a TANGO command called
 point attribute with the specified name::
 
 
-    from tango import Util, Attr
+    from tango import Util, Attr, AttrWriteType
     from tango.server import Device, command
 
     class MyDevice(Device):
 
-	@command(dtype_in=str)
+        @command(dtype_in=str)
         def CreateFloatAttribute(self, attr_name):
-	    attr = Attr(attr_name, tango.DevDouble)
-	    self.add_attribute(attr, self.read_General, self.write_General)
+            attr = Attr(attr_name, tango.DevDouble, AttrWriteType.READ_WRITE)
+            self.add_attribute(attr, self.read_General, self.write_General)
 
-	def read_General(self, attr):
-	    self.info_stream("Reading attribute %s", attr.get_name())
-	    attr.set_value(99.99)
+        def read_General(self, attr):
+            self.info_stream("Reading attribute %s", attr.get_name())
+            attr.set_value(99.99)
 
-	def write_General(self, attr):
-	    self.info_stream("Writting attribute %s", attr.get_name())
+        def write_General(self, attr):
+            self.info_stream("Writting attribute %s", attr.get_name())
 
 
 Create/Delete devices dynamically
@@ -711,13 +858,13 @@ with two strings. No error processing was done on the code for simplicity sake):
 
     class MyDevice(Device):
 
-	@command(dtype_in=[str])
+        @command(dtype_in=[str])
         def CreateDevice(self, pars):
             klass_name, dev_name = pars
             util = Util.instance()
             util.create_device(klass_name, dev_name, alias=None, cb=None)
 
-	@command(dtype_in=[str])
+        @command(dtype_in=[str])
         def DeleteDevice(self, pars):
             klass_name, dev_name = pars
             util = Util.instance()
@@ -737,7 +884,7 @@ the :meth:`~tango.DeviceClass.create_device` / :meth:`~tango.DeviceClass.delete_
 For example, if you wish to create a clone of your device, you can create a
 tango command called *Clone*::
 
-    class MyDevice(tango.Device_4Impl):
+    class MyDevice(tango.Device):
 
         def fill_new_device_properties(self, dev_name):
             prop_names = db.get_device_property_list(self.get_name(), "*")
@@ -767,7 +914,7 @@ This chapter describes how to develop a PyTango device server using the
 original PyTango server API. This API mimics the C++ API and is considered
 low level.
 You should write a server using this API if you are using code generated by
-`Pogo tool <http://www.esrf.eu/computing/cs/tango/tango_doc/tools_doc/pogo_doc>`_
+`Pogo tool <https://tango-controls.readthedocs.io/en/latest/tools-and-extensions/built-in/pogo/index.html>`_
 or if for some reason the high level API helper doesn't provide a feature
 you need (in that case think of writing a mail to tango mailing list explaining
 what you cannot do).
@@ -963,10 +1110,10 @@ The PyDsExp class in Python
 The rule of this class is to implement methods executed by commands and attributes.
 In our example, the code of this class looks like::
 
-    class PyDsExp(tango.Device_4Impl):
+    class PyDsExp(tango.Device):
 
         def __init__(self,cl,name):
-            tango.Device_4Impl.__init__(self, cl, name)
+            tango.Device.__init__(self, cl, name)
             self.info_stream('In PyDsExp.__init__')
             PyDsExp.init_device(self)
 
@@ -1040,7 +1187,8 @@ In our example, the code of this class looks like::
             return self.get_state() in (tango.DevState.ON,)
 
 **Line 1**
-    The PyDsExp class has to inherit from the tango.Device_4Impl
+    The PyDsExp class has to inherit from the tango.Device (this will used the latest
+    device implementation class available, e.g. Device_5Impl)
 **Line 3 to 6**
     PyDsExp class constructor. Note that at line 6, it calls the *init_device()*
     method

@@ -13,11 +13,14 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["Group", "group_init"]
+__all__ = ("Group", "group_init")
 
 __docformat__ = "restructuredtext"
 
-import collections
+try:
+    import collections.abc as collections_abc  # python 3.3+
+except ImportError:
+    import collections as collections_abc
 from ._tango import __Group as _RealGroup, StdStringVector
 from .utils import seq_2_StdStringVector, is_pure_str
 from .utils import document_method as __document_method
@@ -79,7 +82,7 @@ class Group:
             return self.__group._add(patterns_or_group, timeout_ms)
         elif isinstance(patterns_or_group, str):
             return self.__group._add(patterns_or_group, timeout_ms)
-        elif isinstance(patterns_or_group, collections.Sequence):
+        elif isinstance(patterns_or_group, collections_abc.Sequence):
             patterns = seq_2_StdStringVector(patterns_or_group)
             return self.__group._add(patterns, timeout_ms)
         else:
@@ -88,7 +91,7 @@ class Group:
     def remove(self, patterns, forward=True):
         if isinstance(patterns, str):
             return self.__group._remove(patterns, forward)
-        elif isinstance(patterns, collections.Sequence):
+        elif isinstance(patterns, collections_abc.Sequence):
             std_patterns = seq_2_StdStringVector(patterns)
             return self.__group._remove(std_patterns, forward)
         else:
@@ -169,15 +172,16 @@ def __init_proxy_Group():
     def proxy_call_define(fname):
         def fn(self, *args, **kwds):
             return getattr(self._Group__group, fname)(*args, **kwds)
+
         fn.__doc__ = getattr(_RealGroup, fname).__doc__
         setattr(Group, fname, fn)
 
     for fname in proxy_methods:
         proxy_call_define(fname)
 
-    # Group.add.__func__.__doc__ = _RealGroup.add.__doc__
-    # Group.get_group.__func__.__doc__ = _RealGroup.get_group.__doc__
-    # Group.__doc__ = _RealGroup.__doc__
+        # Group.add.__func__.__doc__ = _RealGroup.add.__doc__
+        # Group.get_group.__func__.__doc__ = _RealGroup.get_group.__doc__
+        # Group.__doc__ = _RealGroup.__doc__
 
 
 def __doc_Group():
@@ -259,13 +263,13 @@ def __doc_Group():
         Return     : None
 
         Throws     :
-    """ )
+    """)
 
     document_method("remove_all", """
     remove_all(self) -> None
 
         Removes all elements in the _RealGroup. After such a call, the _RealGroup is empty.
-    """ )
+    """)
 
     document_method("contains", """
     contains(self, pattern, forward=True) -> bool
@@ -283,7 +287,6 @@ def __doc_Group():
 
         Throws     :
     """)
-
 
     document_method("get_device", """
     get_device(self, dev_name) -> DeviceProxy
@@ -439,7 +442,7 @@ def __doc_Group():
         New in PyTango 7.0.0
     """)
 
-# Tango methods (~ DeviceProxy interface)
+    # Tango methods (~ DeviceProxy interface)
     document_method("ping", """
     ping(self, forward=True) -> bool
 
@@ -541,7 +544,7 @@ def __doc_Group():
                     Group.read_attribute_reply() to obtain the results.
 
         Throws     :
-    """ )
+    """)
 
     document_method("read_attributes_asynch", """
     read_attributes_asynch(self, attr_names, forward=True, reserved=-1 ) -> int
@@ -561,7 +564,7 @@ def __doc_Group():
                     Group.read_attributes_reply() to obtain the results.
 
         Throws     :
-    """ )
+    """)
 
     document_method("read_attribute_reply", """
     read_attribute_reply(self, req_id, timeout_ms=0 ) -> sequence<GroupAttrReply>
@@ -669,11 +672,11 @@ def __doc_Group():
         Throws     :
     """)
 
-    def document_method(method_name, desc, append=True):
+    def document_group_method(method_name, desc, append=True):
         return __document_method(Group, method_name, desc, append)
 
-    document_method("add", _RealGroup._add.__doc__, False)
-    document_method("add", """
+    document_group_method("add", _RealGroup._add.__doc__, False)
+    document_group_method("add", """
     add(self, subgroup, timeout_ms=-1) -> None
 
             Attaches a (sub)_RealGroup.
@@ -692,7 +695,7 @@ def __doc_Group():
         Throws     : TypeError, ArgumentError
     """)
 
-    document_method("command_inout", """
+    document_group_method("command_inout", """
     command_inout(self, cmd_name, forward=True) -> sequence<GroupCmdReply>
     command_inout(self, cmd_name, param, forward=True) -> sequence<GroupCmdReply>
     command_inout(self, cmd_name, param_list, forward=True) -> sequence<GroupCmdReply>
@@ -712,21 +715,21 @@ def __doc_Group():
         Return : (sequence<GroupCmdReply>)
     """)
 
-    document_method("read_attribute", """
+    document_group_method("read_attribute", """
     read_attribute(self, attr_name, forward=True) -> sequence<GroupAttrReply>
 
             Just a shortcut to do:
                 self.read_attribute_reply(self.read_attribute_asynch(...))
     """)
 
-    document_method("read_attributes", """
+    document_group_method("read_attributes", """
     read_attributes(self, attr_names, forward=True) -> sequence<GroupAttrReply>
 
             Just a shortcut to do:
                 self.read_attributes_reply(self.read_attributes_asynch(...))
     """)
 
-    document_method("write_attribute", """
+    document_group_method("write_attribute", """
     write_attribute(self, attr_name, value, forward=True, multi=False) -> sequence<GroupReply>
 
             Just a shortcut to do:

@@ -78,6 +78,10 @@ public:
                           const std::string &is_allowed_name,
                           Tango::UserDefaultAttrProp *att_prop);
 
+    void create_fwd_attribute(vector<Tango::Attr *> &att_list,
+                              const std::string &attr_name,
+                              Tango::UserDefaultFwdAttrProp *att_prop);
+
     /**
      * Creates an pipe and adds it to the att_list.
      * This method is intended to be called by python to register a new

@@ -11,6 +11,7 @@
 
 #include "precompiled_header.hpp"
 #include <tango.h>
+#include "pyutils.h"
 
 using namespace boost::python;
 

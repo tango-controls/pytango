@@ -13,14 +13,16 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["callback_init"]
+__all__ = ("callback_init",)
 
 __docformat__ = "restructuredtext"
 
 from ._tango import CmdDoneEvent, AttrReadEvent, AttrWrittenEvent
 
+
 def __init_Callback():
     pass
+
 
 def __doc_Callback():
     CmdDoneEvent.__doc__ = """
@@ -61,6 +63,7 @@ def __doc_Callback():
             - errors     : (NamedDevFailedList) The error stack
             - ext        :
     """
+
 
 def callback_init(doc=True):
     __init_Callback()

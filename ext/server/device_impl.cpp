@@ -16,7 +16,10 @@
 #include "server/device_impl.h"
 #include "server/attr.h"
 #include "server/attribute.h"
+#include "server/command.h"
 #include "to_py.h"
+#include "server/pipe.h"
+
 
 extern const char *param_must_be_seq;
 
@@ -494,6 +497,24 @@ namespace PyDeviceImpl
         self.push_data_ready_event(__att_name, ctr); //__att_name from SAFE_PUSH
     }
 
+    /* **********************************
+     * pipe event
+     * **********************************/
+    inline void push_pipe_event(Tango::DeviceImpl &self, str &pipe_name, object& pipe_data)
+    {
+    	std::string __pipe_name;
+    	from_str_to_char(pipe_name.ptr(), __pipe_name);
+    	boost::python::extract<Tango::DevFailed> except_convert(pipe_data);
+    	if (except_convert.check()) {
+    		self.push_pipe_event(__pipe_name, const_cast<Tango::DevFailed*>(&except_convert()));
+    		return;
+    	}
+    	Tango::DevicePipeBlob dpb;
+    	bool reuse = false;
+    	PyDevicePipe::set_value(dpb, pipe_data);
+    	self.push_pipe_event(__pipe_name, &dpb, reuse);        
+    }
+
     void check_attribute_method_defined(PyObject *self,
                                         const std::string &attr_name,
                                         const std::string &method_name)
@@ -646,6 +667,32 @@ namespace PyDeviceImpl
     {
         string str(att_name);
         self.remove_attribute(str, false, clean_db);
+    }
+
+    void add_command(Tango::DeviceImpl &self, boost::python::object cmd_name, boost::python::object cmd_data,
+    		boost::python::object disp_level, bool device_level = false)
+    {
+        std::string name = boost::python::extract<std::string>(cmd_name);
+
+        std::string in_desc = boost::python::extract<std::string>(cmd_data[0][1]);
+        std::string out_desc = boost::python::extract<std::string>(cmd_data[1][1]);
+
+        Tango::CmdArgType argtype_in = boost::python::extract<Tango::CmdArgType>(cmd_data[0][0]);
+        Tango::CmdArgType argtype_out = boost::python::extract<Tango::CmdArgType>(cmd_data[1][0]);
+        Tango::DispLevel display_level = boost::python::extract<Tango::DispLevel>(disp_level);
+
+        PyCmd *cmd_ptr = new PyCmd(name, argtype_in, argtype_out, in_desc, out_desc, display_level);
+        //
+        // Install the command in Tango.
+        //
+        self.add_command(cmd_ptr, device_level);
+    }
+
+    void remove_command(Tango::DeviceImpl &self, boost::python::object cmd_name,
+                        bool free_it = false, bool clean_db = true)
+    {
+        std::string name = boost::python::extract<std::string>(cmd_name);
+        self.remove_command(name, free_it, clean_db);
     }
 
     inline void debug(Tango::DeviceImpl &self, const string &msg)
@@ -1003,8 +1050,7 @@ Tango::ConstDevString Device_3ImplWrap::dev_status()
     {
         if (override dev_status = this->get_override("dev_status") )
 	{
-            std::string status = dev_status();
-            this->the_status = status;
+            this->the_status = bopy::call<const std::string>(dev_status.ptr());
 	}
         else
 	{
@@ -1179,8 +1225,7 @@ Tango::ConstDevString Device_4ImplWrap::dev_status()
     {
         if (override dev_status = this->get_override("dev_status") )
 	{
-            std::string status = dev_status();
-            this->the_status = status;
+            this->the_status = bopy::call<const std::string>(dev_status.ptr());
 	}
         else
 	{
@@ -1348,8 +1393,7 @@ Tango::ConstDevString Device_5ImplWrap::dev_status()
     {
         if (override dev_status = this->get_override("dev_status") )
 	{
-            std::string status = dev_status();
-            this->the_status = status;
+            this->the_status = bopy::call<const std::string>(dev_status.ptr());
 	}
         else
 	{
@@ -1409,7 +1453,6 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_change_event_overload,
                                        Tango::DeviceImpl::set_change_event, 2, 3)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(set_archive_event_overload,
                                        Tango::DeviceImpl::set_archive_event, 2, 3)
-
 BOOST_PYTHON_FUNCTION_OVERLOADS(remove_attribute_overload,
                                 PyDeviceImpl::remove_attribute, 2, 3)
                                        
@@ -1463,6 +1506,8 @@ void export_device_impl()
         .def("_add_attribute", &PyDeviceImpl::add_attribute)
         .def("_remove_attribute", &PyDeviceImpl::remove_attribute,
             remove_attribute_overload())
+        .def("_add_command", &PyDeviceImpl::add_command)
+        .def("_remove_command", &PyDeviceImpl::remove_command)
         //@TODO .def("get_device_class")
         //@TODO .def("get_db_device")
         .def("is_attribute_polled", &PyDeviceImpl::is_attribute_polled)
@@ -1644,6 +1689,11 @@ void export_device_impl()
 
         .def("push_att_conf_event", &Tango::DeviceImpl::push_att_conf_event)
 
+         .def("push_pipe_event",
+            (void (*) (Tango::DeviceImpl &, str &, object&))
+            &PyDeviceImpl::push_pipe_event,
+            (arg_("self"), arg_("pipe_name"), arg_("pipe_data")))
+
         .def("get_logger", &Tango::DeviceImpl::get_logger, return_internal_reference<>())
         .def("__debug_stream", &PyDeviceImpl::debug)
         .def("__info_stream", &PyDeviceImpl::info)
@@ -1747,3 +1797,25 @@ void export_device_impl()
     implicitly_convertible<auto_ptr<Device_5ImplWrap>, auto_ptr<Tango::Device_5Impl> >();
 
 }
+//namespace PyDevIntrThread
+//{
+//    /* **********************************
+//     * interface change event
+//     * **********************************/
+//    inline void push_devintr_change_event(Tango::DevIntrThread &self)
+//    {
+//    	self.push_event();
+//    }
+//}
+//
+//void export_device_intrthread()
+//{
+//    class_<Tango::DeviceIntrThread, boost::noncopyable>("DeviceImpl",
+//        init<CppDeviceClass *, const char *,
+//             optional<const char *, Tango::DevState, const char *> >())
+//
+//    .def("push_event",
+//        (void (*) (Tango::DevIntrThread &))
+//        &PyDeviceIntrThread::push_devintr_change_event,
+//        (arg_("self")))
+//}

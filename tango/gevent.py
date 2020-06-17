@@ -19,7 +19,7 @@ from ._tango import GreenMode
 from .device_proxy import get_device_proxy
 from .attribute_proxy import get_attribute_proxy
 
-__all__ = ["DeviceProxy", "AttributeProxy", "check_requirements"]
+__all__ = ("DeviceProxy", "AttributeProxy", "check_requirements")
 
 
 def check_requirements():
@@ -40,7 +40,6 @@ def check_requirements():
 
 
 check_requirements()
-
 
 DeviceProxy = partial(get_device_proxy, green_mode=GreenMode.Gevent)
 DeviceProxy.__doc__ = """

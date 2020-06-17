@@ -35,7 +35,7 @@ needs_sphinx = "1.0"
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.pngmath',
+extensions = ['sphinx.ext.imgmath',
               'sphinx.ext.autodoc',
               'sphinx.ext.doctest',
               'sphinx.ext.intersphinx',
@@ -121,7 +121,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'sphinxdoc'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -129,9 +129,18 @@ html_theme = 'sphinxdoc'
 #html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+#html_theme_path = ['_theme']
 
-html_style = 'pytango.css'
+html_context = {
+        'extra_css_files': [
+           # 'https://media.readthedocs.org/css/sphinx_rtd_theme.css',
+           # 'https://media.readthedocs.org/css/readthedocs-doc-embed.css',
+           # '_static/jssor.css',
+           '_static/css/tango_cs_theme.css',
+        ],
+    }
+
+html_style = 'tango_cs_theme.css'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -241,8 +250,11 @@ rst_epilog = """\
 .. _IPython: http://ipython.org
 .. _numpy: http://www.numpy.org
 .. _gevent: http://www.gevent.org
+.. _asyncio: https://asyncio.readthedocs.io/en/latest/
 .. _boost-python: http://www.boost.org/libs/python
 .. _PyPi: https://pypi.python.org/pypi/pytango
+.. _issues: https://github.com/tango-controls/pytango/issues
+.. _PRs: https://github.com/tango-controls/pytango/pulls
 
 """
 
@@ -254,8 +266,8 @@ intersphinx_mapping = {
     'http://docs.scipy.org/doc/numpy': None,
     'http://ipython.org/ipython-doc/stable': None,
     'http://api.mongodb.org/python/current': None,
-    'http://packages.python.org/CouchDB': None,
-    'http://pycassa.github.com/pycassa': None,
+    'http://couchdb-python.readthedocs.io/en/latest': None,
+    'http://pycassa.github.io/pycassa': None,
     'http://docs.sqlalchemy.org/en/latest': None,
 }
 

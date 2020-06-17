@@ -12,6 +12,7 @@
 #pragma once
 
 #include <boost/python.hpp>
+#include <omnithread.h>
 
 namespace bopy = boost::python;
 
@@ -154,24 +155,27 @@ void * PyCapsule_Import(const char *name, int no_block);
 
 #endif /* #if PY_VERSION_HEX < 0x02070000 */
 
-PyObject* from_char_to_str(const char* in, Py_ssize_t size=-1,
-                           const char* encoding=NULL, /* defaults to latin-1 */
-                           const char* errors="strict");
+PyObject* from_char_to_python_str(const char* in, Py_ssize_t size=-1,
+                                  const char* encoding=NULL, /* defaults to latin-1 */
+                                  const char* errors="strict");
 
-PyObject* from_char_to_str(const std::string& in,
-                           const char* encoding=NULL, /* defaults to latin-1 */
-                           const char* errors="strict");
+PyObject* from_char_to_python_str(const std::string& in,
+                                  const char* encoding=NULL, /* defaults to latin-1 */
+                                  const char* errors="strict");
 
-bopy::object from_char_to_str2(const char* in, Py_ssize_t size=-1,
-                               const char* encoding=NULL, /* defaults to latin-1 */
-                               const char* errors="strict");
+bopy::object from_char_to_boost_str(const char* in, Py_ssize_t size=-1,
+                                    const char* encoding=NULL, /* defaults to latin-1 */
+                                    const char* errors="strict");
 
-bopy::object from_char_to_str2(const std::string& in,
-                               const char* encoding=NULL, /* defaults to latin-1 */
-                               const char* errors="strict");
+bopy::object from_char_to_boost_str(const std::string& in,
+                                    const char* encoding=NULL, /* defaults to latin-1 */
+                                    const char* errors="strict");
 
 
+void from_str_to_char(const bopy::object& in, std::string& out);
 void from_str_to_char(PyObject* in, std::string& out);
+char* from_str_to_char(PyObject* in);
+char* from_str_to_char(const bopy::object& in);
 
 inline void raise_(PyObject *type, const char *message)
 {
@@ -205,6 +209,57 @@ public:
     {
         giveup();
     }
+};
+
+/// The following class ensures usage in a non-omniORB thread will
+/// still get a dummy omniORB thread ID - cppTango requires threads to
+/// be identifiable in this way.  It should only be acquired once for the
+/// lifetime of the thread, and must be released before the thread is
+/// cleaned up.
+/// See https://github.com/tango-controls/pytango/issues/307
+class EnsureOmniThread
+{
+    omni_thread::ensure_self *ensure_self;
+
+public:
+    inline EnsureOmniThread()
+    {
+        ensure_self = NULL;
+    }
+
+    inline void acquire()
+    {
+        if (ensure_self == NULL)
+        {
+          ensure_self = new omni_thread::ensure_self;
+        }
+    }
+
+    inline void release()
+    {
+        if (ensure_self != NULL)
+        {
+          delete ensure_self;
+          ensure_self = NULL;
+        }
+    }
+
+    inline ~EnsureOmniThread()
+    {
+      release();
+    }
+
+};
+
+/**
+ * Determines if the calling thread is (or looks like) an omniORB thread.
+ *
+ * @return returns true if the calling thread has an omniORB thread ID or false otherwise
+ */
+inline bool is_omni_thread()
+{
+    omni_thread *thread_id = omni_thread::self();
+    return (thread_id != NULL);
 };
 
 /**

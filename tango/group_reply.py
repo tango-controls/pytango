@@ -13,15 +13,17 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["group_reply_init"]
+__all__ = ("group_reply_init",)
 
 __docformat__ = "restructuredtext"
 
 from .utils import document_method as __document_method
 from ._tango import GroupReply, GroupCmdReply, GroupAttrReply, ExtractAs
 
+
 def __GroupCmdReply__get_data(self):
     return self.get_data_raw().extract()
+
 
 def __GroupAttrReply__get_data(self, extract_as=ExtractAs.Numpy):
     # GroupAttrReply.__get_data() extracts the data from the object, so
@@ -34,15 +36,17 @@ def __GroupAttrReply__get_data(self, extract_as=ExtractAs.Numpy):
         data = self.__get_data(extract_as)
         self.__dataCache = data, extract_as
         return data
-    
+
     if extract_as != orig_extract_as:
         raise Exception("Successive calls to get_data() must receive the same"
                         " parameters as the first one.")
     return data
 
+
 def __init_GroupReply():
     GroupCmdReply.get_data = __GroupCmdReply__get_data
     GroupAttrReply.get_data = __GroupAttrReply__get_data
+
 
 def __doc_GroupReply():
     def document_method(method_name, desc, append=True):
@@ -71,7 +75,7 @@ def __doc_GroupReply():
 
         Parameters : None
         Return     : (any) Whatever is stored there, or None.
-    """ )
+    """)
 
     __document_method(GroupCmdReply, "get_data_raw", """
     get_data_raw(self) -> any
@@ -81,7 +85,7 @@ def __doc_GroupReply():
 
         Parameters : None
         Return     : (DeviceData) Whatever is stored there, or None.
-    """ )
+    """)
 
     __document_method(GroupAttrReply, "get_data", """
     get_data(self, extract_as=ExtractAs.Numpy) -> DeviceAttribute
@@ -92,7 +96,8 @@ def __doc_GroupReply():
             - extract_as : (ExtractAs)
 
         Return     : (DeviceAttribute) Whatever is stored there, or None.
-    """ )
+    """)
+
 
 def group_reply_init(doc=True):
     __init_GroupReply()

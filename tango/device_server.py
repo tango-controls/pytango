@@ -30,14 +30,13 @@ from .attr_data import AttrData
 
 from .log4tango import TangoStream
 
-
 __docformat__ = "restructuredtext"
 
-__all__ = ["ChangeEventProp", "PeriodicEventProp",
+__all__ = ("ChangeEventProp", "PeriodicEventProp",
            "ArchiveEventProp", "AttributeAlarm", "EventProperties",
            "AttributeConfig", "AttributeConfig_2",
            "AttributeConfig_3", "AttributeConfig_5",
-           "MultiAttrProp", "device_server_init"]
+           "MultiAttrProp", "device_server_init")
 
 
 class LatestDeviceImpl(get_latest_device_class()):
@@ -70,6 +69,7 @@ class ChangeEventProp(object):
         self.rel_change = ''
         self.abs_change = ''
         self.extensions = []
+
 
 class PeriodicEventProp(object):
     """This class represents the python interface for the Tango IDL object
@@ -295,7 +295,7 @@ def __DeviceImpl__get_device_properties(self, ds_class=None):
         for prop_name in self.device_property_list:
             setattr(self, prop_name, self.prop_util.get_property_values(prop_name, self.device_property_list))
     except DevFailed as df:
-        print(80*"-")
+        print(80 * "-")
         print(df)
         raise df
 
@@ -318,7 +318,8 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
 
         Return     : (Attr) the newly created attribute.
 
-        Throws     : DevFailed"""
+        Throws     : DevFailed
+    """
 
     attr_data = None
     if isinstance(attr, AttrData):
@@ -363,8 +364,7 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
 
 
 def __DeviceImpl__remove_attribute(self, attr_name):
-    """
-        remove_attribute(self, attr_name) -> None
+    """remove_attribute(self, attr_name) -> None
 
             Remove one attribute from the device attribute list.
 
@@ -373,7 +373,8 @@ def __DeviceImpl__remove_attribute(self, attr_name):
 
         Return     : None
 
-        Throws     : DevFailed"""
+        Throws     : DevFailed
+    """
     try:
         # Call this method in a try/except in case remove_attribute
         # is called during the DS shutdown sequence
@@ -415,6 +416,67 @@ def __DeviceImpl___remove_attr_meth(self, attr_name):
         cl.dyn_att_added_methods.remove(attr_name)
 
 
+def __DeviceImpl__add_command(self, cmd, device_level=True):
+    """add_command(self, cmd, level=TANGO::OPERATOR) -> cmd
+
+        Add a new command to the device command list.
+
+        Parameters :
+            - cmd          : the new command to be added to the list
+            - device_level : Set this flag to true if the command must be added
+                             for only this device
+
+        Return     : Command
+
+        Throws     : DevFailed
+    """
+    add_name_in_list = False      # This flag is always False, what use is it?
+    try:
+        config = dict(cmd.__tango_command__[1][2])
+        if config and ("Display level" in config):
+            disp_level = config["Display level"]
+        else:
+            disp_level = DispLevel.OPERATOR
+        self._add_command(cmd.__name__, cmd.__tango_command__[1], disp_level,
+                          device_level)
+        if add_name_in_list:
+            cl = self.get_device_class()
+            cl.dyn_cmd_added_methods.append(cmd.__name__)
+    except:
+        if add_name_in_list:
+            self._remove_cmd(cmd.__name__)
+        raise
+    return cmd
+
+
+def __DeviceImpl__remove_command(self, cmd_name, free_it=False, clean_db=True):
+    """
+    remove_command(self, attr_name) -> None
+
+            Remove one command from the device command list.
+
+        Parameters :
+            - cmd_name : (str) command name to be removed from the list
+            - free_it  : Boolean set to true if the command object must be freed.
+            - clean_db : Clean command related information (included polling info
+                         if the command is polled) from database.
+        Return     : None
+
+        Throws     : DevFailed
+    """
+    try:
+        # Call this method in a try/except in case remove
+        # is called during the DS shutdown sequence
+        cl = self.get_device_class()
+    except:
+        return
+
+    if cl.dyn_cmd_added_methods.count(cmd_name) != 0:
+        cl.dyn_cmd_added_methods.remove(cmd_name)
+
+    self._remove_command(cmd_name, free_it, clean_db)
+
+
 def __DeviceImpl__debug_stream(self, msg, *args):
     """
     debug_stream(self, msg, *args) -> None
@@ -448,6 +510,7 @@ def __DeviceImpl__info_stream(self, msg, *args):
     """
     self.__info_stream(msg % args)
 
+
 def __DeviceImpl__warn_stream(self, msg, *args):
     """
     warn_stream(self, msg, *args) -> None
@@ -463,6 +526,7 @@ def __DeviceImpl__warn_stream(self, msg, *args):
         Return     : None
     """
     self.__warn_stream(msg % args)
+
 
 def __DeviceImpl__error_stream(self, msg, *args):
     """
@@ -544,6 +608,8 @@ def __init_DeviceImpl():
     DeviceImpl.add_attribute = __DeviceImpl__add_attribute
     DeviceImpl.remove_attribute = __DeviceImpl__remove_attribute
     DeviceImpl._remove_attr_meth = __DeviceImpl___remove_attr_meth
+    DeviceImpl.add_command = __DeviceImpl__add_command
+    DeviceImpl.remove_command = __DeviceImpl__remove_command
     DeviceImpl.__str__ = __DeviceImpl__str
     DeviceImpl.__repr__ = __DeviceImpl__str
     DeviceImpl.debug_stream = __DeviceImpl__debug_stream
@@ -749,7 +815,7 @@ def __doc_DeviceImpl():
         Parameters : None
         Return     : (DevState) the device's previous state
 
-    """ )
+    """)
 
     document_method("get_name", """
     get_name(self) -> (str)
@@ -999,6 +1065,23 @@ def __doc_DeviceImpl():
         Throws     : DevFailed If the attribute name is unknown.
     """)
 
+    document_method("push_pipe_event", """
+    push_pipe_event(self, pipe_name, except) -> None
+    push_pipe_event(self, pipe_name, blob, reuse_it) -> None
+    push_pipe_event(self, pipe_name, blob, timeval, reuse_it) -> None
+
+            Push a pipe event for the given blob.
+
+        Parameters :
+            - pipe_name : (str) pipe name
+            - blob  : (DevicePipeBlob) the blob data
+        Return     : None
+
+        Throws     : DevFailed If the pipe name is unknown.
+
+        New in PyTango 9.2.2
+    """)
+
     document_method("get_logger", """
     get_logger(self) -> Logger
 
@@ -1243,6 +1326,17 @@ def __doc_DeviceImpl():
         New in PyTango 7.2.1
     """)
 
+    document_method("push_pipe_event", """
+    push_pipe_event(self, blob) -> None
+
+            Push an pipe event.
+
+        Parameters :  the blob which pipe event will be send.
+        Return     : None
+
+        New in PyTango 9.2.2
+    """)
+
     document_method("is_there_subscriber", """
     is_there_subscriber(self, att_name, event_type) -> bool
 
@@ -1302,6 +1396,7 @@ def __doc_extra_DeviceImpl(cls):
         Parameters :
             attr_list : (sequence<int>) list of indices in the device object attribute vector
                         of an attribute to be read.
+
         Return     : None
 
         Throws     : DevFailed This method does not throw exception but a redefined method can.
@@ -1872,19 +1967,19 @@ def __doc_WAttribute():
         Return     : (int) the new value data length
     """)
 
-#    document_method("set_write_value", """
-#    set_write_value(self, data, dim_x = 1, dim_y = 0) -> None
-#
-#            Set the writable attribute value.
-#
-#        Parameters :
-#            - data : the data to be set. Data must be compatible with the attribute type and format.
-#                     for SPECTRUM and IMAGE attributes, data can be any type of sequence of elements
-#                     compatible with the attribute type
-#            - dim_x : (int) the attribute set value x length. Default value is 1
-#            - dim_y : (int) the attribute set value y length. Default value is 0
-#        Return     : None
-#    """)
+    #    document_method("set_write_value", """
+    #    set_write_value(self, data, dim_x = 1, dim_y = 0) -> None
+    #
+    #            Set the writable attribute value.
+    #
+    #        Parameters :
+    #            - data : the data to be set. Data must be compatible with the attribute type and format.
+    #                     for SPECTRUM and IMAGE attributes, data can be any type of sequence of elements
+    #                     compatible with the attribute type
+    #            - dim_x : (int) the attribute set value x length. Default value is 1
+    #            - dim_y : (int) the attribute set value y length. Default value is 0
+    #        Return     : None
+    #    """)
 
     document_method("get_write_value", """
     get_write_value(self, lst) -> None  <= DEPRECATED
@@ -1897,6 +1992,7 @@ def __doc_WAttribute():
             - lst : [out] (list) a list object that will be filled with the attribute write value (DEPRECATED)
         Return     : (obj) the attribute write value.
     """)
+
 
 def __doc_MultiClassAttribute():
     def document_method(method_name, desc, append=True):
@@ -1947,6 +2043,7 @@ def __doc_MultiClassAttribute():
 
         New in PyTango 7.2.1
     """)
+
 
 def __doc_MultiAttribute():
     def document_method(method_name, desc, append=True):
@@ -2082,6 +2179,7 @@ def __doc_MultiAttribute():
 
         New in PyTango 7.2.1
     """)
+
 
 def __doc_Attr():
     def document_method(method_name, desc, append=True):
@@ -2381,6 +2479,7 @@ def __doc_Attr():
             - props : (StdAttrPropertyVector) new class level attribute properties
         Return     : None
     """)
+
 
 def __doc_UserDefaultAttrProp():
     def document_method(method_name, desc, append=True):

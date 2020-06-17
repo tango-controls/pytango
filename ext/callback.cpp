@@ -14,6 +14,7 @@
 #include "callback.h"
 #include "device_attribute.h"
 #include "exception.h"
+#include "device_pipe.h"
 
 using namespace boost::python;
 
@@ -214,16 +215,16 @@ namespace {
     template<typename OriginalT>
     static void _push_event(PyCallBackPushEvent* self, OriginalT * ev)
     {
-        // If the event is received after python dies but before the process
+    	// If the event is received after python dies but before the process
         // finishes then discard the event
         if (!Py_IsInitialized())
         {
-            cout4 << "Tango event (" << ev->event << " for " 
-                  << ev->attr_name << ") received for after python shutdown. "
+            cout4 << "Tango event (" << ev->event <<
+                  ") received for after python shutdown. "
                   << "Event will be ignored" << std::endl;
             return;
         }
-        
+
         AutoPythonGIL gil;
 
         // Make a copy of ev in python
@@ -235,8 +236,9 @@ namespace {
         object py_device;
         if (self->m_weak_device) {
             PyObject* py_c_device = PyWeakref_GET_OBJECT(self->m_weak_device);
-            if (py_c_device && py_c_device != Py_None)
-                py_device = object(handle<>(borrowed(py_c_device)));
+            if (py_c_device && py_c_device != Py_None) {
+               py_device = object(handle<>(borrowed(py_c_device)));
+            }
         }
 
         try
@@ -255,8 +257,8 @@ namespace {
 
 
 boost::python::object PyCallBackPushEvent::get_override(const char* name)
-{ 
-    return boost::python::wrapper<Tango::CallBack>::get_override(name); 
+{
+    return boost::python::wrapper<Tango::CallBack>::get_override(name);
 }
 
 
@@ -272,7 +274,7 @@ void PyCallBackPushEvent::fill_py_event(Tango::EventData* ev, object & py_ev, ob
     // attr_value pointer but its own copy, so my efforts are useless.
     if (ev->attr_value)
     {
-#ifdef PYTANGO_HAS_UNIQUE_PTR	
+#ifdef PYTANGO_HAS_UNIQUE_PTR
         Tango::DeviceAttribute *attr = new Tango::DeviceAttribute;
 	(*attr) = std::move(*ev->attr_value);
 #else
@@ -298,7 +300,27 @@ void PyCallBackPushEvent::fill_py_event(Tango::DataReadyEventData* ev, object & 
     copy_device(ev, py_ev, py_device);
 }
 
+void PyCallBackPushEvent::fill_py_event(Tango::PipeEventData* ev, object & py_ev, object py_device, PyTango::ExtractAs extract_as)
+{
+    copy_device(ev, py_ev, py_device);
+    if (ev->pipe_value) {
+#ifdef PYTANGO_HAS_UNIQUE_PTR
+        Tango::DevicePipe *pipe_value = new Tango::DevicePipe;
+        (*pipe_value) = std::move(*ev->pipe_value);
+#else
+        Tango::DevicePipe *pipe_value = new Tango::DevicePipe(*ev->pipe_value);
+#endif
+        py_ev.attr("pipe_value") = PyTango::DevicePipe::convert_to_python(pipe_value, extract_as);
+    }
+}
 
+void PyCallBackPushEvent::fill_py_event(Tango::DevIntrChangeEventData* ev, object & py_ev, object py_device, PyTango::ExtractAs extract_as) {
+
+	copy_device(ev, py_ev, py_device);
+
+	py_ev.attr("cmd_list") = ev->cmd_list;
+	py_ev.attr("att_list") = ev->att_list;
+}
 
 /*virtual*/ void PyCallBackPushEvent::push_event(Tango::EventData *ev)
 {
@@ -315,6 +337,16 @@ void PyCallBackPushEvent::fill_py_event(Tango::DataReadyEventData* ev, object & 
     _push_event(this, ev);
 }
 
+/*virtual*/ void PyCallBackPushEvent::push_event(Tango::PipeEventData *ev)
+{
+    _push_event(this, ev);
+}
+
+/*virtual*/ void PyCallBackPushEvent::push_event(Tango::DevIntrChangeEventData *ev)
+{
+    _push_event(this, ev);
+}
+
 void export_callback()
 {
     PyCallBackAutoDie::init();
@@ -326,10 +358,10 @@ void export_callback()
             .def_readonly("device", &PyCmdDoneEvent::device)
             .def_readonly("cmd_name", &PyCmdDoneEvent::cmd_name)
             .def_readonly("argout_raw", &PyCmdDoneEvent::argout_raw)
-            .def_readonly("argout", &PyCmdDoneEvent::argout)
             .def_readonly("err", &PyCmdDoneEvent::err)
             .def_readonly("errors", &PyCmdDoneEvent::errors)
             .def_readonly("ext", &PyCmdDoneEvent::ext)
+            .def_readwrite("argout", &PyCmdDoneEvent::argout)
     ;
 
     class_<PyAttrReadEvent> AttrReadEvent("AttrReadEvent", no_init);
@@ -379,5 +411,9 @@ void export_callback()
             "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send attribute configuration change event(s) to the client. ")
         .def("push_event", (void (PyCallBackAutoDie::*)(Tango::DataReadyEventData*))&PyCallBackAutoDie::push_event,
             "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send attribute data ready event(s) to the client. ")
+        .def("push_event", (void (PyCallBackAutoDie::*)(Tango::PipeEventData*))&PyCallBackAutoDie::push_event,
+            "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send pipe event(s) to the client. ")
+        .def("push_event", (void (PyCallBackAutoDie::*)(Tango::DevIntrChangeEventData*))&PyCallBackAutoDie::push_event,
+            "This method is defined as being empty and must be overloaded by the user when events are used. This is the method which will be executed when the server send device interface change event(s) to the client. ")
     ;
 }

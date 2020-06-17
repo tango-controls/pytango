@@ -87,7 +87,12 @@ endif
 
 TANGO_CFLAGS=`pkg-config --cflags-only-other tango`
 TANGO_LIBS=`pkg-config --libs-only-l tango`
+
+ifdef CONDA_PREFIX
+BOOST_LIB = boost_python
+else
 BOOST_LIB = boost_python-py$(PY_VER_S)
+endif
 
 PRE_C_H := precompiled_header.hpp
 PRE_C_H_O := $(OBJS_DIR)/$(PRE_C_H).gch
@@ -98,7 +103,7 @@ LN_STATIC := g++ -pthread -static -Wl,$(OPTIMIZE_LN) -Wl,-Bsymbolic-functions
 
 LN_VER := -Wl,-h -Wl,--strip-all
 
-LN_LIBS := -l$(BOOST_LIB) -lpython$(PY_VER) -ltango
+LN_LIBS := -l$(BOOST_LIB) -ltango
 
 INCLUDE_DIRS =
 
@@ -173,17 +178,20 @@ $(OBJS_DIR)/device_attribute_history.o \
 $(OBJS_DIR)/device_data.o \
 $(OBJS_DIR)/device_data_history.o \
 $(OBJS_DIR)/device_info.o \
+$(OBJS_DIR)/devintr_change_event_data.o \
 $(OBJS_DIR)/device_proxy.o \
 $(OBJS_DIR)/enums.o \
 $(OBJS_DIR)/event_data.o \
 $(OBJS_DIR)/exception.o \
 $(OBJS_DIR)/from_py.o \
+$(OBJS_DIR)/fwdAttr.o \
 $(OBJS_DIR)/group.o \
 $(OBJS_DIR)/group_reply.o \
 $(OBJS_DIR)/group_reply_list.o \
 $(OBJS_DIR)/locker_info.o \
 $(OBJS_DIR)/locking_thread.o \
 $(OBJS_DIR)/periodic_event_info.o \
+$(OBJS_DIR)/pipe_event_data.o \
 $(OBJS_DIR)/poll_device.o \
 $(OBJS_DIR)/pytango.o \
 $(OBJS_DIR)/pytgutils.o \

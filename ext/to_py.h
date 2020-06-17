@@ -95,8 +95,7 @@ struct CORBA_sequence_to_tuple<Tango::DevVarStringArray>
         PyObject *t = PyTuple_New(size);
         for(unsigned long i=0; i < size; ++i)
         {
-            
-            boost::python::str x(a[i].in());
+            boost::python::object x = from_char_to_boost_str(a[i].in());
             PyTuple_SetItem(t, i, boost::python::incref(x.ptr()));
         }
         return t;
@@ -123,7 +122,7 @@ struct CORBA_sequence_to_tuple<Tango::DevVarLongStringArray>
 
         for(unsigned long i=0; i < ssize; ++i)
         {
-            boost::python::str x(a.svalue[i].in());
+            boost::python::object x = from_char_to_boost_str(a.svalue[i].in());
             PyTuple_SetItem(st, i, boost::python::incref(x.ptr()));
         }
         PyObject *t = PyTuple_New(2);
@@ -153,7 +152,7 @@ struct CORBA_sequence_to_tuple<Tango::DevVarDoubleStringArray>
 
         for(unsigned long i=0; i < ssize; ++i)
         {
-            boost::python::str x(a.svalue[i].in());
+            boost::python::object x = from_char_to_boost_str(a.svalue[i].in());
             PyTuple_SetItem(st, i, boost::python::incref(x.ptr()));
         }
         PyObject *t = PyTuple_New(2);
@@ -191,7 +190,8 @@ struct CORBA_sequence_to_list<Tango::DevVarStringArray>
         boost::python::list ret;
         for(unsigned long i=0; i < size; ++i)
         {
-            ret.append(a[i].in());
+	    boost::python::object x = from_char_to_boost_str(a[i].in());
+            ret.append(x);
         }
         return ret;
     }
@@ -220,7 +220,8 @@ struct CORBA_sequence_to_list<Tango::DevVarLongStringArray>
         
         for(unsigned long i=0; i < ssize; ++i)
         {
-            st.append(a.svalue[i]);
+	    boost::python::object x = from_char_to_boost_str(a.svalue[i].in());
+            st.append(x);
         }
         
         ret.append(lt);
@@ -248,7 +249,8 @@ struct CORBA_sequence_to_list <Tango::DevVarDoubleStringArray>
         
         for(unsigned long i=0; i < ssize; ++i)
         {
-            st.append(a.svalue[i]);
+	    boost::python::object x = from_char_to_boost_str(a.svalue[i].in());
+            st.append(x);
         }
         
         ret.append(dt);
@@ -264,7 +266,7 @@ struct CORBA_String_member_to_str
 {
     static inline PyObject* convert(CORBA::String_member const& cstr)
     {
-        return from_char_to_str(cstr.in());
+        return from_char_to_python_str(cstr.in());
     }
 
     //static const PyTypeObject* get_pytype() { return &PyBytes_Type; }
@@ -274,7 +276,7 @@ struct CORBA_String_member_to_str2
 {
     static inline PyObject* convert(_CORBA_String_member const& cstr)
     {
-        return from_char_to_str(cstr.in());
+        return from_char_to_python_str(cstr.in());
     }
 
     //static const PyTypeObject* get_pytype() { return &PyBytes_Type; }
@@ -284,7 +286,7 @@ struct CORBA_String_element_to_str
 {
     static inline PyObject* convert(_CORBA_String_element const& cstr)
     {
-        return from_char_to_str(cstr.in());
+        return from_char_to_python_str(cstr.in());
     }
 
     //static const PyTypeObject* get_pytype() { return &PyBytes_Type; }
@@ -294,7 +296,7 @@ struct String_to_str
 {
     static inline PyObject* convert(std::string const& cstr)
     {
-        return from_char_to_str(cstr);
+        return from_char_to_python_str(cstr);
     }
 
     //static const PyTypeObject* get_pytype() { return &PyBytes_Type; }
@@ -304,7 +306,7 @@ struct char_ptr_to_str
 {
     static inline PyObject* convert(const char *cstr)
     {
-        return from_char_to_str(cstr);
+        return from_char_to_python_str(cstr);
     }
 
     //static const PyTypeObject* get_pytype() { return &PyBytes_Type; }

@@ -4,7 +4,6 @@
 import sys
 import tango
 import pkgutil
-import warnings
 
 
 def alias_package(package, alias, extra_modules={}):
@@ -18,6 +17,9 @@ def alias_package(package, alias, extra_modules={}):
     prefix = package.__name__ + '.'
     # Alias all importable modules recursively
     for _, name, _ in pkgutil.walk_packages(path, prefix):
+        # Skip databaseds backends
+        if name.startswith('tango.databaseds.db_access.'):
+            continue
         try:
             if name not in sys.modules:
                 __import__(name)

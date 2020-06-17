@@ -128,6 +128,8 @@ void export_enums()
         .value("USER_EVENT", Tango::USER_EVENT)
         .value("ATTR_CONF_EVENT", Tango::ATTR_CONF_EVENT)
         .value("DATA_READY_EVENT", Tango::DATA_READY_EVENT)
+        .value("INTERFACE_CHANGE_EVENT", Tango::INTERFACE_CHANGE_EVENT)
+        .value("PIPE_EVENT", Tango::PIPE_EVENT)
     ;
 
     enum_<Tango::AttrSerialModel>("AttrSerialModel")
@@ -173,7 +175,7 @@ void export_enums()
         .value("READ_WITH_WRITE", Tango::READ_WITH_WRITE)
         .value("WRITE", Tango::WRITE)
         .value("READ_WRITE", Tango::READ_WRITE)
-        .value("WT_UNKNOWN", Tango::READ_WRITE)
+        .value("WT_UNKNOWN", Tango::WT_UNKNOWN)
         .export_values()
     ;
 

@@ -16,14 +16,11 @@ except ImportError:
 
 import tango
 from tango import AttrWriteType, GreenMode
-from tango.server import Device, DeviceMeta
+from tango.server import Device
 from tango.server import attribute, command
-from tango.server import class_property
-from tango.server import device_property
 from tango.server import run
 
-from tango.globals import get_class, get_class_by_class, \
-    get_constructed_class_by_class
+from tango.globals import get_class_by_class, get_constructed_class_by_class
 
 
 READ_ONLY = AttrWriteType.READ
@@ -31,10 +28,12 @@ WRITE_ONLY = AttrWriteType.WRITE
 READ_WRITE = AttrWriteType.READ_WRITE
 READ_WITH_WRITE = AttrWriteType.READ_WITH_WRITE
 
-#Argument Options
+# Argument Options
 global options
 global WILDCARD_REPLACEMENT
 WILDCARD_REPLACEMENT = True
+
+
 class DbInter(tango.Interceptors):
 
     def create_thread(self):
@@ -43,11 +42,14 @@ class DbInter(tango.Interceptors):
     def delete_thread(self):
         pass
 
+
 DB_NAME = None
+
 
 def set_db_name(db_name):
     global DB_NAME
     DB_NAME = db_name
+
 
 def get_db_name():
     return DB_NAME
@@ -59,6 +61,7 @@ th_exc = tango.Except.throw_exception
 
 from .db_errors import *
 
+
 def check_device_name(dev_name):
     if '*' in dev_name:
         return False, None, None
@@ -69,7 +72,7 @@ def check_device_name(dev_name):
         dev_name = dev_name[5:]
     if dev_name.startswith("//"):
         dev_name = dev_name[2:]
-        if not '/' in dev_name or dev_name.startswith("/"):
+        if '/' not in dev_name or dev_name.startswith("/"):
             return False, None, None
     dfm = dev_name.split("/")
     if len(dfm) != 3:
@@ -78,6 +81,7 @@ def check_device_name(dev_name):
     if not all(map(len, dfm)):
         return False, None, None
     return True, dev_name, dfm
+
 
 def replace_wildcard(text):
     if not WILDCARD_REPLACEMENT:
@@ -94,6 +98,7 @@ def replace_wildcard(text):
     text = text.replace("*", "%")
     return text
 
+
 class TimeStructure:
     def __init__(self):
         self.average = 0
@@ -104,8 +109,10 @@ class TimeStructure:
         self.calls = 0
         self.index = ''
 
+
 def stats(f):
     fname = f.__name__
+
     @functools.wraps(f)
     def wrapper(self, *args, **kwargs):
         start = time.time()
@@ -116,6 +123,7 @@ def stats(f):
             update_timing_stats(self, start, end, fname)
     return wrapper
 
+
 def update_timing_stats(dev, time_before, time_after, cmd_name):
     tmp_time = dev.timing_maps[cmd_name]
     time_elapsed = (time_after - time_before) * 1000.
@@ -125,7 +133,12 @@ def update_timing_stats(dev, time_before, time_after, cmd_name):
     if time_elapsed < tmp_time.minimum or tmp_time.minimum == 0:
         tmp_time.minimum = time_elapsed
     tmp_time.calls = tmp_time.calls + 1
-    tmp_time.average = tmp_time.total_elapsed/tmp_time.calls
+    tmp_time.average = tmp_time.total_elapsed / tmp_time.calls
+
+
+def get_plugin(name):
+    fullname = '%s.%s' % (db_access.__package__, name)
+    return __import__(fullname, None, None, fullname)
 
 
 class DataBase(Device):
@@ -135,27 +148,26 @@ class DataBase(Device):
 
     # --- attributes ---------------------------------------
 
-    Timing_maximum = attribute(dtype=('float64',),max_dim_x=128, access=READ_ONLY)
+    Timing_maximum = attribute(dtype=('float64',), max_dim_x=128, access=READ_ONLY)
 
-    Timing_average = attribute(dtype=('float64',),max_dim_x=128, access=READ_ONLY)
+    Timing_average = attribute(dtype=('float64',), max_dim_x=128, access=READ_ONLY)
 
-    Timing_index = attribute(dtype=('str',),max_dim_x=128, access=READ_ONLY)
+    Timing_index = attribute(dtype=('str',), max_dim_x=128, access=READ_ONLY)
 
-    Timing_calls = attribute(dtype=('float64',),max_dim_x=128, access=READ_ONLY)
+    Timing_calls = attribute(dtype=('float64',), max_dim_x=128, access=READ_ONLY)
 
-    Timing_info = attribute(dtype=('str',),max_dim_x=128, access=READ_ONLY)
+    Timing_info = attribute(dtype=('str',), max_dim_x=128, access=READ_ONLY)
 
     StoredProcedureRelease = attribute(dtype='str', access=READ_ONLY)
 
-    Timing_minimum = attribute(dtype=('float64',),max_dim_x=128, access=READ_ONLY)
+    Timing_minimum = attribute(dtype=('float64',), max_dim_x=128, access=READ_ONLY)
 
     def init_device(self):
-        self._log = log = logging.getLogger(self.get_name())
+        self._log = logging.getLogger(self.get_name())
         self._log.debug("In init_device()")
         self.attr_StoredProcedureRelease_read = ''
         self.init_timing_stats()
-        m = __import__('%s.%s' % (db_access.__package__,options.db_access),None,None,
-                       '%s.%s' % (db_access.__package__,options.db_access))
+        m = get_plugin(options.db_access)
         self.db = m.get_db(personal_name = options.argv[1])
         try:
             global WILDCARD_REPLACEMENT
@@ -1748,6 +1760,9 @@ def main(argv = None):
                           help="database port")
         (options,args) = parser.parse_args(argv)
         options.argv = ["DataBaseds"] + args
+
+    # Check plugin availability
+    get_plugin(options.db_access)
 
     port = options.port
     if port is None:

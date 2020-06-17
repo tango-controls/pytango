@@ -174,17 +174,14 @@ of a Tango device server.
 
 Before creating a server you need to decide:
 
-1. The name of the device server (example: `PowerSupplyDS`). This will be
-   the mandatory name of your python file.
-2. The Tango Class name of your device (example: `PowerSupply`). In our
+1. The Tango Class name of your device (example: `PowerSupply`). In our
    example we will use the same name as the python class name.
-3. the list of attributes of the device, their data type, access (read-only vs
+2. The list of attributes of the device, their data type, access (read-only vs
    read-write), data_format (scalar, 1D, 2D)
-4. the list of commands, their parameters and their result
+3. The list of commands, their parameters and their result
 
-In our example we will write a fake power supply device server. The server
-will be called `PowerSupplyDS`. There will be a class called `PowerSupply`
-which will have attributes:
+In our example we will write a fake power supply device server.
+There will be a class called `PowerSupply` which will have attributes:
 
 * *voltage* (scalar, read-only, numeric)
 * *current* (scalar, read_write, numeric, expert mode)
@@ -205,9 +202,9 @@ properties:
 * *host* (string representing the host name of the actual power supply)
 * *port* (port number in the host with default value = 9788)
 
-Here is the code for the :file:`PowerSupplyDS.py`
+Here is the code for the :file:`power_supply.py`
 
-.. literalinclude:: _static/PowerSupplyDS.py
+.. literalinclude:: _static/power_supply.py
     :linenos:
 
 Check the :ref:`high level server API <pytango-hlapi>` for the complete
@@ -224,7 +221,7 @@ You can do it with Jive (`Jive->Edit->Create server`):
     >>> import tango
 
     >>> dev_info = tango.DbDevInfo()
-    >>> dev_info.server = "PowerSupplyDS/test"
+    >>> dev_info.server = "PowerSupply/test"
     >>> dev_info._class = "PowerSupply"
     >>> dev_info.name = "test/power_supply/1"
 
@@ -233,14 +230,14 @@ You can do it with Jive (`Jive->Edit->Create server`):
 
 After, you can run the server on a console with::
 
-    $ python PowerSupplyDS.py test
+    $ python power_supply.py test
     Ready to accept request
 
 Now you can access it from a python console::
 
     >>> import tango
 
-    >>> power_supply = tango.DeviceProxy("test/power/supply/1")
+    >>> power_supply = tango.DeviceProxy("test/power_supply/1")
     >>> power_supply.state()
     STANDBY
 
@@ -249,11 +246,17 @@ Now you can access it from a python console::
     >>> power_supply.current
     2.3
 
-    >>> power_supply.PowerOn()
+    >>> power_supply.TurnOn()
     >>> power_supply.Ramp(2.1)
     True
 
     >>> power_supply.state()
     ON
 
-Next steps: Check out the :ref:`pytango-api`.
+.. note::
+   In this example, the name of the server and the name of the tango
+   class are the same: `PowerSupply`. This pattern is enforced by the
+   :meth:`~tango.server.Device.run_server` method. However, it is possible
+   to run several tango classes in the same server. In this case, the server
+   name would typically be the name of server file. See the
+   :func:`~tango.server.run` function for further information.

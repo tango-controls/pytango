@@ -1,4 +1,5 @@
-__all__ = ["loads", "dumps"]
+__all__ = ("loads", "dumps")
+
 
 def loads(fmt, data):
     if fmt.startswith("pickle"):
@@ -10,6 +11,7 @@ def loads(fmt, data):
     else:
         raise TypeError("Format '{0}' not supported".format(fmt))
     return loads(data)
+
 
 def dumps(fmt, obj):
     if fmt.startswith("pickle"):

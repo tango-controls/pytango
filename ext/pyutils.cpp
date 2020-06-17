@@ -15,30 +15,30 @@
 
 using namespace boost::python;
 
-bopy::object from_char_to_str2(const std::string& in, 
-                               const char* encoding /*=NULL defaults to latin-1 */,
-                               const char* errors /*="strict" */)
+bopy::object from_char_to_boost_str(const std::string& in,
+                                    const char* encoding /*=NULL defaults to latin-1 */,
+                                    const char* errors /*="strict" */)
 {
-    return from_char_to_str2(in.c_str(), in.size(), encoding, errors);
+    return from_char_to_boost_str(in.c_str(), in.size(), encoding, errors);
 }
 
-bopy::object from_char_to_str2(const char* in, Py_ssize_t size /* =-1 */, 
-                               const char* encoding /*=NULL defaults to latin-1 */,
-                               const char* errors /*="strict" */)
+bopy::object from_char_to_boost_str(const char* in, Py_ssize_t size /* =-1 */,
+                                    const char* encoding /*=NULL defaults to latin-1 */,
+                                    const char* errors /*="strict" */)
 {
-    return bopy::object(bopy::handle<>(from_char_to_str(in, size, encoding, errors)));
+    return bopy::object(bopy::handle<>(from_char_to_python_str(in, size, encoding, errors)));
 }
 
-PyObject* from_char_to_str(const std::string& in, 
-                           const char* encoding /*=NULL defaults to latin-1 */,
-                           const char* errors /*="strict" */)
+PyObject* from_char_to_python_str(const std::string& in,
+                                  const char* encoding /*=NULL defaults to latin-1 */,
+                                  const char* errors /*="strict" */)
 {
-    return from_char_to_str(in.c_str(), in.size(), encoding, errors);
+    return from_char_to_python_str(in.c_str(), in.size(), encoding, errors);
 }
 
-PyObject* from_char_to_str(const char* in, Py_ssize_t size /* =-1 */, 
-                           const char* encoding /*=NULL defaults to latin-1 */,
-                           const char* errors /*="strict" */)
+PyObject* from_char_to_python_str(const char* in, Py_ssize_t size /* =-1 */,
+                                  const char* encoding /*=NULL defaults to latin-1 */,
+                                  const char* errors /*="strict" */)
 {
 if (size < 0)
 {
@@ -50,7 +50,7 @@ if (size < 0)
         return PyUnicode_DecodeLatin1(in, size, errors);
     }
     else
-    {   
+    {
         return PyUnicode_Decode(in, size, encoding, errors);
     }
 #else
@@ -58,18 +58,56 @@ if (size < 0)
 #endif
 }
 
+void from_str_to_char(const bopy::object& in, std::string& out)
+{
+    from_str_to_char(in.ptr(), out);
+}
+
 void from_str_to_char(PyObject* in, std::string& out)
 {
     if (PyUnicode_Check(in))
     {
         PyObject *bytes_in = PyUnicode_AsLatin1String(in);
-        out = PyBytes_AsString(bytes_in);
+        out = std::string(PyBytes_AsString(bytes_in), PyBytes_Size(bytes_in));
         Py_DECREF(bytes_in);
     }
-    else 
+    else
     {
         out = std::string(PyBytes_AsString(in), PyBytes_Size(in));
     }
+}
+
+char* from_str_to_char(const bopy::object& in)
+{
+    return from_str_to_char(in.ptr());
+}
+
+// The result is a newly allocated buffer. It is the responsibility
+// of the caller to manage the memory returned by this function
+char* from_str_to_char(PyObject* in)
+{
+    char* out = NULL;
+    if (PyUnicode_Check(in))
+    {
+        PyObject *bytes_in = PyUnicode_AsLatin1String(in);
+	Py_ssize_t size = PyBytes_Size(bytes_in);
+	out = new char[size+1];
+	out[size] = '\0';
+	out = strncpy(out, PyBytes_AsString(bytes_in), size);
+        Py_DECREF(bytes_in);
+    }
+    else if (PyBytes_Check(in))
+    {
+	Py_ssize_t size = PyBytes_Size(in);
+	out = new char[size+1];
+	out[size] = '\0';
+	out = strncpy(out, PyBytes_AsString(in), size);
+    }
+    else
+    {
+        raise_(PyExc_TypeError, "can't translate python object to C char*");
+    }
+    return out;
 }
 
 bool is_method_defined(object &obj, const std::string &method_name)
@@ -185,4 +223,14 @@ EXIT:
 bool hasattr(boost::python::object& obj, const std::string& name)
 {
     return PyObject_HasAttrString(obj.ptr(), name.c_str());
+}
+
+void export_ensure_omni_thread()
+{
+  bopy::class_<EnsureOmniThread, boost::noncopyable>(
+    "EnsureOmniThread", bopy::init<>())
+    .def("_acquire", &EnsureOmniThread::acquire)
+    .def("_release", &EnsureOmniThread::release)
+  ;
+  bopy::def("is_omni_thread", is_omni_thread);
 }

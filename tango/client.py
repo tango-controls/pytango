@@ -30,6 +30,7 @@ _FMT = "pickle"
 
 dumps = functools.partial(_dumps, _FMT)
 
+
 def _command(device, cmd_info, *args, **kwargs):
     name = cmd_info.cmd_name
     if cmd_info.in_type == CmdArgType.DevEncoded:
@@ -42,9 +43,11 @@ def _command(device, cmd_info, *args, **kwargs):
 
 
 class _DeviceHelper(object):
-
     __CMD_FILTER = set(("init", "state", "status"))
     __ATTR_FILTER = set(("state", "status"))
+
+    __attr_cache = None
+    __cmd_cache = None
 
     def __init__(self, dev_name, *args, **kwargs):
         self.dev_name = dev_name
@@ -61,11 +64,8 @@ class _DeviceHelper(object):
         self.device.unsubscribe_event(i)
 
     def get_attr_cache(self, refresh=False):
-        try:
-            cache = self.__attr_cache
-            if not cache:
-                refresh = True
-        except AttributeError:
+        cache = self.__attr_cache
+        if not cache:
             refresh = True
         if refresh:
             cache = {}
@@ -91,11 +91,8 @@ class _DeviceHelper(object):
             return cache.get(name)
 
     def get_cmd_cache(self, refresh=False):
-        try:
-            cache = self.__cmd_cache
-            if not cache:
-                refresh = True
-        except AttributeError:
+        cache = self.__cmd_cache
+        if not cache:
             refresh = True
         if refresh:
             cache = {}
@@ -270,4 +267,3 @@ def connect(obj, signal, slot, event_type=tango.EventType.CHANGE_EVENT):
 def disconnect(obj, signal, slot):
     """Experimental function. Not part of the official API"""
     return obj._helper.disconnect(signal, slot)
-

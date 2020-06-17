@@ -2,12 +2,13 @@
 from __future__ import absolute_import
 
 import concurrent.futures
+
 try:
     import asyncio
 except ImportError:
     import trollius as asyncio
 
-__all__ = ["run_coroutine_threadsafe"]
+__all__ = ("run_coroutine_threadsafe",)
 
 
 def _set_concurrent_future_state(concurrent, source):
@@ -90,7 +91,7 @@ def run_coroutine_threadsafe(coro, loop):
 
     def callback():
         try:
-            _chain_future(asyncio.async(coro, loop=loop), future)
+            _chain_future(asyncio.ensure_future(coro, loop=loop), future)
         except Exception as exc:
             if future.set_running_or_notify_cancel():
                 future.set_exception(exc)

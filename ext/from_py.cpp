@@ -11,48 +11,9 @@
 
 #include "precompiled_header.hpp"
 #include "from_py.h"
+#include "pyutils.h"
 
 using namespace boost::python;
-
-char* obj_to_new_char(PyObject* obj_ptr)
-{
-    Tango::DevString ret = NULL;
-    if(PyUnicode_Check(obj_ptr))
-    {
-        PyObject* obj_bytes_ptr = PyUnicode_AsLatin1String(obj_ptr);
-        ret = CORBA::string_dup(PyBytes_AsString(obj_bytes_ptr));
-        Py_DECREF(obj_bytes_ptr);
-    }
-    else
-    {
-        ret = CORBA::string_dup(PyBytes_AsString(obj_ptr));
-    }
-    return ret;
-}
-
-char* obj_to_new_char(bopy::object obj)
-{
-    return obj_to_new_char(obj.ptr());
-}
-
-void obj_to_string(PyObject* obj_ptr, std::string& result)
-{
-    if(PyUnicode_Check(obj_ptr))
-    {
-        PyObject* obj_bytes_ptr = PyUnicode_AsLatin1String(obj_ptr);
-        result = PyBytes_AsString(obj_bytes_ptr);
-        Py_DECREF(obj_bytes_ptr);
-    }
-    else
-    {
-        result = PyBytes_AsString(obj_ptr);
-    }
-}
-
-void obj_to_string(bopy::object obj, std::string& result)
-{
-    return obj_to_string(obj.ptr(), result);
-}
 
 /// @bug Not a bug per se, but you should keep in mind: It returns a new
 /// string, so if you pass it to Tango with a release flag there will be
@@ -60,7 +21,7 @@ void obj_to_string(bopy::object obj, std::string& result)
 /// to delete[] it!
 Tango::DevString PyString_AsCorbaString(PyObject* obj_ptr)
 {
-    return obj_to_new_char(obj_ptr);
+    return from_str_to_char(obj_ptr);
 }
 
 void convert2array(const boost::python::object &py_value, Tango::DevVarCharArray & result)
@@ -135,6 +96,7 @@ void convert2array(const object &py_value, Tango::DevVarStringArray & result)
     else if(PyUnicode_Check(py_value_ptr))
     {
         PyObject* py_bytes_value_ptr = PyUnicode_AsLatin1String(py_value_ptr);
+        result.length(1);
         result[0] = CORBA::string_dup(PyBytes_AS_STRING(py_bytes_value_ptr));
         Py_DECREF(py_bytes_value_ptr);
     }
@@ -192,33 +154,33 @@ void convert2array(const boost::python::object &py_value, Tango::DevVarLongStrin
 
 void from_py_object(bopy::object &py_obj, Tango::AttributeAlarm &attr_alarm)
 {
-    attr_alarm.min_alarm = obj_to_new_char(py_obj.attr("min_alarm"));
-    attr_alarm.max_alarm = obj_to_new_char(py_obj.attr("max_alarm"));
-    attr_alarm.min_warning = obj_to_new_char(py_obj.attr("min_warning"));
-    attr_alarm.max_warning = obj_to_new_char(py_obj.attr("max_warning"));
-    attr_alarm.delta_t = obj_to_new_char(py_obj.attr("delta_t"));
-    attr_alarm.delta_val = obj_to_new_char(py_obj.attr("delta_val"));
+    attr_alarm.min_alarm = from_str_to_char(py_obj.attr("min_alarm"));
+    attr_alarm.max_alarm = from_str_to_char(py_obj.attr("max_alarm"));
+    attr_alarm.min_warning = from_str_to_char(py_obj.attr("min_warning"));
+    attr_alarm.max_warning = from_str_to_char(py_obj.attr("max_warning"));
+    attr_alarm.delta_t = from_str_to_char(py_obj.attr("delta_t"));
+    attr_alarm.delta_val = from_str_to_char(py_obj.attr("delta_val"));
     convert2array(py_obj.attr("extensions"), attr_alarm.extensions);
 }
 
 void from_py_object(object &py_obj, Tango::ChangeEventProp &change_evt_prop)
 {
-    change_evt_prop.rel_change = obj_to_new_char(py_obj.attr("rel_change"));
-    change_evt_prop.abs_change = obj_to_new_char(py_obj.attr("abs_change"));
+    change_evt_prop.rel_change = from_str_to_char(py_obj.attr("rel_change"));
+    change_evt_prop.abs_change = from_str_to_char(py_obj.attr("abs_change"));
     convert2array(py_obj.attr("extensions"), change_evt_prop.extensions);
 }
 
 void from_py_object(object &py_obj, Tango::PeriodicEventProp &periodic_evt_prop)
 {
-    periodic_evt_prop.period = obj_to_new_char(py_obj.attr("period"));
+    periodic_evt_prop.period = from_str_to_char(py_obj.attr("period"));
     convert2array(py_obj.attr("extensions"), periodic_evt_prop.extensions);
 }
 
 void from_py_object(object &py_obj, Tango::ArchiveEventProp &archive_evt_prop)
 {
-    archive_evt_prop.rel_change = obj_to_new_char(py_obj.attr("rel_change"));
-    archive_evt_prop.abs_change = obj_to_new_char(py_obj.attr("abs_change"));
-    archive_evt_prop.period = obj_to_new_char(py_obj.attr("period"));
+    archive_evt_prop.rel_change = from_str_to_char(py_obj.attr("rel_change"));
+    archive_evt_prop.abs_change = from_str_to_char(py_obj.attr("abs_change"));
+    archive_evt_prop.period = from_str_to_char(py_obj.attr("period"));
     convert2array(py_obj.attr("extensions"), archive_evt_prop.extensions);
 }
 
@@ -236,66 +198,66 @@ void from_py_object(object &py_obj, Tango::EventProperties &evt_props)
 
 void from_py_object(object &py_obj, Tango::AttributeConfig &attr_conf)
 {
-    attr_conf.name = obj_to_new_char(py_obj.attr("name"));
+    attr_conf.name = from_str_to_char(py_obj.attr("name"));
     attr_conf.writable = extract<Tango::AttrWriteType>(py_obj.attr("writable"));
     attr_conf.data_format = extract<Tango::AttrDataFormat>(py_obj.attr("data_format"));
     attr_conf.data_type = extract<CORBA::Long>(py_obj.attr("data_type"));
     attr_conf.max_dim_x = extract<CORBA::Long>(py_obj.attr("max_dim_x"));
     attr_conf.max_dim_y = extract<CORBA::Long>(py_obj.attr("max_dim_y"));
-    attr_conf.description = obj_to_new_char(py_obj.attr("description"));
-    attr_conf.label = obj_to_new_char(py_obj.attr("label"));
-    attr_conf.unit = obj_to_new_char(py_obj.attr("unit"));
-    attr_conf.standard_unit = obj_to_new_char(py_obj.attr("standard_unit"));
-    attr_conf.display_unit = obj_to_new_char(py_obj.attr("display_unit"));
-    attr_conf.format = obj_to_new_char(py_obj.attr("format"));
-    attr_conf.min_value = obj_to_new_char(py_obj.attr("min_value"));
-    attr_conf.max_value = obj_to_new_char(py_obj.attr("max_value"));
-    attr_conf.min_alarm = obj_to_new_char(py_obj.attr("min_alarm"));
-    attr_conf.max_alarm = obj_to_new_char(py_obj.attr("max_alarm"));
-    attr_conf.writable_attr_name = obj_to_new_char(py_obj.attr("writable_attr_name"));
+    attr_conf.description = from_str_to_char(py_obj.attr("description"));
+    attr_conf.label = from_str_to_char(py_obj.attr("label"));
+    attr_conf.unit = from_str_to_char(py_obj.attr("unit"));
+    attr_conf.standard_unit = from_str_to_char(py_obj.attr("standard_unit"));
+    attr_conf.display_unit = from_str_to_char(py_obj.attr("display_unit"));
+    attr_conf.format = from_str_to_char(py_obj.attr("format"));
+    attr_conf.min_value = from_str_to_char(py_obj.attr("min_value"));
+    attr_conf.max_value = from_str_to_char(py_obj.attr("max_value"));
+    attr_conf.min_alarm = from_str_to_char(py_obj.attr("min_alarm"));
+    attr_conf.max_alarm = from_str_to_char(py_obj.attr("max_alarm"));
+    attr_conf.writable_attr_name = from_str_to_char(py_obj.attr("writable_attr_name"));
     convert2array(py_obj.attr("extensions"), attr_conf.extensions);
 }
 
 void from_py_object(object &py_obj, Tango::AttributeConfig_2 &attr_conf)
 {
-    attr_conf.name = obj_to_new_char(py_obj.attr("name"));
+    attr_conf.name = from_str_to_char(py_obj.attr("name"));
     attr_conf.writable = extract<Tango::AttrWriteType>(py_obj.attr("writable"));
     attr_conf.data_format = extract<Tango::AttrDataFormat>(py_obj.attr("data_format"));
     attr_conf.data_type = extract<CORBA::Long>(py_obj.attr("data_type"));
     attr_conf.max_dim_x = extract<CORBA::Long>(py_obj.attr("max_dim_x"));
     attr_conf.max_dim_y = extract<CORBA::Long>(py_obj.attr("max_dim_y"));
-    attr_conf.description = obj_to_new_char(py_obj.attr("description"));
-    attr_conf.label = obj_to_new_char(py_obj.attr("label"));
-    attr_conf.unit = obj_to_new_char(py_obj.attr("unit"));
-    attr_conf.standard_unit = obj_to_new_char(py_obj.attr("standard_unit"));
-    attr_conf.display_unit = obj_to_new_char(py_obj.attr("display_unit"));
-    attr_conf.format = obj_to_new_char(py_obj.attr("format"));
-    attr_conf.min_value = obj_to_new_char(py_obj.attr("min_value"));
-    attr_conf.max_value = obj_to_new_char(py_obj.attr("max_value"));
-    attr_conf.min_alarm = obj_to_new_char(py_obj.attr("min_alarm"));
-    attr_conf.max_alarm = obj_to_new_char(py_obj.attr("max_alarm"));
-    attr_conf.writable_attr_name = obj_to_new_char(py_obj.attr("writable_attr_name"));
+    attr_conf.description = from_str_to_char(py_obj.attr("description"));
+    attr_conf.label = from_str_to_char(py_obj.attr("label"));
+    attr_conf.unit = from_str_to_char(py_obj.attr("unit"));
+    attr_conf.standard_unit = from_str_to_char(py_obj.attr("standard_unit"));
+    attr_conf.display_unit = from_str_to_char(py_obj.attr("display_unit"));
+    attr_conf.format = from_str_to_char(py_obj.attr("format"));
+    attr_conf.min_value = from_str_to_char(py_obj.attr("min_value"));
+    attr_conf.max_value = from_str_to_char(py_obj.attr("max_value"));
+    attr_conf.min_alarm = from_str_to_char(py_obj.attr("min_alarm"));
+    attr_conf.max_alarm = from_str_to_char(py_obj.attr("max_alarm"));
+    attr_conf.writable_attr_name = from_str_to_char(py_obj.attr("writable_attr_name"));
     attr_conf.level = extract<Tango::DispLevel>(py_obj.attr("level"));
     convert2array(py_obj.attr("extensions"), attr_conf.extensions);
 }
 
 void from_py_object(object &py_obj, Tango::AttributeConfig_3 &attr_conf)
 {
-    attr_conf.name = obj_to_new_char(py_obj.attr("name"));
+    attr_conf.name = from_str_to_char(py_obj.attr("name"));
     attr_conf.writable = extract<Tango::AttrWriteType>(py_obj.attr("writable"));
     attr_conf.data_format = extract<Tango::AttrDataFormat>(py_obj.attr("data_format"));
     attr_conf.data_type = extract<CORBA::Long>(py_obj.attr("data_type"));
     attr_conf.max_dim_x = extract<CORBA::Long>(py_obj.attr("max_dim_x"));
     attr_conf.max_dim_y = extract<CORBA::Long>(py_obj.attr("max_dim_y"));
-    attr_conf.description = obj_to_new_char(py_obj.attr("description"));
-    attr_conf.label = obj_to_new_char(py_obj.attr("label"));
-    attr_conf.unit = obj_to_new_char(py_obj.attr("unit"));
-    attr_conf.standard_unit = obj_to_new_char(py_obj.attr("standard_unit"));
-    attr_conf.display_unit = obj_to_new_char(py_obj.attr("display_unit"));
-    attr_conf.format = obj_to_new_char(py_obj.attr("format"));
-    attr_conf.min_value = obj_to_new_char(py_obj.attr("min_value"));
-    attr_conf.max_value = obj_to_new_char(py_obj.attr("max_value"));
-    attr_conf.writable_attr_name = obj_to_new_char(py_obj.attr("writable_attr_name"));
+    attr_conf.description = from_str_to_char(py_obj.attr("description"));
+    attr_conf.label = from_str_to_char(py_obj.attr("label"));
+    attr_conf.unit = from_str_to_char(py_obj.attr("unit"));
+    attr_conf.standard_unit = from_str_to_char(py_obj.attr("standard_unit"));
+    attr_conf.display_unit = from_str_to_char(py_obj.attr("display_unit"));
+    attr_conf.format = from_str_to_char(py_obj.attr("format"));
+    attr_conf.min_value = from_str_to_char(py_obj.attr("min_value"));
+    attr_conf.max_value = from_str_to_char(py_obj.attr("max_value"));
+    attr_conf.writable_attr_name = from_str_to_char(py_obj.attr("writable_attr_name"));
     attr_conf.level = extract<Tango::DispLevel>(py_obj.attr("level"));
     
     object py_att_alarm = py_obj.attr("att_alarm");
@@ -309,7 +271,7 @@ void from_py_object(object &py_obj, Tango::AttributeConfig_3 &attr_conf)
 
 void from_py_object(object &py_obj, Tango::AttributeConfig_5 &attr_conf)
 {
-    attr_conf.name = obj_to_new_char(py_obj.attr("name"));
+    attr_conf.name = from_str_to_char(py_obj.attr("name"));
     attr_conf.writable = extract<Tango::AttrWriteType>(py_obj.attr("writable"));
     attr_conf.data_format = extract<Tango::AttrDataFormat>(py_obj.attr("data_format"));
     attr_conf.data_type = extract<CORBA::Long>(py_obj.attr("data_type"));
@@ -317,17 +279,17 @@ void from_py_object(object &py_obj, Tango::AttributeConfig_5 &attr_conf)
     attr_conf.mem_init = extract<CORBA::Boolean>(py_obj.attr("mem_init"));
     attr_conf.max_dim_x = extract<CORBA::Long>(py_obj.attr("max_dim_x"));
     attr_conf.max_dim_y = extract<CORBA::Long>(py_obj.attr("max_dim_y"));
-    attr_conf.description = obj_to_new_char(py_obj.attr("description"));
-    attr_conf.label = obj_to_new_char(py_obj.attr("label"));
-    attr_conf.unit = obj_to_new_char(py_obj.attr("unit"));
-    attr_conf.standard_unit = obj_to_new_char(py_obj.attr("standard_unit"));
-    attr_conf.display_unit = obj_to_new_char(py_obj.attr("display_unit"));
-    attr_conf.format = obj_to_new_char(py_obj.attr("format"));
-    attr_conf.min_value = obj_to_new_char(py_obj.attr("min_value"));
-    attr_conf.max_value = obj_to_new_char(py_obj.attr("max_value"));
-    attr_conf.writable_attr_name = obj_to_new_char(py_obj.attr("writable_attr_name"));
+    attr_conf.description = from_str_to_char(py_obj.attr("description"));
+    attr_conf.label = from_str_to_char(py_obj.attr("label"));
+    attr_conf.unit = from_str_to_char(py_obj.attr("unit"));
+    attr_conf.standard_unit = from_str_to_char(py_obj.attr("standard_unit"));
+    attr_conf.display_unit = from_str_to_char(py_obj.attr("display_unit"));
+    attr_conf.format = from_str_to_char(py_obj.attr("format"));
+    attr_conf.min_value = from_str_to_char(py_obj.attr("min_value"));
+    attr_conf.max_value = from_str_to_char(py_obj.attr("max_value"));
+    attr_conf.writable_attr_name = from_str_to_char(py_obj.attr("writable_attr_name"));
     attr_conf.level = extract<Tango::DispLevel>(py_obj.attr("level"));
-    attr_conf.root_attr_name = obj_to_new_char(py_obj.attr("root_attr_name"));
+    attr_conf.root_attr_name = from_str_to_char(py_obj.attr("root_attr_name"));
 
     convert2array(py_obj.attr("enum_labels"), attr_conf.enum_labels);
 
@@ -418,9 +380,9 @@ void from_py_object(object &py_obj, Tango::AttributeConfigList_5 &attr_conf_list
 
 void from_py_object(object &py_obj, Tango::PipeConfig &pipe_conf)
 {
-    pipe_conf.name = obj_to_new_char(py_obj.attr("name"));
-    pipe_conf.description = obj_to_new_char(py_obj.attr("description"));
-    pipe_conf.label = obj_to_new_char(py_obj.attr("label"));
+    pipe_conf.name = from_str_to_char(py_obj.attr("name"));
+    pipe_conf.description = from_str_to_char(py_obj.attr("description"));
+    pipe_conf.label = from_str_to_char(py_obj.attr("label"));
     pipe_conf.level = extract<Tango::DispLevel>(py_obj.attr("level"));
     pipe_conf.writable = extract<Tango::PipeWriteType>(py_obj.attr("writable"));
     convert2array(py_obj.attr("extensions"), pipe_conf.extensions);

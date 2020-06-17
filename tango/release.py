@@ -13,7 +13,7 @@
 This is an internal PyTango module.
 """
 
-__all__ = ["Release"]
+__all__ = ("Release",)
 
 __docformat__ = "restructuredtext"
 
@@ -44,14 +44,14 @@ class Release:
         - keywords: (seq<str>) list of keywords
         - license: (str) the license
     """
-    name = 'PyTango'
-    version_info = (9, 2, 2, 'dev', 0)
+    name = 'pytango'
+    version_info = (9, 3, 3, 'dev', 0)
     version = '.'.join(map(str, version_info[:3]))
     release = ''.join(map(str, version_info[3:]))
     separator = '.' if 'dev' in release or 'post' in release else ''
     version_long = version + separator + release
 
-    version_description = 'This version implements the C++ Tango 9.2 API.'
+    version_description = 'This version implements the C++ Tango 9.3 API.'
     version_number = int(version.replace('.', ''))
     description = 'A python binding for the Tango control system'
     long_description = 'This module implements the Python Tango Device API ' \
@@ -61,5 +61,5 @@ class Release:
     author_lines = "\n".join(["%s <%s>" % x for x in authors.values()])
     url = 'http://github.com/tango-cs/pytango'
     download_url = 'http://pypi.python.org/pypi/pytango'
-    platform = ['Linux', 'Windows XP/Vista/7/8']
+    platform = ['Linux', 'Windows XP/Vista/7/8/10']
     keywords = ['Tango', 'CORBA', 'binding']

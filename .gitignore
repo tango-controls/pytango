@@ -25,6 +25,7 @@ var/
 *.egg
 *.eggs
 *.cfg
+!setup.cfg
 MANIFEST
 
 # Installer logs
@@ -37,6 +38,7 @@ pip-delete-this-directory.txt
 .cache
 nosetests.xml
 coverage.xml
+.pytest_cache/
 
 # Translations
 *.mo
@@ -50,3 +52,6 @@ doc/_build/
 
 # Backup files
 *~
+
+# PyCharm projects files
+.idea
