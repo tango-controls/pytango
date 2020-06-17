@@ -431,6 +431,8 @@ def setup_args():
     add_lib('zmq', directories, sys_libs, lib_name='libzmq')
     add_lib('tango', directories, sys_libs, inc_suffix='tango')
     add_lib_boost(directories)
+    if WINDOWS:
+        add_lib('pthreadVC2', directories, sys_libs, lib_name='pthreadVC2')
 
     # special numpy configuration
 
