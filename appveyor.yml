@@ -122,6 +122,7 @@ install:
   - cmd: echo PLATFORM is '%platform%'
   - cmd: dir
   - cmd: cmake -G "%CMAKE_GENERATOR%" .
+  - cmd: dir
 
 clone_folder: C:\projects\pytango
 
