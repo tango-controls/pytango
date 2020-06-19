@@ -27,43 +27,43 @@ environment:
       PYTHON_ROOT: c:\Python27-x64\
       CMAKE_GENERATOR: "Visual Studio 9 2008 Win64"
 
-#    - platform: win32
-#      configuration: Release
-#      ARCH: win32-msvc14
-#      ARCH_PY: win32-msvc14-py36
-#      VC_VER: 14.0
-#      MSVCVERSION: v140
-#      PYTHON_VER: 36
-#      PYTHON_ROOT: c:\Python36\
-#      CMAKE_GENERATOR: "Visual Studio 14 2015"
-#    - platform: x64
-#      configuration: Release
-#      ARCH: x64-msvc14
-#      ARCH_PY: x64-msvc14-py36
-#      VC_VER: 14.0
-#      MSVCVERSION: v140
-#      PYTHON_VER: 36
-#      PYTHON_ROOT: c:\Python36-x64\
-#      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
-#
-#    - platform: win32
-#      configuration: Release
-#      ARCH: win32-msvc14
-#      ARCH_PY: win32-msvc14-py37
-#      VC_VER: 14.0
-#      MSVCVERSION: v140
-#      PYTHON_VER: 37
-#      PYTHON_ROOT: c:\Python37\
-#      CMAKE_GENERATOR: "Visual Studio 14 2015"
-#    - platform: x64
-#      configuration: Release
-#      ARCH: x64-msvc14
-#      ARCH_PY: x64-msvc14-py37
-#      VC_VER: 14.0
-#      MSVCVERSION: v140
-#      PYTHON_VER: 37
-#      PYTHON_ROOT: c:\Python37-x64\
-#      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
+    - platform: win32
+      configuration: Release
+      ARCH: win32-msvc14
+      ARCH_PY: win32-msvc14-py36
+      VC_VER: 14.0
+      MSVCVERSION: v140
+      PYTHON_VER: 36
+      PYTHON_ROOT: c:\Python36\
+      CMAKE_GENERATOR: "Visual Studio 14 2015"
+    - platform: x64
+      configuration: Release
+      ARCH: x64-msvc14
+      ARCH_PY: x64-msvc14-py36
+      VC_VER: 14.0
+      MSVCVERSION: v140
+      PYTHON_VER: 36
+      PYTHON_ROOT: c:\Python36-x64\
+      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
+
+    - platform: win32
+      configuration: Release
+      ARCH: win32-msvc14
+      ARCH_PY: win32-msvc14-py37
+      VC_VER: 14.0
+      MSVCVERSION: v140
+      PYTHON_VER: 37
+      PYTHON_ROOT: c:\Python37\
+      CMAKE_GENERATOR: "Visual Studio 14 2015"
+    - platform: x64
+      configuration: Release
+      ARCH: x64-msvc14
+      ARCH_PY: x64-msvc14-py37
+      VC_VER: 14.0
+      MSVCVERSION: v140
+      PYTHON_VER: 37
+      PYTHON_ROOT: c:\Python37-x64\
+      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
 
 init:
   # go to hell Xamarin (see http://help.appveyor.com/discussions/problems/4569)
@@ -120,9 +120,7 @@ install:
   - cmd: echo TANGO_ROOT is "%TANGO_ROOT%"
   - cmd: echo CMAKE_GENERATOR is '%CMAKE_GENERATOR%'
   - cmd: echo PLATFORM is '%platform%'
-  - cmd: dir
   - cmd: cmake -G "%CMAKE_GENERATOR%" .
-  - cmd: dir
 
 clone_folder: C:\projects\pytango
 
@@ -132,9 +130,7 @@ build:
 
 build_script:
   - cmd: cd C:/projects/pytango
-  - cmd: dir
   - cmake --build ./ -j 4 --config Release
-  - cmd: dir
 
 
 after_build:
