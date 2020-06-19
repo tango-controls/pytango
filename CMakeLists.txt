@@ -179,6 +179,7 @@ endif()
 
 add_custom_command(TARGET ${PROJECT_NAME}
   POST_BUILD
+  COMMAND cp "$ENV{PTHREAD_WIN}/bin/*.dll" "${CMAKE_CURRENT_SOURCE_DIR}/${RELEASE}/tango/"
   COMMAND "$ENV{PYTHON_ROOT}/python.exe"  ARGS "${CMAKE_CURRENT_SOURCE_DIR}/winsetup.py" ${RELEASE} dist temp_dist $(ConfigurationName) $(PlatformName)
   COMMENT "Building installer")
 
