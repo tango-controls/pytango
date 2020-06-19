@@ -431,8 +431,6 @@ def setup_args():
     add_lib('zmq', directories, sys_libs, lib_name='libzmq')
     add_lib('tango', directories, sys_libs, inc_suffix='tango')
     add_lib_boost(directories)
-    if WINDOWS:
-        add_lib('pthreadVC2', directories, sys_libs, lib_name='pthreadVC2')
 
     # special numpy configuration
 
@@ -499,9 +497,15 @@ def setup_args():
     else:
         tests_require += ['pytest']
 
-    package_data = {
-        'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
-    }
+    if WINDOWS:
+        package_data = {
+            'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
+            'tango': ['*.dll'],
+        }
+    else:
+        package_data = {
+            'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
+        }
 
     data_files = []
 

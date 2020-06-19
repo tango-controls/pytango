@@ -120,6 +120,7 @@ install:
   - cmd: echo TANGO_ROOT is "%TANGO_ROOT%"
   - cmd: echo CMAKE_GENERATOR is '%CMAKE_GENERATOR%'
   - cmd: echo PLATFORM is '%platform%'
+  - cmd: dir
   - cmd: cmake -G "%CMAKE_GENERATOR%" .
 
 clone_folder: C:\projects\pytango
