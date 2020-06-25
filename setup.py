@@ -497,15 +497,11 @@ def setup_args():
     else:
         tests_require += ['pytest']
 
+    package_data = {
+        'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
+    }
     if WINDOWS:
-        package_data = {
-            'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
-            'tango': ['*.dll'],
-        }
-    else:
-        package_data = {
-            'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
-        }
+        package_data['tango'] = ['*.dll']
 
     data_files = []
 
