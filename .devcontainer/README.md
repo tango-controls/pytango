@@ -13,12 +13,12 @@ Run commands like the following:
 
 ```shell script
 export PYTHON_VERSION=3.7
-export TANGO_VERSION=9.3.2
+export TANGO_VERSION=9.3.4
 docker build . -t pytango-dev:py${PYTHON_VERSION}-tango${TANGO_VERSION} --build-arg PYTHON_VERSION --build-arg TANGO_VERSION
 ```
 
-Note: the Tango version must exist in the channel used, the default is here:
-https://anaconda.org/tango-controls/tango/files
+Note: the cppTango version must exist in the channel used, the default is here:
+https://anaconda.org/tango-controls/cpptango/files
 
 ## Build, install and test PyTango in a container
 
@@ -46,11 +46,11 @@ Then run the commands inside that container - here's an example for a specific v
 Due to the volume mount above, the last line will output the environment file to your host's current folder.
 ```shell script
 export PYTHON_VERSION=3.7
-export TANGO_VERSION=9.3.2
+export TANGO_VERSION=9.3.4
 conda create --yes --name env-py${PYTHON_VERSION}-tango${TANGO_VERSION} python=${PYTHON_VERSION}
 conda activate env-py${PYTHON_VERSION}-tango${TANGO_VERSION}
-conda install --yes boost gxx_linux-64
-conda install --yes -c tango-controls tango=${TANGO_VERSION}
+conda install --yes -c main -c conda-forge boost gxx_linux-64 cppzmq numpy
+conda install --yes -c main -c conda-forge -c tango-controls cpptango=${TANGO_VERSION} tango-test
 conda install --yes pytest pytest-xdist 'gevent != 1.5a1' psutil
 conda env export > /opt/current/environment-py${PYTHON_VERSION}-tango${TANGO_VERSION}.yml
 ```
