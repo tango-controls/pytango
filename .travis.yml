@@ -7,7 +7,7 @@ branches:
 
 env:
   global:
-    - TANGO_VERSION=9.3.2alpha.1
+    - TANGO_DEPENDENCIES='cpptango==9.3.4rc6 tango-test'
   matrix:
     - PYTHON_VERSION=2.7
     - PYTHON_VERSION=3.5
@@ -41,11 +41,12 @@ before_install:
 
 install:
   # Install build dependencies
-  - conda install --yes boost gxx_linux-64
-  - conda install --yes -c tango-controls tango=$TANGO_VERSION
-  - conda install --yes numpy  # Not a strong requirement yet
+  - conda install --yes -c main -c conda-forge boost gxx_linux-64 cppzmq numpy
+  - conda install --yes -c main -c conda-forge -c tango-controls $TANGO_DEPENDENCIES
   # Use conda prefix as root for the dependencies
   - export BOOST_ROOT=$CONDA_PREFIX TANGO_ROOT=$CONDA_PREFIX ZMQ_ROOT=$CONDA_PREFIX OMNI_ROOT=$CONDA_PREFIX
+  # Use custom boost python library name to work with newer naming scheme
+  - export BOOST_PYTHON_LIB=boost_python${PYTHON_VERSION//./}
 
   # Uncomment the following line if the tests are running in parrallel
   # with pytest-xdist (see https://github.com/pytest-dev/pytest-xdist/issues/41):
