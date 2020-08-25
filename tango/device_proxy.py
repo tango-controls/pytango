@@ -370,7 +370,6 @@ def __DeviceProxy__setattr(self, name, value):
         six.raise_from(e, cause)
 
 
-
 def __DeviceProxy__dir(self):
     """Return the attribute list including tango objects."""
     extra_entries = set()
