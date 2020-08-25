@@ -277,7 +277,7 @@ def __DeviceProxy__getattr(self, name):
     # ticket http://ipython.scipy.org/ipython/ipython/ticket/229 someday
     # and the ugly trait_names could be removed.
     if name.startswith("_") or name == 'trait_names':
-        raise AttributeError(name) from cause
+        six.raise_from(AttributeError(name), cause)
 
     name_l = name.lower()
 
@@ -321,7 +321,7 @@ def __DeviceProxy__getattr(self, name):
     if name_l in self.__get_pipe_cache():
         return self.read_pipe(name)
 
-    raise AttributeError(name) from cause
+    six.raise_from(AttributeError(name), cause)
 
 
 def __DeviceProxy__setattr(self, name, value):
@@ -329,7 +329,7 @@ def __DeviceProxy__setattr(self, name, value):
     name_l = name.lower()
 
     if name_l in self.__get_cmd_cache():
-        raise TypeError('Cannot set the value of a command') from cause
+        six.raise_from(TypeError('Cannot set the value of a command'), cause)
 
     if name_l in self.__get_attr_cache():
         return __set_attribute_value(self, name, value)
@@ -367,7 +367,7 @@ def __DeviceProxy__setattr(self, name, value):
     try:
         return super(DeviceProxy, self).__setattr__(name, value)
     except Exception as e:
-        raise e from cause
+        six.raise_from(e, cause)
 
 
 
