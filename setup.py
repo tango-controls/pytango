@@ -486,16 +486,21 @@ def setup_args():
         setup_requires += ['pytest-runner']
 
     tests_require = [
-        'pytest-xdist',
         'gevent != 1.5a1',
         'psutil',
     ]
 
     if PYTHON2:
         tests_require += [
-            'trollius', 'futures', 'pyparsing < 3', 'pytest < 5', 'zipp >= 0.5, < 2']
+            'futures',
+            'pyparsing < 3',
+            'pytest < 5',
+            'pytest-xdist < 2',
+            'trollius',
+            'zipp >= 0.5, < 2',
+        ]
     else:
-        tests_require += ['pytest']
+        tests_require += ['pytest', 'pytest-xdist']
 
     package_data = {
         'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
