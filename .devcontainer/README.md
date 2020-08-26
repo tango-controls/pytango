@@ -57,7 +57,7 @@ conda env export > /opt/current/environment-py${PYTHON_VERSION}-tango${TANGO_VER
 
 For Python 2.7, the requirements are slightly different, so replace the line with `pytest` with:
 ```shell script
-conda install --yes trollius futures 'pyparsing < 3' 'pytest < 5' pytest-xdist 'gevent != 1.5a1' psutil enum34
+conda install --yes trollius futures 'pyparsing < 3' 'pytest < 5' 'pytest-xdist < 2' 'gevent != 1.5a1' psutil enum34
 ```
 
 Note:  the packages lists were taken from `.travis.yml` and `setup.py` - these will need
