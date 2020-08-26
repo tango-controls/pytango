@@ -272,11 +272,12 @@ def __set_attribute_value(self, name, value):
 
 
 def __DeviceProxy__getattr(self, name):
+    cause = None
     # trait_names is a feature of IPython. Hopefully they will solve
     # ticket http://ipython.scipy.org/ipython/ipython/ticket/229 someday
     # and the ugly trait_names could be removed.
     if name.startswith("_") or name == 'trait_names':
-        raise AttributeError(name)
+        six.raise_from(AttributeError(name), cause)
 
     name_l = name.lower()
 
@@ -293,8 +294,9 @@ def __DeviceProxy__getattr(self, name):
 
     try:
         self.__refresh_cmd_cache()
-    except:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     cmd_info = self.__get_cmd_cache().get(name_l)
     if cmd_info:
@@ -302,8 +304,9 @@ def __DeviceProxy__getattr(self, name):
 
     try:
         self.__refresh_attr_cache()
-    except:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     attr_info = self.__get_attr_cache().get(name_l)
     if attr_info:
@@ -311,20 +314,22 @@ def __DeviceProxy__getattr(self, name):
 
     try:
         self.__refresh_pipe_cache()
-    except Exception:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     if name_l in self.__get_pipe_cache():
         return self.read_pipe(name)
 
-    raise AttributeError(name)
+    six.raise_from(AttributeError(name), cause)
 
 
 def __DeviceProxy__setattr(self, name, value):
+    cause = None
     name_l = name.lower()
 
     if name_l in self.__get_cmd_cache():
-        raise TypeError('Cannot set the value of a command')
+        six.raise_from(TypeError('Cannot set the value of a command'), cause)
 
     if name_l in self.__get_attr_cache():
         return __set_attribute_value(self, name, value)
@@ -334,29 +339,35 @@ def __DeviceProxy__setattr(self, name, value):
 
     try:
         self.__refresh_cmd_cache()
-    except:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     if name_l in self.__get_cmd_cache():
-        raise TypeError('Cannot set the value of a command')
+        six.raise_from(TypeError('Cannot set the value of a command'), cause)
 
     try:
         self.__refresh_attr_cache()
-    except:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     if name_l in self.__get_attr_cache():
         return __set_attribute_value(self, name, value)
 
     try:
         self.__refresh_pipe_cache()
-    except:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     if name_l in self.__get_pipe_cache():
         return self.write_pipe(name, value)
 
-    return super(DeviceProxy, self).__setattr__(name, value)
+    try:
+        return super(DeviceProxy, self).__setattr__(name, value)
+    except Exception as e:
+        six.raise_from(e, cause)
 
 
 def __DeviceProxy__dir(self):
