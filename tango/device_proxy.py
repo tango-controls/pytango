@@ -344,7 +344,7 @@ def __DeviceProxy__setattr(self, name, value):
             cause = e
 
     if name_l in self.__get_cmd_cache():
-        raise TypeError('Cannot set the value of a command')
+        six.raise_from(TypeError('Cannot set the value of a command'), cause)
 
     try:
         self.__refresh_attr_cache()
