@@ -41,34 +41,30 @@ def test_single_device_old_api():
 
 
 @pytest.mark.parametrize(
-    "spec, device_cls, device",
+    "class_field, device",
     [
-        (SimpleDevice, None, SimpleDevice),
-        ("tango.test_utils.SimpleDevice", None, SimpleDevice),
+        (SimpleDevice, SimpleDevice),
+        ("tango.test_utils.SimpleDevice", SimpleDevice),
         (
             ("tango.test_utils.ClassicAPISimpleDeviceClass", "tango.test_utils.ClassicAPISimpleDeviceImpl"),
-            ClassicAPISimpleDeviceClass,
-            ClassicAPISimpleDeviceImpl,
+            ClassicAPISimpleDeviceImpl
         ),
         (
             ("tango.test_utils.ClassicAPISimpleDeviceClass", ClassicAPISimpleDeviceImpl),
-            ClassicAPISimpleDeviceClass,
             ClassicAPISimpleDeviceImpl
         ),
         (
             (ClassicAPISimpleDeviceClass, "tango.test_utils.ClassicAPISimpleDeviceImpl"),
-            ClassicAPISimpleDeviceClass,
-            ClassicAPISimpleDeviceImpl,
+            ClassicAPISimpleDeviceImpl
         ),
         (
-            (ClassicAPISimpleDeviceClass, ClassicAPISimpleDeviceImpl),
-            ClassicAPISimpleDeviceClass,
-            ClassicAPISimpleDeviceImpl,
+            (ClassicAPISimpleDeviceClass, ClassicAPISimpleDeviceImpl), 
+            ClassicAPISimpleDeviceImpl
         ),
     ]
 )
-def test_multi_devices_info(spec, device_cls, device):
-    devices_info = ({"class": spec, "devices": [{"name": "test/device1/1"}]},)
+def test_multi_devices_info(class_field, device):
+    devices_info = ({"class": class_field, "devices": [{"name": "test/device1/1"}]},)
 
     dev_class = device if isinstance(device, str) else device.__name__
 
