@@ -15,6 +15,7 @@
 // use this precompiled header.
 
 //#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 
 #include <boost/python.hpp>
 #include <boost/version.hpp>
