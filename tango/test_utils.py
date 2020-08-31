@@ -12,6 +12,7 @@ except ImportError:
 from . import DevState, GreenMode
 from .server import Device
 from .test_context import MultiDeviceTestContext, DeviceTestContext
+from . import DeviceClass, LatestDeviceImpl, DevLong64, SCALAR, READ
 
 # Conditional imports
 try:
@@ -24,7 +25,13 @@ try:
 except ImportError:
     numpy = None
 
-__all__ = ('MultiDeviceTestContext', 'DeviceTestContext', 'SimpleDevice')
+__all__ = (
+    'MultiDeviceTestContext',
+    'DeviceTestContext',
+    'SimpleDevice',
+    'ClassicAPISimpleDeviceImpl',
+    'ClassicAPISimpleDeviceClass'
+)
 
 PY3 = sys.version_info >= (3,)
 
@@ -38,6 +45,23 @@ str_devstring = bytes_devstring.decode('latin-1')
 class SimpleDevice(Device):
     def init_device(self):
         self.set_state(DevState.ON)
+
+
+class ClassicAPISimpleDeviceImpl(LatestDeviceImpl):
+    def __init__(self, cls, name):
+        LatestDeviceImpl.__init__(self, cls, name)
+        ClassicAPISimpleDeviceImpl.init_device(self)
+
+    def init_device(self):
+        self.get_device_properties(self.get_device_class())
+        self.attr_attr1_read = 100
+
+    def read_attr1(self, attr):
+        attr.set_value(self.attr_attr1_read)
+
+
+class ClassicAPISimpleDeviceClass(DeviceClass):
+    attr_list = {"attr1": [[DevLong64, SCALAR, READ]]}
 
 
 # Test enums

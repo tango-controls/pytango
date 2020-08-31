@@ -96,6 +96,27 @@ def get_host_ip():
     return ip
 
 
+def _device_class_from_field(field):
+    """
+    Helper function that extracts and return a device class from a
+    'class' field of a devices_info dictionary
+
+    :param field: the field from which to extract the device class
+
+    :return: the device class extracted from the field
+    """
+    device_cls_class = None
+    if is_non_str_seq(field):
+        (device_cls_class, device_class) = (field[0], field[1])
+        if isinstance(device_cls_class, str):
+            device_cls_class = device(device_cls_class)
+    else:
+        device_class = field
+    if isinstance(device_class, str):
+        device_class = device(device_class)
+    return (device_cls_class, device_class)
+
+
 class MultiDeviceTestContext(object):
     """Context to run device(s) without a database.
 
@@ -153,9 +174,11 @@ class MultiDeviceTestContext(object):
       a sequence of dicts with information about
       devices to be exported. Each dict consists of the following keys:
         * "class" which value is either of:
-          * :class:`~tango.server.Device`
-          * a sequence of two elements :class:`~tango.DeviceClass`
-            and :class:`~tango.DeviceImpl`
+          * :class:`~tango.server.Device` or the name of some such class
+          * a sequence of two elements, the first element being a
+           :class:`~tango.DeviceClass` or the name of some such class,
+           the second element being a :class:`~tango.DeviceImpl` or the
+           name of such such class
         * "devices" which value is a sequence of dicts with the following keys:
           * "name" (str)
           * "properties" (dict)
@@ -223,11 +246,7 @@ class MultiDeviceTestContext(object):
                  db=None, host=None, port=0, debug=3,
                  process=False, daemon=False, timeout=None):
         if not server_name:
-            first_cls = devices_info[0]["class"]
-            if is_non_str_seq(first_cls):
-                first_device = first_cls[1]
-            else:
-                first_device = first_cls
+            _, first_device = _device_class_from_field(devices_info[0]["class"])
             server_name = first_device.__name__
         if not instance_name:
             instance_name = server_name.lower()
@@ -260,13 +279,7 @@ class MultiDeviceTestContext(object):
         device_list = []
         tangoclass_list = []
         for device_info in devices_info:
-            device_cls = None
-            cls = device_info["class"]
-            if is_non_str_seq(cls):
-                device_cls = cls[0]
-                device = cls[1]
-            else:
-                device = cls
+            device_cls, device = _device_class_from_field(device_info["class"])
             tangoclass = device.__name__
             if tangoclass in tangoclass_list:
                 os.unlink(self.db)

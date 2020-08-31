@@ -6,7 +6,13 @@ import tango
 
 from tango.server import Device
 from tango.server import command, attribute, device_property
-from tango.test_utils import DeviceTestContext, MultiDeviceTestContext
+from tango.test_utils import (
+    DeviceTestContext,
+    MultiDeviceTestContext,
+    SimpleDevice,
+    ClassicAPISimpleDeviceImpl,
+    ClassicAPISimpleDeviceClass
+)
 
 
 class Device1(Device):
@@ -21,23 +27,6 @@ class Device2(Device):
         return 200
 
 
-class ClassicAPIDeviceImpl(tango.LatestDeviceImpl):
-    def __init__(self, cl, name):
-        tango.LatestDeviceImpl.__init__(self, cl, name)
-        ClassicAPIDeviceImpl.init_device(self)
-
-    def init_device(self):
-        self.get_device_properties(self.get_device_class())
-        self.attr_attr1_read = 100
-
-    def read_attr1(self, attr):
-        attr.set_value(self.attr_attr1_read)
-
-
-class ClassicAPIDeviceClass(tango.DeviceClass):
-    attr_list = {"attr1": [[tango.DevLong64, tango.SCALAR, tango.READ]]}
-
-
 def test_single_device(server_green_mode):
     class TestDevice(Device1):
         green_mode = server_green_mode
@@ -47,8 +36,41 @@ def test_single_device(server_green_mode):
 
 
 def test_single_device_old_api():
-    with DeviceTestContext(ClassicAPIDeviceImpl, ClassicAPIDeviceClass) as proxy:
+    with DeviceTestContext(ClassicAPISimpleDeviceImpl, ClassicAPISimpleDeviceClass) as proxy:
         assert proxy.attr1 == 100
+
+
+@pytest.mark.parametrize(
+    "class_field, device",
+    [
+        (SimpleDevice, SimpleDevice),
+        ("tango.test_utils.SimpleDevice", SimpleDevice),
+        (
+            ("tango.test_utils.ClassicAPISimpleDeviceClass", "tango.test_utils.ClassicAPISimpleDeviceImpl"),
+            ClassicAPISimpleDeviceImpl
+        ),
+        (
+            ("tango.test_utils.ClassicAPISimpleDeviceClass", ClassicAPISimpleDeviceImpl),
+            ClassicAPISimpleDeviceImpl
+        ),
+        (
+            (ClassicAPISimpleDeviceClass, "tango.test_utils.ClassicAPISimpleDeviceImpl"),
+            ClassicAPISimpleDeviceImpl
+        ),
+        (
+            (ClassicAPISimpleDeviceClass, ClassicAPISimpleDeviceImpl), 
+            ClassicAPISimpleDeviceImpl
+        ),
+    ]
+)
+def test_multi_devices_info(class_field, device):
+    devices_info = ({"class": class_field, "devices": [{"name": "test/device1/1"}]},)
+
+    dev_class = device if isinstance(device, str) else device.__name__
+
+    with MultiDeviceTestContext(devices_info) as context:
+        proxy1 = context.get_device("test/device1/1")
+        assert proxy1.info().dev_class == dev_class
 
 
 def test_multi_with_single_device(server_green_mode):
@@ -65,7 +87,7 @@ def test_multi_with_single_device(server_green_mode):
 def test_multi_with_single_device_old_api():
     devices_info = (
         {
-            "class": (ClassicAPIDeviceClass, ClassicAPIDeviceImpl),
+            "class": (ClassicAPISimpleDeviceClass, ClassicAPISimpleDeviceImpl),
             "devices": [{"name": "test/device1/1"}],
         },
     )
@@ -183,7 +205,7 @@ def test_multi_with_two_devices_with_properties(server_green_mode):
             (
                 {"class": Device1, "devices": [{"name": "test/device1/1"}]},
                 {
-                    "class": (ClassicAPIDeviceClass, ClassicAPIDeviceImpl),
+                    "class": (ClassicAPISimpleDeviceClass, ClassicAPISimpleDeviceImpl),
                     "devices": [{"name": "test/device1/2"}],
                 },
             ),
