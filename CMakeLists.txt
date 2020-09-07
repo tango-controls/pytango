@@ -135,11 +135,14 @@ set(HEADERS
 set(${PROJECT_NAME} INCLUDE_DIRS "$ENV{TANGO_ROOT}/include")
 
 if(MSVC90)
+  # v9 used for Python 2
   set(VCSTR "90")
+  set(BOOST_VERSION_ "1_70")
 elseif(MSVC14)
+  # v14 used for Python 3
   set(VCSTR "140")
+  set(BOOST_VERSION_ "1_73")
 endif()
-set(BOOST_VERSION_ "1_70")
 set(ZMQ_VERSION_ "4_0_5")
 
 set(RELEASE "Release_$ENV{PYTHON_VER}_${PY_TARGET}")
