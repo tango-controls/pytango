@@ -70,6 +70,27 @@ environment:
       CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
       boost_version: 1.73.0
 
+    - platform: win32
+      configuration: Release
+      ARCH: win32-msvc14
+      ARCH_PY: win32-msvc14-py38
+      VC_VER: 14.0
+      MSVCVERSION: v140
+      PYTHON_VER: 38
+      PYTHON_ROOT: c:\Python38\
+      CMAKE_GENERATOR: "Visual Studio 14 2015"
+      boost_version: 1.73.0
+    - platform: x64
+      configuration: Release
+      ARCH: x64-msvc14
+      ARCH_PY: x64-msvc14-py38
+      VC_VER: 14.0
+      MSVCVERSION: v140
+      PYTHON_VER: 38
+      PYTHON_ROOT: c:\Python38-x64\
+      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
+      boost_version: 1.73.0
+
 init:
   # Tango
   - cmd: cd "C:\projects\"

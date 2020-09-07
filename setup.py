@@ -468,6 +468,8 @@ def setup_args():
         'PyTango',  # Backward compatibilty
     ]
 
+    python_requires = '>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*'
+
     requires = [
         'boost_python (>=1.33)',
         'numpy (>=1.1)',
@@ -525,6 +527,7 @@ def setup_args():
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Scientific/Engineering',
         'Topic :: Software Development :: Libraries',
     ]
@@ -607,6 +610,7 @@ def setup_args():
         data_files=data_files,
         provides=provides,
         keywords=Release.keywords,
+        python_requires=python_requires,
         requires=requires,
         install_requires=install_requires,
         setup_requires=setup_requires,
