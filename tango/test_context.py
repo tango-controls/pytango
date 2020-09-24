@@ -182,6 +182,7 @@ class MultiDeviceTestContext(object):
         * "devices" which value is a sequence of dicts with the following keys:
           * "name" (str)
           * "properties" (dict)
+          * "memorized" (dict)
     :type devices_info:
       sequence<dict>
     :param server_name:
@@ -363,6 +364,14 @@ class MultiDeviceTestContext(object):
             patched = dict((key, value if value != '' else ' ')
                            for key, value in properties.items())
             db.put_device_property(device_name, patched)
+
+            memorized = info.get("memorized", {})
+            munged = {
+                attribute_name: {
+                    "__value": memorized_value
+                } for (attribute_name, memorized_value) in memorized.items()
+            }
+            db.put_device_attribute_property(device_name, munged)
         return db
 
     def get_server_access(self):
@@ -495,8 +504,8 @@ class DeviceTestContext(MultiDeviceTestContext):
 
     def __init__(self, device, device_cls=None, server_name=None,
                  instance_name=None, device_name=None, properties=None,
-                 db=None, host=None, port=0, debug=3,
-                 process=False, daemon=False, timeout=None):
+                 db=None, host=None, port=0, debug=3, process=False,
+                 daemon=False, timeout=None, memorized=None):
         # Argument
         if not server_name:
             server_name = device.__name__
@@ -506,6 +515,8 @@ class DeviceTestContext(MultiDeviceTestContext):
             device_name = 'test/nodb/' + server_name.lower()
         if properties is None:
             properties = {}
+        if memorized is None:
+            memorized = {}
         if device_cls:
             cls = (device_cls, device)
         else:
@@ -516,7 +527,8 @@ class DeviceTestContext(MultiDeviceTestContext):
                 "devices": (
                     {
                         "name": device_name,
-                        "properties": properties},
+                        "properties": properties,
+                        "memorized": memorized},
                 )
             },
         )
