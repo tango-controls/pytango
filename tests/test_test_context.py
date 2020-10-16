@@ -4,7 +4,7 @@ import pytest
 
 import tango
 
-from tango.server import Device
+from tango.server import AttrWriteType, Device
 from tango.server import command, attribute, device_property
 from tango.test_utils import (
     DeviceTestContext,
@@ -58,7 +58,7 @@ def test_single_device_old_api():
             ClassicAPISimpleDeviceImpl
         ),
         (
-            (ClassicAPISimpleDeviceClass, ClassicAPISimpleDeviceImpl), 
+            (ClassicAPISimpleDeviceClass, ClassicAPISimpleDeviceImpl),
             ClassicAPISimpleDeviceImpl
         ),
     ]
@@ -222,3 +222,89 @@ def test_multi_bad_config_fails(bad_multi_device_config):
     with pytest.raises(expected_error):
         with MultiDeviceTestContext(bad_config):
             pass
+
+
+@pytest.fixture()
+def memorized_attribute_test_device_factory():
+    """
+    Returns a test device factory that provides a test device with an
+    attribute that is memorized or not, according to its boolean
+    argument
+    """
+    def _factory(is_attribute_memorized):
+        class _Device(Device):
+            def init_device(self):
+                self._attr_value = 0
+
+            attr = attribute(
+                access=AttrWriteType.READ_WRITE,
+                memorized=is_attribute_memorized,
+                hw_memorized=is_attribute_memorized
+            )
+
+            def read_attr(self):
+                return self._attr_value
+
+            def write_attr(self, value):
+                self._attr_value = value
+
+        return _Device
+    return _factory
+
+
+@pytest.mark.parametrize(
+    "is_attribute_memorized, memorized_value, expected_value",
+    [
+        (False, None, 0),
+        (False, "1", 0),
+        (True, None, 0),
+        (True, "1", 1),
+    ]
+)
+def test_multi_with_memorized_attribute_values(
+    memorized_attribute_test_device_factory,
+    is_attribute_memorized,
+    memorized_value,
+    expected_value
+):
+    TestDevice = memorized_attribute_test_device_factory(is_attribute_memorized)
+
+    device_info = {"name": "test/device1/1"}
+    if memorized_value is not None:
+        device_info["memorized"] = {"attr": memorized_value}
+
+    devices_info = (
+        {
+            "class": TestDevice,
+            "devices": [device_info]
+        },
+    )
+
+    with MultiDeviceTestContext(devices_info) as context:
+        proxy = context.get_device("test/device1/1")
+        assert proxy.attr == expected_value
+
+
+@pytest.mark.parametrize(
+    "is_attribute_memorized, memorized_value, expected_value",
+    [
+        (False, None, 0),
+        (False, 1, 0),
+        (True, None, 0),
+        (True, 1, 1),
+    ]
+)
+def test_single_with_memorized_attribute_values(
+    memorized_attribute_test_device_factory,
+    is_attribute_memorized,
+    memorized_value,
+    expected_value
+):
+    TestDevice = memorized_attribute_test_device_factory(is_attribute_memorized)
+
+    kwargs = {
+        "memorized": {"attr": memorized_value}
+    } if memorized_value is not None else {}
+
+    with DeviceTestContext(TestDevice, **kwargs) as proxy:
+        assert proxy.attr == expected_value
