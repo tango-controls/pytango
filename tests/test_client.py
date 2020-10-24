@@ -13,6 +13,9 @@ and is even likely to crash the device (!)
 
 """
 
+import gc
+import weakref
+
 from distutils.spawn import find_executable
 from subprocess import Popen
 import platform
@@ -23,9 +26,11 @@ import pytest
 from functools import partial
 from tango import DeviceProxy, DevFailed, GreenMode
 from tango import DeviceInfo, AttributeInfo, AttributeInfoEx
+from tango.server import Device
 from tango.utils import is_str_type, is_int_type, is_float_type, is_bool_type
-from tango.test_utils import PY3, assert_close, bytes_devstring, str_devstring
-
+from tango.test_utils import (
+    DeviceTestContext, PY3, assert_close, bytes_devstring, str_devstring
+)
 from tango.gevent import DeviceProxy as gevent_DeviceProxy
 from tango.futures import DeviceProxy as futures_DeviceProxy
 from tango.asyncio import DeviceProxy as asyncio_DeviceProxy
@@ -193,6 +198,22 @@ def writable_scalar_attribute(request):
                         a.split("_")[-1] not in ("ro", "rww")])
 def writable_spectrum_attribute(request):
     return request.param
+
+
+@pytest.fixture(params=[GreenMode.Synchronous,
+                        GreenMode.Asyncio,
+                        GreenMode.Gevent])
+def green_mode_device_proxy(request):
+    green_mode = request.param
+    return device_proxy_map[green_mode]
+
+
+@pytest.fixture
+def simple_device_fqdn():
+    context = DeviceTestContext(Device)
+    context.start()
+    yield context.get_device_access()
+    context.stop()
 
 
 # Tests
@@ -411,3 +432,40 @@ def test_command_string(tango_test):
         assert len(result) == 2
         assert_close(result[0], [-10, 200])
         assert_close(result[1], [expected_value, expected_value])
+
+
+def test_no_memory_leak_for_repr(green_mode_device_proxy, simple_device_fqdn):
+    proxy = green_mode_device_proxy(simple_device_fqdn)
+    weak_ref = weakref.ref(proxy)
+
+    repr(proxy)
+
+    # clear strong reference and check if object can be garbage collected
+    del proxy
+    gc.collect()
+    assert weak_ref() is None
+
+
+def test_no_memory_leak_for_str(green_mode_device_proxy, simple_device_fqdn):
+    proxy = green_mode_device_proxy(simple_device_fqdn)
+    weak_ref = weakref.ref(proxy)
+
+    str(proxy)
+
+    # clear strong reference and check if object can be garbage collected
+    del proxy
+    gc.collect()
+    assert weak_ref() is None
+
+
+def test_no_memory_leak_when_overriding_methods(
+        green_mode_device_proxy, simple_device_fqdn):
+    proxy = green_mode_device_proxy(simple_device_fqdn)
+    weak_ref = weakref.ref(proxy)
+
+    proxy.write_attribute = proxy.write_attribute
+
+    # clear strong reference and check if object can be garbage collected
+    del proxy
+    gc.collect()
+    assert weak_ref() is None
