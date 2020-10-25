@@ -512,17 +512,3 @@ def test_no_memory_leak_for_str(green_mode_device_proxy, simple_device_fqdn):
     del proxy
     gc.collect()
     assert weak_ref() is None
-
-
-def test_no_memory_leak_when_overriding_methods(
-        green_mode_device_proxy, simple_device_fqdn):
-    proxy = green_mode_device_proxy(simple_device_fqdn)
-    ping_device(proxy)
-    weak_ref = weakref.ref(proxy)
-
-    proxy.write_attribute = proxy.write_attribute
-
-    # clear strong reference and check if object can be garbage collected
-    del proxy
-    gc.collect()
-    assert weak_ref() is None
