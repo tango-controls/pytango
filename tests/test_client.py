@@ -225,7 +225,10 @@ def green_mode_device_proxy(request):
 
 @pytest.fixture
 def simple_device_fqdn():
-    context = DeviceTestContext(Device)
+    class TestDevice(Device):
+        pass
+
+    context = DeviceTestContext(TestDevice)
     context.start()
     yield context.get_device_access()
     context.stop()
@@ -447,6 +450,42 @@ def test_command_string(tango_test):
         assert len(result) == 2
         assert_close(result[0], [-10, 200])
         assert_close(result[1], [expected_value, expected_value])
+
+
+def test_repr_uses_info(green_mode_device_proxy, simple_device_fqdn):
+    proxy = green_mode_device_proxy(simple_device_fqdn)
+    assert repr(proxy) == 'TestDevice(test/nodb/testdevice)'
+
+
+def test_repr_default_if_info_unavailable(green_mode_device_proxy):
+    proxy = green_mode_device_proxy(
+        "tango://localhost:0/invalid/test/dev#dbase=no"
+    )
+
+    def bad_info(self):
+        raise RuntimeError("Break info for test")
+
+    proxy.__class__.info = bad_info
+
+    assert repr(proxy) == 'Device(invalid/test/dev)'
+
+
+def test_multiple_repr_calls_only_call_info_once(
+        green_mode_device_proxy, simple_device_fqdn):
+    proxy = green_mode_device_proxy(simple_device_fqdn)
+
+    def mock_info(self):
+        self.info_call_count += 1
+        return self.info_orig()
+
+    proxy.__class__.info_orig = proxy.info
+    proxy.__class__.info = mock_info
+    proxy.info_call_count = 0
+
+    repr(proxy)
+    assert proxy.info_call_count == 1
+    repr(proxy)
+    assert proxy.info_call_count == 1
 
 
 def test_no_memory_leak_for_repr(green_mode_device_proxy, simple_device_fqdn):
