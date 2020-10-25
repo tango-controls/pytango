@@ -35,6 +35,12 @@ from tango.gevent import DeviceProxy as gevent_DeviceProxy
 from tango.futures import DeviceProxy as futures_DeviceProxy
 from tango.asyncio import DeviceProxy as asyncio_DeviceProxy
 
+# Asyncio imports
+try:
+    import asyncio
+except ImportError:
+    import trollius as asyncio  # noqa: F401
+
 
 ATTRIBUTES = [
     'ampli',
@@ -152,6 +158,13 @@ def wait_for_proxy(host, proc, device, green_mode, retries=400, delay=0.01):
         sleep(delay)
     else:
         raise RuntimeError("TangoTest device did not start up!")
+
+
+def ping_device(proxy):
+    if proxy.get_green_mode() == GreenMode.Asyncio:
+        asyncio.get_event_loop().run_until_complete(proxy.ping())
+    else:
+        proxy.ping()
 
 
 # Fixtures
@@ -436,6 +449,7 @@ def test_command_string(tango_test):
 
 def test_no_memory_leak_for_repr(green_mode_device_proxy, simple_device_fqdn):
     proxy = green_mode_device_proxy(simple_device_fqdn)
+    ping_device(proxy)
     weak_ref = weakref.ref(proxy)
 
     repr(proxy)
@@ -448,6 +462,7 @@ def test_no_memory_leak_for_repr(green_mode_device_proxy, simple_device_fqdn):
 
 def test_no_memory_leak_for_str(green_mode_device_proxy, simple_device_fqdn):
     proxy = green_mode_device_proxy(simple_device_fqdn)
+    ping_device(proxy)
     weak_ref = weakref.ref(proxy)
 
     str(proxy)
@@ -461,6 +476,7 @@ def test_no_memory_leak_for_str(green_mode_device_proxy, simple_device_fqdn):
 def test_no_memory_leak_when_overriding_methods(
         green_mode_device_proxy, simple_device_fqdn):
     proxy = green_mode_device_proxy(simple_device_fqdn)
+    ping_device(proxy)
     weak_ref = weakref.ref(proxy)
 
     proxy.write_attribute = proxy.write_attribute
