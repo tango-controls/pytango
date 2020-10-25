@@ -105,14 +105,45 @@ def get_device_proxy(*args, **kwargs):
 
 
 class __TangoInfo(object):
-    """Helper class for when DeviceProxy.info() is not available"""
+    """Helper class for copying DeviceInfo, or when DeviceProxy.info() fails."""
 
-    def __init__(self):
-        self.dev_class = self.dev_type = 'Device'
-        self.doc_url = 'http://www.esrf.fr/computing/cs/tango/tango_doc/ds_doc/'
-        self.server_host = 'Unknown'
-        self.server_id = 'Unknown'
-        self.server_version = 1
+    def __init__(
+        self,
+        dev_class,
+        dev_type,
+        doc_url,
+        server_id,
+        server_host,
+        server_version,
+    ):
+        self.dev_class = str(dev_class)
+        self.dev_type = str(dev_type)
+        self.doc_url = str(doc_url)
+        self.server_id = str(server_id)
+        self.server_host = str(server_host)
+        self.server_version = int(server_version)
+
+    @classmethod
+    def from_defaults(cls):
+        return cls(
+            dev_class='Device',
+            dev_type='Device',
+            doc_url='Doc URL = https://www.tango-controls.org/developers/dsc',
+            server_host='Unknown',
+            server_id='Unknown',
+            server_version=1,
+        )
+
+    @classmethod
+    def from_copy(cls, info):
+        return cls(
+            dev_class=info.dev_class,
+            dev_type=info.dev_type,
+            doc_url=info.doc_url,
+            server_host=info.server_id,
+            server_id=info.server_host,
+            server_version=info.server_version,
+        )
 
 
 # -------------------------------------------------------------------------------
@@ -1398,9 +1429,11 @@ def __DeviceProxy___get_info_(self):
     """Protected method that gets device info once and stores it in cache"""
     if not hasattr(self, '_dev_info'):
         try:
-            self.__dict__["_dev_info"] = self.info()
+            info = self.info()
+            info_without_cyclic_reference = __TangoInfo.from_copy(info)
+            self.__dict__["_dev_info"] = info_without_cyclic_reference
         except:
-            return __TangoInfo()
+            return __TangoInfo.from_defaults()
     return self._dev_info
 
 
