@@ -171,7 +171,8 @@ def ping_device(proxy):
 
 @pytest.fixture(params=[GreenMode.Synchronous,
                         GreenMode.Asyncio,
-                        GreenMode.Gevent],
+                        GreenMode.Gevent,
+                        GreenMode.Futures],
                 scope="module")
 def tango_test(request):
     green_mode = request.param
@@ -215,7 +216,8 @@ def writable_spectrum_attribute(request):
 
 @pytest.fixture(params=[GreenMode.Synchronous,
                         GreenMode.Asyncio,
-                        GreenMode.Gevent])
+                        GreenMode.Gevent,
+                        GreenMode.Futures])
 def green_mode_device_proxy(request):
     green_mode = request.param
     return device_proxy_map[green_mode]
