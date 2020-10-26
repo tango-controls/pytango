@@ -112,15 +112,15 @@ class __TangoInfo(object):
         dev_class,
         dev_type,
         doc_url,
-        server_id,
         server_host,
+        server_id,
         server_version,
     ):
         self.dev_class = str(dev_class)
         self.dev_type = str(dev_type)
         self.doc_url = str(doc_url)
-        self.server_id = str(server_id)
         self.server_host = str(server_host)
+        self.server_id = str(server_id)
         self.server_version = int(server_version)
 
     @classmethod
@@ -140,8 +140,8 @@ class __TangoInfo(object):
             dev_class=info.dev_class,
             dev_type=info.dev_type,
             doc_url=info.doc_url,
-            server_host=info.server_id,
-            server_id=info.server_host,
+            server_host=info.server_host,
+            server_id=info.server_id,
             server_version=info.server_version,
         )
 
