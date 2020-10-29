@@ -27,7 +27,7 @@ from argparse import ArgumentParser, ArgumentTypeError
 # Local imports
 from .server import run
 from .utils import is_non_str_seq
-from . import DeviceProxy, Database, Util
+from . import DeviceProxy, Database, EnsureOmniThread, Util
 
 __all__ = ("MultiDeviceTestContext", "DeviceTestContext", "run_device_test_context")
 
@@ -309,28 +309,38 @@ class MultiDeviceTestContext(object):
         else:
             raise ValueError("Wrong format of devices_info")
 
-        cls = multiprocessing.Process if process else threading.Thread
-        self.thread = cls(target=self.target, args=(runserver, process))
+        if process:
+            self.thread = multiprocessing.Process(
+                target=self.process_target, args=(runserver,)
+            )
+        else:
+            self.thread = threading.Thread(
+                target=self.threading_target, args=(runserver,)
+            )
         self.thread.daemon = daemon
 
-    def target(self, runserver, process=False):
+    def threading_target(self, runserver):
+        with EnsureOmniThread():
+            self.target(runserver)
+
+    def process_target(self, runserver):
+        self.target(runserver)
+        # Make sure the process has enough time to send the items
+        # because the it might segfault while cleaning up the
+        # the tango resources
+        time.sleep(0.1)
+
+    def target(self, runserver):
         try:
             runserver(post_init_callback=self.post_init, raises=True)
         except Exception:
             # Put exception in the queue
             etype, value, tb = sys.exc_info()
-            if process:
-                tb = None  # Traceback objects can't be pickled
-            self.queue.put((etype, value, tb))
+            self.queue.put((etype, value, None))  # Traceback objects can't be pickled
         finally:
             # Put something in the queue just in case
             exc = RuntimeError("The server failed to report anything")
             self.queue.put((None, exc, None))
-            # Make sure the process has enough time to send the items
-            # because the it might segfault while cleaning up the
-            # the tango resources
-            if process:
-                time.sleep(0.1)
 
     def post_init(self):
         try:
