@@ -96,6 +96,15 @@ def get_host_ip():
     return ip
 
 
+def get_open_port():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("", 0))
+    s.listen(1)
+    port = s.getsockname()[1]
+    s.close()
+    return port
+
+
 def _device_class_from_field(field):
     """
     Helper function that extracts and return a device class from a
@@ -256,6 +265,8 @@ class MultiDeviceTestContext(object):
         if host is None:
             # IP address is used instead of the hostname on purpose (see #246)
             host = get_host_ip()
+        if not port:
+            port = get_open_port()
         if timeout is None:
             timeout = self.process_timeout if process else self.thread_timeout
         # Patch bug #819
