@@ -116,7 +116,7 @@ def test_multi_with_two_devices(server_green_mode):
         assert proxy2.attr2 == 200
 
 
-def test_multi_device_access():
+def test_multi_device_access_via_test_context_methods():
     devices_info = (
         {"class": Device1, "devices": [{"name": "test/device1/1"}]},
         {"class": Device2, "devices": [{"name": "test/device2/2"}]},
@@ -135,6 +135,105 @@ def test_multi_device_access():
         assert proxy1.attr1 == 100
         assert proxy2.attr2 == 200
         assert proxy_server.State() == tango.DevState.ON
+
+
+def test_multi_short_name_device_proxy_access_without_tango_db():
+    devices_info = (
+        {"class": Device1, "devices": [{"name": "test/device1/1"}]},
+    )
+
+    with MultiDeviceTestContext(devices_info):
+        proxy1 = tango.DeviceProxy("test/device1/1")
+        assert proxy1.name() == "test/device1/1"
+        assert proxy1.attr1 == 100
+
+
+def test_multi_short_name_attribute_proxy_access_without_tango_db():
+    devices_info = (
+        {"class": Device1, "devices": [{"name": "test/device1/1"}]},
+    )
+
+    with MultiDeviceTestContext(devices_info):
+        attr1 = tango.AttributeProxy("test/device1/1/attr1")
+        assert attr1.name() == "attr1"
+        assert attr1.read().value == 100
+
+
+def test_single_short_name_device_proxy_access_without_tango_db():
+    with DeviceTestContext(Device1, device_name="test/device1/1"):
+        proxy1 = tango.DeviceProxy("test/device1/1")
+        assert proxy1.name() == "test/device1/1"
+        assert proxy1.attr1 == 100
+
+
+def test_single_short_name_attribute_proxy_access_without_tango_db():
+    with DeviceTestContext(Device1, device_name="test/device1/1"):
+        attr1 = tango.AttributeProxy("test/device1/1/attr1")
+        assert attr1.name() == "attr1"
+        assert attr1.read().value == 100
+
+
+def test_multi_short_name_group_access_without_tango_db():
+    devices_info = (
+        {
+            "class": Device1,
+            "devices": [
+                {"name": "test/device1/1"},
+                {"name": "test/device1/2"}
+            ]
+        },
+    )
+
+    with MultiDeviceTestContext(devices_info) as context:
+        group_singles = tango.Group("add-one-at-a-time")
+        group_singles.add("test/device1/1")
+        group_singles.add("test/device1/2")
+        group_multiples_list = tango.Group("add-multiple-via-list")
+        group_multiples_list.add(["test/device1/1", "test/device1/2"])
+        group_multiples_vector = tango.Group("add-multiple-via-std-vector")
+        vector = tango.StdStringVector()
+        vector.append("test/device1/1")
+        vector.append("test/device1/2")
+        group_multiples_vector.add(vector)
+
+        groups = [
+            group_singles,
+            group_multiples_list,
+            group_multiples_vector,
+        ]
+
+        device1_fqdn = context.get_device_access("test/device1/1")
+        device2_fqdn = context.get_device_access("test/device1/2")
+        for group in groups:
+            assert device1_fqdn in group
+            assert device2_fqdn in group
+            reply = group.read_attribute("attr1")
+            assert reply[0].dev_name() == device1_fqdn
+            assert reply[1].dev_name() == device2_fqdn
+            assert not reply[0].has_failed()
+            assert not reply[1].has_failed()
+            assert reply[0].get_data().value == 100
+            assert reply[1].get_data().value == 100
+
+        # patterns are not supported via DeviceTestContext
+        with pytest.raises(tango.DevFailed):
+            group_multiples_pattern = tango.Group("add-multiple-via-pattern")
+            group_multiples_pattern.add("test/device1/*")
+
+
+def test_multi_short_name_access_fails_if_override_disabled():
+    devices_info = (
+        {"class": Device1, "devices": [{"name": "test/device1/1"}]},
+    )
+
+    context = MultiDeviceTestContext(devices_info)
+    context.enable_test_context_tango_host_override = False
+    try:
+        context.start()
+        with pytest.raises(tango.DevFailed):
+            tango.DeviceProxy("test/device1/1")
+    finally:
+        context.stop()
 
 
 def test_multi_device_proxy_cached():

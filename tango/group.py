@@ -22,8 +22,9 @@ try:
 except ImportError:
     import collections as collections_abc
 from ._tango import __Group as _RealGroup, StdStringVector
-from .utils import seq_2_StdStringVector, is_pure_str
+from .utils import seq_2_StdStringVector, is_non_str_seq, is_pure_str
 from .utils import document_method as __document_method
+from .utils import get_device_uri_with_test_fdqn_if_necessary
 from .device_proxy import __init_device_proxy_internals as init_device_proxy
 
 
@@ -55,7 +56,7 @@ def _get_one_item(group, key):
 # we want to return a Group, not a __Group!
 # The get_device method also needs to be adapted in order to properly
 # initialize the returned proxy with its python attributes.
-class Group:
+class Group(object):
     """A Tango Group represents a hierarchy of tango devices. The hierarchy
     may have more than one level. The main goal is to group devices with
     same attribute(s)/command(s) to be able to do parallel requests."""
@@ -77,16 +78,25 @@ class Group:
 
     def _add(self, patterns_or_group, timeout_ms=-1):
         if isinstance(patterns_or_group, _RealGroup):
-            return self.__group._add(patterns_or_group, timeout_ms)
-        elif isinstance(patterns_or_group, StdStringVector):
-            return self.__group._add(patterns_or_group, timeout_ms)
-        elif isinstance(patterns_or_group, str):
-            return self.__group._add(patterns_or_group, timeout_ms)
-        elif isinstance(patterns_or_group, collections_abc.Sequence):
-            patterns = seq_2_StdStringVector(patterns_or_group)
-            return self.__group._add(patterns, timeout_ms)
+            items = patterns_or_group
         else:
-            raise TypeError('Parameter patterns_or_group: Should be Group, str or a sequence of strings.')
+            if is_pure_str(patterns_or_group):
+                items = [patterns_or_group]
+            elif is_non_str_seq(patterns_or_group):
+                items = patterns_or_group
+            else:
+                raise TypeError(
+                    'Parameter patterns_or_group: Should be Group, '
+                    'str or a sequence of strings.'
+                )
+
+            items = [
+                get_device_uri_with_test_fdqn_if_necessary(item)
+                for item in items
+            ]
+            items = seq_2_StdStringVector(items)
+
+        return self.__group._add(items, timeout_ms)
 
     def remove(self, patterns, forward=True):
         if isinstance(patterns, str):
@@ -121,6 +131,9 @@ class Group:
 
     def __len__(self):
         return self.get_size()
+
+    def __repr__(self):
+        return "Group(%s)" % self.get_name()
 
     def command_inout(self, cmd_name, param=None, forward=True):
         if param is None:

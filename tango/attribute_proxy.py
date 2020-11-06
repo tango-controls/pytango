@@ -26,6 +26,7 @@ from ._tango import StdStringVector, DbData, DbDatum, DeviceProxy
 from ._tango import __AttributeProxy as _AttributeProxy
 from .utils import seq_2_StdStringVector, seq_2_DbData, DbData_2_dict
 from .utils import is_pure_str, is_non_str_seq
+from .utils import get_device_uri_with_test_fdqn_if_necessary
 from .green import green, get_green_mode
 from .device_proxy import __init_device_proxy_internals as init_device_proxy
 
@@ -296,6 +297,13 @@ class AttributeProxy(object):
 
     def __init__(self, *args, **kwds):
         green_mode = kwds.pop('green_mode', get_green_mode())
+
+        device_attr_name = args[0]
+        args = (
+            get_device_uri_with_test_fdqn_if_necessary(device_attr_name),
+            *args[1:]
+        )
+
         self.__attr_proxy = _AttributeProxy(*args, **kwds)
         # get_device_proxy() returns a different python object each time
         # we don't want a different object, so we save the current one.

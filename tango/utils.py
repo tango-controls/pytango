@@ -27,10 +27,13 @@ try:
 except ImportError:
     import collections as collections_abc
 
+from six.moves.urllib.parse import urlparse, urlunparse
+
 from ._tango import StdStringVector, StdDoubleVector, \
     DbData, DbDatum, DbDevInfos, DbDevExportInfos, CmdArgType, AttrDataFormat, \
     EventData, AttrConfEventData, DataReadyEventData, DevFailed, constants, \
-    DevState, CommunicationFailed, PipeEventData, DevIntrChangeEventData
+    DevState, CommunicationFailed, PipeEventData, DevIntrChangeEventData, \
+    ApiUtil
 
 from . import _tango
 from .constants import AlrmValueNotSpec, StatusNotSet, TgLibVers
@@ -47,7 +50,12 @@ __all__ = (
     "CaselessList", "CaselessDict", "EventCallBack", "get_home",
     "from_version_str_to_hex_str", "from_version_str_to_int",
     "seq_2_StdStringVector", "StdStringVector_2_seq",
-    "dir2", "TO_TANGO_TYPE", "ensure_binary")
+    "dir2", "TO_TANGO_TYPE", "ensure_binary",
+    "get_device_uri_with_test_fdqn_if_necessary",
+    "set_test_context_tango_host_fdqn",
+    "clear_test_context_tango_host_fdqn",
+    "InvalidTangoHostUriError",
+)
 
 __docformat__ = "restructuredtext"
 
@@ -1761,3 +1769,81 @@ else:
             return s
         else:
             raise TypeError("not expecting type '%s'" % type(s))
+
+
+__ENV_VAR_FOR_TEST_HOST = "TANGO_HOST_TEST_CONTEXT_OVERRIDE"
+
+
+def set_test_context_tango_host_fdqn(host_uri):
+    if host_uri is not None:
+        os.environ[__ENV_VAR_FOR_TEST_HOST] = host_uri
+
+
+def clear_test_context_tango_host_fdqn():
+    os.environ.pop(__ENV_VAR_FOR_TEST_HOST, None)
+
+
+def get_device_uri_with_test_fdqn_if_necessary(device_uri):
+    host_uri = ApiUtil.get_env_var(__ENV_VAR_FOR_TEST_HOST)
+    if host_uri:
+        device_uri = _get_fully_qualified_device_uri(device_uri, host_uri)
+    return device_uri
+
+
+def _get_fully_qualified_device_uri(device_uri, host_uri):
+    parsed_device = urlparse(device_uri)
+    if not _is_tango_uri_resolved(parsed_device):
+        parsed_host = urlparse(host_uri)
+        device_uri = _try_resolve_tango_uri(parsed_host, parsed_device)
+    return device_uri
+
+
+def _is_tango_uri_resolved(parsed_device):
+    return parsed_device.scheme == "tango"
+
+
+def _try_resolve_tango_uri(parsed_host, parsed_device):
+    if not _is_valid_tango_host_uri(parsed_host):
+        raise InvalidTangoHostUriError(
+            "Invalid form for {} environment variable: {!r}".format(
+                __ENV_VAR_FOR_TEST_HOST,
+                parsed_host,
+            )
+        )
+    return _resolve_tango_uri(parsed_host, parsed_device)
+
+
+def _is_valid_tango_host_uri(parsed_host):
+    scheme_ok = parsed_host.scheme == "tango"
+    hostname_ok = bool(parsed_host.hostname)
+    port_ok = bool(parsed_host.port)
+    path_ok = parsed_host.path == ""
+    params_ok = parsed_host.params == ""
+    query_ok = parsed_host.query == ""
+    fragment_ok = parsed_host.fragment in ["", "dbase=no", "dbase=yes"]
+    return (
+        scheme_ok
+        and hostname_ok
+        and port_ok
+        and path_ok
+        and params_ok
+        and query_ok
+        and fragment_ok
+    )
+
+
+def _resolve_tango_uri(parsed_host, parsed_device):
+    return urlunparse(
+        [
+            parsed_host.scheme,
+            parsed_host.netloc,
+            parsed_device.path,
+            parsed_host.params,
+            parsed_host.query,
+            parsed_host.fragment,
+        ]
+    )
+
+
+class InvalidTangoHostUriError(ValueError):
+    """Invalid URI format for TANGO_HOST-like variable."""

@@ -35,6 +35,7 @@ from .utils import DbData_2_dict, obj_2_property
 from .utils import document_method as __document_method
 from .utils import dir2
 from .utils import ensure_binary
+from .utils import get_device_uri_with_test_fdqn_if_necessary
 
 from .green import green, green_callback
 from .green import get_green_mode
@@ -44,7 +45,6 @@ __all__ = ("device_proxy_init", "get_device_proxy")
 __docformat__ = "restructuredtext"
 
 _UNSUBSCRIBE_LIFETIME = 60
-
 
 @green(consume_green_mode=False)
 def get_device_proxy(*args, **kwargs):
@@ -204,6 +204,13 @@ def __DeviceProxy__init__(self, *args, **kwargs):
     self._executors[GreenMode.Futures] = kwargs.pop('executor', None)
     self._executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
     self._executors[GreenMode.Asyncio] = kwargs.pop('asyncio_executor', None)
+
+    device_name = args[0]
+    args = (
+        get_device_uri_with_test_fdqn_if_necessary(device_name),
+        *args[1:]
+    )
+
     return DeviceProxy.__init_orig__(self, *args, **kwargs)
 
 
