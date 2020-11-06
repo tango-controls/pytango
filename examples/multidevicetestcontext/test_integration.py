@@ -3,25 +3,25 @@ import tango
 from tango.server import Device, attribute, command, device_property
 
 
-class Master(Device):
-    WorkerFQDNs = device_property(dtype="DevVarStringArray")
+class Leader(Device):
+    FollowerFQDNs = device_property(dtype="DevVarStringArray")
 
     @command(dtype_in="DevLong")
-    def Turn_Worker_On(self, worker_id):
-        worker_fqdn = self.WorkerFQDNs[worker_id - 1]
-        worker_device = tango.DeviceProxy(worker_fqdn)
-        worker_device.is_on = True
+    def Turn_Follower_On(self, follower_id):
+        follower_fqdn = self.FollowerFQDNs[follower_id - 1]
+        follower_device = tango.DeviceProxy(follower_fqdn)
+        follower_device.is_on = True
 
     @command(dtype_in="DevLong")
-    def Turn_Worker_Off(self, worker_id):
-        worker_fqdn = self.WorkerFQDNs[worker_id - 1]
-        worker_device = tango.DeviceProxy(worker_fqdn)
-        worker_device.is_on = False
+    def Turn_Follower_Off(self, follower_id):
+        follower_fqdn = self.FollowerFQDNs[follower_id - 1]
+        follower_device = tango.DeviceProxy(follower_fqdn)
+        follower_device.is_on = False
 
 
-class Worker(Device):
+class Follower(Device):
     def init_device(self):
-        super(Worker, self).init_device()
+        super(Follower, self).init_device()
         self._is_on = False
 
     is_on = attribute(
@@ -38,29 +38,29 @@ class Worker(Device):
 
 devices_info = [
     {
-        "class": Master,
+        "class": Leader,
         "devices": (
             {
-                "name": "device/master/1",
+                "name": "device/leader/1",
                 "properties": {
-                    "WorkerFQDNs": [
-                        "device/worker/1",
-                        "device/worker/2"
+                    "FollowerFQDNs": [
+                        "device/follower/1",
+                        "device/follower/2"
                     ],
                 }
             },
         )
     },
     {
-        "class": Worker,
+        "class": Follower,
         "devices": [
             {
-                "name": "device/worker/1",
+                "name": "device/follower/1",
                 "properties": {
                 }
             },
             {
-                "name": "device/worker/2",
+                "name": "device/follower/2",
                 "properties": {
                 }
             },
@@ -69,39 +69,39 @@ devices_info = [
 ]
 
 
-class TestMasterWorkerIntegration:
-    def test_master_turn_worker_on(self, tango_context):
-        master = tango.DeviceProxy("device/master/1")
-        worker_1 = tango.DeviceProxy("device/worker/1")
-        worker_2 = tango.DeviceProxy("device/worker/2")
+class TestLeaderFollowerIntegration:
+    def test_leader_turn_follower_on(self, tango_context):
+        leader = tango.DeviceProxy("device/leader/1")
+        follower_1 = tango.DeviceProxy("device/follower/1")
+        follower_2 = tango.DeviceProxy("device/follower/2")
 
-        # check initial state: both workers are off
-        assert worker_1.is_on == False
-        assert worker_2.is_on == False
+        # check initial state: both followers are off
+        assert follower_1.is_on == False
+        assert follower_2.is_on == False
 
-        # tell master to enable worker_1
-        master.turn_worker_on(1)
+        # tell leader to enable follower_1
+        leader.turn_follower_on(1)
 
-        # check worker_1 is now on, and worker_2 is still off
-        assert worker_1.is_on == True
-        assert worker_2.is_on == False
+        # check follower_1 is now on, and follower_2 is still off
+        assert follower_1.is_on == True
+        assert follower_2.is_on == False
 
-    def test_master_turn_worker_off(self, tango_context):
-        master = tango.DeviceProxy("device/master/1")
-        worker_1 = tango.DeviceProxy("device/worker/1")
-        worker_2 = tango.DeviceProxy("device/worker/2")
+    def test_leader_turn_follower_off(self, tango_context):
+        leader = tango.DeviceProxy("device/leader/1")
+        follower_1 = tango.DeviceProxy("device/follower/1")
+        follower_2 = tango.DeviceProxy("device/follower/2")
 
-        # tell master to enable both workers
-        master.turn_worker_on(1)
-        master.turn_worker_on(2)
+        # tell leader to enable both followers
+        leader.turn_follower_on(1)
+        leader.turn_follower_on(2)
 
-        # check initial state: both workers are on
-        assert worker_1.is_on == True
-        assert worker_2.is_on == True
+        # check initial state: both followers are on
+        assert follower_1.is_on == True
+        assert follower_2.is_on == True
 
-        # tell master to disable worker_1
-        master.turn_worker_off(1)
+        # tell leader to disable follower_1
+        leader.turn_follower_off(1)
 
-        # check worker_1 is now off, and worker_2 is still on
-        assert worker_1.is_on == False
-        assert worker_2.is_on == True
+        # check follower_1 is now off, and follower_2 is still on
+        assert follower_1.is_on == False
+        assert follower_2.is_on == True
