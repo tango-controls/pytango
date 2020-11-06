@@ -71,9 +71,9 @@ devices_info = [
 
 class TestMasterWorkerIntegration:
     def test_master_turn_worker_on(self, tango_context):
-        master = tango_context.get_device("device/master/1")
-        worker_1 = tango_context.get_device("device/worker/1")
-        worker_2 = tango_context.get_device("device/worker/2")
+        master = tango.DeviceProxy("device/master/1")
+        worker_1 = tango.DeviceProxy("device/worker/1")
+        worker_2 = tango.DeviceProxy("device/worker/2")
 
         # check initial state: both workers are off
         assert worker_1.is_on == False
@@ -87,9 +87,9 @@ class TestMasterWorkerIntegration:
         assert worker_2.is_on == False
 
     def test_master_turn_worker_off(self, tango_context):
-        master = tango_context.get_device("device/master/1")
-        worker_1 = tango_context.get_device("device/worker/1")
-        worker_2 = tango_context.get_device("device/worker/2")
+        master = tango.DeviceProxy("device/master/1")
+        worker_1 = tango.DeviceProxy("device/worker/1")
+        worker_2 = tango.DeviceProxy("device/worker/2")
 
         # tell master to enable both workers
         master.turn_worker_on(1)

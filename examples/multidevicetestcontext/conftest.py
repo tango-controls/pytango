@@ -1,13 +1,12 @@
 """
 A module defining pytest fixtures for testing with MultiDeviceTestContext
-Requires pytest and pytest-mock
+Requires pytest, and at least PyTango 9.3.3
+(see commit history for the approach to use with PyTango 9.3.2)
 """
 
 from collections import defaultdict
 import pytest
-import socket
-import tango
-from tango.test_context import MultiDeviceTestContext, get_host_ip
+from tango.test_context import MultiDeviceTestContext
 
 
 @pytest.fixture(scope="module")
@@ -16,32 +15,9 @@ def devices_info(request):
 
     
 @pytest.fixture(scope="function")
-def tango_context(mocker, devices_info):
+def tango_context(devices_info):
     """
-    Creates and returns a TANGO MultiDeviceTestContext object, with
-    tango.DeviceProxy patched to work around a name-resolving issue.
+    Creates and returns a TANGO MultiDeviceTestContext object.
     """
-    
-    def _get_open_port():
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(("", 0))
-        s.listen(1)
-        port = s.getsockname()[1]
-        s.close()
-        return port
-
-    HOST = get_host_ip()
-    PORT = _get_open_port()
-
-    _DeviceProxy = tango.DeviceProxy
-    mocker.patch(
-        'tango.DeviceProxy',
-        wraps=lambda fqdn, *args, **kwargs: _DeviceProxy(
-            "tango://{0}:{1}/{2}#dbase=no".format(HOST, PORT, fqdn),
-            *args,
-            **kwargs
-        )
-    )
-
-    with MultiDeviceTestContext(devices_info, host=HOST, port=PORT, process=True) as context:
+    with MultiDeviceTestContext(devices_info, process=True) as context:
         yield context
