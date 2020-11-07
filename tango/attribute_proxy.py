@@ -297,14 +297,11 @@ class AttributeProxy(object):
 
     def __init__(self, *args, **kwds):
         green_mode = kwds.pop('green_mode', get_green_mode())
-
         device_attr_name = args[0]
-        args = (
+        new_args = [
             get_device_uri_with_test_fdqn_if_necessary(device_attr_name),
-            *args[1:]
-        )
-
-        self.__attr_proxy = _AttributeProxy(*args, **kwds)
+        ] + list(args[1:])
+        self.__attr_proxy = _AttributeProxy(*new_args, **kwds)
         # get_device_proxy() returns a different python object each time
         # we don't want a different object, so we save the current one.
         self.__dev_proxy = dp = self.__attr_proxy.get_device_proxy()

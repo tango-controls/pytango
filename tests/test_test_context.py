@@ -230,8 +230,9 @@ def test_multi_short_name_access_fails_if_override_disabled():
     context.enable_test_context_tango_host_override = False
     try:
         context.start()
-        with pytest.raises(tango.DevFailed):
-            tango.DeviceProxy("test/device1/1")
+        # (disable check for exception to see what is raised in Travis CI)
+        dp = tango.DeviceProxy("test/device1/1")
+        dp.ping()
     finally:
         context.stop()
 
