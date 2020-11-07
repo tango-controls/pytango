@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 import pytest
 
 import tango
@@ -142,7 +144,7 @@ def test_multi_short_name_device_proxy_access_without_tango_db():
         {"class": Device1, "devices": [{"name": "test/device1/1"}]},
     )
 
-    with MultiDeviceTestContext(devices_info):
+    with MultiDeviceTestContext(devices_info, process=True):
         proxy1 = tango.DeviceProxy("test/device1/1")
         assert proxy1.name() == "test/device1/1"
         assert proxy1.attr1 == 100
@@ -223,16 +225,24 @@ def test_multi_short_name_group_access_without_tango_db():
 
 def test_multi_short_name_access_fails_if_override_disabled():
     devices_info = (
-        {"class": Device1, "devices": [{"name": "test/device1/1"}]},
+        {"class": Device1, "devices": [{"name": "test/device1/a"}]},
     )
 
-    context = MultiDeviceTestContext(devices_info)
+    context = MultiDeviceTestContext(devices_info, process=True)
     context.enable_test_context_tango_host_override = False
     try:
         context.start()
         # (disable check for exception to see what is raised in Travis CI)
-        dp = tango.DeviceProxy("test/device1/1")
-        dp.ping()
+        proxy1 = tango.DeviceProxy("test/device1/a")
+        ping_result = proxy1.ping()
+        assert proxy1.attr1 == 100
+        # for debugging
+        assert "" == "ping {}, override {}, dev_host {}, dev_port {}'".format(
+            ping_result,
+            context.enable_test_context_tango_host_override,
+            proxy1.get_dev_host(),
+            proxy1.get_dev_port(),
+        )
     finally:
         context.stop()
 

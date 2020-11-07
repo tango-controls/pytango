@@ -204,11 +204,13 @@ def __DeviceProxy__init__(self, *args, **kwargs):
     self._executors[GreenMode.Futures] = kwargs.pop('executor', None)
     self._executors[GreenMode.Gevent] = kwargs.pop('threadpool', None)
     self._executors[GreenMode.Asyncio] = kwargs.pop('asyncio_executor', None)
-    device_name = args[0]
-    new_args = [
-        get_device_uri_with_test_fdqn_if_necessary(device_name),
-    ] + list(args[1:])
-    return DeviceProxy.__init_orig__(self, *new_args, **kwargs)
+    # device_name = args[0]
+    # new_args = tuple(
+    #     [get_device_uri_with_test_fdqn_if_necessary(device_name)],
+    # ) + args[1:]
+    # print("debug: args {!r} -> new_args {!r}".format(args, new_args))
+    # return DeviceProxy.__init_orig__(self, *new_args, **kwargs)
+    return DeviceProxy.__init_orig__(self, *args, **kwargs)
 
 
 def __DeviceProxy__get_green_mode(self):
