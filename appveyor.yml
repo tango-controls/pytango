@@ -4,7 +4,7 @@ image: Visual Studio 2015
 
 environment:
   cpptango_download_base: https://github.com/tango-controls/cppTango/releases/download/
-  cpptango_version: 9.3.3
+  cpptango_version: 9.3.4
   boost_download_base: https://github.com/tango-controls/boost-ci/releases/download/
   matrix:
     - platform: win32

@@ -7,7 +7,7 @@ branches:
 
 env:
   global:
-    - TANGO_DEPENDENCIES='cpptango==9.3.4rc6 tango-test'
+    - TANGO_DEPENDENCIES='cpptango==9.3.4 tango-test'
   matrix:
     - PYTHON_VERSION=2.7
     - PYTHON_VERSION=3.5

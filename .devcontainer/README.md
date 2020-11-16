@@ -54,7 +54,7 @@ export TANGO_VERSION=9.3.4
 conda create --yes --name env-py${PYTHON_VERSION}-tango${TANGO_VERSION} python=${PYTHON_VERSION}
 conda activate env-py${PYTHON_VERSION}-tango${TANGO_VERSION}
 conda install --yes -c main -c conda-forge boost gxx_linux-64 cppzmq numpy
-conda install --yes -c main -c conda-forge -c tango-controls cpptango=${TANGO_VERSION} tango-test
+conda install --yes -c main -c conda-forge -c tango-controls cpptango==${TANGO_VERSION} tango-test
 conda install --yes pytest pytest-xdist 'gevent != 1.5a1' psutil
 conda env export > /opt/current/environment-py${PYTHON_VERSION}-tango${TANGO_VERSION}.yml
 ```

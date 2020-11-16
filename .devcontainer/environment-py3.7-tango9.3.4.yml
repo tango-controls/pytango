@@ -1,80 +1,83 @@
 name: env-py3.7-tango9.3.4
 channels:
   - tango-controls
-  - conda-forge
   - main
+  - conda-forge
   - defaults
 dependencies:
-  - _libgcc_mutex=0.1=main
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=1_gnu
   - apipkg=1.5=py37_0
-  - attrs=20.1.0=py_0
+  - attrs=20.3.0=pyhd3eb1b0_0
   - binutils_impl_linux-64=2.33.1=he6710b0_7
   - binutils_linux-64=2.33.1=h9595d00_15
   - blas=1.0=mkl
-  - boost=1.73.0=py37h429e714_1
-  - boost-cpp=1.73.0=h9359b55_3
+  - boost=1.73.0=py37_11
   - bzip2=1.0.8=h7b6447c_0
-  - ca-certificates=2020.7.22=0
-  - certifi=2020.6.20=py37_0
-  - cffi=1.14.2=py37he30daa8_0
-  - cpptango=9.3.4rc6=h6bb024c_0
-  - cppzmq=4.6.0=hc9558a2_0
+  - ca-certificates=2020.10.14=0
+  - certifi=2020.6.20=pyhd3eb1b0_3
+  - cffi=1.14.3=py37he30daa8_0
+  - cpptango=9.3.4=h2bc3f7f_0
+  - cppzmq=4.7.1=h667716f_0
   - execnet=1.7.1=py_0
   - gcc_impl_linux-64=7.3.0=habb00fd_1
   - gcc_linux-64=7.3.0=h553295d_15
-  - gevent=20.6.2=py37h7b6447c_0
-  - greenlet=0.4.16=py37h7b6447c_0
+  - gevent=20.9.0=py37h7b6447c_0
+  - greenlet=0.4.17=py37h7b6447c_0
   - gxx_impl_linux-64=7.3.0=hdf63c60_1
   - gxx_linux-64=7.3.0=h553295d_15
-  - icu=67.1=he1b5a44_0
-  - importlib-metadata=1.7.0=py37_0
-  - importlib_metadata=1.7.0=0
-  - iniconfig=1.0.1=py_0
+  - icu=58.2=he6710b0_3
+  - importlib-metadata=2.0.0=py_1
+  - importlib_metadata=2.0.0=1
+  - iniconfig=1.1.1=py_0
   - intel-openmp=2020.2=254
   - ld_impl_linux-64=2.33.1=h53a641e_7
+  - libboost=1.73.0=h37e3b65_11
   - libedit=3.1.20191231=h14c3975_1
   - libffi=3.3=he6710b0_2
-  - libgcc-ng=9.1.0=hdf63c60_0
+  - libgcc-ng=9.3.0=h5dbcf3e_17
+  - libgomp=9.3.0=h5dbcf3e_17
   - libsodium=1.0.18=h7b6447c_0
-  - libstdcxx-ng=9.1.0=hdf63c60_0
-  - lz4-c=1.9.2=he6710b0_1
+  - libstdcxx-ng=9.3.0=h2ae2ef3_17
+  - lz4-c=1.9.2=heb0550a_3
   - mkl=2020.2=256
   - mkl-service=2.3.0=py37he904b0f_0
-  - mkl_fft=1.1.0=py37h23d657b_0
+  - mkl_fft=1.2.0=py37h23d657b_0
   - mkl_random=1.1.1=py37h0573a6f_0
-  - more-itertools=8.4.0=py_0
+  - more-itertools=8.6.0=pyhd3eb1b0_0
   - ncurses=6.2=he6710b0_1
-  - numpy=1.19.1=py37hbc911f0_0
-  - numpy-base=1.19.1=py37hfa32c7d_0
-  - omniorb=4.2.4=py37hb0870dc_0
-  - openssl=1.1.1g=h7b6447c_0
+  - numpy=1.19.2=py37h54aff64_0
+  - numpy-base=1.19.2=py37hfa32c7d_0
+  - omniorb=4.2.4=py37hb0870dc_1
+  - openssl=1.1.1h=h7b6447c_0
   - packaging=20.4=py_0
-  - pip=20.2.2=py37_0
+  - pip=20.2.4=py37h06a4308_0
   - pluggy=0.13.1=py37_0
   - psutil=5.7.2=py37h7b6447c_0
   - py=1.9.0=py_0
+  - py-boost=1.73.0=py37h962f231_11
   - pycparser=2.20=py_2
   - pyparsing=2.4.7=py_0
-  - pytest=6.0.1=py37_0
+  - pytest=6.1.1=py37_0
   - pytest-forked=1.3.0=py_0
   - pytest-xdist=2.1.0=py_0
-  - python=3.7.7=hcff3b4d_5
+  - python=3.7.9=h7579374_0
   - python_abi=3.7=1_cp37m
   - readline=8.0=h7b6447c_0
-  - setuptools=49.6.0=py37_0
-  - six=1.15.0=py_0
+  - setuptools=50.3.1=py37h06a4308_1
+  - six=1.15.0=py37h06a4308_0
   - sqlite=3.33.0=h62c20be_0
   - tango-test=3.0=h6bb024c_2
   - tk=8.6.10=hbc83047_0
   - toml=0.10.1=py_0
-  - wheel=0.35.1=py_0
+  - wheel=0.35.1=pyhd3eb1b0_0
   - xz=5.2.5=h7b6447c_0
-  - zeromq=4.3.2=he6710b0_2
-  - zipp=3.1.0=py_0
+  - zeromq=4.3.3=he6710b0_3
+  - zipp=3.4.0=pyhd3eb1b0_0
   - zlib=1.2.11=h7b6447c_3
   - zope=1.0=py37_1
-  - zope.event=4.4=py37_0
-  - zope.interface=4.7.1=py37h7b6447c_0
+  - zope.event=4.5.0=py37_0
+  - zope.interface=5.1.2=py37h7b6447c_0
   - zstd=1.4.5=h9ceee32_0
 prefix: /opt/conda/envs/env-py3.7-tango9.3.4
 
