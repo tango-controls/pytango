@@ -18,6 +18,7 @@ Contents
     API <api>
     How to <howto>
     How to contribute <how-to-contribute>
+    How to test <testing>
     FAQ <faq>
     TEP <tep>
     History of changes <revision>

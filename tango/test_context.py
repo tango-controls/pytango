@@ -173,16 +173,21 @@ class MultiDeviceTestContext(object):
     :param devices_info:
       a sequence of dicts with information about
       devices to be exported. Each dict consists of the following keys:
+
         * "class" which value is either of:
+
           * :class:`~tango.server.Device` or the name of some such class
           * a sequence of two elements, the first element being a
-           :class:`~tango.DeviceClass` or the name of some such class,
-           the second element being a :class:`~tango.DeviceImpl` or the
-           name of such such class
+            :class:`~tango.DeviceClass` or the name of some such class,
+            the second element being a :class:`~tango.DeviceImpl` or the
+            name of such such class
+
         * "devices" which value is a sequence of dicts with the following keys:
+
           * "name" (str)
           * "properties" (dict)
           * "memorized" (dict)
+
     :type devices_info:
       sequence<dict>
     :param server_name:
@@ -195,7 +200,7 @@ class MultiDeviceTestContext(object):
       Optional.  Default is lower-case version of the server name.
     :type instance_name:
       :py:obj:`str`
-    :param db
+    :param db:
       Path to a pre-populated text file to use for the
       database.
       Optional.  Default is to create a new temporary file and populate it
