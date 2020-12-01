@@ -139,7 +139,9 @@ test_script:
   - "%PYTHON_ROOT%/Scripts/pytest.exe -c pytest_empty_config.txt --collect-only -q -q tests"
   - cmd: cd "C:\projects\pytango\tests"
   - cmd: path=%PYTHON_ROOT%\Scripts;%path%
+  - cmd: nul > summary.json
   - cmd: run_tests_win.bat
+  - cmd: type summary.json
 
 after_test:
   - cmd: cd C:/projects/pytango/dist

@@ -22,3 +22,27 @@ def pytest_sessionfinish(session):
                 f.write("\n")
                 f.write("pytest -c ../pytest_empty_config.txt ")#this empty file is created by appveyor
                 f.write(item.nodeid) 
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport():
+    """ produces summary.json file for quick windows test summary """
+    summary_path = "summary.json"
+    
+    outcome = yield  # Run all other pytest_runtest_makereport non wrapped hooks
+    result = outcome.get_result()
+    if result.when == "call" and 'nt' in os.name and os.path.isfile(summary_path):
+        with open(summary_path, "r+") as f:
+            summary = f.read()
+            try:
+                summary = json.loads(summary)
+            except:
+                summary = {}
+            finally:
+                outcome = str(result.outcome)
+                if outcome in summary:
+                    summary[outcome] += 1
+                else:
+                    summary[outcome] = 1
+                f.seek(0)
+                f.write(json.dumps(summary))
+                f.truncate()
