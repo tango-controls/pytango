@@ -85,13 +85,6 @@ init:
   - appveyor DownloadFile %boost_download_base%/%boost_version%/boost-python-%boost_version%_%ARCH%_py%PYTHON_VER%.zip
   - cmd: 7z -y x boost-python-%boost_version%_%ARCH%_py%PYTHON_VER%.zip -oC:\projects\
 
-  #Pthread-Win32
-  - cmd: cd "C:\projects\"
-  - cmd: md pthreads-win32
-  - cmd: cd "C:\projects\"
-  - appveyor DownloadFile https://github.com/tango-controls/Pthread_WIN32/releases/download/2.9.1/pthreads-win32-2.9.1_%ARCH%.zip
-  - cmd: 7z -y x pthreads-win32-2.9.1_%ARCH%.zip -oC:\projects\pthreads-win32\
-
   #VS2008 patch
   - cmd: cd "C:\projects\"
   - cmd: appveyor DownloadFile https://github.com/menpo/condaci/raw/master/vs2008_patch.zip
@@ -114,7 +107,6 @@ install:
   # Prepare cmake
   - cmd: cd "C:\projects\pytango"
   - cmd: set BOOST_ROOT=c:/projects/Boost
-  - cmd: set PTHREAD_WIN=C:/projects/pthreads-win32/
   - cmd: if /I %platform%==win32 set TANGO_ROOT=C:/projects/libtango/libtango_%cpptango_version%_%MSVCVERSION%_x86
   - cmd: if /I %platform%==x64 set TANGO_ROOT=C:/projects/libtango/libtango_%cpptango_version%_%MSVCVERSION%_x64
   - cmd: echo TANGO_ROOT is "%TANGO_ROOT%"
