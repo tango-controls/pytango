@@ -36,13 +36,17 @@ def pytest_runtest_makereport():
             try:
                 summary = json.loads(summary)
             except:
-                summary = {}
+                summary = []
             finally:
-                outcome = str(result.outcome)
-                if outcome in summary:
-                    summary[outcome] += 1
-                else:
-                    summary[outcome] = 1
+                outcome = str(result.outcome).capitalize()
+                test = {
+                    "testName": result.nodeid,
+                    "outcome": outcome,
+                    "durationMilliseconds": result.duration,
+                    "StdOut": result.capstdout,
+                    "StdErr": result.capstderr,
+                }
+                summary.append(test)
                 f.seek(0)
                 f.write(json.dumps(summary))
                 f.truncate()

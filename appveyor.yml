@@ -141,8 +141,9 @@ test_script:
   - cmd: path=%PYTHON_ROOT%\Scripts;%path%
   - cmd: nul > summary.json
   - cmd: run_tests_win.bat
-  - cmd: type summary.json
-
+  - cmd: set API_URL=%APPVEYOR_API_URL%/api/tests/batch
+  - cmd: powershell -command "$body = Get-Content summary.json -Raw; Invoke-Webrequest $env:API_URL -Method 'POST' -UseBasicParsing -ContentType 'application/json; charset=utf-8' -Body $body"
+ 
 after_test:
   - cmd: cd C:/projects/pytango/dist
   - cmd: dir
