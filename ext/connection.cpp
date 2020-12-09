@@ -19,18 +19,18 @@ namespace PyConnection
     using namespace boost::python;
 
     static
-    Tango::DeviceData command_inout(Tango::Connection& self, const string & cmd_name, const Tango::DeviceData &argin)
+    Tango::DeviceData command_inout(Tango::Connection& self, const std::string & cmd_name, const Tango::DeviceData &argin)
     {
         AutoPythonAllowThreads guard;
-        return self.command_inout(const_cast<string&>(cmd_name), const_cast<Tango::DeviceData&>(argin));
+        return self.command_inout(const_cast<std::string&>(cmd_name), const_cast<Tango::DeviceData&>(argin));
     }
 
 
     static
-    long command_inout_asynch_id(Tango::Connection& self, const string &cmd_name, const Tango::DeviceData &argin, bool forget)
+    long command_inout_asynch_id(Tango::Connection& self, const std::string &cmd_name, const Tango::DeviceData &argin, bool forget)
     {
         AutoPythonAllowThreads guard;
-        return self.command_inout_asynch(const_cast<string&>(cmd_name), const_cast<Tango::DeviceData&>(argin), forget);
+        return self.command_inout_asynch(const_cast<std::string&>(cmd_name), const_cast<Tango::DeviceData&>(argin), forget);
     }
 
 
@@ -49,7 +49,7 @@ namespace PyConnection
     }
 
     static
-    void command_inout_asynch_cb(object py_self, const string & cmd_name, const Tango::DeviceData &argin, object py_cb)
+    void command_inout_asynch_cb(object py_self, const std::string & cmd_name, const Tango::DeviceData &argin, object py_cb)
     {
         Tango::Connection* self = extract<Tango::Connection*>(py_self);
         PyCallBackAutoDie* cb = extract<PyCallBackAutoDie*>(py_cb);
@@ -57,7 +57,7 @@ namespace PyConnection
 
         try {
             AutoPythonAllowThreads guard;
-            self->command_inout_asynch(const_cast<string&>(cmd_name), const_cast<Tango::DeviceData&>(argin), *cb);
+            self->command_inout_asynch(const_cast<std::string&>(cmd_name), const_cast<Tango::DeviceData&>(argin), *cb);
         } catch (...) {
             cb->unset_autokill_references();
             throw;
@@ -80,7 +80,7 @@ namespace PyConnection
     
     str get_fqdn()
     {
-        string fqdn;
+        std::string fqdn;
         Tango::Connection::get_fqdn(fqdn);
         return str(fqdn.c_str());
     }

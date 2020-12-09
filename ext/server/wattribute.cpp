@@ -126,7 +126,7 @@ namespace PyWAttribute
     template<>
     inline void __set_min_value<Tango::DevEncoded>(Tango::WAttribute &self, boost::python::object value)
     {
-    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+    	std::string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
     	Tango::Except::throw_exception((const char *)"API_MethodArgument",
     				  (const char *)err_msg.c_str(),
     				  (const char *)"WAttribute::set_min_value()");
@@ -143,7 +143,7 @@ namespace PyWAttribute
 
     inline void set_min_value(Tango::WAttribute &self, boost::python::object value)
     {
-        bopy::extract<string> value_convert(value);
+        bopy::extract<std::string> value_convert(value);
         
     	if (value_convert.check())
     	{
@@ -185,7 +185,7 @@ namespace PyWAttribute
     template<>
     inline void __set_max_value<Tango::DevEncoded>(Tango::WAttribute &self, boost::python::object value)
     {
-    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+    	std::string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
     	Tango::Except::throw_exception((const char *)"API_MethodArgument",
     				  (const char *)err_msg.c_str(),
     				  (const char *)"WAttribute::set_max_value()");
@@ -202,7 +202,7 @@ namespace PyWAttribute
 
     inline void set_max_value(Tango::WAttribute &self, boost::python::object value)
     {
-        bopy::extract<string> value_convert(value);
+        bopy::extract<std::string> value_convert(value);
         
     	if (value_convert.check())
     	{

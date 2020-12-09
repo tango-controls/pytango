@@ -71,7 +71,7 @@ namespace IfchangeServer_ns
  *  parameter attname: attribute name to be cretated and added.
  */
 //--------------------------------------------------------
-void IfchangeServer::add_ioattr_dynamic_attribute(string attname)
+void IfchangeServer::add_ioattr_dynamic_attribute(std::string attname)
 {
 	//	Attribute : ioattr
 	ioattrAttrib	*ioattr = new ioattrAttrib(attname);
@@ -109,10 +109,10 @@ void IfchangeServer::add_ioattr_dynamic_attribute(string attname)
  *  parameter attname: attribute name to be removed.
  */
 //--------------------------------------------------------
-void IfchangeServer::remove_ioattr_dynamic_attribute(string attname)
+void IfchangeServer::remove_ioattr_dynamic_attribute(std::string attname)
 {
 	remove_attribute(attname, true);
-	map<string,Tango::DevDouble>::iterator ite;
+	map<std::string,Tango::DevDouble>::iterator ite;
     if ((ite=ioattr_data.find(attname))!=ioattr_data.end())
     {
     	/*----- PROTECTED REGION ID(IfchangeServer::remove_ioattr_dynamic_attribute) ENABLED START -----*/
@@ -133,9 +133,9 @@ void IfchangeServer::remove_ioattr_dynamic_attribute(string attname)
  *  parameter attname: the specified attribute name.
  */
 //--------------------------------------------------------
-Tango::DevDouble *IfchangeServer::get_ioattr_data_ptr(string &name)
+Tango::DevDouble *IfchangeServer::get_ioattr_data_ptr(std::string &name)
 {
-	map<string,Tango::DevDouble>::iterator ite;
+	map<std::string,Tango::DevDouble>::iterator ite;
     if ((ite=ioattr_data.find(name))==ioattr_data.end())
     {
 		TangoSys_OMemStream	tms;
@@ -161,7 +161,7 @@ Tango::DevDouble *IfchangeServer::get_ioattr_data_ptr(string &name)
  *  parameter device:  Set this flag to true if the command must be added for only this device.
  */
 //--------------------------------------------------------
-void IfchangeServer::add_iocmd_dynamic_command(string cmdname, bool device)
+void IfchangeServer::add_iocmd_dynamic_command(std::string cmdname, bool device)
 {
 	iocmdClass	*piocmdCmd =
 		new iocmdClass(cmdname.c_str(),
@@ -178,7 +178,7 @@ void IfchangeServer::add_iocmd_dynamic_command(string cmdname, bool device)
  *  parameter cmdname: command name to be removed.
  */
 //--------------------------------------------------------
-void IfchangeServer::remove_iocmd_dynamic_command(string cmdname)
+void IfchangeServer::remove_iocmd_dynamic_command(std::string cmdname)
 {
 	remove_command(cmdname, true);
 }

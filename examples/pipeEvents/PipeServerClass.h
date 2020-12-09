@@ -63,7 +63,7 @@ namespace PipeServer_ns
 class TestPipeClass: public Tango::WPipe
 {
 public:
-	TestPipeClass(const string &name, Tango::DispLevel level)
+	TestPipeClass(const std::string &name, Tango::DispLevel level)
 		:WPipe(name, level) {};
 
 	~TestPipeClass() {};
@@ -129,12 +129,12 @@ class PipeServerClass : public Tango::DeviceClass
 		static PipeServerClass *init(const char *);
 		static PipeServerClass *instance();
 		~PipeServerClass();
-		Tango::DbDatum	get_class_property(string &);
-		Tango::DbDatum	get_default_device_property(string &);
-		Tango::DbDatum	get_default_class_property(string &);
+		Tango::DbDatum	get_class_property(std::string &);
+		Tango::DbDatum	get_default_device_property(std::string &);
+		Tango::DbDatum	get_default_class_property(std::string &);
 	
 	protected:
-		PipeServerClass(string &);
+		PipeServerClass(std::string &);
 		static PipeServerClass *_instance;
 		void command_factory();
 		void attribute_factory(std::vector<Tango::Attr *> &);
@@ -142,15 +142,15 @@ class PipeServerClass : public Tango::DeviceClass
 		void write_class_property();
 		void set_default_property();
 		void get_class_property();
-		string get_cvstag();
-		string get_cvsroot();
+		std::string get_cvstag();
+		std::string get_cvsroot();
 	
 	private:
 		void device_factory(const Tango::DevVarStringArray *);
 		void create_static_attribute_list(std::vector<Tango::Attr *> &);
 		void erase_dynamic_attributes(const Tango::DevVarStringArray *,std::vector<Tango::Attr *> &);
-		std::vector<string>	defaultAttList;
-		Tango::Attr *get_attr_object_by_name(std::vector<Tango::Attr *> &att_list, string attname);
+		std::vector<std::string>	defaultAttList;
+		Tango::Attr *get_attr_object_by_name(std::vector<Tango::Attr *> &att_list, std::string attname);
 };
 
 }	//	End of namespace

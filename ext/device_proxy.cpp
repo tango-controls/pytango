@@ -310,7 +310,7 @@ namespace PyDeviceProxy
         bopy::ssize_t n = bopy::len(py_value);
         std::vector < std::string > elem_names;
         for (size_t i = 0; i < n; ++i) {
-            string s = bopy::extract < std::string > (py_value[i]["name"]);
+            std::string s = bopy::extract < std::string > (py_value[i]["name"]);
             elem_names.push_back(bopy::extract<std::string>(py_value[i]["name"]));
         }
         obj.set_data_elt_names(elem_names);
@@ -384,7 +384,7 @@ namespace PyDeviceProxy
         self.write_attribute(da);
     }
 
-    static inline void write_attribute(Tango::DeviceProxy& self, const string & attr_name, bopy::object py_value)
+    static inline void write_attribute(Tango::DeviceProxy& self, const std::string & attr_name, bopy::object py_value)
     {
         Tango::DeviceAttribute dev_attr;
         PyDeviceAttribute::reset(dev_attr, attr_name, self, py_value);
@@ -403,7 +403,7 @@ namespace PyDeviceProxy
         self.write_attributes(dev_attrs);
     }
 
-    static inline bopy::object write_read_attribute(Tango::DeviceProxy& self, const string & attr_name, bopy::object py_value, PyTango::ExtractAs extract_as)
+    static inline bopy::object write_read_attribute(Tango::DeviceProxy& self, const std::string & attr_name, bopy::object py_value, PyTango::ExtractAs extract_as)
     {
         Tango::DeviceAttribute w_dev_attr;
         unique_pointer<Tango::DeviceAttribute> r_dev_attr;
@@ -587,7 +587,7 @@ namespace PyDeviceProxy
 
     static int subscribe_event_attrib(
             bopy::object py_self,
-            const string &attr_name,
+            const std::string &attr_name,
             Tango::EventType event,
             bopy::object py_cb_or_queuesize,
             bopy::object &py_filters,
@@ -942,7 +942,7 @@ void export_device_proxy()
             ( arg_("self"), arg_("attr_names"), arg_("extract_as")=PyTango::ExtractAsNumpy ) )
 
         .def("_write_attribute",
-            (void (*)(Tango::DeviceProxy&, const string &, bopy::object ))
+            (void (*)(Tango::DeviceProxy&, const std::string &, bopy::object ))
             &PyDeviceProxy::write_attribute,
             ( arg_("self"), arg_("attr_name"), arg_("value") ) )
 

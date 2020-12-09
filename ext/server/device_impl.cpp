@@ -665,7 +665,7 @@ namespace PyDeviceImpl
     void remove_attribute(Tango::DeviceImpl &self, const char *att_name,
                           bool clean_db = true)
     {
-        string str(att_name);
+        std::string str(att_name);
         self.remove_attribute(str, false, clean_db);
     }
 
@@ -695,7 +695,7 @@ namespace PyDeviceImpl
         self.remove_command(name, free_it, clean_db);
     }
 
-    inline void debug(Tango::DeviceImpl &self, const string &msg)
+    inline void debug(Tango::DeviceImpl &self, const std::string &msg)
     {
         if (self.get_logger()->is_debug_enabled()) {
 	    self.get_logger()->debug_stream() 
@@ -703,7 +703,7 @@ namespace PyDeviceImpl
 	}
     }
 
-    inline void info(Tango::DeviceImpl &self, const string &msg)
+    inline void info(Tango::DeviceImpl &self, const std::string &msg)
     {
         if (self.get_logger()->is_info_enabled()) {
 	    self.get_logger()->info_stream() 
@@ -711,7 +711,7 @@ namespace PyDeviceImpl
 	}
     }
 
-    inline void warn(Tango::DeviceImpl &self, const string &msg)
+    inline void warn(Tango::DeviceImpl &self, const std::string &msg)
     {
         if (self.get_logger()->is_warn_enabled()) {
 	    self.get_logger()->warn_stream() 
@@ -719,7 +719,7 @@ namespace PyDeviceImpl
 	}
     }
 
-    inline void error(Tango::DeviceImpl &self, const string &msg)
+    inline void error(Tango::DeviceImpl &self, const std::string &msg)
     {
         if (self.get_logger()->is_error_enabled()) {
 	    self.get_logger()->error_stream() 
@@ -727,7 +727,7 @@ namespace PyDeviceImpl
 	}
     }
 
-    inline void fatal(Tango::DeviceImpl &self, const string &msg)
+    inline void fatal(Tango::DeviceImpl &self, const std::string &msg)
     {
         if (self.get_logger()->is_fatal_enabled()) {
 	    self.get_logger()->fatal_stream() 

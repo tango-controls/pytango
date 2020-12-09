@@ -507,7 +507,7 @@ namespace PyDevicePipe
 	}
 
 	void __append(Tango::DevicePipeBlob& dpb, const std::string& name, bopy::object& value) {
-		if (__check_type<string>(value)) {
+		if (__check_type<std::string>(value)) {
 			__append_scalar<Tango::DevicePipeBlob, Tango::DEV_STRING>(dpb, name, value);
 		} else if (__check_type<int>(value)) {
 			__append_scalar<Tango::DevicePipeBlob, Tango::DEV_LONG64>(dpb, name, value);
@@ -516,7 +516,7 @@ namespace PyDevicePipe
 		} else if (__check_type<bool>(value)) {
 			__append_scalar<Tango::DevicePipeBlob, Tango::DEV_BOOLEAN>(dpb, name, value);
 		} else if (__check_type<bopy::list>(value)) {
-			if (__check_type<string>(value[0])) {
+			if (__check_type<std::string>(value[0])) {
 				__append_array<Tango::DevicePipeBlob, Tango::DEVVAR_STRINGARRAY>(dpb, name, value);
 			} else if (__check_type<int>(value[0])) {
 				__append_array<Tango::DevicePipeBlob, Tango::DEVVAR_LONG64ARRAY>(dpb, name, value);

@@ -83,7 +83,7 @@ namespace IfchangeServer_ns
  *                implementing the classIfchangeServer
  */
 //--------------------------------------------------------
-IfchangeServer::IfchangeServer(Tango::DeviceClass *cl, string &s)
+IfchangeServer::IfchangeServer(Tango::DeviceClass *cl, std::string &s)
  : TANGO_BASE_CLASS(cl, s.c_str())
 {
 	/*----- PROTECTED REGION ID(IfchangeServer::constructor_1) ENABLED START -----*/

@@ -112,7 +112,7 @@ namespace PyUtil
         return Tango::Util::instance(b);
     }
 
-    inline object get_device_list_by_class(Tango::Util &self, const string &class_name)
+    inline object get_device_list_by_class(Tango::Util &self, const std::string &class_name)
     {
         boost::python::list py_dev_list;
         std::vector<Tango::DeviceImpl *> &dev_list = self.get_device_list_by_class(class_name);
@@ -129,7 +129,7 @@ namespace PyUtil
         return py_dev_list;
     }
 
-    inline object get_device_by_name(Tango::Util &self, const string &dev_name)
+    inline object get_device_by_name(Tango::Util &self, const std::string &dev_name)
     {
         Tango::DeviceImpl *value = self.get_device_by_name(dev_name);
         object py_value = object(
@@ -141,7 +141,7 @@ namespace PyUtil
         return py_value;
     }
 
-    inline object get_device_list(Tango::Util &self, const string &name)
+    inline object get_device_list(Tango::Util &self, const std::string &name)
     {
         boost::python::list py_dev_list;
         std::vector<Tango::DeviceImpl *> dev_list = self.get_device_list(name);

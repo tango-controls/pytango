@@ -80,7 +80,7 @@ public:
 class ioattrAttrib: public Tango::Attr
 {
 public:
-	ioattrAttrib(const string &att_name):Attr(att_name.c_str(), 
+	ioattrAttrib(const std::string &att_name):Attr(att_name.c_str(),
 			Tango::DEV_DOUBLE, Tango::READ) {};
 	~ioattrAttrib() {};
 	virtual void read(Tango::DeviceImpl *dev,Tango::Attribute &att)
@@ -192,12 +192,12 @@ class IfchangeServerClass : public Tango::DeviceClass
 		static IfchangeServerClass *init(const char *);
 		static IfchangeServerClass *instance();
 		~IfchangeServerClass();
-		Tango::DbDatum	get_class_property(string &);
-		Tango::DbDatum	get_default_device_property(string &);
-		Tango::DbDatum	get_default_class_property(string &);
+		Tango::DbDatum	get_class_property(std::string &);
+		Tango::DbDatum	get_default_device_property(std::string &);
+		Tango::DbDatum	get_default_class_property(std::string &);
 	
 	protected:
-		IfchangeServerClass(string &);
+		IfchangeServerClass(std::string &);
 		static IfchangeServerClass *_instance;
 		void command_factory();
 		void attribute_factory(std::vector<Tango::Attr *> &);
@@ -205,15 +205,15 @@ class IfchangeServerClass : public Tango::DeviceClass
 		void write_class_property();
 		void set_default_property();
 		void get_class_property();
-		string get_cvstag();
-		string get_cvsroot();
+		std::string get_cvstag();
+		std::string get_cvsroot();
 	
 	private:
 		void device_factory(const Tango::DevVarStringArray *);
 		void create_static_attribute_list(std::vector<Tango::Attr *> &);
 		void erase_dynamic_attributes(const Tango::DevVarStringArray *,std::vector<Tango::Attr *> &);
-		std::vector<string>	defaultAttList;
-		Tango::Attr *get_attr_object_by_name(std::vector<Tango::Attr *> &att_list, string attname);
+		std::vector<std::string>	defaultAttList;
+		Tango::Attr *get_attr_object_by_name(std::vector<Tango::Attr *> &att_list, std::string attname);
 };
 
 }	//	End of namespace

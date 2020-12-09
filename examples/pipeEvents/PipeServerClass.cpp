@@ -75,13 +75,13 @@ PipeServerClass *PipeServerClass::_instance = NULL;
 
 //--------------------------------------------------------
 /**
- * method : 		PipeServerClass::PipeServerClass(string &s)
+ * method : 		PipeServerClass::PipeServerClass(std::string &s)
  * description : 	constructor for the PipeServerClass
  *
  * @param s	The class name
  */
 //--------------------------------------------------------
-PipeServerClass::PipeServerClass(string &s):Tango::DeviceClass(s)
+PipeServerClass::PipeServerClass(std::string &s):Tango::DeviceClass(s)
 {
 	cout2 << "Entering PipeServerClass constructor" << std::endl;
 	set_default_property();
@@ -125,7 +125,7 @@ PipeServerClass *PipeServerClass::init(const char *name)
 	{
 		try
 		{
-			string s(name);
+			std::string s(name);
 			_instance = new PipeServerClass(s);
 		}
 		catch (std::bad_alloc &)
@@ -188,7 +188,7 @@ CORBA::Any *cmd_push_pipe_eventClass::execute(Tango::DeviceImpl *device, const C
  *	Description : Get the class property for specified name.
  */
 //--------------------------------------------------------
-Tango::DbDatum PipeServerClass::get_class_property(string &prop_name)
+Tango::DbDatum PipeServerClass::get_class_property(std::string &prop_name)
 {
 	for (unsigned int i=0 ; i<cl_prop.size() ; i++)
 		if (cl_prop[i].name == prop_name)
@@ -203,7 +203,7 @@ Tango::DbDatum PipeServerClass::get_class_property(string &prop_name)
  *	Description : Return the default value for device property.
  */
 //--------------------------------------------------------
-Tango::DbDatum PipeServerClass::get_default_device_property(string &prop_name)
+Tango::DbDatum PipeServerClass::get_default_device_property(std::string &prop_name)
 {
 	for (unsigned int i=0 ; i<dev_def_prop.size() ; i++)
 		if (dev_def_prop[i].name == prop_name)
@@ -218,7 +218,7 @@ Tango::DbDatum PipeServerClass::get_default_device_property(string &prop_name)
  *	Description : Return the default value for class property.
  */
 //--------------------------------------------------------
-Tango::DbDatum PipeServerClass::get_default_class_property(string &prop_name)
+Tango::DbDatum PipeServerClass::get_default_class_property(std::string &prop_name)
 {
 	for (unsigned int i=0 ; i<cl_def_prop.size() ; i++)
 		if (cl_def_prop[i].name == prop_name)
@@ -242,7 +242,7 @@ void PipeServerClass::set_default_property()
 	string	prop_name;
 	string	prop_desc;
 	string	prop_def;
-	std::vector<string>	vect_data;
+	std::vector<std::string>	vect_data;
 
 	//	Set Default Class Properties
 
@@ -274,7 +274,7 @@ void PipeServerClass::write_class_property()
 
 	//	Put Description
 	Tango::DbDatum	description("Description");
-	std::vector<string>	str_desc;
+	std::vector<std::string>	str_desc;
 	str_desc.push_back("");
 	description << str_desc;
 	data.push_back(description);
@@ -286,7 +286,7 @@ void PipeServerClass::write_class_property()
 	// check for cvs information
 	string	src_path(CvsPath);
 	start = src_path.find("/");
-	if (start!=string::npos)
+	if (start!=std::string::npos)
 	{
 		end   = src_path.find(filename);
 		if (end>start)
@@ -294,10 +294,10 @@ void PipeServerClass::write_class_property()
 			string	strloc = src_path.substr(start, end-start);
 			//	Check if specific repository
 			start = strloc.find("/cvsroot/");
-			if (start!=string::npos && start>0)
+			if (start!=std::string::npos && start>0)
 			{
 				string	repository = strloc.substr(0, start);
-				if (repository.find("/segfs/")!=string::npos)
+				if (repository.find("/segfs/")!=std::string::npos)
 					strloc = "ESRF:" + strloc.substr(start, strloc.length()-start);
 			}
 			Tango::DbDatum	cvs_loc("cvs_location");
@@ -311,7 +311,7 @@ void PipeServerClass::write_class_property()
 	{
 		string	src_path(SvnPath);
 		start = src_path.find("://");
-		if (start!=string::npos)
+		if (start!=std::string::npos)
 		{
 			end = src_path.find(filename);
 			if (end>start)
@@ -336,7 +336,7 @@ void PipeServerClass::write_class_property()
 	string	endstr(" $");
 	
 	end   = tagname.find(endstr);
-	if (end!=string::npos && end>start)
+	if (end!=std::string::npos && end>start)
 	{
 		string	strtag = tagname.substr(start, end-start);
 		Tango::DbDatum	cvs_tag("cvs_tag");
@@ -350,13 +350,13 @@ void PipeServerClass::write_class_property()
 	start = header.length();
 	
 	end   = svnpath.find(endstr);
-	if (end!=string::npos && end>start)
+	if (end!=std::string::npos && end>start)
 	{
 		string	strloc = svnpath.substr(start, end-start);
 		
-		string tagstr ("/tags/");
+		std::string tagstr ("/tags/");
 		start = strloc.find(tagstr);
-		if ( start!=string::npos )
+		if ( start!=std::string::npos )
 		{
 			start = start + tagstr.length();
 			end   = strloc.find(filename);
@@ -379,7 +379,7 @@ void PipeServerClass::write_class_property()
 
 	//  Put inheritance
 	Tango::DbDatum	inher_datum("InheritedFrom");
-	std::vector<string> inheritance;
+	std::vector<std::string> inheritance;
 	inheritance.push_back("TANGO_BASE_CLASS");
 	inher_datum << inheritance;
 	data.push_back(inher_datum);
@@ -535,7 +535,7 @@ void PipeServerClass::create_static_attribute_list(std::vector<Tango::Attr *> &a
 {
 	for (unsigned long i=0 ; i<att_list.size() ; i++)
 	{
-		string att_name(att_list[i]->get_name());
+		std::string att_name(att_list[i]->get_name());
 		transform(att_name.begin(), att_name.end(), att_name.begin(), ::tolower);
 		defaultAttList.push_back(att_name);
 	}
@@ -570,10 +570,10 @@ void PipeServerClass::erase_dynamic_attributes(const Tango::DevVarStringArray *d
 		std::vector<Tango::Attribute *>::iterator ite_att;
 		for (ite_att=dev_att_list.begin() ; ite_att != dev_att_list.end() ; ++ite_att)
 		{
-			string att_name((*ite_att)->get_name_lower());
+			std::string att_name((*ite_att)->get_name_lower());
 			if ((att_name == "state") || (att_name == "status"))
 				continue;
-			std::vector<string>::iterator ite_str = find(defaultAttList.begin(), defaultAttList.end(), att_name);
+			std::vector<std::string>::iterator ite_str = find(defaultAttList.begin(), defaultAttList.end(), att_name);
 			if (ite_str == defaultAttList.end())
 			{
 				cout2 << att_name << " is a UNWANTED dynamic attribute for device " << (*devlist_ptr)[i] << std::endl;
@@ -594,7 +594,7 @@ void PipeServerClass::erase_dynamic_attributes(const Tango::DevVarStringArray *d
  *	Description : returns Tango::Attr * object found by name
  */
 //--------------------------------------------------------
-Tango::Attr *PipeServerClass::get_attr_object_by_name(std::vector<Tango::Attr *> &att_list, string attname)
+Tango::Attr *PipeServerClass::get_attr_object_by_name(std::vector<Tango::Attr *> &att_list, std::string attname)
 {
 	std::vector<Tango::Attr *>::iterator it;
 	for (it=att_list.begin() ; it<att_list.end() ; ++it)

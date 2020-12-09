@@ -36,8 +36,8 @@ using namespace boost::python;
     try { boost::python::call_method<void>(m_self, #name, __VA_ARGS__); } \
     __AUX_CATCH_PY_EXCEPTION
 
-CppDeviceClass::CppDeviceClass(const string &name)
-    :Tango::DeviceClass(const_cast<string&>(name))
+CppDeviceClass::CppDeviceClass(const std::string &name)
+    :Tango::DeviceClass(const_cast<std::string&>(name))
 {}
 
 CppDeviceClass::~CppDeviceClass()
@@ -399,13 +399,13 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS (export_device_overload,
 
 void export_device_class()
 {
-    void (Tango::DeviceClass::*add_wiz_dev_prop_)(string &,string &) =
+    void (Tango::DeviceClass::*add_wiz_dev_prop_)(std::string &,std::string &) =
         &Tango::DeviceClass::add_wiz_dev_prop;
-    void (Tango::DeviceClass::*add_wiz_dev_prop__)(string &,string &,string &) =
+    void (Tango::DeviceClass::*add_wiz_dev_prop__)(std::string &,std::string &,std::string &) =
         &Tango::DeviceClass::add_wiz_dev_prop;
-    void (Tango::DeviceClass::*add_wiz_class_prop_)(string &,string &) =
+    void (Tango::DeviceClass::*add_wiz_class_prop_)(std::string &,std::string &) =
         &Tango::DeviceClass::add_wiz_class_prop;
-    void (Tango::DeviceClass::*add_wiz_class_prop__)(string &,string &,string &) =
+    void (Tango::DeviceClass::*add_wiz_class_prop__)(std::string &,std::string &,std::string &) =
         &Tango::DeviceClass::add_wiz_class_prop;
 
     class_<CppDeviceClass, auto_ptr<CppDeviceClassWrap>, boost::noncopyable>("DeviceClass",

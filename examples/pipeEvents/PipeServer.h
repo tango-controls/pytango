@@ -68,7 +68,7 @@ class PipeServer : public TANGO_BASE_CLASS
 	Tango::DevicePipeBlob 		inner_inner_blob;
 	Tango::DevicePipeBlob 		inner_blob;
 
-	string						inner_str;
+	std::string						inner_str;
 	Tango::DevBoolean			inner_bool;
 	std::vector<Tango::DevLong>		v_dl;
 
@@ -83,7 +83,7 @@ public:
 	 *	@param cl	Class.
 	 *	@param s 	Device Name
 	 */
-	PipeServer(Tango::DeviceClass *cl,string &s);
+	PipeServer(Tango::DeviceClass *cl,std::string &s);
 	/**
 	 * Constructs a newly device object.
 	 *

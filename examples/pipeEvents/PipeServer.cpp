@@ -81,7 +81,7 @@ namespace PipeServer_ns
  *                implementing the classPipeServer
  */
 //--------------------------------------------------------
-PipeServer::PipeServer(Tango::DeviceClass *cl, string &s)
+PipeServer::PipeServer(Tango::DeviceClass *cl, std::string &s)
  : TANGO_BASE_CLASS(cl, s.c_str())
 {
 	/*----- PROTECTED REGION ID(PipeServer::constructor_1) ENABLED START -----*/
@@ -210,7 +210,7 @@ void PipeServer::read_TestPipe(Tango::Pipe &pipe)
 	DEBUG_STREAM << "PipeServer::read_TestPipe(Tango::Pipe &pipe) entering... " << std::endl;
 	/*----- PROTECTED REGION ID(PipeServer::read_TestPipe) ENABLED START -----*/
 
-    std::vector<string> de_names;
+    std::vector<std::string> de_names;
     de_names.push_back("x");
     de_names.push_back("y");
     de_names.push_back("width");
@@ -222,7 +222,7 @@ void PipeServer::read_TestPipe(Tango::Pipe &pipe)
     y=6.0;
     width=30.0;
     height=45.0;
-    string root_name = "theBlob";
+    std::string root_name = "theBlob";
 
     pipe.set_root_blob_name(root_name);
     pipe << x << y << width << height;
@@ -326,7 +326,7 @@ void PipeServer::cmd_push_pipe_event(Tango::DevShort argin)
 	{
 		Tango::DevicePipeBlob dpb("PipeEventCase0");
 
-		std::vector<string> de_inner_inner_names;
+		std::vector<std::string> de_inner_inner_names;
 		de_inner_inner_names.push_back("InnerInnerFirstDE");
 		de_inner_inner_names.push_back("InneraaaaaaaInnerSecondDE");
 		inner_inner_blob.set_data_elt_names(de_inner_inner_names);
@@ -340,7 +340,7 @@ void PipeServer::cmd_push_pipe_event(Tango::DevShort argin)
 		inner_inner_blob["InneraaaaaaaInnerSecondDE"] << v_db;
 		inner_inner_blob["InnerInnerFirstDE"] << dl;
 
-		std::vector<string> de_inner_names;
+		std::vector<std::string> de_inner_names;
 		de_inner_names.push_back("InnerFirstDE");
 		de_inner_names.push_back("InnerSecondDE");
 		de_inner_names.push_back("InnerThirdDE");
@@ -352,7 +352,7 @@ void PipeServer::cmd_push_pipe_event(Tango::DevShort argin)
 
 		inner_blob << inner_str << inner_inner_blob << inner_bool;
 
-		std::vector<string> de_names;
+		std::vector<std::string> de_names;
 		de_names.push_back("1DE");
 		de_names.push_back("2DE");
 		dpb.set_data_elt_names(de_names);
@@ -369,14 +369,14 @@ void PipeServer::cmd_push_pipe_event(Tango::DevShort argin)
 	else if (argin == 1)
 	{
 		Tango::DevicePipeBlob dpb("PipeEventCase1");
-		std::vector<string> de_names;
+		std::vector<std::string> de_names;
 		de_names.push_back("Another_1DE");
 		de_names.push_back("Another_2DE");
 		dpb.set_data_elt_names(de_names);
 
 		v_dl.clear();
 		v_dl.push_back(2);
-		string str("Barcelona");
+		std::string str("Barcelona");
 
 		dpb << v_dl << str;
 
@@ -385,7 +385,7 @@ void PipeServer::cmd_push_pipe_event(Tango::DevShort argin)
 	else if (argin == 2)
 	{
 		Tango::DevicePipeBlob dpb("PipeEventCase2");
-		std::vector<string> de_names;
+		std::vector<std::string> de_names;
 		de_names.push_back("Qwerty_1DE");
 		de_names.push_back("Azerty_2DE");
 		dpb.set_data_elt_names(de_names);
@@ -396,7 +396,7 @@ void PipeServer::cmd_push_pipe_event(Tango::DevShort argin)
 		v_df.push_back(6.284);
 		v_df.push_back(12.568);
 		v_df.push_back(25.136);
-		string str("Barcelona");
+		std::string str("Barcelona");
 
 		dpb << str << v_df;
 
@@ -425,12 +425,12 @@ void PipeServer::cmd_push_pipe_event(Tango::DevShort argin)
 	else if (argin == 4)
 	{
 		Tango::DevicePipeBlob dpb("PipeEventCase4");
-		std::vector<string> de_names;
+		std::vector<std::string> de_names;
 		de_names.push_back("Lunes");
 		de_names.push_back("Martes");
 		dpb.set_data_elt_names(de_names);
 
-		string str("Girona");
+		std::string str("Girona");
 
 		v_dl.clear();
 		for (int loop = 0;loop < 3000;loop++)

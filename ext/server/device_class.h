@@ -18,7 +18,7 @@
 class CppDeviceClass: public Tango::DeviceClass
 {
 public:
-    CppDeviceClass(const string &);
+    CppDeviceClass(const std::string &);
 
     virtual ~CppDeviceClass();
 

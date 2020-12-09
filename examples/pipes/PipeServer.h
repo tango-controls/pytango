@@ -75,7 +75,7 @@ public:
 	 *	@param cl	Class.
 	 *	@param s 	Device Name
 	 */
-	PipeServer(Tango::DeviceClass *cl,string &s);
+	PipeServer(Tango::DeviceClass *cl,std::string &s);
 	/**
 	 * Constructs a newly device object.
 	 *

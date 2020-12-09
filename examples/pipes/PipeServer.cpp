@@ -80,7 +80,7 @@ namespace PipeServer_ns
  *                implementing the classPipeServer
  */
 //--------------------------------------------------------
-PipeServer::PipeServer(Tango::DeviceClass *cl, string &s)
+PipeServer::PipeServer(Tango::DeviceClass *cl, std::string &s)
  : TANGO_BASE_CLASS(cl, s.c_str())
 {
 	/*----- PROTECTED REGION ID(PipeServer::constructor_1) ENABLED START -----*/
@@ -207,7 +207,7 @@ void PipeServer::read_TestPipe(Tango::Pipe &pipe)
 	DEBUG_STREAM << "PipeServer::read_TestPipe(Tango::Pipe &pipe) entering... " << std::endl;
 	/*----- PROTECTED REGION ID(PipeServer::read_TestPipe) ENABLED START -----*/
 	
-    std::vector<string> de_names;
+    std::vector<std::string> de_names;
     de_names.push_back("x");
     de_names.push_back("y");
     de_names.push_back("width");
@@ -219,7 +219,7 @@ void PipeServer::read_TestPipe(Tango::Pipe &pipe)
     y=6.0;
     width=30.0;
     height=45.0;
-    string root_name = "theBlob";
+    std::string root_name = "theBlob";
 
     pipe.set_root_blob_name(root_name);
     pipe << x << y << width << height;
