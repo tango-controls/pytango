@@ -132,8 +132,8 @@ build_script:
   - cmake --build ./ -j 4 --config Release
 
 test_script:
-  - "%PYTHON_ROOT%/Scripts/pip.exe install gevent pytest psutil six numpy"
-  - cmd: if %PYTHON_VER%==27 "%PYTHON_ROOT%/Scripts/pip.exe" install enum34 futures trollius zipp
+  - "%PYTHON_ROOT%/Scripts/pip.exe install \"gevent!=1.5a1\" \"pytest<5\" psutil \"six>=1.10\" \"numpy>=1.1\""
+  - cmd: if %PYTHON_VER%==27 "%PYTHON_ROOT%/Scripts/pip.exe" install enum34 futures trollius "zipp>=0.5,<2" "pyparsing<3"
   - cmd: cd "C:\projects\pytango"
   - cmd: nul > pytest_empty_config.txt
   - "%PYTHON_ROOT%/Scripts/pytest.exe -c pytest_empty_config.txt --collect-only -q -q tests"
@@ -143,6 +143,7 @@ test_script:
   - cmd: run_tests_win.bat
   - cmd: set API_URL=%APPVEYOR_API_URL%/api/tests/batch
   - cmd: powershell -command "$body = Get-Content summary.json -Raw; Invoke-Webrequest $env:API_URL -Method 'POST' -UseBasicParsing -ContentType 'application/json; charset=utf-8' -Body $body"
+  - cmd: powershell -command "if(Select-String -Path test.txt \"Failed\"){Write-Error \"Some tests failed.\"}"
  
 after_test:
   - cmd: cd C:/projects/pytango/dist
