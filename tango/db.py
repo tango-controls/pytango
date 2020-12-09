@@ -1569,8 +1569,7 @@ def __doc_Database():
             Query the database for server information.
 
         Parameters :
-            - server : (str) name of the server to be unexported with
-                       format: <server name>/<instance>
+            - server : (str) name of the server with format: <server name>/<instance>
         Return     : DbServerInfo with server information
 
         Throws     : ConnectionFailed, CommunicationFailed, DevFailed from device (DB_SQLError)

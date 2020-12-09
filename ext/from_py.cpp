@@ -96,6 +96,7 @@ void convert2array(const object &py_value, Tango::DevVarStringArray & result)
     else if(PyUnicode_Check(py_value_ptr))
     {
         PyObject* py_bytes_value_ptr = PyUnicode_AsLatin1String(py_value_ptr);
+        result.length(1);
         result[0] = CORBA::string_dup(PyBytes_AS_STRING(py_bytes_value_ptr));
         Py_DECREF(py_bytes_value_ptr);
     }

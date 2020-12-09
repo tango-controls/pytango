@@ -1212,9 +1212,10 @@ class device_property(_BaseProperty):
                                               update_db)
         self.mandatory = mandatory
         if mandatory and default_value is not None:
-            msg = "device_property arguments mandatory " \
-                  "and default_value are incompatible"
-            raise Exception(msg)
+            msg = ("Invalid arguments: 'mandatory' is True, so 'default_value' must be None. "
+                   "A mandatory device property value must be defined in the Tango Database "
+                   "so it cannot have a default.")
+            raise ValueError(msg)
 
 
 class class_property(_BaseProperty):

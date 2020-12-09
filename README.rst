@@ -83,7 +83,7 @@ To test the installation, import ``tango`` and check ``tango.utils.info()``::
 
     >>> import tango
     >>> print(tango.utils.info())
-    PyTango 9.3.2 (9, 3, 2)
+    PyTango 9.3.3 (9, 3, 3)
     PyTango compiled with:
         Python : 2.7.15
         Numpy  : 1.16.2
@@ -145,7 +145,7 @@ All contributions,  `PR and bug reports`_ are welcome, please see: `How to Contr
             :alt: Codacy Badge
 
 .. _Tango: http://tango-controls.org
-.. _Tango C++ API: http://esrf.eu/computing/cs/tango/tango_doc/kernel_doc/cpp_doc
+.. _Tango C++ API: https://tango-controls.github.io/cppTango-docs/index.html
 .. _PyTango: http://github.com/tango-cs/pytango
 .. _PyPI: http://pypi.python.org/pypi/pytango
 

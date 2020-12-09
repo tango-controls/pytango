@@ -105,14 +105,45 @@ def get_device_proxy(*args, **kwargs):
 
 
 class __TangoInfo(object):
-    """Helper class for when DeviceProxy.info() is not available"""
+    """Helper class for copying DeviceInfo, or when DeviceProxy.info() fails."""
 
-    def __init__(self):
-        self.dev_class = self.dev_type = 'Device'
-        self.doc_url = 'http://www.esrf.fr/computing/cs/tango/tango_doc/ds_doc/'
-        self.server_host = 'Unknown'
-        self.server_id = 'Unknown'
-        self.server_version = 1
+    def __init__(
+        self,
+        dev_class,
+        dev_type,
+        doc_url,
+        server_host,
+        server_id,
+        server_version,
+    ):
+        self.dev_class = str(dev_class)
+        self.dev_type = str(dev_type)
+        self.doc_url = str(doc_url)
+        self.server_host = str(server_host)
+        self.server_id = str(server_id)
+        self.server_version = int(server_version)
+
+    @classmethod
+    def from_defaults(cls):
+        return cls(
+            dev_class='Device',
+            dev_type='Device',
+            doc_url='Doc URL = https://www.tango-controls.org/developers/dsc',
+            server_host='Unknown',
+            server_id='Unknown',
+            server_version=1,
+        )
+
+    @classmethod
+    def from_copy(cls, info):
+        return cls(
+            dev_class=info.dev_class,
+            dev_type=info.dev_type,
+            doc_url=info.doc_url,
+            server_host=info.server_host,
+            server_id=info.server_id,
+            server_version=info.server_version,
+        )
 
 
 # -------------------------------------------------------------------------------
@@ -272,11 +303,12 @@ def __set_attribute_value(self, name, value):
 
 
 def __DeviceProxy__getattr(self, name):
+    cause = None
     # trait_names is a feature of IPython. Hopefully they will solve
     # ticket http://ipython.scipy.org/ipython/ipython/ticket/229 someday
     # and the ugly trait_names could be removed.
     if name.startswith("_") or name == 'trait_names':
-        raise AttributeError(name)
+        six.raise_from(AttributeError(name), cause)
 
     name_l = name.lower()
 
@@ -293,8 +325,9 @@ def __DeviceProxy__getattr(self, name):
 
     try:
         self.__refresh_cmd_cache()
-    except:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     cmd_info = self.__get_cmd_cache().get(name_l)
     if cmd_info:
@@ -302,8 +335,9 @@ def __DeviceProxy__getattr(self, name):
 
     try:
         self.__refresh_attr_cache()
-    except:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     attr_info = self.__get_attr_cache().get(name_l)
     if attr_info:
@@ -311,20 +345,22 @@ def __DeviceProxy__getattr(self, name):
 
     try:
         self.__refresh_pipe_cache()
-    except Exception:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     if name_l in self.__get_pipe_cache():
         return self.read_pipe(name)
 
-    raise AttributeError(name)
+    six.raise_from(AttributeError(name), cause)
 
 
 def __DeviceProxy__setattr(self, name, value):
+    cause = None
     name_l = name.lower()
 
     if name_l in self.__get_cmd_cache():
-        raise TypeError('Cannot set the value of a command')
+        six.raise_from(TypeError('Cannot set the value of a command'), cause)
 
     if name_l in self.__get_attr_cache():
         return __set_attribute_value(self, name, value)
@@ -334,29 +370,35 @@ def __DeviceProxy__setattr(self, name, value):
 
     try:
         self.__refresh_cmd_cache()
-    except:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     if name_l in self.__get_cmd_cache():
-        raise TypeError('Cannot set the value of a command')
+        six.raise_from(TypeError('Cannot set the value of a command'), cause)
 
     try:
         self.__refresh_attr_cache()
-    except:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     if name_l in self.__get_attr_cache():
         return __set_attribute_value(self, name, value)
 
     try:
         self.__refresh_pipe_cache()
-    except:
-        pass
+    except Exception as e:
+        if cause is None:
+            cause = e
 
     if name_l in self.__get_pipe_cache():
         return self.write_pipe(name, value)
 
-    return super(DeviceProxy, self).__setattr__(name, value)
+    try:
+        return super(DeviceProxy, self).__setattr__(name, value)
+    except Exception as e:
+        six.raise_from(e, cause)
 
 
 def __DeviceProxy__dir(self):
@@ -1387,9 +1429,11 @@ def __DeviceProxy___get_info_(self):
     """Protected method that gets device info once and stores it in cache"""
     if not hasattr(self, '_dev_info'):
         try:
-            self.__dict__["_dev_info"] = self.info()
+            info = self.info()
+            info_without_cyclic_reference = __TangoInfo.from_copy(info)
+            self.__dict__["_dev_info"] = info_without_cyclic_reference
         except:
-            return __TangoInfo()
+            return __TangoInfo.from_defaults()
     return self._dev_info
 
 
