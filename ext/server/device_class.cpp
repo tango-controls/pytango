@@ -408,7 +408,7 @@ void export_device_class()
     void (Tango::DeviceClass::*add_wiz_class_prop__)(std::string &,std::string &,std::string &) =
         &Tango::DeviceClass::add_wiz_class_prop;
 
-    class_<CppDeviceClass, auto_ptr<CppDeviceClassWrap>, boost::noncopyable>("DeviceClass",
+    class_<CppDeviceClass, std::auto_ptr<CppDeviceClassWrap>, boost::noncopyable>("DeviceClass",
         init<const std::string &>())
 
         .def("device_factory", &CppDeviceClassWrap::device_factory)
@@ -467,6 +467,6 @@ void export_device_class()
         .def("get_class_attr", &Tango::DeviceClass::get_class_attr,
             return_value_policy<reference_existing_object>())
     ;
-    implicitly_convertible<auto_ptr<CppDeviceClassWrap>, auto_ptr<CppDeviceClass> >();
+    implicitly_convertible<std::auto_ptr<CppDeviceClassWrap>, std::auto_ptr<CppDeviceClass> >();
 }
 

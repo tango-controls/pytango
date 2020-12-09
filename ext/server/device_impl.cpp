@@ -1471,7 +1471,7 @@ void export_device_impl()
     void (Tango::DeviceImpl::*stop_polling1)() = &Tango::DeviceImpl::stop_polling;
     void (Tango::DeviceImpl::*stop_polling2)(bool) = &Tango::DeviceImpl::stop_polling;
     
-    class_<Tango::DeviceImpl, auto_ptr<DeviceImplWrap>, boost::noncopyable>("DeviceImpl",
+    class_<Tango::DeviceImpl, std::auto_ptr<DeviceImplWrap>, boost::noncopyable>("DeviceImpl",
         init<CppDeviceClass *, const char *,
              optional<const char *, Tango::DevState, const char *> >())
 
@@ -1711,7 +1711,7 @@ void export_device_impl()
 	.def("is_there_subscriber",
 	     &Tango::DeviceImpl::is_there_subscriber)
     ;
-    implicitly_convertible<auto_ptr<DeviceImplWrap>, auto_ptr<Tango::DeviceImpl> >();
+    implicitly_convertible<std::auto_ptr<DeviceImplWrap>, std::auto_ptr<Tango::DeviceImpl> >();
     
     class_<Tango::Device_2Impl, Device_2ImplWrap,
            bases<Tango::DeviceImpl>,
@@ -1748,7 +1748,7 @@ void export_device_impl()
         .def("set_attribute_config_3", &PyDevice_3Impl::set_attribute_config_3)
     ;
 
-    class_<Tango::Device_4Impl, auto_ptr<Device_4ImplWrap>,
+    class_<Tango::Device_4Impl, std::auto_ptr<Device_4ImplWrap>,
            bases<Tango::Device_3Impl>,
            boost::noncopyable>
            ("Device_4Impl",
@@ -1770,9 +1770,9 @@ void export_device_impl()
         .def("signal_handler", &Tango::Device_4Impl::signal_handler,
             &Device_4ImplWrap::default_signal_handler)
     ;
-    implicitly_convertible<auto_ptr<Device_4ImplWrap>, auto_ptr<Tango::Device_4Impl> >();
+    implicitly_convertible<std::auto_ptr<Device_4ImplWrap>, std::auto_ptr<Tango::Device_4Impl> >();
 
-    class_<Tango::Device_5Impl, auto_ptr<Device_5ImplWrap>,
+    class_<Tango::Device_5Impl, std::auto_ptr<Device_5ImplWrap>,
            bases<Tango::Device_4Impl>,
            boost::noncopyable>
            ("Device_5Impl",
@@ -1794,7 +1794,7 @@ void export_device_impl()
         .def("signal_handler", &Tango::Device_5Impl::signal_handler,
             &Device_5ImplWrap::default_signal_handler)
     ;
-    implicitly_convertible<auto_ptr<Device_5ImplWrap>, auto_ptr<Tango::Device_5Impl> >();
+    implicitly_convertible<std::auto_ptr<Device_5ImplWrap>, std::auto_ptr<Tango::Device_5Impl> >();
 
 }
 //namespace PyDevIntrThread
