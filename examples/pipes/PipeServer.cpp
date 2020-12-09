@@ -236,13 +236,13 @@ void PipeServer::write_TestPipe(Tango::WPipe &pipe)
 {
 	DEBUG_STREAM << "PipeServer::write_TestPipe(Tango::WPipe &pipe) entering... " << std::endl;
 	/*----- PROTECTED REGION ID(PipeServer::write_TestPipe) ENABLED START -----*/
-    cout << "root blob name " << pipe.get_root_blob_name() << std::endl;
-    cout << "nb of data elements " << pipe.get_data_elt_nb() << std::endl;
+    std::cout << "root blob name " << pipe.get_root_blob_name() << std::endl;
+    std::cout << "nb of data elements " << pipe.get_data_elt_nb() << std::endl;
     try {
     	extract(pipe);
     }
     catch (exception &e) {
-    	cout << "Exception: " << e.what() << std::endl;
+    	std::cout << "Exception: " << e.what() << std::endl;
     }
 	//	Add your own code here
 	
@@ -269,64 +269,64 @@ void PipeServer::add_dynamic_commands()
 template<typename T>
 void PipeServer::extract(T& obj) {
 	for (unsigned i = 0; i < obj.get_data_elt_nb(); i++) {
-		cout << "name " << obj.get_data_elt_name(i) << std::endl;
+		std::cout << "name " << obj.get_data_elt_name(i) << std::endl;
 	}
 	for (unsigned i = 0; i < obj.get_data_elt_nb(); i++) {
-		cout << "name " << obj.get_data_elt_name(i) << std::endl;
+		std::cout << "name " << obj.get_data_elt_name(i) << std::endl;
 		int data_type = obj.get_data_elt_type(i);
-		cout << "data_type " << data_type << std::endl;
+		std::cout << "data_type " << data_type << std::endl;
 		if (data_type == Tango::DEV_DOUBLE) {
 			Tango::DataElement<double> data;
 			obj >> data;
-			cout << "value " << data.value << std::endl;
+			std::cout << "value " << data.value << std::endl;
 		} else if (data_type == Tango::DEV_BOOLEAN) {
 			Tango::DataElement<bool> data;
 			obj >> data;
-			cout << "value " << data.value << std::endl;
+			std::cout << "value " << data.value << std::endl;
 		} else if (data_type == Tango::DEV_STRING) {
 			Tango::DataElement < std::string > data;
 			obj >> data;
-			cout << "value " << data.value << std::endl;
+			std::cout << "value " << data.value << std::endl;
 		} else if (data_type == Tango::DEV_LONG64) {
 			Tango::DataElement < int64_t > data;
 			obj >> data;
-			cout << "value " << data.value << std::endl;
+			std::cout << "value " << data.value << std::endl;
 		} else if (data_type == Tango::DEV_STATE) {
 			Tango::DataElement < Tango::DevState > data;
 			obj >> data;
-			cout << "value " << data.value << std::endl;
+			std::cout << "value " << data.value << std::endl;
 		} else if (data_type == Tango::DEVVAR_DOUBLEARRAY) {
 			std::vector<double> data;
 			obj >> data;
 			for (std::vector<double>::iterator it = data.begin(); it != data.end(); ++it)
-				cout << *it << " ";
-			cout << std::endl;
+				std::cout << *it << " ";
+			std::cout << std::endl;
 		} else if (data_type == Tango::DEVVAR_LONG64ARRAY) {
 			std::vector < int64_t > data;
 			obj >> data;
 			for (std::vector<int64_t>::iterator it = data.begin(); it != data.end(); ++it)
-				cout << *it << " ";
-			cout << std::endl;
+				std::cout << *it << " ";
+			std::cout << std::endl;
 		} else if (data_type == Tango::DEVVAR_STATEARRAY) {
 			std::vector < Tango::DevState > data;
 			obj >> data;
 			for (std::vector<Tango::DevState>::iterator it = data.begin(); it != data.end(); ++it)
-				cout << *it << " ";
-			cout << std::endl;
+				std::cout << *it << " ";
+			std::cout << std::endl;
 		} else if (data_type == Tango::DEVVAR_STRINGARRAY) {
 			std::vector < std::string > data;
 			obj >> data;
 			for (std::vector<std::string>::iterator it = data.begin(); it != data.end(); ++it)
-				cout << *it << " ";
-			cout << std::endl;
+				std::cout << *it << " ";
+			std::cout << std::endl;
 		} else if (data_type == Tango::DEVVAR_BOOLEANARRAY) {
 			std::vector<bool> data;
 			obj >> data;
 			for (std::vector<bool>::iterator it = data.begin(); it != data.end(); ++it)
-				cout << *it << " ";
-			cout << std::endl;
+				std::cout << *it << " ";
+			std::cout << std::endl;
 		} else if (data_type == Tango::DEV_PIPE_BLOB) {
-			cout << "Found inner blob" << std::endl;
+			std::cout << "Found inner blob" << std::endl;
 			Tango::DevicePipeBlob blob;
 			obj >> blob;
 			extract (blob);
