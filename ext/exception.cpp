@@ -58,7 +58,7 @@ namespace Tango
 
 void sequencePyDevError_2_DevErrorList(PyObject *value, Tango::DevErrorList &del)
 {
-    long len = max((int)PySequence_Size(value), 0);
+    long len = std::max((int)PySequence_Size(value), 0);
     del.length(len);
 
     for (long loop = 0; loop < len; ++loop)
