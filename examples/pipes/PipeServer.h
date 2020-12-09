@@ -121,7 +121,7 @@ public:
 	 *	Description : Hardware acquisition for attributes.
 	 */
 	//--------------------------------------------------------
-	virtual void read_attr_hardware(vector<long> &attr_list);
+	virtual void read_attr_hardware(std::vector<long> &attr_list);
 
 
 	//--------------------------------------------------------

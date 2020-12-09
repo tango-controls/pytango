@@ -115,8 +115,8 @@ namespace PyUtil
     inline object get_device_list_by_class(Tango::Util &self, const string &class_name)
     {
         boost::python::list py_dev_list;
-        vector<Tango::DeviceImpl *> &dev_list = self.get_device_list_by_class(class_name);
-        for(vector<Tango::DeviceImpl *>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
+        std::vector<Tango::DeviceImpl *> &dev_list = self.get_device_list_by_class(class_name);
+        for(std::vector<Tango::DeviceImpl *>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
         {
             object py_value = object(
                         handle<>(
@@ -144,8 +144,8 @@ namespace PyUtil
     inline object get_device_list(Tango::Util &self, const string &name)
     {
         boost::python::list py_dev_list;
-        vector<Tango::DeviceImpl *> dev_list = self.get_device_list(name);
-        for(vector<Tango::DeviceImpl *>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
+        std::vector<Tango::DeviceImpl *> dev_list = self.get_device_list(name);
+        for(std::vector<Tango::DeviceImpl *>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
         {
             object py_value = object(
                         handle<>(

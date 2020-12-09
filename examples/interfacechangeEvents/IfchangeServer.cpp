@@ -177,9 +177,9 @@ void IfchangeServer::always_executed_hook()
  *	Description : Hardware acquisition for attributes
  */
 //--------------------------------------------------------
-void IfchangeServer::read_attr_hardware(TANGO_UNUSED(vector<long> &attr_list))
+void IfchangeServer::read_attr_hardware(TANGO_UNUSED(std::vector<long> &attr_list))
 {
-	DEBUG_STREAM << "IfchangeServer::read_attr_hardware(vector<long> &attr_list) entering... " << endl;
+	DEBUG_STREAM << "IfchangeServer::read_attr_hardware(std::vector<long> &attr_list) entering... " << endl;
 	/*----- PROTECTED REGION ID(IfchangeServer::read_attr_hardware) ENABLED START -----*/
 	
 	//	Add your own code

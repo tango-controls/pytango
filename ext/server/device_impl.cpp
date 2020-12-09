@@ -601,7 +601,7 @@ namespace PyDeviceImpl
         Tango::Attr *attr_ptr = NULL;
 
         long x, y;
-        vector<Tango::AttrProperty> &def_prop = new_attr.get_user_default_properties();
+        std::vector<Tango::AttrProperty> &def_prop = new_attr.get_user_default_properties();
         Tango::AttrDataFormat attr_format = new_attr.get_format();
         long attr_type = new_attr.get_type();
 
@@ -1011,22 +1011,22 @@ void Device_3ImplWrap::default_always_executed_hook()
     this->Tango::Device_3Impl::always_executed_hook();
 }
 
-void Device_3ImplWrap::read_attr_hardware(vector<long> &attr_list)
+void Device_3ImplWrap::read_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_3Impl, read_attr_hardware, attr_list)
 }
 
-void Device_3ImplWrap::default_read_attr_hardware(vector<long> &attr_list)
+void Device_3ImplWrap::default_read_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_3Impl::read_attr_hardware(attr_list);
 }
 
-void Device_3ImplWrap::write_attr_hardware(vector<long> &attr_list)
+void Device_3ImplWrap::write_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_3Impl, write_attr_hardware, attr_list)
 }
 
-void Device_3ImplWrap::default_write_attr_hardware(vector<long> &attr_list)
+void Device_3ImplWrap::default_write_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_3Impl::write_attr_hardware(attr_list);
 }
@@ -1186,22 +1186,22 @@ void Device_4ImplWrap::default_always_executed_hook()
     this->Tango::Device_4Impl::always_executed_hook();
 }
 
-void Device_4ImplWrap::read_attr_hardware(vector<long> &attr_list)
+void Device_4ImplWrap::read_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_4Impl, read_attr_hardware, attr_list)
 }
 
-void Device_4ImplWrap::default_read_attr_hardware(vector<long> &attr_list)
+void Device_4ImplWrap::default_read_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_4Impl::read_attr_hardware(attr_list);
 }
 
-void Device_4ImplWrap::write_attr_hardware(vector<long> &attr_list)
+void Device_4ImplWrap::write_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_4Impl, write_attr_hardware, attr_list)
 }
 
-void Device_4ImplWrap::default_write_attr_hardware(vector<long> &attr_list)
+void Device_4ImplWrap::default_write_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_4Impl::write_attr_hardware(attr_list);
 }
@@ -1354,22 +1354,22 @@ void Device_5ImplWrap::default_always_executed_hook()
     this->Tango::Device_5Impl::always_executed_hook();
 }
 
-void Device_5ImplWrap::read_attr_hardware(vector<long> &attr_list)
+void Device_5ImplWrap::read_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_5Impl, read_attr_hardware, attr_list)
 }
 
-void Device_5ImplWrap::default_read_attr_hardware(vector<long> &attr_list)
+void Device_5ImplWrap::default_read_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_5Impl::read_attr_hardware(attr_list);
 }
 
-void Device_5ImplWrap::write_attr_hardware(vector<long> &attr_list)
+void Device_5ImplWrap::write_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_5Impl, write_attr_hardware, attr_list)
 }
 
-void Device_5ImplWrap::default_write_attr_hardware(vector<long> &attr_list)
+void Device_5ImplWrap::default_write_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_5Impl::write_attr_hardware(attr_list);
 }

@@ -64,7 +64,7 @@ public:
      * This method is intended to be called by python to register a new
      * attribute.
      */
-    void create_attribute(vector<Tango::Attr *> &att_list,
+    void create_attribute(std::vector<Tango::Attr *> &att_list,
                           const std::string &attr_name,
                           Tango::CmdArgType attr_type,
                           Tango::AttrDataFormat attr_format,
@@ -78,7 +78,7 @@ public:
                           const std::string &is_allowed_name,
                           Tango::UserDefaultAttrProp *att_prop);
 
-    void create_fwd_attribute(vector<Tango::Attr *> &att_list,
+    void create_fwd_attribute(std::vector<Tango::Attr *> &att_list,
                               const std::string &attr_name,
                               Tango::UserDefaultFwdAttrProp *att_prop);
 
@@ -87,7 +87,7 @@ public:
      * This method is intended to be called by python to register a new
      * pipe.
      */
-    void create_pipe(vector<Tango::Pipe *> &pipe_list,
+    void create_pipe(std::vector<Tango::Pipe *> &pipe_list,
 		     const std::string &name,
 		     Tango::PipeWriteType access,
 		     Tango::DispLevel display_level,

@@ -169,9 +169,9 @@ void PipeServer::always_executed_hook()
  *	Description : Hardware acquisition for attributes
  */
 //--------------------------------------------------------
-void PipeServer::read_attr_hardware(TANGO_UNUSED(vector<long> &attr_list))
+void PipeServer::read_attr_hardware(TANGO_UNUSED(std::vector<long> &attr_list))
 {
-	DEBUG_STREAM << "PipeServer::read_attr_hardware(vector<long> &attr_list) entering... " << endl;
+	DEBUG_STREAM << "PipeServer::read_attr_hardware(std::vector<long> &attr_list) entering... " << endl;
 	/*----- PROTECTED REGION ID(PipeServer::read_attr_hardware) ENABLED START -----*/
 	
 	//	Add your own code
@@ -207,7 +207,7 @@ void PipeServer::read_TestPipe(Tango::Pipe &pipe)
 	DEBUG_STREAM << "PipeServer::read_TestPipe(Tango::Pipe &pipe) entering... " << endl;
 	/*----- PROTECTED REGION ID(PipeServer::read_TestPipe) ENABLED START -----*/
 	
-    vector<string> de_names;
+    std::vector<string> de_names;
     de_names.push_back("x");
     de_names.push_back("y");
     de_names.push_back("width");

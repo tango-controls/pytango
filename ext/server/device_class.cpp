@@ -70,7 +70,7 @@ void CppDeviceClass::create_command(const std::string &cmd_name,
         command_list.push_back(cmd_ptr);
 }
 
-void CppDeviceClass::create_fwd_attribute(vector<Tango::Attr *> &att_list,
+void CppDeviceClass::create_fwd_attribute(std::vector<Tango::Attr *> &att_list,
 		const std::string &attr_name,
 		Tango::UserDefaultFwdAttrProp *att_prop)
 {
@@ -79,7 +79,7 @@ void CppDeviceClass::create_fwd_attribute(vector<Tango::Attr *> &att_list,
 	att_list.push_back(attr_ptr);
 }
 
-void CppDeviceClass::create_attribute(vector<Tango::Attr *> &att_list,
+void CppDeviceClass::create_attribute(std::vector<Tango::Attr *> &att_list,
 				      const std::string &attr_name,
 				      Tango::CmdArgType attr_type,
 				      Tango::AttrDataFormat attr_format,
@@ -156,7 +156,7 @@ void CppDeviceClass::create_attribute(vector<Tango::Attr *> &att_list,
 
     att_list.push_back(attr_ptr);
 }
-void CppDeviceClass::create_pipe(vector<Tango::Pipe *> &pipe_list,
+void CppDeviceClass::create_pipe(std::vector<Tango::Pipe *> &pipe_list,
 				 const std::string &name,
 				 Tango::PipeWriteType access,
 				 Tango::DispLevel display_level,
@@ -330,8 +330,8 @@ namespace PyDeviceClass
     object get_device_list(CppDeviceClass &self)
     {
         boost::python::list py_dev_list;
-        vector<Tango::DeviceImpl *> dev_list = self.get_device_list();
-        for(vector<Tango::DeviceImpl *>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
+        std::vector<Tango::DeviceImpl *> dev_list = self.get_device_list();
+        for(std::vector<Tango::DeviceImpl *>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
         {
             object py_value = object(
                         handle<>(
@@ -346,8 +346,8 @@ namespace PyDeviceClass
     object get_command_list(CppDeviceClass &self)
     {
         boost::python::list py_cmd_list;
-        vector<Tango::Command *> cmd_list = self.get_command_list();
-        for(vector<Tango::Command *>::iterator it = cmd_list.begin(); 
+        std::vector<Tango::Command *> cmd_list = self.get_command_list();
+        for(std::vector<Tango::Command *>::iterator it = cmd_list.begin(); 
 	    it != cmd_list.end(); ++it)
         {
             object py_value = object(
@@ -363,9 +363,9 @@ namespace PyDeviceClass
     object get_pipe_list(CppDeviceClass &self, const std::string& dev_name)
     {
         boost::python::list py_pipe_list;
-        vector<Tango::Pipe *> pipe_list = self.get_pipe_list(dev_name);
-//        vector<Tango::Pipe *> pipe_list = self.get_pipe_list();
-        for(vector<Tango::Pipe *>::iterator it = pipe_list.begin();
+        std::vector<Tango::Pipe *> pipe_list = self.get_pipe_list(dev_name);
+//        std::vector<Tango::Pipe *> pipe_list = self.get_pipe_list();
+        for(std::vector<Tango::Pipe *>::iterator it = pipe_list.begin();
 	    it != pipe_list.end(); ++it)
         {
             object py_value = object(

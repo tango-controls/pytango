@@ -222,7 +222,7 @@ void PipeServerClass::set_default_property()
 	string	prop_name;
 	string	prop_desc;
 	string	prop_def;
-	vector<string>	vect_data;
+	std::vector<string>	vect_data;
 
 	//	Set Default Class Properties
 
@@ -254,7 +254,7 @@ void PipeServerClass::write_class_property()
 
 	//	Put Description
 	Tango::DbDatum	description("Description");
-	vector<string>	str_desc;
+	std::vector<string>	str_desc;
 	str_desc.push_back("");
 	description << str_desc;
 	data.push_back(description);
@@ -359,7 +359,7 @@ void PipeServerClass::write_class_property()
 
 	//  Put inheritance
 	Tango::DbDatum	inher_datum("InheritedFrom");
-	vector<string> inheritance;
+	std::vector<string> inheritance;
 	inheritance.push_back("TANGO_BASE_CLASS");
 	inher_datum << inheritance;
 	data.push_back(inher_datum);
@@ -424,7 +424,7 @@ void PipeServerClass::device_factory(const Tango::DevVarStringArray *devlist_ptr
  *                and store them in the attribute list
  */
 //--------------------------------------------------------
-void PipeServerClass::attribute_factory(vector<Tango::Attr *> &att_list)
+void PipeServerClass::attribute_factory(std::vector<Tango::Attr *> &att_list)
 {
 	/*----- PROTECTED REGION ID(PipeServerClass::attribute_factory_before) ENABLED START -----*/
 	
@@ -502,7 +502,7 @@ void PipeServerClass::command_factory()
  * @param	att_list	the ceated attribute list
  */
 //--------------------------------------------------------
-void PipeServerClass::create_static_attribute_list(vector<Tango::Attr *> &att_list)
+void PipeServerClass::create_static_attribute_list(std::vector<Tango::Attr *> &att_list)
 {
 	for (unsigned long i=0 ; i<att_list.size() ; i++)
 	{
@@ -528,7 +528,7 @@ void PipeServerClass::create_static_attribute_list(vector<Tango::Attr *> &att_li
  * @param	list of all attributes
  */
 //--------------------------------------------------------
-void PipeServerClass::erase_dynamic_attributes(const Tango::DevVarStringArray *devlist_ptr, vector<Tango::Attr *> &att_list)
+void PipeServerClass::erase_dynamic_attributes(const Tango::DevVarStringArray *devlist_ptr, std::vector<Tango::Attr *> &att_list)
 {
 	Tango::Util *tg = Tango::Util::instance();
 
@@ -537,14 +537,14 @@ void PipeServerClass::erase_dynamic_attributes(const Tango::DevVarStringArray *d
 		Tango::DeviceImpl *dev_impl = tg->get_device_by_name(((string)(*devlist_ptr)[i]).c_str());
 		PipeServer *dev = static_cast<PipeServer *> (dev_impl);
 
-		vector<Tango::Attribute *> &dev_att_list = dev->get_device_attr()->get_attribute_list();
-		vector<Tango::Attribute *>::iterator ite_att;
+		std::vector<Tango::Attribute *> &dev_att_list = dev->get_device_attr()->get_attribute_list();
+		std::vector<Tango::Attribute *>::iterator ite_att;
 		for (ite_att=dev_att_list.begin() ; ite_att != dev_att_list.end() ; ++ite_att)
 		{
 			string att_name((*ite_att)->get_name_lower());
 			if ((att_name == "state") || (att_name == "status"))
 				continue;
-			vector<string>::iterator ite_str = find(defaultAttList.begin(), defaultAttList.end(), att_name);
+			std::vector<string>::iterator ite_str = find(defaultAttList.begin(), defaultAttList.end(), att_name);
 			if (ite_str == defaultAttList.end())
 			{
 				cout2 << att_name << " is a UNWANTED dynamic attribute for device " << (*devlist_ptr)[i] << endl;
@@ -565,9 +565,9 @@ void PipeServerClass::erase_dynamic_attributes(const Tango::DevVarStringArray *d
  *	Description : returns Tango::Attr * object found by name
  */
 //--------------------------------------------------------
-Tango::Attr *PipeServerClass::get_attr_object_by_name(vector<Tango::Attr *> &att_list, string attname)
+Tango::Attr *PipeServerClass::get_attr_object_by_name(std::vector<Tango::Attr *> &att_list, string attname)
 {
-	vector<Tango::Attr *>::iterator it;
+	std::vector<Tango::Attr *>::iterator it;
 	for (it=att_list.begin() ; it<att_list.end() ; ++it)
 		if ((*it)->get_name()==attname)
 			return (*it);

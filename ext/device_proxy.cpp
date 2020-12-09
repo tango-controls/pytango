@@ -458,7 +458,7 @@ namespace PyDeviceProxy
             device_data_hist =
                 self.command_history(const_cast<std::string&>(cmd_name), depth);
         }
-        vector<Tango::DeviceDataHistory>::iterator it = device_data_hist->begin();
+        std::vector<Tango::DeviceDataHistory>::iterator it = device_data_hist->begin();
         for(;it != device_data_hist->end(); ++it)
         {
             Tango::DeviceDataHistory& hist = *it;
@@ -471,7 +471,7 @@ namespace PyDeviceProxy
     static inline bopy::object
             attribute_history(Tango::DeviceProxy& self, const std::string & attr_name, int depth, PyTango::ExtractAs extract_as)
     {
-        unique_pointer< vector<Tango::DeviceAttributeHistory> > att_hist;
+        unique_pointer< std::vector<Tango::DeviceAttributeHistory> > att_hist;
         {
             AutoPythonAllowThreads guard;
             att_hist.reset(self.attribute_history(const_cast<std::string&>(attr_name), depth));
