@@ -80,7 +80,7 @@ struct from_py<tangoTypeConst> \
     struct from_py<tangoTypeConst> \
     { \
         typedef TANGO_const2type(tangoTypeConst) TangoScalarType; \
-        typedef numeric_limits<TangoScalarType> TangoScalarTypeLimits; \
+        typedef std::numeric_limits<TangoScalarType> TangoScalarTypeLimits; \
     \
         static inline void convert(const boost::python::object &o, TangoScalarType &tg) \
         { \
@@ -114,7 +114,7 @@ struct from_py<tangoTypeConst> \
     struct from_py<tangoTypeConst> \
     { \
         typedef TANGO_const2type(tangoTypeConst) TangoScalarType; \
-        typedef numeric_limits<TangoScalarType> TangoScalarTypeLimits; \
+        typedef std::numeric_limits<TangoScalarType> TangoScalarTypeLimits; \
     \
         static inline void convert(const boost::python::object &o, TangoScalarType &tg) \
         { \
@@ -196,7 +196,7 @@ struct array_element_from_py<Tango::DEVVAR_CHARARRAY>
     static const long tangoArrayTypeConst = Tango::DEVVAR_CHARARRAY;
 
     typedef TANGO_const2scalartype(tangoArrayTypeConst) TangoScalarType;
-    typedef numeric_limits<TangoScalarType> TangoScalarTypeLimits;
+    typedef std::numeric_limits<TangoScalarType> TangoScalarTypeLimits;
 
     static inline void convert(const boost::python::object &o, TangoScalarType &tg)
     {
