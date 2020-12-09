@@ -118,7 +118,7 @@ IfchangeServer::IfchangeServer(Tango::DeviceClass *cl, const char *s, const char
 //--------------------------------------------------------
 void IfchangeServer::delete_device()
 {
-	DEBUG_STREAM << "IfchangeServer::delete_device() " << device_name << endl;
+	DEBUG_STREAM << "IfchangeServer::delete_device() " << device_name << std::endl;
 	/*----- PROTECTED REGION ID(IfchangeServer::delete_device) ENABLED START -----*/
 	
 	//	Delete device allocated objects
@@ -135,7 +135,7 @@ void IfchangeServer::delete_device()
 //--------------------------------------------------------
 void IfchangeServer::init_device()
 {
-	DEBUG_STREAM << "IfchangeServer::init_device() create device " << device_name << endl;
+	DEBUG_STREAM << "IfchangeServer::init_device() create device " << device_name << std::endl;
 	/*----- PROTECTED REGION ID(IfchangeServer::init_device_before) ENABLED START -----*/
 	
 	//	Initialization before get_device_property() call
@@ -163,7 +163,7 @@ void IfchangeServer::init_device()
 //--------------------------------------------------------
 void IfchangeServer::always_executed_hook()
 {
-	DEBUG_STREAM << "IfchangeServer::always_executed_hook()  " << device_name << endl;
+	DEBUG_STREAM << "IfchangeServer::always_executed_hook()  " << device_name << std::endl;
 	/*----- PROTECTED REGION ID(IfchangeServer::always_executed_hook) ENABLED START -----*/
 	
 	//	code always executed before all requests
@@ -179,7 +179,7 @@ void IfchangeServer::always_executed_hook()
 //--------------------------------------------------------
 void IfchangeServer::read_attr_hardware(TANGO_UNUSED(std::vector<long> &attr_list))
 {
-	DEBUG_STREAM << "IfchangeServer::read_attr_hardware(std::vector<long> &attr_list) entering... " << endl;
+	DEBUG_STREAM << "IfchangeServer::read_attr_hardware(std::vector<long> &attr_list) entering... " << std::endl;
 	/*----- PROTECTED REGION ID(IfchangeServer::read_attr_hardware) ENABLED START -----*/
 	
 	//	Add your own code
@@ -198,7 +198,7 @@ void IfchangeServer::read_attr_hardware(TANGO_UNUSED(std::vector<long> &attr_lis
 //--------------------------------------------------------
 void IfchangeServer::read_busy(Tango::Attribute &attr)
 {
-	DEBUG_STREAM << "IfchangeServer::read_busy(Tango::Attribute &attr) entering... " << endl;
+	DEBUG_STREAM << "IfchangeServer::read_busy(Tango::Attribute &attr) entering... " << std::endl;
 	/*----- PROTECTED REGION ID(IfchangeServer::read_busy) ENABLED START -----*/
 	//	Set the attribute value
 	*attr_busy_read = true;
@@ -218,7 +218,7 @@ void IfchangeServer::read_busy(Tango::Attribute &attr)
 //--------------------------------------------------------
 void IfchangeServer::read_ioattr(Tango::Attribute &attr)
 {
-	DEBUG_STREAM << "IfchangeServer::read_ioattr(Tango::Attribute &attr) entering... " << endl;
+	DEBUG_STREAM << "IfchangeServer::read_ioattr(Tango::Attribute &attr) entering... " << std::endl;
 	Tango::DevDouble	*att_value = get_ioattr_data_ptr(attr.get_name());
 	/*----- PROTECTED REGION ID(IfchangeServer::read_ioattr) ENABLED START -----*/
 	//	Set the attribute value
@@ -254,7 +254,7 @@ void IfchangeServer::add_dynamic_attributes()
 //--------------------------------------------------------
 void IfchangeServer::add_dynamic()
 {
-	DEBUG_STREAM << "IfchangeServer::Add_dynamic()  - " << device_name << endl;
+	DEBUG_STREAM << "IfchangeServer::Add_dynamic()  - " << device_name << std::endl;
 	/*----- PROTECTED REGION ID(IfchangeServer::add_dynamic) ENABLED START -----*/
 	
 	add_iocmd_dynamic_command("test_dynamic_Command", true);
@@ -272,7 +272,7 @@ void IfchangeServer::add_dynamic()
 //--------------------------------------------------------
 void IfchangeServer::delete__dynamic()
 {
-	DEBUG_STREAM << "IfchangeServer::Delete_Dynamic()  - " << device_name << endl;
+	DEBUG_STREAM << "IfchangeServer::Delete_Dynamic()  - " << device_name << std::endl;
 	/*----- PROTECTED REGION ID(IfchangeServer::delete__dynamic) ENABLED START -----*/
 	
 	remove_iocmd_dynamic_command("test_dynamic_Command");
@@ -290,7 +290,7 @@ void IfchangeServer::delete__dynamic()
 //--------------------------------------------------------
 void IfchangeServer::iocmd(Tango::Command &command)
 {
-	DEBUG_STREAM << "IfchangeServer::" << command.get_name() << "  - " << device_name << endl;
+	DEBUG_STREAM << "IfchangeServer::" << command.get_name() << "  - " << device_name << std::endl;
 	/*----- PROTECTED REGION ID(IfchangeServer::iocmd) ENABLED START -----*/
 	
 	//	Add your own code

@@ -83,7 +83,7 @@ IfchangeServerClass *IfchangeServerClass::_instance = NULL;
 //--------------------------------------------------------
 IfchangeServerClass::IfchangeServerClass(string &s):Tango::DeviceClass(s)
 {
-	cout2 << "Entering IfchangeServerClass constructor" << endl;
+	cout2 << "Entering IfchangeServerClass constructor" << std::endl;
 	set_default_property();
 	write_class_property();
 
@@ -91,7 +91,7 @@ IfchangeServerClass::IfchangeServerClass(string &s):Tango::DeviceClass(s)
 	
 	/*----- PROTECTED REGION END -----*/	//	IfchangeServerClass::constructor
 
-	cout2 << "Leaving IfchangeServerClass constructor" << endl;
+	cout2 << "Leaving IfchangeServerClass constructor" << std::endl;
 }
 
 //--------------------------------------------------------
@@ -147,7 +147,7 @@ IfchangeServerClass *IfchangeServerClass::instance()
 {
 	if (_instance == NULL)
 	{
-		cerr << "Class is not initialised !!" << endl;
+		cerr << "Class is not initialised !!" << std::endl;
 		exit(-1);
 	}
 	return _instance;
@@ -171,7 +171,7 @@ IfchangeServerClass *IfchangeServerClass::instance()
 //--------------------------------------------------------
 CORBA::Any *Add_dynamicClass::execute(Tango::DeviceImpl *device, TANGO_UNUSED(const CORBA::Any &in_any))
 {
-	cout2 << "Add_dynamicClass::execute(): arrived" << endl;
+	cout2 << "Add_dynamicClass::execute(): arrived" << std::endl;
 	((static_cast<IfchangeServer *>(device))->add_dynamic());
 	return new CORBA::Any();
 }
@@ -189,7 +189,7 @@ CORBA::Any *Add_dynamicClass::execute(Tango::DeviceImpl *device, TANGO_UNUSED(co
 //--------------------------------------------------------
 CORBA::Any *Delete_DynamicClass::execute(Tango::DeviceImpl *device, TANGO_UNUSED(const CORBA::Any &in_any))
 {
-	cout2 << "Delete_DynamicClass::execute(): arrived" << endl;
+	cout2 << "Delete_DynamicClass::execute(): arrived" << std::endl;
 	((static_cast<IfchangeServer *>(device))->delete__dynamic());
 	return new CORBA::Any();
 }
@@ -207,7 +207,7 @@ CORBA::Any *Delete_DynamicClass::execute(Tango::DeviceImpl *device, TANGO_UNUSED
 //--------------------------------------------------------
 CORBA::Any *iocmdClass::execute(Tango::DeviceImpl *device, TANGO_UNUSED(const CORBA::Any &in_any))
 {
-	cout2 << "iocmdClass::execute(): arrived" << endl;
+	cout2 << "iocmdClass::execute(): arrived" << std::endl;
 	((static_cast<IfchangeServer *>(device))->iocmd(*this));
 	return new CORBA::Any();
 }
@@ -444,7 +444,7 @@ void IfchangeServerClass::device_factory(const Tango::DevVarStringArray *devlist
 	//	Create devices and add it into the device list
 	for (unsigned long i=0 ; i<devlist_ptr->length() ; i++)
 	{
-		cout4 << "Device name : " << (*devlist_ptr)[i].in() << endl;
+		cout4 << "Device name : " << (*devlist_ptr)[i].in() << std::endl;
 		device_list.push_back(new IfchangeServer(this, (*devlist_ptr)[i]));
 	}
 
@@ -601,7 +601,7 @@ void IfchangeServerClass::create_static_attribute_list(std::vector<Tango::Attr *
 		defaultAttList.push_back(att_name);
 	}
 
-	cout2 << defaultAttList.size() << " attributes in default list" << endl;
+	cout2 << defaultAttList.size() << " attributes in default list" << std::endl;
 
 	/*----- PROTECTED REGION ID(IfchangeServerClass::create_static_att_list) ENABLED START -----*/
 	
@@ -637,7 +637,7 @@ void IfchangeServerClass::erase_dynamic_attributes(const Tango::DevVarStringArra
 			std::vector<string>::iterator ite_str = find(defaultAttList.begin(), defaultAttList.end(), att_name);
 			if (ite_str == defaultAttList.end())
 			{
-				cout2 << att_name << " is a UNWANTED dynamic attribute for device " << (*devlist_ptr)[i] << endl;
+				cout2 << att_name << " is a UNWANTED dynamic attribute for device " << (*devlist_ptr)[i] << std::endl;
 				Tango::Attribute &att = dev->get_device_attr()->get_attr_by_name(att_name.c_str());
 				dev->remove_attribute(att_list[att.get_attr_idx()], true, false);
 				--ite_att;
