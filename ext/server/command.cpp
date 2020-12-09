@@ -69,7 +69,7 @@ void allocate_any(CORBA::Any *&any_ptr)
     {
         any_ptr = new CORBA::Any();
     }
-    catch (bad_alloc)
+    catch (std::bad_alloc)
     {
         Tango::Except::throw_exception(
             "API_MemoryAllocation",

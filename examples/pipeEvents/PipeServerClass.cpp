@@ -128,7 +128,7 @@ PipeServerClass *PipeServerClass::init(const char *name)
 			string s(name);
 			_instance = new PipeServerClass(s);
 		}
-		catch (bad_alloc &)
+		catch (std::bad_alloc &)
 		{
 			throw;
 		}

@@ -68,7 +68,7 @@ int main(int argc,char *argv[])
 		std::cout << "Ready to accept request" << std::endl;
 		tg->server_run();
 	}
-	catch (bad_alloc &)
+	catch (std::bad_alloc &)
 	{
 		std::cout << "Can't allocate memory to store device object !!!" << std::endl;
 		std::cout << "Exiting" << std::endl;

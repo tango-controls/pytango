@@ -128,7 +128,7 @@ IfchangeServerClass *IfchangeServerClass::init(const char *name)
 			string s(name);
 			_instance = new IfchangeServerClass(s);
 		}
-		catch (bad_alloc &)
+		catch (std::bad_alloc &)
 		{
 			throw;
 		}
