@@ -83,7 +83,7 @@ void throw_bad_type(const char *type)
     TangoSys_OMemStream o;
 
     o << "Incompatible command argument type, expected type is : Tango::" 
-      << type << ends;
+      << type << std::ends;
     Tango::Except::throw_exception(
             "API_IncompatibleCmdArgumentType",
             o.str(),

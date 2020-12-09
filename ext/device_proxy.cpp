@@ -98,7 +98,7 @@ namespace PyDeviceProxy
                          const char *method)
     {
         TangoSys_OMemStream o;
-        o << "Wrong Python type for pipe " << name << ends;
+        o << "Wrong Python type for pipe " << name << std::ends;
         Tango::Except::throw_exception("PyDs_WrongPythonDataTypeForPipe",
                        o.str(), method);
     }

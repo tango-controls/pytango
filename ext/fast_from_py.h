@@ -478,7 +478,7 @@ inline TANGO_const2type(Tango::DEV_ENCODED)*
     fast_python_to_tango_buffer_sequence<Tango::DEV_ENCODED>(PyObject*, long*, long*, const std::string & fname, bool isImage, long& res_dim_x, long& res_dim_y)
 {
     TangoSys_OMemStream o;
-    o << "DevEncoded is only supported for SCALAR attributes." << ends;
+    o << "DevEncoded is only supported for SCALAR attributes." << std::ends;
     Tango::Except::throw_exception(
             "PyDs_WrongPythonDataTypeForAttribute",
             o.str(), fname + "()");

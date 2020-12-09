@@ -48,7 +48,7 @@ inline static void throw_wrong_python_data_type(const std::string &att_name,
                                          const char *method)
 {
     TangoSys_OMemStream o;
-    o << "Wrong Python type for attribute " << att_name << ends;
+    o << "Wrong Python type for attribute " << att_name << std::ends;
     Tango::Except::throw_exception(
             "PyDs_WrongPythonDataTypeForAttribute",
             o.str(),
@@ -380,7 +380,7 @@ namespace PyWAttribute
                 TangoSys_OMemStream o;
                 o << "Wrong Python type for attribute " << att.get_name()
                   << "of type " << Tango::CmdArgTypeName[type]
-                  << ". Expected a sequence." << ends;
+                  << ". Expected a sequence." << std::ends;
 
                 Tango::Except::throw_exception(
                         "PyDs_WrongPythonDataTypeForAttribute",
@@ -405,7 +405,7 @@ namespace PyWAttribute
             TangoSys_OMemStream o;
             o << "Cannot call set_value(data, dim_x) on scalar attribute "
               << att.get_name() << ". Use set_write_value(data) instead"
-              << ends;
+              << std::ends;
 
             Tango::Except::throw_exception(
                     "PyDs_WrongPythonDataTypeForAttribute",
@@ -419,7 +419,7 @@ namespace PyWAttribute
                 TangoSys_OMemStream o;
                 o << "Wrong Python type for attribute " << att.get_name()
                   << "of type " << Tango::CmdArgTypeName[type]
-                  << ". Expected a sequence" << ends;
+                  << ". Expected a sequence" << std::ends;
 
                 Tango::Except::throw_exception(
                         "PyDs_WrongPythonDataTypeForAttribute",
@@ -443,7 +443,7 @@ namespace PyWAttribute
             TangoSys_OMemStream o;
             o << "Cannot call set_write_value(data, dim_x, dim_y) "
               << "on scalar attribute " << att.get_name()
-              << ". Use set_write_value(data) instead" << ends;
+              << ". Use set_write_value(data) instead" << std::ends;
 
             Tango::Except::throw_exception(
                     (const char *)"PyDs_WrongPythonDataTypeForAttribute",
@@ -457,7 +457,7 @@ namespace PyWAttribute
                 TangoSys_OMemStream o;
                 o << "Wrong Python type for attribute " << att.get_name()
                   << "of type " << Tango::CmdArgTypeName[type]
-                  << ". Expected a sequence" << ends;
+                  << ". Expected a sequence" << std::ends;
 
                 Tango::Except::throw_exception(
                         (const char *)"PyDs_WrongPythonDataTypeForAttribute",

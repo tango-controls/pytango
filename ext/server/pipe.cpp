@@ -110,7 +110,7 @@ namespace PyTango { namespace Pipe {
 					     const char *method)
     {
 	TangoSys_OMemStream o;
-	o << "Wrong Python type for pipe " << name << ends;
+	o << "Wrong Python type for pipe " << name << std::ends;
 	Tango::Except::throw_exception("PyDs_WrongPythonDataTypeForPipe",
 				       o.str(), method);
     }
@@ -469,7 +469,7 @@ namespace PyDevicePipe
 {
 	static void throw_wrong_python_data_type(const std::string &name, const char *method) {
 		TangoSys_OMemStream o;
-		o << "Wrong Python type for pipe " << name << ends;
+		o << "Wrong Python type for pipe " << name << std::ends;
 		Tango::Except::throw_exception("PyDs_WrongPythonDataTypeForPipe",
 				o.str(), method);
 	}

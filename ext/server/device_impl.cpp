@@ -528,7 +528,7 @@ namespace PyDeviceImpl
             TangoSys_OMemStream o;
             o << "Wrong definition of attribute " << attr_name
               << "\nThe attribute method " << method_name
-              << " does not exist in your class!" << ends;
+              << " does not exist in your class!" << std::ends;
 
             Tango::Except::throw_exception(
                     (const char *)"PyDs_WrongCommandDefinition",
@@ -541,7 +541,7 @@ namespace PyDeviceImpl
             TangoSys_OMemStream o;
             o << "Wrong definition of attribute " << attr_name
               << "\nThe object " << method_name
-              << " exists in your class but is not a Python method" << ends;
+              << " exists in your class but is not a Python method" << std::ends;
 
             Tango::Except::throw_exception(
                     (const char *)"PyDs_WrongCommandDefinition",
@@ -632,7 +632,7 @@ namespace PyDeviceImpl
                 TangoSys_OMemStream o;
                 o << "Attribute " << attr_name << " has an unexpected data format\n"
                   << "Please report this bug to the PyTango development team"
-                  << ends;
+                  << std::ends;
                 Tango::Except::throw_exception(
                         (const char *)"PyDs_UnexpectedAttributeFormat",
                         o.str(),

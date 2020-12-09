@@ -129,7 +129,7 @@ void CppDeviceClass::create_attribute(std::vector<Tango::Attr *> &att_list,
             TangoSys_OMemStream o;
             o << "Attribute " << attr_name << " has an unexpected data format\n"
               << "Please report this bug to the PyTango development team"
-              << ends;
+              << std::ends;
             Tango::Except::throw_exception(
                     (const char *)"PyDs_UnexpectedAttributeFormat",
                     o.str(),
