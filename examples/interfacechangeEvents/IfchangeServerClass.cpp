@@ -147,7 +147,7 @@ IfchangeServerClass *IfchangeServerClass::instance()
 {
 	if (_instance == NULL)
 	{
-		cerr << "Class is not initialised !!" << std::endl;
+		std::cerr << "Class is not initialised !!" << std::endl;
 		exit(-1);
 	}
 	return _instance;
