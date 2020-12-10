@@ -164,7 +164,7 @@ test_script:
   - cmd: run_tests_win.bat
   - cmd: set API_URL=%APPVEYOR_API_URL%/api/tests/batch
   - cmd: powershell -command "$body = Get-Content summary.json -Raw; Invoke-Webrequest $env:API_URL -Method 'POST' -UseBasicParsing -ContentType 'application/json; charset=utf-8' -Body $body"
-  - cmd: powershell -command "if(Select-String -Path test.txt \"Failed\"){Write-Error \"Some tests failed.\"}"
+  - cmd: powershell -command "if(Select-String -Path summary.json \"Failed\"){Write-Error \"Some tests failed.\"}"
  
 after_test:
   - cmd: cd C:/projects/pytango/dist
