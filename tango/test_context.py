@@ -257,7 +257,10 @@ class MultiDeviceTestContext(object):
         if not instance_name:
             instance_name = server_name.lower()
         if db is None:
-            _, db = tempfile.mkstemp()
+            handle, db = tempfile.mkstemp()
+            self.handle = handle
+        else:
+            self.handle = None
         if host is None:
             # IP address is used instead of the hostname on purpose (see #246)
             host = get_host_ip()
@@ -288,7 +291,7 @@ class MultiDeviceTestContext(object):
             device_cls, device = _device_class_from_field(device_info["class"])
             tangoclass = device.__name__
             if tangoclass in tangoclass_list:
-                os.unlink(self.db)
+                self.delete_db()
                 raise ValueError("multiple entries in devices_info pointing "
                                  "to the same Tango class")
             tangoclass_list.append(tangoclass)
@@ -302,7 +305,7 @@ class MultiDeviceTestContext(object):
 
         # Target and arguments
         if class_list and device_list:
-            os.unlink(self.db)
+            self.delete_db()
             raise ValueError("mixing HLAPI and classical API in devices_info "
                              "is not supported")
         if class_list:
@@ -379,6 +382,12 @@ class MultiDeviceTestContext(object):
             db.put_device_attribute_property(device_name, munged)
         return db
 
+    def delete_db(self):
+        """ delete temporary database file only if it was created by this class """
+        if self.handle is not None:
+            os.close(self.handle)
+            os.unlink(self.db)
+    
     def get_server_access(self):
         """Return the full server name."""
         form = 'tango://{0}:{1}/{2}#{3}'
@@ -438,7 +447,7 @@ class MultiDeviceTestContext(object):
                 self.server.command_inout('Kill')
             self.join(self.timeout)
         finally:
-            os.unlink(self.db)
+            self.delete_db()
 
     def join(self, timeout=None):
         self.thread.join(timeout)

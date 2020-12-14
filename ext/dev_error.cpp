@@ -10,8 +10,8 @@
 ******************************************************************************/
 
 #include "precompiled_header.hpp"
-#include "pyutils.h"
 #include <tango.h>
+#include "pyutils.h"
 
 namespace PyDevError
 {

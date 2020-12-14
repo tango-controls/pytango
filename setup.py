@@ -16,6 +16,7 @@ import sys
 import runpy
 import struct
 import subprocess
+import json
 
 from ctypes.util import find_library
 
@@ -32,6 +33,7 @@ from distutils.version import LooseVersion as V
 try:
     import sphinx
     import sphinx.util.console
+
     sphinx.util.console.color_terminal = lambda: False
     from sphinx.setup_command import BuildDoc
 except ImportError:
@@ -44,23 +46,25 @@ except ImportError:
     numpy = None
 
 # Platform constants
-POSIX = 'posix' in os.name
-WINDOWS = 'nt' in os.name
+POSIX = "posix" in os.name
+WINDOWS = "nt" in os.name
 IS64 = 8 * struct.calcsize("P") == 64
 PYTHON_VERSION = sys.version_info
 PYTHON2 = (2,) <= PYTHON_VERSION < (3,)
 PYTHON3 = (3,) <= PYTHON_VERSION < (4,)
 
 # Arguments
-TESTING = any(x in sys.argv for x in ['test', 'pytest'])
+TESTING = any(x in sys.argv for x in ["test", "pytest"])
 
 
-def get_readme(name='README.rst'):
+def get_readme(name="README.rst"):
     """Get readme file contents without the badges."""
     with open(name) as f:
-        return '\n'.join(
-            line for line in f.read().splitlines()
-            if not line.startswith('|') or not line.endswith('|'))
+        return "\n".join(
+            line
+            for line in f.read().splitlines()
+            if not line.startswith("|") or not line.endswith("|")
+        )
 
 
 def pkg_config(*packages, **config):
@@ -69,8 +73,13 @@ def pkg_config(*packages, **config):
         "-L": "library_dirs",
         "-l": "libraries",
     }
-    cmd = ["pkg-config", "--cflags-only-I",
-           "--libs-only-L", "--libs-only-l", " ".join(packages)]
+    cmd = [
+        "pkg-config",
+        "--cflags-only-I",
+        "--libs-only-L",
+        "--libs-only-l",
+        " ".join(packages),
+    ]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     result = proc.wait()
     result = str(proc.communicate()[0].decode("utf-8"))
@@ -90,10 +99,8 @@ def abspath(*path):
 
 
 def get_release_info():
-    namespace = runpy.run_path(
-        abspath('tango/release.py'),
-        run_name='tango.release')
-    return namespace['Release']
+    namespace = runpy.run_path(abspath("tango/release.py"), run_name="tango.release")
+    return namespace["Release"]
 
 
 def uniquify(seq):
@@ -129,10 +136,9 @@ def has_numpy(with_src=True):
     return ret
 
 
-def add_lib(name, dirs, sys_libs,
-            env_name=None, lib_name=None, inc_suffix=None):
+def add_lib(name, dirs, sys_libs, env_name=None, lib_name=None, inc_suffix=None):
     if env_name is None:
-        env_name = name.upper() + '_ROOT'
+        env_name = name.upper() + "_ROOT"
     ENV = os.environ.get(env_name)
     if lib_name is None:
         lib_name = name
@@ -140,22 +146,22 @@ def add_lib(name, dirs, sys_libs,
         sys_libs.append(lib_name)
         return
     else:
-        inc_dir = os.path.join(ENV, 'include')
-        dirs['include_dirs'].append(inc_dir)
+        inc_dir = os.path.join(ENV, "include")
+        dirs["include_dirs"].append(inc_dir)
         if inc_suffix is not None:
             inc_dir = os.path.join(inc_dir, inc_suffix)
-            dirs['include_dirs'].append(inc_dir)
+            dirs["include_dirs"].append(inc_dir)
 
-        lib_dirs = [os.path.join(ENV, 'lib')]
+        lib_dirs = [os.path.join(ENV, "lib")]
         if IS64:
-            lib64_dir = os.path.join(ENV, 'lib64')
+            lib64_dir = os.path.join(ENV, "lib64")
             if os.path.isdir(lib64_dir):
                 lib_dirs.insert(0, lib64_dir)
-        dirs['library_dirs'].extend(lib_dirs)
+        dirs["library_dirs"].extend(lib_dirs)
 
-        if lib_name.startswith('lib'):
+        if lib_name.startswith("lib"):
             lib_name = lib_name[3:]
-        dirs['libraries'].append(lib_name)
+        dirs["libraries"].append(lib_name)
 
 
 def add_lib_boost(dirs):
@@ -193,11 +199,11 @@ def add_lib_boost(dirs):
 
     """
 
-    BOOST_ROOT = os.environ.get('BOOST_ROOT')
-    BOOST_HEADERS = os.environ.get('BOOST_HEADERS')
-    BOOST_LIBRARIES = os.environ.get('BOOST_LIBRARIES')
-    BOOST_PYTHON_LIB = os.environ.get('BOOST_PYTHON_LIB')
-    boost_library_name = BOOST_PYTHON_LIB if BOOST_PYTHON_LIB else 'boost_python'
+    BOOST_ROOT = os.environ.get("BOOST_ROOT")
+    BOOST_HEADERS = os.environ.get("BOOST_HEADERS")
+    BOOST_LIBRARIES = os.environ.get("BOOST_LIBRARIES")
+    BOOST_PYTHON_LIB = os.environ.get("BOOST_PYTHON_LIB")
+    boost_library_name = BOOST_PYTHON_LIB if BOOST_PYTHON_LIB else "boost_python"
     if BOOST_ROOT is None:
         if POSIX and not BOOST_PYTHON_LIB:
             # library name differs widely across distributions, so if it
@@ -209,7 +215,7 @@ def add_lib_boost(dirs):
                 "-py{v[0]}{v[1]}".format(v=PYTHON_VERSION),
                 "{v[0]}-py{v[0]}{v[1]}".format(v=PYTHON_VERSION),
                 "{v[0]}".format(v=PYTHON_VERSION),
-                ""
+                "",
             ]
             for suffix in suffixes:
                 candidate = boost_library_name + suffix
@@ -217,21 +223,21 @@ def add_lib_boost(dirs):
                     boost_library_name = candidate
                     break
         if BOOST_HEADERS:
-            dirs['include_dirs'].append(BOOST_HEADERS)
+            dirs["include_dirs"].append(BOOST_HEADERS)
         if BOOST_LIBRARIES:
-            dirs['library_dirs'].append(BOOST_LIBRARIES)
+            dirs["library_dirs"].append(BOOST_LIBRARIES)
     else:
-        inc_dir = os.path.join(BOOST_ROOT, 'include')
-        lib_dirs = [os.path.join(BOOST_ROOT, 'lib')]
+        inc_dir = os.path.join(BOOST_ROOT, "include")
+        lib_dirs = [os.path.join(BOOST_ROOT, "lib")]
         if IS64:
-            lib64_dir = os.path.join(BOOST_ROOT, 'lib64')
+            lib64_dir = os.path.join(BOOST_ROOT, "lib64")
             if os.path.isdir(lib64_dir):
                 lib_dirs.insert(0, lib64_dir)
 
-        dirs['include_dirs'].append(inc_dir)
-        dirs['library_dirs'].extend(lib_dirs)
+        dirs["include_dirs"].append(inc_dir)
+        dirs["library_dirs"].extend(lib_dirs)
 
-    dirs['libraries'].append(boost_library_name)
+    dirs["libraries"].append(boost_library_name)
 
 
 class build(dftbuild):
@@ -239,19 +245,19 @@ class build(dftbuild):
     user_options = list(dftbuild.user_options)
 
     # Strip library option
-    user_options.append((
-        'strip-lib',
-        None,
-        "strips the shared library of debugging symbols"
-        " (Unix like systems only)"))
+    user_options.append(
+        (
+            "strip-lib",
+            None,
+            "strips the shared library of debugging symbols"
+            " (Unix like systems only)",
+        )
+    )
 
     # No documentation option
-    user_options.append((
-        'no-doc',
-        None,
-        "do not build documentation"))
+    user_options.append(("no-doc", None, "do not build documentation"))
 
-    boolean_options = dftbuild.boolean_options + ['strip-lib', 'no-doc']
+    boolean_options = dftbuild.boolean_options + ["strip-lib", "no-doc"]
 
     def initialize_options(self):
         dftbuild.initialize_options(self)
@@ -263,7 +269,7 @@ class build(dftbuild):
 
     def run(self):
         if numpy is None:
-            self.warn('NOT using numpy: it is not available')
+            self.warn("NOT using numpy: it is not available")
         elif get_c_numpy() is None:
             self.warn("NOT using numpy: numpy available but C source is not")
         dftbuild.run(self)
@@ -297,31 +303,32 @@ class build(dftbuild):
         if sphinx is None:
             return False
         if V(sphinx.__version__) <= V("0.6.5"):
-            print("Documentation will not be generated:"
-                  " sphinx version (%s) too low."
-                  " Needs 0.6.6" % sphinx.__version__)
+            print(
+                "Documentation will not be generated:"
+                " sphinx version (%s) too low."
+                " Needs 0.6.6" % sphinx.__version__
+            )
             return False
         setup_dir = os.path.dirname(os.path.abspath(__file__))
-        return os.path.isdir(os.path.join(setup_dir, 'doc'))
+        return os.path.isdir(os.path.join(setup_dir, "doc"))
 
-    sub_commands = dftbuild.sub_commands + [('build_doc', has_doc), ]
+    sub_commands = dftbuild.sub_commands + [
+        ("build_doc", has_doc),
+    ]
 
 
 class build_ext(dftbuild_ext):
-
     def build_extensions(self):
         self.use_cpp_0x = False
         if isinstance(self.compiler, UnixCCompiler):
             compiler_pars = self.compiler.compiler_so
-            while '-Wstrict-prototypes' in compiler_pars:
-                del compiler_pars[compiler_pars.index('-Wstrict-prototypes')]
+            while "-Wstrict-prototypes" in compiler_pars:
+                del compiler_pars[compiler_pars.index("-Wstrict-prototypes")]
             # self.compiler.compiler_so = " ".join(compiler_pars)
 
             # mimic tango check to activate C++0x extension
             compiler = self.compiler.compiler
-            proc = subprocess.Popen(
-                compiler + ["-dumpversion"],
-                stdout=subprocess.PIPE)
+            proc = subprocess.Popen(compiler + ["-dumpversion"], stdout=subprocess.PIPE)
             pipe = proc.stdout
             proc.wait()
             gcc_ver = pipe.readlines()[0].decode().strip()
@@ -331,23 +338,25 @@ class build_ext(dftbuild_ext):
 
     def build_extension(self, ext):
         if self.use_cpp_0x:
-            ext.extra_compile_args += ['-std=c++0x']
-            ext.define_macros += [('PYTANGO_HAS_UNIQUE_PTR', '1')]
-        ext.extra_compile_args += ['-Wno-unused-variable',
-                                   '-Wno-deprecated-declarations',
-                                   '-Wno-maybe-uninitialized']
+            ext.extra_compile_args += ["-std=c++0x"]
+            ext.define_macros += [("PYTANGO_HAS_UNIQUE_PTR", "1")]
+        ext.extra_compile_args += [
+            "-Wno-unused-variable",
+            "-Wno-deprecated-declarations",
+            "-Wno-maybe-uninitialized",
+        ]
         dftbuild_ext.build_extension(self, ext)
 
 
 if sphinx:
-    class build_doc(BuildDoc):
 
+    class build_doc(BuildDoc):
         def run(self):
             # make sure the python path is pointing to the newly built
             # code so that the documentation is built on this and not a
             # previously installed version
 
-            build_cmd = self.get_finalized_command('build')
+            build_cmd = self.get_finalized_command("build")
             sys.path.insert(0, os.path.abspath(build_cmd.build_lib))
             sphinx.setup_command.BuildDoc.run(self)
             sys.path.pop(0)
@@ -358,22 +367,19 @@ class install_html(Command):
     user_options = []
 
     # Install directory option
-    user_options.append((
-        'install-dir=',
-        'd',
-        'base directory for installing HTML documentation files'))
+    user_options.append(
+        ("install-dir=", "d", "base directory for installing HTML documentation files")
+    )
 
     def initialize_options(self):
         self.install_dir = None
 
     def finalize_options(self):
-        self.set_undefined_options(
-            'install',
-            ('install_html', 'install_dir'))
+        self.set_undefined_options("install", ("install_html", "install_dir"))
 
     def run(self):
-        build_doc_cmd = self.get_finalized_command('build_doc')
-        src_html_dir = abspath(build_doc_cmd.build_dir, 'html')
+        build_doc_cmd = self.get_finalized_command("build_doc")
+        src_html_dir = abspath(build_doc_cmd.build_dir, "html")
         self.copy_tree(src_html_dir, self.install_dir)
 
 
@@ -382,10 +388,9 @@ class install(dftinstall):
     user_options = list(dftinstall.user_options)
 
     # HTML directory option
-    user_options.append((
-        'install-html=',
-        None,
-        "installation directory for HTML documentation"))
+    user_options.append(
+        ("install-html=", None, "installation directory for HTML documentation")
+    )
 
     def initialize_options(self):
         dftinstall.initialize_options(self)
@@ -404,132 +409,171 @@ class install(dftinstall):
         # since install_data seems to be, in practice, the proper install_base
         # on all different systems.
         if self.install_html is None:
-            self.install_html = os.path.join(self.install_data,
-                                             'share', 'doc', 'pytango', 'html')
+            self.install_html = os.path.join(
+                self.install_data, "share", "doc", "pytango", "html"
+            )
 
     def has_html(self):
         return sphinx is not None
 
     sub_commands = list(dftinstall.sub_commands)
-    sub_commands.append(('install_html', has_html))
+    sub_commands.append(("install_html", has_html))
+
+
+class check_tests_errors(Command):
+    """ Checks tests summary.json for failed tests and raises errror if found """
+
+    description = (
+        "Checks tests summary.json for failed tests and raises errror if found"
+    )
+
+    user_options = [
+        ("summary-file=", None, "Path to summary.json"),
+        (
+            "ignore-gevent-errors",
+            None,
+            "Failed tests using GreenMode.Gevent will not raise error.",
+        ),
+    ]
+
+    def initialize_options(self):
+        self.summary_file = "summary.json"
+        self.ignore_gevent_errors = False
+
+    def finalize_options(self):
+        if self.ignore_gevent_errors is not False:
+            self.ignore_gevent_errors = True
+        if not os.path.isfile(self.summary_file):
+            raise Exception("Provided summary.json file does not exists.")
+
+    def run(self):
+        with open(self.summary_file, "r") as f:
+            summary = json.load(f)
+            for test in summary:
+                if test["outcome"] in ["failed", "Failed", "fail", "error", "Error"]:
+                    if self.ignore_gevent_errors and "Gevent" in test["testName"]:
+                        pass
+                    else:
+                        raise Exception("Some tests in summary.json failed.")
+        print("No failed tests found in the tests summary file.")
 
 
 def setup_args():
 
     directories = {
-        'include_dirs': [],
-        'library_dirs': [],
-        'libraries': [],
+        "include_dirs": [],
+        "library_dirs": [],
+        "libraries": [],
     }
     sys_libs = []
 
     # Link specifically to libtango version 9
-    tangolib = ':libtango.so.9' if POSIX else 'tango'
-    directories['libraries'].append(tangolib)
+    tangolib = ":libtango.so.9" if POSIX else "tango"
+    directories["libraries"].append(tangolib)
 
-    add_lib('omni', directories, sys_libs, lib_name='omniORB4')
-    add_lib('zmq', directories, sys_libs, lib_name='libzmq')
-    add_lib('tango', directories, sys_libs, inc_suffix='tango')
+    add_lib("omni", directories, sys_libs, lib_name="omniORB4")
+    add_lib("zmq", directories, sys_libs, lib_name="libzmq")
+    add_lib("tango", directories, sys_libs, inc_suffix="tango")
     add_lib_boost(directories)
 
     # special numpy configuration
 
     numpy_c_include = get_c_numpy()
     if numpy_c_include is not None:
-        directories['include_dirs'].append(numpy_c_include)
+        directories["include_dirs"].append(numpy_c_include)
 
     macros = []
     if not has_numpy():
-        macros.append(('DISABLE_PYTANGO_NUMPY', None))
+        macros.append(("DISABLE_PYTANGO_NUMPY", None))
     else:
-        macros.append(('PYTANGO_NUMPY_VERSION', '"%s"' % numpy.__version__))
+        macros.append(("PYTANGO_NUMPY_VERSION", '"%s"' % numpy.__version__))
 
     if POSIX:
         directories = pkg_config(*sys_libs, **directories)
 
     Release = get_release_info()
 
-    author = Release.authors['Coutinho']
+    author = Release.authors["Coutinho"]
 
     please_debug = False
 
     packages = [
-        'tango',
-        'tango.databaseds',
-        'tango.databaseds.db_access',
+        "tango",
+        "tango.databaseds",
+        "tango.databaseds.db_access",
     ]
 
     py_modules = [
-        'PyTango',  # Backward compatibilty
+        "PyTango",  # Backward compatibilty
     ]
 
     provides = [
-        'tango',
-        'PyTango',  # Backward compatibilty
+        "tango",
+        "PyTango",  # Backward compatibilty
     ]
 
-    python_requires = '>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*'
+    python_requires = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
     requires = [
-        'boost_python (>=1.33)',
-        'numpy (>=1.1)',
-        'six (>=1.10)',
+        "boost_python (>=1.33)",
+        "numpy (>=1.1)",
+        "six (>=1.10)",
     ]
 
     install_requires = [
-        'six (>=1.10)',
+        "six (>=1.10)",
     ]
     if PYTHON_VERSION < (3, 4):
-        install_requires.append('enum34')
+        install_requires.append("enum34")
 
     setup_requires = []
 
     if TESTING:
-        setup_requires += ['pytest-runner']
+        setup_requires += ["pytest-runner"]
 
     tests_require = [
-        'gevent != 1.5a1',
-        'psutil',
+        "gevent != 1.5a1",
+        "psutil",
     ]
 
     if PYTHON2:
         tests_require += [
-            'futures',
-            'pyparsing < 3',
-            'pytest < 5',
-            'pytest-xdist < 2',
-            'trollius',
-            'zipp >= 0.5, < 2',
+            "futures",
+            "pyparsing < 3",
+            "pytest < 5",
+            "pytest-xdist < 2",
+            "trollius",
+            "zipp >= 0.5, < 2",
         ]
     else:
-        tests_require += ['pytest', 'pytest-xdist']
+        tests_require += ["pytest", "pytest-xdist"]
 
     package_data = {
-        'tango.databaseds': ['*.xmi', '*.sql', '*.sh', 'DataBaseds'],
+        "tango.databaseds": ["*.xmi", "*.sql", "*.sh", "DataBaseds"],
     }
 
     data_files = []
 
     classifiers = [
-        'Development Status :: 5 - Production/Stable',
-        'Environment :: Other Environment',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved ::'
-        ' GNU Library or Lesser General Public License (LGPL)',
-        'Natural Language :: English',
-        'Operating System :: Microsoft :: Windows',
-        'Operating System :: POSIX',
-        'Operating System :: POSIX :: Linux',
-        'Operating System :: Unix',
-        'Programming Language :: C',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Topic :: Scientific/Engineering',
-        'Topic :: Software Development :: Libraries',
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Other Environment",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved ::"
+        " GNU Library or Lesser General Public License (LGPL)",
+        "Natural Language :: English",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX",
+        "Operating System :: POSIX :: Linux",
+        "Operating System :: Unix",
+        "Programming Language :: C",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Software Development :: Libraries",
     ]
 
     # Note for PyTango developers:
@@ -541,36 +585,37 @@ def setup_args():
         # '-include ext/precompiled_header.hpp',
     ]
 
-    extra_link_args = [
-    ]
+    extra_link_args = []
 
     if please_debug:
-        extra_compile_args += ['-g', '-O0']
-        extra_link_args += ['-g', '-O0']
+        extra_compile_args += ["-g", "-O0"]
+        extra_link_args += ["-g", "-O0"]
 
-    src_dir = abspath('ext')
+    src_dir = abspath("ext")
     client_dir = src_dir
-    server_dir = os.path.join(src_dir, 'server')
+    server_dir = os.path.join(src_dir, "server")
 
     clientfiles = sorted(
         os.path.join(client_dir, fname)
         for fname in os.listdir(client_dir)
-        if fname.endswith('.cpp'))
+        if fname.endswith(".cpp")
+    )
 
     serverfiles = sorted(
         os.path.join(server_dir, fname)
         for fname in os.listdir(server_dir)
-        if fname.endswith('.cpp'))
+        if fname.endswith(".cpp")
+    )
 
     cppfiles = clientfiles + serverfiles
-    directories['include_dirs'].extend([client_dir, server_dir])
+    directories["include_dirs"].extend([client_dir, server_dir])
 
-    include_dirs = uniquify(directories['include_dirs'])
-    library_dirs = uniquify(directories['library_dirs'])
-    libraries = uniquify(directories['libraries'])
+    include_dirs = uniquify(directories["include_dirs"])
+    library_dirs = uniquify(directories["library_dirs"])
+    libraries = uniquify(directories["libraries"])
 
     pytango_ext = Extension(
-        name='_tango',
+        name="_tango",
         sources=cppfiles,
         include_dirs=include_dirs,
         library_dirs=library_dirs,
@@ -578,22 +623,25 @@ def setup_args():
         define_macros=macros,
         extra_compile_args=extra_compile_args,
         extra_link_args=extra_link_args,
-        language='c++',
-        depends=[])
+        language="c++",
+        depends=[],
+    )
 
     cmdclass = {
-        'build': build,
-        'build_ext': build_ext,
-        'install_html': install_html,
-        'install': install}
+        "build": build,
+        "build_ext": build_ext,
+        "install_html": install_html,
+        "install": install,
+        "check_tests_errors": check_tests_errors,
+    }
 
     if sphinx:
-        cmdclass['build_doc'] = build_doc
+        cmdclass["build_doc"] = build_doc
 
     long_description = get_readme()
 
     opts = dict(
-        name='pytango',
+        name="pytango",
         version=Release.version_long,
         description=Release.description,
         long_description=long_description,
@@ -615,9 +663,10 @@ def setup_args():
         install_requires=install_requires,
         setup_requires=setup_requires,
         tests_require=tests_require,
-        ext_package='tango',
+        ext_package="tango",
         ext_modules=[pytango_ext],
-        cmdclass=cmdclass)
+        cmdclass=cmdclass,
+    )
 
     return opts
 

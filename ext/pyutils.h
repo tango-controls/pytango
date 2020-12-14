@@ -12,6 +12,7 @@
 #pragma once
 
 #include <boost/python.hpp>
+#include <tango.h>
 #include <omnithread.h>
 
 namespace bopy = boost::python;
