@@ -371,51 +371,60 @@ def test_read_write_dynamic_attribute_enum(server_green_mode):
 
 # Test properties
 
-def test_device_property(typed_values, server_green_mode):
+def test_device_property_no_default(typed_values, server_green_mode):
     dtype, values, expected = typed_values
     patched_dtype = dtype if dtype != (bool,) else (int,)
-    default = values[0]
     value = values[1]
 
     class TestDevice(Device):
         green_mode = server_green_mode
 
-        prop_1 = device_property(dtype=dtype)
-        prop_2 = device_property(dtype=dtype, default_value=default)
+        prop_without_db_value = device_property(dtype=dtype)
+        prop_with_db_value = device_property(dtype=dtype)
+
+        @command(dtype_out=bool)
+        def is_prop_without_db_value_set_to_none(self):
+            return self.prop_without_db_value is None
 
         @command(dtype_out=patched_dtype)
-        def get_prop_1(self):
-            return default if self.prop_1 is None else self.prop_1
-        
-        @command(dtype_out=patched_dtype)
-        def get_prop_2(self):
-            return self.prop_2
-    
-    with DeviceTestContext(TestDevice) as proxy:
-        assert_close(proxy.get_prop_1(), expected(default))
-        assert_close(proxy.get_prop_2(), expected(default))
+        def get_prop_with_db_value(self):
+            return self.prop_with_db_value
 
-
-def test_default_device_test_context_property(typed_values, server_green_mode):
-    dtype, values, expected = typed_values
-    patched_dtype = dtype if dtype != (bool,) else (int,)
-
-    default = values[0]
-    value = values[1]
-
-    class TestDevice(Device):
-        green_mode = server_green_mode
-
-        prop = device_property(dtype=dtype, default_value=default)
-
-        @command(dtype_out=patched_dtype)
-        def get_prop(self):
-            print(self.prop)
-            return self.prop
-    
     with DeviceTestContext(TestDevice,
-                           properties={'prop': value}) as proxy:
-        assert_close(proxy.get_prop(), expected(value))
+                           properties={'prop_with_db_value': value}) as proxy:
+        assert proxy.is_prop_without_db_value_set_to_none()
+        assert_close(proxy.get_prop_with_db_value(), expected(value))
+
+
+def test_device_property_with_default_value(typed_values, server_green_mode):
+    dtype, values, expected = typed_values
+    patched_dtype = dtype if dtype != (bool,) else (int,)
+
+    default = values[0]
+    value = values[1]
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+
+        prop_without_db_value = device_property(
+            dtype=dtype, default_value=default
+        )
+        prop_with_db_value = device_property(
+            dtype=dtype, default_value=default
+        )
+
+        @command(dtype_out=patched_dtype)
+        def get_prop_without_db_value(self):
+            return self.prop_without_db_value
+
+        @command(dtype_out=patched_dtype)
+        def get_prop_with_db_value(self):
+            return self.prop_with_db_value
+
+    with DeviceTestContext(TestDevice,
+                           properties={'prop_with_db_value': value}) as proxy:
+        assert_close(proxy.get_prop_without_db_value(), expected(default))
+        assert_close(proxy.get_prop_with_db_value(), expected(value))
     
 
 def test_device_get_device_properties_when_init_device(server_green_mode):
@@ -543,7 +552,8 @@ def test_polled_attribute(server_green_mode):
             assert dct[attr] == poll_period
 
 
-def test_mandatory_device_property(typed_values, server_green_mode):
+def test_mandatory_device_property_with_db_value_succeeds(
+        typed_values, server_green_mode):
     dtype, values, expected = typed_values
     patched_dtype = dtype if dtype != (bool,) else (int,)
     default, value = values[:2]
@@ -557,8 +567,21 @@ def test_mandatory_device_property(typed_values, server_green_mode):
         def get_prop(self):
             return self.prop
 
+    with DeviceTestContext(TestDevice,
+                           properties={'prop': value}) as proxy:
+        assert_close(proxy.get_prop(), expected(value))
+
+
+def test_mandatory_device_property_without_db_value_fails(
+        typed_values, server_green_mode):
+    dtype, _, _ = typed_values
+
+    class TestDevice(Device):
+        green_mode = server_green_mode
+        prop = device_property(dtype=dtype, mandatory=True)
+
     with pytest.raises(DevFailed) as context:
-        with DeviceTestContext(TestDevice) as proxy:
+        with DeviceTestContext(TestDevice):
             pass
     assert 'Device property prop is mandatory' in str(context.value)
 
