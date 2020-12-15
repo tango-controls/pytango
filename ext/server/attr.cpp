@@ -106,7 +106,7 @@ bool PyAttr::_is_method(Tango::DeviceImpl *dev, const std::string &name)
     return is_method_defined(__dev_py, name);
 }
 
-void PyAttr::set_user_prop(vector<Tango::AttrProperty> &user_prop,
+void PyAttr::set_user_prop(std::vector<Tango::AttrProperty> &user_prop,
                            Tango::UserDefaultAttrProp &def_prop)
 {
 
@@ -121,7 +121,7 @@ void PyAttr::set_user_prop(vector<Tango::AttrProperty> &user_prop,
     for (size_t loop = 0;loop < nb_prop;loop++)
     {
         Tango::AttrProperty  prop = user_prop[loop];
-        string &prop_name = prop.get_name();
+        std::string &prop_name = prop.get_name();
         const char *prop_value = prop.get_value().c_str();
 
         if (prop_name == "label")
@@ -166,10 +166,10 @@ void PyAttr::set_user_prop(vector<Tango::AttrProperty> &user_prop,
             def_prop.set_archive_event_period(prop_value);
         else if (prop_name == "enum_labels") {
             // Convert string back to vector
-            vector<string> labels;
-            string label_str = prop.get_value();
+            std::vector<std::string> labels;
+            std::string label_str = prop.get_value();
             size_t offset = 0, pos = 0;
-            while( (pos = label_str.find(",", offset)) != string::npos) {
+            while( (pos = label_str.find(",", offset)) != std::string::npos) {
                 labels.push_back(label_str.substr(offset, pos-offset));
                 offset = pos + 1;
             }

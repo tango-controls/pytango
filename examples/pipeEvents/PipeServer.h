@@ -64,13 +64,13 @@ class PipeServer : public TANGO_BASE_CLASS
 //	Add your own data members
 
 	Tango::DevLong 				dl;
-	vector<double> 				v_db;
+	std::vector<double> 				v_db;
 	Tango::DevicePipeBlob 		inner_inner_blob;
 	Tango::DevicePipeBlob 		inner_blob;
 
-	string						inner_str;
+	std::string						inner_str;
 	Tango::DevBoolean			inner_bool;
-	vector<Tango::DevLong>		v_dl;
+	std::vector<Tango::DevLong>		v_dl;
 
     /*----- PROTECTED REGION END -----*/	//	PipeServer::Data Members
 
@@ -83,7 +83,7 @@ public:
 	 *	@param cl	Class.
 	 *	@param s 	Device Name
 	 */
-	PipeServer(Tango::DeviceClass *cl,string &s);
+	PipeServer(Tango::DeviceClass *cl,std::string &s);
 	/**
 	 * Constructs a newly device object.
 	 *
@@ -129,7 +129,7 @@ public:
 	 *	Description : Hardware acquisition for attributes.
 	 */
 	//--------------------------------------------------------
-	virtual void read_attr_hardware(vector<long> &attr_list);
+	virtual void read_attr_hardware(std::vector<long> &attr_list);
 
 
 	//--------------------------------------------------------

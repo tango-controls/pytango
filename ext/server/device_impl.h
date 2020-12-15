@@ -204,22 +204,22 @@ public:
     /**
      * Necessary read_attr_hardware implementation to call python
      */
-    virtual void read_attr_hardware(vector<long> &attr_list);
+    virtual void read_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Executes default read_attr_hardware implementation
      */
-    void default_read_attr_hardware(vector<long> &attr_list);
+    void default_read_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Necessary write_attr_hardware implementation to call python
      */
-    virtual void write_attr_hardware(vector<long> &attr_list);
+    virtual void write_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Executes default write_attr_hardware implementation
      */
-    void default_write_attr_hardware(vector<long> &attr_list);
+    void default_write_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Necessary dev_state implementation to call python
@@ -331,22 +331,22 @@ public:
     /**
      * Necessary read_attr_hardware implementation to call python
      */
-    virtual void read_attr_hardware(vector<long> &attr_list);
+    virtual void read_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Executes default read_attr_hardware implementation
      */
-    void default_read_attr_hardware(vector<long> &attr_list);
+    void default_read_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Necessary write_attr_hardware implementation to call python
      */
-    virtual void write_attr_hardware(vector<long> &attr_list);
+    virtual void write_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Executes default write_attr_hardware implementation
      */
-    void default_write_attr_hardware(vector<long> &attr_list);
+    void default_write_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Necessary dev_state implementation to call python
@@ -458,22 +458,22 @@ public:
     /**
      * Necessary read_attr_hardware implementation to call python
      */
-    virtual void read_attr_hardware(vector<long> &attr_list);
+    virtual void read_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Executes default read_attr_hardware implementation
      */
-    void default_read_attr_hardware(vector<long> &attr_list);
+    void default_read_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Necessary write_attr_hardware implementation to call python
      */
-    virtual void write_attr_hardware(vector<long> &attr_list);
+    virtual void write_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Executes default write_attr_hardware implementation
      */
-    void default_write_attr_hardware(vector<long> &attr_list);
+    void default_write_attr_hardware(std::vector<long> &attr_list);
 
     /**
      * Necessary dev_state implementation to call python

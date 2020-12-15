@@ -75,15 +75,15 @@ IfchangeServerClass *IfchangeServerClass::_instance = NULL;
 
 //--------------------------------------------------------
 /**
- * method : 		IfchangeServerClass::IfchangeServerClass(string &s)
+ * method : 		IfchangeServerClass::IfchangeServerClass(std::string &s)
  * description : 	constructor for the IfchangeServerClass
  *
  * @param s	The class name
  */
 //--------------------------------------------------------
-IfchangeServerClass::IfchangeServerClass(string &s):Tango::DeviceClass(s)
+IfchangeServerClass::IfchangeServerClass(std::string &s):Tango::DeviceClass(s)
 {
-	cout2 << "Entering IfchangeServerClass constructor" << endl;
+	cout2 << "Entering IfchangeServerClass constructor" << std::endl;
 	set_default_property();
 	write_class_property();
 
@@ -91,7 +91,7 @@ IfchangeServerClass::IfchangeServerClass(string &s):Tango::DeviceClass(s)
 	
 	/*----- PROTECTED REGION END -----*/	//	IfchangeServerClass::constructor
 
-	cout2 << "Leaving IfchangeServerClass constructor" << endl;
+	cout2 << "Leaving IfchangeServerClass constructor" << std::endl;
 }
 
 //--------------------------------------------------------
@@ -125,10 +125,10 @@ IfchangeServerClass *IfchangeServerClass::init(const char *name)
 	{
 		try
 		{
-			string s(name);
+			std::string s(name);
 			_instance = new IfchangeServerClass(s);
 		}
-		catch (bad_alloc &)
+		catch (std::bad_alloc &)
 		{
 			throw;
 		}
@@ -147,7 +147,7 @@ IfchangeServerClass *IfchangeServerClass::instance()
 {
 	if (_instance == NULL)
 	{
-		cerr << "Class is not initialised !!" << endl;
+		std::cerr << "Class is not initialised !!" << std::endl;
 		exit(-1);
 	}
 	return _instance;
@@ -171,7 +171,7 @@ IfchangeServerClass *IfchangeServerClass::instance()
 //--------------------------------------------------------
 CORBA::Any *Add_dynamicClass::execute(Tango::DeviceImpl *device, TANGO_UNUSED(const CORBA::Any &in_any))
 {
-	cout2 << "Add_dynamicClass::execute(): arrived" << endl;
+	cout2 << "Add_dynamicClass::execute(): arrived" << std::endl;
 	((static_cast<IfchangeServer *>(device))->add_dynamic());
 	return new CORBA::Any();
 }
@@ -189,7 +189,7 @@ CORBA::Any *Add_dynamicClass::execute(Tango::DeviceImpl *device, TANGO_UNUSED(co
 //--------------------------------------------------------
 CORBA::Any *Delete_DynamicClass::execute(Tango::DeviceImpl *device, TANGO_UNUSED(const CORBA::Any &in_any))
 {
-	cout2 << "Delete_DynamicClass::execute(): arrived" << endl;
+	cout2 << "Delete_DynamicClass::execute(): arrived" << std::endl;
 	((static_cast<IfchangeServer *>(device))->delete__dynamic());
 	return new CORBA::Any();
 }
@@ -207,7 +207,7 @@ CORBA::Any *Delete_DynamicClass::execute(Tango::DeviceImpl *device, TANGO_UNUSED
 //--------------------------------------------------------
 CORBA::Any *iocmdClass::execute(Tango::DeviceImpl *device, TANGO_UNUSED(const CORBA::Any &in_any))
 {
-	cout2 << "iocmdClass::execute(): arrived" << endl;
+	cout2 << "iocmdClass::execute(): arrived" << std::endl;
 	((static_cast<IfchangeServer *>(device))->iocmd(*this));
 	return new CORBA::Any();
 }
@@ -222,7 +222,7 @@ CORBA::Any *iocmdClass::execute(Tango::DeviceImpl *device, TANGO_UNUSED(const CO
  *	Description : Get the class property for specified name.
  */
 //--------------------------------------------------------
-Tango::DbDatum IfchangeServerClass::get_class_property(string &prop_name)
+Tango::DbDatum IfchangeServerClass::get_class_property(std::string &prop_name)
 {
 	for (unsigned int i=0 ; i<cl_prop.size() ; i++)
 		if (cl_prop[i].name == prop_name)
@@ -237,7 +237,7 @@ Tango::DbDatum IfchangeServerClass::get_class_property(string &prop_name)
  *	Description : Return the default value for device property.
  */
 //--------------------------------------------------------
-Tango::DbDatum IfchangeServerClass::get_default_device_property(string &prop_name)
+Tango::DbDatum IfchangeServerClass::get_default_device_property(std::string &prop_name)
 {
 	for (unsigned int i=0 ; i<dev_def_prop.size() ; i++)
 		if (dev_def_prop[i].name == prop_name)
@@ -252,7 +252,7 @@ Tango::DbDatum IfchangeServerClass::get_default_device_property(string &prop_nam
  *	Description : Return the default value for class property.
  */
 //--------------------------------------------------------
-Tango::DbDatum IfchangeServerClass::get_default_class_property(string &prop_name)
+Tango::DbDatum IfchangeServerClass::get_default_class_property(std::string &prop_name)
 {
 	for (unsigned int i=0 ; i<cl_def_prop.size() ; i++)
 		if (cl_def_prop[i].name == prop_name)
@@ -276,7 +276,7 @@ void IfchangeServerClass::set_default_property()
 	string	prop_name;
 	string	prop_desc;
 	string	prop_def;
-	vector<string>	vect_data;
+	std::vector<std::string>	vect_data;
 
 	//	Set Default Class Properties
 
@@ -308,7 +308,7 @@ void IfchangeServerClass::write_class_property()
 
 	//	Put Description
 	Tango::DbDatum	description("Description");
-	vector<string>	str_desc;
+	std::vector<std::string>	str_desc;
 	str_desc.push_back("");
 	description << str_desc;
 	data.push_back(description);
@@ -320,7 +320,7 @@ void IfchangeServerClass::write_class_property()
 	// check for cvs information
 	string	src_path(CvsPath);
 	start = src_path.find("/");
-	if (start!=string::npos)
+	if (start!=std::string::npos)
 	{
 		end   = src_path.find(filename);
 		if (end>start)
@@ -328,10 +328,10 @@ void IfchangeServerClass::write_class_property()
 			string	strloc = src_path.substr(start, end-start);
 			//	Check if specific repository
 			start = strloc.find("/cvsroot/");
-			if (start!=string::npos && start>0)
+			if (start!=std::string::npos && start>0)
 			{
 				string	repository = strloc.substr(0, start);
-				if (repository.find("/segfs/")!=string::npos)
+				if (repository.find("/segfs/")!=std::string::npos)
 					strloc = "ESRF:" + strloc.substr(start, strloc.length()-start);
 			}
 			Tango::DbDatum	cvs_loc("cvs_location");
@@ -345,7 +345,7 @@ void IfchangeServerClass::write_class_property()
 	{
 		string	src_path(SvnPath);
 		start = src_path.find("://");
-		if (start!=string::npos)
+		if (start!=std::string::npos)
 		{
 			end = src_path.find(filename);
 			if (end>start)
@@ -370,7 +370,7 @@ void IfchangeServerClass::write_class_property()
 	string	endstr(" $");
 	
 	end   = tagname.find(endstr);
-	if (end!=string::npos && end>start)
+	if (end!=std::string::npos && end>start)
 	{
 		string	strtag = tagname.substr(start, end-start);
 		Tango::DbDatum	cvs_tag("cvs_tag");
@@ -384,13 +384,13 @@ void IfchangeServerClass::write_class_property()
 	start = header.length();
 	
 	end   = svnpath.find(endstr);
-	if (end!=string::npos && end>start)
+	if (end!=std::string::npos && end>start)
 	{
 		string	strloc = svnpath.substr(start, end-start);
 		
-		string tagstr ("/tags/");
+		std::string tagstr ("/tags/");
 		start = strloc.find(tagstr);
-		if ( start!=string::npos )
+		if ( start!=std::string::npos )
 		{
 			start = start + tagstr.length();
 			end   = strloc.find(filename);
@@ -413,7 +413,7 @@ void IfchangeServerClass::write_class_property()
 
 	//  Put inheritance
 	Tango::DbDatum	inher_datum("InheritedFrom");
-	vector<string> inheritance;
+	std::vector<std::string> inheritance;
 	inheritance.push_back("TANGO_BASE_CLASS");
 	inher_datum << inheritance;
 	data.push_back(inher_datum);
@@ -444,7 +444,7 @@ void IfchangeServerClass::device_factory(const Tango::DevVarStringArray *devlist
 	//	Create devices and add it into the device list
 	for (unsigned long i=0 ; i<devlist_ptr->length() ; i++)
 	{
-		cout4 << "Device name : " << (*devlist_ptr)[i].in() << endl;
+		cout4 << "Device name : " << (*devlist_ptr)[i].in() << std::endl;
 		device_list.push_back(new IfchangeServer(this, (*devlist_ptr)[i]));
 	}
 
@@ -479,7 +479,7 @@ void IfchangeServerClass::device_factory(const Tango::DevVarStringArray *devlist
  *                and store them in the attribute list
  */
 //--------------------------------------------------------
-void IfchangeServerClass::attribute_factory(vector<Tango::Attr *> &att_list)
+void IfchangeServerClass::attribute_factory(std::vector<Tango::Attr *> &att_list)
 {
 	/*----- PROTECTED REGION ID(IfchangeServerClass::attribute_factory_before) ENABLED START -----*/
 	
@@ -592,16 +592,16 @@ void IfchangeServerClass::command_factory()
  * @param	att_list	the ceated attribute list
  */
 //--------------------------------------------------------
-void IfchangeServerClass::create_static_attribute_list(vector<Tango::Attr *> &att_list)
+void IfchangeServerClass::create_static_attribute_list(std::vector<Tango::Attr *> &att_list)
 {
 	for (unsigned long i=0 ; i<att_list.size() ; i++)
 	{
-		string att_name(att_list[i]->get_name());
+		std::string att_name(att_list[i]->get_name());
 		transform(att_name.begin(), att_name.end(), att_name.begin(), ::tolower);
 		defaultAttList.push_back(att_name);
 	}
 
-	cout2 << defaultAttList.size() << " attributes in default list" << endl;
+	cout2 << defaultAttList.size() << " attributes in default list" << std::endl;
 
 	/*----- PROTECTED REGION ID(IfchangeServerClass::create_static_att_list) ENABLED START -----*/
 	
@@ -618,7 +618,7 @@ void IfchangeServerClass::create_static_attribute_list(vector<Tango::Attr *> &at
  * @param	list of all attributes
  */
 //--------------------------------------------------------
-void IfchangeServerClass::erase_dynamic_attributes(const Tango::DevVarStringArray *devlist_ptr, vector<Tango::Attr *> &att_list)
+void IfchangeServerClass::erase_dynamic_attributes(const Tango::DevVarStringArray *devlist_ptr, std::vector<Tango::Attr *> &att_list)
 {
 	Tango::Util *tg = Tango::Util::instance();
 
@@ -627,17 +627,17 @@ void IfchangeServerClass::erase_dynamic_attributes(const Tango::DevVarStringArra
 		Tango::DeviceImpl *dev_impl = tg->get_device_by_name(((string)(*devlist_ptr)[i]).c_str());
 		IfchangeServer *dev = static_cast<IfchangeServer *> (dev_impl);
 
-		vector<Tango::Attribute *> &dev_att_list = dev->get_device_attr()->get_attribute_list();
-		vector<Tango::Attribute *>::iterator ite_att;
+		std::vector<Tango::Attribute *> &dev_att_list = dev->get_device_attr()->get_attribute_list();
+		std::vector<Tango::Attribute *>::iterator ite_att;
 		for (ite_att=dev_att_list.begin() ; ite_att != dev_att_list.end() ; ++ite_att)
 		{
-			string att_name((*ite_att)->get_name_lower());
+			std::string att_name((*ite_att)->get_name_lower());
 			if ((att_name == "state") || (att_name == "status"))
 				continue;
-			vector<string>::iterator ite_str = find(defaultAttList.begin(), defaultAttList.end(), att_name);
+			std::vector<std::string>::iterator ite_str = find(defaultAttList.begin(), defaultAttList.end(), att_name);
 			if (ite_str == defaultAttList.end())
 			{
-				cout2 << att_name << " is a UNWANTED dynamic attribute for device " << (*devlist_ptr)[i] << endl;
+				cout2 << att_name << " is a UNWANTED dynamic attribute for device " << (*devlist_ptr)[i] << std::endl;
 				Tango::Attribute &att = dev->get_device_attr()->get_attr_by_name(att_name.c_str());
 				dev->remove_attribute(att_list[att.get_attr_idx()], true, false);
 				--ite_att;
@@ -655,9 +655,9 @@ void IfchangeServerClass::erase_dynamic_attributes(const Tango::DevVarStringArra
  *	Description : returns Tango::Attr * object found by name
  */
 //--------------------------------------------------------
-Tango::Attr *IfchangeServerClass::get_attr_object_by_name(vector<Tango::Attr *> &att_list, string attname)
+Tango::Attr *IfchangeServerClass::get_attr_object_by_name(std::vector<Tango::Attr *> &att_list, std::string attname)
 {
-	vector<Tango::Attr *>::iterator it;
+	std::vector<Tango::Attr *>::iterator it;
 	for (it=att_list.begin() ; it<att_list.end() ; ++it)
 		if ((*it)->get_name()==attname)
 			return (*it);

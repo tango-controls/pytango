@@ -316,19 +316,19 @@ void export_database()
             (Tango::DbDevFullInfo (Tango::Database::*) (const std::string &))
             get_device_info_)
         .def("get_device_name",
-            (Tango::DbDatum (Tango::Database::*) (const string &, const string &))
+            (Tango::DbDatum (Tango::Database::*) (const std::string &, const std::string &))
             get_device_name_)
         .def("get_device_exported",
-            (Tango::DbDatum (Tango::Database::*) (const string &))
+            (Tango::DbDatum (Tango::Database::*) (const std::string &))
             get_device_exported_)
         .def("get_device_domain",
-            (Tango::DbDatum (Tango::Database::*) (const string &))
+            (Tango::DbDatum (Tango::Database::*) (const std::string &))
             get_device_domain_)
         .def("get_device_family",
-            (Tango::DbDatum (Tango::Database::*) (const string &))
+            (Tango::DbDatum (Tango::Database::*) (const std::string &))
             get_device_family_)
         .def("get_device_member",
-            (Tango::DbDatum (Tango::Database::*) (const string &))
+            (Tango::DbDatum (Tango::Database::*) (const std::string &))
             get_device_member_)
         .def("get_device_alias", &PyDatabase::get_device_alias)
         .def("get_alias", &PyDatabase::get_alias)

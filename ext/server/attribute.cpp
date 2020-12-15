@@ -36,7 +36,7 @@ inline static void throw_wrong_python_data_type(const std::string &att_name,
                                          const char *method)
 {
     TangoSys_OMemStream o;
-    o << "Wrong Python type for attribute " << att_name << ends;
+    o << "Wrong Python type for attribute " << att_name << std::ends;
     Tango::Except::throw_exception(
             (const char *)"PyDs_WrongPythonDataTypeForAttribute",
             o.str(), method);
@@ -49,7 +49,7 @@ inline static void throw_wrong_python_data_type_in_array(const std::string &att_
     TangoSys_OMemStream o;
     o << "Wrong Python type for attribute " << att_name
       << ".\nElement with index " << idx << " in sequence does not "
-      << "have a correct type." << ends;
+      << "have a correct type." << std::ends;
 
     Tango::Except::throw_exception(
             (const char *)"PyDs_WrongPythonDataTypeForAttribute",
@@ -263,7 +263,7 @@ namespace PyAttribute
                 
             TangoSys_OMemStream o;
             o << "Wrong Python type for attribute " << att.get_name()
-              << " of type " << arg_type << ". Expected a sequence." << ends;
+              << " of type " << arg_type << ". Expected a sequence." << std::ends;
 
             Tango::Except::throw_exception(
                     "PyDs_WrongPythonDataTypeForAttribute",
@@ -306,9 +306,9 @@ namespace PyAttribute
                     o << "(data, dim_x) on scalar attribute ";
 
                 if (quality)
-                    o << att.get_name() << ". Use set_value_date_quality(data) instead" << ends;
+                    o << att.get_name() << ". Use set_value_date_quality(data) instead" << std::ends;
                 else
-                    o << att.get_name() << ". Use set_value(data) instead" << ends;
+                    o << att.get_name() << ". Use set_value(data) instead" << std::ends;
 
                 Tango::Except::throw_exception(
                         "PyDs_WrongPythonDataTypeForAttribute",
@@ -435,7 +435,7 @@ namespace PyAttribute
     {
         Tango::AttributeConfig_3 tg_attr_cfg;
         from_py_object(attr_cfg, tg_attr_cfg);
-        string tg_dev_name = bopy::extract<string>(dev_name);
+        std::string tg_dev_name = bopy::extract<std::string>(dev_name);
         att.set_upd_properties(tg_attr_cfg,tg_dev_name);
     }
 
@@ -454,7 +454,7 @@ namespace PyAttribute
         }
         TangoSys_OMemStream o;
         o << "Wrong Python argument type for attribute " << self.get_name()
-            << ". Expected a DevFailed." << ends;
+            << ". Expected a DevFailed." << std::ends;
         Tango::Except::throw_exception(
                 "PyDs_WrongPythonDataTypeForAttribute",
                 o.str(),
@@ -482,7 +482,7 @@ namespace PyAttribute
     template<>
     inline void _set_min_alarm<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
     {
-    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+    	std::string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
     	Tango::Except::throw_exception((const char *)"API_MethodArgument",
     				  (const char *)err_msg.c_str(),
     				  (const char *)"Attribute::set_min_alarm()");
@@ -492,7 +492,7 @@ namespace PyAttribute
 
     inline void set_min_alarm(Tango::Attribute &self, bopy::object value)
     {
-        bopy::extract<string> value_convert(value);
+        bopy::extract<std::string> value_convert(value);
         
     	if (value_convert.check())
     	{
@@ -525,7 +525,7 @@ namespace PyAttribute
     template<>
     inline void _set_max_alarm<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
     {
-    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+    	std::string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
     	Tango::Except::throw_exception((const char *)"API_MethodArgument",
     				  (const char *)err_msg.c_str(),
     				  (const char *)"Attribute::set_max_alarm()");
@@ -535,7 +535,7 @@ namespace PyAttribute
 
     inline void set_max_alarm(Tango::Attribute &self, bopy::object value)
     {
-        bopy::extract<string> value_convert(value);
+        bopy::extract<std::string> value_convert(value);
         
     	if (value_convert.check())
     	{
@@ -568,7 +568,7 @@ namespace PyAttribute
     template<>
     inline void _set_min_warning<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
     {
-    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+    	std::string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
     	Tango::Except::throw_exception((const char *)"API_MethodArgument",
     				  (const char *)err_msg.c_str(),
     				  (const char *)"Attribute::set_min_warning()");
@@ -578,7 +578,7 @@ namespace PyAttribute
 
     inline void set_min_warning(Tango::Attribute &self, bopy::object value)
     {
-        bopy::extract<string> value_convert(value);
+        bopy::extract<std::string> value_convert(value);
         
     	if (value_convert.check())
     	{
@@ -611,7 +611,7 @@ namespace PyAttribute
     template<>
     inline void _set_max_warning<Tango::DevEncoded>(Tango::Attribute &self, bopy::object value)
     {
-    	string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
+    	std::string err_msg = "Attribute properties cannot be set with Tango::DevEncoded data type";
     	Tango::Except::throw_exception((const char *)"API_MethodArgument",
     				  (const char *)err_msg.c_str(),
     				  (const char *)"Attribute::set_max_warning()");
@@ -621,7 +621,7 @@ namespace PyAttribute
 
     inline void set_max_warning(Tango::Attribute &self, bopy::object value)
     {
-        bopy::extract<string> value_convert(value);
+        bopy::extract<std::string> value_convert(value);
         
     	if (value_convert.check())
     	{

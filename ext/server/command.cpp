@@ -69,7 +69,7 @@ void allocate_any(CORBA::Any *&any_ptr)
     {
         any_ptr = new CORBA::Any();
     }
-    catch (bad_alloc)
+    catch (std::bad_alloc)
     {
         Tango::Except::throw_exception(
             "API_MemoryAllocation",
@@ -83,7 +83,7 @@ void throw_bad_type(const char *type)
     TangoSys_OMemStream o;
 
     o << "Incompatible command argument type, expected type is : Tango::" 
-      << type << ends;
+      << type << std::ends;
     Tango::Except::throw_exception(
             "API_IncompatibleCmdArgumentType",
             o.str(),

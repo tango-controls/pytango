@@ -528,7 +528,7 @@ namespace PyDeviceImpl
             TangoSys_OMemStream o;
             o << "Wrong definition of attribute " << attr_name
               << "\nThe attribute method " << method_name
-              << " does not exist in your class!" << ends;
+              << " does not exist in your class!" << std::ends;
 
             Tango::Except::throw_exception(
                     (const char *)"PyDs_WrongCommandDefinition",
@@ -541,7 +541,7 @@ namespace PyDeviceImpl
             TangoSys_OMemStream o;
             o << "Wrong definition of attribute " << attr_name
               << "\nThe object " << method_name
-              << " exists in your class but is not a Python method" << ends;
+              << " exists in your class but is not a Python method" << std::ends;
 
             Tango::Except::throw_exception(
                     (const char *)"PyDs_WrongCommandDefinition",
@@ -601,7 +601,7 @@ namespace PyDeviceImpl
         Tango::Attr *attr_ptr = NULL;
 
         long x, y;
-        vector<Tango::AttrProperty> &def_prop = new_attr.get_user_default_properties();
+        std::vector<Tango::AttrProperty> &def_prop = new_attr.get_user_default_properties();
         Tango::AttrDataFormat attr_format = new_attr.get_format();
         long attr_type = new_attr.get_type();
 
@@ -632,7 +632,7 @@ namespace PyDeviceImpl
                 TangoSys_OMemStream o;
                 o << "Attribute " << attr_name << " has an unexpected data format\n"
                   << "Please report this bug to the PyTango development team"
-                  << ends;
+                  << std::ends;
                 Tango::Except::throw_exception(
                         (const char *)"PyDs_UnexpectedAttributeFormat",
                         o.str(),
@@ -665,7 +665,7 @@ namespace PyDeviceImpl
     void remove_attribute(Tango::DeviceImpl &self, const char *att_name,
                           bool clean_db = true)
     {
-        string str(att_name);
+        std::string str(att_name);
         self.remove_attribute(str, false, clean_db);
     }
 
@@ -695,7 +695,7 @@ namespace PyDeviceImpl
         self.remove_command(name, free_it, clean_db);
     }
 
-    inline void debug(Tango::DeviceImpl &self, const string &msg)
+    inline void debug(Tango::DeviceImpl &self, const std::string &msg)
     {
         if (self.get_logger()->is_debug_enabled()) {
 	    self.get_logger()->debug_stream() 
@@ -703,7 +703,7 @@ namespace PyDeviceImpl
 	}
     }
 
-    inline void info(Tango::DeviceImpl &self, const string &msg)
+    inline void info(Tango::DeviceImpl &self, const std::string &msg)
     {
         if (self.get_logger()->is_info_enabled()) {
 	    self.get_logger()->info_stream() 
@@ -711,7 +711,7 @@ namespace PyDeviceImpl
 	}
     }
 
-    inline void warn(Tango::DeviceImpl &self, const string &msg)
+    inline void warn(Tango::DeviceImpl &self, const std::string &msg)
     {
         if (self.get_logger()->is_warn_enabled()) {
 	    self.get_logger()->warn_stream() 
@@ -719,7 +719,7 @@ namespace PyDeviceImpl
 	}
     }
 
-    inline void error(Tango::DeviceImpl &self, const string &msg)
+    inline void error(Tango::DeviceImpl &self, const std::string &msg)
     {
         if (self.get_logger()->is_error_enabled()) {
 	    self.get_logger()->error_stream() 
@@ -727,7 +727,7 @@ namespace PyDeviceImpl
 	}
     }
 
-    inline void fatal(Tango::DeviceImpl &self, const string &msg)
+    inline void fatal(Tango::DeviceImpl &self, const std::string &msg)
     {
         if (self.get_logger()->is_fatal_enabled()) {
 	    self.get_logger()->fatal_stream() 
@@ -1011,22 +1011,22 @@ void Device_3ImplWrap::default_always_executed_hook()
     this->Tango::Device_3Impl::always_executed_hook();
 }
 
-void Device_3ImplWrap::read_attr_hardware(vector<long> &attr_list)
+void Device_3ImplWrap::read_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_3Impl, read_attr_hardware, attr_list)
 }
 
-void Device_3ImplWrap::default_read_attr_hardware(vector<long> &attr_list)
+void Device_3ImplWrap::default_read_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_3Impl::read_attr_hardware(attr_list);
 }
 
-void Device_3ImplWrap::write_attr_hardware(vector<long> &attr_list)
+void Device_3ImplWrap::write_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_3Impl, write_attr_hardware, attr_list)
 }
 
-void Device_3ImplWrap::default_write_attr_hardware(vector<long> &attr_list)
+void Device_3ImplWrap::default_write_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_3Impl::write_attr_hardware(attr_list);
 }
@@ -1186,22 +1186,22 @@ void Device_4ImplWrap::default_always_executed_hook()
     this->Tango::Device_4Impl::always_executed_hook();
 }
 
-void Device_4ImplWrap::read_attr_hardware(vector<long> &attr_list)
+void Device_4ImplWrap::read_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_4Impl, read_attr_hardware, attr_list)
 }
 
-void Device_4ImplWrap::default_read_attr_hardware(vector<long> &attr_list)
+void Device_4ImplWrap::default_read_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_4Impl::read_attr_hardware(attr_list);
 }
 
-void Device_4ImplWrap::write_attr_hardware(vector<long> &attr_list)
+void Device_4ImplWrap::write_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_4Impl, write_attr_hardware, attr_list)
 }
 
-void Device_4ImplWrap::default_write_attr_hardware(vector<long> &attr_list)
+void Device_4ImplWrap::default_write_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_4Impl::write_attr_hardware(attr_list);
 }
@@ -1354,22 +1354,22 @@ void Device_5ImplWrap::default_always_executed_hook()
     this->Tango::Device_5Impl::always_executed_hook();
 }
 
-void Device_5ImplWrap::read_attr_hardware(vector<long> &attr_list)
+void Device_5ImplWrap::read_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_5Impl, read_attr_hardware, attr_list)
 }
 
-void Device_5ImplWrap::default_read_attr_hardware(vector<long> &attr_list)
+void Device_5ImplWrap::default_read_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_5Impl::read_attr_hardware(attr_list);
 }
 
-void Device_5ImplWrap::write_attr_hardware(vector<long> &attr_list)
+void Device_5ImplWrap::write_attr_hardware(std::vector<long> &attr_list)
 {
     CALL_DEVICE_METHOD_VARGS(Device_5Impl, write_attr_hardware, attr_list)
 }
 
-void Device_5ImplWrap::default_write_attr_hardware(vector<long> &attr_list)
+void Device_5ImplWrap::default_write_attr_hardware(std::vector<long> &attr_list)
 {
     this->Tango::Device_5Impl::write_attr_hardware(attr_list);
 }
@@ -1471,7 +1471,7 @@ void export_device_impl()
     void (Tango::DeviceImpl::*stop_polling1)() = &Tango::DeviceImpl::stop_polling;
     void (Tango::DeviceImpl::*stop_polling2)(bool) = &Tango::DeviceImpl::stop_polling;
     
-    class_<Tango::DeviceImpl, auto_ptr<DeviceImplWrap>, boost::noncopyable>("DeviceImpl",
+    class_<Tango::DeviceImpl, std::auto_ptr<DeviceImplWrap>, boost::noncopyable>("DeviceImpl",
         init<CppDeviceClass *, const char *,
              optional<const char *, Tango::DevState, const char *> >())
 
@@ -1711,7 +1711,7 @@ void export_device_impl()
 	.def("is_there_subscriber",
 	     &Tango::DeviceImpl::is_there_subscriber)
     ;
-    implicitly_convertible<auto_ptr<DeviceImplWrap>, auto_ptr<Tango::DeviceImpl> >();
+    implicitly_convertible<std::auto_ptr<DeviceImplWrap>, std::auto_ptr<Tango::DeviceImpl> >();
     
     class_<Tango::Device_2Impl, Device_2ImplWrap,
            bases<Tango::DeviceImpl>,
@@ -1748,7 +1748,7 @@ void export_device_impl()
         .def("set_attribute_config_3", &PyDevice_3Impl::set_attribute_config_3)
     ;
 
-    class_<Tango::Device_4Impl, auto_ptr<Device_4ImplWrap>,
+    class_<Tango::Device_4Impl, std::auto_ptr<Device_4ImplWrap>,
            bases<Tango::Device_3Impl>,
            boost::noncopyable>
            ("Device_4Impl",
@@ -1770,9 +1770,9 @@ void export_device_impl()
         .def("signal_handler", &Tango::Device_4Impl::signal_handler,
             &Device_4ImplWrap::default_signal_handler)
     ;
-    implicitly_convertible<auto_ptr<Device_4ImplWrap>, auto_ptr<Tango::Device_4Impl> >();
+    implicitly_convertible<std::auto_ptr<Device_4ImplWrap>, std::auto_ptr<Tango::Device_4Impl> >();
 
-    class_<Tango::Device_5Impl, auto_ptr<Device_5ImplWrap>,
+    class_<Tango::Device_5Impl, std::auto_ptr<Device_5ImplWrap>,
            bases<Tango::Device_4Impl>,
            boost::noncopyable>
            ("Device_5Impl",
@@ -1794,7 +1794,7 @@ void export_device_impl()
         .def("signal_handler", &Tango::Device_5Impl::signal_handler,
             &Device_5ImplWrap::default_signal_handler)
     ;
-    implicitly_convertible<auto_ptr<Device_5ImplWrap>, auto_ptr<Tango::Device_5Impl> >();
+    implicitly_convertible<std::auto_ptr<Device_5ImplWrap>, std::auto_ptr<Tango::Device_5Impl> >();
 
 }
 //namespace PyDevIntrThread

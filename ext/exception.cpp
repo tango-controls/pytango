@@ -58,7 +58,7 @@ namespace Tango
 
 void sequencePyDevError_2_DevErrorList(PyObject *value, Tango::DevErrorList &del)
 {
-    long len = max((int)PySequence_Size(value), 0);
+    long len = (std::max)((int)PySequence_Size(value), 0);
     del.length(len);
 
     for (long loop = 0; loop < len; ++loop)
@@ -477,6 +477,6 @@ void export_exceptions()
     NamedDevFailedList
         .def("get_faulty_attr_nb", &Tango::NamedDevFailedList::get_faulty_attr_nb) // size_t
         .def("call_failed", &Tango::NamedDevFailedList::call_failed) // bool
-        .def_readonly("err_list", &Tango::NamedDevFailedList::err_list) // vector<NamedDevFailed>
+        .def_readonly("err_list", &Tango::NamedDevFailedList::err_list) // std::vector<NamedDevFailed>
     ;
 }

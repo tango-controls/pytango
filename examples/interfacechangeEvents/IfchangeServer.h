@@ -78,7 +78,7 @@ public:
 	 *	@param cl	Class.
 	 *	@param s 	Device Name
 	 */
-	IfchangeServer(Tango::DeviceClass *cl,string &s);
+	IfchangeServer(Tango::DeviceClass *cl,std::string &s);
 	/**
 	 * Constructs a newly device object.
 	 *
@@ -124,7 +124,7 @@ public:
 	 *	Description : Hardware acquisition for attributes.
 	 */
 	//--------------------------------------------------------
-	virtual void read_attr_hardware(vector<long> &attr_list);
+	virtual void read_attr_hardware(std::vector<long> &attr_list);
 
 /**
  *	Attribute busy related methods
@@ -148,10 +148,10 @@ public:
 	 */
 	virtual void read_ioattr(Tango::Attribute &attr);
 	virtual bool is_ioattr_allowed(Tango::AttReqType type);
-	void add_ioattr_dynamic_attribute(string attname);
-	void remove_ioattr_dynamic_attribute(string attname);
-	Tango::DevDouble *get_ioattr_data_ptr(string &name);
-	map<string,Tango::DevDouble>	   ioattr_data;
+	void add_ioattr_dynamic_attribute(std::string attname);
+	void remove_ioattr_dynamic_attribute(std::string attname);
+	Tango::DevDouble *get_ioattr_data_ptr(std::string &name);
+	map<std::string,Tango::DevDouble>	   ioattr_data;
 
 	//--------------------------------------------------------
 	/**
@@ -190,8 +190,8 @@ public:
 	 */
 	virtual void iocmd(Tango::Command &command);
 	virtual bool is_iocmd_allowed(const CORBA::Any &any);
-	void add_iocmd_dynamic_command(string cmdname, bool device);
-	void remove_iocmd_dynamic_command(string cmdname);
+	void add_iocmd_dynamic_command(std::string cmdname, bool device);
+	void remove_iocmd_dynamic_command(std::string cmdname);
 
 	//--------------------------------------------------------
 	/**

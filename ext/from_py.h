@@ -273,74 +273,74 @@ void from_py_object(bopy::object &, Tango::AttributeConfig_5 &);
 template<typename T>
 void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_prop)
 {
-	multi_attr_prop.label = bopy::extract<string>(bopy::str(py_obj.attr("label")));
-	multi_attr_prop.description = bopy::extract<string>(bopy::str(py_obj.attr("description")));
-	multi_attr_prop.unit = bopy::extract<string>(bopy::str(py_obj.attr("unit")));
-	multi_attr_prop.standard_unit = bopy::extract<string>(bopy::str(py_obj.attr("standard_unit")));
-	multi_attr_prop.display_unit = bopy::extract<string>(bopy::str(py_obj.attr("display_unit")));
-	multi_attr_prop.format = bopy::extract<string>(bopy::str(py_obj.attr("format")));
+	multi_attr_prop.label = bopy::extract<std::string>(bopy::str(py_obj.attr("label")));
+	multi_attr_prop.description = bopy::extract<std::string>(bopy::str(py_obj.attr("description")));
+	multi_attr_prop.unit = bopy::extract<std::string>(bopy::str(py_obj.attr("unit")));
+	multi_attr_prop.standard_unit = bopy::extract<std::string>(bopy::str(py_obj.attr("standard_unit")));
+	multi_attr_prop.display_unit = bopy::extract<std::string>(bopy::str(py_obj.attr("display_unit")));
+	multi_attr_prop.format = bopy::extract<std::string>(bopy::str(py_obj.attr("format")));
 
-	bopy::extract<string> min_value(py_obj.attr("min_value"));
+	bopy::extract<std::string> min_value(py_obj.attr("min_value"));
 	if(min_value.check())
 		multi_attr_prop.min_value = min_value();
 	else
 		multi_attr_prop.min_value = bopy::extract<T>(py_obj.attr("min_value"));
 
-	bopy::extract<string> max_value(py_obj.attr("max_value"));
+	bopy::extract<std::string> max_value(py_obj.attr("max_value"));
 	if(max_value.check())
 		multi_attr_prop.max_value = max_value();
 	else
 		multi_attr_prop.max_value = bopy::extract<T>(py_obj.attr("max_value"));
 
-	bopy::extract<string> min_alarm(py_obj.attr("min_alarm"));
+	bopy::extract<std::string> min_alarm(py_obj.attr("min_alarm"));
 	if(min_alarm.check())
 		multi_attr_prop.min_alarm = min_alarm();
 	else
 		multi_attr_prop.min_alarm = bopy::extract<T>(py_obj.attr("min_alarm"));
 
-	bopy::extract<string> max_alarm(py_obj.attr("max_alarm"));
+	bopy::extract<std::string> max_alarm(py_obj.attr("max_alarm"));
 	if(max_alarm.check())
 		multi_attr_prop.max_alarm = max_alarm();
 	else
 		multi_attr_prop.max_alarm = bopy::extract<T>(py_obj.attr("max_alarm"));
 
-	bopy::extract<string> min_warning(py_obj.attr("min_warning"));
+	bopy::extract<std::string> min_warning(py_obj.attr("min_warning"));
 	if(min_warning.check())
 		multi_attr_prop.min_warning = min_warning();
 	else
 		multi_attr_prop.min_warning = bopy::extract<T>(py_obj.attr("min_warning"));
 
-	bopy::extract<string> max_warning(py_obj.attr("max_warning"));
+	bopy::extract<std::string> max_warning(py_obj.attr("max_warning"));
 	if(max_warning.check())
 		multi_attr_prop.max_warning = max_warning();
 	else
 		multi_attr_prop.max_warning = bopy::extract<T>(py_obj.attr("max_warning"));
 
-	bopy::extract<string> delta_t(py_obj.attr("delta_t"));
+	bopy::extract<std::string> delta_t(py_obj.attr("delta_t"));
 	if(delta_t.check())
 		multi_attr_prop.delta_t = delta_t();
 	else
 		multi_attr_prop.delta_t = bopy::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
 
-	bopy::extract<string> delta_val(py_obj.attr("delta_val"));
+	bopy::extract<std::string> delta_val(py_obj.attr("delta_val"));
 	if(delta_val.check())
 		multi_attr_prop.delta_val = delta_val();
 	else
 		multi_attr_prop.delta_val = bopy::extract<T>(py_obj.attr("delta_val"));
 
-	bopy::extract<string> event_period(py_obj.attr("event_period"));
+	bopy::extract<std::string> event_period(py_obj.attr("event_period"));
 	if(event_period.check())
 		multi_attr_prop.event_period = event_period();
 	else
 		multi_attr_prop.event_period = bopy::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
 
-	bopy::extract<string> archive_period(py_obj.attr("archive_period"));
+	bopy::extract<std::string> archive_period(py_obj.attr("archive_period"));
 	if(archive_period.check())
 		multi_attr_prop.archive_period = archive_period();
 	else
 		multi_attr_prop.archive_period = bopy::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
 
-	bopy::extract<string> rel_change(py_obj.attr("rel_change"));
+	bopy::extract<std::string> rel_change(py_obj.attr("rel_change"));
 	if(rel_change.check())
 		multi_attr_prop.rel_change = rel_change();
 	else
@@ -348,7 +348,7 @@ void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_pr
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.rel_change = change_vec;
@@ -357,7 +357,7 @@ void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_pr
 			multi_attr_prop.rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
 	}
 
-	bopy::extract<string> abs_change(py_obj.attr("abs_change"));
+	bopy::extract<std::string> abs_change(py_obj.attr("abs_change"));
 	if(abs_change.check())
 		multi_attr_prop.abs_change = abs_change();
 	else
@@ -365,7 +365,7 @@ void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_pr
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.abs_change = change_vec;
@@ -374,7 +374,7 @@ void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_pr
 			multi_attr_prop.abs_change = bopy::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
 	}
 
-	bopy::extract<string> archive_rel_change(py_obj.attr("archive_rel_change"));
+	bopy::extract<std::string> archive_rel_change(py_obj.attr("archive_rel_change"));
 	if(archive_rel_change.check())
 		multi_attr_prop.archive_rel_change = archive_rel_change();
 	else
@@ -382,7 +382,7 @@ void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_pr
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_rel_change = change_vec;
@@ -391,7 +391,7 @@ void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_pr
 			multi_attr_prop.archive_rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
 	}
 
-	bopy::extract<string> archive_abs_change(py_obj.attr("archive_abs_change"));
+	bopy::extract<std::string> archive_abs_change(py_obj.attr("archive_abs_change"));
 	if(archive_abs_change.check())
 		multi_attr_prop.archive_abs_change = archive_abs_change();
 	else
@@ -399,7 +399,7 @@ void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_pr
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_abs_change = change_vec;
@@ -412,74 +412,74 @@ void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<T> &multi_attr_pr
 template<>
 inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::DevEncoded> &multi_attr_prop)
 {
-	multi_attr_prop.label = bopy::extract<string>(bopy::str(py_obj.attr("label")));
-	multi_attr_prop.description = bopy::extract<string>(bopy::str(py_obj.attr("description")));
-	multi_attr_prop.unit = bopy::extract<string>(bopy::str(py_obj.attr("unit")));
-	multi_attr_prop.standard_unit = bopy::extract<string>(bopy::str(py_obj.attr("standard_unit")));
-	multi_attr_prop.display_unit = bopy::extract<string>(bopy::str(py_obj.attr("display_unit")));
-	multi_attr_prop.format = bopy::extract<string>(bopy::str(py_obj.attr("format")));
+	multi_attr_prop.label = bopy::extract<std::string>(bopy::str(py_obj.attr("label")));
+	multi_attr_prop.description = bopy::extract<std::string>(bopy::str(py_obj.attr("description")));
+	multi_attr_prop.unit = bopy::extract<std::string>(bopy::str(py_obj.attr("unit")));
+	multi_attr_prop.standard_unit = bopy::extract<std::string>(bopy::str(py_obj.attr("standard_unit")));
+	multi_attr_prop.display_unit = bopy::extract<std::string>(bopy::str(py_obj.attr("display_unit")));
+	multi_attr_prop.format = bopy::extract<std::string>(bopy::str(py_obj.attr("format")));
 
-	bopy::extract<string> min_value(py_obj.attr("min_value"));
+	bopy::extract<std::string> min_value(py_obj.attr("min_value"));
 	if(min_value.check())
 		multi_attr_prop.min_value = min_value();
 	else
 		multi_attr_prop.min_value = bopy::extract<Tango::DevUChar>(py_obj.attr("min_value"));
 
-	bopy::extract<string> max_value(py_obj.attr("max_value"));
+	bopy::extract<std::string> max_value(py_obj.attr("max_value"));
 	if(max_value.check())
 		multi_attr_prop.max_value = max_value();
 	else
 		multi_attr_prop.max_value = bopy::extract<Tango::DevUChar>(py_obj.attr("max_value"));
 
-	bopy::extract<string> min_alarm(py_obj.attr("min_alarm"));
+	bopy::extract<std::string> min_alarm(py_obj.attr("min_alarm"));
 	if(min_alarm.check())
 		multi_attr_prop.min_alarm = min_alarm();
 	else
 		multi_attr_prop.min_alarm = bopy::extract<Tango::DevUChar>(py_obj.attr("min_alarm"));
 
-	bopy::extract<string> max_alarm(py_obj.attr("max_alarm"));
+	bopy::extract<std::string> max_alarm(py_obj.attr("max_alarm"));
 	if(max_alarm.check())
 		multi_attr_prop.max_alarm = max_alarm();
 	else
 		multi_attr_prop.max_alarm = bopy::extract<Tango::DevUChar>(py_obj.attr("max_alarm"));
 
-	bopy::extract<string> min_warning(py_obj.attr("min_warning"));
+	bopy::extract<std::string> min_warning(py_obj.attr("min_warning"));
 	if(min_warning.check())
 		multi_attr_prop.min_warning = min_warning();
 	else
 		multi_attr_prop.min_warning = bopy::extract<Tango::DevUChar>(py_obj.attr("min_warning"));
 
-	bopy::extract<string> max_warning(py_obj.attr("max_warning"));
+	bopy::extract<std::string> max_warning(py_obj.attr("max_warning"));
 	if(max_warning.check())
 		multi_attr_prop.max_warning = max_warning();
 	else
 		multi_attr_prop.max_warning = bopy::extract<Tango::DevUChar>(py_obj.attr("max_warning"));
 
-	bopy::extract<string> delta_t(py_obj.attr("delta_t"));
+	bopy::extract<std::string> delta_t(py_obj.attr("delta_t"));
 	if(delta_t.check())
 		multi_attr_prop.delta_t = delta_t();
 	else
 		multi_attr_prop.delta_t = bopy::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
 
-	bopy::extract<string> delta_val(py_obj.attr("delta_val"));
+	bopy::extract<std::string> delta_val(py_obj.attr("delta_val"));
 	if(delta_val.check())
 		multi_attr_prop.delta_val = delta_val();
 	else
 		multi_attr_prop.delta_val = bopy::extract<Tango::DevUChar>(py_obj.attr("delta_val"));
 
-	bopy::extract<string> event_period(py_obj.attr("event_period"));
+	bopy::extract<std::string> event_period(py_obj.attr("event_period"));
 	if(event_period.check())
 		multi_attr_prop.event_period = event_period();
 	else
 		multi_attr_prop.event_period = bopy::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
 
-	bopy::extract<string> archive_period(py_obj.attr("archive_period"));
+	bopy::extract<std::string> archive_period(py_obj.attr("archive_period"));
 	if(archive_period.check())
 		multi_attr_prop.archive_period = archive_period();
 	else
 		multi_attr_prop.archive_period = bopy::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
 
-	bopy::extract<string> rel_change(py_obj.attr("rel_change"));
+	bopy::extract<std::string> rel_change(py_obj.attr("rel_change"));
 	if(rel_change.check())
 		multi_attr_prop.rel_change = rel_change();
 	else
@@ -487,7 +487,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.rel_change = change_vec;
@@ -496,7 +496,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 			multi_attr_prop.rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
 	}
 
-	bopy::extract<string> abs_change(py_obj.attr("abs_change"));
+	bopy::extract<std::string> abs_change(py_obj.attr("abs_change"));
 	if(abs_change.check())
 		multi_attr_prop.abs_change = abs_change();
 	else
@@ -504,7 +504,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.abs_change = change_vec;
@@ -513,7 +513,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 			multi_attr_prop.abs_change = bopy::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
 	}
 
-	bopy::extract<string> archive_rel_change(py_obj.attr("archive_rel_change"));
+	bopy::extract<std::string> archive_rel_change(py_obj.attr("archive_rel_change"));
 	if(archive_rel_change.check())
 		multi_attr_prop.archive_rel_change = archive_rel_change();
 	else
@@ -521,7 +521,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_rel_change = change_vec;
@@ -530,7 +530,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 			multi_attr_prop.archive_rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
 	}
 
-	bopy::extract<string> archive_abs_change(py_obj.attr("archive_abs_change"));
+	bopy::extract<std::string> archive_abs_change(py_obj.attr("archive_abs_change"));
 	if(archive_abs_change.check())
 		multi_attr_prop.archive_abs_change = archive_abs_change();
 	else
@@ -538,7 +538,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_abs_change = change_vec;
@@ -551,76 +551,76 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 template<>
 inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::DevString> &multi_attr_prop)
 {
-	string empty_str("");
+	std::string empty_str("");
 
-	multi_attr_prop.label = bopy::extract<string>(bopy::str(py_obj.attr("label")));
-	multi_attr_prop.description = bopy::extract<string>(bopy::str(py_obj.attr("description")));
-	multi_attr_prop.unit = bopy::extract<string>(bopy::str(py_obj.attr("unit")));
-	multi_attr_prop.standard_unit = bopy::extract<string>(bopy::str(py_obj.attr("standard_unit")));
-	multi_attr_prop.display_unit = bopy::extract<string>(bopy::str(py_obj.attr("display_unit")));
-	multi_attr_prop.format = bopy::extract<string>(bopy::str(py_obj.attr("format")));
+	multi_attr_prop.label = bopy::extract<std::string>(bopy::str(py_obj.attr("label")));
+	multi_attr_prop.description = bopy::extract<std::string>(bopy::str(py_obj.attr("description")));
+	multi_attr_prop.unit = bopy::extract<std::string>(bopy::str(py_obj.attr("unit")));
+	multi_attr_prop.standard_unit = bopy::extract<std::string>(bopy::str(py_obj.attr("standard_unit")));
+	multi_attr_prop.display_unit = bopy::extract<std::string>(bopy::str(py_obj.attr("display_unit")));
+	multi_attr_prop.format = bopy::extract<std::string>(bopy::str(py_obj.attr("format")));
 
-	bopy::extract<string> min_value(py_obj.attr("min_value"));
+	bopy::extract<std::string> min_value(py_obj.attr("min_value"));
 	if(min_value.check())
 		multi_attr_prop.min_value = min_value();
 	else
 		multi_attr_prop.min_value = empty_str;
 
-	bopy::extract<string> max_value(py_obj.attr("max_value"));
+	bopy::extract<std::string> max_value(py_obj.attr("max_value"));
 	if(max_value.check())
 		multi_attr_prop.max_value = max_value();
 	else
 		multi_attr_prop.max_value = empty_str;
 
-	bopy::extract<string> min_alarm(py_obj.attr("min_alarm"));
+	bopy::extract<std::string> min_alarm(py_obj.attr("min_alarm"));
 	if(min_alarm.check())
 		multi_attr_prop.min_alarm = min_alarm();
 	else
 		multi_attr_prop.min_alarm = empty_str;
 
-	bopy::extract<string> max_alarm(py_obj.attr("max_alarm"));
+	bopy::extract<std::string> max_alarm(py_obj.attr("max_alarm"));
 	if(max_alarm.check())
 		multi_attr_prop.max_alarm = max_alarm();
 	else
 		multi_attr_prop.max_alarm = empty_str;
 
-	bopy::extract<string> min_warning(py_obj.attr("min_warning"));
+	bopy::extract<std::string> min_warning(py_obj.attr("min_warning"));
 	if(min_warning.check())
 		multi_attr_prop.min_warning = min_warning();
 	else
 		multi_attr_prop.min_warning = empty_str;
 
-	bopy::extract<string> max_warning(py_obj.attr("max_warning"));
+	bopy::extract<std::string> max_warning(py_obj.attr("max_warning"));
 	if(max_warning.check())
 		multi_attr_prop.max_warning = max_warning();
 	else
 		multi_attr_prop.max_warning = empty_str;
 
-	bopy::extract<string> delta_t(py_obj.attr("delta_t"));
+	bopy::extract<std::string> delta_t(py_obj.attr("delta_t"));
 	if(delta_t.check())
 		multi_attr_prop.delta_t = delta_t();
 	else
 		multi_attr_prop.delta_t = bopy::extract<Tango::DevLong>(py_obj.attr("delta_t")); // Property type is Tango::DevLong!
 
-	bopy::extract<string> delta_val(py_obj.attr("delta_val"));
+	bopy::extract<std::string> delta_val(py_obj.attr("delta_val"));
 	if(delta_val.check())
 		multi_attr_prop.delta_val = delta_val();
 	else
 		multi_attr_prop.delta_val = empty_str;
 
-	bopy::extract<string> event_period(py_obj.attr("event_period"));
+	bopy::extract<std::string> event_period(py_obj.attr("event_period"));
 	if(event_period.check())
 		multi_attr_prop.event_period = event_period();
 	else
 		multi_attr_prop.event_period = bopy::extract<Tango::DevLong>(py_obj.attr("event_period")); // Property type is Tango::DevLong!
 
-	bopy::extract<string> archive_period(py_obj.attr("archive_period"));
+	bopy::extract<std::string> archive_period(py_obj.attr("archive_period"));
 	if(archive_period.check())
 		multi_attr_prop.archive_period = archive_period();
 	else
 		multi_attr_prop.archive_period = bopy::extract<Tango::DevLong>(py_obj.attr("archive_period")); // Property type is Tango::DevLong!
 
-	bopy::extract<string> rel_change(py_obj.attr("rel_change"));
+	bopy::extract<std::string> rel_change(py_obj.attr("rel_change"));
 	if(rel_change.check())
 		multi_attr_prop.rel_change = rel_change();
 	else
@@ -628,7 +628,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.rel_change = change_vec;
@@ -637,7 +637,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 			multi_attr_prop.rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("rel_change")); // Property type is Tango::DevDouble!
 	}
 
-	bopy::extract<string> abs_change(py_obj.attr("abs_change"));
+	bopy::extract<std::string> abs_change(py_obj.attr("abs_change"));
 	if(abs_change.check())
 		multi_attr_prop.abs_change = abs_change();
 	else
@@ -645,7 +645,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.abs_change = change_vec;
@@ -654,7 +654,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 			multi_attr_prop.abs_change = bopy::extract<Tango::DevDouble>(py_obj.attr("abs_change")); // Property type is Tango::DevDouble!
 	}
 
-	bopy::extract<string> archive_rel_change(py_obj.attr("archive_rel_change"));
+	bopy::extract<std::string> archive_rel_change(py_obj.attr("archive_rel_change"));
 	if(archive_rel_change.check())
 		multi_attr_prop.archive_rel_change = archive_rel_change();
 	else
@@ -662,7 +662,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_rel_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_rel_change = change_vec;
@@ -671,7 +671,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 			multi_attr_prop.archive_rel_change = bopy::extract<Tango::DevDouble>(py_obj.attr("archive_rel_change")); // Property type is Tango::DevDouble!
 	}
 
-	bopy::extract<string> archive_abs_change(py_obj.attr("archive_abs_change"));
+	bopy::extract<std::string> archive_abs_change(py_obj.attr("archive_abs_change"));
 	if(archive_abs_change.check())
 		multi_attr_prop.archive_abs_change = archive_abs_change();
 	else
@@ -679,7 +679,7 @@ inline void from_py_object(bopy::object &py_obj, Tango::MultiAttrProp<Tango::Dev
 		bopy::object prop_py_obj = bopy::object(py_obj.attr("archive_abs_change"));
 		if(PySequence_Check(prop_py_obj.ptr()))
 		{
-			vector<Tango::DevDouble> change_vec;
+			std::vector<Tango::DevDouble> change_vec;
 			for(long i = 0; i < bopy::len(prop_py_obj); i++)
 				change_vec.push_back(bopy::extract<Tango::DevDouble>(prop_py_obj[i]));
 			multi_attr_prop.archive_abs_change = change_vec;
