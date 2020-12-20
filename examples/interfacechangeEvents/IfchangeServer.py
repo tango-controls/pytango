@@ -1,9 +1,8 @@
 import logging
 
 import tango
-from tango.server import Device
-from tango.server import DispLevel
 
+from tango.server import Device
 from tango.server import attribute, command
 
 
@@ -53,7 +52,8 @@ class IfchangeServer(Device):
         cmd = command(f=self.start, dtype_in=str, dtype_out=int,
                       doc_in='description of input',
                       doc_out='description of output',
-                      display_level=DispLevel.EXPERT, polling_period=5.1)
+                      display_level=tango.DispLevel.EXPERT,
+                      polling_period=5100)
         self.add_command(cmd, device_level)
 
     @command(dtype_in=str, doc_in='name of dynamic command to delete')
