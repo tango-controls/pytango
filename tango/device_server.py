@@ -278,7 +278,8 @@ def __DeviceImpl__get_device_properties(self, ds_class=None):
                          None meaning that the corresponding DeviceClass object for this
                          DeviceImpl will be used
 
-        Throws     : DevFailed
+        Raises:
+            DevFailed:
     """
     if ds_class is None:
         try:
@@ -322,7 +323,8 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
 
         Return     : (Attr) the newly created attribute.
 
-        Throws     : DevFailed
+        Raises:
+            DevFailed:
     """
 
     attr_data = None
@@ -376,7 +378,8 @@ def __DeviceImpl__remove_attribute(self, attr_name):
         Parameters :
             - attr_name : (str) attribute name
 
-        Throws     : DevFailed
+        Raises:
+            DevFailed:
     """
     try:
         # Call this method in a try/except in case remove_attribute
@@ -432,7 +435,8 @@ def __DeviceImpl__add_command(self, cmd, device_level=True):
 
         Return     : Command
 
-        Throws     : DevFailed
+        Raises:
+            DevFailed:
     """
     add_name_in_list = False      # This flag is always False, what use is it?
     try:
@@ -465,7 +469,8 @@ def __DeviceImpl__remove_command(self, cmd_name, free_it=False, clean_db=True):
             - clean_db : Clean command related information (included polling info
                          if the command is polled) from database.
 
-        Throws     : DevFailed
+        Raises:
+            DevFailed:
     """
     try:
         # Call this method in a try/except in case remove
@@ -882,7 +887,8 @@ def __doc_DeviceImpl():
 
         Return     : (DevState) the device state
 
-        Throws     : DevFailed - If it is necessary to read attribute(s) and a problem occurs during the reading
+        Raises:
+            DevFailed: If it is necessary to read attribute(s) and a problem occurs during the reading
     """)
 
     document_method("dev_status", """
@@ -897,7 +903,8 @@ def __doc_DeviceImpl():
 
         Return     : (str) the device status
 
-        Throws     : DevFailed - If it is necessary to read attribute(s) and a problem occurs during the reading
+        Raises:
+            DevFailed: If it is necessary to read attribute(s) and a problem occurs during the reading
     """)
 
     document_method("set_change_event", """
@@ -960,7 +967,8 @@ def __doc_DeviceImpl():
             - time_stamp : (double) the time stamp
             - quality : (AttrQuality) the attribute quality factor
 
-        Throws     : DevFailed If the attribute data type is not coherent.
+        Raises:
+            DevFailed: If the attribute data type is not coherent.
     """)
 
     document_method("push_archive_event", """
@@ -989,7 +997,8 @@ def __doc_DeviceImpl():
             - time_stamp : (double) the time stamp
             - quality : (AttrQuality) the attribute quality factor
 
-        Throws     : DevFailed If the attribute data type is not coherent.
+        Raises:
+            DevFailed: If the attribute data type is not coherent.
     """)
 
     document_method("push_event", """
@@ -1018,7 +1027,8 @@ def __doc_DeviceImpl():
             - time_stamp : (double) the time stamp
             - quality : (AttrQuality) the attribute quality factor
 
-        Throws     : DevFailed If the attribute data type is not coherent.
+        Raises:
+            DevFailed: If the attribute data type is not coherent.
     """)
 
     document_method("push_data_ready_event", """
@@ -1035,7 +1045,8 @@ def __doc_DeviceImpl():
             - attr_name : (str) attribute name
             - counter : (int) the user counter
 
-        Throws     : DevFailed If the attribute name is unknown.
+        Raises:
+            DevFailed: If the attribute name is unknown.
     """)
 
     document_method("push_pipe_event", """
@@ -1049,7 +1060,8 @@ def __doc_DeviceImpl():
             - pipe_name : (str) pipe name
             - blob  : (DevicePipeBlob) the blob data
 
-        Throws     : DevFailed If the pipe name is unknown.
+        Raises:
+            DevFailed: If the pipe name is unknown.
 
         New in PyTango 9.2.2
     """)
@@ -1195,7 +1207,10 @@ def __doc_DeviceImpl():
         Parameters :
             - cmd_name: (str) the command name
 
-        Throws     : DevFailed API_IncompatibleCmdArgumentType, API_CommandNotFound
+        Raises:
+            DevFailed
+            API_IncompatibleCmdArgumentType
+            API_CommandNotFound
 
         New in PyTango 7.1.2
     """)
@@ -1336,7 +1351,8 @@ def __doc_extra_DeviceImpl(cls):
         any command is executed. This method can be redefined in sub-classes
         in case of the default behaviour does not fullfill the needs
 
-        Throws     : DevFailed This method does not throw exception but a redefined method can.
+        Raises:
+            DevFailed: This method does not throw exception but a redefined method can.
     """)
 
     document_method("read_attr_hardware", """
@@ -1352,7 +1368,8 @@ def __doc_extra_DeviceImpl(cls):
             attr_list : (sequence<int>) list of indices in the device object attribute vector
                         of an attribute to be read.
 
-        Throws     : DevFailed This method does not throw exception but a redefined method can.
+        Raises:
+            DevFailed: This method does not throw exception but a redefined method can.
     """)
 
     document_method("write_attr_hardware", """
@@ -1368,7 +1385,8 @@ def __doc_extra_DeviceImpl(cls):
             attr_list : (sequence<int>) list of indices in the device object attribute vector
                         of an attribute to be written.
 
-        Throws     : DevFailed This method does not throw exception but a redefined method can.
+        Raises:
+            DevFailed: This method does not throw exception but a redefined method can.
     """)
 
     document_method("signal_handler", """
@@ -1383,7 +1401,8 @@ def __doc_extra_DeviceImpl(cls):
         Parameters :
             - signo : (int) the signal number
 
-        Throws     : DevFailed This method does not throw exception but a redefined method can.
+        Raises:
+            DevFailed: This method does not throw exception but a redefined method can.
     """)
 
     copy_doc(cls, "dev_state")
@@ -1461,7 +1480,8 @@ def __doc_Attribute():
 
         Return     : (bool) true if the attribute is in alarm condition.
 
-        Throws     : DevFailed If no alarm level is defined.
+        Raises:
+            DevFailed: If no alarm level is defined.
     """)
 
     document_method("get_writable", """
@@ -1928,7 +1948,8 @@ def __doc_MultiClassAttribute():
 
         Return     : (Attr) the attribute object
 
-        Throws     : DevFailed If the attribute is not defined.
+        Raises:
+            DevFailed: If the attribute is not defined.
 
         New in PyTango 7.2.1
     """)
@@ -1983,7 +2004,8 @@ def __doc_MultiAttribute():
 
         Return     : (Attribute) the attribute object
 
-        Throws     : DevFailed If the attribute is not defined.
+        Raises:
+            DevFailed: If the attribute is not defined.
     """)
 
     document_method("get_attr_by_ind", """
@@ -2014,7 +2036,8 @@ def __doc_MultiAttribute():
 
         Return     : (WAttribute) the attribute object
 
-        Throws     : DevFailed If the attribute is not defined.
+        Raises:
+            DevFailed: If the attribute is not defined.
     """)
 
     document_method("get_w_attr_by_ind", """
@@ -2045,7 +2068,8 @@ def __doc_MultiAttribute():
 
         Return     : (int) the attribute index
 
-        Throws     : DevFailed If the attribute is not found in the vector.
+        Raises:
+            DevFailed: If the attribute is not found in the vector.
 
         New in PyTango 7.0.0
     """)
@@ -2077,7 +2101,8 @@ def __doc_MultiAttribute():
 
         Return     : (bool) True if at least one attribute is in alarm condition
 
-        Throws     : DevFailed If at least one attribute does not have any alarm level defined
+        Raises:
+            DevFailed: If at least one attribute does not have any alarm level defined
 
         New in PyTango 7.0.0
     """)
@@ -2673,3 +2698,4 @@ def device_server_init(doc=True):
         __doc_MultiClassAttribute()
         __doc_UserDefaultAttrProp()
         __doc_Attr()
+
