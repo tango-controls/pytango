@@ -227,7 +227,7 @@ def __Attribute__get_properties(self, attr_cfg=None):
 
 def __Attribute__set_properties(self, attr_cfg, dev=None):
     """
-    set_properties(self, attr_cfg, dev) -> None
+    set_properties(self, attr_cfg, dev)
 
         Set attribute properties.
 
@@ -268,7 +268,7 @@ def __DeviceImpl__get_device_class(self):
 
 def __DeviceImpl__get_device_properties(self, ds_class=None):
     """
-    get_device_properties(self, ds_class = None) -> None
+    get_device_properties(self, ds_class = None)
 
         Utility method that fetches all the device properties from the database
         and converts them into members of this DeviceImpl.
@@ -371,7 +371,7 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
 
 def __DeviceImpl__remove_attribute(self, attr_name):
     """
-    remove_attribute(self, attr_name) -> None
+    remove_attribute(self, attr_name)
 
         Remove one attribute from the device attribute list.
 
@@ -459,7 +459,7 @@ def __DeviceImpl__add_command(self, cmd, device_level=True):
 
 def __DeviceImpl__remove_command(self, cmd_name, free_it=False, clean_db=True):
     """
-    remove_command(self, attr_name) -> None
+    remove_command(self, attr_name)
 
         Remove one command from the device command list.
 
@@ -488,7 +488,7 @@ def __DeviceImpl__remove_command(self, cmd_name, free_it=False, clean_db=True):
 
 def __DeviceImpl__debug_stream(self, msg, *args):
     """
-    debug_stream(self, msg, *args) -> None
+    debug_stream(self, msg, *args)
 
         Sends the given message to the tango debug stream.
 
@@ -506,7 +506,7 @@ def __DeviceImpl__debug_stream(self, msg, *args):
 
 def __DeviceImpl__info_stream(self, msg, *args):
     """
-    info_stream(self, msg, *args) -> None
+    info_stream(self, msg, *args)
 
         Sends the given message to the tango info stream.
 
@@ -524,7 +524,7 @@ def __DeviceImpl__info_stream(self, msg, *args):
 
 def __DeviceImpl__warn_stream(self, msg, *args):
     """
-    warn_stream(self, msg, *args) -> None
+    warn_stream(self, msg, *args)
 
         Sends the given message to the tango warn stream.
 
@@ -542,7 +542,7 @@ def __DeviceImpl__warn_stream(self, msg, *args):
 
 def __DeviceImpl__error_stream(self, msg, *args):
     """
-    error_stream(self, msg, *args) -> None
+    error_stream(self, msg, *args)
 
         Sends the given message to the tango error stream.
 
@@ -560,7 +560,7 @@ def __DeviceImpl__error_stream(self, msg, *args):
 
 def __DeviceImpl__fatal_stream(self, msg, *args):
     """
-    fatal_stream(self, msg, *args) -> None
+    fatal_stream(self, msg, *args)
 
         Sends the given message to the tango fatal stream.
 
@@ -640,7 +640,7 @@ def __init_DeviceImpl():
 
 def __Logger__log(self, level, msg, *args):
     """
-    log(self, level, msg, *args) -> None
+    log(self, level, msg, *args)
 
         Sends the given message to the tango the selected stream.
 
@@ -656,7 +656,7 @@ def __Logger__log(self, level, msg, *args):
 
 def __Logger__log_unconditionally(self, level, msg, *args):
     """
-    log_unconditionally(self, level, msg, *args) -> None
+    log_unconditionally(self, level, msg, *args)
 
         Sends the given message to the tango the selected stream,
         without checking the level.
@@ -673,7 +673,7 @@ def __Logger__log_unconditionally(self, level, msg, *args):
 
 def __Logger__debug(self, msg, *args):
     """
-    debug(self, msg, *args) -> None
+    debug(self, msg, *args)
 
         Sends the given message to the tango debug stream.
 
@@ -688,7 +688,7 @@ def __Logger__debug(self, msg, *args):
 
 def __Logger__info(self, msg, *args):
     """
-    info(self, msg, *args) -> None
+    info(self, msg, *args)
 
         Sends the given message to the tango info stream.
 
@@ -703,7 +703,7 @@ def __Logger__info(self, msg, *args):
 
 def __Logger__warn(self, msg, *args):
     """
-    warn(self, msg, *args) -> None
+    warn(self, msg, *args)
 
         Sends the given message to the tango warn stream.
 
@@ -718,7 +718,7 @@ def __Logger__warn(self, msg, *args):
 
 def __Logger__error(self, msg, *args):
     """
-    error(self, msg, *args) -> None
+    error(self, msg, *args)
 
         Sends the given message to the tango error stream.
 
@@ -733,7 +733,7 @@ def __Logger__error(self, msg, *args):
 
 def __Logger__fatal(self, msg, *args):
     """
-    fatal(self, msg, *args) -> None
+    fatal(self, msg, *args)
 
         Sends the given message to the tango fatal stream.
 
@@ -748,7 +748,7 @@ def __Logger__fatal(self, msg, *args):
 
 def __UserDefaultAttrProp_set_enum_labels(self, enum_labels):
     """
-    set_enum_labels(self, enum_labels) -> None
+    set_enum_labels(self, enum_labels)
 
         Set default enumeration labels.
 
@@ -797,7 +797,7 @@ def __doc_DeviceImpl():
     """
 
     document_method("init_device", """
-    init_device(self) -> None
+    init_device(self)
 
         Intialize the device.
 
@@ -805,7 +805,7 @@ def __doc_DeviceImpl():
     """)
 
     document_method("set_state", """
-    set_state(self, new_state) -> None
+    set_state(self, new_state)
 
         Set device state.
 
@@ -851,7 +851,7 @@ def __doc_DeviceImpl():
     """)
 
     document_method("register_signal", """
-    register_signal(self, signo) -> None
+    register_signal(self, signo)
 
         Register a signal.
 
@@ -865,7 +865,7 @@ def __doc_DeviceImpl():
     """)
 
     document_method("unregister_signal", """
-    unregister_signal(self, signo) -> None
+    unregister_signal(self, signo)
 
         Unregister a signal.
 
@@ -887,7 +887,7 @@ def __doc_DeviceImpl():
     """)
 
     document_method("set_status", """
-    set_status(self, new_status) -> None
+    set_status(self, new_status)
 
         Set device status.
 
@@ -898,7 +898,7 @@ def __doc_DeviceImpl():
     """)
 
     document_method("append_status", """
-    append_status(self, status, new_line=False) -> None
+    append_status(self, status, new_line=False)
 
         Appends a string to the device status.
 
@@ -943,7 +943,7 @@ def __doc_DeviceImpl():
     """)
 
     document_method("set_change_event", """
-    set_change_event(self, attr_name, implemented, detect=True) -> None
+    set_change_event(self, attr_name, implemented, detect=True)
 
         Set an implemented flag for the attribute to indicate that the server fires
         change events manually, without the polling to be started.
@@ -962,7 +962,7 @@ def __doc_DeviceImpl():
     """)
 
     document_method("set_archive_event", """
-    set_archive_event(self, attr_name, implemented, detect=True) -> None
+    set_archive_event(self, attr_name, implemented, detect=True)
 
         Set an implemented flag for the attribute to indicate that the server fires
         archive events manually, without the polling to be started.
@@ -981,12 +981,12 @@ def __doc_DeviceImpl():
     """)
 
     document_method("push_change_event", """
-    push_change_event(self, attr_name) -> None
-    push_change_event(self, attr_name, except) -> None
-    push_change_event(self, attr_name, data, dim_x = 1, dim_y = 0) -> None
-    push_change_event(self, attr_name, str_data, data) -> None
-    push_change_event(self, attr_name, data, time_stamp, quality, dim_x = 1, dim_y = 0) -> None
-    push_change_event(self, attr_name, str_data, data, time_stamp, quality) -> None
+    push_change_event(self, attr_name)
+    push_change_event(self, attr_name, except)
+    push_change_event(self, attr_name, data, dim_x = 1, dim_y = 0)
+    push_change_event(self, attr_name, str_data, data)
+    push_change_event(self, attr_name, data, time_stamp, quality, dim_x = 1, dim_y = 0)
+    push_change_event(self, attr_name, str_data, data, time_stamp, quality)
 
         Push a change event for the given attribute name.
 
@@ -1010,12 +1010,12 @@ def __doc_DeviceImpl():
     """)
 
     document_method("push_archive_event", """
-    push_archive_event(self, attr_name) -> None
-    push_archive_event(self, attr_name, except) -> None
-    push_archive_event(self, attr_name, data, dim_x = 1, dim_y = 0) -> None
-    push_archive_event(self, attr_name, str_data, data) -> None
-    push_archive_event(self, attr_name, data, time_stamp, quality, dim_x = 1, dim_y = 0) -> None
-    push_archive_event(self, attr_name, str_data, data, time_stamp, quality) -> None
+    push_archive_event(self, attr_name)
+    push_archive_event(self, attr_name, except)
+    push_archive_event(self, attr_name, data, dim_x = 1, dim_y = 0)
+    push_archive_event(self, attr_name, str_data, data)
+    push_archive_event(self, attr_name, data, time_stamp, quality, dim_x = 1, dim_y = 0)
+    push_archive_event(self, attr_name, str_data, data, time_stamp, quality)
 
         Push an archive event for the given attribute name.
 
@@ -1039,11 +1039,11 @@ def __doc_DeviceImpl():
     """)
 
     document_method("push_event", """
-    push_event(self, attr_name, filt_names, filt_vals) -> None
-    push_event(self, attr_name, filt_names, filt_vals, data, dim_x = 1, dim_y = 0) -> None
-    push_event(self, attr_name, filt_names, filt_vals, str_data, data) -> None
-    push_event(self, attr_name, filt_names, filt_vals, data, time_stamp, quality, dim_x = 1, dim_y = 0) -> None
-    push_event(self, attr_name, filt_names, filt_vals, str_data, data, time_stamp, quality) -> None
+    push_event(self, attr_name, filt_names, filt_vals)
+    push_event(self, attr_name, filt_names, filt_vals, data, dim_x = 1, dim_y = 0)
+    push_event(self, attr_name, filt_names, filt_vals, str_data, data)
+    push_event(self, attr_name, filt_names, filt_vals, data, time_stamp, quality, dim_x = 1, dim_y = 0)
+    push_event(self, attr_name, filt_names, filt_vals, str_data, data, time_stamp, quality)
 
         Push a user event for the given attribute name.
 
@@ -1068,7 +1068,7 @@ def __doc_DeviceImpl():
     """)
 
     document_method("push_data_ready_event", """
-    push_data_ready_event(self, attr_name, counter = 0) -> None
+    push_data_ready_event(self, attr_name, counter = 0)
 
         Push a data ready event for the given attribute name.
 
@@ -1087,9 +1087,9 @@ def __doc_DeviceImpl():
     """)
 
     document_method("push_pipe_event", """
-    push_pipe_event(self, pipe_name, except) -> None
-    push_pipe_event(self, pipe_name, blob, reuse_it) -> None
-    push_pipe_event(self, pipe_name, blob, timeval, reuse_it) -> None
+    push_pipe_event(self, pipe_name, except)
+    push_pipe_event(self, pipe_name, blob, reuse_it)
+    push_pipe_event(self, pipe_name, blob, timeval, reuse_it)
 
         Push a pipe event for the given blob.
 
@@ -1193,8 +1193,8 @@ def __doc_DeviceImpl():
     """)
 
     document_method("stop_polling", """
-    stop_polling(self) -> None
-    stop_polling(self, with_db_upd) -> None
+    stop_polling(self)
+    stop_polling(self, with_db_upd)
 
         Stop all polling for a device. if the device is polled, call this
         method before deleting it.
@@ -1236,7 +1236,7 @@ def __doc_DeviceImpl():
     """)
 
     document_method("check_command_exists", """
-    check_command_exists(self) -> None
+    check_command_exists(self)
 
         Check that a command is supported by the device and
         does not need input value.
@@ -1331,7 +1331,7 @@ def __doc_DeviceImpl():
     """)
 
     document_method("push_att_conf_event", """
-    push_att_conf_event(self, attr) -> None
+    push_att_conf_event(self, attr)
 
         Push an attribute configuration event.
 
@@ -1343,7 +1343,7 @@ def __doc_DeviceImpl():
     """)
 
     document_method("push_pipe_event", """
-    push_pipe_event(self, blob) -> None
+    push_pipe_event(self, blob)
 
         Push an pipe event.
 
@@ -1380,7 +1380,7 @@ def __doc_extra_DeviceImpl(cls):
         return __document_method(cls, method_name, desc, append)
 
     document_method("delete_device", """
-    delete_device(self) -> None
+    delete_device(self)
 
         Delete the device.
 
@@ -1388,7 +1388,7 @@ def __doc_extra_DeviceImpl(cls):
     """)
 
     document_method("always_executed_hook", """
-    always_executed_hook(self) -> None
+    always_executed_hook(self)
 
         Hook method.
 
@@ -1402,7 +1402,7 @@ def __doc_extra_DeviceImpl(cls):
     """)
 
     document_method("read_attr_hardware", """
-    read_attr_hardware(self, attr_list) -> None
+    read_attr_hardware(self, attr_list)
 
         Read the hardware to return attribute value(s).
 
@@ -1420,7 +1420,7 @@ def __doc_extra_DeviceImpl(cls):
     """)
 
     document_method("write_attr_hardware", """
-    write_attr_hardware(self) -> None
+    write_attr_hardware(self)
 
         Write the hardware for attributes.
 
@@ -1438,7 +1438,7 @@ def __doc_extra_DeviceImpl(cls):
     """)
 
     document_method("signal_handler", """
-    signal_handler(self, signo) -> None
+    signal_handler(self, signo)
 
         Signal handler.
 
@@ -1581,7 +1581,7 @@ def __doc_Attribute():
     """)
 
     document_method("set_assoc_ind", """
-    set_assoc_ind(self, index) -> None
+    set_assoc_ind(self, index)
 
         Set index of the associated writable attribute.
 
@@ -1600,7 +1600,7 @@ def __doc_Attribute():
     """)
 
     document_method("set_date", """
-    set_date(self, new_date) -> None
+    set_date(self, new_date)
 
         Set attribute date.
 
@@ -1627,7 +1627,7 @@ def __doc_Attribute():
     """)
 
     document_method("set_quality", """
-    set_quality(self, quality, send_event=False) -> None
+    set_quality(self, quality, send_event=False)
 
         Set attribute data quality.
 
@@ -1639,7 +1639,7 @@ def __doc_Attribute():
     """)
 
     document_method("get_data_size", """
-    get_data_size(self) -> None
+    get_data_size(self)
 
         Get attribute data size.
 
@@ -1714,9 +1714,9 @@ def __doc_Attribute():
     """)
 
     document_method("set_value", """
-    set_value(self, data, dim_x = 1, dim_y = 0) -> None <= DEPRECATED
-    set_value(self, data) -> None
-    set_value(self, str_data, data) -> None
+    set_value(self, data, dim_x = 1, dim_y = 0) <= DEPRECATED
+    set_value(self, data)
+    set_value(self, str_data, data)
 
         Set internal attribute value.
 
@@ -1743,9 +1743,9 @@ def __doc_Attribute():
     """)
 
     document_method("set_value_date_quality", """
-    set_value_date_quality(self, data, time_stamp, quality, dim_x = 1, dim_y = 0) -> None <= DEPRECATED
-    set_value_date_quality(self, data, time_stamp, quality) -> None
-    set_value_date_quality(self, str_data, data, time_stamp, quality) -> None
+    set_value_date_quality(self, data, time_stamp, quality, dim_x = 1, dim_y = 0) <= DEPRECATED
+    set_value_date_quality(self, data, time_stamp, quality)
+    set_value_date_quality(self, str_data, data, time_stamp, quality)
 
         Set internal attribute value, date and quality factor.
 
@@ -1773,7 +1773,7 @@ def __doc_Attribute():
     """)
 
     document_method("set_change_event", """
-    set_change_event(self, implemented, detect = True) -> None
+    set_change_event(self, implemented, detect = True)
 
         Set a flag to indicate that the server fires change events manually,
         without the polling to be started for the attribute.
@@ -1794,7 +1794,7 @@ def __doc_Attribute():
     """)
 
     document_method("set_archive_event", """
-    set_archive_event(self, implemented, detect = True) -> None
+    set_archive_event(self, implemented, detect = True)
 
         Set a flag to indicate that the server fires archive events manually,
         without the polling to be started for the attribute.
@@ -1855,7 +1855,7 @@ def __doc_Attribute():
     """)
 
     document_method("set_data_ready_event", """
-    set_data_ready_event(self, implemented) -> None
+    set_data_ready_event(self, implemented)
 
         Set a flag to indicate that the server fires data ready events.
 
@@ -1879,7 +1879,7 @@ def __doc_Attribute():
     """)
 
     document_method("remove_configuration", """
-    remove_configuration(self) -> None
+    remove_configuration(self)
 
         Remove the attribute configuration from the database.
 
@@ -1923,7 +1923,7 @@ def __doc_WAttribute():
     """)
 
     document_method("set_min_value", """
-    set_min_value(self, data) -> None
+    set_min_value(self, data)
 
         Set attribute minimum value.
 
@@ -1935,7 +1935,7 @@ def __doc_WAttribute():
     """)
 
     document_method("set_max_value", """
-    set_max_value(self, data) -> None
+    set_max_value(self, data)
 
         Set attribute maximum value.
 
@@ -1971,7 +1971,7 @@ def __doc_WAttribute():
     """)
 
     #    document_method("set_write_value", """
-    #    set_write_value(self, data, dim_x = 1, dim_y = 0) -> None
+    #    set_write_value(self, data, dim_x = 1, dim_y = 0)
     #
     #        Set the writable attribute value.
     #
@@ -1986,7 +1986,7 @@ def __doc_WAttribute():
     #    """)
 
     document_method("get_write_value", """
-    get_write_value(self, lst) -> None  <= DEPRECATED
+    get_write_value(self, lst)  <= DEPRECATED
     get_write_value(self, extract_as=ExtractAs.Numpy) -> obj
 
         Retrieve the new value for writable attribute.
@@ -2028,7 +2028,7 @@ def __doc_MultiClassAttribute():
     """)
 
     document_method("remove_attr", """
-    remove_attr(self, attr_name, cl_name) -> None
+    remove_attr(self, attr_name, cl_name)
 
         Remove the :class:`~tango.Attr` object for the attribute with
         name passed as parameter.
@@ -2177,7 +2177,7 @@ def __doc_MultiAttribute():
     """)
 
     document_method("read_alarm", """
-    read_alarm(self, status) -> None
+    read_alarm(self, status)
 
         Add alarm message to device status.
 
@@ -2212,7 +2212,7 @@ def __doc_Attr():
     """
 
     document_method("set_default_properties", """
-    set_default_properties(self) -> None
+    set_default_properties(self)
 
         Set default attribute properties.
 
@@ -2223,7 +2223,7 @@ def __doc_Attr():
     """)
 
     document_method("set_disp_level", """
-    set_disp_level(self, disp_lelel) -> None
+    set_disp_level(self, disp_lelel)
 
         Set the attribute display level.
 
@@ -2234,7 +2234,7 @@ def __doc_Attr():
     """)
 
     document_method("set_polling_period", """
-    set_polling_period(self, period) -> None
+    set_polling_period(self, period)
 
         Set the attribute polling update period.
 
@@ -2245,7 +2245,7 @@ def __doc_Attr():
     """)
 
     document_method("set_memorized", """
-    set_memorized(self) -> None
+    set_memorized(self)
 
         Set the attribute as memorized in database (only for scalar
         and writable attribute).
@@ -2257,7 +2257,7 @@ def __doc_Attr():
     """)
 
     document_method("set_memorized_init", """
-    set_memorized_init(self, write_on_init) -> None
+    set_memorized_init(self, write_on_init)
 
         Set the initialisation flag for memorized attributes.
 
@@ -2273,7 +2273,7 @@ def __doc_Attr():
     """)
 
     document_method("set_change_event", """
-    set_change_event(self, implemented, detect) -> None
+    set_change_event(self, implemented, detect)
 
         Set a flag to indicate that the server fires change events manually
         without the polling to be started for the attribute.
@@ -2309,7 +2309,7 @@ def __doc_Attr():
     """)
 
     document_method("set_archive_event", """
-    set_archive_event(self) -> None
+    set_archive_event(self)
 
         Set a flag to indicate that the server fires archive events manually
         without the polling to be started for the attribute.
@@ -2345,7 +2345,7 @@ def __doc_Attr():
     """)
 
     document_method("set_data_ready_event", """
-    set_data_ready_event(self, implemented) -> None
+    set_data_ready_event(self, implemented)
 
         Set a flag to indicate that the server fires data ready events.
 
@@ -2459,7 +2459,7 @@ def __doc_Attr():
     """)
 
     document_method("set_cl_name", """
-    set_cl_name(self, cl) -> None
+    set_cl_name(self, cl)
 
         Sets the class name.
 
@@ -2488,7 +2488,7 @@ def __doc_Attr():
     """)
 
     document_method("set_class_properties", """
-    set_class_properties(self, props) -> None
+    set_class_properties(self, props)
 
         Set the class level attribute properties.
 
@@ -2514,7 +2514,7 @@ def __doc_UserDefaultAttrProp():
     """
 
     document_method("set_label", """
-    set_label(self, def_label) -> None
+    set_label(self, def_label)
 
         Set default label property.
 
@@ -2525,7 +2525,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_description", """
-    set_description(self, def_description) -> None
+    set_description(self, def_description)
 
         Set default description property.
 
@@ -2536,7 +2536,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_format", """
-    set_format(self, def_format) -> None
+    set_format(self, def_format)
 
         Set default format property.
 
@@ -2547,7 +2547,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_unit", """
-    set_unit(self, def_unit) -> None
+    set_unit(self, def_unit)
 
         Set default unit property.
 
@@ -2558,7 +2558,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_standard_unit", """
-    set_standard_unit(self, def_standard_unit) -> None
+    set_standard_unit(self, def_standard_unit)
 
         Set default standard unit property.
 
@@ -2569,7 +2569,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_display_unit", """
-    set_display_unit(self, def_display_unit) -> None
+    set_display_unit(self, def_display_unit)
 
         Set default display unit property.
 
@@ -2580,7 +2580,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_min_value", """
-    set_min_value(self, def_min_value) -> None
+    set_min_value(self, def_min_value)
 
         Set default min_value property.
 
@@ -2591,7 +2591,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_max_value", """
-    set_max_value(self, def_max_value) -> None
+    set_max_value(self, def_max_value)
 
         Set default max_value property.
 
@@ -2602,7 +2602,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_min_alarm", """
-    set_min_alarm(self, def_min_alarm) -> None
+    set_min_alarm(self, def_min_alarm)
 
         Set default min_alarm property.
 
@@ -2613,7 +2613,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_max_alarm", """
-    set_max_alarm(self, def_max_alarm) -> None
+    set_max_alarm(self, def_max_alarm)
 
         Set default max_alarm property.
 
@@ -2624,7 +2624,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_min_warning", """
-    set_min_warning(self, def_min_warning) -> None
+    set_min_warning(self, def_min_warning)
 
         Set default min_warning property.
 
@@ -2635,7 +2635,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_max_warning", """
-    set_max_warning(self, def_max_warning) -> None
+    set_max_warning(self, def_max_warning)
 
         Set default max_warning property.
 
@@ -2646,7 +2646,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_delta_t", """
-    set_delta_t(self, def_delta_t) -> None
+    set_delta_t(self, def_delta_t)
 
         Set default RDS alarm delta_t property.
 
@@ -2657,7 +2657,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_delta_val", """
-    set_delta_val(self, def_delta_val) -> None
+    set_delta_val(self, def_delta_val)
 
         Set default RDS alarm delta_val property.
 
@@ -2668,7 +2668,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_abs_change", """
-    set_abs_change(self, def_abs_change) -> None <= DEPRECATED
+    set_abs_change(self, def_abs_change) <= DEPRECATED
 
         Set default change event abs_change property.
 
@@ -2681,7 +2681,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_event_abs_change", """
-    set_event_abs_change(self, def_abs_change) -> None
+    set_event_abs_change(self, def_abs_change)
 
         Set default change event abs_change property.
 
@@ -2694,7 +2694,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_rel_change", """
-    set_rel_change(self, def_rel_change) -> None <= DEPRECATED
+    set_rel_change(self, def_rel_change) <= DEPRECATED
 
         Set default change event rel_change property.
 
@@ -2707,7 +2707,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_event_rel_change", """
-    set_event_rel_change(self, def_rel_change) -> None
+    set_event_rel_change(self, def_rel_change)
 
         Set default change event rel_change property.
 
@@ -2720,7 +2720,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_period", """
-    set_period(self, def_period) -> None <= DEPRECATED
+    set_period(self, def_period) <= DEPRECATED
 
         Set default periodic event period property.
 
@@ -2733,7 +2733,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_event_period", """
-    set_event_period(self, def_period) -> None
+    set_event_period(self, def_period)
 
         Set default periodic event period property.
 
@@ -2746,7 +2746,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_archive_abs_change", """
-    set_archive_abs_change(self, def_archive_abs_change) -> None <= DEPRECATED
+    set_archive_abs_change(self, def_archive_abs_change) <= DEPRECATED
 
         Set default archive event abs_change property.
 
@@ -2759,7 +2759,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_archive_event_abs_change", """
-    set_archive_event_abs_change(self, def_archive_abs_change) -> None
+    set_archive_event_abs_change(self, def_archive_abs_change)
 
         Set default archive event abs_change property.
 
@@ -2772,7 +2772,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_archive_rel_change", """
-    set_archive_rel_change(self, def_archive_rel_change) -> None <= DEPRECATED
+    set_archive_rel_change(self, def_archive_rel_change) <= DEPRECATED
 
         Set default archive event rel_change property.
 
@@ -2785,7 +2785,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_archive_event_rel_change", """
-    set_archive_event_rel_change(self, def_archive_rel_change) -> None
+    set_archive_event_rel_change(self, def_archive_rel_change)
 
         Set default archive event rel_change property.
 
@@ -2798,7 +2798,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_archive_period", """
-    set_archive_period(self, def_archive_period) -> None <= DEPRECATED
+    set_archive_period(self, def_archive_period) <= DEPRECATED
 
         Set default archive event period property.
 
@@ -2811,7 +2811,7 @@ def __doc_UserDefaultAttrProp():
     """)
 
     document_method("set_archive_event_period", """
-    set_archive_event_period(self, def_archive_period) -> None
+    set_archive_event_period(self, def_archive_period)
 
         Set default archive event period property.
 
