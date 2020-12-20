@@ -212,8 +212,8 @@ def __Attribute__get_properties(self, attr_cfg=None):
                      AttributeConfig_3, AttributeConfig_5 or
                      MultiAttrProp
 
-        Return     : (AttributeConfig) the config object filled with
-                     attribute configuration information
+        Return:
+            AttributeConfig: the config object filled with attribute configuration information
 
         New in PyTango 7.1.4
     """
@@ -321,7 +321,8 @@ def __DeviceImpl__add_attribute(self, attr, r_meth=None, w_meth=None, is_allo_me
             - is_allo_meth: (callable) the method that is called to check if it
                             is possible to access the attribute or not
 
-        Return     : (Attr) the newly created attribute.
+        Return:
+            Attr: the newly created attribute.
 
         Raises:
             DevFailed:
@@ -433,7 +434,8 @@ def __DeviceImpl__add_command(self, cmd, device_level=True):
             - device_level : Set this flag to true if the command must be added
                              for only this device
 
-        Return     : Command
+        Return:
+            Command:
 
         Raises:
             DevFailed:
@@ -791,7 +793,8 @@ def __doc_DeviceImpl():
 
         Get a COPY of the device state.
 
-        Return     : (DevState) Current device state
+        Return:
+            DevState: Current device state
     """)
 
     document_method("get_prev_state", """
@@ -799,8 +802,8 @@ def __doc_DeviceImpl():
 
         Get a COPY of the device's previous state.
 
-        Return     : (DevState) the device's previous state
-
+        Return:
+            DevState: the device's previous state
     """)
 
     document_method("get_name", """
@@ -808,8 +811,8 @@ def __doc_DeviceImpl():
 
         Get a COPY of the device name.
 
-        Return     : (str) the device name
-
+        Return:
+            str: the device name
     """)
 
     document_method("get_device_attr", """
@@ -817,8 +820,8 @@ def __doc_DeviceImpl():
 
         Get device multi attribute object.
 
-        Return     : (MultiAttribute) the device's MultiAttribute object
-
+        Return:
+            MultiAttribute: the device's MultiAttribute object
     """)
 
     document_method("register_signal", """
@@ -850,7 +853,8 @@ def __doc_DeviceImpl():
 
         Get a COPY of the device status.
 
-        Return     : (str) the device status
+        Return:
+            str: the device status
     """)
 
     document_method("set_status", """
@@ -885,7 +889,8 @@ def __doc_DeviceImpl():
         returns the state This method can be redefined in sub-classes in case
         of the default behaviour does not fullfill the needs.
 
-        Return     : (DevState) the device state
+        Return:
+            DevState: the device state
 
         Raises:
             DevFailed: If it is necessary to read attribute(s) and a problem occurs during the reading
@@ -901,7 +906,8 @@ def __doc_DeviceImpl():
         to the device status. This method can be redefined in sub-classes in case
         of the default behaviour does not fullfill the needs.
 
-        Return     : (str) the device status
+        Return:
+            str: the device status
 
         Raises:
             DevFailed: If it is necessary to read attribute(s) and a problem occurs during the reading
@@ -1071,7 +1077,8 @@ def __doc_DeviceImpl():
 
         Returns the Logger object for this device
 
-        Return     : (Logger) the Logger object for this device
+        Return:
+            Logger: the Logger object for this device
     """)
 
     document_method("get_exported_flag", """
@@ -1079,7 +1086,8 @@ def __doc_DeviceImpl():
 
         Returns the state of the exported flag
 
-        Return     : (bool) the state of the exported flag
+        Return:
+            bool: the state of the exported flag
 
         New in PyTango 7.1.2
     """)
@@ -1089,7 +1097,8 @@ def __doc_DeviceImpl():
 
         Returns the poll ring depth
 
-        Return     : (int) the poll ring depth
+        Return:
+            int: the poll ring depth
 
         New in PyTango 7.1.2
     """)
@@ -1099,7 +1108,8 @@ def __doc_DeviceImpl():
 
         Returns the poll old factor
 
-        Return     : (int) the poll old factor
+        Return:
+            int: the poll old factor
 
         New in PyTango 7.1.2
     """)
@@ -1109,7 +1119,8 @@ def __doc_DeviceImpl():
 
         Returns if it is polled
 
-        Return     : (bool) True if it is polled or False otherwise
+        Return:
+            bool: True if it is polled or False otherwise
 
         New in PyTango 7.1.2
     """)
@@ -1119,7 +1130,8 @@ def __doc_DeviceImpl():
 
         Returns a COPY of the list of polled commands
 
-        Return     : (sequence<str>) a COPY of the list of polled commands
+        Return:
+            sequence<str>: a COPY of the list of polled commands
 
         New in PyTango 7.1.2
     """)
@@ -1129,7 +1141,8 @@ def __doc_DeviceImpl():
 
         Returns a COPY of the list of polled attributes
 
-        Return     : (sequence<str>) a COPY of the list of polled attributes
+        Return:
+            sequence<str>: a COPY of the list of polled attributes
 
         New in PyTango 7.1.2
     """)
@@ -1139,7 +1152,8 @@ def __doc_DeviceImpl():
 
         Returns a COPY of the list of non automatic polled commands
 
-        Return     : (sequence<str>) a COPY of the list of non automatic polled commands
+        Return:
+            sequence<str>: a COPY of the list of non automatic polled commands
 
         New in PyTango 7.1.2
     """)
@@ -1149,7 +1163,8 @@ def __doc_DeviceImpl():
 
         Returns a COPY of the list of non automatic polled attributes
 
-        Return     : (sequence<str>) a COPY of the list of non automatic polled attributes
+        Return:
+            sequence<str>: a COPY of the list of non automatic polled attributes
 
         New in PyTango 7.1.2
     """)
@@ -1176,7 +1191,8 @@ def __doc_DeviceImpl():
         Parameters :
             - attr_name : (str) attribute name
 
-        Return     : (int) attribute polling period (ms) or 0 if it is not polled
+        Return:
+            int: attribute polling period (ms) or 0 if it is not polled
 
         New in PyTango 8.0.0
     """)
@@ -1190,7 +1206,8 @@ def __doc_DeviceImpl():
         Parameters :
             - cmd_name : (str) command name
 
-        Return     : (int) command polling period (ms) or 0 if it is not polled
+        Return:
+            int: command polling period (ms) or 0 if it is not polled
 
         New in PyTango 8.0.0
     """)
@@ -1220,7 +1237,8 @@ def __doc_DeviceImpl():
 
         Returns the IDL version.
 
-        Return     : (int) the IDL version
+        Return:
+            int: the IDL version
 
         New in PyTango 7.1.2
     """)
@@ -1233,7 +1251,8 @@ def __doc_DeviceImpl():
         Parameters :
             - cmd_name: (str) the command name
 
-        Return     : (int) the command poll ring depth
+        Return:
+            int: the command poll ring depth
 
         New in PyTango 7.1.2
     """)
@@ -1246,7 +1265,8 @@ def __doc_DeviceImpl():
         Parameters :
             - attr_name: (str) the attribute name
 
-        Return     : (int) the attribute poll ring depth
+        Return:
+            int: the attribute poll ring depth
 
         New in PyTango 7.1.2
     """)
@@ -1256,7 +1276,8 @@ def __doc_DeviceImpl():
 
         Returns if this device is locked by a client.
 
-        Return     : (bool) True if it is locked or False otherwise
+        Return:
+            bool: True if it is locked or False otherwise
 
         New in PyTango 7.1.2
     """)
@@ -1266,7 +1287,8 @@ def __doc_DeviceImpl():
 
         Returns the min poll period.
 
-        Return     : (int) the min poll period
+        Return:
+            int: the min poll period
 
         New in PyTango 7.2.0
     """)
@@ -1276,7 +1298,8 @@ def __doc_DeviceImpl():
 
         Returns the min command poll period.
 
-        Return     : (seq<str>) the min command poll period
+        Return:
+            seq<str>: the min command poll period
 
         New in PyTango 7.2.0
     """)
@@ -1286,7 +1309,8 @@ def __doc_DeviceImpl():
 
         Returns the min attribute poll period
 
-        Return     : (seq<str>) the min attribute poll period
+        Return:
+            seq<str>: the min attribute poll period
 
         New in PyTango 7.2.0
     """)
@@ -1328,7 +1352,8 @@ def __doc_DeviceImpl():
             - att_name: (str) the attribute name
             - event_type (EventType): the event type
 
-        Return     : True if there is at least one listener or False otherwise
+        Return:
+            bool: True if there is at least one listener or False otherwise
     """)
 
 
@@ -1422,7 +1447,8 @@ def __doc_Attribute():
 
         Check if the attribute has an associated writable attribute.
 
-        Return     : (bool) True if there is an associated writable attribute
+        Return:
+            bool: True if there is an associated writable attribute
     """)
 
     document_method("is_min_alarm", """
@@ -1430,7 +1456,8 @@ def __doc_Attribute():
 
         Check if the attribute is in minimum alarm condition.
 
-        Return     : (bool) true if the attribute is in alarm condition (read value below the min. alarm).
+        Return:
+            bool: true if the attribute is in alarm condition (read value below the min. alarm).
     """)
 
     document_method("is_max_alarm", """
@@ -1438,7 +1465,8 @@ def __doc_Attribute():
 
         Check if the attribute is in maximum alarm condition.
 
-        Return     : (bool) true if the attribute is in alarm condition (read value above the max. alarm).
+        Return:
+            bool: true if the attribute is in alarm condition (read value above the max. alarm).
     """)
 
     document_method("is_min_warning", """
@@ -1446,7 +1474,8 @@ def __doc_Attribute():
 
         Check if the attribute is in minimum warning condition.
 
-        Return     : (bool) true if the attribute is in warning condition (read value below the min. warning).
+        Return:
+            bool: true if the attribute is in warning condition (read value below the min. warning).
     """)
 
     document_method("is_max_warning", """
@@ -1454,7 +1483,8 @@ def __doc_Attribute():
 
         Check if the attribute is in maximum warning condition.
 
-        Return     : (bool) true if the attribute is in warning condition (read value above the max. warning).
+        Return:
+            bool: true if the attribute is in warning condition (read value above the max. warning).
     """)
 
     document_method("is_rds_alarm", """
@@ -1462,7 +1492,8 @@ def __doc_Attribute():
 
         Check if the attribute is in RDS alarm condition.
 
-        Return     : (bool) true if the attribute is in RDS condition (Read Different than Set).
+        Return:
+            bool: true if the attribute is in RDS condition (Read Different than Set).
     """)
 
     document_method("is_polled", """
@@ -1470,7 +1501,8 @@ def __doc_Attribute():
 
         Check if the attribute is polled.
 
-        Return     : (bool) true if the attribute is polled.
+        Return:
+            bool: true if the attribute is polled.
     """)
 
     document_method("check_alarm", """
@@ -1478,7 +1510,8 @@ def __doc_Attribute():
 
         Check if the attribute read value is below/above the alarm level.
 
-        Return     : (bool) true if the attribute is in alarm condition.
+        Return:
+            bool: true if the attribute is in alarm condition.
 
         Raises:
             DevFailed: If no alarm level is defined.
@@ -1489,7 +1522,8 @@ def __doc_Attribute():
 
         Get the attribute writable type (RO/WO/RW).
 
-        Return     : (AttrWriteType) The attribute write type.
+        Return:
+            AttrWriteType: The attribute write type.
     """)
 
     document_method("get_name", """
@@ -1497,7 +1531,8 @@ def __doc_Attribute():
 
         Get attribute name.
 
-        Return     : (str) The attribute name
+        Return:
+            str: The attribute name
     """)
 
     document_method("get_data_type", """
@@ -1505,7 +1540,8 @@ def __doc_Attribute():
 
         Get attribute data type.
 
-        Return     : (int) the attribute data type
+        Return:
+            int: the attribute data type
     """)
 
     document_method("get_data_format", """
@@ -1513,7 +1549,8 @@ def __doc_Attribute():
 
         Get attribute data format.
 
-        Return     : (AttrDataFormat) the attribute data format
+        Return:
+            AttrDataFormat: the attribute data format
     """)
 
     document_method("get_assoc_name", """
@@ -1521,7 +1558,8 @@ def __doc_Attribute():
 
         Get name of the associated writable attribute.
 
-        Return     : (str) the associated writable attribute name
+        Return:
+            str: the associated writable attribute name
     """)
 
     document_method("get_assoc_ind", """
@@ -1529,7 +1567,8 @@ def __doc_Attribute():
 
         Get index of the associated writable attribute.
 
-        Return     : (int) the index in the main attribute vector of the associated writable attribute
+        Return:
+            int: the index in the main attribute vector of the associated writable attribute
     """)
 
     document_method("set_assoc_ind", """
@@ -1546,7 +1585,8 @@ def __doc_Attribute():
 
         Get a COPY of the attribute date.
 
-        Return     : (TimeVal) the attribute date
+        Return:
+            TimeVal: the attribute date
     """)
 
     document_method("set_date", """
@@ -1563,7 +1603,8 @@ def __doc_Attribute():
 
         Get attribute label property.
 
-        Return     : (str) he attribute label
+        Return:
+            str: he attribute label
     """)
 
     document_method("get_quality", """
@@ -1571,7 +1612,8 @@ def __doc_Attribute():
 
         Get a COPY of the attribute data quality.
 
-        Return     : (AttrQuality) the attribute data quality
+        Return:
+            AttrQuality: the attribute data quality
     """)
 
     document_method("set_quality", """
@@ -1589,7 +1631,8 @@ def __doc_Attribute():
 
         Get attribute data size.
 
-        Return     : (int) the attribute data size
+        Return:
+            int: the attribute data size
     """)
 
     document_method("get_x", """
@@ -1597,7 +1640,8 @@ def __doc_Attribute():
 
         Get attribute data size in x dimension.
 
-        Return     : (int) the attribute data size in x dimension. Set to 1 for scalar attribute
+        Return:
+            int: the attribute data size in x dimension. Set to 1 for scalar attribute
     """)
 
     document_method("get_max_dim_x", """
@@ -1605,7 +1649,8 @@ def __doc_Attribute():
 
         Get attribute maximum data size in x dimension.
 
-        Return     : (int) the attribute maximum data size in x dimension. Set to 1 for scalar attribute
+        Return:
+            int: the attribute maximum data size in x dimension. Set to 1 for scalar attribute
     """)
 
     document_method("get_y", """
@@ -1613,7 +1658,8 @@ def __doc_Attribute():
 
         Get attribute data size in y dimension.
 
-        Return     : (int) the attribute data size in y dimension. Set to 1 for scalar attribute
+        Return:
+            int: the attribute data size in y dimension. Set to 1 for scalar attribute
     """)
 
     document_method("get_max_dim_y", """
@@ -1621,7 +1667,8 @@ def __doc_Attribute():
 
         Get attribute maximum data size in y dimension.
 
-        Return     : (int) the attribute maximum data size in y dimension. Set to 0 for scalar attribute
+        Return:
+            int: the attribute maximum data size in y dimension. Set to 0 for scalar attribute
     """)
 
     document_method("get_polling_period", """
@@ -1629,7 +1676,8 @@ def __doc_Attribute():
 
         Get attribute polling period.
 
-        Return     : (int) The attribute polling period in mS. Set to 0 when the attribute is not polled
+        Return:
+            int: The attribute polling period in mS. Set to 0 when the attribute is not polled
     """)
 
     document_method("set_attr_serial_model", """
@@ -1652,7 +1700,8 @@ def __doc_Attribute():
 
         Get attribute serialization model.
 
-        Return     : (AttrSerialModel) The attribute serialization model
+        Return:
+            AttrSerialModel: The attribute serialization model
 
         New in PyTango 7.1.0
     """)
@@ -1754,7 +1803,8 @@ def __doc_Attribute():
 
         Check if the change event is fired manually (without polling) for this attribute.
 
-        Return     : (bool) True if a manual fire change event is implemented.
+        Return:
+            bool: True if a manual fire change event is implemented.
 
         New in PyTango 7.1.0
     """)
@@ -1765,7 +1815,8 @@ def __doc_Attribute():
         Check if the change event criteria should be checked when firing the
         event manually.
 
-        Return     : (bool) True if a change event criteria will be checked.
+        Return:
+            bool: True if a change event criteria will be checked.
 
         New in PyTango 7.1.0
     """)
@@ -1774,7 +1825,9 @@ def __doc_Attribute():
     is_archive_event(self) -> bool
 
         Check if the archive event is fired manually (without polling) for this attribute.
-        Return     : (bool) True if a manual fire archive event is implemented.
+
+        Return:
+            bool: True if a manual fire archive event is implemented.
 
         New in PyTango 7.1.0
     """)
@@ -1785,7 +1838,8 @@ def __doc_Attribute():
         Check if the archive event criteria should be checked when firing the
         event manually.
 
-        Return     : (bool) True if a archive event criteria will be checked.
+        Return:
+            bool: True if a archive event criteria will be checked.
 
         New in PyTango 7.1.0
     """)
@@ -1807,7 +1861,8 @@ def __doc_Attribute():
         Check if the data ready event is fired manually (without polling)
         for this attribute.
 
-        Return     : (bool) True if a manual fire data ready event is implemented.
+        Return:
+            bool: True if a manual fire data ready event is implemented.
 
         New in PyTango 7.2.0
     """)
@@ -1842,7 +1897,8 @@ def __doc_WAttribute():
         Get attribute minimum value or throws an exception if the
         attribute does not have a minimum value.
 
-        Return     : (obj) an object with the python minimum value
+        Return:
+            obj: an object with the python minimum value
     """)
 
     document_method("get_max_value", """
@@ -1851,7 +1907,8 @@ def __doc_WAttribute():
         Get attribute maximum value or throws an exception if the
         attribute does not have a maximum value.
 
-        Return     : (obj) an object with the python maximum value
+        Return:
+            obj: an object with the python maximum value
     """)
 
     document_method("set_min_value", """
@@ -1879,7 +1936,8 @@ def __doc_WAttribute():
 
         Check if the attribute has a minimum value.
 
-        Return     : (bool) true if the attribute has a minimum value defined
+        Return:
+            bool: true if the attribute has a minimum value defined
     """)
 
     document_method("is_max_value", """
@@ -1887,7 +1945,8 @@ def __doc_WAttribute():
 
         Check if the attribute has a maximum value.
 
-        Return     : (bool) true if the attribute has a maximum value defined
+        Return:
+            bool: true if the attribute has a maximum value defined
     """)
 
     document_method("get_write_value_length", """
@@ -1895,7 +1954,8 @@ def __doc_WAttribute():
 
         Retrieve the new value length (data number) for writable attribute.
 
-        Return     : (int) the new value data length
+        Return:
+            int: the new value data length
     """)
 
     #    document_method("set_write_value", """
@@ -1921,7 +1981,8 @@ def __doc_WAttribute():
             - extract_as: (ExtractAs)
             - lst : [out] (list) a list object that will be filled with the attribute write value (DEPRECATED)
 
-        Return     : (obj) the attribute write value.
+        Return:
+            obj: the attribute write value.
     """)
 
 
@@ -1946,7 +2007,8 @@ def __doc_MultiClassAttribute():
         Parameters :
             - attr_name : (str) attribute name
 
-        Return     : (Attr) the attribute object
+        Return:
+            Attr: the attribute object
 
         Raises:
             DevFailed: If the attribute is not defined.
@@ -1974,7 +2036,8 @@ def __doc_MultiClassAttribute():
 
         Get the list of :class:`~tango.Attr` for this device class.
 
-        Return     : (seq<Attr>) the list of attribute objects
+        Return:
+            seq<Attr>: the list of attribute objects
 
         New in PyTango 7.2.1
     """)
@@ -2002,7 +2065,8 @@ def __doc_MultiAttribute():
         Parameters :
             - attr_name : (str) attribute name
 
-        Return     : (Attribute) the attribute object
+        Return:
+            Attribute: the attribute object
 
         Raises:
             DevFailed: If the attribute is not defined.
@@ -2019,7 +2083,8 @@ def __doc_MultiAttribute():
         Parameters :
             - ind : (int) the attribute index
 
-        Return     : (Attribute) the attribute object
+        Return:
+            Attribute: the attribute object
     """)
 
     document_method("get_w_attr_by_name", """
@@ -2034,7 +2099,8 @@ def __doc_MultiAttribute():
         Parameters :
             - attr_name : (str) attribute name
 
-        Return     : (WAttribute) the attribute object
+        Return:
+            WAttribute: the attribute object
 
         Raises:
             DevFailed: If the attribute is not defined.
@@ -2051,7 +2117,8 @@ def __doc_MultiAttribute():
         Parameters :
             - ind : (int) the attribute index
 
-        Return     : (WAttribute) the attribute object
+        Return:
+            WAttribute: the attribute object
     """)
 
     document_method("get_attr_ind_by_name", """
@@ -2066,7 +2133,8 @@ def __doc_MultiAttribute():
         Parameters :
             - attr_name : (str) attribute name
 
-        Return     : (int) the attribute index
+        Return:
+            int: the attribute index
 
         Raises:
             DevFailed: If the attribute is not found in the vector.
@@ -2079,7 +2147,8 @@ def __doc_MultiAttribute():
 
         Get attribute number.
 
-        Return     : (int) the number of attributes
+        Return:
+            int: the number of attributes
 
         New in PyTango 7.0.0
     """)
@@ -2099,7 +2168,8 @@ def __doc_MultiAttribute():
             - attr_name : (str) attribute name
             - ind : (int) the attribute index
 
-        Return     : (bool) True if at least one attribute is in alarm condition
+        Return:
+            bool: True if at least one attribute is in alarm condition
 
         Raises:
             DevFailed: If at least one attribute does not have any alarm level defined
@@ -2126,7 +2196,8 @@ def __doc_MultiAttribute():
 
         Get the list of attribute objects.
 
-        Return     : (seq<Attribute>) list of attribute objects
+        Return:
+            seq<Attribute>: list of attribute objects
 
         New in PyTango 7.2.1
     """)
@@ -2214,7 +2285,8 @@ def __doc_Attr():
 
         Check if the change event is fired manually for this attribute.
 
-        Return     : (bool) true if a manual fire change event is implemented.
+        Return:
+            bool: true if a manual fire change event is implemented.
     """)
 
     document_method("is_check_change_criteria", """
@@ -2222,7 +2294,8 @@ def __doc_Attr():
 
         Check if the change event criteria should be checked when firing the event manually.
 
-        Return     : (bool) true if a change event criteria will be checked.
+        Return:
+            bool: true if a change event criteria will be checked.
     """)
 
     document_method("set_archive_event", """
@@ -2248,7 +2321,8 @@ def __doc_Attr():
 
         Check if the archive event is fired manually for this attribute.
 
-        Return     : (bool) true if a manual fire archive event is implemented.
+        Return:
+            bool: true if a manual fire archive event is implemented.
     """)
 
     document_method("is_check_archive_criteria", """
@@ -2256,7 +2330,8 @@ def __doc_Attr():
 
         Check if the archive event criteria should be checked when firing the event manually.
 
-        Return     : (bool) true if a archive event criteria will be checked.
+        Return:
+            bool: true if a archive event criteria will be checked.
     """)
 
     document_method("set_data_ready_event", """
@@ -2275,7 +2350,8 @@ def __doc_Attr():
 
         Check if the data ready event is fired for this attribute.
 
-        Return     : (bool) true if firing data ready event is implemented.
+        Return:
+            bool: true if firing data ready event is implemented.
 
         New in PyTango 7.2.0
     """)
@@ -2285,7 +2361,8 @@ def __doc_Attr():
 
         Get the attribute name.
 
-        Return     : (str) the attribute name
+        Return:
+            str: the attribute name
     """)
 
     document_method("get_format", """
@@ -2293,7 +2370,8 @@ def __doc_Attr():
 
         Get the attribute format.
 
-        Return     : (AttrDataFormat) the attribute format
+        Return:
+            AttrDataFormat: the attribute format
     """)
 
     document_method("get_writable", """
@@ -2301,7 +2379,8 @@ def __doc_Attr():
 
         Get the attribute write type.
 
-        Return     : (AttrWriteType) the attribute write type
+        Return:
+            AttrWriteType: the attribute write type
     """)
 
     document_method("get_type", """
@@ -2309,7 +2388,8 @@ def __doc_Attr():
 
         Get the attribute data type.
 
-        Return     : (int) the attribute data type
+        Return:
+            int: the attribute data type
     """)
 
     document_method("get_disp_level", """
@@ -2317,7 +2397,8 @@ def __doc_Attr():
 
         Get the attribute display level.
 
-        Return     : (DispLevel) the attribute display level
+        Return:
+            DispLevel: the attribute display level
     """)
 
     document_method("get_polling_period", """
@@ -2325,7 +2406,8 @@ def __doc_Attr():
 
         Get the polling period (mS).
 
-        Return     : (int) the polling period (mS)
+        Return:
+            int: the polling period (mS)
     """)
 
     document_method("get_memorized", """
@@ -2333,7 +2415,8 @@ def __doc_Attr():
 
         Determine if the attribute is memorized or not.
 
-        Return     : (bool) True if the attribute is memorized
+        Return:
+            bool: True if the attribute is memorized
     """)
 
     document_method("get_memorized_init", """
@@ -2342,7 +2425,8 @@ def __doc_Attr():
         Determine if the attribute is written at startup from the memorized
         value if it is memorized.
 
-        Return     : (bool) True if initialized with memorized value or not
+        Return:
+            bool: True if initialized with memorized value or not
     """)
 
     document_method("get_assoc", """
@@ -2350,7 +2434,8 @@ def __doc_Attr():
 
         Get the associated name.
 
-        Return     : (bool) the associated name
+        Return:
+            bool: the associated name
     """)
 
     document_method("is_assoc", """
@@ -2358,7 +2443,8 @@ def __doc_Attr():
 
         Determine if it is assoc.
 
-        Return     : (bool) if it is assoc
+        Return:
+            bool: if it is assoc
     """)
 
     document_method("get_cl_name", """
@@ -2366,7 +2452,8 @@ def __doc_Attr():
 
         Returns the class name.
 
-        Return     : (str) the class name
+        Return:
+            str: the class name
 
         New in PyTango 7.2.0
     """)
@@ -2387,7 +2474,8 @@ def __doc_Attr():
 
         Get the class level attribute properties.
 
-        Return     : (sequence<AttrProperty>) the class attribute properties
+        Return:
+            sequence<AttrProperty>: the class attribute properties
     """)
 
     document_method("get_user_default_properties", """
@@ -2395,7 +2483,8 @@ def __doc_Attr():
 
         Get the user default attribute properties.
 
-        Return     : (sequence<AttrProperty>) the user default attribute properties
+        Return:
+            sequence<AttrProperty>: the user default attribute properties
     """)
 
     document_method("set_class_properties", """
