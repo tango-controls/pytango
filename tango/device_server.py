@@ -278,8 +278,6 @@ def __DeviceImpl__get_device_properties(self, ds_class=None):
                          None meaning that the corresponding DeviceClass object for this
                          DeviceImpl will be used
 
-        Return     : None
-
         Throws     : DevFailed
     """
     if ds_class is None:
@@ -378,8 +376,6 @@ def __DeviceImpl__remove_attribute(self, attr_name):
         Parameters :
             - attr_name : (str) attribute name
 
-        Return     : None
-
         Throws     : DevFailed
     """
     try:
@@ -469,8 +465,6 @@ def __DeviceImpl__remove_command(self, cmd_name, free_it=False, clean_db=True):
             - clean_db : Clean command related information (included polling info
                          if the command is polled) from database.
 
-        Return     : None
-
         Throws     : DevFailed
     """
     try:
@@ -498,8 +492,6 @@ def __DeviceImpl__debug_stream(self, msg, *args):
 
         Parameters :
             - msg : (str) the message to be sent to the debug stream
-
-        Return     : None
     """
     self.__debug_stream(msg % args)
 
@@ -516,8 +508,6 @@ def __DeviceImpl__info_stream(self, msg, *args):
 
         Parameters :
             - msg : (str) the message to be sent to the info stream
-
-        Return     : None
     """
     self.__info_stream(msg % args)
 
@@ -534,8 +524,6 @@ def __DeviceImpl__warn_stream(self, msg, *args):
 
         Parameters :
             - msg : (str) the message to be sent to the warn stream
-
-        Return     : None
     """
     self.__warn_stream(msg % args)
 
@@ -552,8 +540,6 @@ def __DeviceImpl__error_stream(self, msg, *args):
 
         Parameters :
             - msg : (str) the message to be sent to the error stream
-
-        Return     : None
     """
     self.__error_stream(msg % args)
 
@@ -570,8 +556,6 @@ def __DeviceImpl__fatal_stream(self, msg, *args):
 
         Parameters :
             - msg : (str) the message to be sent to the fatal stream
-
-        Return     : None
     """
     self.__fatal_stream(msg % args)
 
@@ -648,8 +632,6 @@ def __Logger__log(self, level, msg, *args):
             - level: (Level.LevelLevel) Log level
             - msg : (str) the message to be sent to the stream
             - args: (seq<str>) list of optional message arguments
-
-        Return     : None
     """
     self.__log(level, msg % args)
 
@@ -665,8 +647,6 @@ def __Logger__log_unconditionally(self, level, msg, *args):
             - level: (Level.LevelLevel) Log level
             - msg : (str) the message to be sent to the stream
             - args: (seq<str>) list of optional message arguments
-
-        Return     : None
     """
     self.__log_unconditionally(level, msg % args)
 
@@ -680,8 +660,6 @@ def __Logger__debug(self, msg, *args):
         Parameters :
             - msg : (str) the message to be sent to the debug stream
             - args: (seq<str>) list of optional message arguments
-
-        Return     : None
     """
     self.__debug(msg % args)
 
@@ -695,8 +673,6 @@ def __Logger__info(self, msg, *args):
         Parameters :
             - msg : (str) the message to be sent to the info stream
             - args: (seq<str>) list of optional message arguments
-
-        Return     : None
     """
     self.__info(msg % args)
 
@@ -710,8 +686,6 @@ def __Logger__warn(self, msg, *args):
         Parameters :
             - msg : (str) the message to be sent to the warn stream
             - args: (seq<str>) list of optional message arguments
-
-        Return     : None
     """
     self.__warn(msg % args)
 
@@ -725,8 +699,6 @@ def __Logger__error(self, msg, *args):
         Parameters :
             - msg : (str) the message to be sent to the error stream
             - args: (seq<str>) list of optional message arguments
-
-        Return     : None
     """
     self.__error(msg % args)
 
@@ -740,8 +712,6 @@ def __Logger__fatal(self, msg, *args):
         Parameters :
             - msg : (str) the message to be sent to the fatal stream
             - args: (seq<str>) list of optional message arguments
-
-        Return     : None
     """
     self.__fatal(msg % args)
 
@@ -800,8 +770,6 @@ def __doc_DeviceImpl():
     init_device(self)
 
         Intialize the device.
-
-        Return     : None
     """)
 
     document_method("set_state", """
@@ -811,8 +779,6 @@ def __doc_DeviceImpl():
 
         Parameters :
             - new_state : (DevState) the new device state
-
-        Return     : None
     """)
 
     document_method("get_state", """
@@ -860,8 +826,6 @@ def __doc_DeviceImpl():
 
         Parameters :
             - signo : (int) signal identifier
-
-        Return     : None
     """)
 
     document_method("unregister_signal", """
@@ -874,8 +838,6 @@ def __doc_DeviceImpl():
 
         Parameters :
             - signo : (int) signal identifier
-
-        Return     : None
     """)
 
     document_method("get_status", """
@@ -893,8 +855,6 @@ def __doc_DeviceImpl():
 
         Parameters :
             - new_status : (str) the new device status
-
-        Return     : None
     """)
 
     document_method("append_status", """
@@ -905,8 +865,6 @@ def __doc_DeviceImpl():
         Parameters :
             status : (str) the string to be appened to the device status
             new_line : (bool) If true, appends a new line character before the string. Default is False
-
-        Return     : None
     """)
 
     document_method("dev_state", """
@@ -957,8 +915,6 @@ def __doc_DeviceImpl():
             - implemented : (bool) True when the server fires change events manually.
             - detect : (bool) Triggers the verification of the change event properties
                        when set to true. Default value is true.
-
-        Return     : None
     """)
 
     document_method("set_archive_event", """
@@ -976,8 +932,6 @@ def __doc_DeviceImpl():
             - implemented : (bool) True when the server fires change events manually.
             - detect : (bool) Triggers the verification of the change event properties
                        when set to true. Default value is true.
-
-        Return     : None
     """)
 
     document_method("push_change_event", """
@@ -1081,8 +1035,6 @@ def __doc_DeviceImpl():
             - attr_name : (str) attribute name
             - counter : (int) the user counter
 
-        Return     : None
-
         Throws     : DevFailed If the attribute name is unknown.
     """)
 
@@ -1096,8 +1048,6 @@ def __doc_DeviceImpl():
         Parameters :
             - pipe_name : (str) pipe name
             - blob  : (DevicePipeBlob) the blob data
-
-        Return     : None
 
         Throws     : DevFailed If the pipe name is unknown.
 
@@ -1202,8 +1152,6 @@ def __doc_DeviceImpl():
         Parameters :
             - with_db_upd : (bool)  Is it necessary to update db?
 
-        Return     : None
-
         New in PyTango 7.1.2
     """)
 
@@ -1246,8 +1194,6 @@ def __doc_DeviceImpl():
 
         Parameters :
             - cmd_name: (str) the command name
-
-        Return     : None
 
         Throws     : DevFailed API_IncompatibleCmdArgumentType, API_CommandNotFound
 
@@ -1337,8 +1283,6 @@ def __doc_DeviceImpl():
 
         Parameters : (Attribute) the attribute for which the configuration event
                      will be sent.
-        Return     : None
-
         New in PyTango 7.2.1
     """)
 
@@ -1348,8 +1292,6 @@ def __doc_DeviceImpl():
         Push an pipe event.
 
         Parameters :  the blob which pipe event will be send.
-
-        Return     : None
 
         New in PyTango 9.2.2
     """)
@@ -1383,8 +1325,6 @@ def __doc_extra_DeviceImpl(cls):
     delete_device(self)
 
         Delete the device.
-
-        Return     : None
     """)
 
     document_method("always_executed_hook", """
@@ -1395,8 +1335,6 @@ def __doc_extra_DeviceImpl(cls):
         Default method to implement an action necessary on a device before
         any command is executed. This method can be redefined in sub-classes
         in case of the default behaviour does not fullfill the needs
-
-        Return     : None
 
         Throws     : DevFailed This method does not throw exception but a redefined method can.
     """)
@@ -1414,8 +1352,6 @@ def __doc_extra_DeviceImpl(cls):
             attr_list : (sequence<int>) list of indices in the device object attribute vector
                         of an attribute to be read.
 
-        Return     : None
-
         Throws     : DevFailed This method does not throw exception but a redefined method can.
     """)
 
@@ -1432,8 +1368,6 @@ def __doc_extra_DeviceImpl(cls):
             attr_list : (sequence<int>) list of indices in the device object attribute vector
                         of an attribute to be written.
 
-        Return     : None
-
         Throws     : DevFailed This method does not throw exception but a redefined method can.
     """)
 
@@ -1448,8 +1382,6 @@ def __doc_extra_DeviceImpl(cls):
 
         Parameters :
             - signo : (int) the signal number
-
-        Return     : None
 
         Throws     : DevFailed This method does not throw exception but a redefined method can.
     """)
@@ -1587,8 +1519,6 @@ def __doc_Attribute():
 
         Parameters :
             - index : (int) The new index in the main attribute vector of the associated writable attribute
-
-        Return     : None
     """)
 
     document_method("get_date", """
@@ -1606,8 +1536,6 @@ def __doc_Attribute():
 
         Parameters :
             - new_date : (TimeVal) the attribute date
-
-        Return     : None
     """)
 
     document_method("get_label", """
@@ -1634,8 +1562,6 @@ def __doc_Attribute():
         Parameters :
             - quality : (AttrQuality) the new attribute data quality
             - send_event : (bool) true if a change event should be sent. Default is false.
-
-        Return     : None
     """)
 
     document_method("get_data_size", """
@@ -1698,8 +1624,6 @@ def __doc_Attribute():
                           serialization model must be one of ATTR_BY_KERNEL,
                           ATTR_BY_USER or ATTR_NO_SYNC
 
-        Return     : None
-
         New in PyTango 7.1.0
     """)
 
@@ -1738,8 +1662,6 @@ def __doc_Attribute():
                          be a str or an object with the buffer interface.
             - dim_x : (int) [DEPRECATED] the attribute x length. Default value is 1
             - dim_y : (int) [DEPRECATED] the attribute y length. Default value is 0
-
-        Return     : None
     """)
 
     document_method("set_value_date_quality", """
@@ -1768,8 +1690,6 @@ def __doc_Attribute():
             - dim_y : (int) [DEPRECATED] the attribute y length. Default value is 0
             - time_stamp : (double) the time stamp
             - quality : (AttrQuality) the attribute quality factor
-
-        Return     : None
     """)
 
     document_method("set_change_event", """
@@ -1788,8 +1708,6 @@ def __doc_Attribute():
             - detect : (bool) (optional, default is True) Triggers the verification of
                        the change event properties when set to true.
 
-        Return     : None
-
         New in PyTango 7.1.0
     """)
 
@@ -1807,8 +1725,6 @@ def __doc_Attribute():
             - implemented : (bool) True when the server fires archive events manually.
             - detect : (bool) (optional, default is True) Triggers the verification of
                        the archive event properties when set to true.
-
-        Return     : None
 
         New in PyTango 7.1.0
     """)
@@ -1862,8 +1778,6 @@ def __doc_Attribute():
         Parameters :
             - implemented : (bool) True when the server fires data ready events manually.
 
-        Return     : None
-
         New in PyTango 7.2.0
     """)
 
@@ -1889,8 +1803,6 @@ def __doc_Attribute():
 
         The method removes all configured attribute properties and removes
         the attribute from the list of polled attributes.
-
-        Return     : None
 
         New in PyTango 7.1.0
     """)
@@ -1930,8 +1842,6 @@ def __doc_WAttribute():
         Parameters :
             - data : the attribute minimum value. python data type must be compatible
                      with the attribute data format and type.
-
-        Return     : None
     """)
 
     document_method("set_max_value", """
@@ -1942,8 +1852,6 @@ def __doc_WAttribute():
         Parameters :
             - data : the attribute maximum value. python data type must be compatible
                      with the attribute data format and type.
-
-        Return     : None
     """)
 
     document_method("is_min_value", """
@@ -1981,8 +1889,6 @@ def __doc_WAttribute():
     #                     compatible with the attribute type
     #            - dim_x : (int) the attribute set value x length. Default value is 1
     #            - dim_y : (int) the attribute set value y length. Default value is 0
-    #
-    #        Return     : None
     #    """)
 
     document_method("get_write_value", """
@@ -2187,8 +2093,6 @@ def __doc_MultiAttribute():
         Parameters :
             - status : (str) a string (should be the device status)
 
-        Return     : None
-
         New in PyTango 7.0.0
     """)
 
@@ -2218,8 +2122,6 @@ def __doc_Attr():
 
         Parameters :
             - attr_prop : (UserDefaultAttrProp) the user default property class
-
-        Return     : None
     """)
 
     document_method("set_disp_level", """
@@ -2229,8 +2131,6 @@ def __doc_Attr():
 
         Parameters :
             - disp_level : (DispLevel) the new display level
-
-        Return     : None
     """)
 
     document_method("set_polling_period", """
@@ -2240,8 +2140,6 @@ def __doc_Attr():
 
         Parameters :
             - period : (int) the attribute polling period (in mS)
-
-        Return     : None
     """)
 
     document_method("set_memorized", """
@@ -2252,8 +2150,6 @@ def __doc_Attr():
 
         With no argument the setpoint will be
         written to the attribute during initialisation!
-
-        Return     : None
     """)
 
     document_method("set_memorized_init", """
@@ -2268,9 +2164,7 @@ def __doc_Attr():
 
         Parameters :
             - write_on_init : (bool) if true the setpoint value will be written
-                              to the attribute on initialisation
-        Return     : None
-    """)
+                              to the attribute on initialisation    """)
 
     document_method("set_change_event", """
     set_change_event(self, implemented, detect)
@@ -2288,8 +2182,6 @@ def __doc_Attr():
             - implemented : (bool) True when the server fires change events manually.
             - detect : (bool) Triggers the verification of the change event properties
                        when set to true.
-
-        Return     : None
     """)
 
     document_method("is_change_event", """
@@ -2324,8 +2216,6 @@ def __doc_Attr():
             - implemented : (bool) True when the server fires change events manually.
             - detect : (bool) Triggers the verification of the archive event properties
                        when set to true.
-
-        Return     : None
     """)
 
     document_method("is_archive_event", """
@@ -2351,8 +2241,6 @@ def __doc_Attr():
 
         Parameters :
             - implemented : (bool) True when the server fires data ready events
-
-        Return     : None
 
         New in PyTango 7.2.0
     """)
@@ -2466,8 +2354,6 @@ def __doc_Attr():
         Parameters :
             - cl : (str) new class name
 
-        Return     : None
-
         New in PyTango 7.2.0
     """)
 
@@ -2494,8 +2380,6 @@ def __doc_Attr():
 
         Parameters :
             - props : (StdAttrPropertyVector) new class level attribute properties
-
-        Return     : None
     """)
 
 
@@ -2520,8 +2404,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_label : (str) the user default label property
-
-        Return     : None
     """)
 
     document_method("set_description", """
@@ -2531,8 +2413,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_description : (str) the user default description property
-
-        Return     : None
     """)
 
     document_method("set_format", """
@@ -2542,8 +2422,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_format : (str) the user default format property
-
-        Return     : None
     """)
 
     document_method("set_unit", """
@@ -2553,8 +2431,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_unit : (str) te user default unit property
-
-        Return     : None
     """)
 
     document_method("set_standard_unit", """
@@ -2564,8 +2440,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_standard_unit : (str) the user default standard unit property
-
-        Return     : None
     """)
 
     document_method("set_display_unit", """
@@ -2575,8 +2449,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_display_unit : (str) the user default display unit property
-
-        Return     : None
     """)
 
     document_method("set_min_value", """
@@ -2586,8 +2458,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_min_value : (str) the user default min_value property
-
-        Return     : None
     """)
 
     document_method("set_max_value", """
@@ -2597,8 +2467,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_max_value : (str) the user default max_value property
-
-        Return     : None
     """)
 
     document_method("set_min_alarm", """
@@ -2608,8 +2476,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_min_alarm : (str) the user default min_alarm property
-
-        Return     : None
     """)
 
     document_method("set_max_alarm", """
@@ -2619,8 +2485,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_max_alarm : (str) the user default max_alarm property
-
-        Return     : None
     """)
 
     document_method("set_min_warning", """
@@ -2630,8 +2494,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_min_warning : (str) the user default min_warning property
-
-        Return     : None
     """)
 
     document_method("set_max_warning", """
@@ -2641,8 +2503,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_max_warning : (str) the user default max_warning property
-
-        Return     : None
     """)
 
     document_method("set_delta_t", """
@@ -2652,8 +2512,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_delta_t : (str) the user default RDS alarm delta_t property
-
-        Return     : None
     """)
 
     document_method("set_delta_val", """
@@ -2663,8 +2521,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_delta_val : (str) the user default RDS alarm delta_val property
-
-        Return     : None
     """)
 
     document_method("set_abs_change", """
@@ -2674,8 +2530,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_abs_change : (str) the user default change event abs_change property
-
-        Return     : None
 
         Deprecated since PyTango 8.0. Please use set_event_abs_change instead.
     """)
@@ -2688,8 +2542,6 @@ def __doc_UserDefaultAttrProp():
         Parameters :
             - def_abs_change : (str) the user default change event abs_change property
 
-        Return     : None
-
         New in PyTango 8.0
     """)
 
@@ -2700,8 +2552,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_rel_change : (str) the user default change event rel_change property
-
-        Return     : None
 
         Deprecated since PyTango 8.0. Please use set_event_rel_change instead.
     """)
@@ -2714,8 +2564,6 @@ def __doc_UserDefaultAttrProp():
         Parameters :
             - def_rel_change : (str) the user default change event rel_change property
 
-        Return     : None
-
         New in PyTango 8.0
     """)
 
@@ -2726,8 +2574,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_period : (str) the user default periodic event period property
-
-        Return     : None
 
         Deprecated since PyTango 8.0. Please use set_event_period instead.
     """)
@@ -2740,8 +2586,6 @@ def __doc_UserDefaultAttrProp():
         Parameters :
             - def_period : (str) the user default periodic event period property
 
-        Return     : None
-
         New in PyTango 8.0
     """)
 
@@ -2752,8 +2596,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_archive_abs_change : (str) the user default archive event abs_change property
-
-        Return     : None
 
         Deprecated since PyTango 8.0. Please use set_archive_event_abs_change instead.
     """)
@@ -2766,8 +2608,6 @@ def __doc_UserDefaultAttrProp():
         Parameters :
             - def_archive_abs_change : (str) the user default archive event abs_change property
 
-        Return     : None
-
         New in PyTango 8.0
     """)
 
@@ -2778,8 +2618,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_archive_rel_change : (str) the user default archive event rel_change property
-
-        Return     : None
 
         Deprecated since PyTango 8.0. Please use set_archive_event_rel_change instead.
     """)
@@ -2792,8 +2630,6 @@ def __doc_UserDefaultAttrProp():
         Parameters :
             - def_archive_rel_change : (str) the user default archive event rel_change property
 
-        Return     : None
-
         New in PyTango 8.0
     """)
 
@@ -2805,8 +2641,6 @@ def __doc_UserDefaultAttrProp():
         Parameters :
             - def_archive_period : (str) t
 
-        Return     : None
-
         Deprecated since PyTango 8.0. Please use set_archive_event_period instead.
     """)
 
@@ -2817,8 +2651,6 @@ def __doc_UserDefaultAttrProp():
 
         Parameters :
             - def_archive_period : (str) t
-
-        Return     : None
 
         New in PyTango 8.0
     """)
