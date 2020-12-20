@@ -801,8 +801,6 @@ def __doc_DeviceImpl():
 
         Intialize the device.
 
-        Parameters : None
-
         Return     : None
     """)
 
@@ -822,8 +820,6 @@ def __doc_DeviceImpl():
 
         Get a COPY of the device state.
 
-        Parameters : None
-
         Return     : (DevState) Current device state
     """)
 
@@ -831,8 +827,6 @@ def __doc_DeviceImpl():
     get_prev_state(self) -> DevState
 
         Get a COPY of the device's previous state.
-
-        Parameters : None
 
         Return     : (DevState) the device's previous state
 
@@ -843,8 +837,6 @@ def __doc_DeviceImpl():
 
         Get a COPY of the device name.
 
-        Parameters : None
-
         Return     : (str) the device name
 
     """)
@@ -853,8 +845,6 @@ def __doc_DeviceImpl():
     get_device_attr(self) -> MultiAttribute
 
         Get device multi attribute object.
-
-        Parameters : None
 
         Return     : (MultiAttribute) the device's MultiAttribute object
 
@@ -892,8 +882,6 @@ def __doc_DeviceImpl():
     get_status(self, ) -> str
 
         Get a COPY of the device status.
-
-        Parameters : None
 
         Return     : (str) the device status
     """)
@@ -934,8 +922,6 @@ def __doc_DeviceImpl():
         returns the state This method can be redefined in sub-classes in case
         of the default behaviour does not fullfill the needs.
 
-        Parameters : None
-
         Return     : (DevState) the device state
 
         Throws     : DevFailed - If it is necessary to read attribute(s) and a problem occurs during the reading
@@ -950,8 +936,6 @@ def __doc_DeviceImpl():
         dev_status field. If the device state is ALARM, alarm messages are added
         to the device status. This method can be redefined in sub-classes in case
         of the default behaviour does not fullfill the needs.
-
-        Parameters : None
 
         Return     : (str) the device status
 
@@ -1125,8 +1109,6 @@ def __doc_DeviceImpl():
 
         Returns the Logger object for this device
 
-        Parameters : None
-
         Return     : (Logger) the Logger object for this device
     """)
 
@@ -1134,8 +1116,6 @@ def __doc_DeviceImpl():
     get_exported_flag(self) -> bool
 
         Returns the state of the exported flag
-
-        Parameters : None
 
         Return     : (bool) the state of the exported flag
 
@@ -1147,8 +1127,6 @@ def __doc_DeviceImpl():
 
         Returns the poll ring depth
 
-        Parameters : None
-
         Return     : (int) the poll ring depth
 
         New in PyTango 7.1.2
@@ -1158,8 +1136,6 @@ def __doc_DeviceImpl():
     get_poll_old_factor(self) -> int
 
         Returns the poll old factor
-
-        Parameters : None
 
         Return     : (int) the poll old factor
 
@@ -1171,8 +1147,6 @@ def __doc_DeviceImpl():
 
         Returns if it is polled
 
-        Parameters : None
-
         Return     : (bool) True if it is polled or False otherwise
 
         New in PyTango 7.1.2
@@ -1182,8 +1156,6 @@ def __doc_DeviceImpl():
     get_polled_cmd(self) -> sequence<str>
 
         Returns a COPY of the list of polled commands
-
-        Parameters : None
 
         Return     : (sequence<str>) a COPY of the list of polled commands
 
@@ -1195,8 +1167,6 @@ def __doc_DeviceImpl():
 
         Returns a COPY of the list of polled attributes
 
-        Parameters : None
-
         Return     : (sequence<str>) a COPY of the list of polled attributes
 
         New in PyTango 7.1.2
@@ -1207,8 +1177,6 @@ def __doc_DeviceImpl():
 
         Returns a COPY of the list of non automatic polled commands
 
-        Parameters : None
-
         Return     : (sequence<str>) a COPY of the list of non automatic polled commands
 
         New in PyTango 7.1.2
@@ -1218,8 +1186,6 @@ def __doc_DeviceImpl():
     get_non_auto_polled_attr(self) -> sequence<str>
 
         Returns a COPY of the list of non automatic polled attributes
-
-        Parameters : None
 
         Return     : (sequence<str>) a COPY of the list of non automatic polled attributes
 
@@ -1293,8 +1259,6 @@ def __doc_DeviceImpl():
 
         Returns the IDL version.
 
-        Parameters : None
-
         Return     : (int) the IDL version
 
         New in PyTango 7.1.2
@@ -1331,8 +1295,6 @@ def __doc_DeviceImpl():
 
         Returns if this device is locked by a client.
 
-        Parameters : None
-
         Return     : (bool) True if it is locked or False otherwise
 
         New in PyTango 7.1.2
@@ -1342,8 +1304,6 @@ def __doc_DeviceImpl():
     get_min_poll_period(self) -> int
 
         Returns the min poll period.
-
-        Parameters : None
 
         Return     : (int) the min poll period
 
@@ -1355,8 +1315,6 @@ def __doc_DeviceImpl():
 
         Returns the min command poll period.
 
-        Parameters : None
-
         Return     : (seq<str>) the min command poll period
 
         New in PyTango 7.2.0
@@ -1366,8 +1324,6 @@ def __doc_DeviceImpl():
     get_attr_min_poll_period(self) -> seq<str>
 
         Returns the min attribute poll period
-
-        Parameters : None
 
         Return     : (seq<str>) the min attribute poll period
 
@@ -1428,8 +1384,6 @@ def __doc_extra_DeviceImpl(cls):
 
         Delete the device.
 
-        Parameters : None
-
         Return     : None
     """)
 
@@ -1441,8 +1395,6 @@ def __doc_extra_DeviceImpl(cls):
         Default method to implement an action necessary on a device before
         any command is executed. This method can be redefined in sub-classes
         in case of the default behaviour does not fullfill the needs
-
-        Parameters : None
 
         Return     : None
 
@@ -1519,8 +1471,6 @@ def __doc_Attribute():
 
         Check if the attribute has an associated writable attribute.
 
-        Parameters : None
-
         Return     : (bool) True if there is an associated writable attribute
     """)
 
@@ -1528,8 +1478,6 @@ def __doc_Attribute():
     is_min_alarm(self) -> bool
 
         Check if the attribute is in minimum alarm condition.
-
-        Parameters : None
 
         Return     : (bool) true if the attribute is in alarm condition (read value below the min. alarm).
     """)
@@ -1539,8 +1487,6 @@ def __doc_Attribute():
 
         Check if the attribute is in maximum alarm condition.
 
-        Parameters : None
-
         Return     : (bool) true if the attribute is in alarm condition (read value above the max. alarm).
     """)
 
@@ -1548,8 +1494,6 @@ def __doc_Attribute():
     is_min_warning(self) -> bool
 
         Check if the attribute is in minimum warning condition.
-
-        Parameters : None
 
         Return     : (bool) true if the attribute is in warning condition (read value below the min. warning).
     """)
@@ -1559,8 +1503,6 @@ def __doc_Attribute():
 
         Check if the attribute is in maximum warning condition.
 
-        Parameters : None
-
         Return     : (bool) true if the attribute is in warning condition (read value above the max. warning).
     """)
 
@@ -1568,8 +1510,6 @@ def __doc_Attribute():
     is_rds_alarm(self) -> bool
 
         Check if the attribute is in RDS alarm condition.
-
-        Parameters : None
 
         Return     : (bool) true if the attribute is in RDS condition (Read Different than Set).
     """)
@@ -1579,8 +1519,6 @@ def __doc_Attribute():
 
         Check if the attribute is polled.
 
-        Parameters : None
-
         Return     : (bool) true if the attribute is polled.
     """)
 
@@ -1588,8 +1526,6 @@ def __doc_Attribute():
     check_alarm(self) -> bool
 
         Check if the attribute read value is below/above the alarm level.
-
-        Parameters : None
 
         Return     : (bool) true if the attribute is in alarm condition.
 
@@ -1601,8 +1537,6 @@ def __doc_Attribute():
 
         Get the attribute writable type (RO/WO/RW).
 
-        Parameters : None
-
         Return     : (AttrWriteType) The attribute write type.
     """)
 
@@ -1610,8 +1544,6 @@ def __doc_Attribute():
     get_name(self) -> str
 
         Get attribute name.
-
-        Parameters : None
 
         Return     : (str) The attribute name
     """)
@@ -1621,8 +1553,6 @@ def __doc_Attribute():
 
         Get attribute data type.
 
-        Parameters : None
-
         Return     : (int) the attribute data type
     """)
 
@@ -1630,8 +1560,6 @@ def __doc_Attribute():
     get_data_format(self) -> AttrDataFormat
 
         Get attribute data format.
-
-        Parameters : None
 
         Return     : (AttrDataFormat) the attribute data format
     """)
@@ -1641,8 +1569,6 @@ def __doc_Attribute():
 
         Get name of the associated writable attribute.
 
-        Parameters : None
-
         Return     : (str) the associated writable attribute name
     """)
 
@@ -1650,8 +1576,6 @@ def __doc_Attribute():
     get_assoc_ind(self) -> int
 
         Get index of the associated writable attribute.
-
-        Parameters : None
 
         Return     : (int) the index in the main attribute vector of the associated writable attribute
     """)
@@ -1672,8 +1596,6 @@ def __doc_Attribute():
 
         Get a COPY of the attribute date.
 
-        Parameters : None
-
         Return     : (TimeVal) the attribute date
     """)
 
@@ -1693,8 +1615,6 @@ def __doc_Attribute():
 
         Get attribute label property.
 
-        Parameters : None
-
         Return     : (str) he attribute label
     """)
 
@@ -1702,8 +1622,6 @@ def __doc_Attribute():
     get_quality(self) -> AttrQuality
 
         Get a COPY of the attribute data quality.
-
-        Parameters : None
 
         Return     : (AttrQuality) the attribute data quality
     """)
@@ -1725,8 +1643,6 @@ def __doc_Attribute():
 
         Get attribute data size.
 
-        Parameters : None
-
         Return     : (int) the attribute data size
     """)
 
@@ -1734,8 +1650,6 @@ def __doc_Attribute():
     get_x(self) -> int
 
         Get attribute data size in x dimension.
-
-        Parameters : None
 
         Return     : (int) the attribute data size in x dimension. Set to 1 for scalar attribute
     """)
@@ -1745,8 +1659,6 @@ def __doc_Attribute():
 
         Get attribute maximum data size in x dimension.
 
-        Parameters : None
-
         Return     : (int) the attribute maximum data size in x dimension. Set to 1 for scalar attribute
     """)
 
@@ -1754,8 +1666,6 @@ def __doc_Attribute():
     get_y(self) -> int
 
         Get attribute data size in y dimension.
-
-        Parameters : None
 
         Return     : (int) the attribute data size in y dimension. Set to 1 for scalar attribute
     """)
@@ -1765,8 +1675,6 @@ def __doc_Attribute():
 
         Get attribute maximum data size in y dimension.
 
-        Parameters : None
-
         Return     : (int) the attribute maximum data size in y dimension. Set to 0 for scalar attribute
     """)
 
@@ -1774,8 +1682,6 @@ def __doc_Attribute():
     get_polling_period(self) -> int
 
         Get attribute polling period.
-
-        Parameters : None
 
         Return     : (int) The attribute polling period in mS. Set to 0 when the attribute is not polled
     """)
@@ -1801,8 +1707,6 @@ def __doc_Attribute():
     get_attr_serial_model(self) -> AttrSerialModel
 
         Get attribute serialization model.
-
-        Parameters : None
 
         Return     : (AttrSerialModel) The attribute serialization model
 
@@ -1914,8 +1818,6 @@ def __doc_Attribute():
 
         Check if the change event is fired manually (without polling) for this attribute.
 
-        Parameters : None
-
         Return     : (bool) True if a manual fire change event is implemented.
 
         New in PyTango 7.1.0
@@ -1927,8 +1829,6 @@ def __doc_Attribute():
         Check if the change event criteria should be checked when firing the
         event manually.
 
-        Parameters : None
-
         Return     : (bool) True if a change event criteria will be checked.
 
         New in PyTango 7.1.0
@@ -1938,8 +1838,6 @@ def __doc_Attribute():
     is_archive_event(self) -> bool
 
         Check if the archive event is fired manually (without polling) for this attribute.
-
-        Parameters : None
         Return     : (bool) True if a manual fire archive event is implemented.
 
         New in PyTango 7.1.0
@@ -1950,8 +1848,6 @@ def __doc_Attribute():
 
         Check if the archive event criteria should be checked when firing the
         event manually.
-
-        Parameters : None
 
         Return     : (bool) True if a archive event criteria will be checked.
 
@@ -1977,8 +1873,6 @@ def __doc_Attribute():
         Check if the data ready event is fired manually (without polling)
         for this attribute.
 
-        Parameters : None
-
         Return     : (bool) True if a manual fire data ready event is implemented.
 
         New in PyTango 7.2.0
@@ -1995,8 +1889,6 @@ def __doc_Attribute():
 
         The method removes all configured attribute properties and removes
         the attribute from the list of polled attributes.
-
-        Parameters : None
 
         Return     : None
 
@@ -2018,8 +1910,6 @@ def __doc_WAttribute():
         Get attribute minimum value or throws an exception if the
         attribute does not have a minimum value.
 
-        Parameters : None
-
         Return     : (obj) an object with the python minimum value
     """)
 
@@ -2028,8 +1918,6 @@ def __doc_WAttribute():
 
         Get attribute maximum value or throws an exception if the
         attribute does not have a maximum value.
-
-        Parameters : None
 
         Return     : (obj) an object with the python maximum value
     """)
@@ -2063,8 +1951,6 @@ def __doc_WAttribute():
 
         Check if the attribute has a minimum value.
 
-        Parameters : None
-
         Return     : (bool) true if the attribute has a minimum value defined
     """)
 
@@ -2073,8 +1959,6 @@ def __doc_WAttribute():
 
         Check if the attribute has a maximum value.
 
-        Parameters : None
-
         Return     : (bool) true if the attribute has a maximum value defined
     """)
 
@@ -2082,8 +1966,6 @@ def __doc_WAttribute():
     get_write_value_length(self) -> int
 
         Retrieve the new value length (data number) for writable attribute.
-
-        Parameters : None
 
         Return     : (int) the new value data length
     """)
@@ -2267,8 +2149,6 @@ def __doc_MultiAttribute():
 
         Get attribute number.
 
-        Parameters : None
-
         Return     : (int) the number of attributes
 
         New in PyTango 7.0.0
@@ -2373,8 +2253,6 @@ def __doc_Attr():
         With no argument the setpoint will be
         written to the attribute during initialisation!
 
-        Parameters : None
-
         Return     : None
     """)
 
@@ -2419,8 +2297,6 @@ def __doc_Attr():
 
         Check if the change event is fired manually for this attribute.
 
-        Parameters : None
-
         Return     : (bool) true if a manual fire change event is implemented.
     """)
 
@@ -2428,8 +2304,6 @@ def __doc_Attr():
     is_check_change_criteria(self) -> bool
 
         Check if the change event criteria should be checked when firing the event manually.
-
-        Parameters : None
 
         Return     : (bool) true if a change event criteria will be checked.
     """)
@@ -2459,8 +2333,6 @@ def __doc_Attr():
 
         Check if the archive event is fired manually for this attribute.
 
-        Parameters : None
-
         Return     : (bool) true if a manual fire archive event is implemented.
     """)
 
@@ -2468,8 +2340,6 @@ def __doc_Attr():
     is_check_archive_criteria(self) -> bool
 
         Check if the archive event criteria should be checked when firing the event manually.
-
-        Parameters : None
 
         Return     : (bool) true if a archive event criteria will be checked.
     """)
@@ -2492,8 +2362,6 @@ def __doc_Attr():
 
         Check if the data ready event is fired for this attribute.
 
-        Parameters : None
-
         Return     : (bool) true if firing data ready event is implemented.
 
         New in PyTango 7.2.0
@@ -2504,8 +2372,6 @@ def __doc_Attr():
 
         Get the attribute name.
 
-        Parameters : None
-
         Return     : (str) the attribute name
     """)
 
@@ -2513,8 +2379,6 @@ def __doc_Attr():
     get_format(self) -> AttrDataFormat
 
         Get the attribute format.
-
-        Parameters : None
 
         Return     : (AttrDataFormat) the attribute format
     """)
@@ -2524,8 +2388,6 @@ def __doc_Attr():
 
         Get the attribute write type.
 
-        Parameters : None
-
         Return     : (AttrWriteType) the attribute write type
     """)
 
@@ -2533,8 +2395,6 @@ def __doc_Attr():
     get_type(self) -> int
 
         Get the attribute data type.
-
-        Parameters : None
 
         Return     : (int) the attribute data type
     """)
@@ -2544,8 +2404,6 @@ def __doc_Attr():
 
         Get the attribute display level.
 
-        Parameters : None
-
         Return     : (DispLevel) the attribute display level
     """)
 
@@ -2554,8 +2412,6 @@ def __doc_Attr():
 
         Get the polling period (mS).
 
-        Parameters : None
-
         Return     : (int) the polling period (mS)
     """)
 
@@ -2563,8 +2419,6 @@ def __doc_Attr():
     get_memorized(self) -> bool
 
         Determine if the attribute is memorized or not.
-
-        Parameters : None
 
         Return     : (bool) True if the attribute is memorized
     """)
@@ -2575,8 +2429,6 @@ def __doc_Attr():
         Determine if the attribute is written at startup from the memorized
         value if it is memorized.
 
-        Parameters : None
-
         Return     : (bool) True if initialized with memorized value or not
     """)
 
@@ -2584,8 +2436,6 @@ def __doc_Attr():
     get_assoc(self) -> str
 
         Get the associated name.
-
-        Parameters : None
 
         Return     : (bool) the associated name
     """)
@@ -2595,8 +2445,6 @@ def __doc_Attr():
 
         Determine if it is assoc.
 
-        Parameters : None
-
         Return     : (bool) if it is assoc
     """)
 
@@ -2604,8 +2452,6 @@ def __doc_Attr():
     get_cl_name(self) -> str
 
         Returns the class name.
-
-        Parameters : None
 
         Return     : (str) the class name
 
@@ -2630,8 +2476,6 @@ def __doc_Attr():
 
         Get the class level attribute properties.
 
-        Parameters : None
-
         Return     : (sequence<AttrProperty>) the class attribute properties
     """)
 
@@ -2639,8 +2483,6 @@ def __doc_Attr():
     get_user_default_properties(self) -> sequence<AttrProperty>
 
         Get the user default attribute properties.
-
-        Parameters : None
 
         Return     : (sequence<AttrProperty>) the user default attribute properties
     """)
