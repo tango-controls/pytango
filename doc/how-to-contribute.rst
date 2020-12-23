@@ -115,7 +115,7 @@ Create an issue in Github
 Make a branch from ``develop`` to prepare the release
   * Example branch name: ``prepare-v9.3.3``.
   * Edit the changelog (in ``docs/revision.rst``).  Include *all* pull requests
-    since the previous release.
+    since the version was bumped after the previous release.
   * Bump the versions (``tango/release.py`` and ``appveyor.yml``).
     E.g. ``version_info = (9, 3, 3)``, and ``version: 9.3.3.{build}``
   * Create a pull request to get these changes reviewed before proceeding.

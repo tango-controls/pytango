@@ -107,7 +107,9 @@ Document revisions
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 | 08/08/19 | `9.3.1 <http://pytango.readthedocs.io/en/v9.3.1>`_                               | 9.3.1 Release                                       | A\. Joubert                    |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
-| 30/04/19 | `9.3.2 <http://pytango.readthedocs.io/en/v9.3.2>`_                               | 9.3.2 Release                                       | A\. Joubert                    |
+| 30/04/20 | `9.3.2 <http://pytango.readthedocs.io/en/v9.3.2>`_                               | 9.3.2 Release                                       | A\. Joubert                    |
++----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
+| 24/12/20 | `9.3.3 <http://pytango.readthedocs.io/en/v9.3.3>`_                               | 9.3.3 Release                                       | A\. Joubert                    |
 +----------+----------------------------------------------------------------------------------+-----------------------------------------------------+--------------------------------+
 
 .. _pytango-version-history:
@@ -118,6 +120,32 @@ Version history
 +----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Version  | Changes                                                                                                                                                               |
 +==========+=======================================================================================================================================================================+
+| 9.3.3    | 9.3.3 release.                                                                                                                                                        |
+|          |                                                                                                                                                                       |
+|          | Features:                                                                                                                                                             |
+|          |     - `Pull Request #378: Add string support for MultiDeviceTestContext devices_info class field <https://github.com/tango-controls/pytango/pull/378>`_               |
+|          |     - `Pull Request #384: Add test context support for memorized attributes <https://github.com/tango-controls/pytango/pull/384>`_                                    |
+|          |     - `Pull Request #395: Fix Windows build and add CI test suite (#355, #368, #369) <https://github.com/tango-controls/pytango/pull/395>`_                           |
+|          |                                                                                                                                                                       |
+|          | Changes:                                                                                                                                                              |
+|          |     - `Pull Request #365: Preserve cause of exception when getting/setting attribute in DeviceProxy (#364) <https://github.com/tango-controls/pytango/pull/365>`_     |
+|          |     - `Pull Request #385: Improve mandatory + default device property error message (#380) <https://github.com/tango-controls/pytango/pull/385>`_                     |
+|          |     - `Pull Request #397: Add std namespace prefix in C++ code <https://github.com/tango-controls/pytango/pull/397>`_                                                 |
+|          |                                                                                                                                                                       |
+|          | Bug/doc fixes:                                                                                                                                                        |
+|          |     - `Pull Request #360: Fix convert2array for Unicode to DevVarStringArray (Py3) (#361) <https://github.com/tango-controls/pytango/pull/360>`_                      |
+|          |     - `Pull Request #386: Fix DeviceProxy repr/str memory leak (#298) <https://github.com/tango-controls/pytango/pull/386>`_                                          |
+|          |     - `Pull Request #352: Fix sphinx v3 warning <https://github.com/tango-controls/pytango/pull/352>`_                                                                |
+|          |     - `Pull Request #359: MultiDeviceTestContext example <https://github.com/tango-controls/pytango/pull/359>`_                                                       |
+|          |     - `Pull Request #363: Change old doc links from ESRF to RTD <https://github.com/tango-controls/pytango/pull/363>`_                                                |
+|          |     - `Pull Request #370: Update CI to use cppTango 9.3.4rc6 <https://github.com/tango-controls/pytango/pull/370>`_                                                   |
+|          |     - `Pull Request #389: Update CI and dev Docker to cpptango 9.3.4 <https://github.com/tango-controls/pytango/pull/389>`_                                           |
+|          |     - `Pull Request #376: Update Windows CI and dev containers to boost 1.73.0 <https://github.com/tango-controls/pytango/pull/376>`_                                 |
+|          |     - `Pull Request #377: VScode remote development container support <https://github.com/tango-controls/pytango/pull/377>`_                                          |
+|          |     - `Pull Request #391: Add documentation about testing <https://github.com/tango-controls/pytango/pull/391>`_                                                      |
+|          |     - `Pull Request #393: Fix a typo in get_server_info documentation (#392) <https://github.com/tango-controls/pytango/pull/393>`_                                   |
+|          |                                                                                                                                                                       |
++----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 9.3.2    | 9.3.2 release.                                                                                                                                                        |
 |          |                                                                                                                                                                       |
 |          | Features:                                                                                                                                                             |
