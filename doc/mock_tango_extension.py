@@ -115,12 +115,28 @@ def set_device_proxy_implementations(module):
     module.DeviceProxy = type('DeviceProxy', (module.Connection,), attrs)
 
 
+# Create ExtractAs with dummy "methods"
+def set_extract_as_implementation(module):
+    attrs= {
+        '__module__': module.__name__,
+        'ByteArray': None,
+        'Bytes': None,
+        'List': None,
+        'Nothing': None,
+        'Numpy': None,
+        'String': None,
+        'Tuple': None,
+    }
+    module.ExtractAs = type('ExtractAs', (object,), attrs)
+
+
 # Patch the extension module
 _tango = ExtensionMock(name='_tango')
 _tango.constants.TgLibVers = TANGO_VERSION
 _tango._get_tango_lib_release.return_value = TANGO_VERSION_INT
 set_device_implementations(_tango)
 set_device_proxy_implementations(_tango)
+set_extract_as_implementation(_tango)
 
 
 # Patch modules
