@@ -83,20 +83,20 @@ To test the installation, import ``tango`` and check ``tango.utils.info()``::
 
     >>> import tango
     >>> print(tango.utils.info())
-    PyTango 9.3.3 (9, 3, 3)
+    PyTango 9.3.4 (9, 3, 4)
     PyTango compiled with:
-        Python : 2.7.15
-        Numpy  : 1.16.2
-        Tango  : 9.3.3
-        Boost  : 1.67.0
+        Python : 3.8.5
+        Numpy  : 1.19.2
+        Tango  : 9.3.4
+        Boost  : 1.73.0
 
     PyTango runtime is:
-        Python : 2.7.15
-        Numpy  : 1.16.2
-        Tango  : 9.3.3
+        Python : 3.8.5
+        Numpy  : 1.19.2
+        Tango  : 9.3.4
 
     PyTango running on:
-    ('Linux', 'hostname', '4.4.0-131-generic', '#157-Ubuntu SMP Sat Jul 27 06:00:36 UTC 2019', 'x86_64', 'x86_64')
+    uname_result(system='Linux', node='ed71265a2807', release='4.19.76-linuxkit', version='#1 SMP Tue May 26 11:42:35 UTC 2020', machine='x86_64', processor='')
 
 For an interactive use, consider using ITango_, a tango IPython_ profile.
 

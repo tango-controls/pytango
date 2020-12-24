@@ -94,9 +94,9 @@ Pick a version number
     number should correspond the current development number since each
     release process finishes with a version bump.
   * Patch release example:
-      - ``9.3.3.devN`` or ``9.3.3aN`` or ``9.3.3bN`` (current development branch)
-      - changes to ``9.3.3`` (the actual release)
-      - changes to ``9.3.4.dev0`` (bump the patch version at the end of the release process)
+      - ``9.3.4.devN`` or ``9.3.4aN`` or ``9.3.4bN`` (current development branch)
+      - changes to ``9.3.4`` (the actual release)
+      - changes to ``9.3.5.dev0`` (bump the patch version at the end of the release process)
 
 Create an issue in Github
   * This is to inform the community that a release is planned.
@@ -121,11 +121,11 @@ Create an issue in Github
   * A check list in this form on github can be ticked off as the work progresses.
 
 Make a branch from ``develop`` to prepare the release
-  * Example branch name: ``prepare-v9.3.3``.
+  * Example branch name: ``prepare-v9.3.4``.
   * Edit the changelog (in ``docs/revision.rst``).  Include *all* pull requests
     since the version was bumped after the previous release.
   * Bump the versions (``tango/release.py`` and ``appveyor.yml``).
-    E.g. ``version_info = (9, 3, 3)``, and ``version: 9.3.3.{build}``
+    E.g. ``version_info = (9, 3, 4)``, and ``version: 9.3.4.{build}``
   * Create a pull request to get these changes reviewed before proceeding.
 
 Merge ``stable`` into ``develop``
@@ -153,7 +153,7 @@ Make sure the documentation is updated
   * Readthedocs *should* automatically build the docs for each:
       - push to develop (latest docs)
       - push to stable (stable docs)
-      - new tags (e.g v9.3.3)
+      - new tags (e.g v9.3.4)
   * *But*, the webhooks are somehow broken, so it probably won't work automatically!
       - Trigger the builds manually here:  https://readthedocs.org/projects/pytango/builds/
       - Set the new version to "active" here:
@@ -164,8 +164,8 @@ Create an annotated tag for the release
   * Create tag:
       - ``$ git checkout stable``
       - ``$ git pull``
-      - ``$ git tag -a -m "tag v9.3.3" v9.3.3``
-      - ``$ git push -v origin refs/tags/v9.3.3``
+      - ``$ git tag -a -m "tag v9.3.4" v9.3.4``
+      - ``$ git push -v origin refs/tags/v9.3.4``
 
 Upload the new version to PyPI
   * Log in to https://pypi.org.
@@ -174,31 +174,31 @@ Upload the new version to PyPI
   * Build release from the tagged commit:
       - ``$ git clean -xfd  # Warning - remove all non-versioned files and directories``
       - ``$ git fetch``
-      - ``$ git checkout v9.3.3``
+      - ``$ git checkout v9.3.4``
       - ``$ python setup.py sdist``
   * Optional:  Upload to https://test.pypi.org, and make sure all is well:
-      - ``$ twine upload -r testpypi dist/pytango-9.3.3.tar.gz``
+      - ``$ twine upload -r testpypi dist/pytango-9.3.4.tar.gz``
   * Optional:  Test installation (in a virtualenv):
       - ``$ pip install -i https://test.pypi.org/simple/ pytango``
   * Upload the source tarball to the real PyPI:
-      - ``$ twine upload dist/pytango-9.3.3.tar.gz``
+      - ``$ twine upload dist/pytango-9.3.4.tar.gz``
   * Run build for the tag on AppVeyor, download artifacts, and upload wheels:
-      - ``$ twine upload dist/pytango-9.3.3-cp27-cp27m-win32.whl``
-      - ``$ twine upload dist/pytango-9.3.3-cp27-cp27m-win_amd64.whl``
-      - ``$ twine upload dist/pytango-9.3.3-cp36-cp36m-win32.whl``
-      - ``$ twine upload dist/pytango-9.3.3-cp36-cp36m-win_amd64.whl``
-      - ``$ twine upload dist/pytango-9.3.3-cp37-cp37m-win32.whl``
-      - ``$ twine upload dist/pytango-9.3.3-cp37-cp37m-win_amd64.whl``
+      - ``$ twine upload dist/pytango-9.3.4-cp27-cp27m-win32.whl``
+      - ``$ twine upload dist/pytango-9.3.4-cp27-cp27m-win_amd64.whl``
+      - ``$ twine upload dist/pytango-9.3.4-cp36-cp36m-win32.whl``
+      - ``$ twine upload dist/pytango-9.3.4-cp36-cp36m-win_amd64.whl``
+      - ``$ twine upload dist/pytango-9.3.4-cp37-cp37m-win32.whl``
+      - ``$ twine upload dist/pytango-9.3.4-cp37-cp37m-win_amd64.whl``
 
 Bump the version with "-dev" in the develop branch
   * Make branch like ``bump-dev-version`` from head of ``develop``.
   * Change all references to next version and next + 1.  E.g. if releasing
-    v9.3.3, then update v9.3.4 to v9.3.5 and v9.3.3 to v9.3.4.
+    v9.3.4, then update v9.3.6 to v9.3.7, v9.3.5 to v9.3.6, and v9.3.4 to v9.3.5.
   * This includes files like ``README.rst``, ``doc/howto.rst``, ``doc/start.rst``, ``doc/how-to-contribute.rst``.
-  * In ``tango/release.py``, change ``version_info``, e.g. from ``(9, 3, 3)`` to
-    ``(9, 3, 4, 'dev', 0)``.
-  * In ``appveyor.yml``, change ``version``, e.g. from ``9.3.3.{build}`` to
-    ``9.3.4.dev0.{build}``.
+  * In ``tango/release.py``, change ``version_info``, e.g. from ``(9, 3, 4)`` to
+    ``(9, 3, 5, 'dev', 0)``.
+  * In ``appveyor.yml``, change ``version``, e.g. from ``9.3.4.{build}`` to
+    ``9.3.5.dev0.{build}``.
   * Create PR, merge to ``develop``.
 
 Create and fill in the release description on GitHub

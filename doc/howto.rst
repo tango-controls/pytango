@@ -44,15 +44,15 @@ The PyTango version::
 
     >>> import tango
     >>> tango.__version__
-    '9.3.3'
+    '9.3.4'
     >>> tango.__version_info__
-    (9, 3, 3)
+    (9, 3, 4)
 
 and the Tango C++ library version that PyTango was compiled with::
 
     >>> import tango
     >>> tango.constants.TgLibVers
-    '9.3.3'
+    '9.3.4'
 
 
 Report a bug
