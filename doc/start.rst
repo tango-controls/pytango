@@ -115,6 +115,6 @@ To test the installation, import ``tango`` and check ``tango.Release.version``:
 .. sourcecode:: console
 
     $ python -c "import tango; print(tango.Release.version)"
-    9.3.3
+    9.3.4
 
 Next steps: Check out the :ref:`pytango-quick-tour`.
