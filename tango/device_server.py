@@ -1412,7 +1412,7 @@ def __doc_extra_DeviceImpl(cls):
         Read the hardware to return attribute value(s).
 
         Default method to implement an action necessary on a device to read
-        the hardware involved in a a read attribute CORBA call. This method
+        the hardware involved in a read attribute CORBA call. This method
         must be redefined in sub-classes in order to support attribute reading
 
         :param attr_list: list of indices in the device object attribute vector
@@ -1428,7 +1428,7 @@ def __doc_extra_DeviceImpl(cls):
         Write the hardware for attributes.
 
         Default method to implement an action necessary on a device to write
-        the hardware involved in a a write attribute. This method must be
+        the hardware involved in a write attribute. This method must be
         redefined in sub-classes in order to support writable attribute
 
         :param attr_list: list of indices in the device object attribute vector
@@ -1625,7 +1625,7 @@ def __doc_Attribute():
 
         Get attribute label property.
 
-        :returns: he attribute label
+        :returns: the attribute label
         :rtype: str
     """)
 
@@ -1681,7 +1681,7 @@ def __doc_Attribute():
 
         Get attribute data size in y dimension.
 
-        :returns: the attribute data size in y dimension. Set to 1 for scalar attribute
+        :returns: the attribute data size in y dimension. Set to 0 for scalar attribute
         :rtype: int
     """)
 
