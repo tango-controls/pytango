@@ -637,7 +637,7 @@ def __Logger__log(self, level, msg, *args):
         :param msg: the message to be sent to the stream
         :type msg: str
         :param args: list of optional message arguments
-        :type args: seq<str>
+        :type args: Sequence[str]
     """
     self.__log(level, msg % args)
 
@@ -654,7 +654,7 @@ def __Logger__log_unconditionally(self, level, msg, *args):
         :param msg: the message to be sent to the stream
         :type msg: str
         :param args: list of optional message arguments
-        :type args: seq<str>
+        :type args: Sequence[str]
     """
     self.__log_unconditionally(level, msg % args)
 
@@ -668,7 +668,7 @@ def __Logger__debug(self, msg, *args):
         :param msg: the message to be sent to the debug stream
         :type msg: str
         :param args: list of optional message arguments
-        :type args: seq<str>
+        :type args: Sequence[str]
     """
     self.__debug(msg % args)
 
@@ -682,7 +682,7 @@ def __Logger__info(self, msg, *args):
         :param msg: the message to be sent to the info stream
         :type msg: str
         :param args: list of optional message arguments
-        :type args: seq<str>
+        :type args: Sequence[str]
     """
     self.__info(msg % args)
 
@@ -696,7 +696,7 @@ def __Logger__warn(self, msg, *args):
         :param msg: the message to be sent to the warn stream
         :type msg: str
         :param args: list of optional message arguments
-        :type args: seq<str>
+        :type args: Sequence[str]
     """
     self.__warn(msg % args)
 
@@ -710,7 +710,7 @@ def __Logger__error(self, msg, *args):
         :param msg: the message to be sent to the error stream
         :type msg: str
         :param args: list of optional message arguments
-        :type args: seq<str>
+        :type args: Sequence[str]
     """
     self.__error(msg % args)
 
@@ -724,7 +724,7 @@ def __Logger__fatal(self, msg, *args):
         :param msg: the message to be sent to the fatal stream
         :type msg: str
         :param args: list of optional message arguments
-        :type args: seq<str>
+        :type args: Sequence[str]
     """
     self.__fatal(msg % args)
 
@@ -736,7 +736,7 @@ def __UserDefaultAttrProp_set_enum_labels(self, enum_labels):
         Set default enumeration labels.
 
         :param enum_labels: list of enumeration labels
-        :type enum_labels: seq<str>
+        :type enum_labels: Sequence[str]
 
         New in PyTango 9.2.0
     """
@@ -1040,9 +1040,9 @@ def __doc_DeviceImpl():
         :param attr_name: attribute name
         :type attr_name: str
         :param filt_names: the filterable fields name
-        :type filt_names: sequence<str>
+        :type filt_names: Sequence[str]
         :param filt_vals: the filterable fields value
-        :type filt_vals: sequence<double>
+        :type filt_vals: Sequence[double]
         :param data: the data to be sent as attribute event data. Data must be compatible with the
                      attribute type and format.
                      for SPECTRUM and IMAGE attributes, data can be any type of sequence of elements
@@ -1151,45 +1151,45 @@ def __doc_DeviceImpl():
     """)
 
     document_method("get_polled_cmd", """
-    get_polled_cmd(self) -> sequence<str>
+    get_polled_cmd(self) -> Sequence[str]
 
         Returns a COPY of the list of polled commands
 
         :returns: a COPY of the list of polled commands
-        :rtype: sequence<str>
+        :rtype: Sequence[str]
 
         New in PyTango 7.1.2
     """)
 
     document_method("get_polled_attr", """
-    get_polled_attr(self) -> sequence<str>
+    get_polled_attr(self) -> Sequence[str]
 
         Returns a COPY of the list of polled attributes
 
         :returns: a COPY of the list of polled attributes
-        :rtype: sequence<str>
+        :rtype: Sequence[str]
 
         New in PyTango 7.1.2
     """)
 
     document_method("get_non_auto_polled_cmd", """
-    get_non_auto_polled_cmd(self) -> sequence<str>
+    get_non_auto_polled_cmd(self) -> Sequence[str]
 
         Returns a COPY of the list of non automatic polled commands
 
         :returns: a COPY of the list of non automatic polled commands
-        :rtype: sequence<str>
+        :rtype: Sequence[str]
 
         New in PyTango 7.1.2
     """)
 
     document_method("get_non_auto_polled_attr", """
-    get_non_auto_polled_attr(self) -> sequence<str>
+    get_non_auto_polled_attr(self) -> Sequence[str]
 
         Returns a COPY of the list of non automatic polled attributes
 
         :returns: a COPY of the list of non automatic polled attributes
-        :rtype: sequence<str>
+        :rtype: Sequence[str]
 
         New in PyTango 7.1.2
     """)
@@ -1318,23 +1318,23 @@ def __doc_DeviceImpl():
     """)
 
     document_method("get_cmd_min_poll_period", """
-    get_cmd_min_poll_period(self) -> seq<str>
+    get_cmd_min_poll_period(self) -> Sequence[str]
 
         Returns the min command poll period.
 
         :returns: the min command poll period
-        :rtype: seq<str>
+        :rtype: Sequence[str]
 
         New in PyTango 7.2.0
     """)
 
     document_method("get_attr_min_poll_period", """
-    get_attr_min_poll_period(self) -> seq<str>
+    get_attr_min_poll_period(self) -> Sequence[str]
 
         Returns the min attribute poll period
 
         :returns: the min attribute poll period
-        :rtype: seq<str>
+        :rtype: Sequence[str]
 
         New in PyTango 7.2.0
     """)
@@ -1417,7 +1417,7 @@ def __doc_extra_DeviceImpl(cls):
 
         :param attr_list: list of indices in the device object attribute vector
                           of an attribute to be read.
-        :type attr_list: sequence<int>
+        :type attr_list: Sequence[int]
 
         :raises DevFailed: This method does not throw exception but a redefined method can.
     """)
@@ -1433,7 +1433,7 @@ def __doc_extra_DeviceImpl(cls):
 
         :param attr_list: list of indices in the device object attribute vector
                           of an attribute to be written.
-        :type attr_list: sequence<int>
+        :type attr_list: Sequence[int]
 
         :raises DevFailed: This method does not throw exception but a redefined method can.
     """)
@@ -2063,12 +2063,12 @@ def __doc_MultiClassAttribute():
     """)
 
     document_method("get_attr_list", """
-    get_attr_list(self) -> seq<Attr>
+    get_attr_list(self) -> Sequence[Attr]
 
         Get the list of :class:`~tango.Attr` for this device class.
 
         :returns: the list of attribute objects
-        :rtype: seq<Attr>
+        :rtype: Sequence[Attr]
 
         New in PyTango 7.2.1
     """)
@@ -2220,12 +2220,12 @@ def __doc_MultiAttribute():
     """)
 
     document_method("get_attribute_list", """
-    get_attribute_list(self) -> seq<Attribute>
+    get_attribute_list(self) -> Sequence[Attribute]
 
         Get the list of attribute objects.
 
         :returns: list of attribute objects
-        :rtype: seq<Attribute>
+        :rtype: Sequence[Attribute]
 
         New in PyTango 7.2.1
     """)
@@ -2501,21 +2501,21 @@ def __doc_Attr():
     """)
 
     document_method("get_class_properties", """
-    get_class_properties(self) -> sequence<AttrProperty>
+    get_class_properties(self) -> Sequence[AttrProperty]
 
         Get the class level attribute properties.
 
         :returns: the class attribute properties
-        :rtype: sequence<AttrProperty>
+        :rtype: Sequence[AttrProperty]
     """)
 
     document_method("get_user_default_properties", """
-    get_user_default_properties(self) -> sequence<AttrProperty>
+    get_user_default_properties(self) -> Sequence[AttrProperty]
 
         Get the user default attribute properties.
 
         :returns: the user default attribute properties
-        :rtype: sequence<AttrProperty>
+        :rtype: Sequence[AttrProperty]
     """)
 
     document_method("set_class_properties", """
