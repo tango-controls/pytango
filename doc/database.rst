@@ -18,6 +18,9 @@ Database API
 .. autoclass:: tango.DbDevImportInfo
     :members:
 
+.. autoclass:: tango.DbDevImportInfos
+    :members:
+
 .. autoclass:: tango.DbDevInfo
     :members:
 
