@@ -12,10 +12,13 @@ Database API
 .. autoclass:: tango.DbDevExportInfo
     :members:
 
-.. autoclass:: tango.DbDevExportInfo
+.. autoclass:: tango.DbDevExportInfos
     :members:
 
 .. autoclass:: tango.DbDevImportInfo
+    :members:
+
+.. autoclass:: tango.DbDevImportInfos
     :members:
 
 .. autoclass:: tango.DbDevInfo
