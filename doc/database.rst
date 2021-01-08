@@ -12,7 +12,7 @@ Database API
 .. autoclass:: tango.DbDevExportInfo
     :members:
 
-.. autoclass:: tango.DbDevExportInfo
+.. autoclass:: tango.DbDevExportInfos
     :members:
 
 .. autoclass:: tango.DbDevImportInfo
