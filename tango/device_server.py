@@ -958,11 +958,13 @@ def __doc_DeviceImpl():
 
     document_method("push_change_event", """
     push_change_event(self, attr_name)
-    push_change_event(self, attr_name, except)
-    push_change_event(self, attr_name, data, dim_x = 1, dim_y = 0)
-    push_change_event(self, attr_name, str_data, data)
-    push_change_event(self, attr_name, data, time_stamp, quality, dim_x = 1, dim_y = 0)
-    push_change_event(self, attr_name, str_data, data, time_stamp, quality)
+
+        .. function:: push_change_event(self, attr_name, except)
+                      push_change_event(self, attr_name, data, dim_x = 1, dim_y = 0)
+                      push_change_event(self, attr_name, str_data, data)
+                      push_change_event(self, attr_name, data, time_stamp, quality, dim_x = 1, dim_y = 0)
+                      push_change_event(self, attr_name, str_data, data, time_stamp, quality)
+            :noindex:
 
         Push a change event for the given attribute name.
 
@@ -993,11 +995,13 @@ def __doc_DeviceImpl():
 
     document_method("push_archive_event", """
     push_archive_event(self, attr_name)
-    push_archive_event(self, attr_name, except)
-    push_archive_event(self, attr_name, data, dim_x = 1, dim_y = 0)
-    push_archive_event(self, attr_name, str_data, data)
-    push_archive_event(self, attr_name, data, time_stamp, quality, dim_x = 1, dim_y = 0)
-    push_archive_event(self, attr_name, str_data, data, time_stamp, quality)
+
+        .. function:: push_archive_event(self, attr_name, except)
+                      push_archive_event(self, attr_name, data, dim_x = 1, dim_y = 0)
+                      push_archive_event(self, attr_name, str_data, data)
+                      push_archive_event(self, attr_name, data, time_stamp, quality, dim_x = 1, dim_y = 0)
+                      push_archive_event(self, attr_name, str_data, data, time_stamp, quality)
+            :noindex:
 
         Push an archive event for the given attribute name.
 
@@ -1028,10 +1032,12 @@ def __doc_DeviceImpl():
 
     document_method("push_event", """
     push_event(self, attr_name, filt_names, filt_vals)
-    push_event(self, attr_name, filt_names, filt_vals, data, dim_x = 1, dim_y = 0)
-    push_event(self, attr_name, filt_names, filt_vals, str_data, data)
-    push_event(self, attr_name, filt_names, filt_vals, data, time_stamp, quality, dim_x = 1, dim_y = 0)
-    push_event(self, attr_name, filt_names, filt_vals, str_data, data, time_stamp, quality)
+
+        .. function:: push_event(self, attr_name, filt_names, filt_vals, data, dim_x = 1, dim_y = 0)
+                      push_event(self, attr_name, filt_names, filt_vals, str_data, data)
+                      push_event(self, attr_name, filt_names, filt_vals, data, time_stamp, quality, dim_x = 1, dim_y = 0)
+                      push_event(self, attr_name, filt_names, filt_vals, str_data, data, time_stamp, quality)
+            :noindex:
 
         Push a user event for the given attribute name.
 
@@ -1082,8 +1088,10 @@ def __doc_DeviceImpl():
 
     document_method("push_pipe_event", """
     push_pipe_event(self, pipe_name, except)
-    push_pipe_event(self, pipe_name, blob, reuse_it)
-    push_pipe_event(self, pipe_name, blob, timeval, reuse_it)
+
+        .. function:: push_pipe_event(self, pipe_name, blob, reuse_it)
+                      push_pipe_event(self, pipe_name, blob, timeval, reuse_it)
+            :noindex:
 
         Push a pipe event for the given blob.
 
@@ -1196,7 +1204,9 @@ def __doc_DeviceImpl():
 
     document_method("stop_polling", """
     stop_polling(self)
-    stop_polling(self, with_db_upd)
+
+        .. function:: stop_polling(self, with_db_upd)
+            :noindex:
 
         Stop all polling for a device. if the device is polled, call this
         method before deleting it.
@@ -1731,8 +1741,10 @@ def __doc_Attribute():
 
     document_method("set_value", """
     set_value(self, data, dim_x = 1, dim_y = 0) <= DEPRECATED
-    set_value(self, data)
-    set_value(self, str_data, data)
+
+        .. function:: set_value(self, data)
+                      set_value(self, str_data, data)
+            :noindex:
 
         Set internal attribute value.
 
@@ -1760,8 +1772,10 @@ def __doc_Attribute():
 
     document_method("set_value_date_quality", """
     set_value_date_quality(self, data, time_stamp, quality, dim_x = 1, dim_y = 0) <= DEPRECATED
-    set_value_date_quality(self, data, time_stamp, quality)
-    set_value_date_quality(self, str_data, data, time_stamp, quality)
+
+        .. function:: set_value_date_quality(self, data, time_stamp, quality)
+                      set_value_date_quality(self, str_data, data, time_stamp, quality)
+            :noindex:
 
         Set internal attribute value, date and quality factor.
 
@@ -2003,7 +2017,9 @@ def __doc_WAttribute():
 
     document_method("get_write_value", """
     get_write_value(self, lst)  <= DEPRECATED
-    get_write_value(self, extract_as=ExtractAs.Numpy) -> obj
+
+        .. function:: get_write_value(self, extract_as=ExtractAs.Numpy) -> obj
+            :noindex:
 
         Retrieve the new value for writable attribute.
 
@@ -2183,8 +2199,10 @@ def __doc_MultiAttribute():
 
     document_method("check_alarm", """
     check_alarm(self) -> bool
-    check_alarm(self, attr_name) -> bool
-    check_alarm(self, ind) -> bool
+
+        .. function:: check_alarm(self, attr_name) -> bool
+                      check_alarm(self, ind) -> bool
+            :noindex:
 
         Checks an alarm.
 
