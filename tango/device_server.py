@@ -424,7 +424,7 @@ def __DeviceImpl___remove_attr_meth(self, attr_name):
 
 def __DeviceImpl__add_command(self, cmd, device_level=True):
     """
-    add_command(self, cmd, level=TANGO::OPERATOR) -> cmd
+    add_command(self, cmd, device_level=True) -> cmd
 
         Add a new command to the device command list.
 
@@ -432,7 +432,7 @@ def __DeviceImpl__add_command(self, cmd, device_level=True):
         :param device_level: Set this flag to true if the command must be added
                              for only this device
 
-        :returns:
+        :returns: The command to add
         :rtype: Command
 
         :raises DevFailed:
