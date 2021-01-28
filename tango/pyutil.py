@@ -22,7 +22,7 @@ import copy
 
 from ._tango import Util, Except, DevFailed, DbDevInfo, EnsureOmniThread, is_omni_thread
 from .utils import document_method as __document_method
-# from utils import document_static_method as __document_static_method
+from .utils import document_static_method as __document_static_method
 from .globals import class_list, cpp_class_list, get_constructed_classes
 try:
     import collections.abc as collections_abc  # python 3.3+
@@ -296,21 +296,21 @@ def __doc_Util():
     def document_method(method_name, desc, append=True):
         return __document_method(Util, method_name, desc, append)
 
-    #    def document_static_method(method_name, desc, append=True):
-    #        return __document_static_method(_Util, method_name, desc, append)
+    def document_static_method(method_name, desc, append=True):
+        return __document_static_method(Util, method_name, desc, append)
 
-    #    document_static_method("instance", """
-    #    instance(exit = True) -> Util
-    #
-    #            Static method that gets the singleton object reference.
-    #            If the class has not been initialised with it's init method,
-    #            this method prints a message and aborts the device server process
-    #
-    #        Parameters :
-    #            - exit : (bool)
-    #
-    #        Return     : (Util) the tango Util object
-    #    """ )
+    document_static_method("instance", """
+    instance(exit = True) -> Util
+
+           Static method that gets the singleton object reference.
+           If the class has not been initialised with it's init method,
+           this method prints a message and aborts the device server process
+
+       Parameters :
+           - exit : (bool)
+
+       Return     : (Util) the tango Util object
+    """)
 
     document_method("set_trace_level", """
     set_trace_level(self, level) -> None
