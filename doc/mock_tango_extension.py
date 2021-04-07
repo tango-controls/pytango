@@ -71,6 +71,7 @@ class ExtensionMock(MagicMock):
             import tango.connection
             tango.utils.__dict__['document_enum'] = document_enum
             tango.utils.__dict__['document_method'] = document_method
+            tango.utils.__dict__['document_static_method'] = document_method
             tango.base_types.__dict__['__document_enum'] = document_enum
             tango.device_server.__dict__['__document_method'] = document_method
             tango.connection.__dict__['__document_method'] = document_method
