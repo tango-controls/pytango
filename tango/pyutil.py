@@ -304,12 +304,14 @@ def __doc_Util():
 
            Static method that gets the singleton object reference.
            If the class has not been initialised with it's init method,
-           this method prints a message and aborts the device server process
+           this method prints a message and aborts the device server process.
 
        Parameters :
-           - exit : (bool)
+           - exit : (bool) exit or throw DevFailed
 
        Return     : (Util) the tango Util object
+       
+       Throws     : DevFailed instead of aborting if exit is set to False
     """)
 
     document_method("set_trace_level", """
